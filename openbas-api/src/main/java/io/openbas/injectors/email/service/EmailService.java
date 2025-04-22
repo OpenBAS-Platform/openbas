@@ -1,8 +1,8 @@
 package io.openbas.injectors.email.service;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewSuccessTrace;
 import static io.openbas.helper.TemplateHelper.buildContextualContent;
 import static java.util.stream.Collectors.joining;
 

@@ -65,7 +65,7 @@ public class EndpointMapper {
         .collect(Collectors.toSet());
   }
 
-  private AgentOutput toAgentOutput(Agent agent) {
+  public AgentOutput toAgentOutput(Agent agent) {
     AgentOutput.AgentOutputBuilder builder =
         AgentOutput.builder()
             .id(agent.getId())

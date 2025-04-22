@@ -1,7 +1,7 @@
 package io.openbas.injectors.ovh;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewSuccessTrace;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.Execution;

@@ -35,7 +35,7 @@ public class Execution {
   @Getter
   @Setter
   @JsonProperty("execution_traces")
-  private List<ExecutionTraces> traces = new ArrayList<>();
+  private List<ExecutionTrace> traces = new ArrayList<>();
 
   public Execution() {
     // Default constructor for serialization
@@ -55,7 +55,7 @@ public class Execution {
     this.stopTime = now();
   }
 
-  public void addTrace(ExecutionTraces context) {
+  public void addTrace(ExecutionTrace context) {
     ExecutionTraceStatus status = context.getStatus();
     if (ExecutionTraceStatus.SUCCESS.equals(status) || ExecutionTraceStatus.INFO.equals(status)) {
       LOGGER.log(Level.INFO, context.getMessage());

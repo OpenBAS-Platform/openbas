@@ -1,8 +1,8 @@
 package io.openbas.injectors.channel;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewSuccessTrace;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 

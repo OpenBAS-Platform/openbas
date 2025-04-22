@@ -7,7 +7,7 @@ import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import InjectIcon from '../common/injects/InjectIcon';
-import InjectStatus from '../common/injects/status/InjectStatus';
+import ExecutionStatusDetail from '../common/injects/status/ExecutionStatusDetail';
 
 interface Props {
   open: boolean;
@@ -58,7 +58,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
             {truncate(test?.inject_title, 80)}
           </CardContent>
         </Card>
-        <InjectStatus injectStatus={test} canShowGlobalExecutionStatus />
+        <ExecutionStatusDetail injectStatus={test} canShowGlobalExecutionStatus />
       </div>
     </Drawer>
 

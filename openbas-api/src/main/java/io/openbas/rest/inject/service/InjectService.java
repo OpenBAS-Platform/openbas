@@ -13,14 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.ee.Ee;
 import io.openbas.injector_contract.fields.ContractFieldType;
+import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -38,10 +37,7 @@ import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.UserService;
-import io.openbas.utils.FilterUtilsJpa;
-import io.openbas.utils.InjectMapper;
-import io.openbas.utils.InjectUtils;
-import io.openbas.utils.JpaUtils;
+import io.openbas.utils.*;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -70,6 +66,7 @@ import org.springframework.util.CollectionUtils;
 public class InjectService {
 
   private final TeamRepository teamRepository;
+  private final ExecutionTraceRepository executionTraceRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
   private final Ee eeService;
@@ -83,6 +80,7 @@ public class InjectService {
   private final TagRuleService tagRuleService;
   private final TagService tagService;
   private final DocumentService documentService;
+  private final InjectStatusMapper injectStatusMapper;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -672,5 +670,30 @@ public class InjectService {
     }
 
     return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle())).toList();
+  }
+
+  public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(
+      final String injectId, final String targetId, final TargetType targetType) {
+    switch (targetType) {
+      case AGENT:
+        return injectStatusMapper.toExecutionTracesOutput(
+            this.executionTraceRepository.findByInjectIdAndAgentId(injectId, targetId));
+      case ASSETS:
+        return injectStatusMapper.toExecutionTracesOutput(
+            this.executionTraceRepository.findByInjectIdAndAssetId(injectId, targetId));
+      case TEAMS:
+        return injectStatusMapper.toExecutionTracesOutput(
+            this.executionTraceRepository.findByInjectIdAndTeamId(injectId, targetId));
+      case PLAYER:
+        return injectStatusMapper.toExecutionTracesOutput(
+            this.executionTraceRepository.findByInjectIdAndPlayerId(injectId, targetId));
+      default:
+        throw new UnsupportedOperationException("Target type " + targetType + " is not supported");
+    }
+  }
+
+  public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
+    return injectStatusMapper.toInjectStatusOutput(
+        injectStatusRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
   }
 }

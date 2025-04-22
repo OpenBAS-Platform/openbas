@@ -1,6 +1,5 @@
 package io.openbas.database.repository;
 
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -25,5 +24,12 @@ public interface InjectStatusRepository
 
   Optional<InjectStatus> findByInjectId(@NotNull String injectId);
 
-  Optional<InjectStatus> findByInject(@NotNull Inject inject);
+  @Query(
+      value =
+          "SELECT ins FROM injects_statuses ins "
+              + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
+              + "INNER JOIN execution_traces t ON t.execution_inject_status_id = ins.status_id "
+              + "WHERE i.inject_id = :injectId AND t.execution_agent_id IS NULL",
+      nativeQuery = true)
+  Optional<InjectStatus> findInjectStatusWithGlobalExecutionTraces(String injectId);
 }

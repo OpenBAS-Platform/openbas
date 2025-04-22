@@ -36,10 +36,10 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 import InjectIcon from '../../common/injects/InjectIcon';
+import ExecutionStatusDetail from '../../common/injects/status/ExecutionStatusDetail';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
-import ExecutionDetail from './ExecutionDetail';
 import ExpirationChip from './ExpirationChip';
 import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
@@ -973,7 +973,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       ))}
       <div style={{ paddingTop: theme.spacing(3) }}>
         {(activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab)
-          && <ExecutionDetail target={target} injectResultOverviewOutput={inject} />}
+          && <ExecutionStatusDetail target={target} injectId={inject.inject_id} />}
       </div>
     </>
   );

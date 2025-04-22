@@ -1,7 +1,7 @@
 package io.openbas.injectors.opencti.service;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewSuccessTrace;
 
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;

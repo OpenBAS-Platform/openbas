@@ -1,5 +1,5 @@
-import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
+import { InfoOutlined, PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -13,7 +13,9 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
+import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import AtomicTestingInformation from './AtomicTestingInformation';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
@@ -162,6 +164,27 @@ const AtomicTestingHeader = () => {
         >
           {truncate(injectResultOverviewOutput.inject_title, 80)}
         </Typography>
+      </Tooltip>
+      <Tooltip
+        slotProps={{
+          tooltip: {
+            sx: {
+              maxWidth: 500,
+              backgroundColor: 'background.paper',
+              color: 'text.primary',
+            },
+          },
+        }}
+        title={
+          <AtomicTestingInformation injectResultOverviewOutput={injectResultOverviewOutput} />
+        }
+      >
+        <IconButton size="small">
+          <InfoOutlined
+            fontSize="small"
+            color="primary"
+          />
+        </IconButton>
       </Tooltip>
       <div className={classes.actions}>
         {getActionButton(injectResultOverviewOutput)}

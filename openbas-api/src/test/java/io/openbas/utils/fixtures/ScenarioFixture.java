@@ -7,7 +7,6 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

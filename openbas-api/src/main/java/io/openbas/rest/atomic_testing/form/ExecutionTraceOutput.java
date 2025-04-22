@@ -3,6 +3,7 @@ package io.openbas.rest.atomic_testing.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.ExecutionTraceStatus;
+import io.openbas.rest.asset.endpoint.form.AgentOutput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -12,7 +13,8 @@ import lombok.Data;
 @Data
 @Builder
 @Schema(description = "Represents a single execution trace detail")
-public class ExecutionTracesOutput {
+public class ExecutionTraceOutput {
+
   @NotNull
   @JsonProperty("execution_status")
   @Schema(
@@ -36,4 +38,8 @@ public class ExecutionTracesOutput {
       example =
           "START, PREREQUISITE_CHECK, PREREQUISITE_EXECUTION, EXECUTION, CLEANUP_EXECUTION or COMPLETE")
   private ExecutionTraceAction action;
+
+  @JsonProperty("execution_agent")
+  @NotNull
+  private AgentOutput agent;
 }

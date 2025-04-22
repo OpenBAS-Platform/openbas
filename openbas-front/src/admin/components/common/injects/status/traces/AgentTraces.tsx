@@ -1,45 +1,67 @@
 import { ArrowDropDownSharp, ArrowRightSharp } from '@mui/icons-material';
 import { Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemStatus from '../../../../../../components/ItemStatus';
-import { type AgentStatusOutput, type ExecutionTracesOutput } from '../../../../../../utils/api-types';
+import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
 import ExecutionTime from './ExecutionTime';
 import TraceMessage from './TraceMessage';
 
 interface Props {
-  agentStatus: AgentStatusOutput;
+  traces: ExecutionTraceOutput[];
   isInitialExpanded?: boolean;
 }
 
-const AgentTraces = ({ agentStatus, isInitialExpanded = false }: Props) => {
-  // Standard hooks
+const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
   const theme = useTheme();
-  const [isExpanded, setIsExpanded] = useState(isInitialExpanded);
   const { t } = useFormatter();
+  const [isExpanded, setIsExpanded] = useState(isInitialExpanded);
 
-  const toggleExpand = () => {
-    setIsExpanded(prevState => !prevState);
-  };
+  const toggleExpand = () => setIsExpanded(prev => !prev);
 
-  const tracesByAction: {
-    action: string;
-    traces: ExecutionTracesOutput[];
-  }[] = [];
-  (agentStatus.agent_traces || [])
-    .sort((a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime())
-    .forEach((trace, index) => {
-      if (index > 0 && trace.execution_action === tracesByAction[tracesByAction?.length - 1]?.action) {
-        tracesByAction[tracesByAction?.length - 1].traces.push(trace);
+  const agentStatus = useMemo(() => {
+    const sorted = [...traces].sort(
+      (a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime(),
+    );
+
+    const finalTrace = sorted.find(t => t.execution_action === 'COMPLETE') ?? null;
+    const startTrace = sorted.find(t => t.execution_action === 'START') ?? null;
+
+    const agent = sorted[0]?.execution_agent;
+
+    return {
+      agentName: agent?.agent_executed_by_user ?? null,
+      executorName: agent?.agent_executor?.executor_name ?? null,
+      executorType: agent?.agent_executor?.executor_type ?? null,
+      statusName: finalTrace?.execution_status ?? 'PENDING',
+      trackingStart: startTrace?.execution_time ?? null,
+      trackingEnd: finalTrace?.execution_time ?? null,
+      traces: sorted,
+    };
+  }, [traces]);
+
+  const tracesByAction = useMemo(() => {
+    const grouped: {
+      action: string;
+      traces: ExecutionTraceOutput[];
+    }[] = [];
+
+    agentStatus.traces.forEach((trace) => {
+      const last = grouped[grouped.length - 1];
+      if (last && trace.execution_action === last.action) {
+        last.traces.push(trace);
       } else {
-        tracesByAction.push({
+        grouped.push({
           action: trace.execution_action,
           traces: [trace],
         });
       }
     });
+
+    return grouped;
+  }, [agentStatus.traces]);
 
   return (
     <>
@@ -49,14 +71,20 @@ const AgentTraces = ({ agentStatus, isInitialExpanded = false }: Props) => {
           marginTop: theme.spacing(3),
           cursor: 'pointer',
           display: 'flex',
+          alignItems: 'center',
         }}
       >
-        {isExpanded ? <ArrowDropDownSharp /> : <ArrowRightSharp /> }
+        {isExpanded ? <ArrowDropDownSharp /> : <ArrowRightSharp />}
         <Typography gutterBottom marginRight="12px">
-          {agentStatus.agent_name}
+          {agentStatus.agentName}
         </Typography>
-        <ItemStatus isInject={true} status={agentStatus.agent_status_name ?? 'PENDING'} label={agentStatus.agent_status_name ?? 'PENDING'} />
+        <ItemStatus
+          isInject
+          status={agentStatus.statusName}
+          label={agentStatus.statusName}
+        />
       </div>
+
       {isExpanded && (
         <div style={{
           marginLeft: theme.spacing(3),
@@ -64,42 +92,42 @@ const AgentTraces = ({ agentStatus, isInitialExpanded = false }: Props) => {
         }}
         >
           <ExecutionTime
-            startDate={agentStatus.tracking_sent_date ?? null}
-            endDate={agentStatus.tracking_end_date ?? null}
+            startDate={agentStatus.trackingStart}
+            endDate={agentStatus.trackingEnd}
           />
           <div style={{
             display: 'flex',
-            flexBasis: '100%',
             gap: '12px',
+            alignItems: 'center',
           }}
           >
             <Typography variant="h3">{t('Executor')}</Typography>
             <img
-              src={`/api/images/executors/icons/${agentStatus.agent_executor_type}`}
-              alt={agentStatus.agent_executor_type}
+              src={`/api/images/executors/icons/${agentStatus.executorType}`}
+              alt={agentStatus.executorType || ''}
               style={{
                 width: 20,
                 height: 20,
                 borderRadius: 4,
               }}
             />
-            <Typography variant="body2">{t(agentStatus.agent_executor_name)}</Typography>
+            <Typography variant="body2">{t(agentStatus.executorName)}</Typography>
           </div>
-          <Typography variant="h3">
-            {t('Traces :')}
+          <Typography variant="h3" sx={{ marginTop: 2 }}>
+            {t('Traces')}
           </Typography>
-          {(tracesByAction || [])
-            .map((traceByAction, index) => (
-              <div key={`agent-trace-${index}`}>
-                <Typography variant="h3">
-                  {t(traceByAction.action)}
-                </Typography>
-                <TraceMessage traces={traceByAction.traces} />
-              </div>
-            ))}
+          {tracesByAction.map((group, index) => (
+            <div key={`trace-group-${index}`}>
+              <Typography variant="h4" gutterBottom>
+                {t(group.action)}
+              </Typography>
+              <TraceMessage traces={group.traces} />
+            </div>
+          ))}
         </div>
       )}
     </>
   );
 };
+
 export default AgentTraces;

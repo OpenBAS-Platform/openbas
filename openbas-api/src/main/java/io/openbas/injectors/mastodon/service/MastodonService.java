@@ -1,6 +1,6 @@
 package io.openbas.injectors.mastodon.service;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.DataAttachment;

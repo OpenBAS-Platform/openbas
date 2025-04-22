@@ -205,28 +205,7 @@ const AtomicTesting = () => {
       spacing={3}
       classes={{ container: classes.gridContainer }}
     >
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-          {t('Information')}
-        </Typography>
-        <AtomicTestingInformation injectResultOverviewOutput={injectResultOverviewOutput} />
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-          {t('Results')}
-        </Typography>
-        <Paper
-          classes={{ root: classes.paper }}
-          variant="outlined"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
-        </Paper>
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ marginTop: 30 }}>
+      <GridLegacy item xs={6}>
         <Typography variant="h4" gutterBottom style={{ float: 'left' }} sx={{ mb: 1 }}>
           {t('Targets')}
         </Typography>
@@ -312,29 +291,41 @@ const AtomicTesting = () => {
           )}
         </Paper>
       </GridLegacy>
-      <GridLegacy item xs={6} style={{ marginTop: 29 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-          {t('Results by target')}
-        </Typography>
-        <Paper classes={{ root: classes.paper }} variant="outlined">
-          {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
-            <TargetResultsDetail
-              inject={injectResultOverviewOutput}
-              upperParentTargetId={upperParentTarget?.id}
-              parentTargetId={currentParentTarget?.id}
-              target={selectedTargetLegacy}
-              lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
-              lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
-            />
-          )}
-          {!selectedTargetLegacy && (
-            <Empty message={t('No target data available.')} />
-          )}
-        </Paper>
+      <GridLegacy item xs={6} style={{paddingTop: 50}}>
+        <GridLegacy item>
+          <Paper
+            classes={{ root: classes.paper }}
+            variant="outlined"
+            style={{
+              alignItems: 'center',
+            }}
+          >
+            <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
+          </Paper>
+        </GridLegacy>
+        <GridLegacy item>
+          <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
+            {t('Results by target')}
+          </Typography>
+          <Paper classes={{ root: classes.paper }} variant="outlined">
+            {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
+              <TargetResultsDetail
+                inject={injectResultOverviewOutput}
+                upperParentTargetId={upperParentTarget?.id}
+                parentTargetId={currentParentTarget?.id}
+                target={selectedTargetLegacy}
+                lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
+                lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
+              />
+            )}
+            {!selectedTargetLegacy && (
+              <Empty message={t('No target data available.')} />
+            )}
+          </Paper>
+        </GridLegacy>
       </GridLegacy>
     </GridLegacy>
-  )
-  ;
+  );
 };
 
 export default AtomicTesting;

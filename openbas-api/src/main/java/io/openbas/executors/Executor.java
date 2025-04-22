@@ -42,7 +42,8 @@ public class Executor {
       throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     String jsonInject = mapper.writeValueAsString(executableInject);
-    InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
+    InjectStatus injectStatus =
+        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     queueService.publish(injector.getType(), jsonInject);
     injectStatus.addInfoTrace(
         "The inject has been published and is now waiting to be consumed.",
@@ -58,7 +59,8 @@ public class Executor {
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
-    InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
+    InjectStatus injectStatus =
+        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
     return injectStatusRepository.save(completeStatus);
   }

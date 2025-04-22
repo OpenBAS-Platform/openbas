@@ -1,6 +1,6 @@
 package io.openbas.injectors.openbas;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;

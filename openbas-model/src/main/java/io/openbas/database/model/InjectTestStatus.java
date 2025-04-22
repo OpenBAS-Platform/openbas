@@ -21,7 +21,7 @@ public class InjectTestStatus extends BaseInjectStatus {
       orphanRemoval = true,
       fetch = FetchType.EAGER)
   @JsonProperty("status_traces")
-  private List<ExecutionTraces> traces = new ArrayList<>();
+  private List<ExecutionTrace> traces = new ArrayList<>();
 
   @CreationTimestamp
   @Column(name = "status_created_at")
@@ -38,7 +38,7 @@ public class InjectTestStatus extends BaseInjectStatus {
     injectTestStatus.setTrackingSentDate(Instant.now());
     injectTestStatus.getTraces().addAll(execution.getTraces());
     if (!execution.getTraces().isEmpty()) {
-      List<ExecutionTraces> traces =
+      List<ExecutionTrace> traces =
           execution.getTraces().stream()
               .peek(t -> t.setInjectTestStatus(injectTestStatus))
               .toList();

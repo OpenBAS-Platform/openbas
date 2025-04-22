@@ -31,15 +31,7 @@ public class InjectStatusOutput {
 
   @Builder.Default
   @JsonProperty("status_main_traces")
-  private List<ExecutionTracesOutput> traces = new ArrayList<>();
-
-  @Builder.Default
-  @JsonProperty("status_traces_by_player")
-  private List<PlayerStatusOutput> tracesByPlayer = new ArrayList<>();
-
-  @Builder.Default
-  @JsonProperty("status_traces_by_agent")
-  private List<AgentStatusOutput> tracesByAgent = new ArrayList<>();
+  private List<ExecutionTraceOutput> traces = new ArrayList<>();
 
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate;
