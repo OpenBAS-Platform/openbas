@@ -30,10 +30,7 @@ import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
 
-const useStyles = makeStyles()(() => ({
-  itemHead: { textTransform: 'uppercase' },
-  item: { height: 50 },
-}));
+const useStyles = makeStyles()(() => ({ itemHead: { textTransform: 'uppercase' } }));
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: { width: '25%' },
@@ -325,7 +322,6 @@ const Endpoints = () => {
                 return (
                   <ListItem
                     key={endpoint.asset_id}
-                    classes={{ root: classes.item }}
                     divider
                     secondaryAction={
                       (userAdmin
