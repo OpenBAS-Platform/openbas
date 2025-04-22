@@ -291,14 +291,12 @@ const AtomicTesting = () => {
           )}
         </Paper>
       </GridLegacy>
-      <GridLegacy item xs={6} style={{paddingTop: 50}}>
+      <GridLegacy item xs={6} style={{ paddingTop: 50 }}>
         <GridLegacy item>
           <Paper
             classes={{ root: classes.paper }}
             variant="outlined"
-            style={{
-              alignItems: 'center',
-            }}
+            style={{ alignItems: 'center' }}
           >
             <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
           </Paper>

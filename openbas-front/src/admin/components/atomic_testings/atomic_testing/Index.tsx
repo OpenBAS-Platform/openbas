@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Box, Paper, Tab, Tabs } from '@mui/material';
+import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { interval } from 'rxjs';
@@ -17,7 +17,6 @@ import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutput
 import AtomicTestingHeader from './AtomicTestingHeader';
 import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 import AtomicTestingPayloadInfo from './payload_info/AtomicTestingPayloadInfo';
-import ResponsePie from '../../common/injects/ResponsePie';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -107,7 +106,12 @@ const Index = () => {
         updateInjectResultOverviewOutput,
       }}
       >
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '20px',
+        }}
+        >
           <div style={{ flex: 1 }}>
             <Breadcrumbs
               variant="object"
@@ -174,8 +178,8 @@ const Index = () => {
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
             {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
-                || injectResultOverviewOutput.inject_type === 'openbas_nmap')
-              && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
+              || injectResultOverviewOutput.inject_type === 'openbas_nmap')
+            && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
               <Route

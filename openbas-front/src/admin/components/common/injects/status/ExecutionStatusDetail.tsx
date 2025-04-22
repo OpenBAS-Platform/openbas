@@ -45,7 +45,7 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
 
   return (
     <>
-      {traces.length > 0 && <Typography variant="h4">{t('Execution logs')}</Typography>}
+      <Typography variant="h4">{t('Execution logs')}</Typography>
       <Paper variant="outlined" style={{ padding: '0 20px 20px' }}>
         {!loading && (
           <>

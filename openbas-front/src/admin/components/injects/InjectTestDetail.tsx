@@ -7,18 +7,18 @@ import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import InjectIcon from '../common/injects/InjectIcon';
-import ExecutionStatusDetail from '../common/injects/status/ExecutionStatusDetail';
+import GlobalExecutionTraces from '../common/injects/status/traces/GlobalExecutionTraces';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  test: InjectTestStatusOutput | undefined;
+  injectTestStatus: InjectTestStatusOutput | undefined;
 }
 
 const InjectTestDetail: FunctionComponent<Props> = ({
   open,
   handleClose,
-  test,
+  injectTestStatus,
 }) => {
   const theme = useTheme();
   const { t } = useFormatter();
@@ -29,17 +29,16 @@ const InjectTestDetail: FunctionComponent<Props> = ({
       handleClose={handleClose}
       title={t('Test Details')}
     >
-
       <div>
         <Card elevation={0} style={{ marginBottom: '20px' }}>
-          {test
+          {injectTestStatus
             ? (
                 <CardHeader
                   sx={{ backgroundColor: theme.palette.background.default }}
                   avatar={(
                     <InjectIcon
                       isPayload={false}
-                      type={test.inject_type}
+                      type={injectTestStatus.inject_type}
                       variant="list"
                     />
                   )}
@@ -55,13 +54,12 @@ const InjectTestDetail: FunctionComponent<Props> = ({
             textAlign: 'center',
           }}
           >
-            {truncate(test?.inject_title, 80)}
+            {truncate(injectTestStatus?.inject_title, 80)}
           </CardContent>
         </Card>
-        <ExecutionStatusDetail injectStatus={test} canShowGlobalExecutionStatus />
+        {injectTestStatus && <GlobalExecutionTraces injectStatus={injectTestStatus} />}
       </div>
     </Drawer>
-
   );
 };
 

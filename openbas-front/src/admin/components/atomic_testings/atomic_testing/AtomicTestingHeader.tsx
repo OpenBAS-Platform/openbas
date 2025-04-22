@@ -1,19 +1,15 @@
 import { InfoOutlined, PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Tooltip, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import {
-  launchAtomicTesting,
-  relaunchAtomicTesting,
-} from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { launchAtomicTesting, relaunchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
-import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingInformation from './AtomicTestingInformation';
 import AtomicTestingPopover from './AtomicTestingPopover';
@@ -129,9 +125,9 @@ const AtomicTestingHeader = () => {
       >
         <DialogContent>
           <DialogContentText>
-            { injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
+            {injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
               ? t('Do you want to launch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })
-              : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title }) }
+              : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })}
           </DialogContentText>
           {(injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id) && (
             <Alert severity="warning" style={{ marginTop: 20 }}>
