@@ -15,6 +15,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,8 +43,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
   private final Environment env;
-  private final int INJECT_EXECUTION_THRESHOLD =
-      Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
+  private int injectExecutionThreshold;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
@@ -65,6 +65,12 @@ public class InjectsExecutionJob implements Job {
       List.of(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
 
   @Resource protected ObjectMapper mapper;
+
+  @PostConstruct
+  private void init() {
+    this.injectExecutionThreshold =
+        Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
+  }
 
   public void handleAutoStartExercises() {
     List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
@@ -98,7 +104,7 @@ public class InjectsExecutionJob implements Job {
 
   public void handlePendingInject() {
     List<Inject> pendingInjects =
-        injectHelper.getAllPendingInjectsWithThresholdMinutes(INJECT_EXECUTION_THRESHOLD);
+        injectHelper.getAllPendingInjectsWithThresholdMinutes(this.injectExecutionThreshold);
 
     if (pendingInjects.isEmpty()) {
       return;
@@ -113,7 +119,7 @@ public class InjectsExecutionJob implements Job {
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
-                          + INJECT_EXECUTION_THRESHOLD
+                          + this.injectExecutionThreshold
                           + " minutes threshold.",
                       ExecutionTraceAction.EXECUTION);
                   return status;
