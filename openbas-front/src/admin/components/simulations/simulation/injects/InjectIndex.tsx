@@ -22,6 +22,7 @@ import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/pa
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';
+import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 
 const useStyles = makeStyles()(() => ({
   item: {
@@ -150,6 +151,7 @@ const InjectIndexComponent: FunctionComponent<{
             { (injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               || injectResultOverviewOutput.inject_type === 'openbas_nmap')
             && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
+            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             { injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               && <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />}
             {/* Not found */}
