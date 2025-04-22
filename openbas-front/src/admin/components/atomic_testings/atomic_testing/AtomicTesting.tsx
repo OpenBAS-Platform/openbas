@@ -1,5 +1,5 @@
 import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
-import {Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState} from 'react';
+import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
@@ -101,12 +101,15 @@ const AtomicTesting = () => {
     if (!injectResultOverviewOutput) return;
 
     setSelectedTargetLegacy(
-      selectedTargetLegacy ||
-      currentParentTarget ||
-      injectResultOverviewOutput?.inject_targets?.[0]
+      selectedTargetLegacy
+      || currentParentTarget
+      || injectResultOverviewOutput?.inject_targets?.[0],
     );
 
-    const searchPaginationInput1Result = { ...searchPaginationInput, size: 1 };
+    const searchPaginationInput1Result = {
+      ...searchPaginationInput,
+      size: 1,
+    };
 
     searchTargets(injectId, 'ASSETS_GROUPS', searchPaginationInput1Result)
       .then((response) => {
@@ -233,59 +236,59 @@ const AtomicTesting = () => {
               >
                 {tabConfig
                   .map(tab => (
-                  <Tab key={`tab-${tab.key}`} label={tab.label} />
-                ))}
+                    <Tab key={`tab-${tab.key}`} label={tab.label} />
+                  ))}
               </Tabs>
               {tabConfig
                 .map((tab) => {
-                const isAllTargets = tab.type === 'ALL_TARGETS';
-                return (
-                  <div key={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
-                    {!isAllTargets && (
-                      <>
-                        <PaginationComponentV2
-                          fetch={input => searchTargets(injectResultOverviewOutput?.inject_id, tab.type, input)}
-                          searchPaginationInput={searchPaginationInput}
-                          setContent={setTargets}
-                          entityPrefix={tab.entityPrefix}
-                          queryableHelpers={queryableHelpers}
-                          topPagination={true}
-                        />
-                        {targets && targets.length > 0 ? (
-                          <List>
-                            {targets.map(target => (
-                              <NewTargetListItem
-                                onClick={() => handleNewTargetClick(target)}
-                                target={target}
-                                selected={selectedTarget?.target_id === target.target_id}
-                                key={target?.target_id}
-                              />
-                            ))}
-                          </List>
-                        ) : (
-                          <Empty message={t('No target configured.')} />
-                        )}
-                      </>
-                    )}
+                  const isAllTargets = tab.type === 'ALL_TARGETS';
+                  return (
+                    <div key={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
+                      {!isAllTargets && (
+                        <>
+                          <PaginationComponentV2
+                            fetch={input => searchTargets(injectResultOverviewOutput?.inject_id, tab.type, input)}
+                            searchPaginationInput={searchPaginationInput}
+                            setContent={setTargets}
+                            entityPrefix={tab.entityPrefix}
+                            queryableHelpers={queryableHelpers}
+                            topPagination={true}
+                          />
+                          {targets && targets.length > 0 ? (
+                            <List>
+                              {targets.map(target => (
+                                <NewTargetListItem
+                                  onClick={() => handleNewTargetClick(target)}
+                                  target={target}
+                                  selected={selectedTarget?.target_id === target.target_id}
+                                  key={target?.target_id}
+                                />
+                              ))}
+                            </List>
+                          ) : (
+                            <Empty message={t('No target configured.')} />
+                          )}
+                        </>
+                      )}
 
-                    {isAllTargets && (
-                      <>
-                        {sortedTargets.length > 0 ? (
-                          <List>
-                            {sortedTargets.map(target => (
-                              <div key={target?.id}>
-                                {renderTargetItem(target, undefined, undefined)}
-                              </div>
-                            ))}
-                          </List>
-                        ) : (
-                          <Empty message={t('No target configured.')} />
-                        )}
-                      </>
-                    )}
-                  </div>
-                );
-              })}
+                      {isAllTargets && (
+                        <>
+                          {sortedTargets.length > 0 ? (
+                            <List>
+                              {sortedTargets.map(target => (
+                                <div key={target?.id}>
+                                  {renderTargetItem(target, undefined, undefined)}
+                                </div>
+                              ))}
+                            </List>
+                          ) : (
+                            <Empty message={t('No target configured.')} />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
             </>
           )}
         </Paper>
