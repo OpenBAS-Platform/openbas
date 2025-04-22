@@ -41,6 +41,7 @@ import { makeStyles } from 'tss-react/mui';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
 import { fetchPlayerDocuments } from '../../../actions/Document';
+import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import Transition from '../../../components/common/Transition';
 import Empty from '../../../components/Empty';
@@ -170,6 +171,7 @@ const ChallengesPlayer = () => {
   const {
     challenge_detail: currentChallenge,
     challenge_expectation: currentExpectation,
+    challenge_attempt: currentAttempt,
   } = currentChallengeEntry ?? {};
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
@@ -239,18 +241,15 @@ const ChallengesPlayer = () => {
   };
 
   // Result
-  const noResult = () => {
-    return (currentExpectation?.inject_expectation_results?.length ?? 0) === 0 && currentResult === null;
-  };
-  const hasResult = () => {
-    return (currentExpectation?.inject_expectation_results?.length ?? 0) > 0 || currentResult !== null;
-  };
-  const validResult = () => {
-    return (currentExpectation?.inject_expectation_results?.length ?? 0) > 0;
-  };
-  const invalidResult = () => {
-    return (currentExpectation?.inject_expectation_results?.length ?? 0) === 0 && currentResult !== null;
-  };
+
+  const resultList = currentExpectation?.inject_expectation_results ?? [];
+  const hasManualResult = currentResult !== null;
+
+  const noResult = () => resultList.length === 0 && !hasManualResult;
+  const hasResult = () => resultList.length > 0 || hasManualResult;
+  const validResult = () => resultList.length > 0 && resultList.every(r => r.result !== FAILED);
+  const invalidResult = () => (resultList.length === 0 && hasManualResult) || resultList.some(r => r.result === FAILED);
+  const maxAttemptsExceeded = () => !!currentChallenge?.challenge_max_attempts && currentAttempt >= currentChallenge?.challenge_max_attempts;
 
   if (exercise) {
     const groupChallenges = R.groupBy(
@@ -279,7 +278,7 @@ const ChallengesPlayer = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/exercises/${exerciseId}/definition`}
+            to={`/admin/simulations/${exerciseId}/definition`}
             style={{
               position: 'absolute',
               top: 20,
@@ -533,7 +532,13 @@ const ChallengesPlayer = () => {
                     severity="error"
                     onClose={() => setCurrentResult(null)}
                   >
-                    {t('Flag is not correct! Try again...')}
+                    {t('Flag is not correct!')}
+                    {maxAttemptsExceeded() && (
+                      <>
+                        <br />
+                        {t('Max attempts exceeded.')}
+                      </>
+                    )}
                   </Alert>
                 )}
                 <div style={{
@@ -547,7 +552,12 @@ const ChallengesPlayer = () => {
                 </div>
               </div>
             )}
-            {noResult() && (
+            {maxAttemptsExceeded() && noResult() && (
+              <Alert severity="error">
+                {t('Max attempts exceeded.')}
+              </Alert>
+            )}
+            {!maxAttemptsExceeded() && noResult() && (
               <Form
                 keepDirtyOnReinitialize={true}
                 onSubmit={data => submit(currentChallenge?.challenge_id, data)}
