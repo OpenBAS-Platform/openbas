@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAgent;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
@@ -10,6 +11,7 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 import static io.openbas.utils.AgentUtils.getActiveAgents;
 
 import io.openbas.database.model.*;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
@@ -22,6 +24,9 @@ public class ExpectationUtils {
 
   public static final String OBAS_IMPLANT = "obas-implant-";
   public static final String OBAS_IMPLANT_CALDERA = "obas-implant-caldera-";
+
+  public static final List<EXPECTATION_TYPE> HUMAN_EXPECTATION =
+      List.of(MANUAL, CHALLENGE, ARTICLE);
 
   private ExpectationUtils() {}
 

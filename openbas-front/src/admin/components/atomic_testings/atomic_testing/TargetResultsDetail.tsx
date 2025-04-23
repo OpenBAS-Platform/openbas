@@ -631,13 +631,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     <GridLegacy container={true} spacing={2} style={{ alignItems: 'baseline' }}>
                       <GridLegacy item={true} xs={6}>
                         <Typography variant="h5">
-                          {injectExpectation.inject_expectation_type}
-                          {' '}
-                          {injectExpectation.inject_expectation_type === 'MANUAL' && (t('Expectation'))}
+                          {injectExpectation.inject_expectation_name}
                         </Typography>
                       </GridLegacy>
                       {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
-
                         <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
@@ -659,11 +656,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               <ItemResult label="Not Detected" status="Not Detected" />
                             )
                           }
-                          {
-                            injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_status && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 && (
-                              <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
-                            )
-                          }
+                          {injectExpectation.inject_expectation_status && injectExpectation.inject_expectation_results.length > 0 && (
+                            <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
+                          )}
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
                         </GridLegacy>
                       )
@@ -680,7 +675,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             </GridLegacy>
 
                           )}
-
                       {
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
                           return (
@@ -717,7 +711,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   </MenuItem>
                                 </Menu>
                               </GridLegacy>
-
                             </>
                           );
                         })
@@ -765,7 +758,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         {emptyFilled(getLabelOfValidationType(injectExpectation))}
                       </div>
                     </div>
-                    {injectExpectation.inject_expectation_type !== 'MANUAL' && (
+                    {isTechnicalExpectation(injectExpectation.inject_expectation_type) && (
                       <TableContainer>
                         <Table
                           size="small"

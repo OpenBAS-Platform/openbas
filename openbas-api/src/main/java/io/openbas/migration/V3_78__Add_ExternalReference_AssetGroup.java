@@ -7,13 +7,13 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_79__Change_Parameters extends BaseJavaMigration {
+public class V3_78__Add_ExternalReference_AssetGroup extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
     select.execute(
-        "alter table parameters alter column parameter_value type text using parameter_value::text;");
+        "ALTER TABLE asset_groups ADD column asset_group_external_reference VARCHAR(255);");
   }
 }
