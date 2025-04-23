@@ -586,7 +586,6 @@ const Injects: FunctionComponent<Props> = ({
                   <ListItem
                     key={inject.inject_id}
                     divider
-                    classes={{ root: classes.item }}
                     secondaryAction={(
                       <InjectPopover
                         inject={inject}

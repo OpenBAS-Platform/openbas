@@ -62,7 +62,7 @@ const ChannelPreview = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/exercises/${exerciseId}/definition`}
+            to={`/admin/simulations/${exerciseId}/definition`}
             style={{
               position: 'absolute',
               top: 20,

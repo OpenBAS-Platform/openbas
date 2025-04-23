@@ -2,6 +2,9 @@ package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.utils.challenge.ChallengeAttemptUtils.buildChallengeAttempt;
+import static io.openbas.utils.challenge.ChallengeAttemptUtils.buildChallengeAttemptID;
+import static io.openbas.utils.challenge.ChallengeExpectationUtils.buildChallengeUpdateInput;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,14 +19,13 @@ import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.ExpectationUtils;
+import io.openbas.rest.exercise.form.ExpectationUpdateInput;
+import io.openbas.service.challenge.ChallengeAttemptService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,9 @@ public class ChallengeService {
   private final ExerciseRepository exerciseRepository;
   private final ChallengeRepository challengeRepository;
   private final InjectRepository injectRepository;
+  private final InjectExpectationService injectExpectationService;
   private final InjectExpectationRepository injectExpectationRepository;
+  private final ChallengeAttemptService challengeAttemptService;
   @Resource protected ObjectMapper mapper;
 
   public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
@@ -78,7 +82,9 @@ public class ChallengeService {
 
   public ChallengeResult tryChallenge(String challengeId, ChallengeTryInput input) {
     Challenge challenge =
-        challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
+        challengeRepository
+            .findById(challengeId)
+            .orElseThrow(() -> new ElementNotFoundException("Challenge not found"));
     for (ChallengeFlag flag : challenge.getFlags()) {
       if (checkFlag(flag, input.getValue())) {
         return new ChallengeResult(true);
@@ -113,7 +119,20 @@ public class ChallengeService {
                 injectExpectation -> {
                   Challenge challenge = injectExpectation.getChallenge();
                   challenge.setVirtualPublication(injectExpectation.getCreatedAt());
-                  return new ChallengeInformation(challenge, injectExpectation);
+                  InjectStatus injectStatus =
+                      injectExpectation
+                          .getInject()
+                          .getStatus()
+                          .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
+                  ChallengeAttemptId challengeAttemptId =
+                      buildChallengeAttemptID(
+                          challenge.getId(), injectStatus.getId(), user.getId());
+                  ChallengeAttempt challengeAttempt =
+                      this.challengeAttemptService
+                          .getChallengeAttempt(challengeAttemptId)
+                          .orElse(buildChallengeAttempt(challengeAttemptId));
+                  return new ChallengeInformation(
+                      challenge, injectExpectation, challengeAttempt.getAttempt());
                 })
             .sorted(Comparator.comparing(o -> o.getChallenge().getVirtualPublication()))
             .toList();
@@ -124,55 +143,85 @@ public class ChallengeService {
   public ChallengesReader validateChallenge(
       String exerciseId, String challengeId, ChallengeTryInput input, User user) {
     ChallengeResult challengeResult = tryChallenge(challengeId, input);
-    if (challengeResult.getResult()) {
-      // Find and update the expectations linked to the user
+    if (challengeResult.isResult()) {
+      // Success: Find and update the user's expectations and challenge attempt
       List<InjectExpectation> playerExpectations =
           injectExpectationRepository.findByUserAndExerciseAndChallenge(
               user.getId(), exerciseId, challengeId);
       playerExpectations.forEach(
           playerExpectation -> {
-            playerExpectation.setScore(playerExpectation.getExpectedScore());
-            InjectExpectationResult expectationResult =
-                InjectExpectationResult.builder()
-                    .sourceId("challenge")
-                    .sourceType("challenge")
-                    .sourceName("Challenge validation")
-                    .result(Instant.now().toString())
-                    .date(Instant.now().toString())
-                    .score(playerExpectation.getExpectedScore())
-                    .build();
-            playerExpectation.getResults().add(expectationResult);
-            playerExpectation.setUpdatedAt(Instant.now());
-            injectExpectationRepository.save(playerExpectation);
-          });
+            InjectStatus injectStatus =
+                playerExpectation
+                    .getInject()
+                    .getStatus()
+                    .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
+            ChallengeAttemptId challengeAttemptId =
+                buildChallengeAttemptID(challengeId, injectStatus.getId(), user.getId());
+            ChallengeAttempt challengeAttempt =
+                this.challengeAttemptService
+                    .getChallengeAttempt(challengeAttemptId)
+                    .orElse(buildChallengeAttempt(challengeAttemptId));
+            // Adjust the score based on the current attempt number
+            double score =
+                playerExpectation.getChallenge().getMaxAttempts() == null
+                        || challengeAttempt.getAttempt()
+                            < playerExpectation.getChallenge().getMaxAttempts()
+                    ? playerExpectation.getExpectedScore()
+                    : 0;
 
-      // -- VALIDATION TYPE --
-      processByValidationType(exerciseId, challengeId, user, true);
+            ExpectationUpdateInput expectationUpdateInput = buildChallengeUpdateInput(score);
+            this.injectExpectationService.updateInjectExpectation(
+                playerExpectation.getId(), expectationUpdateInput);
+          });
+    } else {
+      // Failure: Find and update the user's challenge attempt
+      List<InjectExpectation> playerExpectations =
+          injectExpectationRepository.findByUserAndExerciseAndChallenge(
+              user.getId(), exerciseId, challengeId);
+      List<String> injectStatusIds =
+          playerExpectations.stream()
+              .map(
+                  e ->
+                      e.getInject()
+                          .getStatus()
+                          .orElseThrow(() -> new ElementNotFoundException("Status should exist"))
+                          .getId())
+              .toList();
+      Map<ChallengeAttemptId, InjectExpectation> expectationMap = new HashMap<>();
+      List<ChallengeAttemptId> challengeAttemptIds = new ArrayList<>();
+      for (int i = 0; i < playerExpectations.size(); i++) {
+        InjectExpectation expectation = playerExpectations.get(i);
+        String injectStatusId = injectStatusIds.get(i);
+        ChallengeAttemptId challengeAttemptId =
+            buildChallengeAttemptID(challengeId, injectStatusId, user.getId());
+        expectationMap.put(challengeAttemptId, expectation);
+        challengeAttemptIds.add(challengeAttemptId);
+      }
+      List<ChallengeAttempt> challengeAttempts =
+          challengeAttemptService.getChallengeAttempts(challengeAttemptIds);
+      List<ChallengeAttempt> attemptsToSave = new ArrayList<>();
+      Map<String, ExpectationUpdateInput> expectationsToUpdate = new HashMap<>();
+      for (ChallengeAttemptId id : challengeAttemptIds) {
+        InjectExpectation expectation = expectationMap.get(id);
+        ChallengeAttempt attempt =
+            challengeAttempts.stream()
+                .filter(ca -> ca.getCompositeId().equals(id))
+                .findFirst()
+                .orElse(buildChallengeAttempt(id));
+
+        attempt.setAttempt(attempt.getAttempt() + 1);
+        attemptsToSave.add(attempt);
+
+        if (expectation.getChallenge().getMaxAttempts() != null
+            && attempt.getAttempt() >= expectation.getChallenge().getMaxAttempts()) {
+          expectationsToUpdate.put(expectation.getId(), buildChallengeUpdateInput(0D));
+        }
+      }
+
+      challengeAttemptService.saveChallengeAttempts(attemptsToSave);
+      expectationsToUpdate.forEach(injectExpectationService::updateInjectExpectation);
     }
     return playerChallenges(exerciseId, user);
-  }
-
-  private void processByValidationType(
-      String exerciseId, String challengeId, User user, boolean isaNewExpectationResult) {
-    // Process expectations linked to teams where the user is a member
-    List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-    // Find all expectations for this exercise, challenge and teams
-    List<InjectExpectation> challengeExpectations =
-        injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
-    // If user is null then expectation is from a team
-    List<InjectExpectation> parentExpectations =
-        challengeExpectations.stream().filter(exp -> exp.getUser() == null).toList();
-    // If user is not null then expectation is from a player
-    Map<Team, List<InjectExpectation>> playerByTeam =
-        challengeExpectations.stream()
-            .filter(exp -> exp.getUser() != null)
-            .collect(Collectors.groupingBy(InjectExpectation::getTeam));
-
-    // Depending on type of validation, We process the parent expectations:
-    List<InjectExpectation> toUpdate =
-        ExpectationUtils.processByValidationType(
-            isaNewExpectationResult, challengeExpectations, parentExpectations, playerByTeam);
-    injectExpectationRepository.saveAll(toUpdate);
   }
 
   // -- PRIVATE --
