@@ -21,8 +21,8 @@ const useStyles = makeStyles()(() => ({
 interface Props {
   injectResultOverview: InjectResultOverviewOutput;
   exercise: ExerciseType;
-  backlabel: string;
-  backuri: string;
+  backlabel?: string | null;
+  backuri?: string | null;
 }
 
 const openbasNmap = 'openbas_nmap';
