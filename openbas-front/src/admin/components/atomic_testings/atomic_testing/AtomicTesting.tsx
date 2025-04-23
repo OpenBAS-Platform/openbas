@@ -86,9 +86,9 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, t]);
+  }, [hasAssetsGroup]);
 
-  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: {
       mode: 'and',
       filters: [],
@@ -99,6 +99,13 @@ const AtomicTesting = () => {
 
   useEffect(() => {
     if (!injectResultOverviewOutput) return;
+
+    setSearchPaginationInput({
+      filterGroup: {
+        mode: 'and',
+        filters: [],
+      }, page: 0, size: 20
+    })
 
     setSelectedTargetLegacy(
       selectedTargetLegacy
@@ -115,22 +122,12 @@ const AtomicTesting = () => {
       .then((response) => {
         if (response.data.content.length > 0) {
           setHasAssetsGroup(true);
-        }
+        } else { setHasAssetsGroup(false) }
       })
       .finally(() => {
         setHasAssetsGroupChecked(true);
       });
   }, [injectResultOverviewOutput]);
-
-  useEffect(() => {
-    if (!hasAssetsGroupChecked || !injectResultOverviewOutput || tabConfig[0].type == 'ALL_TARGETS') return;
-
-    searchTargets(injectId, tabConfig[0].type, searchPaginationInput)
-      .then((response) => {
-        setTargets(response.data);
-        setSelectedTarget(response.data);
-      });
-  }, [hasAssetsGroupChecked, injectResultOverviewOutput]);
 
   // Handles
 
@@ -148,6 +145,7 @@ const AtomicTesting = () => {
       targetType: target.target_type,
       platformType: undefined,
     });
+    setSelectedTarget(target);
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
