@@ -1,5 +1,5 @@
 import { InfoOutlined } from '@mui/icons-material';
-import { IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useContext } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -30,7 +30,7 @@ const AtomicTestingHeader = () => {
   }
 
   return (
-    <>
+    <Box>
       <Tooltip title={injectResultOverviewOutput.inject_title}>
         <Typography
           variant="h1"
@@ -61,7 +61,7 @@ const AtomicTestingHeader = () => {
           />
         </IconButton>
       </Tooltip>
-    </>
+    </Box>
   );
 };
 

@@ -1,3 +1,4 @@
+import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
@@ -29,34 +30,48 @@ const TraceMessage = ({ traces }: Props) => {
   return (
     <pre style={{ marginTop: theme.spacing(1) }}>
       <ul>
-        {sorted.map((tr, index) => (
-          <li key={index}>
-            {tr.execution_message.startsWith('LICENSE RESTRICTION') && <EEChip clickable featureDetectedInfo={tr.execution_message.replace('LICENSE RESTRICTION - ', '')} />}
-            <strong>{tr.execution_status}</strong>
-            {' '}
-            <span>
-              {expandedMessages.has(index) ? (
-                <>
-                  {tr.execution_message}
-                  <Button variant="outlined" onClick={() => toggleMessage(index)}>
-                    {t('See Less')}
+        {sorted.map((tr, index) => {
+          const isExpanded = expandedMessages.has(index);
+          const isTruncated = tr.execution_message.length > truncateLength;
+          const displayMessage = isExpanded || !isTruncated
+            ? tr.execution_message
+            : `${tr.execution_message.slice(0, truncateLength)}`;
+
+          return (
+            <li key={index}>
+              {tr.execution_message.startsWith('LICENSE RESTRICTION') && <EEChip clickable featureDetectedInfo={tr.execution_message.replace('LICENSE RESTRICTION - ', '')} />}
+              <strong>{tr.execution_status}</strong>
+              {' '}
+              <span>
+                {displayMessage}
+                {isTruncated && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => toggleMessage(index)}
+                    style={{
+                      width: '100%',
+                      height: theme.spacing(5),
+                      marginTop: theme.spacing(2),
+                      textTransform: 'none',
+                    }}
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ArrowDropUpOutlined fontSize="large" />
+                        {t('See Less')}
+                      </>
+                    ) : (
+                      <>
+                        <ArrowDropDownOutlined fontSize="large" />
+                        {t('See More')}
+                      </>
+                    )}
                   </Button>
-                </>
-              ) : (
-                <>
-                  {tr.execution_message.length > truncateLength
-                    ? `${tr.execution_message.slice(0, truncateLength)}... `
-                    : tr.execution_message}
-                  {tr.execution_message.length > truncateLength && (
-                    <Button variant="outlined" onClick={() => toggleMessage(index)}>
-                      {t('See More')}
-                    </Button>
-                  )}
-                </>
-              )}
-            </span>
-          </li>
-        ))}
+                )}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </pre>
   );

@@ -12,7 +12,6 @@ import Loader from '../../../../components/Loader';
 import SearchFilter from '../../../../components/SearchFilter';
 import { type InjectTarget, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingInformation from './AtomicTestingInformation';
 import NewTargetListItem from './NewTargetListItem';

@@ -1,5 +1,5 @@
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, GridLegacy, Paper, Tab, Tabs } from '@mui/material';
+import { Alert, AlertTitle, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router';
@@ -229,15 +229,13 @@ const Index = () => {
           display="flex"
           justifyContent="space-between"
           mb={2}
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 4,
+          }}
         >
-          {/* LEFT: Breadcrumbs, Title, Tabs */}
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-              marginBottom: 4,
-              paddingBottom: 0,
-            }}>
+          <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
             <Breadcrumbs
               variant="object"
               elements={[
@@ -252,10 +250,8 @@ const Index = () => {
               ]}
             />
             <AtomicTestingHeader />
-            <Box
-              sx={{ marginTop: 1 }}
-            >
-              <Tabs value={tabValue} >
+            <Box mt={3} mb={0}>
+              <Tabs value={tabValue}>
                 <Tab
                   component={Link}
                   to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}`}
@@ -293,15 +289,9 @@ const Index = () => {
             </Box>
           </Box>
 
-          <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={2}
-               sx={{
-                 borderBottom: 1,
-                 borderColor: 'divider',
-                 marginBottom: 4,
-                 paddingBottom: 0,
-               }}>
+          <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={2}>
             <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
-            <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+            <Box display="flex" flexDirection="row" alignItems="center" gap={1} ml={theme.spacing(4)}>
               {getActionButton(injectResultOverviewOutput)}
               <AtomicTestingPopover
                 atomic={injectResultOverviewOutput}
@@ -310,11 +300,8 @@ const Index = () => {
               />
             </Box>
           </Box>
-
-          {/* Dialog */}
           {getDialog(injectResultOverviewOutput)}
         </Box>
-        {/* CONTENT ROUTES */}
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
