@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Base;
 import jakarta.annotation.Resource;
 import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PreRemove;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,13 @@ public class ModelBaseListener {
   void preRemove(Object base) {
     Base instance = (Base) base;
     appPublisher.publishEvent(new BaseEvent(DATA_DELETE, instance, mapper));
+  }
+
+  // Delete indexing must be handled by direct event
+  // Create / update is handle by a built-in cron job.
+  @PostRemove
+  void postRemove(Object base) {
+    Base instance = (Base) base;
+    appPublisher.publishEvent(new IndexEvent(DATA_DELETE, instance.getId()));
   }
 }

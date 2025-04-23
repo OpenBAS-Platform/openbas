@@ -146,7 +146,7 @@ export const convertJsonClassToJavaClass = (input: string) => {
 
   return segments
     .map((segment) => {
-      return segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase();
+      return segment.charAt(0).toUpperCase() + segment.slice(1);
     })
     .join('');
 };
