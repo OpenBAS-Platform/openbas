@@ -337,7 +337,6 @@ const Endpoints = () => {
                   >
                     <ListItemButton
                       component={Link}
-                      classes={{ root: classes.item }}
                       to={`/admin/assets/endpoints/${endpoint.asset_id}`}
                     >
                       <ListItemIcon>
