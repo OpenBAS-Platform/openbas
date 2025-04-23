@@ -2,7 +2,12 @@ import { type Theme } from '@mui/material';
 import * as C from '@mui/material/colors';
 import { type ApexOptions } from 'apexcharts';
 
+import { scaleFactor } from '../components/AppThemeProvider';
+
 type Temp = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800;
+
+const spacing = scaleFactor;
+const spacingDot5 = scaleFactor / 2;
 
 export const colors = (temp: Temp): string[] => {
   const tempPlus100 = (temp + 100) as Temp;
@@ -114,8 +119,8 @@ export const lineChartOptions = (
   legend: {
     show: true,
     itemMargin: {
-      horizontal: 5,
-      vertical: 20,
+      vertical: spacing,
+      horizontal: spacingDot5,
     },
   },
   stroke: { curve: 'smooth' },
@@ -299,8 +304,8 @@ export const verticalBarsChartOptions = (
   legend: {
     show: legend,
     itemMargin: {
-      horizontal: 5,
-      vertical: 20,
+      vertical: spacing,
+      horizontal: spacingDot5,
     },
     onItemClick: { toggleDataSeries: !isFakeData },
     onItemHover: { highlightDataSeries: !isFakeData },
@@ -412,7 +417,10 @@ export const horizontalBarsChartOptions = (
   },
   legend: {
     show: legend,
-    itemMargin: { horizontal: 5 },
+    itemMargin: {
+      vertical: spacing,
+      horizontal: spacingDot5,
+    },
   },
   tooltip: {
     enabled: !isFakeData,
@@ -567,6 +575,10 @@ export const polarAreaChartOptions = (
     states: { hover: { filter: { type: 'lighten' } } },
     legend: {
       show: legend,
+      itemMargin: {
+        vertical: spacing,
+        horizontal: spacingDot5,
+      },
       position: legendPosition,
       fontFamily: '"IBM Plex Sans", sans-serif',
     },
@@ -699,6 +711,10 @@ export const donutChartOptions = ({
     legend: {
       show: displayLegend,
       position: legendPosition,
+      itemMargin: {
+        vertical: spacing,
+        horizontal: spacingDot5,
+      },
       fontFamily: '"IBM Plex Sans", sans-serif',
       onItemClick: { toggleDataSeries: !isFakeData },
       onItemHover: { highlightDataSeries: !isFakeData },

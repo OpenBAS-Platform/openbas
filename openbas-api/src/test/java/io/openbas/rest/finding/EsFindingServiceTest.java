@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
 @Transactional
-class FindingServiceTest extends IntegrationTest {
+class EsFindingServiceTest extends IntegrationTest {
 
   @Autowired private FindingComposer findingComposer;
   @Autowired private InjectComposer injectComposer;
@@ -69,7 +69,7 @@ class FindingServiceTest extends IntegrationTest {
   }
 
   @Nested
-  class CreateFinding {
+  class CreateEsFinding {
 
     @Test
     void given_new_text_finding_should_create_finding() {
