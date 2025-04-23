@@ -47,6 +47,7 @@ const AtomicTestingHeader = () => {
               maxWidth: 500,
               backgroundColor: 'background.paper',
               color: 'text.primary',
+              padding:0,
             },
           },
         }}
