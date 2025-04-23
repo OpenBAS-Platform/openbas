@@ -1,11 +1,12 @@
 package io.openbas.rest.exercise.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -14,6 +15,7 @@ import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -191,6 +193,108 @@ class ExerciseServiceTest {
     exerciseService.updateExercice(exercise, currentTags, false);
 
     verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
+  }
+
+  @Test
+  public void test_isThereAScoreDegradation_with_same_results() {
+    List<Double> scores = List.of(1.0, 1.0, 0.0, 0.5);
+    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultsByTypes =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+    assertFalse(
+        exerciseService.isThereAScoreDegradation(
+            expectationResultsByTypes, expectationResultsByTypes));
+  }
+
+  @Test
+  public void test_isThereAScoreDegradation_with_lower_result() {
+    List<Double> scores = List.of(1.0, 1.0, 0.0, 0.5, 1.0);
+    List<Double> lowerScores = List.of(1.0, 1.0, 0.0, 0.5, 0.0);
+    List<AtomicTestingUtils.ExpectationResultsByType> lastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+    List<AtomicTestingUtils.ExpectationResultsByType> previousLastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+    assertTrue(
+        exerciseService.isThereAScoreDegradation(lastResultByType, previousLastResultByType));
+  }
+
+  @Test
+  public void test_isThereAScoreDegradation_WITH_manual_expectation() {
+    List<Double> scores = List.of(1.0, 1.0, 0.0, 0.5, 1.0);
+    List<Double> lowerScores = List.of(1.0, 1.0, 0.0, 0.5, 0.0);
+    List<AtomicTestingUtils.ExpectationResultsByType> lastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.HUMAN_RESPONSE,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+    List<AtomicTestingUtils.ExpectationResultsByType> previousLastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.HUMAN_RESPONSE,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+    assertFalse(
+        exerciseService.isThereAScoreDegradation(lastResultByType, previousLastResultByType));
+  }
+
+  @Test
+  public void test_isThereAScoreDegradation_WITH_expectation_pending() {
+    List<Double> scores = List.of(1.0, 1.0, 0.0, 0.5, 1.0);
+    List<Double> lowerScores = List.of(1.0, 1.0, 0.0, 0.5, 0.0);
+    List<AtomicTestingUtils.ExpectationResultsByType> lastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.PENDING,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+    List<AtomicTestingUtils.ExpectationResultsByType> previousLastResultByType =
+        List.of(
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+    assertFalse(
+        exerciseService.isThereAScoreDegradation(lastResultByType, previousLastResultByType));
   }
 
   private AssetGroup getAssetGroup(String name) {

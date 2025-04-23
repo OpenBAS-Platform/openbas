@@ -2,6 +2,7 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ExerciseSpecification.*;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -19,6 +20,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -26,6 +28,7 @@ import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
@@ -693,5 +696,50 @@ public class ExerciseService {
     }
     exercise.setUpdatedAt(now());
     return exerciseRepository.save(exercise);
+  }
+
+  public Exercise previousFinishedSimulation(
+      @NotBlank final String scenarioId, @NotNull final Instant instant) {
+    return this.exerciseRepository
+        .findAll(fromScenario(scenarioId).and(finished()).and(closestBefore(instant)))
+        .stream()
+        .findFirst()
+        .orElse(null);
+  }
+
+  public boolean isThereAScoreDegradation(
+      List<AtomicTestingUtils.ExpectationResultsByType> lastSimulationResults,
+      List<AtomicTestingUtils.ExpectationResultsByType> secondLastSimulationResults) {
+
+    // Map the second last results by type for quick lookup
+    Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+        secondLastSimulationResultsMap =
+            secondLastSimulationResults.stream()
+                .collect(
+                    Collectors.toMap(
+                        AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
+
+    for (AtomicTestingUtils.ExpectationResultsByType result : lastSimulationResults) {
+      // we ignore manual expectation
+      if (ExpectationType.HUMAN_RESPONSE.equals(result.type())) {
+        break;
+      }
+
+      // we ignore if one of the 2 expectation is still PENDING
+      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(result.avgResult())
+          || InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              secondLastSimulationResultsMap.get(result.type()).avgResult())) {
+        break;
+      }
+
+      float lastSimulationScore = ScenarioStatisticService.getRoundedPercentage(result);
+      float secondLastSimulationScore =
+          ScenarioStatisticService.getRoundedPercentage(
+              secondLastSimulationResultsMap.get(result.type()));
+      if (lastSimulationScore < secondLastSimulationScore) {
+        return true;
+      }
+    }
+    return false;
   }
 }

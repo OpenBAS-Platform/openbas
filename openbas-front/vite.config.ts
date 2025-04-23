@@ -72,6 +72,7 @@ export default ({ mode }: { mode: string }) => {
         'react-csv',
         'react-final-form',
         'react-final-form-arrays',
+        'react-grid-layout',
         'react-hook-form',
         'react-markdown',
         'remark-flexible-markers',

@@ -76,6 +76,11 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
 
   // Pagination
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const load = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchEndpointsFromAssetGroup(input, assetGroupId).finally(() => setLoading(false));
+  };
 
   const availableFilterNames = [
     'endpoint_platform',
@@ -121,7 +126,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
       </div>
       <div style={{ padding: theme.spacing(1) }}>
         <PaginationComponentV2
-          fetch={((searchPaginationInput: SearchPaginationInput) => searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId))}
+          fetch={((searchPaginationInput: SearchPaginationInput) => load(searchPaginationInput))}
           searchPaginationInput={searchPaginationInput}
           setContent={setEndpoints}
           entityPrefix="endpoint"
@@ -132,6 +137,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
 
       <EndpointsList
         endpoints={endpoints}
+        loading={loading}
         actions={userAdmin
           ? (
             // @ts-expect-error: Endpoint property handle by EndpointsList

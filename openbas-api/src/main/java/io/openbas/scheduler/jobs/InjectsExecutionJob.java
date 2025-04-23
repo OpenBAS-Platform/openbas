@@ -9,14 +9,19 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectDependenciesRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.helper.InjectHelper;
+import io.openbas.notification.model.NotificationEvent;
+import io.openbas.notification.model.NotificationEventType;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
+import io.openbas.service.NotificationEventService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -40,17 +46,18 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
-
+  private final Environment env;
+  private int injectExecutionThreshold;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
-  private final InjectStatusRepository injectStatusRepository;
   private final ExerciseRepository exerciseRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectStatusService injectStatusService;
   private final io.openbas.executors.Executor executor;
   private final ActionMetricCollector actionMetricCollector;
+  private final NotificationEventService notificationEventService;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -63,6 +70,15 @@ public class InjectsExecutionJob implements Job {
       List.of(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
 
   @Resource protected ObjectMapper mapper;
+
+  @PostConstruct
+  private void init() {
+    String threshold = env.getProperty("inject.execution.threshold.minutes");
+    if (threshold == null || threshold.isBlank()) {
+      threshold = "10";
+    }
+    this.injectExecutionThreshold = Integer.parseInt(threshold);
+  }
 
   public void handleAutoStartExercises() {
     List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
@@ -83,15 +99,60 @@ public class InjectsExecutionJob implements Job {
   public void handleAutoClosingExercises() {
     // Change status of finished exercises.
     List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
-    exerciseRepository.saveAll(
-        mustBeFinishedExercises.stream()
-            .peek(
-                exercise -> {
-                  exercise.setStatus(ExerciseStatus.FINISHED);
-                  exercise.setEnd(now());
-                  exercise.setUpdatedAt(now());
+    List<Exercise> exercisesFinished =
+        exerciseRepository.saveAll(
+            mustBeFinishedExercises.stream()
+                .peek(
+                    exercise -> {
+                      exercise.setStatus(ExerciseStatus.FINISHED);
+                      exercise.setEnd(now());
+                      exercise.setUpdatedAt(now());
+                    })
+                .toList());
+
+    // send notification
+    exercisesFinished.stream()
+        .filter(
+            ex ->
+                ex.getScenario()
+                    != null) // only send notification for exercise associated to a scenario
+        .forEach(
+            ex ->
+                notificationEventService.sendNotificationEventWithDelay(
+                    NotificationEvent.builder()
+                        .eventType(NotificationEventType.SIMULATION_COMPLETED)
+                        .resourceType(NotificationRuleResourceType.SCENARIO)
+                        .resourceId(ex.getScenario().getId())
+                        .timestamp(Instant.now())
+                        .build(),
+                    3600L)); // add a 1 hour delay
+  }
+
+  public void handlePendingInject() {
+    List<Inject> pendingInjects =
+        injectHelper.getAllPendingInjectsWithThresholdMinutes(this.injectExecutionThreshold);
+
+    if (pendingInjects.isEmpty()) {
+      return;
+    }
+
+    List<InjectStatus> updatedStatuses =
+        pendingInjects.stream()
+            .map(
+                inject -> {
+                  InjectStatus status =
+                      inject.getStatus().orElseThrow(ElementNotFoundException::new);
+                  status.setName(ExecutionStatus.MAYBE_PREVENTED);
+                  status.addWarningTrace(
+                      "Execution delay detected: Inject exceeded the "
+                          + this.injectExecutionThreshold
+                          + " minutes threshold.",
+                      ExecutionTraceAction.EXECUTION);
+                  return status;
                 })
-            .toList());
+            .collect(Collectors.toList());
+
+    injectStatusService.saveAll(updatedStatuses);
   }
 
   private void executeInject(ExecutableInject executableInject)
@@ -270,6 +331,7 @@ public class InjectsExecutionJob implements Job {
           });
       // Change status of finished exercises.
       handleAutoClosingExercises();
+      handlePendingInject();
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       throw new JobExecutionException(e);

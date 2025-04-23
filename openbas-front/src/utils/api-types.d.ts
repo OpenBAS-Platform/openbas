@@ -10,6 +10,8 @@
  * ---------------------------------------------------------------
  */
 
+type UtilRequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export interface Agent {
   agent_active?: boolean;
   agent_asset: string;
@@ -399,6 +401,8 @@ export interface ChallengeFlag {
 }
 
 export interface ChallengeInformation {
+  /** @format int32 */
+  challenge_attempt?: number;
   challenge_detail?: PublicChallenge;
   challenge_expectation?: InjectExpectation;
 }
@@ -711,6 +715,14 @@ export interface CreateExerciseInput {
   exercise_tags?: string[];
 }
 
+export interface CreateNotificationRuleInput {
+  resource_id?: string;
+  resource_type?: string;
+  subject?: string;
+  trigger?: string;
+  type?: string;
+}
+
 export interface CreateUserInput {
   /** True if the user is admin */
   user_admin?: boolean;
@@ -727,6 +739,39 @@ export interface CreateUserInput {
   /** Tags of the user */
   user_tags?: string[];
 }
+
+export interface CustomDashboard {
+  /** @format date-time */
+  custom_dashboard_created_at: string;
+  custom_dashboard_description?: string;
+  custom_dashboard_id: string;
+  custom_dashboard_name: string;
+  /** @format date-time */
+  custom_dashboard_updated_at: string;
+  custom_dashboard_widgets?: Widget[];
+  listened?: boolean;
+}
+
+export interface CustomDashboardInput {
+  custom_dashboard_description?: string;
+  custom_dashboard_name: string;
+}
+
+export interface DateHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type DateHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
+  end: string;
+  interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  series: DateHistogramSeries[];
+  start: string;
+};
 
 export interface DirectInjectInput {
   inject_content?: object;
@@ -915,6 +960,29 @@ export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
   asset_tags?: string[];
+}
+
+export interface EsSearch {
+  base_created_at?: string;
+  base_entity?: string;
+  base_id: string;
+  base_representative?: string;
+  /** @format double */
+  base_score?: number;
+  base_updated_at?: string;
+}
+
+export interface EsSeries {
+  color?: string;
+  data?: EsSeriesData[];
+  label?: string;
+}
+
+export interface EsSeriesData {
+  key?: string;
+  label?: string;
+  /** @format int64 */
+  value?: number;
 }
 
 export interface Evaluation {
@@ -1421,6 +1489,14 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: "structural" | "temporal";
+  stacked?: boolean;
+  title?: string;
+}
+
 export interface ImportMapper {
   /** @format date-time */
   import_mapper_created_at?: string;
@@ -1631,6 +1707,10 @@ export interface InjectExpectation {
   target_id?: string;
 }
 
+export interface InjectExpectationBulkUpdateInput {
+  inputs: Record<string, InjectExpectationUpdateInput>;
+}
+
 export interface InjectExpectationResult {
   date?: string;
   metadata?: Record<string, string>;
@@ -1677,6 +1757,10 @@ export interface InjectExpectationTrace {
   /** @format date-time */
   inject_expectation_trace_updated_at: string;
   listened?: boolean;
+}
+
+export interface InjectExpectationTraceBulkInsertInput {
+  expectation_traces: InjectExpectationTraceInput[];
 }
 
 export interface InjectExpectationTraceInput {
@@ -2467,6 +2551,21 @@ export interface NetworkTraffic {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
+export interface NotificationRuleOutput {
+  /** ID of the notification rule */
+  notification_rule_id?: string;
+  /** Owner of the notification rule */
+  notification_rule_owner?: string;
+  /** Resource id of the resource associated with the rule */
+  notification_rule_resource_id?: string;
+  /** Resource type of the resource associated with the rule */
+  notification_rule_resource_type?: string;
+  /** Subject of the notification rule */
+  notification_rule_subject?: string;
+  /** Event that will trigger the notification */
+  notification_rule_trigger?: string;
+}
+
 /** List of Saml2 providers */
 export interface OAuthProvider {
   provider_login?: string;
@@ -2594,6 +2693,25 @@ export interface PageAssetGroupOutput {
 
 export interface PageAttackPattern {
   content?: AttackPattern[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageCustomDashboard {
+  content?: CustomDashboard[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2822,6 +2940,25 @@ export interface PageLessonsTemplate {
 
 export interface PageMitigation {
   content?: Mitigation[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageNotificationRuleOutput {
+  content?: NotificationRuleOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3320,7 +3457,9 @@ export interface PolicyInput {
 }
 
 export interface PropertySchemaDTO {
+  schema_property_entity: string;
   schema_property_has_dynamic_value?: boolean;
+  schema_property_label: string;
   schema_property_name: string;
   schema_property_type: string;
   schema_property_type_array?: boolean;
@@ -3356,16 +3495,19 @@ export interface PublicExercise {
 }
 
 export interface RawAttackPattern {
+  /** @format date-time */
   attack_pattern_created_at?: string;
   attack_pattern_description?: string;
   attack_pattern_external_id?: string;
   attack_pattern_id?: string;
+  /** @uniqueItems true */
   attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name?: string;
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id?: string;
+  /** @format date-time */
   attack_pattern_updated_at?: string;
 }
 
@@ -3862,6 +4004,19 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
+export interface StructuralHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type StructuralHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
+  series: StructuralHistogramSeries[];
+};
+
 export interface Tag {
   listened?: boolean;
   /** Color of the tag */
@@ -4102,6 +4257,10 @@ export interface UpdateMePasswordInput {
   user_plain_password: string;
 }
 
+export interface UpdateNotificationRuleInput {
+  notification_rule_subject?: string;
+}
+
 export interface UpdateProfileInput {
   user_country?: string;
   user_email?: string;
@@ -4309,4 +4468,34 @@ export interface ViolationErrorBag {
   message?: string;
   /** The type of error */
   type?: string;
+}
+
+export interface Widget {
+  listened?: boolean;
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  /** @format date-time */
+  widget_created_at: string;
+  widget_custom_dashboard?: string;
+  widget_id: string;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  /** @format date-time */
+  widget_updated_at: string;
+}
+
+export interface WidgetInput {
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+}
+
+export interface WidgetLayout {
+  /** @format int32 */
+  widget_layout_h: number;
+  /** @format int32 */
+  widget_layout_w: number;
+  /** @format int32 */
+  widget_layout_x: number;
+  /** @format int32 */
+  widget_layout_y: number;
 }

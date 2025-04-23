@@ -114,7 +114,7 @@ public class ScenarioStatisticService {
     return getRoundedPercentage(expectationResultByType);
   }
 
-  private static float getRoundedPercentage(ExpectationResultsByType expectationResultByType) {
+  public static float getRoundedPercentage(ExpectationResultsByType expectationResultByType) {
     float percentage =
         ((float) getNumberOfInjectsOnSuccess(expectationResultByType)
                 / getTotalNumberOfInjects(expectationResultByType))
