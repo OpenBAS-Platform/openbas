@@ -40,15 +40,11 @@ const LeftBar = () => {
           icon: () => (<InsertChartOutlined />),
           label: 'Dashboards',
         },
-      ],
-    },
-    {
-      items: [
-        {
+      {
           path: '/admin/findings',
           icon: () => (<Binoculars />),
           label: 'Findings',
-        },
+      },
       ],
     },
     {
