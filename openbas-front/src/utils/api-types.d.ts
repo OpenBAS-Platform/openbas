@@ -384,6 +384,8 @@ export interface ChallengeFlag {
 }
 
 export interface ChallengeInformation {
+  /** @format int32 */
+  challenge_attempt?: number;
   challenge_detail?: PublicChallenge;
   challenge_expectation?: InjectExpectation;
 }
