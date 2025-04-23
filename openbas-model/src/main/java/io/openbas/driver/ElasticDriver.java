@@ -45,9 +45,13 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableRetry
 @RequiredArgsConstructor
 public class ElasticDriver {
 
@@ -267,6 +271,10 @@ public class ElasticDriver {
     return mappings;
   }
 
+  @Retryable(
+      retryFor = {IllegalStateException.class},
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 30000))
   @Bean
   public <T extends EsBase> ElasticsearchClient elasticClient() throws Exception {
     LOGGER.info("Creating ElasticClient");
