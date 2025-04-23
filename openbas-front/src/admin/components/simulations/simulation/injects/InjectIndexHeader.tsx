@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useSearchParams } from 'react-router';
 
 import Breadcrumbs, { type BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
@@ -15,6 +16,7 @@ interface Props {
 
 const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const [searchParams] = useSearchParams();
   const backlabel = searchParams.get('backlabel');
   const backuri = searchParams.get('backuri');
@@ -46,11 +48,10 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
     <Box
       display="flex"
       justifyContent="space-between"
-      mb={2}
       sx={{
         borderBottom: 1,
         borderColor: 'divider',
-        marginBottom: 4,
+        marginBottom: theme.spacing(4),
       }}
     >
       <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
@@ -58,8 +59,8 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
         <IndexTitle injectResultOverview={injectResultOverview} />
         <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
       </Box>
-      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={2}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
+        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReduceView />
       </Box>
     </Box>
 

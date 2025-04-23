@@ -7,21 +7,16 @@ import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 import AtomicTestingInformation from './AtomicTestingInformation';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   title: {
     float: 'left',
-    marginRight: 10,
-  },
-  actions: {
-    margin: '-6px 0 0 0',
-    float: 'right',
+    marginRight: theme.spacing(1),
   },
 }));
 
 interface Props { injectResultOverview: InjectResultOverviewOutput }
 
 const IndexTitle = ({ injectResultOverview }: Props) => {
-  // Standard hooks
   const { classes } = useStyles();
 
   if (!injectResultOverview) {
@@ -46,7 +41,6 @@ const IndexTitle = ({ injectResultOverview }: Props) => {
               maxWidth: 500,
               backgroundColor: 'background.paper',
               color: 'text.primary',
-              padding: 0,
             },
           },
         }}

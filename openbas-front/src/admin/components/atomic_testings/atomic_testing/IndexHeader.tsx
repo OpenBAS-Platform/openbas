@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 import Breadcrumbs, { type BreadcrumbsElement } from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
@@ -15,6 +16,8 @@ interface Props {
 
 const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) => {
   const { t } = useFormatter();
+  const theme = useTheme();
+
   const breadcrumbs: BreadcrumbsElement[] = [
     {
       label: t('Atomic testings'),
@@ -30,11 +33,10 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
     <Box
       display="flex"
       justifyContent="space-between"
-      mb={2}
       sx={{
         borderBottom: 1,
         borderColor: 'divider',
-        marginBottom: 4,
+        marginBottom: theme.spacing(4),
       }}
     >
       <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
@@ -45,8 +47,8 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
         <IndexTitle injectResultOverview={injectResultOverview} />
         <IndexTabs injectResultOverview={injectResultOverview} />
       </Box>
-      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={2}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
+        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReduceView />
         <IndexActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
       </Box>
     </Box>

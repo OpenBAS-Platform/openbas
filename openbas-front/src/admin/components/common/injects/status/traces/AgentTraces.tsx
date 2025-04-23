@@ -15,8 +15,8 @@ interface Props {
 }
 
 const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
-  const theme = useTheme();
   const { t } = useFormatter();
+  const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(isInitialExpanded);
 
   const toggleExpand = () => setIsExpanded(prev => !prev);
@@ -113,7 +113,7 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
             />
             <Typography variant="body2">{t(agentStatus.executorName)}</Typography>
           </div>
-          <Typography variant="h3" sx={{ marginTop: 2 }}>
+          <Typography variant="h3" sx={{ marginTop: theme.spacing(2) }}>
             {t('Traces')}
           </Typography>
           {tracesByAction.map((group, index) => (

@@ -1,4 +1,5 @@
 import { Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import type React from 'react';
 
 import { useFormatter } from '../../../../../../components/i18n';
@@ -7,8 +8,9 @@ import TraceMessage from './TraceMessage';
 
 interface Props { traces?: ExecutionTraceOutput[] }
 
-const MainTraces: React.FC<Props> = ({ traces }) => {
+const MainTraces = ({ traces }: Props) => {
   const { t } = useFormatter();
+  const theme = useTheme();
 
   if (!traces || traces.length === 0) return null;
 
@@ -18,7 +20,7 @@ const MainTraces: React.FC<Props> = ({ traces }) => {
         variant="subtitle1"
         style={{
           fontWeight: 'bold',
-          marginTop: 20,
+          marginTop: theme.spacing(3),
         }}
         gutterBottom
       >

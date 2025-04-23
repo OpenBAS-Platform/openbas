@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 
 import { getInjectTracesFromInjectAndTarget } from '../../../../../actions/injects/inject-action';
@@ -16,8 +17,9 @@ interface Props {
 
 const ExecutionStatusDetail = ({ injectId, target }: Props) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const [traces, setTraces] = useState<ExecutionTraceOutput[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const isTeam = target?.targetType === 'TEAMS';
   const isPlayer = target?.targetType === 'PLAYER';
@@ -45,19 +47,20 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
 
   return (
     <>
-      <Typography variant="h4">{t('Execution logs')}</Typography>
-      <Paper variant="outlined" style={{ padding: '0 20px 20px' }}>
-        {!loading && traces && traces.length > 0 && (
-          <>
-            {(isTeam || isPlayer) && (<MainTraces traces={traces} />)}
-            {isAsset && (<EndpointTraces key={target.id} endpoint={target} tracesByAgent={traces} />)}
-            {isAgent && (<AgentTraces traces={traces} isInitialExpanded />)}
-          </>
-        )}
-      </Paper>
+      {!loading && traces && traces.length > 0 && (
+        <>
+          <Typography variant="h4">{t('Execution logs')}</Typography>
+          <Paper variant="outlined" style={{ padding: theme.spacing(0, 3, 3) }}>
+            <>
+              {(isTeam || isPlayer) && (<MainTraces traces={traces} />)}
+              {isAsset && (<EndpointTraces key={target.id} endpoint={target} tracesByAgent={traces} />)}
+              {isAgent && (<AgentTraces traces={traces} isInitialExpanded />)}
+            </>
+          </Paper>
+        </>
+      )}
     </>
-  )
-  ;
+  );
 };
 
 export default ExecutionStatusDetail;

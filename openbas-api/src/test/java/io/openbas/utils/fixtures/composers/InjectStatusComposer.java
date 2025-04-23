@@ -2,6 +2,8 @@ package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectStatusRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,20 +13,34 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
 
   public class Composer extends InnerComposerBase<InjectStatus> {
     private final InjectStatus injectStatus;
+    private final List<ExecutionTraceComposer.Composer> executionTracesComposer = new ArrayList<>();
 
     public Composer(InjectStatus injectStatus) {
       this.injectStatus = injectStatus;
     }
 
+    public Composer withExecutionTraces(List<ExecutionTraceComposer.Composer> traces) {
+      traces.forEach(trace -> withExecutionTrace(trace));
+      return this;
+    }
+
+    public Composer withExecutionTrace(ExecutionTraceComposer.Composer executionTrace) {
+      executionTracesComposer.add(executionTrace);
+      this.injectStatus.getTraces().add(executionTrace.get());
+      return this;
+    }
+
     @Override
     public InjectStatusComposer.Composer persist() {
       injectStatusRepository.save(injectStatus);
+      executionTracesComposer.forEach(ExecutionTraceComposer.Composer::persist);
       return this;
     }
 
     @Override
     public InjectStatusComposer.Composer delete() {
       injectStatusRepository.delete(injectStatus);
+      executionTracesComposer.forEach(ExecutionTraceComposer.Composer::delete);
       return this;
     }
 

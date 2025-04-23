@@ -527,8 +527,7 @@ public class InjectApi extends RestBehavior {
   // -- Execution Traces
   @Operation(
       description =
-          "Get ExecutionTraces from a specific inject and target (asset, agent, team, player)",
-      tags = {"injects-api"})
+          "Get ExecutionTraces from a specific inject and target (asset, agent, team, player)")
   @GetMapping(INJECT_URI + "/execution-traces")
   @LogExecutionTime
   public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(
@@ -538,9 +537,7 @@ public class InjectApi extends RestBehavior {
     return this.injectService.getInjectTracesFromInjectAndTarget(injectId, targetId, targetType);
   }
 
-  @Operation(
-      description = "Get InjectStatus with global execution traces",
-      tags = {"injects-api"})
+  @Operation(description = "Get InjectStatus with global execution traces")
   @GetMapping(INJECT_URI + "/status")
   @LogExecutionTime
   public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(

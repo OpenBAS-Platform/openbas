@@ -50,6 +50,43 @@ public class ScenarioInjectApi extends RestBehavior {
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
 
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @Transactional(readOnly = true)
+  public Iterable<InjectOutput> scenarioInjectsSimple(
+      @PathVariable @NotBlank final String scenarioId) {
+    return injectSearchService.injects(fromScenario(scenarioId));
+  }
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @Transactional(readOnly = true)
+  public Iterable<InjectOutput> scenarioInjectsSimple(
+      @PathVariable @NotBlank final String scenarioId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
+    return buildPaginationCriteriaBuilder(
+        (Specification<Inject> specification,
+            Specification<Inject> specificationCount,
+            Pageable pageable) ->
+            this.injectSearchService.injects(
+                fromScenario(scenarioId).and(specification),
+                fromScenario(scenarioId).and(specificationCount),
+                pageable,
+                joinMap),
+        searchPaginationInput,
+        Inject.class,
+        joinMap);
+  }
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
+  public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
+      @PathVariable @NotBlank String scenarioId,
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return injectTestStatusService.findAllInjectTestsByScenarioId(
+        scenarioId, searchPaginationInput);
+  }
+
   // -- SCENARIOS --
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
@@ -137,45 +174,6 @@ public class ScenarioInjectApi extends RestBehavior {
     this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
     this.injectRepository.deleteById(injectId);
   }
-
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  @Transactional(readOnly = true)
-  public Iterable<InjectOutput> scenarioInjectsSimple(
-      @PathVariable @NotBlank final String scenarioId) {
-    return injectSearchService.injects(fromScenario(scenarioId));
-  }
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  @Transactional(readOnly = true)
-  public Iterable<InjectOutput> scenarioInjectsSimple(
-      @PathVariable @NotBlank final String scenarioId,
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    Map<String, Join<Base, Base>> joinMap = new HashMap<>();
-    return buildPaginationCriteriaBuilder(
-        (Specification<Inject> specification,
-            Specification<Inject> specificationCount,
-            Pageable pageable) ->
-            this.injectSearchService.injects(
-                fromScenario(scenarioId).and(specification),
-                fromScenario(scenarioId).and(specificationCount),
-                pageable,
-                joinMap),
-        searchPaginationInput,
-        Inject.class,
-        joinMap);
-  }
-
-  @PostMapping("/api/scenario/{scenarioId}/injects/test")
-  public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
-      @PathVariable @NotBlank String scenarioId,
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectTestStatusService.findAllInjectTestsByScenarioId(
-        scenarioId, searchPaginationInput);
-  }
-
-  // -- SCENARIOS --
 
   private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
     Inject inject =

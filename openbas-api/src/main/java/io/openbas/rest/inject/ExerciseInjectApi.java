@@ -114,7 +114,7 @@ public class ExerciseInjectApi extends RestBehavior {
         joinMap);
   }
 
-  @PostMapping("/api/exercise/{exerciseId}/injects/test")
+  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {

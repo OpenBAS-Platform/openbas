@@ -6,12 +6,13 @@ import { useFormatter } from '../../../../../../components/i18n';
 import PlatformIcon from '../../../../../../components/PlatformIcon';
 import { type ExecutionTraceOutput, type InjectTargetWithResult } from '../../../../../../utils/api-types';
 import AgentTraces from './AgentTraces';
+
 interface Props {
   endpoint: InjectTargetWithResult;
   tracesByAgent: ExecutionTraceOutput[];
 }
 
-const EndpointTraces: React.FC<Props> = ({ endpoint, tracesByAgent }) => {
+const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
 
@@ -26,7 +27,6 @@ const EndpointTraces: React.FC<Props> = ({ endpoint, tracesByAgent }) => {
       grouped[agentId].push(trace);
     }
 
-    // Optional: sort by agent name for nicer UI
     return Object.entries(grouped).sort(([, a], [, b]) => {
       const nameA = a[0]?.execution_agent?.agent_executed_by_user ?? '';
       const nameB = b[0]?.execution_agent?.agent_executed_by_user ?? '';

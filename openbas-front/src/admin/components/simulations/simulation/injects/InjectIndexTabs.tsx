@@ -1,4 +1,5 @@
 import { Box, Tab, Tabs } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Link, useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -6,15 +7,12 @@ import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     height: 30,
     fontSize: 13,
     float: 'left',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
+    paddingRight: theme.spacing(1),
   },
 }));
 
@@ -29,6 +27,7 @@ const openbasNmap = 'openbas_nmap';
 
 const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }: Props) => {
   const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
 
   const location = useLocation();
@@ -42,7 +41,7 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
   };
 
   return (
-    <Box mt={3} mb={0}>
+    <Box mt={theme.spacing(2)}>
       <Tabs value={tabValue}>
         <Tab
           component={Link}

@@ -27,24 +27,26 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
-import io.openbas.utils.fixtures.composers.AgentComposer;
-import io.openbas.utils.fixtures.composers.EndpointComposer;
-import io.openbas.utils.fixtures.composers.InjectComposer;
-import io.openbas.utils.fixtures.composers.InjectStatusComposer;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +60,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.util.ResourceUtils;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -83,6 +86,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ExecutionTraceComposer executionTraceComposer;
 
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
@@ -98,6 +102,8 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
+
+  @Autowired private EntityManager entityManager;
 
   @BeforeAll
   void beforeAll() {
@@ -782,6 +788,7 @@ class InjectApiTest extends IntegrationTest {
     @Nested
     @DisplayName("Action Handling:")
     class ActionHandlingTest {
+
       @DisplayName("Should add trace when process is not finished")
       @Test
       void shouldAddTraceWhenProcessNotFinished() throws Exception {
@@ -946,6 +953,87 @@ class InjectApiTest extends IntegrationTest {
         testAgentStatusFunction(
             "COMMAND_CANNOT_BE_EXECUTED", "MAYBE_PREVENTED", ExecutionTraceStatus.MAYBE_PREVENTED);
       }
+    }
+  }
+
+  @Nested
+  @WithMockAdminUser
+  @DisplayName("Fetch execution traces for inject/atomic overview")
+  class ShouldFetchExecutionTracesForInjectOverview {
+
+    private Inject buildInjectWithTraces(List<ExecutionTraceComposer.Composer> traces) {
+      AgentComposer.Composer agentComposer1 =
+          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+      EndpointComposer.Composer endpointComposer1 =
+          endpointComposer
+              .forEndpoint(EndpointFixture.createEndpoint())
+              .withAgent(agentComposer1)
+              .withAgent(agentComposer1);
+
+      return injectComposer
+          .forInject(InjectFixture.getDefaultInject())
+          .withEndpoint(endpointComposer1)
+          .withInjectStatus(
+              injectStatusComposer
+                  .forInjectStatus(InjectStatusFixture.createDefaultInjectStatus())
+                  .withExecutionTraces(traces))
+          .persist()
+          .get();
+    }
+
+    private String performGetRequest(String baseUri, String injectId, String targetId)
+        throws Exception {
+      MockHttpServletRequestBuilder requestBuilder =
+          get(baseUri).accept(MediaType.APPLICATION_JSON).param("injectId", injectId);
+
+      if (targetId != null) {
+        requestBuilder.param("targetId", targetId);
+        requestBuilder.param("targetType", TargetType.AGENT.name());
+      }
+
+      return mvc.perform(requestBuilder)
+          .andExpect(status().is2xxSuccessful())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject")
+    void should_fetch_execution_traces_by_target_and_inject() throws Exception {
+
+      AgentComposer.Composer agent =
+          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer
+                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                      .withAgent(agent),
+                  executionTraceComposer
+                      .forExecutionTrace(
+                          ExecutionTraceFixture.createDefaultExecutionTraceComplete())
+                      .withAgent(agent)));
+
+      Agent savedAgent = inject.getStatus().get().getTraces().get(0).getAgent();
+
+      String response =
+          performGetRequest(INJECT_URI + "/execution-traces", inject.getId(), savedAgent.getId());
+    }
+
+    @Test
+    @DisplayName("Fetch inject status with global traces by inject")
+    void should_fetch_inject_status_with_global_traces_by_inject() throws Exception {
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStart()),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceError())));
+
+      String response = performGetRequest(INJECT_URI + "/status", inject.getId(), null);
     }
   }
 }

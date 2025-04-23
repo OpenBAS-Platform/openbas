@@ -15,11 +15,11 @@ interface Props {
   injectTestStatus: InjectTestStatusOutput | undefined;
 }
 
-const InjectTestDetail: FunctionComponent<Props> = ({
+const InjectTestDetail = ({
   open,
   handleClose,
   injectTestStatus,
-}) => {
+}: Props) => {
   const theme = useTheme();
   const { t } = useFormatter();
 
@@ -30,7 +30,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
       title={t('Test Details')}
     >
       <div>
-        <Card elevation={0} style={{ marginBottom: '20px' }}>
+        <Card elevation={0} style={{ marginBottom: theme.spacing(3) }}>
           {injectTestStatus
             ? (
                 <CardHeader
@@ -45,7 +45,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
 
                 />
               ) : (
-                <Paper variant="outlined" style={{ padding: '20px' }}>
+                <Paper variant="outlined" style={{ padding: theme.spacing(3) }}>
                   <Typography variant="body1">{t('No data available')}</Typography>
                 </Paper>
               )}

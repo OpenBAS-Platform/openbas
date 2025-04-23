@@ -39,6 +39,7 @@ const Index = () => {
   };
 
   if (pristine && loading) return <Loader />;
+
   if (!injectResultOverviewOutput) {
     return (
       <Alert severity="warning">

@@ -22,7 +22,6 @@ const InjectIndexComponent: FunctionComponent<{
   exercise,
   injectResult,
 }) => {
-  // Context
   const permissionsContext: PermissionsContextType = { permissions: usePermissions(exercise.exercise_id) };
 
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>(injectResult);

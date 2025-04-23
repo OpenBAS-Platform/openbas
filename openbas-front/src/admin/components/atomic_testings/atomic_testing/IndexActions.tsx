@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { launchAtomicTesting, relaunchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import AtomicTestingPopover from './AtomicTestingPopover';
@@ -62,7 +61,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
       const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.status_id ? 'Launch now' : 'Relaunch now';
       return (
         <Button
-          style={{ marginRight: theme.spacing(1.25) }}
+          style={{ marginRight: theme.spacing(1) }}
           startIcon={<PlayArrowOutlined />}
           variant="contained"
           color="primary"
@@ -77,7 +76,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
       return (
         <>
           <Button
-            style={{ marginRight: theme.spacing(1.25) }}
+            style={{ marginRight: theme.spacing(1) }}
             startIcon={<SettingsOutlined />}
             variant="contained"
             color="warning"
@@ -94,7 +93,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
 
   function getDialog(injectResultOverviewOutput: InjectResultOverviewOutput) {
     return (
-      <Dialog open={openDialog} onClose={handleCloseDialog} TransitionComponent={Transition} PaperProps={{ elevation: 1 }}>
+      <Dialog open={openDialog} onClose={handleCloseDialog} slotProps={{ paper: { elevation: 1 } }}>
         <DialogContent>
           <DialogContentText>
             {injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
@@ -102,7 +101,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
               : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })}
           </DialogContentText>
           {injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id && (
-            <Alert severity="warning" style={{ marginTop: 2.5 }}>
+            <Alert severity="warning" style={{ marginTop: theme.spacing(2) }}>
               {t('This atomic testing and its previous results will be deleted')}
             </Alert>
           )}
@@ -126,7 +125,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
 
   return (
     <>
-      <Box display="flex" flexDirection="row" alignItems="center" gap={1} ml={theme.spacing(4)}>
+      <Box display="flex" flexDirection="row" alignItems="center" ml={theme.spacing(2)}>
         {getActionButton(injectResultOverview)}
         <AtomicTestingPopover
           atomic={injectResultOverview}
