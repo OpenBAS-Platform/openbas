@@ -68,8 +68,11 @@ public class InjectsExecutionJob implements Job {
 
   @PostConstruct
   private void init() {
-    this.injectExecutionThreshold =
-        Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
+    String threshold = env.getProperty("inject.execution.threshold.minutes");
+    if (threshold == null || threshold.isBlank()) {
+      threshold = "10";
+    }
+    this.injectExecutionThreshold = Integer.parseInt(threshold);
   }
 
   public void handleAutoStartExercises() {
