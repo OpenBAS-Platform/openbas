@@ -3,6 +3,8 @@ import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 
 import { ExpectationType } from './Expectation';
 
+export const FAILED = 'Failed';
+
 export const isAutomatic = (type: string) => {
   return [ExpectationType.ARTICLE.toString(), ExpectationType.PREVENTION.toString(), ExpectationType.DETECTION.toString()].includes(type);
 };

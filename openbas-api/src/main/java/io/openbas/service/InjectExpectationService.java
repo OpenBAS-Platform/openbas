@@ -3,6 +3,7 @@ package io.openbas.service;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.InjectExpectationUtils.*;
+import static io.openbas.utils.ExpectationUtils.HUMAN_EXPECTATION;
 import static io.openbas.utils.ExpectationUtils.isAssetGroupExpectation;
 import static java.time.Instant.now;
 
@@ -70,7 +71,7 @@ public class InjectExpectationService {
             .findAny();
 
     String result;
-    if (MANUAL.equals(injectExpectation.getType())) {
+    if (HUMAN_EXPECTATION.contains(injectExpectation.getType())) {
       result = input.getScore() >= injectExpectation.getExpectedScore() ? SUCCESS : FAILED;
       injectExpectation.getResults().clear();
       exists = Optional.empty();
@@ -112,7 +113,7 @@ public class InjectExpectationService {
       injectExpectation.setScore(input.getScore());
     } else {
       if (input.getScore() > injectExpectation.getScore()
-          || MANUAL.equals(injectExpectation.getType())) {
+          || HUMAN_EXPECTATION.contains(injectExpectation.getType())) {
         injectExpectation.setScore(input.getScore());
       } else {
         injectExpectation.setScore(
@@ -138,7 +139,7 @@ public class InjectExpectationService {
     }
 
     // If the expectation is type manual, We should update expectations for teams and players
-    if (MANUAL.equals(updated.getType()) && updated.getTeam() != null) {
+    if (HUMAN_EXPECTATION.contains(injectExpectation.getType()) && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
     return updated;
