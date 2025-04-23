@@ -25,6 +25,7 @@ export interface ExpectationInputForm extends Omit<ExpectationInput, 'expectatio
 
 export enum ExpectationType {
   ARTICLE = 'ARTICLE',
+  CHALLENGE = 'CHALLENGE',
   PREVENTION = 'PREVENTION',
   DETECTION = 'DETECTION',
   MANUAL = 'MANUAL',
