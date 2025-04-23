@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_82__Add_Unique_constraint_injects_expectations_traces extends BaseJavaMigration {
+public class V3_83__Add_Unique_constraint_injects_expectations_traces extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
