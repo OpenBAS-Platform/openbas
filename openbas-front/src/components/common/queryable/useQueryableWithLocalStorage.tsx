@@ -61,7 +61,7 @@ const buildUseQueryable = (
   return ({
     queryableHelpers,
     searchPaginationInput,
-    setSearchPaginationInput
+    setSearchPaginationInput,
   });
 };
 

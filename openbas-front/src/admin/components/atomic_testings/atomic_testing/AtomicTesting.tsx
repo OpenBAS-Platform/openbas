@@ -104,8 +104,10 @@ const AtomicTesting = () => {
       filterGroup: {
         mode: 'and',
         filters: [],
-      }, page: 0, size: 20
-    })
+      },
+      page: 0,
+      size: 20,
+    });
 
     setSelectedTargetLegacy(
       selectedTargetLegacy
@@ -122,7 +124,7 @@ const AtomicTesting = () => {
       .then((response) => {
         if (response.data.content.length > 0) {
           setHasAssetsGroup(true);
-        } else { setHasAssetsGroup(false) }
+        } else { setHasAssetsGroup(false); }
       })
       .finally(() => {
         setHasAssetsGroupChecked(true);
