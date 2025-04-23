@@ -14,9 +14,11 @@ import lombok.Data;
     discriminatorProperty = "target_type",
     oneOf = {
       AssetGroupTarget.class,
+      TeamTarget.class
     },
     discriminatorMapping = {
       @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
+      @DiscriminatorMapping(value = "TEAMS", schema = TeamTarget.class)
     })
 public abstract class InjectTarget {
   @Id
