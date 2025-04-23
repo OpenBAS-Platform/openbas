@@ -763,10 +763,7 @@ export interface DateHistogramSeries {
   name?: string;
 }
 
-export type DateHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
-> & {
+export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   end: string;
   interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
@@ -4010,10 +4007,7 @@ export interface StructuralHistogramSeries {
   name?: string;
 }
 
-export type StructuralHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
-> & {
+export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   series: StructuralHistogramSeries[];
 };
 
