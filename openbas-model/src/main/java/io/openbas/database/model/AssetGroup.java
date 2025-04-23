@@ -102,7 +102,6 @@ public class AssetGroup implements Base {
   // -- INJECT --
 
   @ArraySchema(schema = @Schema(type = "string"))
-  @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "injects_asset_groups",
