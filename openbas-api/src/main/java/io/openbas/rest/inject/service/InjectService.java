@@ -6,6 +6,7 @@ import static io.openbas.utils.AgentUtils.isPrimaryAgent;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
+import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,10 +25,7 @@ import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.LicenseRestrictionException;
-import io.openbas.rest.inject.form.InjectBulkProcessingInput;
-import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
-import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
-import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.inject.form.*;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
@@ -81,6 +79,8 @@ public class InjectService {
   private final TagService tagService;
   private final DocumentService documentService;
   private final InjectStatusMapper injectStatusMapper;
+  private final TagRepository tagRepository;
+  private final DocumentRepository documentRepository;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -543,6 +543,141 @@ public class InjectService {
       }
     }
     return result;
+  }
+
+  public Inject updateInject(
+      @NotBlank final String injectId, @jakarta.validation.constraints.NotNull InjectInput input) {
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    inject.setUpdateAttributes(input);
+
+    // Set dependencies
+    if (input.getDependsOn() != null) {
+      input
+          .getDependsOn()
+          .forEach(
+              entry -> {
+                Optional<InjectDependency> existingDependency =
+                    inject.getDependsOn().stream()
+                        .filter(
+                            injectDependency ->
+                                injectDependency
+                                    .getCompositeId()
+                                    .getInjectParent()
+                                    .getId()
+                                    .equals(entry.getRelationship().getInjectParentId()))
+                        .findFirst();
+                if (existingDependency.isPresent()) {
+                  existingDependency
+                      .get()
+                      .getInjectDependencyCondition()
+                      .setConditions(entry.getConditions().getConditions());
+                  existingDependency
+                      .get()
+                      .getInjectDependencyCondition()
+                      .setMode(entry.getConditions().getMode());
+                } else {
+                  InjectDependency injectDependency = new InjectDependency();
+                  injectDependency.getCompositeId().setInjectChildren(inject);
+                  injectDependency
+                      .getCompositeId()
+                      .setInjectParent(
+                          injectRepository
+                              .findById(entry.getRelationship().getInjectParentId())
+                              .orElse(null));
+                  injectDependency.setInjectDependencyCondition(
+                      new InjectDependencyConditions.InjectDependencyCondition());
+                  injectDependency
+                      .getInjectDependencyCondition()
+                      .setConditions(entry.getConditions().getConditions());
+                  injectDependency
+                      .getInjectDependencyCondition()
+                      .setMode(entry.getConditions().getMode());
+                  inject.getDependsOn().add(injectDependency);
+                }
+              });
+    }
+
+    List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
+    if (inject.getDependsOn() != null && !inject.getDependsOn().isEmpty()) {
+      if (input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
+        inject
+            .getDependsOn()
+            .forEach(
+                injectDependency -> {
+                  if (!input.getDependsOn().stream()
+                      .map(
+                          (injectDependencyInput ->
+                              injectDependencyInput.getRelationship().getInjectParentId()))
+                      .toList()
+                      .contains(injectDependency.getCompositeId().getInjectParent().getId())) {
+                    injectDepencyToRemove.add(injectDependency);
+                  }
+                });
+      } else {
+        injectDepencyToRemove.addAll(inject.getDependsOn());
+      }
+      inject.getDependsOn().removeAll(injectDepencyToRemove);
+    }
+
+    inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
+    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+    inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+
+    // Set documents
+    List<InjectDocumentInput> inputDocuments = input.getDocuments();
+    List<InjectDocument> injectDocuments = inject.getDocuments();
+
+    List<String> askedDocumentIds =
+        inputDocuments.stream().map(InjectDocumentInput::getDocumentId).toList();
+    List<String> currentDocumentIds =
+        inject.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
+    // To delete
+    List<InjectDocument> toRemoveDocuments =
+        injectDocuments.stream()
+            .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
+            .toList();
+    injectDocuments.removeAll(toRemoveDocuments);
+    // To add
+    inputDocuments.stream()
+        .filter(doc -> !currentDocumentIds.contains(doc.getDocumentId()))
+        .forEach(
+            in -> {
+              Optional<Document> doc = this.documentRepository.findById(in.getDocumentId());
+              if (doc.isPresent()) {
+                InjectDocument injectDocument = new InjectDocument();
+                injectDocument.setInject(inject);
+                Document document = doc.get();
+                injectDocument.setDocument(document);
+                injectDocument.setAttached(in.isAttached());
+                InjectDocument savedInjectDoc = this.injectDocumentRepository.save(injectDocument);
+                injectDocuments.add(savedInjectDoc);
+              }
+            });
+    // Remap the attached boolean
+    injectDocuments.forEach(
+        injectDoc -> {
+          Optional<InjectDocumentInput> inputInjectDoc =
+              input.getDocuments().stream()
+                  .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId()))
+                  .findFirst();
+          Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
+          injectDoc.setAttached(attached);
+        });
+    inject.setDocuments(injectDocuments);
+
+    return inject;
+  }
+
+  public Inject updateInjectActivation(
+      @NotBlank final String injectId,
+      @jakarta.validation.constraints.NotNull final InjectUpdateActivationInput input) {
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    inject.setEnabled(input.isEnabled());
+    inject.setUpdatedAt(now());
+    return injectRepository.save(inject);
   }
 
   /**

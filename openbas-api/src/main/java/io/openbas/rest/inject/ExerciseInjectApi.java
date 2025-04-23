@@ -35,7 +35,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,7 +258,7 @@ public class ExerciseInjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateActivationInput input) {
-    return updateInjectActivation(injectId, input);
+    return injectService.updateInjectActivation(injectId, input);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/trigger")
@@ -291,15 +290,6 @@ public class ExerciseInjectApi extends RestBehavior {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     Iterable<Team> injectTeams = teamRepository.findAllById(input.getTeamIds());
     inject.setTeams(fromIterable(injectTeams));
-    return injectRepository.save(inject);
-  }
-
-  private Inject updateInjectActivation(
-      @NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setEnabled(input.isEnabled());
-    inject.setUpdatedAt(now());
     return injectRepository.save(inject);
   }
 }
