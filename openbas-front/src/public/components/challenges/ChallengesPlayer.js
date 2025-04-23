@@ -532,7 +532,7 @@ const ChallengesPlayer = () => {
                     severity="error"
                     onClose={() => setCurrentResult(null)}
                   >
-                    {t('Flag is not correct!')}
+                    {t('Flag is not correct! Try again...')}
                     {maxAttemptsExceeded() && (
                       <>
                         <br />
