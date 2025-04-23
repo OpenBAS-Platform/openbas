@@ -98,8 +98,17 @@ const InjectIndexComponent: FunctionComponent<{
     }}
     >
       <PermissionsContext.Provider value={permissionsContext}>
-        <Breadcrumbs variant="object" elements={breadcrumbs} />
-        <InjectHeader inject={injectResult} />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '20px',
+        }}
+        >
+          <div style={{ flex: 1 }}>
+            <Breadcrumbs variant="object" elements={breadcrumbs} />
+            <InjectHeader inject={injectResult} />
+          </div>
+        </div>
         <Box
           sx={{
             borderBottom: 1,

@@ -77,7 +77,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     const data = useMemo(() => (hasDistribution ? expectationResultsByType.distribution.map(e => e.value) : [1]), [expectationResultsByType]);
 
     return (
-      <Grid size={4}>
+      <Grid size={2}>
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -86,7 +86,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         >
           <Box sx={{
             position: 'relative',
-            height: 120,
+            height: 100,
           }}
           >
             {renderIcon(type, hasDistribution)}
@@ -114,13 +114,12 @@ const ResponsePie: FunctionComponent<Props> = ({
             style={{
               ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
               fontWeight: 500,
-              paddingTop: 24,
+              paddingTop: 0,
             }}
           >
             {title}
           </span>
           {expectationResultsByType?.type === 'HUMAN_RESPONSE' && displayHumanValidationBtn && (
-
             <Button
               startIcon={<InfoOutlined />}
               color="primary"
@@ -137,7 +136,7 @@ const ResponsePie: FunctionComponent<Props> = ({
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid id="score_details" container spacing={3} direction="row">
+      <Grid id="score_details" container spacing={1} direction="row" justifyContent="right">
         <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
         <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
         <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
