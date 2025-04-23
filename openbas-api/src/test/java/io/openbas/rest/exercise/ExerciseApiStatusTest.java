@@ -141,7 +141,7 @@ public class ExerciseApiStatusTest {
     injectRepository.save(inject2);
     injectRepository.save(inject3);
     injectRepository.save(inject4);
-    injectRepository.save(inject5);
+    SAVED_INJECT5 = injectRepository.save(inject5);
 
     InjectStatus injectStatus = new InjectStatus();
 
