@@ -43,6 +43,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
     }
     handleCanLaunch();
   };
+
   const submitRelaunch = async () => {
     handleCloseDialog();
     handleCannotLaunch();
@@ -90,6 +91,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
       );
     }
   }
+
   function getDialog(injectResultOverviewOutput: InjectResultOverviewOutput) {
     return (
       <Dialog open={openDialog} onClose={handleCloseDialog} TransitionComponent={Transition} PaperProps={{ elevation: 1 }}>
