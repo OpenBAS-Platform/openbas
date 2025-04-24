@@ -18,14 +18,15 @@ import { type QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles<{ topPagination?: boolean }>()((theme, props) => ({
   topbar: {
     display: 'flex',
     alignItems: 'center',
   },
+  topPagination: { display: 'block' },
   parameters: {
     marginTop: -10,
-    display: 'flex',
+    display: props.topPagination ? 'block' : 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -49,6 +50,7 @@ interface Props<T> {
   attackPatterns?: AttackPattern[];
   reloadContentCount?: number;
   contextId?: string;
+  topPagination?: boolean;
 }
 
 const PaginationComponentV2 = <T extends object>({
@@ -64,9 +66,10 @@ const PaginationComponentV2 = <T extends object>({
   topBarButtons,
   reloadContentCount = 0,
   contextId,
+  topPagination = false,
 }: Props<T>) => {
   // Standard hooks
-  const { classes } = useStyles();
+  const { classes } = useStyles({ topPagination });
   const { t } = useFormatter();
 
   const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);
@@ -127,6 +130,19 @@ const PaginationComponentV2 = <T extends object>({
   return (
     <>
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
+        {topPagination
+          && (
+            <div className={classes.topPagination}>
+              {!disablePagination && (
+                <TablePaginationComponentV2
+                  page={searchPaginationInput.page}
+                  size={searchPaginationInput.size}
+                  paginationHelpers={queryableHelpers.paginationHelpers}
+                />
+              )}
+              {!!topBarButtonComponent && topBarButtonComponent}
+            </div>
+          )}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -174,16 +190,19 @@ const PaginationComponentV2 = <T extends object>({
             </div>
           )}
         </div>
-        <div className={classes.topbar}>
-          {!disablePagination && (
-            <TablePaginationComponentV2
-              page={searchPaginationInput.page}
-              size={searchPaginationInput.size}
-              paginationHelpers={queryableHelpers.paginationHelpers}
-            />
+        {!topPagination
+          && (
+            <div className={classes.topbar}>
+              {!disablePagination && (
+                <TablePaginationComponentV2
+                  page={searchPaginationInput.page}
+                  size={searchPaginationInput.size}
+                  paginationHelpers={queryableHelpers.paginationHelpers}
+                />
+              )}
+              {!!topBarButtonComponent && topBarButtonComponent}
+            </div>
           )}
-          {!!topBarButtonComponent && topBarButtonComponent}
-        </div>
       </div>
       {/* Handle Mitre Filter */}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (

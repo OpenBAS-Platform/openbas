@@ -560,6 +560,7 @@
   "finding_asset_groups": "Groupes d'actifs",
   "finding_assets": "Points finaux",
   "finding_created_at": "Créé à",
+  "finding_inject_id": "Stimuli",
   "finding_name": "Nom",
   "finding_scenario": "Scénario",
   "finding_simulation": "Simulation",
@@ -1254,6 +1255,8 @@
   "tag_rule_tag": "Étiquette",
   "Tags": "Tags",
   "Target": "Cible",
+  "target_name": "Nom",
+  "target_tags": "Tags",
   "Targeted asset groups": "Groupes d'assets ciblés",
   "Targeted assets": "Assets ciblés",
   "Targeted players": "Joueurs ciblés",
@@ -1514,6 +1517,5 @@
   "Your file should be a XLS": "Votre fichier doit être un XLS",
   "Your overall evaluation about this question.": "Votre évaluation globale de cette question.",
   "your trial license online": "votre licence d'essai en ligne",
-  "YYYY": "AAAA",
-  "finding_inject_id": "Stimuli"
+  "YYYY": "AAAA"
 }

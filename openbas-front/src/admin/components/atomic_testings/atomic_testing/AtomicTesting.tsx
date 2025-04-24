@@ -1,16 +1,21 @@
 import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { Fragment, type SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import { searchTargets } from '../../../../actions/injects/inject-action';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import SearchFilter from '../../../../components/SearchFilter';
-import { type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectTarget, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingInformation from './AtomicTestingInformation';
+import NewTargetListItem from './NewTargetListItem';
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
@@ -45,7 +50,9 @@ const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
+  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult>();
+  const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
+  const [targets, setTargets] = useState<InjectTarget[]>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
@@ -53,27 +60,99 @@ const AtomicTesting = () => {
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
-  useEffect(() => {
-    setSelectedTarget(selectedTarget || currentParentTarget || injectResultOverviewOutput?.inject_targets ? injectResultOverviewOutput?.inject_targets[0] : undefined);
-  }, [injectResultOverviewOutput]);
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
+
+  const [hasAssetsGroup, setHasAssetsGroup] = useState(false);
+  const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
+
+  const tabConfig = useMemo(() => {
+    let index = 0;
+    const tabs = [];
+
+    if (hasAssetsGroup) {
+      tabs.push({
+        key: index++,
+        label: t('Asset groups'),
+        type: 'ASSETS_GROUPS',
+        entityPrefix: 'asset_group_target',
+      });
+    }
+
+    tabs.push({
+      key: index++,
+      label: t('All targets'),
+      type: 'ALL_TARGETS',
+    });
+
+    return tabs;
+  }, [hasAssetsGroup]);
+
+  const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryable(buildSearchPagination({
+    filterGroup: {
+      mode: 'and',
+      filters: [],
+    },
+  }));
+
+  const injectId = injectResultOverviewOutput?.inject_id || '';
+
+  useEffect(() => {
+    if (!injectResultOverviewOutput) return;
+
+    setSearchPaginationInput({
+      filterGroup: {
+        mode: 'and',
+        filters: [],
+      },
+      page: 0,
+      size: 20,
+    });
+
+    setSelectedTargetLegacy(
+      selectedTargetLegacy
+      || currentParentTarget
+      || injectResultOverviewOutput?.inject_targets?.[0],
+    );
+
+    const searchPaginationInput1Result = {
+      ...searchPaginationInput,
+      size: 1,
+    };
+
+    searchTargets(injectId, 'ASSETS_GROUPS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasAssetsGroup(true);
+        } else { setHasAssetsGroup(false); }
+      })
+      .finally(() => {
+        setHasAssetsGroupChecked(true);
+      });
+  }, [injectResultOverviewOutput]);
 
   // Handles
 
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTarget(target);
+    setSelectedTargetLegacy(target);
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
+  };
+
+  const handleNewTargetClick = (target: InjectTarget) => {
+    // TODO: handle the platform type for Endpoint targets
+    setSelectedTargetLegacy({
+      id: target.target_id,
+      name: target.target_name,
+      targetType: target.target_type,
+      platformType: undefined,
+    });
+    setSelectedTarget(target);
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-
-  useEffect(() => {
-    setActiveTab(0);
-  });
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
     return (
@@ -81,7 +160,7 @@ const AtomicTesting = () => {
         <TargetListItem
           onClick={() => handleTargetClick(target, parent, upperParent)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
+          selected={selectedTargetLegacy?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
@@ -100,26 +179,6 @@ const AtomicTesting = () => {
   if (!injectResultOverviewOutput) {
     return <Loader variant="inElement" />;
   }
-
-  const tabConfig = [
-    {
-      key: 0,
-      label: t('All targets'),
-      content: sortedTargets.length > 0
-        ? (
-            <List>
-              {sortedTargets.map(target => (
-                <div key={target?.id}>
-                  {renderTargetItem(target, undefined, undefined)}
-                </div>
-              ))}
-            </List>
-          )
-        : (
-            <Empty message={t('No target configured.')} />
-          ),
-    },
-  ];
 
   return (
     <GridLegacy
@@ -166,22 +225,72 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            className={classes.tabs}
-          >
-            {tabConfig.map(tab => (
-              <Tab key={tab.key} label={tab.label} />
-            ))}
-          </Tabs>
-          {tabConfig.map(tab => (
-            <div key={tab.key} hidden={activeTab !== tab.key}>
-              {tab.content}
-            </div>
-          ))}
+          {hasAssetsGroupChecked && (
+            <>
+              <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                indicatorColor="primary"
+                textColor="primary"
+                className={classes.tabs}
+              >
+                {tabConfig
+                  .map(tab => (
+                    <Tab key={`tab-${tab.key}`} label={tab.label} />
+                  ))}
+              </Tabs>
+              {tabConfig
+                .map((tab) => {
+                  const isAllTargets = tab.type === 'ALL_TARGETS';
+                  return (
+                    <div key={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
+                      {!isAllTargets && (
+                        <>
+                          <PaginationComponentV2
+                            fetch={input => searchTargets(injectResultOverviewOutput?.inject_id, tab.type, input)}
+                            searchPaginationInput={searchPaginationInput}
+                            setContent={setTargets}
+                            entityPrefix={tab.entityPrefix}
+                            queryableHelpers={queryableHelpers}
+                            topPagination={true}
+                          />
+                          {targets && targets.length > 0 ? (
+                            <List>
+                              {targets.map(target => (
+                                <NewTargetListItem
+                                  onClick={() => handleNewTargetClick(target)}
+                                  target={target}
+                                  selected={selectedTarget?.target_id === target.target_id}
+                                  key={target?.target_id}
+                                />
+                              ))}
+                            </List>
+                          ) : (
+                            <Empty message={t('No target configured.')} />
+                          )}
+                        </>
+                      )}
+
+                      {isAllTargets && (
+                        <>
+                          {sortedTargets.length > 0 ? (
+                            <List>
+                              {sortedTargets.map(target => (
+                                <div key={target?.id}>
+                                  {renderTargetItem(target, undefined, undefined)}
+                                </div>
+                              ))}
+                            </List>
+                          ) : (
+                            <Empty message={t('No target configured.')} />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+            </>
+          )}
         </Paper>
       </GridLegacy>
       <GridLegacy item xs={6} style={{ marginTop: 29 }}>
@@ -189,17 +298,17 @@ const AtomicTesting = () => {
           {t('Results by target')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {selectedTarget && !!injectResultOverviewOutput.inject_type && (
+          {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
               upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
-              target={selectedTarget}
+              target={selectedTargetLegacy}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
               lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
             />
           )}
-          {!selectedTarget && (
+          {!selectedTargetLegacy && (
             <Empty message={t('No target data available.')} />
           )}
         </Paper>
