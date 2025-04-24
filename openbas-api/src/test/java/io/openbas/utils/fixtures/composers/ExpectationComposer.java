@@ -13,9 +13,16 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
   public class Composer extends InnerComposerBase<InjectExpectation> {
     private final InjectExpectation injectExpectation;
     private Optional<AssetGroupComposer.Composer> assetGroupComposer = Optional.empty();
+    private Optional<TeamComposer.Composer> teamComposer = Optional.empty();
 
     public Composer(InjectExpectation injectExpectation) {
       this.injectExpectation = injectExpectation;
+    }
+
+    public Composer withTeam(TeamComposer.Composer teamComposer) {
+      this.teamComposer = Optional.of(teamComposer);
+      this.injectExpectation.setTeam(teamComposer.get());
+      return this;
     }
 
     public Composer withAssetGroup(AssetGroupComposer.Composer assetGroupComposer) {
@@ -27,6 +34,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     @Override
     public Composer persist() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::persist);
+      teamComposer.ifPresent(TeamComposer.Composer::persist);
       injectExpectationRepository.save(injectExpectation);
       return this;
     }
@@ -34,6 +42,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     @Override
     public InnerComposerBase<InjectExpectation> delete() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::delete);
+      teamComposer.ifPresent(TeamComposer.Composer::delete);
       injectExpectationRepository.delete(injectExpectation);
       return this;
     }
