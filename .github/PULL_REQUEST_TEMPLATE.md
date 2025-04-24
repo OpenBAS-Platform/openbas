@@ -10,6 +10,11 @@ Thus already a BIG THANK YOU upfront to you for choosing to help with your PR.
 *
 *
 
+### What should be tested?
+
+*  
+* 
+
 ### Related issues
 
 * Closes #ISSUE-NUMBER
