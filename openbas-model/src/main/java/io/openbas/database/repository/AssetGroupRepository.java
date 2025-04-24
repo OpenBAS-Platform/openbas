@@ -71,6 +71,15 @@ public interface AssetGroupRepository
 
   // -- PAGINATION --
 
+  @Query(
+      value =
+          "SELECT CAST(asset_group_dynamic_filter as text)"
+              + "FROM asset_groups ag "
+              + "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id "
+              + "WHERE iat.inject_id = :injectId;",
+      nativeQuery = true)
+  List<String> rawDynamicFiltersByInjectId(@Param("injectId") String injectId);
+
   @NotNull
   @EntityGraph(value = "AssetGroup.tags-assets", type = EntityGraph.EntityGraphType.LOAD)
   Page<AssetGroup> findAll(@NotNull Specification<AssetGroup> spec, @NotNull Pageable pageable);

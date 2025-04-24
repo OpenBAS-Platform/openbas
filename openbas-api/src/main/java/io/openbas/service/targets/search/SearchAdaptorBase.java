@@ -41,7 +41,7 @@ public abstract class SearchAdaptorBase {
       injectScopeFilter.setOperator(Filters.FilterOperator.eq);
       injectScopeFilter.setValues(List.of(scopedInject.getId()));
       injectScopeFilter.setKey(fieldTranslations.get("target_injects"));
-      newFilters.add(injectScopeFilter);
+      //newFilters.add(injectScopeFilter);
     }
 
     Filters.FilterGroup newFilterGroup = new Filters.FilterGroup();
