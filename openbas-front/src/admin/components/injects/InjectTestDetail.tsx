@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent } from 'react';
 
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';

@@ -1,6 +1,5 @@
 import { Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type React from 'react';
 
 import { useFormatter } from '../../../../../../components/i18n';
 import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
