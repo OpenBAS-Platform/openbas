@@ -18,11 +18,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TeamTargetSeachAdaptator extends SearchAdaptorBase {
+public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
   private final TeamService teamService;
   private final InjectExpectationService injectExpectationService;
 
-  public TeamTargetSeachAdaptator(
+  public TeamTargetSearchAdaptor(
       TeamService teamService, InjectExpectationService injectExpectationService) {
     this.teamService = teamService;
     this.injectExpectationService = injectExpectationService;

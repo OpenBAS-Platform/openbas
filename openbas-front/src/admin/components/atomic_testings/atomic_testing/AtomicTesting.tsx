@@ -244,7 +244,7 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {(hasAssetsGroupChecked || hasTeamsChecked) && (
+          {hasAssetsGroupChecked && hasTeamsChecked && (
             <>
               <Tabs
                 value={activeTab}
