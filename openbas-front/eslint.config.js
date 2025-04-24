@@ -1,7 +1,7 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 
 // imports to not let tools report them as unused
-import 'eslint-import-resolver-oxc';
+import 'eslint-import-resolver-typescript';
 
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
@@ -33,7 +33,7 @@ export default [
   importPlugin.flatConfigs.typescript,
   {
     settings: {
-      'import/resolver': 'oxc',
+      'import/resolver': 'typescript',
       'import/ignore': [
         'react-apexcharts', // ignore react-apexcharts as the default export is broken
       ],
