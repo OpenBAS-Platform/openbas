@@ -60,7 +60,7 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
         <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
       </Box>
       <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReduceView />
+        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
       </Box>
     </Box>
 

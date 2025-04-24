@@ -13,7 +13,7 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   disableChartAnimation?: boolean;
-  isReduceView?: boolean;
+  isReducedView?: boolean;
 }
 
 const getTotal = (distribution: ResultDistribution[]) => {
@@ -44,7 +44,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
   disableChartAnimation,
-  isReduceView,
+  isReducedView,
 }) => {
   const { t } = useFormatter();
   const theme = useTheme();
@@ -78,7 +78,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     const data = useMemo(() => (hasDistribution ? expectationResultsByType.distribution.map(e => e.value) : [1]), [expectationResultsByType]);
 
     return (
-      <Grid size={isReduceView ? 2 : 4}>
+      <Grid size={isReducedView ? 2 : 4}>
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -87,7 +87,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         >
           <Box sx={{
             position: 'relative',
-            height: isReduceView ? 100 : 120,
+            height: isReducedView ? 100 : 120,
           }}
           >
             {renderIcon(type, hasDistribution)}
@@ -141,7 +141,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         container
         spacing={1}
         direction="row"
-        justifyContent={isReduceView ? 'right' : 'flex-start'}
+        justifyContent={isReducedView ? 'right' : 'flex-start'}
       >
         <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
         <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />

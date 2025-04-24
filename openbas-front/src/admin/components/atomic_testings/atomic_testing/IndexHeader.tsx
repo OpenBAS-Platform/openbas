@@ -48,7 +48,7 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
         <IndexTabs injectResultOverview={injectResultOverview} />
       </Box>
       <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReduceView />
+        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
         <IndexActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
       </Box>
     </Box>
