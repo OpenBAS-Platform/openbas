@@ -118,6 +118,17 @@ public class Team implements Base {
   @JsonProperty("team_scenarios")
   private List<Scenario> scenarios = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "injects_teams",
+      joinColumns = @JoinColumn(name = "team_id"),
+      inverseJoinColumns = @JoinColumn(name = "inject_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("team_injects")
+  @Queryable(filterable = true, dynamicValues = true, path = "injects.id")
+  private List<Inject> injects = new ArrayList<>();
+
   @Column(name = "team_contextual")
   @JsonProperty("team_contextual")
   @Schema(
