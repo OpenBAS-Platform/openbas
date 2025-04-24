@@ -560,6 +560,7 @@
   "finding_asset_groups": "Asset groups",
   "finding_assets": "Endpoints",
   "finding_created_at": "Created at",
+  "finding_inject_id": "Inject",
   "finding_name": "Name",
   "finding_scenario": "Scenario",
   "finding_simulation": "Simulation",
@@ -605,7 +606,7 @@
   "Headers": "Headers",
   "Hello": "Hello",
   "here": "here",
-  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.": "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.",
+  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. Each agent can be installed on Windows, Linux and MacOS using x86_64 or arm64 architectures.": "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. Each agent can be installed on Windows, Linux and MacOS using x86_64 or arm64 architectures.",
   "Hide timeline": "Hide timeline",
   "High": "High",
   "Home": "Home",
@@ -1258,6 +1259,8 @@
   "tag_rule_tag": "Tag",
   "Tags": "Tags",
   "Target": "Target",
+  "target_name": "Name",
+  "target_tags": "Tags",
   "Targeted asset groups": "Targeted asset groups",
   "Targeted assets": "Targeted assets",
   "Targeted players": "Targeted players",
@@ -1518,6 +1521,5 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY",
-  "finding_inject_id": "Inject"
+  "YYYY": "YYYY"
 }
