@@ -28,7 +28,11 @@ const TraceMessage = ({ traces }: Props) => {
   };
 
   return (
-    <pre style={{ marginTop: theme.spacing(1) }}>
+    <pre style={{
+      marginTop: theme.spacing(1),
+      padding: theme.spacing(0.2, 4, 0.2, 0),
+    }}
+    >
       <ul>
         {sorted.map((tr, index) => {
           const isExpanded = expandedMessages.has(index);
@@ -47,12 +51,11 @@ const TraceMessage = ({ traces }: Props) => {
                 {isTruncated && (
                   <Button
                     variant="outlined"
+                    size="small"
                     onClick={() => toggleMessage(index)}
                     style={{
                       width: '100%',
-                      height: theme.spacing(5),
                       marginTop: theme.spacing(2),
-                      textTransform: 'none',
                     }}
                   >
                     {isExpanded ? (
