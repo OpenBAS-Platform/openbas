@@ -7,7 +7,6 @@ import { fetchDocuments } from '../../../../actions/Document';
 import type { DocumentHelper } from '../../../../actions/helper';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
-import ItemStatus from '../../../../components/ItemStatus';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
@@ -56,13 +55,13 @@ const AtomicTestingInformation: FunctionComponent<Props> = ({ injectResultOvervi
   }, [injectResultOverviewOutput.injects_documents, documentMap]);
 
   return (
-    <Paper sx={{ p: 2 }} classes={{ root: classes.paper }} variant="outlined">
+    <Paper sx={{ p: theme.spacing(2) }} classes={{ root: classes.paper }} variant="outlined">
       <div style={{
         display: 'grid',
         gap: `0px ${theme.spacing(3)}`,
         gridTemplateColumns: '1fr 1fr 1fr',
         gridTemplateAreas: `
-        "description description status"
+        "description description description"
         "type execution documents"
         "tags platforms killchainphases"
         `,
@@ -74,16 +73,6 @@ const AtomicTestingInformation: FunctionComponent<Props> = ({ injectResultOvervi
             {t('Description')}
           </Typography>
           <ExpandableMarkdown source={injectResultOverviewOutput.inject_description} limit={300} />
-        </div>
-        <div style={{ gridArea: 'status' }}>
-          <Typography variant="h3" gutterBottom>
-            {t('Execution status')}
-          </Typography>
-          <ItemStatus
-            isInject={true}
-            status={injectResultOverviewOutput.inject_status?.status_name}
-            label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
-          />
         </div>
         <div style={{
           gridArea: 'type',

@@ -2,6 +2,8 @@ import { InfoOutlined } from '@mui/icons-material';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
+import { useFormatter } from '../../../../components/i18n';
+import ItemStatus from '../../../../components/ItemStatus';
 import Loader from '../../../../components/Loader';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
@@ -18,6 +20,7 @@ interface Props { injectResultOverview: InjectResultOverviewOutput }
 
 const IndexTitle = ({ injectResultOverview }: Props) => {
   const { classes } = useStyles();
+  const { t } = useFormatter();
 
   if (!injectResultOverview) {
     return <Loader variant="inElement" />;
@@ -34,6 +37,11 @@ const IndexTitle = ({ injectResultOverview }: Props) => {
           {truncate(injectResultOverview.inject_title, 80)}
         </Typography>
       </Tooltip>
+      <ItemStatus
+        isInject={true}
+        status={injectResultOverview.inject_status?.status_name}
+        label={t(injectResultOverview.inject_status?.status_name ?? 'Unknown')}
+      />
       <Tooltip
         slotProps={{
           tooltip: {
