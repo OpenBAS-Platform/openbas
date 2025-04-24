@@ -12,7 +12,12 @@ import MainTraces from './traces/MainTraces';
 
 interface Props {
   injectId: string;
-  target?: InjectTargetWithResult;
+  target?: {
+    id: string;
+    name?: string;
+    targetType: string;
+    platformType?: string;
+  };
 }
 
 const ExecutionStatusDetail = ({ injectId, target }: Props) => {

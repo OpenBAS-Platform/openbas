@@ -8,7 +8,12 @@ import { type ExecutionTraceOutput, type InjectTargetWithResult } from '../../..
 import AgentTraces from './AgentTraces';
 
 interface Props {
-  endpoint: InjectTargetWithResult;
+  endpoint: {
+    id: string;
+    name?: string;
+    targetType: string;
+    platformType?: string;
+  };
   tracesByAgent: ExecutionTraceOutput[];
 }
 
