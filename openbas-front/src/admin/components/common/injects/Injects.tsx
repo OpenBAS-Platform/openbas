@@ -239,10 +239,16 @@ const Injects: FunctionComponent<Props> = ({
     size: 20,
   }));
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchInjectsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return injectContext.searchInjects(input).finally(() => setLoading(false));
+  };
+
   // Injects
   // scoped to page
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
-  // Bulk loading indcator for tests and delete
+  // Bulk loading indicator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
@@ -500,13 +506,6 @@ const Injects: FunctionComponent<Props> = ({
   if (isBulkLoading) {
     return <Loader />;
   }
-
-  const [loading, setLoading] = useState<boolean>(true);
-  const searchInjectsToLoad = (input: SearchPaginationInput) => {
-    setLoading(true);
-    return injectContext.searchInjects(input).finally(() => setLoading(false));
-  };
-
   return (
     <>
       <PaginationComponentV2
