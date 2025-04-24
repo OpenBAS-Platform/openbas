@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.AttackPattern;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(
+    value = {"listened"},
+    ignoreUnknown = true)
 public abstract class InjectorContractMixin {
 
   @JsonSerialize(using = JsonSerializer.None.class)
