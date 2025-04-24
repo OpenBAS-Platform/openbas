@@ -26,6 +26,7 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
 
     public Composer withExecutionTrace(ExecutionTraceComposer.Composer executionTrace) {
       executionTracesComposer.add(executionTrace);
+      executionTrace.get().setInjectStatus(this.injectStatus);
       this.injectStatus.getTraces().add(executionTrace.get());
       return this;
     }
@@ -39,8 +40,8 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
 
     @Override
     public InjectStatusComposer.Composer delete() {
-      injectStatusRepository.delete(injectStatus);
       executionTracesComposer.forEach(ExecutionTraceComposer.Composer::delete);
+      injectStatusRepository.delete(injectStatus);
       return this;
     }
 

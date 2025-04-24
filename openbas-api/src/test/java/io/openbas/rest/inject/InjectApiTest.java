@@ -8,6 +8,7 @@ import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
@@ -36,7 +37,6 @@ import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +47,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -102,8 +103,6 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
-
-  @Autowired private EntityManager entityManager;
 
   @BeforeAll
   void beforeAll() {
@@ -962,17 +961,8 @@ class InjectApiTest extends IntegrationTest {
   class ShouldFetchExecutionTracesForInjectOverview {
 
     private Inject buildInjectWithTraces(List<ExecutionTraceComposer.Composer> traces) {
-      AgentComposer.Composer agentComposer1 =
-          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
-      EndpointComposer.Composer endpointComposer1 =
-          endpointComposer
-              .forEndpoint(EndpointFixture.createEndpoint())
-              .withAgent(agentComposer1)
-              .withAgent(agentComposer1);
-
       return injectComposer
           .forInject(InjectFixture.getDefaultInject())
-          .withEndpoint(endpointComposer1)
           .withInjectStatus(
               injectStatusComposer
                   .forInjectStatus(InjectStatusFixture.createDefaultInjectStatus())
@@ -1001,9 +991,10 @@ class InjectApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch execution traces by target and inject")
     void should_fetch_execution_traces_by_target_and_inject() throws Exception {
-
       AgentComposer.Composer agent =
           agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).withAgent(agent).persist();
 
       Inject inject =
           buildInjectWithTraces(
@@ -1017,9 +1008,15 @@ class InjectApiTest extends IntegrationTest {
                       .withAgent(agent)));
 
       Agent savedAgent = inject.getStatus().get().getTraces().get(0).getAgent();
-
       String response =
           performGetRequest(INJECT_URI + "/execution-traces", inject.getId(), savedAgent.getId());
+
+      MatcherAssert.assertThat(response, containsString("execution_message\":\"Info"));
+      MatcherAssert.assertThat(response, containsString("execution_message\":\"Success"));
+      MatcherAssert.assertThat(response, containsString("execution_action\":\"START"));
+      MatcherAssert.assertThat(response, containsString("execution_action\":\"COMPLETE"));
+      MatcherAssert.assertThat(response, containsString("execution_status\":\"INFO"));
+      MatcherAssert.assertThat(response, containsString("execution_status\":\"SUCCESS"));
     }
 
     @Test
@@ -1034,6 +1031,13 @@ class InjectApiTest extends IntegrationTest {
                       ExecutionTraceFixture.createDefaultExecutionTraceError())));
 
       String response = performGetRequest(INJECT_URI + "/status", inject.getId(), null);
+
+      MatcherAssert.assertThat(response, containsString("execution_message\":\"Info"));
+      MatcherAssert.assertThat(response, containsString("execution_message\":\"Error"));
+      MatcherAssert.assertThat(response, containsString("execution_action\":\"START"));
+      MatcherAssert.assertThat(response, containsString("execution_action\":\"COMPLETE"));
+      MatcherAssert.assertThat(response, containsString("execution_status\":\"INFO"));
+      MatcherAssert.assertThat(response, containsString("execution_status\":\"ERROR"));
     }
   }
 }

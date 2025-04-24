@@ -27,14 +27,13 @@ public class ExecutionTraceComposer extends ComposerBase<ExecutionTrace> {
     @Override
     public ExecutionTraceComposer.Composer persist() {
       executionTraceRepository.save(executionTrace);
-      agentComposer.ifPresent(AgentComposer.Composer::persist);
       return this;
     }
 
     @Override
     public ExecutionTraceComposer.Composer delete() {
-      executionTraceRepository.delete(executionTrace);
       agentComposer.ifPresent(AgentComposer.Composer::delete);
+      executionTraceRepository.delete(executionTrace);
       return this;
     }
 
