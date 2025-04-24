@@ -17,25 +17,8 @@ const GlobalExecutionTraces = ({ injectStatus }: Props) => {
     <>
       <Typography variant="h4">{t('Execution logs')}</Typography>
       <Paper variant="outlined" style={{ padding: theme.spacing(0, 3, 3) }}>
-        <Typography
-          variant="subtitle1"
-          style={{
-            paddingTop: theme.spacing(3),
-            fontWeight: 'bold',
-          }}
-          gutterBottom
-        >
-          {t('Execution status')}
-        </Typography>
-        {injectStatus.status_name && (
-          <ItemStatus
-            isInject
-            status={injectStatus.status_name}
-            label={t(injectStatus.status_name)}
-          />
-        )}
         <ExecutionTime
-          style={{ marginTop: theme.spacing(2) }}
+          style={{ marginTop: theme.spacing(3) }}
           startDate={injectStatus.tracking_sent_date ?? null}
           endDate={injectStatus.tracking_end_date ?? null}
         />
