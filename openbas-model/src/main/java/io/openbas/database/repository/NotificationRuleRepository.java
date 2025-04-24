@@ -28,8 +28,8 @@ public interface NotificationRuleRepository
       @NotBlank String resourceId, @NotBlank String userId);
 
   @Query(
-          "select nr from NotificationRule nr "
-                  + "where nr.resourceId = :resourceId AND nr.trigger = :trigger")
+      "select nr from NotificationRule nr "
+          + "where nr.resourceId = :resourceId AND nr.trigger = :trigger")
   List<NotificationRule> findNotificationRuleByResourceAndTrigger(
-          @NotBlank String resourceId, @NotBlank NotificationRuleTrigger trigger);
+      @NotBlank String resourceId, @NotBlank NotificationRuleTrigger trigger);
 }

@@ -7,7 +7,7 @@ public class SessionHelper {
   public static final String ANONYMOUS_USER = "anonymousUser";
 
   public static OpenBASPrincipal currentUser() {
-    if(SecurityContextHolder.getContext().getAuthentication() == null){
+    if (SecurityContextHolder.getContext().getAuthentication() == null) {
       return new OpenBASAnonymous();
     }
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

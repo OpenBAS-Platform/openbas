@@ -27,7 +27,6 @@ public class NotificationRuleService {
   private final ScenarioService scenarioService;
   private final EmailNotificationService emailNotificationService;
 
-
   public Optional<NotificationRule> findById(final String id) {
     return notificationRuleRepository.findById(id);
   }
@@ -95,15 +94,16 @@ public class NotificationRuleService {
   }
 
   @Transactional
-  public void activateNotificationRules(@NotNull final String resourceId,
-                                        @NotNull final NotificationRuleTrigger trigger,
-                                        @NotNull final Map<String,String> data) {
-    List<NotificationRule> rules = notificationRuleRepository
-            .findNotificationRuleByResourceAndTrigger(resourceId, trigger);
+  public void activateNotificationRules(
+      @NotNull final String resourceId,
+      @NotNull final NotificationRuleTrigger trigger,
+      @NotNull final Map<String, String> data) {
+    List<NotificationRule> rules =
+        notificationRuleRepository.findNotificationRuleByResourceAndTrigger(resourceId, trigger);
 
-    for(NotificationRule rule : rules) {
-      if(NotificationRuleType.EMAIL.equals(rule.getType())){
-          emailNotificationService.sendNotification(rule, data);
+    for (NotificationRule rule : rules) {
+      if (NotificationRuleType.EMAIL.equals(rule.getType())) {
+        emailNotificationService.sendNotification(rule, data);
       }
     }
   }
