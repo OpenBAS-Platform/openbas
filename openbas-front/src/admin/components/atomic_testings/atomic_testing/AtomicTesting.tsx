@@ -1,5 +1,5 @@
 import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
-import {Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
@@ -140,7 +140,7 @@ const AtomicTesting = () => {
       .finally(() => {
         setHasEndpointsChecked(true);
       });
-    setReloadContentCount(reloadContentCount+1);
+    setReloadContentCount(reloadContentCount + 1);
     setActiveTab(0);
   }, [injectResultOverviewOutput]);
 
@@ -166,43 +166,7 @@ const AtomicTesting = () => {
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
-    setReloadContentCount(reloadContentCount+1);
-  };
-
-  const drawTabs = () => {
-    let tab = tabConfig.find(value => value.key == activeTab);
-    if (!tab) {
-      return (<div />);
-    }
-    const isAllTargets = tab.type === 'ALL_TARGETS';
-    return (
-        <>
-          {!isAllTargets && injectResultOverviewOutput && (
-              <PaginatedTargetTab
-                  handleSelectTarget={handleNewTargetClick}
-                  entityPrefix={tab.entityPrefix}
-                  inject_id={injectResultOverviewOutput.inject_id}
-                  target_type={tab.type}
-                  reloadContentCount={reloadContentCount}
-              />
-          )}
-          {isAllTargets && (
-              <>
-                {sortedTargets.length > 0 ? (
-                    <List>
-                      {sortedTargets.map(target => (
-                          <div key={target?.id}>
-                            {renderTargetItem(target, undefined, undefined)}
-                          </div>
-                      ))}
-                    </List>
-                ) : (
-                    <Empty message={t('No target configured.')} />
-                )}
-              </>
-          )}
-        </>
-    );
+    setReloadContentCount(reloadContentCount + 1);
   };
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
@@ -222,6 +186,42 @@ const AtomicTesting = () => {
             ))}
             <Divider className={classes.dividerL} />
           </List>
+        )}
+      </>
+    );
+  };
+
+  const drawTabs = () => {
+    const tab = tabConfig.find(value => value.key == activeTab);
+    if (!tab) {
+      return (<div />);
+    }
+    const isAllTargets = tab.type === 'ALL_TARGETS';
+    return (
+      <>
+        {!isAllTargets && injectResultOverviewOutput && (
+          <PaginatedTargetTab
+            handleSelectTarget={handleNewTargetClick}
+            entityPrefix={tab.entityPrefix}
+            inject_id={injectResultOverviewOutput.inject_id}
+            target_type={tab.type}
+            reloadContentCount={reloadContentCount}
+          />
+        )}
+        {isAllTargets && (
+          <>
+            {sortedTargets.length > 0 ? (
+              <List>
+                {sortedTargets.map(target => (
+                  <div key={target?.id}>
+                    {renderTargetItem(target, undefined, undefined)}
+                  </div>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No target configured.')} />
+            )}
+          </>
         )}
       </>
     );
