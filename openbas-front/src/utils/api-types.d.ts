@@ -222,32 +222,12 @@ export interface AssetGroupSimple {
 }
 
 export interface AssetGroupTarget {
-  target_detection_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_execution_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_human_response_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_id: string;
   target_name?: string;
-  target_prevention_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_subtype?: string;
   /** @uniqueItems true */
   target_tags?: string[];
@@ -336,32 +316,12 @@ export interface AttackPatternUpsertInput {
 }
 
 interface BaseInjectTarget {
-  target_detection_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_execution_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_human_response_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_id: string;
   target_name?: string;
-  target_prevention_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_subtype?: string;
   /** @uniqueItems true */
   target_tags?: string[];
@@ -390,16 +350,7 @@ interface BasePayload {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -407,12 +358,7 @@ interface BasePayload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 type BasePayloadPayloadTypeMapping<Key, Type> = {
@@ -656,16 +602,7 @@ export interface Command {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -673,12 +610,7 @@ export interface Command {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 /** List of communications of this team */
@@ -720,14 +652,7 @@ export interface ContractOutputElement {
   contract_output_element_regex_groups: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
-  contract_output_element_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   /** @format date-time */
   contract_output_element_updated_at: string;
   listened?: boolean;
@@ -752,14 +677,7 @@ export interface ContractOutputElementInput {
   /** List of tags */
   contract_output_element_tags?: string[];
   /** Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials */
-  contract_output_element_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 /** Represents the rules for parsing the output of an execution. */
@@ -778,14 +696,7 @@ export interface ContractOutputElementSimple {
    * Represents the data type being extracted.
    * @example "text, number, port, portscan, ipv4, ipv6, credentials"
    */
-  contract_output_element_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 export interface CreateExerciseInput {
@@ -852,10 +763,7 @@ export interface DateHistogramSeries {
   name?: string;
 }
 
-export type DateHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
-> & {
+export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   end: string;
   interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
@@ -890,16 +798,7 @@ export interface DnsResolution {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -907,12 +806,7 @@ export interface DnsResolution {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 export interface Document {
@@ -960,15 +854,7 @@ export interface Endpoint {
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   endpoint_seen_ip?: string;
   listened?: boolean;
 }
@@ -993,15 +879,7 @@ export interface EndpointOutput {
   /** Architecture */
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
-  endpoint_platform:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   /** The endpoint is associated with an asset group, either statically or dynamically. */
   is_static?: boolean;
 }
@@ -1038,15 +916,7 @@ export interface EndpointOverviewOutput {
    */
   endpoint_mac_addresses?: string[];
   /** Platform */
-  endpoint_platform?:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
+  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   /** Seen IP */
   endpoint_seen_ip?: string;
 }
@@ -1071,15 +941,7 @@ export interface EndpointRegisterInput {
    */
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
-  endpoint_platform:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   seenIp?: string;
 }
 
@@ -1157,16 +1019,7 @@ export interface Executable {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -1174,12 +1027,7 @@ export interface Executable {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 export interface ExecutionTraces {
@@ -1319,26 +1167,11 @@ export interface Exercise {
   exercise_name: string;
   /** @format date-time */
   exercise_next_inject_date?: string;
-  exercise_next_possible_status?: (
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED"
-  )[];
+  exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
   exercise_observers?: string[];
   exercise_pauses?: string[];
   exercise_planners?: string[];
-  exercise_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  exercise_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   exercise_scenario?: string;
   /** @format double */
   exercise_score?: number;
@@ -1373,12 +1206,7 @@ export interface ExerciseSimple {
    */
   exercise_start_date?: string;
   /** Exercise status */
-  exercise_status?:
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED";
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   /** Exercise Subtitle */
   exercise_subtitle?: string;
   /**
@@ -1415,12 +1243,7 @@ export interface ExerciseUpdateStartDateInput {
 }
 
 export interface ExerciseUpdateStatusInput {
-  exercise_status?:
-    | "SCHEDULED"
-    | "CANCELED"
-    | "RUNNING"
-    | "PAUSED"
-    | "FINISHED";
+  exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
 }
 
 export interface ExerciseUpdateTagsInput {
@@ -1484,16 +1307,7 @@ export interface FileDrop {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -1501,12 +1315,7 @@ export interface FileDrop {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 export interface Filter {
@@ -1550,14 +1359,7 @@ export interface Finding {
   finding_simulation?: Exercise;
   finding_tags?: string[];
   finding_teams?: string[];
-  finding_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   /** @format date-time */
   finding_updated_at: string;
   finding_users?: string[];
@@ -1569,14 +1371,7 @@ export interface FindingInput {
   finding_field: string;
   finding_inject_id?: string;
   finding_labels?: string[];
-  finding_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   finding_value: string;
 }
 
@@ -1613,14 +1408,7 @@ export interface FindingOutput {
    * Represents the data type being extracted.
    * @example "text, number, port, portscan, ipv4, ipv6, credentials"
    */
-  finding_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   /** Finding Value */
   finding_value: string;
 }
@@ -1903,22 +1691,10 @@ export interface InjectExpectation {
   /** @format double */
   inject_expectation_score?: number;
   inject_expectation_signatures?: InjectExpectationSignature[];
-  inject_expectation_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   inject_expectation_team?: string;
   inject_expectation_traces?: InjectExpectationTrace[];
-  inject_expectation_type:
-    | "TEXT"
-    | "DOCUMENT"
-    | "ARTICLE"
-    | "CHALLENGE"
-    | "MANUAL"
-    | "PREVENTION"
-    | "DETECTION";
+  inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: string;
@@ -2222,15 +1998,7 @@ export interface InjectTargetWithResult {
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
-  platformType?:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
+  platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
   targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
@@ -2341,16 +2109,7 @@ export interface InjectorContractInput {
   contract_id: string;
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
-  contract_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  contract_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   is_atomic_testing?: boolean;
 }
 
@@ -2782,16 +2541,7 @@ export interface NetworkTraffic {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -2799,12 +2549,7 @@ export interface NetworkTraffic {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
-  typeEnum?:
-    | "COMMAND"
-    | "EXECUTABLE"
-    | "FILE_DROP"
-    | "DNS_RESOLUTION"
-    | "NETWORK_TRAFFIC";
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 export interface NotificationRuleOutput {
@@ -3474,16 +3219,7 @@ export interface PayloadCreateInput {
    * @uniqueItems true
    */
   payload_output_parsers?: OutputParserInput[];
-  payload_platforms: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -3522,16 +3258,7 @@ export interface PayloadUpdateInput {
    * @uniqueItems true
    */
   payload_output_parsers?: OutputParserInput[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
 }
@@ -3557,16 +3284,7 @@ export interface PayloadUpsertInput {
    * @uniqueItems true
    */
   payload_output_parsers?: OutputParserInput[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -4010,16 +3728,7 @@ export interface Scenario {
   scenario_name: string;
   scenario_observers?: string[];
   scenario_planners?: string[];
-  scenario_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  scenario_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   scenario_recurrence?: string;
   /** @format date-time */
   scenario_recurrence_end?: string;
@@ -4223,10 +3932,7 @@ export interface SimulationDetails {
 }
 
 export interface SimulationsResultsLatest {
-  global_scores_by_expectation_type: Record<
-    string,
-    GlobalScoreBySimulationEndDate[]
-  >;
+  global_scores_by_expectation_type: Record<string, GlobalScoreBySimulationEndDate[]>;
 }
 
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
@@ -4292,16 +3998,7 @@ export interface StatusPayloadOutput {
   payload_obfuscator?: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParserSimple[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
   payload_tags?: string[];
@@ -4314,10 +4011,7 @@ export interface StructuralHistogramSeries {
   name?: string;
 }
 
-export type StructuralHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
-> & {
+export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   series: StructuralHistogramSeries[];
 };
 
@@ -4403,10 +4097,7 @@ export interface Team {
    */
   team_injects_expectations_total_expected_score: number;
   /** Total expected score of expectations by simulation linked to this team */
-  team_injects_expectations_total_expected_score_by_exercise: Record<
-    string,
-    number
-  >;
+  team_injects_expectations_total_expected_score_by_exercise: Record<string, number>;
   /**
    * Total score of expectations linked to this team
    * @format double
@@ -4500,32 +4191,12 @@ export interface TeamOutput {
 }
 
 export interface TeamTarget {
-  target_detection_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_execution_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
-  target_human_response_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_id: string;
   target_name?: string;
-  target_prevention_status?:
-    | "FAILED"
-    | "PENDING"
-    | "PARTIAL"
-    | "UNKNOWN"
-    | "SUCCESS";
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_subtype?: string;
   /** @uniqueItems true */
   target_tags?: string[];
