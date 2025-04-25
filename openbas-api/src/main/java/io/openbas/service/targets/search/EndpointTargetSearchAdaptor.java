@@ -7,16 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.service.InjectExpectationService;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,15 +28,19 @@ import org.springframework.stereotype.Component;
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   private final EndpointRepository endpointRepository;
   private final AssetGroupRepository assetGroupRepository;
+  private final InjectExpectationService injectExpectationService;
 
   public EndpointTargetSearchAdaptor(
-      EndpointRepository endpointRepository, AssetGroupRepository assetGroupRepository) {
+      EndpointRepository endpointRepository,
+      AssetGroupRepository assetGroupRepository,
+      InjectExpectationService injectExpectationService) {
     this.endpointRepository = endpointRepository;
+    this.injectExpectationService = injectExpectationService;
     // field name translations
     this.fieldTranslations.put("target_name", "asset_name");
     this.fieldTranslations.put("target_tags", "asset_tags");
     this.fieldTranslations.put("target_asset_groups", "endpoint_asset_groups");
-    //this.fieldTranslations.put("target_injects", "endpoint_injects");
+    // this.fieldTranslations.put("target_injects", "endpoint_injects");
     this.assetGroupRepository = assetGroupRepository;
   }
 
@@ -66,11 +70,11 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
           Join<AssetGroup, Asset> assetJoin = assetGroupJoin.join("assets");
 
           subQuery
-                  .select(criteriaBuilder.literal(1))
-                  .where(
-                          criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
-                          criteriaBuilder.equal(assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id"))
-                  );
+              .select(criteriaBuilder.literal(1))
+              .where(
+                  criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
+                  criteriaBuilder.equal(
+                      assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
           return criteriaBuilder.exists(subQuery);
         };
 
@@ -82,11 +86,11 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
           Join<Inject, Asset> assetJoin = injectTable.join("assets");
 
           subQuery
-                  .select(criteriaBuilder.literal(1))
-                  .where(
-                          criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
-                          criteriaBuilder.equal(assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id"))
-                  );
+              .select(criteriaBuilder.literal(1))
+              .where(
+                  criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
+                  criteriaBuilder.equal(
+                      assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
           return criteriaBuilder.exists(subQuery);
         };
 
@@ -95,13 +99,21 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     Page<Endpoint> eps =
         buildPaginationJPA(
             (Specification<Endpoint> specification, Pageable pageable) -> {
-                Specification<Endpoint> finalSpec = dynamicFilterSpec == null ? compiledTargetingSpec.and(specification) : dynamicFilterSpec.or(compiledTargetingSpec).and(specification);
-                return this.endpointRepository.findAll(
-                        finalSpec, pageable);},
+              Specification<Endpoint> finalSpec =
+                  dynamicFilterSpec == null
+                      ? compiledTargetingSpec.and(specification)
+                      : dynamicFilterSpec.or(compiledTargetingSpec).and(specification);
+              return this.endpointRepository.findAll(finalSpec, pageable);
+            },
             this.translate(input, scopedInject),
             Endpoint.class);
 
-    return new PageImpl<>(eps.getContent().stream().map(this::convertFromEndpoint).toList(), eps.getPageable(), eps.getTotalElements());
+    return new PageImpl<>(
+        eps.getContent().stream()
+            .map(endpoint -> convertFromEndpoint(endpoint, scopedInject))
+            .toList(),
+        eps.getPageable(),
+        eps.getTotalElements());
   }
 
   private Specification<Endpoint> compileFilterGroupsWithOR(
@@ -118,11 +130,28 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     return result;
   }
 
-  private InjectTarget convertFromEndpoint(Endpoint endpoint) {
-      InjectTarget newTarget = new EndpointTarget(endpoint.getId(), endpoint.getName(), endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()), endpoint.getPlatform().name(), new HashSet<>());
+  private InjectTarget convertFromEndpoint(Endpoint endpoint, Inject inject) {
+    InjectTarget target =
+        new EndpointTarget(
+            endpoint.getId(),
+            endpoint.getName(),
+            endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+            endpoint.getPlatform().name(),
+            new HashSet<>());
 
-      Is it
+    List<AtomicTestingUtils.ExpectationResultsByType> results =
+        AtomicTestingUtils.getExpectationResultByTypes(
+            injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+                inject.getId(), target.getId(), null, target.getTargetType()));
 
-      return newTarget;
+    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
+      switch (result.type()) {
+        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
+        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
+        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
+      }
+    }
+
+    return target;
   }
 }

@@ -176,11 +176,15 @@ public class InjectTargetSearchTest extends IntegrationTest {
       SearchPaginationInput search =
           PaginationFixture.simpleFilter("target_name", "", Filters.FilterOperator.contains);
 
-      String response = mvc.perform(
-              post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(mapper.writeValueAsString(search)))
-          .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
 
       assertThatJson(response).isNotNull();
     }

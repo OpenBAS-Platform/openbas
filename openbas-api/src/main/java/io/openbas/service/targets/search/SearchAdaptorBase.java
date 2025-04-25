@@ -33,8 +33,9 @@ public abstract class SearchAdaptorBase {
     }
 
     // avoid double adding this filter if it's already in the collection
-    if (fieldTranslations.containsKey("target_injects") && newFilters.stream()
-        .noneMatch(filter -> filter.getKey().equals(fieldTranslations.get("target_injects")))) {
+    if (fieldTranslations.containsKey("target_injects")
+        && newFilters.stream()
+            .noneMatch(filter -> filter.getKey().equals(fieldTranslations.get("target_injects")))) {
       // add search term on inject scope
       Filters.Filter injectScopeFilter = new Filters.Filter();
       injectScopeFilter.setMode(Filters.FilterMode.and);
