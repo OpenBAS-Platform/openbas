@@ -1,5 +1,5 @@
 import { List } from '@mui/material';
-import { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -15,9 +15,10 @@ interface Props {
   entityPrefix: string;
   inject_id: string;
   target_type: string;
+  reloadContentCount: number;
 }
 
-const PaginatedTargetTab: React.FC<Props> = (props) => {
+const PaginatedTargetTab : React.FC<Props> = (props) => {
   const { t } = useFormatter();
   const pagination = useQueryableWithLocalStorage(props.target_type + '_' + props.inject_id + '_filters', buildSearchPagination({
     filterGroup: {
@@ -28,6 +29,11 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
 
   const [targets, setTargets] = useState<InjectTarget[]>();
   const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
+  const [searchReloadContentCount, setSearchReloadContentCount] = useState(0);
+
+  useEffect(() => {
+    setSearchReloadContentCount(searchReloadContentCount+1);
+  }, [props.reloadContentCount]);
 
   const handleSetTargets = (content: InjectTarget[]) => {
     setTargets(content);
@@ -46,6 +52,7 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
         setContent={handleSetTargets}
         entityPrefix={props.entityPrefix}
         queryableHelpers={pagination.queryableHelpers}
+        reloadContentCount={searchReloadContentCount}
         topPagination={true}
       />
       {targets && targets.length > 0 ? (
