@@ -6,43 +6,16 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
-import {
-  type BasePayload,
-  type Command,
-  type ContractOutputElement,
-  type DnsResolution,
-  type Executable,
-  type FileDrop,
-  type OutputParser,
-  type RegexGroup,
-} from '../../../utils/api-types';
+import { type PayloadCreateInput } from '../../../utils/api-types-custom';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
 
-type omit = 'payload_type' | 'payload_source' | 'payload_status' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_output_parsers';
-type more = {
-  payload_output_parsers?: (
-  Omit<OutputParser, 'output_parser_created_at' | 'output_parser_updated_at' | 'output_parser_id' | 'output_parser_contract_output_elements'>
-  & {
-    output_parser_contract_output_elements: (Omit<ContractOutputElement, 'contract_output_element_created_at' | 'contract_output_element_updated_at' | 'contract_output_element_id' | 'contract_output_element_regex_groups'>
-      & { contract_output_element_regex_groups: Omit<RegexGroup, 'regex_group_created_at' | 'regex_group_updated_at' | 'regex_group_id'>[] })[];
-  }
-  )[];
-};
-type PayloadCreateInputForm = Omit<BasePayload, omit> & more &
-  (
-    | Omit<Command, omit> & more & { payload_type: 'Command' }
-    | Omit<Executable, omit> & more & { payload_type: 'Executable' }
-    | Omit<FileDrop, omit> & more & { payload_type: 'FileDrop' }
-    | Omit<DnsResolution, omit> & more & { payload_type: 'DnsResolution' }
-    );
-
 interface Props {
-  onSubmit: SubmitHandler<PayloadCreateInputForm>;
+  onSubmit: SubmitHandler<PayloadCreateInput>;
   handleClose: () => void;
   editing: boolean;
-  initialValues?: PayloadCreateInputForm;
+  initialValues?: Partial<PayloadCreateInput>;
 }
 
 const PayloadForm = ({
@@ -50,7 +23,6 @@ const PayloadForm = ({
   handleClose,
   editing,
   initialValues = {
-    // @ts-expect-error because of the discriminated union we need to ignore this ts error
     payload_type: undefined,
     payload_name: '',
     payload_platforms: [],
@@ -158,7 +130,7 @@ const PayloadForm = ({
       path: ['payload_cleanup_executor'],
     });
 
-  const methods = useForm<PayloadCreateInputForm>({
+  const methods = useForm<PayloadCreateInput>({
     mode: 'onTouched',
     resolver: zodResolver(schema),
     defaultValues: initialValues,

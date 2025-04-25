@@ -4,7 +4,7 @@ import { deleteCustomDashboardWidget, updateCustomDashboardWidget } from '../../
 import ButtonPopover, { type PopoverEntry } from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
-import { type Widget } from '../../../../../utils/api-types';
+import { type Widget } from '../../../../../utils/api-types-custom';
 import WidgetForm from './WidgetForm';
 import { type WidgetInputWithoutLayout } from './WidgetUtils';
 

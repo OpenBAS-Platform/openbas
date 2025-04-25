@@ -1,7 +1,5 @@
 package io.openbas.engine.api;
 
-import static io.openbas.engine.api.HistogramWidget.HistogramConfigMode.STRUCTURAL;
-
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -14,6 +12,8 @@ import lombok.Setter;
 @Setter
 public class StructuralHistogramWidget extends HistogramWidget {
 
+  public static final String STRUCTURAL_MODE = "structural";
+
   @NotNull List<StructuralHistogramSeries> series = new ArrayList<>();
 
   @Data
@@ -24,6 +24,6 @@ public class StructuralHistogramWidget extends HistogramWidget {
   }
 
   public StructuralHistogramWidget() {
-    super(STRUCTURAL);
+    super(STRUCTURAL_MODE);
   }
 }
