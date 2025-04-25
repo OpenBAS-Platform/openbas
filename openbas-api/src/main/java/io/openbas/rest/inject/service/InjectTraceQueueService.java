@@ -74,7 +74,7 @@ public class InjectTraceQueueService {
   private void setupConsumer() throws IOException {
     Channel consumerChannel = connection.createChannel();
     // Limiter le nombre de messages non acquittés
-    consumerChannel.basicQos(10);
+    consumerChannel.basicQos(50);
 
     DeliverCallback deliverCallback =
         (consumerTag, delivery) -> {
