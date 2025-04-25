@@ -142,6 +142,7 @@ const AtomicTesting = () => {
         .finally(() => {
           setHasEndpointsChecked(true);
         });
+    setActiveTab(0);
   }, [injectResultOverviewOutput]);
 
   // Handles
