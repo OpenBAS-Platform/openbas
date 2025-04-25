@@ -73,7 +73,7 @@ public class TeamFixture {
     return createTeamWithName(null);
   }
 
-  private static Team createTeamWithName(String name) {
+  public static Team createTeamWithName(String name) {
     String new_name = name == null ? "team-%s".formatted(UUID.randomUUID()) : name;
     Team team = new Team();
     team.setName(new_name);

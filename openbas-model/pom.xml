@@ -14,7 +14,7 @@
     <description>OpenBAS model</description>
 
     <properties>
-        <elasticsearch.version>8.17.3</elasticsearch.version>
+        <elasticsearch.version>8.18.0</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -34,6 +34,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

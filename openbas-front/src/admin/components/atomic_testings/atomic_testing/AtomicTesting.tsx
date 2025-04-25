@@ -63,6 +63,8 @@ const AtomicTesting = () => {
   const [hasEndpoints, setHasEndpoints] = useState(false);
   const [hasEndpointsChecked, setHasEndpointsChecked] = useState(false);
   const [reloadContentCount, setReloadContentCount] = useState(0);
+  const [hasTeams, setHasTeams] = useState(false);
+  const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
 
   const tabConfig: {
     key: number;
@@ -79,6 +81,14 @@ const AtomicTesting = () => {
         label: t('Asset groups'),
         type: 'ASSETS_GROUPS',
         entityPrefix: 'asset_group_target',
+      });
+    }
+    if (hasTeams) {
+      tabs.push({
+        key: index++,
+        label: t('Teams'),
+        type: 'TEAMS',
+        entityPrefix: 'team_target',
       });
     }
 
@@ -99,7 +109,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, hasEndpoints]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -140,6 +150,17 @@ const AtomicTesting = () => {
       .finally(() => {
         setHasEndpointsChecked(true);
       });
+
+    searchTargets(injectId, 'TEAMS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasTeams(true);
+        } else { setHasTeams(false); }
+      })
+      .finally(() => {
+        setHasTeamsChecked(true);
+      });
+
     setReloadContentCount(reloadContentCount + 1);
     setActiveTab(0);
   }, [injectResultOverviewOutput]);
@@ -276,7 +297,7 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && hasEndpointsChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && (
             <>
               <Tabs
                 value={activeTab}

@@ -395,9 +395,11 @@ public class EndpointService {
   }
 
   private void setUpdatedEndpointAttributes(Endpoint endpoint, AgentRegisterInput input) {
-    // Hostname not updated by Crowdstrike because Crowdstrike hostname is 15 length max
+    // Hostname and arch not updated by Crowdstrike because Crowdstrike hostname is 15 length max
+    // and arch is hard coded
     if (!CROWDSTRIKE_EXECUTOR_TYPE.equals(input.getExecutor().getType())) {
       endpoint.setHostname(input.getHostname());
+      endpoint.setArch(input.getArch());
     }
     endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
     endpoint.setSeenIp(input.getSeenIp());

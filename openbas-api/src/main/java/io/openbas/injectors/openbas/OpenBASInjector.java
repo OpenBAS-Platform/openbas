@@ -19,7 +19,13 @@ public class OpenBASInjector {
   public static final String OPENBAS_INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
 
   private String dlUri(OpenBASConfig openBASConfig, String platform, String arch) {
-    return openBASConfig.getBaseUrlForAgent() + "/api/implant/openbas/" + platform + "/" + arch;
+    return "\""
+        + openBASConfig.getBaseUrlForAgent()
+        + "/api/implant/openbas/"
+        + platform
+        + "/"
+        + arch
+        + "?injectId=#{inject}&agentId=#{agent}\"";
   }
 
   @SuppressWarnings("SameParameterValue")
@@ -30,6 +36,7 @@ public class OpenBASInjector {
         + platform
         + "/"
         + arch
+        + "?injectId=#{inject}&agentId=#{agent}"
         + "\"";
   }
 
