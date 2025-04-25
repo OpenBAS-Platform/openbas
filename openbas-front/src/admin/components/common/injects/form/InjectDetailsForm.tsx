@@ -285,6 +285,7 @@ const InjectDetailsForm = ({
   useEffect(() => {
     const initialValues = getInitialValues();
     setDefaultValues(initialValues);
+    setOpenDetails(false);
     reset(initialValues, { keepDirtyValues: true });
   }, [injectorContractContent]);
 
