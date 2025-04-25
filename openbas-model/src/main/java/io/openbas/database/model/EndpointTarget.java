@@ -12,6 +12,7 @@ public class EndpointTarget extends InjectTarget {
     this.setId(id);
     this.setName(name);
     this.setTags(tags);
+    this.setTargetType("ASSETS");
     this.subType = subType;
   }
 

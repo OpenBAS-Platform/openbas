@@ -33,7 +33,7 @@ public abstract class SearchAdaptorBase {
     }
 
     // avoid double adding this filter if it's already in the collection
-    if (newFilters.stream()
+    if (fieldTranslations.containsKey("target_injects") && newFilters.stream()
         .noneMatch(filter -> filter.getKey().equals(fieldTranslations.get("target_injects")))) {
       // add search term on inject scope
       Filters.Filter injectScopeFilter = new Filters.Filter();
@@ -41,7 +41,7 @@ public abstract class SearchAdaptorBase {
       injectScopeFilter.setOperator(Filters.FilterOperator.eq);
       injectScopeFilter.setValues(List.of(scopedInject.getId()));
       injectScopeFilter.setKey(fieldTranslations.get("target_injects"));
-      //newFilters.add(injectScopeFilter);
+      newFilters.add(injectScopeFilter);
     }
 
     Filters.FilterGroup newFilterGroup = new Filters.FilterGroup();

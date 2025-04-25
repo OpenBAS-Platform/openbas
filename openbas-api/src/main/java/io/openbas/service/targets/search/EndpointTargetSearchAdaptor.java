@@ -9,7 +9,10 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
@@ -33,7 +36,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     this.fieldTranslations.put("target_name", "asset_name");
     this.fieldTranslations.put("target_tags", "asset_tags");
     this.fieldTranslations.put("target_asset_groups", "endpoint_asset_groups");
-    this.fieldTranslations.put("target_injects", "endpoint_injects");
+    //this.fieldTranslations.put("target_injects", "endpoint_injects");
     this.assetGroupRepository = assetGroupRepository;
   }
 
@@ -57,18 +60,18 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     // transitive targeting via explicit membership in target asset groups
     Specification<Endpoint> transitiveTargetingSpec =
         (root, query, criteriaBuilder) -> {
-//          Subquery<Integer> subQuery = query.subquery(Integer.class);
-//          Root<Inject> injectTable = subQuery.from(Inject.class);
-//          Join<Inject, AssetGroup> assetGroupJoin = injectTable.join("injects_asset_groups");
-//          Join<AssetGroup, Asset> assetJoin = assetGroupJoin.join("asset_groups_assets");
-//
-//          subQuery
-//                  .select(criteriaBuilder.literal(1))
-//                  .where(
-//                          criteriaBuilder.equal(assetJoin.get("inject_id"), scopedInject.getId())
-//                  );
-//          return criteriaBuilder.exists(subQuery);
-          return criteriaBuilder.and();
+          Subquery<Integer> subQuery = query.subquery(Integer.class);
+          Root<Inject> injectTable = subQuery.from(Inject.class);
+          Join<Inject, AssetGroup> assetGroupJoin = injectTable.join("assetGroups");
+          Join<AssetGroup, Asset> assetJoin = assetGroupJoin.join("assets");
+
+          subQuery
+                  .select(criteriaBuilder.literal(1))
+                  .where(
+                          criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
+                          criteriaBuilder.equal(assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id"))
+                  );
+          return criteriaBuilder.exists(subQuery);
         };
 
     // direct targeting
@@ -89,17 +92,16 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
     Specification<Endpoint> compiledTargetingSpec = transitiveTargetingSpec.or(directTargetingSpec);
 
-    String toto = dynamicFilterSpec.toString();
-
     Page<Endpoint> eps =
         buildPaginationJPA(
-            (Specification<Endpoint> specification, Pageable pageable) ->
-                this.endpointRepository.findAll(
-                    dynamicFilterSpec.or(directTargetingSpec).and(specification), pageable),
+            (Specification<Endpoint> specification, Pageable pageable) -> {
+                Specification<Endpoint> finalSpec = dynamicFilterSpec == null ? compiledTargetingSpec.and(specification) : dynamicFilterSpec.or(compiledTargetingSpec).and(specification);
+                return this.endpointRepository.findAll(
+                        finalSpec, pageable);},
             this.translate(input, scopedInject),
             Endpoint.class);
 
-    return new PageImpl<>(List.of());
+    return new PageImpl<>(eps.getContent().stream().map(this::convertFromEndpoint).toList(), eps.getPageable(), eps.getTotalElements());
   }
 
   private Specification<Endpoint> compileFilterGroupsWithOR(
@@ -114,5 +116,9 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
       result = result.or(converted);
     }
     return result;
+  }
+
+  private InjectTarget convertFromEndpoint(Endpoint endpoint) {
+      return new EndpointTarget(endpoint.getId(), endpoint.getName(), endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()), endpoint.getPlatform().name(), new HashSet<>());
   }
 }
