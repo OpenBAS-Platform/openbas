@@ -209,7 +209,7 @@ const Players = () => {
               </ListItem>
             ))}
       </List>
-      {me.isPlanner
+      {me.user_is_planner
         && (
           <CreatePlayer
             onCreate={result => setPlayers([result, ...players])}
