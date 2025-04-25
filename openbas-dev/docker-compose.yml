@@ -88,7 +88,9 @@ services:
       - discovery.type=single-node
       - xpack.ml.enabled=false
       - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms2G -Xmx2G"
+      # -XX:UseSVE=0 is necessary for Apple M4 architecture
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2G -XX:+IgnoreUnrecognizedVMOptions -XX:UseSVE=0"
+      - "CLI_JAVA_OPTS=-XX:+IgnoreUnrecognizedVMOptions -XX:UseSVE=0"
     restart: unless-stopped
     ulimits:
       memlock:
