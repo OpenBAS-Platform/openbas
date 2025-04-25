@@ -1,24 +1,20 @@
 import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
-import {Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import SearchFilter from '../../../../components/SearchFilter';
-import {type InjectTarget, type InjectTargetWithResult, SearchPaginationInput} from '../../../../utils/api-types';
+import { type InjectTarget, type InjectTargetWithResult, type SearchPaginationInput } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingInformation from './AtomicTestingInformation';
-import NewTargetListItem from './NewTargetListItem';
+import PaginatedTargetTab from './PaginatedTargetTab';
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
-import PaginatedTargetTab from "./PaginatedTargetTab";
 
 const useStyles = makeStyles()(() => ({
   chip: {
@@ -67,11 +63,12 @@ const AtomicTesting = () => {
   const [hasEndpoints, setHasEndpoints] = useState(false);
   const [hasEndpointsChecked, setHasEndpointsChecked] = useState(false);
 
-  const tabConfig : {
-    key: number,
-    label: string,
-    type: string,
-    entityPrefix: string,}[] = useMemo(() => {
+  const tabConfig: {
+    key: number;
+    label: string;
+    type: string;
+    entityPrefix: string;
+  }[] = useMemo(() => {
     let index = 0;
     const tabs = [];
 
@@ -114,13 +111,13 @@ const AtomicTesting = () => {
       || injectResultOverviewOutput?.inject_targets?.[0],
     );
 
-    const searchPaginationInput1Result : SearchPaginationInput = {
+    const searchPaginationInput1Result: SearchPaginationInput = {
       filterGroup: {
         mode: 'and',
         filters: [],
       },
       size: 1,
-      page: 0
+      page: 0,
     };
 
     searchTargets(injectId, 'ASSETS_GROUPS', searchPaginationInput1Result)
@@ -134,14 +131,14 @@ const AtomicTesting = () => {
       });
 
     searchTargets(injectId, 'ASSETS', searchPaginationInput1Result)
-        .then((response) => {
-          if (response.data.content.length > 0) {
-            setHasEndpoints(true);
-          } else { setHasEndpoints(false); }
-        })
-        .finally(() => {
-          setHasEndpointsChecked(true);
-        });
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasEndpoints(true);
+        } else { setHasEndpoints(false); }
+      })
+      .finally(() => {
+        setHasEndpointsChecked(true);
+      });
     setActiveTab(0);
   }, [injectResultOverviewOutput]);
 
@@ -160,7 +157,7 @@ const AtomicTesting = () => {
       id: target.target_id,
       name: target.target_name,
       targetType: target.target_type,
-      // @ts-expect-error
+      // @ts-expect-error target_subtype is always within the allowed values
       platformType: target.target_subtype,
     });
   };
@@ -194,6 +191,41 @@ const AtomicTesting = () => {
   if (!injectResultOverviewOutput) {
     return <Loader variant="inElement" />;
   }
+
+  const drawTabs = () => {
+    const tab = tabConfig.find(value => value.key == activeTab);
+    if (!tab) {
+      return (<div />);
+    }
+    const isAllTargets = tab.type === 'ALL_TARGETS';
+    return (
+      <div>
+        {!isAllTargets && (
+          <PaginatedTargetTab
+            handleSelectTarget={handleNewTargetClick}
+            entityPrefix={tab.entityPrefix}
+            inject_id={injectResultOverviewOutput?.inject_id}
+            target_type={tab.type}
+          />
+        )}
+        {isAllTargets && (
+          <>
+            {sortedTargets.length > 0 ? (
+              <List>
+                {sortedTargets.map(target => (
+                  <div key={target?.id}>
+                    {renderTargetItem(target, undefined, undefined)}
+                  </div>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No target configured.')} />
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <GridLegacy
@@ -254,38 +286,7 @@ const AtomicTesting = () => {
                     <Tab key={`tab-${tab.key}`} label={tab.label} />
                   ))}
               </Tabs>
-              {tabConfig
-                .map((tab) => {
-                  const isAllTargets = tab.type === 'ALL_TARGETS';
-                  {if (activeTab == tab.key)
-                  return (
-                    <div>
-                      {!isAllTargets && (
-                          <PaginatedTargetTab
-                              handleSelectTarget={handleNewTargetClick}
-                              entityPrefix={tab.entityPrefix}
-                              inject_id={injectResultOverviewOutput?.inject_id}
-                              target_type={tab.type}
-                          />
-                      )}
-                      {isAllTargets && (
-                        <>
-                          {sortedTargets.length > 0 ? (
-                            <List>
-                              {sortedTargets.map(target => (
-                                <div key={target?.id}>
-                                  {renderTargetItem(target, undefined, undefined)}
-                                </div>
-                              ))}
-                            </List>
-                          ) : (
-                            <Empty message={t('No target configured.')} />
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )};
-                })}
+              {drawTabs()}
             </>
           )}
         </Paper>

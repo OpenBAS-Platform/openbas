@@ -4,9 +4,9 @@ import { useTheme } from '@mui/material/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from 'tss-react/mui';
 
+import PlatformIcon from '../../../../components/PlatformIcon';
 import type { InjectTarget } from '../../../../utils/api-types';
 import NewAtomicTestingResult from './NewAtomicTestingResult';
-import PlatformIcon from "../../../../components/PlatformIcon";
 
 const useStyles = makeStyles()(() => ({
   bodyTarget: {
