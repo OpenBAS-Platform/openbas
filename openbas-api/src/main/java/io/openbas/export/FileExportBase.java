@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
-import io.openbas.rest.attack_pattern.exports.AttackPatternMixin;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.exports.InjectsFileExport;
-import io.openbas.rest.inject.exports.PayloadMixin;
-import io.openbas.rest.injector_contract.exports.InjectorContractMixin;
 import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import lombok.Getter;
@@ -46,9 +43,9 @@ public class FileExportBase {
     this.objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
     this.objectMapper.addMixIn(Challenge.class, Mixins.Challenge.class);
     this.objectMapper.addMixIn(Tag.class, Mixins.Tag.class);
-    this.objectMapper.addMixIn(InjectorContract.class, InjectorContractMixin.class);
-    this.objectMapper.addMixIn(Payload.class, PayloadMixin.class);
-    this.objectMapper.addMixIn(AttackPattern.class, AttackPatternMixin.class);
+    this.objectMapper.addMixIn(InjectorContract.class, Mixins.InjectorContract.class);
+    this.objectMapper.addMixIn(AttackPattern.class, Mixins.AttackPattern.class);
+    this.objectMapper.addMixIn(Payload.class, Mixins.Payload.class);
 
     // default options
     // variables with no value
