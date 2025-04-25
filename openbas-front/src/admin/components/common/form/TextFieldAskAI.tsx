@@ -526,8 +526,8 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     return (
       <div style={style || {
         position: 'absolute',
-        top: 64,
-        right: 5,
+        top: -10,
+        right: 0,
       }}
       >
         {renderButton()}
