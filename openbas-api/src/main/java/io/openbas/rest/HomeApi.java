@@ -2,10 +2,10 @@ package io.openbas.rest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.*;
-import java.util.Optional;
-
-import org.apache.commons.io.IOUtils;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -14,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,15 +50,5 @@ public class HomeApi {
             .replaceAll("%APP_MANIFEST%", basePath + "/static/ext/manifest.json")
             .replaceAll("%BASE_PATH%", basePath);
     return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "no-cache").body(newIndex);
-  }
-
-  @GetMapping(value = "/api/images/static/{imageName}", produces = MediaType.IMAGE_PNG_VALUE)
-  public @ResponseBody byte[] getObasImage(@PathVariable String imageName) throws IOException {
-    Optional<InputStream> in = Optional.ofNullable(
-        getClass().getResourceAsStream("/img/" + imageName));
-    if (in.isPresent()) {
-      return IOUtils.toByteArray(in.get());
-    }
-    return null;
   }
 }

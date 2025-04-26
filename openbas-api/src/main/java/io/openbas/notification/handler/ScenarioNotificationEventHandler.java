@@ -1,9 +1,7 @@
 package io.openbas.notification.handler;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.NotificationRuleTrigger;
-import io.openbas.database.model.Scenario;
+import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
@@ -12,13 +10,15 @@ import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.service.NotificationRuleService;
+import io.openbas.service.PlatformSettingsService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingUtils;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
   private final ExerciseService exerciseService;
   private final ScenarioService scenarioService;
   private final NotificationRuleService notificationRuleService;
+  private final PlatformSettingsService platformSettingsService;
 
   @Override
   public void handle(NotificationEvent event) {
@@ -113,6 +114,13 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
             lastSimulationResultsMap.get(ExpectationType.DETECTION));
     float decreasePrev = secondLastSimulationPrevScore - lastSimulationPrevScore;
     float decreaseDetect = secondLastSimulationDetectScore - lastSimulationDetectScore;
+
+    String customLogoUrl =
+        platformSettingsService
+            .setting(Theme.THEME_KEYS.LOGO_URL.name())
+            .map(Setting::getValue)
+            .orElse("");
+
     Map<String, String> data = new HashMap<>();
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
@@ -126,6 +134,22 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
     data.put("instanceLink", url);
     data.put("scenario_name", scenario.getName());
+    // check the paramater to verify if we need to hide filigran's logo
+    data.put(
+        "hide_filigran_logo", Boolean.toString(platformSettingsService.isPlatformWhiteMarked()));
+    // pass the custom logo to the template if it is set to use a custom logo
+    data.put("custom_logo_b64", customLogoUrl);
+
     return data;
+  }
+
+  // TODO find a better place for this code
+  public static String downloadImageAndEncodeBase64(String imageUrl) {
+    try (InputStream inputStream = new URL(imageUrl).openStream()) {
+      byte[] imageBytes = inputStream.readAllBytes();
+      return Base64.getEncoder().encodeToString(imageBytes);
+    } catch (IOException e) {
+      throw new RuntimeException("error while downloading custom logo " + imageUrl, e);
+    }
   }
 }

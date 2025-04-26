@@ -10,6 +10,7 @@ import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
+import io.openbas.database.model.SettingKeys;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.ee.Ee;
@@ -485,5 +486,14 @@ public class PlatformSettingsService {
           resolve(bannerLevelOpt, PLATFORM_BANNER + "." + banner.key(), banner.level().name());
       settingRepository.save(bannerLevel);
     }
+  }
+
+  public boolean isPlatformWhiteMarked() {
+    String defaultValue = SettingKeys.PLATFORM_WHITEMARK.defaultValue();
+    Optional<Setting> platformWhiteMarkedSetting =
+        this.setting(SettingKeys.PLATFORM_WHITEMARK.name());
+    return platformWhiteMarkedSetting
+        .map(setting -> Boolean.parseBoolean(setting.getValue()))
+        .orElse(Boolean.parseBoolean(defaultValue));
   }
 }
