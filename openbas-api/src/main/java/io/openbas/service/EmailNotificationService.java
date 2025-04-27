@@ -6,12 +6,14 @@ import io.openbas.database.model.NotificationRule;
 import io.openbas.execution.ExecutionContext;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class EmailNotificationService {
 
   private final MailingService mailingService;
+  private final ResourceLoader resourceLoader;
 
   public void sendNotification(
       @NotNull final NotificationRule rule, @NotNull final Map<String, String> data) {
@@ -50,23 +53,19 @@ public class EmailNotificationService {
    * @return template content
    */
   private String getTemplate(@NotNull final NotificationRule rule) {
-    String templatePath = "email/notification_template_%s_%s_%s.html";
 
-    String templatePathFormatted =
-        String.format(
-            templatePath,
+    // TODO update this method to get the template in the user's language and default to english if not possible
+    String templatePath = String.format(
+            "classpath:email/notification_template_%s_%s_%s.html",
             rule.getResourceType().name().toLowerCase(),
             rule.getTrigger().name().toLowerCase(),
-            "en");
-    // TODO update this method to get the template in the user's language and default to english if
-    // not possible
+            "en"
+    );
 
-    ClassPathResource resource = new ClassPathResource(templatePathFormatted);
-
-    try {
-      return Files.readString(Path.of(resource.getURI()));
+    try (InputStream inputStream = resourceLoader.getResource(templatePath).getInputStream()) {
+      return new String(inputStream.readAllBytes());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Failed to read template", e);
     }
   }
 }
