@@ -9,7 +9,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -106,18 +105,24 @@ public class NotificationRuleService {
       @NotNull final Map<String, String> data) {
     List<NotificationRule> rules =
         notificationRuleRepository.findNotificationRuleByResourceAndTrigger(resourceId, trigger);
-
-    //add data about custom logo and whitemarked platform
-    if(!rules.isEmpty()) {
+    // TODO extract this logic from this method
+    // TODO fix: custom logo only working with png because of the html template
+    // add data about custom logo and whitemarked platform
+    if (!rules.isEmpty()) {
+      // check if there is a
+      String theme =
+          platformSettingsService
+              .setting(SettingKeys.DEFAULT_THEME.name())
+              .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
+              .orElseGet(SettingKeys.DEFAULT_THEME::defaultValue);
       String b64CustomLogo =
-              platformSettingsService
-                      .setting(Theme.THEME_KEYS.LOGO_URL.name())
-                      .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
-                      .orElse("");
+          platformSettingsService
+              .setting(theme + "." + Theme.THEME_KEYS.LOGO_URL.name().toLowerCase())
+              .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
+              .orElse("");
       data.put("custom_logo_b64", b64CustomLogo);
       data.put(
-              "hide_filigran_logo", Boolean.toString(platformSettingsService.isPlatformWhiteMarked()));
-
+          "hide_filigran_logo", Boolean.toString(platformSettingsService.isPlatformWhiteMarked()));
     }
 
     for (NotificationRule rule : rules) {
@@ -126,7 +131,6 @@ public class NotificationRuleService {
       }
     }
   }
-
 
   // TODO find a better place for this code
   private String downloadImageAndEncodeBase64(String imageUrl) {
