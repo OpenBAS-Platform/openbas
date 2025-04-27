@@ -27,6 +27,8 @@ public class NotificationRuleServiceTest {
 
   @Mock private ScenarioService scenarioService;
 
+  @Mock private PlatformSettingsService platformSettingsService;
+
   @InjectMocks private NotificationRuleService notificationRuleService;
 
   @Test

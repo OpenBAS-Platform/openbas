@@ -31,7 +31,6 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
   private final ExerciseService exerciseService;
   private final ScenarioService scenarioService;
   private final NotificationRuleService notificationRuleService;
-  private final PlatformSettingsService platformSettingsService;
 
   @Override
   public void handle(NotificationEvent event) {
@@ -115,12 +114,6 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     float decreasePrev = secondLastSimulationPrevScore - lastSimulationPrevScore;
     float decreaseDetect = secondLastSimulationDetectScore - lastSimulationDetectScore;
 
-    String customLogoUrl =
-        platformSettingsService
-            .setting(Theme.THEME_KEYS.LOGO_URL.name())
-            .map(Setting::getValue)
-            .orElse("");
-
     Map<String, String> data = new HashMap<>();
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
@@ -134,22 +127,6 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
     data.put("instanceLink", url);
     data.put("scenario_name", scenario.getName());
-    // check the paramater to verify if we need to hide filigran's logo
-    data.put(
-        "hide_filigran_logo", Boolean.toString(platformSettingsService.isPlatformWhiteMarked()));
-    // pass the custom logo to the template if it is set to use a custom logo
-    data.put("custom_logo_b64", customLogoUrl);
-
     return data;
-  }
-
-  // TODO find a better place for this code
-  public static String downloadImageAndEncodeBase64(String imageUrl) {
-    try (InputStream inputStream = new URL(imageUrl).openStream()) {
-      byte[] imageBytes = inputStream.readAllBytes();
-      return Base64.getEncoder().encodeToString(imageBytes);
-    } catch (IOException e) {
-      throw new RuntimeException("error while downloading custom logo " + imageUrl, e);
-    }
   }
 }

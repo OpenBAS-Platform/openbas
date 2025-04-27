@@ -9,6 +9,11 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +31,7 @@ public class NotificationRuleService {
   private final UserService userService;
   private final ScenarioService scenarioService;
   private final EmailNotificationService emailNotificationService;
+  private final PlatformSettingsService platformSettingsService;
 
   public Optional<NotificationRule> findById(final String id) {
     return notificationRuleRepository.findById(id);
@@ -101,10 +107,34 @@ public class NotificationRuleService {
     List<NotificationRule> rules =
         notificationRuleRepository.findNotificationRuleByResourceAndTrigger(resourceId, trigger);
 
+    //add data about custom logo and whitemarked platform
+    if(!rules.isEmpty()) {
+      String b64CustomLogo =
+              platformSettingsService
+                      .setting(Theme.THEME_KEYS.LOGO_URL.name())
+                      .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
+                      .orElse("");
+      data.put("custom_logo_b64", b64CustomLogo);
+      data.put(
+              "hide_filigran_logo", Boolean.toString(platformSettingsService.isPlatformWhiteMarked()));
+
+    }
+
     for (NotificationRule rule : rules) {
       if (NotificationRuleType.EMAIL.equals(rule.getType())) {
         emailNotificationService.sendNotification(rule, data);
       }
+    }
+  }
+
+
+  // TODO find a better place for this code
+  private String downloadImageAndEncodeBase64(String imageUrl) {
+    try (InputStream inputStream = new URL(imageUrl).openStream()) {
+      byte[] imageBytes = inputStream.readAllBytes();
+      return Base64.getEncoder().encodeToString(imageBytes);
+    } catch (IOException e) {
+      throw new RuntimeException("error while downloading custom logo " + imageUrl, e);
     }
   }
 }
