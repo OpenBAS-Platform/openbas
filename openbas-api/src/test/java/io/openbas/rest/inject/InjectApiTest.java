@@ -8,7 +8,7 @@ import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
-import static org.hamcrest.Matchers.containsString;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
@@ -24,6 +24,8 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
+import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
@@ -43,11 +45,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.hamcrest.MatcherAssert;
+import java.util.*;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -963,6 +962,7 @@ class InjectApiTest extends IntegrationTest {
     private Inject buildInjectWithTraces(List<ExecutionTraceComposer.Composer> traces) {
       return injectComposer
           .forInject(InjectFixture.getDefaultInject())
+          .persist()
           .withInjectStatus(
               injectStatusComposer
                   .forInjectStatus(InjectStatusFixture.createDefaultInjectStatus())
@@ -1011,12 +1011,33 @@ class InjectApiTest extends IntegrationTest {
       String response =
           performGetRequest(INJECT_URI + "/execution-traces", inject.getId(), savedAgent.getId());
 
-      MatcherAssert.assertThat(response, containsString("execution_message\":\"Info"));
-      MatcherAssert.assertThat(response, containsString("execution_message\":\"Success"));
-      MatcherAssert.assertThat(response, containsString("execution_action\":\"START"));
-      MatcherAssert.assertThat(response, containsString("execution_action\":\"COMPLETE"));
-      MatcherAssert.assertThat(response, containsString("execution_status\":\"INFO"));
-      MatcherAssert.assertThat(response, containsString("execution_status\":\"SUCCESS"));
+      List<ExecutionTraceOutput> expected = new ArrayList<>();
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.START)
+              .message("Info")
+              .status(ExecutionTraceStatus.INFO)
+              .build());
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.COMPLETE)
+              .message("Success")
+              .status(ExecutionTraceStatus.SUCCESS)
+              .build());
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .when(Option.IGNORING_EXTRA_FIELDS)
+          .whenIgnoringPaths(
+              "execution_time",
+              "execution_agent",
+              "execution_agent.agent_id",
+              "execution_agent.agent_privilege",
+              "execution_agent.agent_deployment_mode",
+              "execution_agent.agent_executed_by_user",
+              "execution_agent.agent_active",
+              "execution_agent.agent_last_seen")
+          .isEqualTo(mapper.writeValueAsString(expected));
     }
 
     @Test
@@ -1032,12 +1053,30 @@ class InjectApiTest extends IntegrationTest {
 
       String response = performGetRequest(INJECT_URI + "/status", inject.getId(), null);
 
-      MatcherAssert.assertThat(response, containsString("execution_message\":\"Info"));
-      MatcherAssert.assertThat(response, containsString("execution_message\":\"Error"));
-      MatcherAssert.assertThat(response, containsString("execution_action\":\"START"));
-      MatcherAssert.assertThat(response, containsString("execution_action\":\"COMPLETE"));
-      MatcherAssert.assertThat(response, containsString("execution_status\":\"INFO"));
-      MatcherAssert.assertThat(response, containsString("execution_status\":\"ERROR"));
+      List<ExecutionTraceOutput> expectedTraces = new ArrayList<>();
+      expectedTraces.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.START)
+              .message("Info")
+              .status(ExecutionTraceStatus.INFO)
+              .build());
+      expectedTraces.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.COMPLETE)
+              .message("Error")
+              .status(ExecutionTraceStatus.ERROR)
+              .build());
+
+      InjectStatusOutput expected = InjectStatusOutput.builder().traces(expectedTraces).build();
+
+      assertThatJson(response)
+          .whenIgnoringPaths(
+              "status_id",
+              "status_name",
+              "status_tracking_sent_date",
+              "status_tracking_end_date",
+              "status_main_traces[*].execution_time")
+          .isEqualTo(mapper.writeValueAsString(expected));
     }
   }
 }

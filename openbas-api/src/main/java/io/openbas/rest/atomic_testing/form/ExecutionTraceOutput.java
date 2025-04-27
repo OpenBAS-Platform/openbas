@@ -1,5 +1,8 @@
 package io.openbas.rest.atomic_testing.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.ExecutionTraceStatus;
@@ -11,6 +14,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
+@JsonInclude(NON_NULL)
 @Builder
 @Schema(description = "Represents a single execution trace detail")
 public class ExecutionTraceOutput {

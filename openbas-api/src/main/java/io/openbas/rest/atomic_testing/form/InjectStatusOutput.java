@@ -1,7 +1,9 @@
 package io.openbas.rest.atomic_testing.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static lombok.AccessLevel.NONE;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +14,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@JsonInclude(NON_NULL)
 @SuperBuilder
 public class InjectStatusOutput {
 
