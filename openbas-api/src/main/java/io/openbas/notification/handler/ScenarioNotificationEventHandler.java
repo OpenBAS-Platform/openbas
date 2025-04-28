@@ -108,11 +108,11 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     Map<String, String> data = new HashMap<>();
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
-    data.put("prev_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
-    data.put("prev_percentage_detection", Float.toString(lastSimulationDetectScore));
-    data.put("prev_percentage_prevention", Float.toString(secondLastSimulationDetectScore));
+    data.put("prev_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
+    data.put("prev_percentage_detection", Float.toString(secondLastSimulationDetectScore));
+    data.put("prev_percentage_prevention", Float.toString(secondLastSimulationPrevScore));
     data.put(
-        "new_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
+        "new_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
     data.put("new_percentage_detection", Float.toString(lastSimulationDetectScore));
     data.put("new_percentage_prevention", Float.toString(lastSimulationPrevScore));
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
