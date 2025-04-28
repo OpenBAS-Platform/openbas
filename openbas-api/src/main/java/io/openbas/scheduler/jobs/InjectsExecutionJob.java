@@ -126,7 +126,7 @@ public class InjectsExecutionJob implements Job {
                         .resourceId(ex.getScenario().getId())
                         .timestamp(Instant.now())
                         .build(),
-                    delayForSimulationCompletedEvent)); // add a 1 hour delay
+                    delayForSimulationCompletedEvent));
   }
 
   public void handlePendingInject() {
