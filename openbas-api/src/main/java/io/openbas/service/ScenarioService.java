@@ -20,12 +20,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
+import io.openbas.ee.Ee;
 import io.openbas.export.Mixins;
 import io.openbas.helper.ObjectMapperHelper;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -100,7 +102,9 @@ public class ScenarioService {
 
   private final ExerciseMapper exerciseMapper;
   private final ActionMetricCollector actionMetricCollector;
+  private final LicenseCacheManager licenseCacheManager;
 
+  private final Ee eeService;
   private final GrantService grantService;
   private final VariableService variableService;
   private final ChallengeService challengeService;
@@ -260,6 +264,13 @@ public class ScenarioService {
     Long total = countQuery(cb, this.entityManager, Scenario.class, specificationCount);
 
     return new PageImpl<>(scenarios, pageable, total);
+  }
+
+  public void throwIfScenarioNotLaunchable(Scenario scenario) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    scenario.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
   /** Scenario is recurring AND start date is before now AND end date is after now */

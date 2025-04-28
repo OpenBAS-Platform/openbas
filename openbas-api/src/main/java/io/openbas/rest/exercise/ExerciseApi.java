@@ -327,6 +327,16 @@ public class ExerciseApi extends RestBehavior {
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
+  @Deprecated(since = "1.16.0")
+  public Exercise deprecatedUpdateExerciseStart(
+      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
+      throws InputValidationException {
+    return this.updateExerciseStart(exerciseId, input);
+  }
+
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/start-date")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseStart(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
       throws InputValidationException {
@@ -336,6 +346,7 @@ public class ExerciseApi extends RestBehavior {
       String message = "Change date is only possible in scheduling state";
       throw new InputValidationException("exercise_start_date", message);
     }
+    exerciseService.throwIfExerciseNotLaunchable(exercise);
     exercise.setUpdateAttributes(input);
     return exerciseRepository.save(exercise);
   }
@@ -597,6 +608,7 @@ public class ExerciseApi extends RestBehavior {
     // In case of manual start
     if (ExerciseStatus.SCHEDULED.equals(exercise.getStatus())
         && ExerciseStatus.RUNNING.equals(status)) {
+      exerciseService.throwIfExerciseNotLaunchable(exercise);
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
       actionMetricCollector.addSimulationPlayedCount();
