@@ -113,7 +113,11 @@ public class ExerciseInjectApi extends RestBehavior {
         joinMap);
   }
 
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test")
+  /**
+   * @deprecated since 1.16.0, forRemoval = true
+   * @see #findExercisePageInjectTests
+   */
+  @PostMapping("/api/exercise/{exerciseId}/injects/test")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -121,7 +125,13 @@ public class ExerciseInjectApi extends RestBehavior {
         exerciseId, searchPaginationInput);
   }
 
-  // -- EXERCISES --
+  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test")
+  public Page<InjectTestStatusOutput> findExercisePageInjectTests(
+      @PathVariable @NotBlank String exerciseId,
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return injectTestStatusService.findAllInjectTestsByExerciseId(
+        exerciseId, searchPaginationInput);
+  }
 
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
