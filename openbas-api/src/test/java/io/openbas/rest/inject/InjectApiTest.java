@@ -965,7 +965,7 @@ class InjectApiTest extends IntegrationTest {
           .persist()
           .withInjectStatus(
               injectStatusComposer
-                  .forInjectStatus(InjectStatusFixture.createDefaultInjectStatus())
+                  .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
                   .withExecutionTraces(traces))
           .persist()
           .get();
