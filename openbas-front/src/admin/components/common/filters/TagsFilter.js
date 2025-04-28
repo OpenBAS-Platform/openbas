@@ -26,7 +26,7 @@ const useStyles = makeStyles()(() => ({
 const TagsFilter = (props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const tags = useHelper(helper => helper.getTags());
+  const { tags } = useHelper(helper => ({ tags: helper.getTags() }));
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;
   const tagTransform = n => ({
     id: n.tag_id,

@@ -38,7 +38,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
       helper: UserHelper & OrganizationHelper & TagHelper,
     ) => {
       return {
-        userAdmin: helper.getMe()?.user_admin,
+        userAdmin: helper.getMeAdmin(),
         organizationsMap: helper.getOrganizationsMap(),
         tagsMap: helper.getTagsMap(),
       };

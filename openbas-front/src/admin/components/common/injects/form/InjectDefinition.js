@@ -1037,7 +1037,6 @@ InjectDefinition.propTypes = {
   handleClose: PropTypes.func,
   injectorContract: PropTypes.object,
   fetchDocuments: PropTypes.func,
-  tagsMap: PropTypes.object,
   articlesFromExerciseOrScenario: PropTypes.array,
   variablesFromExerciseOrScenario: PropTypes.array,
   readOnly: PropTypes.bool,
@@ -1050,10 +1049,10 @@ InjectDefinition.propTypes = {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  const documentsMap = helper.getDocumentsMap();
-  const channelsMap = helper.getChannelsMap();
-  const articlesMap = helper.getArticlesMap();
-  const challengesMap = helper.getChallengesMap();
+  const documentsMap = helper.getDocumentsMap().toJS();
+  const channelsMap = helper.getChannelsMap().toJS();
+  const articlesMap = helper.getArticlesMap().toJS();
+  const challengesMap = helper.getChallengesMap().toJS();
   return {
     documentsMap,
     articlesMap,

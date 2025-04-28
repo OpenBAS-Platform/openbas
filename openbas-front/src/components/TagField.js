@@ -130,8 +130,8 @@ class TagField extends Component {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    tags: helper.getTags(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    tags: helper.getTags().toJS(),
+    userAdmin: helper.getMeAdmin(),
   };
 };
 

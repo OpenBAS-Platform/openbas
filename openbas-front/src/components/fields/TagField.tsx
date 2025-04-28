@@ -51,7 +51,7 @@ const TagField: FunctionComponent<Props> = ({
     userAdmin: boolean;
   } = useHelper((helper: TagHelper & UserHelper) => ({
     tags: helper.getTags(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   const dispatch = useAppDispatch();
 

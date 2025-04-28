@@ -6,7 +6,8 @@ import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useCon
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { exportInjectSearch } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
@@ -123,7 +124,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_type',
       label: 'Type',
       isSortable: false,
-      value: (_: InjectOutputType, injectContract: InjectorContractConvertedContent) => {
+      value: (_: InjectOutputType, injectContract: InjectorContractConverted['convertedContent']) => {
         const injectorContractName = tPick(injectContract?.label);
         return injectContract
           ? (
@@ -140,13 +141,13 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <>{inject.inject_title}</>,
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => <>{inject.inject_title}</>,
     },
     {
       field: 'inject_depends_duration',
       label: 'Trigger',
       isSortable: true,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => {
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => {
         const duration = splitDuration(
           inject.inject_depends_duration || 0,
         );
@@ -165,7 +166,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_platforms',
       label: 'Platform(s)',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => (
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => (
         <>
           {
             inject.inject_injector_contract?.injector_contract_platforms?.map(
@@ -186,7 +187,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_enabled',
       label: 'Status',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => {
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => {
         let injectStatus = inject.inject_enabled
           ? t('Enabled')
           : t('Disabled');
@@ -208,7 +209,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_tags',
       label: 'Tags',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <ItemTags variant="list" tags={inject.inject_tags} />,
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => <ItemTags variant="list" tags={inject.inject_tags} />,
     },
   ], []);
 

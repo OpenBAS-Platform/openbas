@@ -156,7 +156,7 @@ const Validations = () => {
         <List>
           {Object.entries(groupedByInject).map(([injectId, expectationsByInject]) => {
             const inject = injectsMap[injectId] || {};
-            const injectContract = inject.inject_injector_contract.injector_contract_content_parsed || {};
+            const injectContract = inject.inject_injector_contract.convertedContent || {};
             return (
               <div key={inject.inject_id}>
                 <ListItem divider={true} classes={{ root: classes.item }}>

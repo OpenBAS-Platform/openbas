@@ -69,7 +69,7 @@ const FileTransferDialog: FunctionComponent<Props> = ({
     userAdmin: string;
   } = useHelper((helper: DocumentHelper & UserHelper) => ({
     documents: helper.getDocuments(),
-    userAdmin: helper.getMe()?.user_admin,
+    userAdmin: helper.getMeAdmin(),
   }));
 
   useEffect(() => {

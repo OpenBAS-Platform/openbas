@@ -4,8 +4,7 @@ import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import { searchTeams } from '../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../actions/teams/team-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -68,7 +67,7 @@ const Teams = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = [

@@ -21,10 +21,7 @@ const EETooltip = ({
   const [feedbackCreation, setFeedbackCreation] = useState(false);
   const [openEnableAI, setOpenEnableAI] = useState(false);
   const [openConfigAI, setOpenConfigAI] = useState(false);
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const isEnterpriseEdition = useEnterpriseEdition();
   const { enabled, configured } = useAI();
   if (isEnterpriseEdition && (!forAi || (forAi && enabled && configured))) {

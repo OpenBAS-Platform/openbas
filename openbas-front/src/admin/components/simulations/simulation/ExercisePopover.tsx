@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -116,7 +116,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Button Popover
   const entries = [];

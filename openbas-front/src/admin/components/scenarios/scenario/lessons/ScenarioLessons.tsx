@@ -3,7 +3,6 @@ import { useParams } from 'react-router';
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
-import { fetchScenarioInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
@@ -65,7 +64,6 @@ const ScenarioLessons = () => {
     scenario,
     source,
     objectives,
-    injects,
     teams,
     teamsMap,
     lessonsCategories,
@@ -78,7 +76,6 @@ const ScenarioLessons = () => {
       scenario: scenarioData,
       source: processToGenericSource(helper.getScenario(scenarioId)),
       objectives: helper.getScenarioObjectives(scenarioId),
-      injects: helper.getScenarioInjects(scenarioId),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
       lessonsTemplates: helper.getLessonsTemplates(),
@@ -94,7 +91,6 @@ const ScenarioLessons = () => {
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
     dispatch(fetchScenarioObjectives(scenarioId));
-    dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
@@ -145,7 +141,6 @@ const ScenarioLessons = () => {
           isUpdatable: permissions.canWrite,
         }}
         objectives={objectives}
-        injects={injects}
         teamsMap={teamsMap}
         teams={teams}
         lessonsCategories={lessonsCategories}

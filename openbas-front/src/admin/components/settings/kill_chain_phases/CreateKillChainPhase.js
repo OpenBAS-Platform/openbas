@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
 import { addKillChainPhase } from '../../../../actions/KillChainPhase';
+import { storeHelper } from '../../../../actions/Schema.js';
 import Drawer from '../../../../components/common/Drawer';
 import inject18n from '../../../../components/i18n';
 import KillChainPhaseForm from './KillChainPhaseForm';
@@ -79,7 +80,10 @@ CreateKillChainPhase.propTypes = {
   onCreate: PropTypes.func,
 };
 
-const select = state => ({ organizations: state.referential.entities.organizations });
+const select = (state) => {
+  const helper = storeHelper(state);
+  return { organizations: helper.getOrganizations().toJS() };
+};
 
 export default R.compose(
   connect(select, { addKillChainPhase }),
