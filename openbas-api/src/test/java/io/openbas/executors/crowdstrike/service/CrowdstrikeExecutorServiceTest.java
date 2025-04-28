@@ -1,11 +1,13 @@
 package io.openbas.executors.crowdstrike.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
@@ -33,13 +35,11 @@ public class CrowdstrikeExecutorServiceTest {
   public static final String HOST_GROUP_CS = "hostGroupCs";
 
   @Mock private CrowdStrikeExecutorClient client;
-
   @Mock private CrowdStrikeExecutorConfig config;
-
+  @Mock private LicenseCacheManager licenseCacheManager;
   @Mock private AssetGroupService assetGroupService;
-
+  @Mock private Ee eeService;
   @Mock private EndpointService endpointService;
-
   @Mock private AgentService agentService;
 
   @InjectMocks private CrowdStrikeExecutorService crowdStrikeExecutorService;
@@ -91,6 +91,8 @@ public class CrowdstrikeExecutorServiceTest {
   void test_launchBatchExecutorSubprocess_crowdstrike()
       throws InterruptedException, JsonProcessingException {
     // Init datas
+    when(licenseCacheManager.getEnterpriseEditionInfo()).thenReturn(null);
+    doNothing().when(eeService).throwEEExecutorService(any(), any(), any());
     when(config.isEnable()).thenReturn(true);
     when(config.getApiBatchExecutionActionPagination()).thenReturn(1);
     when(config.getWindowsScriptName()).thenReturn("MyScript");
