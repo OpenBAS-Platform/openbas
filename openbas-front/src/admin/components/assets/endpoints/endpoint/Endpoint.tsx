@@ -1,4 +1,4 @@
-import { List, Paper, Typography } from '@mui/material';
+import { List, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -52,7 +52,7 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_inject?.inject_title,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
     },
     {
       field: 'finding_simulation',
