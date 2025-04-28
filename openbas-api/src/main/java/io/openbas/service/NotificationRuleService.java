@@ -109,7 +109,7 @@ public class NotificationRuleService {
     // TODO fix: custom logo only working with png because of the html template
     // add data about custom logo and whitemarked platform
     if (!rules.isEmpty()) {
-      // check if there is a
+      // check if there is a custom logo
       String theme =
           platformSettingsService
               .setting(SettingKeys.DEFAULT_THEME.name())
