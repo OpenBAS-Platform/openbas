@@ -5,7 +5,7 @@ import arrayMutators from 'final-form-arrays';
 import { type FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
 
-import { type InjectOutputType } from '../../../../actions/injects/Inject';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
@@ -17,7 +17,7 @@ import InjectChainsForm from './InjectChainsForm';
 import InjectIcon from './InjectIcon';
 
 interface Props {
-  inject: Inject;
+  inject: InjectStore;
   handleClose: () => void;
   onUpdateInject?: (data: Inject[]) => Promise<void>;
   injects?: InjectOutputType[];

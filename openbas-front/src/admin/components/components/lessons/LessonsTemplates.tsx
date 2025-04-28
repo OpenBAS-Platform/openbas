@@ -40,7 +40,7 @@ const LessonsTemplates = () => {
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => {
-    return { userAdmin: helper.getMe()?.user_admin ?? false };
+    return { userAdmin: helper.getMeAdmin() };
   });
 
   // Headers

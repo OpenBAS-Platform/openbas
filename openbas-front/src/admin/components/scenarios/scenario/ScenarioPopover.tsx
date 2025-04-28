@@ -1,7 +1,7 @@
 import { type FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -36,7 +36,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Duplicate
   const [duplicate, setDuplicate] = useState(false);

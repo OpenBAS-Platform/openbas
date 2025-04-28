@@ -43,7 +43,7 @@ const LessonsTemplate = () => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
       questions: helper.getLessonsTemplateQuestions(),
-      userAdmin: helper.getMe()?.user_admin ?? false,
+      userAdmin: helper.getMeAdmin(),
     };
   });
   useDataLoader(() => {

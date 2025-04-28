@@ -8,7 +8,7 @@ import { type InjectHelper } from '../../../../../actions/injects/inject-helper'
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import { type Exercise, type Inject, type InjectExpectation } from '../../../../../utils/api-types';
+import { type Exercise, type InjectExpectation } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 
 interface Props { exerciseId: Exercise['exercise_id'] }
@@ -20,7 +20,7 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
 
   // Fetching data
   const { injectsMap, injectExpectations }: {
-    injectsMap: Record<string, Inject>;
+    injectsMap: Record<string, InjectStore>;
     injectExpectations: InjectExpectation[];
   } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),
@@ -55,7 +55,7 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
       inject_expectation_inject: InjectStore;
     }>]) => ({
       name: tPick(n[1][0].inject_expectation_inject.inject_injector_contract?.injector_contract_labels),
-      color: n[1][0].inject_expectation_inject.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
+      color: n[1][0].inject_expectation_inject.inject_injector_contract?.convertedContent?.config?.[`color_${theme.palette.mode}`],
       data: n[1].map((i: InjectExpectation & { inject_expectation_cumulated_score: number }) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,

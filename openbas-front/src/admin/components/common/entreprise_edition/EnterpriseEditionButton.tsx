@@ -30,10 +30,7 @@ interface Props {
 const EnterpriseEditionButton = ({ style = {}, classes }: Props) => {
   const { t } = useFormatter();
   const [openEnterpriseEditionConsent, setOpenEnterpriseEditionConsent] = useState(false);
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   return (
     <>
       <EnterpriseEditionAgreementDialog

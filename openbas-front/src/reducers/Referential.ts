@@ -1,4 +1,4 @@
-import { List, Map } from 'immutable';
+import { fromJS, List, Map } from 'immutable';
 import * as R from 'ramda';
 
 import * as Constants from '../constants/ActionTypes';
@@ -57,11 +57,19 @@ export const entitiesInitializer = Map({
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mergeDeepOverwriteLists = (a: any, b: any) => {
+const mergeDeepOverwriteLists = (a: any, b: any, deep = 0) => {
   // First, check if 'b' is null to avoid overwriting 'a', even if 'a' is mergeable.
   // Then, check if 'a' is mergeable.
-  if (b !== null && a && typeof a === 'object' && typeof a.mergeWith === 'function' && !List.isList(a)) {
-    return a.mergeWith(mergeDeepOverwriteLists, b);
+  // Then, merge a is not a list & b is immutable then merge them otherwise return b
+  if (!b) {
+    return b;
+  }
+  if (deep < 3 && a && Map.isMap(a)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return a.mergeWith((c: any, d: any): any => mergeDeepOverwriteLists(c, d, deep + 1), b);
+  }
+  if (!List.isList(a) && Map.isMap(b)) {
+    return a.merge(b);
   }
   return b;
 };
@@ -71,7 +79,7 @@ const referential = (state: any = Map({}), action: any = {}) => {
   switch (action.type) {
     case Constants.DATA_UPDATE_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
-      return mergeDeepOverwriteLists(state, R.dissoc('result', action.payload));
+      return mergeDeepOverwriteLists(state, fromJS(R.dissoc('result', action.payload)));
     }
     case Constants.DATA_DELETE_SUCCESS: {
       const toDeleteIn = state.getIn(['entities', action.payload.type]);

@@ -815,13 +815,13 @@ ToolBar.propTypes = {
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
-  const endpoints = helper.getEndpoints()
+  const endpoints = helper.getEndpoints().toJS()
     .map(n => ({
       label: n.asset_name,
       value: n.asset_id,
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
-  const assetGroups = helper.getAssetGroups()
+  const assetGroups = helper.getAssetGroups().toJS()
     .map(n => ({
       label: n.asset_group_name,
       value: n.asset_group_id,

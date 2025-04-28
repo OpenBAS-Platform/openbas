@@ -23,10 +23,7 @@ import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
 import { useHelper } from '../../../store';
 
 const LeftBar = () => {
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const entries = [
     {
       items: [

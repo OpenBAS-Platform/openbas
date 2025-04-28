@@ -31,15 +31,12 @@ const Channel = () => {
   const { channelId } = useParams();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { channel, documentsMap, userAdmin } = useHelper((helper) => {
-    const med = helper.getChannel(channelId);
-    const docsMap = helper.getDocumentsMap();
-    return {
-      channel: med,
-      documentsMap: docsMap,
-      userAdmin: helper.getMe()?.user_admin ?? false,
-    };
-  });
+  const { channel, documentsMap, userAdmin } = useHelper(helper => ({
+    channel: helper.getChannel(channelId),
+    documentsMap: helper.getDocumentsMap(),
+    userAdmin: helper.getMeAdmin(),
+  }),
+  );
   useDataLoader(() => {
     dispatch(fetchDocuments());
   });

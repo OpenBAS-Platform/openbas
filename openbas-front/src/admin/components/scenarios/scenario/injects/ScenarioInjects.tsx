@@ -28,7 +28,6 @@ const ScenarioInjects: FunctionComponent = () => {
   const { scenario, teams, articles, variables } = useHelper(
     (helper: InjectHelper & ScenariosHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
-        injects: helper.getScenarioInjects(scenarioId),
         scenario: helper.getScenario(scenarioId),
         teams: helper.getScenarioTeams(scenarioId),
         articles: helper.getScenarioArticles(scenarioId),

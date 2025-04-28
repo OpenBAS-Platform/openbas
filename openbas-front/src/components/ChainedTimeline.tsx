@@ -101,12 +101,15 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const reactFlow = useReactFlow();
 
-  const injectsMap = useHelper((injectHelper: InjectHelper) => injectHelper.getInjectsMap());
-  const teams = useHelper((teamsHelper: TeamsHelper) => teamsHelper.getTeamsMap());
-  const assets = useHelper((endpointHelper: EndpointHelper) => endpointHelper.getEndpointsMap());
-  const assetGroups = useHelper((assetGroupsHelper: AssetGroupsHelper) => assetGroupsHelper.getAssetGroupMaps());
-  const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(exerciseOrScenarioId));
-  const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseOrScenarioId));
+  const { injectsMap, teams, assets, assetGroups, scenario, exercise }
+    = useHelper((helper: ExercisesHelper & InjectHelper & TeamsHelper & EndpointHelper & AssetGroupsHelper & ScenariosHelper) => ({
+      injectsMap: helper.getInjectsMap(),
+      teams: helper.getTeamsMap(),
+      assets: helper.getEndpointsMap(),
+      assetGroups: helper.getAssetGroupMaps(),
+      scenario: helper.getScenario(exerciseOrScenarioId),
+      exercise: helper.getExercise(exerciseOrScenarioId),
+    }));
 
   const { t } = useFormatter();
 

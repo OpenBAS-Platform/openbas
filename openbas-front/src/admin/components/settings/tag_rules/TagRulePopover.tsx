@@ -1,10 +1,9 @@
 import { type FunctionComponent, useState } from 'react';
 
 import { deleteTagRule } from '../../../../actions/tag_rules/tagrule-actions';
-import { type PopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
-import IconPopover from '../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../components/i18n';
 import { type TagRuleOutput } from '../../../../utils/api-types';
 import OPEN_CTI_TAG_NAME from './TagRuleConstants';
@@ -56,7 +55,7 @@ const TagRulePopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <IconPopover entries={entries} />
+      <ButtonPopover entries={entries} variant="icon" />
 
       <Drawer
         open={openEdit}

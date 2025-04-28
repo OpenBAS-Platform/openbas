@@ -148,7 +148,6 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                   )}
                   <WidgetPopover
                     className="noDrag"
-                    size="small"
                     customDashboardId={customDashboardId}
                     widget={widget}
                     onUpdate={widget => handleWidgetUpdate(widget)}
