@@ -1,11 +1,13 @@
 import { List } from '@mui/material';
-import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
-import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import {
+  useQueryable,
+  useQueryableWithLocalStorage
+} from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import { type InjectTarget } from '../../../../utils/api-types';
@@ -31,6 +33,13 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
   const [targets, setTargets] = useState<InjectTarget[]>();
   const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
   const [searchReloadContentCount, setSearchReloadContentCount] = useState(0);
+
+  useEffect(() => {
+    console.log("remount!");
+    return () => {
+      console.log("unmount!");
+    }
+  }, []);
 
   useEffect(() => {
     setSearchReloadContentCount(searchReloadContentCount + 1);

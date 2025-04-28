@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import io.openbas.database.raw.RawAssetGroupDynamicFilter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,12 +75,13 @@ public interface AssetGroupRepository
 
   @Query(
       value =
-          "SELECT CAST(asset_group_dynamic_filter as text)"
+          "SELECT ag.asset_group_id as asset_group_id, "
+              + "CAST(asset_group_dynamic_filter as text) as asset_group_dynamic_filter "
               + "FROM asset_groups ag "
               + "LEFT JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id "
               + "WHERE iat.inject_id = :injectId;",
       nativeQuery = true)
-  List<String> rawDynamicFiltersByInjectId(@Param("injectId") String injectId);
+  List<RawAssetGroupDynamicFilter> rawDynamicFiltersByInjectId(@Param("injectId") String injectId);
 
   @NotNull
   @EntityGraph(value = "AssetGroup.tags-assets", type = EntityGraph.EntityGraphType.LOAD)

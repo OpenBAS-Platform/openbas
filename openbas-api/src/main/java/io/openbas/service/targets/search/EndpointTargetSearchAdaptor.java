@@ -5,6 +5,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawAssetGroupDynamicFilter;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.service.InjectExpectationService;
@@ -14,7 +15,7 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,6 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     // field name translations
     this.fieldTranslations.put("target_name", "asset_name");
     this.fieldTranslations.put("target_tags", "asset_tags");
-    this.fieldTranslations.put("target_asset_groups", "endpoint_asset_groups");
   }
 
   @Override
@@ -50,13 +50,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
         compileFilterGroupsWithOR(
             assetGroupRepository.rawDynamicFiltersByInjectId(scopedInject.getId()).stream()
                 .map(
-                    df -> {
-                      try {
-                        return new ObjectMapper().readValue(df, Filters.FilterGroup.class);
-                      } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                      }
-                    })
+                        df -> df.getAssetGroupDynamicFilter())
                 .toList());
 
     // transitive targeting via explicit membership in target asset groups
@@ -94,6 +88,10 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
     Specification<Endpoint> compiledTargetingSpec = transitiveTargetingSpec.or(directTargetingSpec);
 
+    SearchPaginationInput translatedInput = this.translate(input, scopedInject);
+
+    // special case the target_asset_group field
+
     Page<Endpoint> eps =
         buildPaginationJPA(
             (Specification<Endpoint> specification, Pageable pageable) -> {
@@ -103,7 +101,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
                       : dynamicFilterSpec.or(compiledTargetingSpec).and(specification);
               return this.endpointRepository.findAll(finalSpec, pageable);
             },
-            this.translate(input, scopedInject),
+                translatedInput,
             Endpoint.class);
 
     return new PageImpl<>(
@@ -134,8 +132,8 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
             endpoint.getId(),
             endpoint.getName(),
             endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
-            endpoint.getPlatform().name(),
-            new HashSet<>());
+            endpoint.getPlatform().name()
+        );
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
