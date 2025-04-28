@@ -128,7 +128,7 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
 
   return (
     <>
-      <Box display="flex" flexDirection="row" alignItems="center" ml={theme.spacing(2)}>
+      <Box display="flex" flexDirection="row" alignItems="center">
         {getActionButton(injectResultOverview)}
         <AtomicTestingPopover
           atomic={injectResultOverview}

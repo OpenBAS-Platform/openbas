@@ -115,6 +115,7 @@ const ResponsePie: FunctionComponent<Props> = ({
             style={{
               ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
               fontWeight: 500,
+              textAlign: 'center',
             }}
           >
             {title}
@@ -135,19 +136,11 @@ const ResponsePie: FunctionComponent<Props> = ({
   }, [theme, displayHumanValidationBtn, humanValidationLink, pending]);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid
-        id="score_details"
-        container
-        spacing={1}
-        direction="row"
-        justifyContent={isReducedView ? 'right' : 'flex-start'}
-      >
-        <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
-        <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
-        <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
-      </Grid>
-    </Box>
+    <div style={{ display: 'flex' }}>
+      <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
+      <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
+      <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
+    </div>
   );
 };
 

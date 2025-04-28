@@ -30,14 +30,13 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
   ];
 
   return (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      sx={{
-        borderBottom: 1,
-        borderColor: 'divider',
-        marginBottom: theme.spacing(4),
-      }}
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 500px auto',
+      gap: theme.spacing(2),
+      alignItems: 'start',
+      marginBottom: theme.spacing(2),
+    }}
     >
       <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
         <Breadcrumbs
@@ -47,11 +46,9 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
         <IndexTitle injectResultOverview={injectResultOverview} />
         <IndexTabs injectResultOverview={injectResultOverview} />
       </Box>
-      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
-        <IndexActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
-      </Box>
-    </Box>
+      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
+      <IndexActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
+    </div>
   );
 };
 
