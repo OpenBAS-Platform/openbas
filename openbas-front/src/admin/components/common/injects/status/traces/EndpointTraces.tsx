@@ -50,7 +50,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: theme.spacing(1),
+        gap: theme.spacing(1.5),
       }}
       >
         <Typography margin="0" variant="h3">
@@ -62,7 +62,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: theme.spacing(1),
+        gap: theme.spacing(1.5),
       }}
       >
         <Typography margin="0" variant="h3">
@@ -74,7 +74,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: theme.spacing(1),
+        gap: theme.spacing(1.5),
       }}
       >
         <Typography margin="0" variant="h3">
