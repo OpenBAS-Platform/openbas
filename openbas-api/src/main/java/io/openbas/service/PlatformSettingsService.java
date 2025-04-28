@@ -491,7 +491,7 @@ public class PlatformSettingsService {
   public boolean isPlatformWhiteMarked() {
     String defaultValue = SettingKeys.PLATFORM_WHITEMARK.defaultValue();
     Optional<Setting> platformWhiteMarkedSetting =
-        this.setting(SettingKeys.PLATFORM_WHITEMARK.name());
+        this.setting(SettingKeys.PLATFORM_WHITEMARK.name().toLowerCase());
     return platformWhiteMarkedSetting
         .map(setting -> Boolean.parseBoolean(setting.getValue()))
         .orElse(Boolean.parseBoolean(defaultValue));

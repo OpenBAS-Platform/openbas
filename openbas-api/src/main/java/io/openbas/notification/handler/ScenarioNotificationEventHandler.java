@@ -13,7 +13,8 @@ import io.openbas.service.NotificationRuleService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.AtomicTestingUtils;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -92,6 +93,9 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
       @NotNull
           final Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
               secondLastSimulationResultsMap) {
+    // TODO handle date format dynamically
+    DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneId.systemDefault());
 
     Scenario scenario = scenarioService.scenario(scenarioId);
     String url = openBASConfig.getBaseUrl();
@@ -114,10 +118,10 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
     data.put(
-        "prev_simulation_date", secondLastSimulation.getEnd().map(Instant::toString).orElse("NA"));
+        "prev_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
     data.put("prev_percentage_detection", Float.toString(lastSimulationPrevScore));
     data.put("prev_percentage_prevention", Float.toString(lastSimulationDetectScore));
-    data.put("new_simulation_date", lastSimulation.getEnd().map(Instant::toString).orElse("NA"));
+    data.put("new_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
     data.put("new_percentage_detection", Float.toString(secondLastSimulationDetectScore));
     data.put("new_percentage_prevention", Float.toString(secondLastSimulationPrevScore));
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
