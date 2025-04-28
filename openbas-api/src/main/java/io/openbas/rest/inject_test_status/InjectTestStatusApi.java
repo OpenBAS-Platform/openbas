@@ -22,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class InjectTestStatusApi extends RestBehavior {
 
