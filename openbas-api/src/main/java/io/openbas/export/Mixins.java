@@ -47,20 +47,12 @@ public class Mixins {
       })
   public static class AttackPattern {}
 
-  @JsonIgnoreProperties(
-      ignoreUnknown = true,
-      value = {"listened"})
   public abstract static class InjectorContract {
-
     @JsonSerialize(using = JsonSerializer.None.class)
     public abstract List<AttackPattern> getAttackPatterns();
   }
 
-  @JsonIgnoreProperties(
-      value = {"listened"},
-      ignoreUnknown = true)
   public abstract static class Payload {
-
     @JsonSerialize(using = JsonSerializer.None.class)
     public abstract List<io.openbas.database.model.AttackPattern> getAttackPatterns();
   }
