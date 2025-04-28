@@ -9621,7 +9621,7 @@ __metadata:
     monocart-coverage-reports: "npm:2.12.4"
     monocart-reporter: "npm:2.9.17"
     normalizr: "npm:3.6.2"
-    pdfmake: "npm:0.2.18"
+    pdfmake: "npm:0.2.19"
     prop-types: "npm:15.8.1"
     qs: "npm:6.14.0"
     ramda: "npm:0.30.1"
@@ -9912,15 +9912,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfmake@npm:0.2.18":
-  version: 0.2.18
-  resolution: "pdfmake@npm:0.2.18"
+"pdfmake@npm:0.2.19":
+  version: 0.2.19
+  resolution: "pdfmake@npm:0.2.19"
   dependencies:
     "@foliojs-fork/linebreak": "npm:^1.1.2"
     "@foliojs-fork/pdfkit": "npm:^0.15.3"
     iconv-lite: "npm:^0.6.3"
-    xmldoc: "npm:^1.3.0"
-  checksum: 10c0/173c5e347d137af744a103c155822b52c58da44902a51576f0e6d151c3233c9a573a4b799fa282b5cffa3abf7f6304e75d18d7ed48ceb977d6223e823be35368
+    xmldoc: "npm:^2.0.0"
+  checksum: 10c0/1cacc11d68d56ea4b61c14a2d05d14b0dddc093deb5c9972db82a848edc1020410da7278fbe4f1908ce0a4f0690c1dd1f6e4e95a32d0ec5bd3e35ab4a239dc9a
   languageName: node
   linkType: hard
 
@@ -12896,12 +12896,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xmldoc@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "xmldoc@npm:1.3.0"
+"xmldoc@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "xmldoc@npm:2.0.0"
   dependencies:
     sax: "npm:^1.2.4"
-  checksum: 10c0/7957c57ff77008ced62063560d3e8f80c7fdf31d3fafa12d16c9f1fe676c8255f50889e8f41b61cca4cd473b841eedf2625089dcaf3f6b8717df521b9d0acfcf
+  checksum: 10c0/d51fcbe77cb3ed97d8cc5fa964d6a7d46afe90c377ccde2f9e3b1e93afcf2ec8e30f66023b210a8e0d0fe21c496ec558c025e1091a0c2fdfbabf155687d1a28d
   languageName: node
   linkType: hard
 
