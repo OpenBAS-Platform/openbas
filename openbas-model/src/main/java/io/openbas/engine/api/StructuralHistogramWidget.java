@@ -20,7 +20,7 @@ public class StructuralHistogramWidget extends HistogramWidget {
   public static class StructuralHistogramSeries {
 
     private String name;
-    private Filters.FilterGroup filter;
+    private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
 
   public StructuralHistogramWidget() {

@@ -3,9 +3,11 @@ package io.openbas.rest.exercise.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -32,15 +34,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
+  @Mock private Ee eeService;
   @Mock private GrantService grantService;
   @Mock private InjectDuplicateService injectDuplicateService;
   @Mock private TeamService teamService;
   @Mock private VariableService variableService;
+  @Mock private TagRuleService tagRuleService;
+  @Mock private InjectService injectService;
 
   @Mock private ExerciseMapper exerciseMapper;
   @Mock private InjectMapper injectMapper;
   @Mock private ResultUtils resultUtils;
   @Mock private ActionMetricCollector actionMetricCollector;
+  @Mock private LicenseCacheManager licenseCacheManager;
+
   @Mock private AssetRepository assetRepository;
   @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private InjectExpectationRepository injectExpectationRepository;
@@ -50,8 +57,6 @@ class ExerciseServiceTest {
   @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock private InjectRepository injectRepository;
   @Mock private LessonsCategoryRepository lessonsCategoryRepository;
-  @Mock private TagRuleService tagRuleService;
-  @Mock private InjectService injectService;
 
   @InjectMocks private ExerciseService exerciseService;
 
@@ -59,6 +64,7 @@ class ExerciseServiceTest {
   void setUp() {
     exerciseService =
         new ExerciseService(
+            eeService,
             grantService,
             injectDuplicateService,
             teamService,
@@ -69,6 +75,7 @@ class ExerciseServiceTest {
             injectMapper,
             resultUtils,
             actionMetricCollector,
+            licenseCacheManager,
             assetRepository,
             assetGroupRepository,
             injectExpectationRepository,

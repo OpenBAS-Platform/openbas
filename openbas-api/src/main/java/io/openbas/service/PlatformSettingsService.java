@@ -8,6 +8,7 @@ import static java.util.Optional.ofNullable;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.SettingKeys;
@@ -64,6 +65,7 @@ public class PlatformSettingsService {
   @Resource private OpenBASConfig openBASConfig;
   @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
   @Resource private RabbitmqConfig rabbitmqConfig;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   @Autowired
   public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
@@ -309,7 +311,7 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     // License
-    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfo());
+    platformSettings.setPlatformLicense(licenseCacheManager.getEnterpriseEditionInfo());
     return platformSettings;
   }
 
@@ -372,6 +374,7 @@ public class PlatformSettingsService {
     }
     settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), certPem));
     settingRepository.saveAll(settingsToSave);
+    licenseCacheManager.refreshLicense();
     return findSettings();
   }
 
