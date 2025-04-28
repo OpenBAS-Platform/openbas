@@ -128,7 +128,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          style={{ padding: 0 }}
+          style={{ paddingTop: 0 }}
         >
           <ListItemIcon />
           <ListItemText
@@ -145,8 +145,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
           <ListItem
             key={finding.finding_id}
             classes={{ root: classes.item }}
-            divider={true}
-            disablePadding={true}
+            divider
           >
             <ListItemIcon>
               <FindingIcon findingType={finding.finding_type} tooltip={true} />
