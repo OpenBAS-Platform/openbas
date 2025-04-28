@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 public class TargetService {
   private final AssetGroupTargetSearchAdaptor assetGroupTargetSearchAdaptor;
   private final EndpointTargetSearchAdaptor endpointTargetSearchAdaptor;
-  private final TeamTargetSearchAdaptor teamTargetSeachAdaptor;
+  private final TeamTargetSearchAdaptor teamTargetSearchAdaptor;
 
-  public Page<InjectTarget> injectTargets(
+  public Page<InjectTarget> searchTargets(
       TargetType injectTargetType, Inject inject, SearchPaginationInput input) {
     return switch (injectTargetType) {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.search(input, inject);
       case ASSETS -> endpointTargetSearchAdaptor.search(input, inject);
       case AGENT -> null;
-      case TEAMS -> teamTargetSeachAdaptor.search(input, inject);
+      case TEAMS -> teamTargetSearchAdaptor.search(input, inject);
       case PLAYER -> null;
       default -> throw new IllegalArgumentException("Unsupported target type: " + injectTargetType);
     };

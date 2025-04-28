@@ -181,7 +181,7 @@ public class InjectApi extends RestBehavior {
 
     Inject inject = injectService.inject(injectId);
 
-    return targetService.injectTargets(injectTargetTypeEnum, inject, input);
+    return targetService.searchTargets(injectTargetTypeEnum, inject, input);
   }
 
   @PostMapping(

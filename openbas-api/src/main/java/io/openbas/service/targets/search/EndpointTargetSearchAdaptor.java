@@ -35,18 +35,16 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
       AssetGroupRepository assetGroupRepository,
       InjectExpectationService injectExpectationService) {
     this.endpointRepository = endpointRepository;
+    this.assetGroupRepository = assetGroupRepository;
     this.injectExpectationService = injectExpectationService;
     // field name translations
     this.fieldTranslations.put("target_name", "asset_name");
     this.fieldTranslations.put("target_tags", "asset_tags");
     this.fieldTranslations.put("target_asset_groups", "endpoint_asset_groups");
-    // this.fieldTranslations.put("target_injects", "endpoint_injects");
-    this.assetGroupRepository = assetGroupRepository;
   }
 
   @Override
   public Page<InjectTarget> search(SearchPaginationInput input, @NotNull Inject scopedInject) {
-
     // dynamic filters from target dynamic groups
     Specification<Endpoint> dynamicFilterSpec =
         compileFilterGroupsWithOR(
