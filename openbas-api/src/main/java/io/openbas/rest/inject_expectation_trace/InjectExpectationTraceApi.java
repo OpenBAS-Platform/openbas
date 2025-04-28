@@ -52,10 +52,18 @@ public class InjectExpectationTraceApi extends RestBehavior {
     bulkInput.setExpectationTraces(List.of(input));
 
     this.bulkInsertInjectExpectationTraceForCollector(bulkInput);
-    // fetch the inserted data from the DB
+
+    Collector collector =
+        collectorRepository
+            .findById(input.getSourceId())
+            .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
+
     return this.injectExpectationTraceRepository
-        .findByAlertLink(input.getAlertLink())
-        .orElseThrow(ElementNotFoundException::new);
+        .findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
+            input.getAlertLink(),
+            input.getAlertName(),
+            collector.getSecurityPlatform().getId(),
+            input.getInjectExpectationId());
   }
 
   /**
