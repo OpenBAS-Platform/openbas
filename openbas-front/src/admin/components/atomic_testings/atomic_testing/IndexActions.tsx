@@ -61,7 +61,10 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
       const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.status_id ? 'Launch now' : 'Relaunch now';
       return (
         <Button
-          style={{ marginRight: theme.spacing(1) }}
+          style={{
+            marginRight: theme.spacing(1),
+            whiteSpace: 'nowrap',
+          }}
           startIcon={<PlayArrowOutlined />}
           variant="contained"
           color="primary"
