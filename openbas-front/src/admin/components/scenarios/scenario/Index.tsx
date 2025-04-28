@@ -219,14 +219,14 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               >
                 <IconButton
                   size="small"
-                  style={{ marginRight: 5 }}
+                  style={{ marginRight: theme.spacing(1) }}
                   onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
                 >
                   <NotificationsOutlined color={editNotification ? 'success' : 'primary'} />
                 </IconButton>
                 <Typography
                   variant="body1"
-                  style={{ marginRight: 5 }}
+                  style={{ marginRight: theme.spacing(1) }}
                 >
                   {t('Notification rules')}
                 </Typography>
@@ -246,7 +246,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               </div>
               <div>
                 {!cronExpression && (
-                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
                     <UpdateOutlined color="primary" />
                   </IconButton>
                 )}
@@ -255,7 +255,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                     size="small"
                     style={{
                       cursor: 'default',
-                      marginRight: 5,
+                      marginRight: theme.spacing(1),
                     }}
                   >
                     <UpdateOutlined />
@@ -263,7 +263,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 )}
                 {cronExpression && scenario.scenario_recurrence && (
                   <Tooltip title={(t('Modify the scheduling'))}>
-                    <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                    <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
                       <UpdateOutlined color="primary" />
                     </IconButton>
                   </Tooltip>

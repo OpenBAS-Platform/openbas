@@ -716,11 +716,11 @@ export interface CreateExerciseInput {
 }
 
 export interface CreateNotificationRuleInput {
-  resource_id?: string;
-  resource_type?: string;
+  resource_id: string;
+  resource_type: string;
   subject: string;
-  trigger?: string;
-  type?: string;
+  trigger: string;
+  type: string;
 }
 
 export interface CreateUserInput {

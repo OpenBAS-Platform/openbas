@@ -12,15 +12,19 @@ import lombok.extern.jackson.Jacksonized;
 public class CreateNotificationRuleInput {
 
   @JsonProperty("resource_type")
+  @NotNull
   private String resourceType;
 
   @JsonProperty("resource_id")
+  @NotNull
   private String resourceId;
 
   @JsonProperty("trigger")
+  @NotNull
   private String trigger;
 
   @JsonProperty("type")
+  @NotNull
   private String type;
 
   @JsonProperty("subject")

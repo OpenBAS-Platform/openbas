@@ -33,10 +33,10 @@ const CreationNotificationRuleForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<CreateNotificationRuleInput>().with({
-        resource_id: z.string().optional(),
-        resource_type: z.string().optional(),
-        trigger: z.string().optional(),
-        type: z.string().optional(),
+        resource_id: z.string(),
+        resource_type: z.string(),
+        trigger: z.string(),
+        type: z.string(),
         subject: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),

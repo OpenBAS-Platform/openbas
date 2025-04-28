@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { type FunctionComponent } from 'react';
 
 import { createNotificationRule, deleteNotificationRule, updateNotificationRule } from '../../../../../actions/scenarios/scenario-notification-rules';
@@ -42,13 +41,10 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
   });
 
   const onSubmitCreation = async (data: CreateNotificationRuleInput) => {
-    const toCreate = R.pipe(
-      R.assoc('resource_type', data.resource_type),
-      R.assoc('trigger', data.trigger),
-      R.assoc('type', data.type),
-      R.assoc('subject', data.subject),
-      R.assoc('resource_id', scenarioId),
-    )(data);
+    const toCreate = {
+      ...data,
+      resource_id: scenarioId,
+    };
     await createNotificationRule(toCreate).then((result: { data: NotificationRuleOutput }) => {
       setOpen(false);
       if (onCreate) {
