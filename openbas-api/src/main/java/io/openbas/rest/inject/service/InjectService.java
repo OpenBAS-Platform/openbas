@@ -11,17 +11,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.ee.Ee;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.LicenseRestrictionException;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
@@ -31,6 +34,10 @@ import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.*;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.AssetService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.UserService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
@@ -42,6 +49,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -64,6 +72,7 @@ public class InjectService {
   private final TeamRepository teamRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
+  private final Ee eeService;
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final InjectStatusRepository injectStatusRepository;
@@ -75,6 +84,7 @@ public class InjectService {
   private final TagService tagService;
   private final DocumentService documentService;
 
+  private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
 
   private SecurityExpression getAmbientSecurityExpression() {
@@ -267,9 +277,23 @@ public class InjectService {
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
+  public void throwIfInjectNotLaunchable(Inject inject) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    List<Agent> agents = this.getAgentsByInject(inject);
+    List<String> eeExecutors = eeService.detectEEExecutors(agents);
+
+    if (!eeExecutors.isEmpty()) {
+      throw new LicenseRestrictionException(
+          "Some asset will be executed through " + String.join(" and ", eeExecutors));
+    }
+  }
+
   @Transactional
   public InjectResultOverviewOutput launch(String id) {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    this.throwIfInjectNotLaunchable(inject);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
     Inject savedInject = saveInjectAndStatusAsQueuing(inject);
@@ -279,6 +303,7 @@ public class InjectService {
   @Transactional
   public InjectResultOverviewOutput relaunch(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
+    this.throwIfInjectNotLaunchable(duplicatedInject);
     Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
     delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
@@ -606,22 +631,27 @@ public class InjectService {
         });
   }
 
-  public final List<Agent> getAgentsByInject(Inject inject) {
+  public List<Agent> getAgentsByInject(Inject inject) {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();
 
-    resolveAllAssetsToExecute(inject).stream()
-        .map(assetToExecute -> (Endpoint) Hibernate.unproxy(assetToExecute.asset()))
-        .flatMap(
-            endpoint -> Optional.ofNullable(endpoint.getAgents()).stream().flatMap(List::stream))
-        .filter(agent -> isPrimaryAgent(agent))
-        .forEach(
-            agent -> {
-              if (!agentIds.contains(agent.getId())) {
-                agents.add(agent);
-                agentIds.add(agent.getId());
-              }
-            });
+    Consumer<Asset> extractAgents =
+        asset -> {
+          List<Agent> collectedAgents =
+              Optional.ofNullable(((Endpoint) Hibernate.unproxy(asset)).getAgents())
+                  .orElse(Collections.emptyList());
+          for (Agent agent : collectedAgents) {
+            if (isPrimaryAgent(agent) && !agentIds.contains(agent.getId())) {
+              agents.add(agent);
+              agentIds.add(agent.getId());
+            }
+          }
+        };
+
+    new ArrayList<>(inject.getAssets()).forEach(extractAgents);
+    inject.getAssetGroups().stream()
+        .flatMap(assetGroup -> assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
+        .forEach(extractAgents);
 
     return agents;
   }

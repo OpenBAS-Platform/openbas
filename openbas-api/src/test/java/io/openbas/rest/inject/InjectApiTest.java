@@ -761,7 +761,7 @@ class InjectApiTest extends IntegrationTest {
                   .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
                   .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentSession())))
           .withInjectStatus(
-              injectStatusComposer.forInjectStatus(InjectStatusFixture.createDefaultInjectStatus()))
+              injectStatusComposer.forInjectStatus(InjectStatusFixture.createPendingInjectStatus()))
           .persist()
           .get();
     }

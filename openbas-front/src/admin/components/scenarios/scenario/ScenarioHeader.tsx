@@ -84,13 +84,16 @@ const ScenarioHeader = ({
   // Local
   const ended = scenario.scenario_recurrence_end && new Date(scenario.scenario_recurrence_end).getTime() < new Date().getTime();
   const onSubmit = (cron: string, start: string, end?: string) => {
-    setCronExpression(cron);
-    setParsedCronExpression(parseCron(cron));
     dispatch(updateScenarioRecurrence(scenarioId, {
       scenario_recurrence: cron,
       scenario_recurrence_start: start,
       scenario_recurrence_end: end,
-    }));
+    })).then((result: { [x: string]: string }) => {
+      if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
+        setCronExpression(cron);
+        setParsedCronExpression(parseCron(cron));
+      }
+    });
     setOpenScenarioRecurringFormDialog(false);
   };
   useEffect(() => {

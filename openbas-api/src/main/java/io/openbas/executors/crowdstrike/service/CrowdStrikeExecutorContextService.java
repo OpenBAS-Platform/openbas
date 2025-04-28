@@ -3,7 +3,9 @@ package io.openbas.executors.crowdstrike.service;
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_NAME;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
@@ -22,10 +24,10 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(CROWDSTRIKE_EXECUTOR_NAME)
+@Service(CrowdStrikeExecutorContextService.SERVICE_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
-
+  public static final String SERVICE_NAME = CROWDSTRIKE_EXECUTOR_NAME;
   private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
   private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
@@ -46,6 +48,8 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
@@ -54,10 +58,14 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   public List<Agent> launchBatchExecutorSubprocess(
       Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
-    List<Agent> csAgents = new ArrayList<>(agents);
+
+    eeService.throwEEExecutorService(
+        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectStatus);
+
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
       throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
     }
+    List<Agent> csAgents = new ArrayList<>(agents);
 
     Injector injector =
         inject

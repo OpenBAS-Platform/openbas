@@ -1,7 +1,6 @@
 package io.openbas.rest;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -14,11 +13,12 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorContractRepository;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.utils.fixtures.AtomicTestingInputFixture;
-import io.openbas.utils.fixtures.InjectFixture;
-import io.openbas.utils.fixtures.InjectStatusFixture;
+import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import jakarta.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,10 +34,18 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static InjectStatus INJECT_STATUS;
   static InjectorContract INJECTOR_CONTRACT;
 
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ExecutorFixture executorFixture;
+
   @Autowired private MockMvc mvc;
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectStatusRepository injectStatusRepository;
+
+  List<InjectComposer.Composer> injectWrapperComposers = new ArrayList<>();
 
   @BeforeAll
   void beforeAll() {
@@ -47,9 +55,29 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
     Inject injectWithPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
     INJECT_WITH_STATUS_AND_COMMAND_LINES = injectRepository.save(injectWithPayload);
-    InjectStatus injectStatus = InjectStatusFixture.createDefaultInjectStatus();
+    InjectStatus injectStatus = InjectStatusFixture.createPendingInjectStatus();
     injectStatus.setInject(injectWithPayload);
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
+  }
+
+  private Inject getAtomicTesting(
+      @Nullable InjectStatus injectStatus, @Nullable Executor executor) {
+    InjectStatus injectStatusToSet =
+        (injectStatus == null) ? InjectStatusFixture.createDraftInjectStatus() : injectStatus;
+    Executor executorToRun = (executor == null) ? executorFixture.getDefaultExecutor() : executor;
+    InjectComposer.Composer atomicTestingComposer =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withEndpoint(
+                endpointComposer
+                    .forEndpoint(EndpointFixture.createEndpoint())
+                    .withAgent(
+                        agentComposer.forAgent(
+                            AgentFixture.createDefaultAgentSession(executorToRun))))
+            .withInjectStatus(injectStatusComposer.forInjectStatus(injectStatusToSet))
+            .persist();
+    injectWrapperComposers.add(atomicTestingComposer);
+    return atomicTestingComposer.get();
   }
 
   @Test
@@ -123,24 +151,9 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Launch an Atomic Testing")
   @WithMockAdminUser
   void launchAtomicTesting() throws Exception {
-    AtomicTestingInput atomicTestingInput =
-        AtomicTestingInputFixture.createDefaultAtomicTestingInput();
-    atomicTestingInput.setInjectorContract(INJECTOR_CONTRACT.getId());
+    Inject atomicTesting = getAtomicTesting(null, null);
 
-    String createdInject =
-        mvc.perform(
-                post(ATOMIC_TESTINGS_URI)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(atomicTestingInput)))
-            .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.inject_status.status_name").value("DRAFT"))
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    String injectId = JsonPath.read(createdInject, "$.inject_id");
-
-    mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/launch"))
+    mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/launch"))
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"));
   }
@@ -149,29 +162,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Relaunch an Atomic Testing")
   @WithMockAdminUser
   void relaunchAtomicTesting() throws Exception {
-    AtomicTestingInput atomicTestingInput =
-        AtomicTestingInputFixture.createDefaultAtomicTestingInput();
-    atomicTestingInput.setInjectorContract(INJECTOR_CONTRACT.getId());
-
-    String createdInject =
-        mvc.perform(
-                post(ATOMIC_TESTINGS_URI)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(atomicTestingInput)))
-            .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.inject_status.status_name").value("DRAFT"))
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    String injectId = JsonPath.read(createdInject, "$.inject_id");
-
-    mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/launch"))
-        .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"));
+    Inject atomicTesting = getAtomicTesting(InjectStatusFixture.createQueuingInjectStatus(), null);
 
     String relaunchedInject =
-        mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/relaunch"))
+        mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/relaunch"))
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"))
             .andReturn()
@@ -179,11 +173,37 @@ public class AtomicTestingApiTest extends IntegrationTest {
             .getContentAsString();
 
     String relaunchedInjectId = JsonPath.read(relaunchedInject, "$.inject_id");
-
-    mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + injectId)).andExpect(status().is4xxClientError());
-
+    mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId()))
+        .andExpect(status().is4xxClientError());
     mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + relaunchedInjectId))
         .andExpect(status().is2xxSuccessful());
+  }
+
+  @Nested
+  @DisplayName("Lock Atomic testing EE feature")
+  @WithMockAdminUser
+  class LockAtomicTestingEEFeature {
+    @Test
+    @DisplayName("Throw license restricted error when launch with crowdstrike")
+    void given_crowdstrike_should_not_LaunchAtomicTesting() throws Exception {
+      Inject atomicTesting = getAtomicTesting(null, executorFixture.getCrowdstrikeExecutor());
+
+      mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/launch"))
+          .andExpect(status().isForbidden())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when relaunch with Tanium")
+    void given_tanium_should_not_relaunchAtomicTesting() throws Exception {
+      Inject atomicTesting =
+          getAtomicTesting(
+              InjectStatusFixture.createQueuingInjectStatus(), executorFixture.getTaniumExecutor());
+
+      mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/relaunch"))
+          .andExpect(status().isForbidden())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
   }
 
   @Test
@@ -209,5 +229,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
   void afterAll() {
     injectStatusRepository.deleteAll();
     injectRepository.deleteAll();
+    injectWrapperComposers.forEach(InjectComposer.Composer::delete);
   }
 }
