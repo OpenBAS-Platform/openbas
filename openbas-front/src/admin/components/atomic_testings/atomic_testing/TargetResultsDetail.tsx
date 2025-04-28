@@ -1,23 +1,5 @@
 import { AddModeratorOutlined, MoreVertOutlined, PersonAddOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  GridLegacy,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  Tab, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow,
-  Tabs,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
 import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
@@ -971,10 +953,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-      <div style={{ paddingTop: theme.spacing(3) }}>
-        {(activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab)
-          && <ExecutionStatusDetail target={target} injectId={inject.inject_id} />}
-      </div>
+      {(initialized && activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab) && (
+        <div style={{ paddingTop: theme.spacing(3) }}>
+          <ExecutionStatusDetail target={target} injectId={inject.inject_id} />
+        </div>
+      )}
     </>
   );
 };

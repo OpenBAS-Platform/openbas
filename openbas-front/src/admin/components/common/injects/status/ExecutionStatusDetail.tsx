@@ -19,15 +19,13 @@ interface Props {
     targetType: string;
     platformType?: string;
   };
-  isActive?: boolean;
 }
 
-const ExecutionStatusDetail = ({ injectId, target, isActive = false }: Props) => {
+const ExecutionStatusDetail = ({ injectId, target }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const [traces, setTraces] = useState<ExecutionTraceOutput[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
 
   const isTeam = target?.targetType === 'TEAMS';
   const isPlayer = target?.targetType === 'PLAYER';
@@ -43,14 +41,10 @@ const ExecutionStatusDetail = ({ injectId, target, isActive = false }: Props) =>
         setTraces(result.data || []);
       } finally {
         setLoading(false);
-        setHasFetched(true);
       }
     };
-
-    if (isActive && !hasFetched) {
-      fetchTraces();
-    }
-  }, [isActive, injectId, target, hasFetched]);
+    fetchTraces();
+  }, [injectId, target]);
 
   if (loading) {
     return <Loader />;
