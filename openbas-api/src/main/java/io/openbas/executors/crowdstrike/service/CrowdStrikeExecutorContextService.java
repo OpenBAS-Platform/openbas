@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 @Log
@@ -86,7 +87,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   private List<Agent> getAgentsFromOS(List<Agent> agents, Endpoint.PLATFORM_TYPE platform) {
     return agents.stream()
-        .filter(agent -> ((Endpoint) agent.getAsset()).getPlatform().equals(platform))
+        .filter(
+            agent ->
+                ((Endpoint) Hibernate.unproxy(agent.getAsset())).getPlatform().equals(platform))
         .toList();
   }
 
