@@ -10,7 +10,7 @@ import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import IndexRoutes from '../../../atomic_testings/atomic_testing/IndexRoutes';
+import AtomicTestingRoutes from '../../../atomic_testings/atomic_testing/AtomicTestingRoutes';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';
 import InjectIndexHeader from './InjectIndexHeader';
@@ -39,7 +39,7 @@ const InjectIndexComponent: FunctionComponent<{
       <PermissionsContext.Provider value={permissionsContext}>
         <InjectIndexHeader injectResultOverview={injectResultOverviewOutput} exercise={exercise} />
         <Suspense fallback={<Loader />}>
-          <IndexRoutes injectResultOverview={injectResultOverviewOutput} />
+          <AtomicTestingRoutes injectResultOverview={injectResultOverviewOutput} />
         </Suspense>
       </PermissionsContext.Provider>
     </InjectResultOverviewOutputContext.Provider>

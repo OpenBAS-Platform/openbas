@@ -10,9 +10,9 @@ import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
+import AtomicTestingHeader from './AtomicTestingHeader';
+import AtomicTestingRoutes from './AtomicTestingRoutes';
 import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
-import IndexHeader from './IndexHeader';
-import IndexRoutes from './IndexRoutes';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -77,9 +77,9 @@ const Index = () => {
         updateInjectResultOverviewOutput,
       }}
       >
-        <IndexHeader injectResultOverview={injectResultOverviewOutput} setInjectResultOverview={setInjectResultOverviewOutput} />
+        <AtomicTestingHeader injectResultOverview={injectResultOverviewOutput} setInjectResultOverview={setInjectResultOverviewOutput} />
         <Suspense fallback={<Loader />}>
-          <IndexRoutes injectResultOverview={injectResultOverviewOutput} />
+          <AtomicTestingRoutes injectResultOverview={injectResultOverviewOutput} />
         </Suspense>
       </InjectResultOverviewOutputContext.Provider>
     </TeamContext.Provider>

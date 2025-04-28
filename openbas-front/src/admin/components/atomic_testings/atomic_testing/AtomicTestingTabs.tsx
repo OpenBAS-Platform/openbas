@@ -19,7 +19,7 @@ interface Props { injectResultOverview: InjectResultOverviewOutput }
 
 const openbasNmap = 'openbas_nmap';
 
-const IndexTabs = ({ injectResultOverview }: Props) => {
+const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
@@ -54,7 +54,7 @@ const IndexTabs = ({ injectResultOverview }: Props) => {
           component={Link}
           to={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
           value={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
-          label={t('Execution details')}
+          label={t('Inject Execution details')}
           className={classes.item}
         />
         {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
@@ -70,4 +70,4 @@ const IndexTabs = ({ injectResultOverview }: Props) => {
     </Box>
   );
 };
-export default IndexTabs;
+export default AtomicTestingTabs;

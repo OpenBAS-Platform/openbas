@@ -14,7 +14,7 @@ const AtomicTestingPayloadInfo = lazy(() => import('./payload_info/AtomicTesting
 
 const openbasNmap = 'openbas_nmap';
 
-const IndexRoutes = ({ injectResultOverview }: Props) => {
+const AtomicTestingRoutes = ({ injectResultOverview }: Props) => {
   return (
     <Routes>
       <Route path="" element={errorWrapper(AtomicTesting)()} />
@@ -30,4 +30,4 @@ const IndexRoutes = ({ injectResultOverview }: Props) => {
     </Routes>
   );
 };
-export default IndexRoutes;
+export default AtomicTestingRoutes;

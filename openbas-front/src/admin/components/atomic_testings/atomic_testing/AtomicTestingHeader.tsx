@@ -5,16 +5,16 @@ import Breadcrumbs, { type BreadcrumbsElement } from '../../../../components/Bre
 import { useFormatter } from '../../../../components/i18n';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import ResponsePie from '../../common/injects/ResponsePie';
-import IndexActions from './IndexActions';
-import IndexTabs from './IndexTabs';
-import IndexTitle from './IndexTitle';
+import AtomicTestingHeaderActions from './AtomicTestingHeaderActions';
+import AtomicTestingTabs from './AtomicTestingTabs';
+import AtomicTestingTitle from './AtomicTestingTitle';
 
 interface Props {
   injectResultOverview: InjectResultOverviewOutput;
   setInjectResultOverview: (injectResultOverviewOutput: InjectResultOverviewOutput) => void;
 }
 
-const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) => {
+const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
 
@@ -43,13 +43,13 @@ const IndexHeader = ({ injectResultOverview, setInjectResultOverview }: Props) =
           variant="object"
           elements={breadcrumbs}
         />
-        <IndexTitle injectResultOverview={injectResultOverview} />
-        <IndexTabs injectResultOverview={injectResultOverview} />
+        <AtomicTestingTitle injectResultOverview={injectResultOverview} />
+        <AtomicTestingTabs injectResultOverview={injectResultOverview} />
       </Box>
       <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
-      <IndexActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
+      <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
     </div>
   );
 };
 
-export default IndexHeader;
+export default AtomicTestingHeader;

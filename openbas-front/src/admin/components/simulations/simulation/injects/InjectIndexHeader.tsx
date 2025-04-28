@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router';
 import Breadcrumbs, { type BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
-import IndexTitle from '../../../atomic_testings/atomic_testing/IndexTitle';
+import AtomicTestingTitle from '../../../atomic_testings/atomic_testing/AtomicTestingTitle';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import InjectIndexTabs from './InjectIndexTabs';
 
@@ -45,25 +45,21 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
   });
 
   return (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      sx={{
-        borderBottom: 1,
-        borderColor: 'divider',
-        marginBottom: theme.spacing(4),
-      }}
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 500px auto',
+      gap: theme.spacing(2),
+      alignItems: 'start',
+      marginBottom: theme.spacing(2),
+    }}
     >
       <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
         <Breadcrumbs variant="object" elements={breadcrumbs} />
-        <IndexTitle injectResultOverview={injectResultOverview} />
+        <AtomicTestingTitle injectResultOverview={injectResultOverview} />
         <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
       </Box>
-      <Box display="flex" flexDirection="row" justifyContent="right" alignItems="flex-start" mb={theme.spacing(1)}>
-        <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
-      </Box>
-    </Box>
-
+      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
+    </div>
   );
 };
 

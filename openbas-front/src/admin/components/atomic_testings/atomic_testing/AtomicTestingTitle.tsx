@@ -18,7 +18,7 @@ const useStyles = makeStyles()(theme => ({
 
 interface Props { injectResultOverview: InjectResultOverviewOutput }
 
-const IndexTitle = ({ injectResultOverview }: Props) => {
+const AtomicTestingTitle = ({ injectResultOverview }: Props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
 
@@ -38,7 +38,7 @@ const IndexTitle = ({ injectResultOverview }: Props) => {
         </Typography>
       </Tooltip>
       <ItemStatus
-        isInject={true}
+        isInject
         status={injectResultOverview.inject_status?.status_name}
         label={t(injectResultOverview.inject_status?.status_name ?? 'Unknown')}
       />
@@ -68,4 +68,4 @@ const IndexTitle = ({ injectResultOverview }: Props) => {
   );
 };
 
-export default IndexTitle;
+export default AtomicTestingTitle;

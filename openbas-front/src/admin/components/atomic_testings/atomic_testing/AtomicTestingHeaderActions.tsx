@@ -15,7 +15,7 @@ interface Props {
   setInjectResultOverview: (injectResultOverviewOutput: InjectResultOverviewOutput) => void;
 }
 
-const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) => {
+const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverview }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -141,4 +141,4 @@ const IndexActions = ({ injectResultOverview, setInjectResultOverview }: Props) 
   );
 };
 
-export default IndexActions;
+export default AtomicTestingHeaderActions;
