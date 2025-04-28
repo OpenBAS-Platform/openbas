@@ -110,7 +110,7 @@ public class CrowdstrikeExecutorServiceTest {
     crowdStrikeExecutorContextService.launchBatchExecutorSubprocess(
         inject,
         List.of(AgentFixture.createAgent(EndpointFixture.createEndpoint(), "12345")),
-        InjectStatusFixture.createDefaultInjectStatus());
+        InjectStatusFixture.createPendingInjectStatus());
     // Asserts
     ArgumentCaptor<List<String>> agentIds = ArgumentCaptor.forClass(List.class);
     ArgumentCaptor<String> scriptName = ArgumentCaptor.forClass(String.class);
