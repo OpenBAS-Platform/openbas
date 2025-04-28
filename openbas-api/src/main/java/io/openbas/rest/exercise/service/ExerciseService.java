@@ -712,7 +712,8 @@ public class ExerciseService {
       Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
           secondLastSimulationResultsMap) {
 
-    for (Map.Entry<ExpectationType, ExpectationResultsByType> entry : lastSimulationResultsMap.entrySet()) {
+    for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :
+        lastSimulationResultsMap.entrySet()) {
       ExpectationResultsByType lastSimulationResultsByType = entry.getValue();
       ExpectationType type = entry.getKey();
 

@@ -5,8 +5,6 @@ import io.openbas.database.model.*;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
-import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
-import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.service.NotificationRuleService;
@@ -100,21 +98,21 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
             lastSimulationResultsMap.get(ExpectationType.DETECTION));
     float secondLastSimulationPrevScore =
         ScenarioStatisticService.getRoundedPercentage(
-                secondLastSimulationResultsMap.get(ExpectationType.PREVENTION));
+            secondLastSimulationResultsMap.get(ExpectationType.PREVENTION));
     float secondLastSimulationDetectScore =
         ScenarioStatisticService.getRoundedPercentage(
-                secondLastSimulationResultsMap.get(ExpectationType.DETECTION));
+            secondLastSimulationResultsMap.get(ExpectationType.DETECTION));
     float decreasePrev = secondLastSimulationPrevScore - lastSimulationPrevScore;
     float decreaseDetect = secondLastSimulationDetectScore - lastSimulationDetectScore;
 
     Map<String, String> data = new HashMap<>();
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
-    data.put(
-        "prev_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
+    data.put("prev_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
     data.put("prev_percentage_detection", Float.toString(lastSimulationDetectScore));
     data.put("prev_percentage_prevention", Float.toString(secondLastSimulationDetectScore));
-    data.put("new_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
+    data.put(
+        "new_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
     data.put("new_percentage_detection", Float.toString(lastSimulationDetectScore));
     data.put("new_percentage_prevention", Float.toString(lastSimulationPrevScore));
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
