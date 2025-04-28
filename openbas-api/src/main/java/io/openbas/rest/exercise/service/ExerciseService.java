@@ -712,13 +712,15 @@ public class ExerciseService {
       Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
           secondLastSimulationResultsMap) {
 
-    for (ExpectationType type : lastSimulationResultsMap.keySet()) {
+    for (Map.Entry<ExpectationType, ExpectationResultsByType> entry : lastSimulationResultsMap.entrySet()) {
+      ExpectationResultsByType lastSimulationResultsByType = entry.getValue();
+      ExpectationType type = entry.getKey();
+
       // we ignore manual expectation
       if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
         break;
       }
 
-      ExpectationResultsByType lastSimulationResultsByType = lastSimulationResultsMap.get(type);
       ExpectationResultsByType secondLastSimulationResultsByType =
           secondLastSimulationResultsMap.get(type);
 
