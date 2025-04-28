@@ -1,6 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.NotificationRule;
+import io.openbas.database.model.NotificationRuleTrigger;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,10 @@ public interface NotificationRuleRepository
           + "where nr.resourceId = :resourceId AND nr.owner.id = :userId")
   List<NotificationRule> findNotificationRuleByResourceAndUser(
       @NotBlank String resourceId, @NotBlank String userId);
+
+  @Query(
+      "select nr from NotificationRule nr "
+          + "where nr.resourceId = :resourceId AND nr.trigger = :trigger")
+  List<NotificationRule> findNotificationRuleByResourceAndTrigger(
+      @NotBlank String resourceId, @NotBlank NotificationRuleTrigger trigger);
 }
