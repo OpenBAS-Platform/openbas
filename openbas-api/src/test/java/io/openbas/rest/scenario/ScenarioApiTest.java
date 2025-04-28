@@ -269,6 +269,7 @@ public class ScenarioApiTest extends IntegrationTest {
               .withInject(
                   injectComposer
                       .forInject(InjectFixture.getDefaultInject())
+                      .persist()
                       .withEndpoint(
                           endpointComposer
                               .forEndpoint(EndpointFixture.createEndpoint())

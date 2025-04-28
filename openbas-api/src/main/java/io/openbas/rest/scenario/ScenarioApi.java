@@ -281,7 +281,6 @@ public class ScenarioApi extends RestBehavior {
     return scenarioRepository.save(scenario);
   }
 
-  // EXERCISE
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercise/running")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Exercise createRunningExerciseFromScenario(

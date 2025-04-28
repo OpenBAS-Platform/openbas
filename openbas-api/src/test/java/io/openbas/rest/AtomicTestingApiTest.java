@@ -68,6 +68,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     InjectComposer.Composer atomicTestingComposer =
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
+            .persist()
             .withEndpoint(
                 endpointComposer
                     .forEndpoint(EndpointFixture.createEndpoint())
