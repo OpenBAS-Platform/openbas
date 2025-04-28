@@ -18,13 +18,14 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 interface Props {
+  widgetId: string;
   widgetTitle: string;
   data: EsSeries[];
   fullscreen: boolean;
   setFullscreen: (fullscreen: boolean) => void;
 }
 
-const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data, fullscreen, setFullscreen }) => {
+const SecurityCoverage: FunctionComponent<Props> = ({ widgetId, widgetTitle, data, fullscreen, setFullscreen }) => {
   // Standard hooks
   const { classes } = useStyles();
 
@@ -52,14 +53,14 @@ const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data, fullscr
         </DialogTitle>
         <DialogContent>
           <Box display="flex">
-            <SecurityCoverageContent data={data} />
+            <SecurityCoverageContent widgetId={widgetId} data={data} />
           </Box>
         </DialogContent>
       </Dialog>
     );
   }
 
-  return <SecurityCoverageContent data={data} />;
+  return <SecurityCoverageContent widgetId={widgetId} data={data} />;
 };
 
 export default SecurityCoverage;

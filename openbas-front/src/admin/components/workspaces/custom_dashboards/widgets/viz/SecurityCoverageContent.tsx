@@ -1,7 +1,8 @@
 import { Box, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
+import { useLocalStorage } from 'usehooks-ts';
 
 import type { AttackPatternHelper } from '../../../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../../../actions/kill_chain_phases/killchainphase-helper';
@@ -41,9 +42,12 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface Props { data: EsSeries[] }
+interface Props {
+  widgetId: string;
+  data: EsSeries[];
+}
 
-const SecurityCoverageContent: FunctionComponent<Props> = ({ data }) => {
+const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
@@ -61,7 +65,11 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ data }) => {
   const resolvedDataSuccess = resolvedData(attackPatternMap, killChainPhaseMap, data.at(0)?.data ?? []);
   const resolvedDataFailure = resolvedData(attackPatternMap, killChainPhaseMap, data.at(1)?.data ?? []);
 
-  const [showCoveredOnly, setShowCoveredOnly] = useState(false);
+  const [showCoveredOnly, setShowCoveredOnly] = useLocalStorage<boolean>('widget-' + widgetId, false);
+  const handleShowCoveredOnly = (checked: boolean) => {
+    setShowCoveredOnly(checked);
+  };
+
   return (
     <Box
       flex={1}
@@ -81,7 +89,7 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ data }) => {
             control={(
               <Checkbox
                 checked={showCoveredOnly}
-                onChange={e => setShowCoveredOnly(e.target.checked)}
+                onChange={e => handleShowCoveredOnly(e.target.checked)}
                 color="primary"
               />
             )}

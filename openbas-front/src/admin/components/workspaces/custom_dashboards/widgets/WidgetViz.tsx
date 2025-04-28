@@ -50,6 +50,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     case 'security-coverage':
       return (
         <SecurityCoverage
+          widgetId={widget.widget_id}
           widgetTitle={getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
           fullscreen={fullscreen}
           setFullscreen={setFullscreen}
