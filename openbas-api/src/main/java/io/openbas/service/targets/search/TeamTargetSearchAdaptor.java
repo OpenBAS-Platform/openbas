@@ -52,8 +52,8 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), "not applicable", target.getTargetType()));
+            injectExpectationService.findExpectationsByInjectAndTargetAndTargetTypeUnderAllParents(
+                inject.getId(), target.getId(), target.getTargetType()));
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {

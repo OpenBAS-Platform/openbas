@@ -816,6 +816,26 @@ public class InjectExpectationService {
     }
   }
 
+  public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetTypeUnderAllParents(
+      @NotBlank final String injectId,
+      @NotBlank final String targetId,
+      @NotBlank final String targetType) {
+    try {
+      TargetType targetTypeEnum = TargetType.valueOf(targetType);
+      return switch (targetTypeEnum) {
+        // forward this call to the more specific method since there is no difference here
+        case TEAMS, ASSETS_GROUPS ->
+            this.findExpectationsByInjectAndTargetAndTargetType(
+                injectId, targetId, "not applicable", targetType);
+        case PLAYER -> injectExpectationRepository.findAllByInjectAndPlayer(injectId, targetId);
+        case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
+        case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+      };
+    } catch (IllegalArgumentException e) {
+      return Collections.emptyList();
+    }
+  }
+
   // -- BUILD AND SAVE INJECT EXPECTATION --
 
   @Transactional
