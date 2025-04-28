@@ -45,7 +45,9 @@ public class InjectStatusMapper {
     output.setName(status.getName().name());
     output.setTraces(
         toExecutionTracesOutput(
-            executionTraces.stream().filter(trace -> trace.getAgent() == null).toList()));
+            executionTraces.stream()
+                .filter(trace -> trace.getAgent() == null && trace.getIdentifiers().isEmpty())
+                .toList()));
     output.setTrackingSentDate(status.getTrackingSentDate());
     output.setTrackingEndDate(status.getTrackingEndDate());
     return output;

@@ -71,11 +71,10 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
           marginTop: theme.spacing(3),
           cursor: 'pointer',
           display: 'flex',
-          alignItems: 'center',
         }}
       >
         {isExpanded ? <ArrowDropDownSharp /> : <ArrowRightSharp />}
-        <Typography gutterBottom marginRight="12px">
+        <Typography gutterBottom sx={{ marginRight: theme.spacing(1) }}>
           {agentStatus.agentName}
         </Typography>
         <ItemStatus
@@ -97,8 +96,7 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
           />
           <div style={{
             display: 'flex',
-            gap: '12px',
-            alignItems: 'center',
+            gap: theme.spacing(1),
           }}
           >
             <Typography variant="h3">{t('Executor')}</Typography>
