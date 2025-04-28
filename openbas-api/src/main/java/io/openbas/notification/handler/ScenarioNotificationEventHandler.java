@@ -45,13 +45,6 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
         return;
       }
 
-      // calculate if there is a score degradation
-      ExercisesGlobalScoresInput exercisesGlobalScoresInput =
-          new ExercisesGlobalScoresInput(
-              List.of(lastSimulation.getId(), secondLastSimulation.getId()));
-      ExercisesGlobalScoresOutput exercisesGlobalScoresOutput =
-          exerciseService.getExercisesGlobalScores(exercisesGlobalScoresInput);
-
       // create map with the results to facilitate the computing of the score difference
       // TODO update exerciseService to return a map with result
       Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap =
@@ -107,10 +100,10 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
             lastSimulationResultsMap.get(ExpectationType.DETECTION));
     float secondLastSimulationPrevScore =
         ScenarioStatisticService.getRoundedPercentage(
-            lastSimulationResultsMap.get(ExpectationType.PREVENTION));
+                secondLastSimulationResultsMap.get(ExpectationType.PREVENTION));
     float secondLastSimulationDetectScore =
         ScenarioStatisticService.getRoundedPercentage(
-            lastSimulationResultsMap.get(ExpectationType.DETECTION));
+                secondLastSimulationResultsMap.get(ExpectationType.DETECTION));
     float decreasePrev = secondLastSimulationPrevScore - lastSimulationPrevScore;
     float decreaseDetect = secondLastSimulationDetectScore - lastSimulationDetectScore;
 
@@ -118,12 +111,12 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
     data.put("decrease_prev", Float.toString(decreasePrev));
     data.put("decrease_detect", Float.toString(decreaseDetect));
     data.put(
-        "prev_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
-    data.put("prev_percentage_detection", Float.toString(lastSimulationPrevScore));
-    data.put("prev_percentage_prevention", Float.toString(lastSimulationDetectScore));
-    data.put("new_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
-    data.put("new_percentage_detection", Float.toString(secondLastSimulationDetectScore));
-    data.put("new_percentage_prevention", Float.toString(secondLastSimulationPrevScore));
+        "prev_simulation_date", lastSimulation.getEnd().map(formatter::format).orElse("NA"));
+    data.put("prev_percentage_detection", Float.toString(lastSimulationDetectScore));
+    data.put("prev_percentage_prevention", Float.toString(secondLastSimulationDetectScore));
+    data.put("new_simulation_date", secondLastSimulation.getEnd().map(formatter::format).orElse("NA"));
+    data.put("new_percentage_detection", Float.toString(lastSimulationDetectScore));
+    data.put("new_percentage_prevention", Float.toString(lastSimulationPrevScore));
     data.put("scenarioLink", String.format("%s/admin/scenarios/%s", url, scenarioId));
     data.put("instanceLink", url);
     data.put("scenario_name", scenario.getName());
