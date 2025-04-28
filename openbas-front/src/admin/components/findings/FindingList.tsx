@@ -67,6 +67,11 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       label: 'Type',
       isSortable: true,
       value: (finding: FindingOutput) => finding.finding_type,
+    }, {
+      field: 'finding_name',
+      label: 'Name',
+      isSortable: true,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_name}><span>{finding.finding_name}</span></Tooltip>,
     },
     {
       field: 'finding_value',
@@ -96,9 +101,10 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
     ...additionalHeaders,
   ];
 
-  const basis = `${100 / headers.length}%`;
+  const basis = `${90 / (headers.length - 1)}%`;
   const inlineStyles: Record<string, CSSProperties> = ({
-    finding_type: { width: basis },
+    finding_type: { width: '10%' },
+    finding_name: { width: basis },
     finding_value: { width: basis },
     finding_assets: { width: basis },
     finding_tags: { width: basis },

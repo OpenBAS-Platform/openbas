@@ -1,3 +1,5 @@
+import { Tooltip } from '@mui/material';
+
 import { searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
@@ -30,7 +32,7 @@ const Findings = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_inject?.inject_title,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
     },
   ];
   return (
