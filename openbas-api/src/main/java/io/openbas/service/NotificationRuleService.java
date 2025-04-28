@@ -5,6 +5,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.NotificationRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.ImageUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -113,12 +114,12 @@ public class NotificationRuleService {
       String theme =
           platformSettingsService
               .setting(SettingKeys.DEFAULT_THEME.name())
-              .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
+              .map(Setting::getValue)
               .orElseGet(SettingKeys.DEFAULT_THEME::defaultValue);
       String b64CustomLogo =
           platformSettingsService
               .setting(theme + "." + Theme.THEME_KEYS.LOGO_URL.name().toLowerCase())
-              .map(setting -> downloadImageAndEncodeBase64(setting.getValue()))
+              .map(setting -> ImageUtils.downloadImageAndEncodeBase64(setting.getValue()))
               .orElse("");
       data.put("custom_logo_b64", b64CustomLogo);
       data.put(
@@ -129,16 +130,6 @@ public class NotificationRuleService {
       if (NotificationRuleType.EMAIL.equals(rule.getType())) {
         emailNotificationService.sendNotification(rule, data);
       }
-    }
-  }
-
-  // TODO find a better place for this code
-  private String downloadImageAndEncodeBase64(String imageUrl) {
-    try (InputStream inputStream = new URL(imageUrl).openStream()) {
-      byte[] imageBytes = inputStream.readAllBytes();
-      return Base64.getEncoder().encodeToString(imageBytes);
-    } catch (IOException e) {
-      throw new RuntimeException("error while downloading custom logo " + imageUrl, e);
     }
   }
 }
