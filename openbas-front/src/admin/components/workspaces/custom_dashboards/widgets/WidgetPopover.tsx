@@ -1,10 +1,8 @@
-import { type IconButtonProps } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
 import { deleteCustomDashboardWidget, updateCustomDashboardWidget } from '../../../../../actions/custom_dashboards/customdashboardwidget-action';
-import type { PopoverEntry } from '../../../../../components/common/ButtonPopover';
+import ButtonPopover, { type PopoverEntry } from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
-import IconPopover from '../../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../../components/i18n';
 import { type Widget } from '../../../../../utils/api-types';
 import WidgetForm from './WidgetForm';
@@ -13,7 +11,6 @@ import { type WidgetInputWithoutLayout } from './WidgetUtils';
 interface Props {
   customDashboardId: string;
   widget: Widget;
-  size: IconButtonProps['size'];
   className: string;
   onUpdate: (widget: Widget) => void;
   onDelete: (widgetId: string) => void;
@@ -21,7 +18,6 @@ interface Props {
 
 const WidgetPopover: FunctionComponent<Props> = ({
   customDashboardId,
-  size,
   widget,
   className,
   onUpdate,
@@ -71,7 +67,7 @@ const WidgetPopover: FunctionComponent<Props> = ({
 
   return (
     <div className={className}>
-      <IconPopover size={size} entries={entries} />
+      <ButtonPopover entries={entries} variant="icon" />
       <WidgetForm
         open={openEdit}
         toggleDialog={toggleDialog}
