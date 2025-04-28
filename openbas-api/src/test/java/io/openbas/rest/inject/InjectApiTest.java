@@ -1073,8 +1073,8 @@ class InjectApiTest extends IntegrationTest {
           .whenIgnoringPaths(
               "status_id",
               "status_name",
-              "status_tracking_sent_date",
-              "status_tracking_end_date",
+              "tracking_sent_date",
+              "tracking_end_date",
               "status_main_traces[*].execution_time")
           .isEqualTo(mapper.writeValueAsString(expected));
     }
