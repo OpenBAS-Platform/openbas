@@ -9,6 +9,7 @@ import { type ExecutionTraceOutput } from '../../../../../utils/api-types';
 import AgentTraces from './traces/AgentTraces';
 import EndpointTraces from './traces/EndpointTraces';
 import MainTraces from './traces/MainTraces';
+import Empty from '../../../../../components/Empty';
 
 interface Props {
   injectId: string;
@@ -18,13 +19,15 @@ interface Props {
     targetType: string;
     platformType?: string;
   };
+  isActive?: boolean;
 }
 
-const ExecutionStatusDetail = ({ injectId, target }: Props) => {
+const ExecutionStatusDetail = ({ injectId, target, isActive = false }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const [traces, setTraces] = useState<ExecutionTraceOutput[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const isTeam = target?.targetType === 'TEAMS';
   const isPlayer = target?.targetType === 'PLAYER';
@@ -40,14 +43,21 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
         setTraces(result.data || []);
       } finally {
         setLoading(false);
+        setHasFetched(true)
       }
     };
 
-    fetchTraces();
-  }, [injectId, target]);
+    if (isActive && !hasFetched) {
+      fetchTraces();
+    }
+  }, [isActive, injectId, target, hasFetched]);
 
   if (loading) {
     return <Loader />;
+  }
+
+  if (traces && traces.length === 0) {
+    return <Empty message={t('No traces on this target.')} />
   }
 
   return (
@@ -64,8 +74,9 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
           </Paper>
         </>
       )}
-    </>
-  );
+</>
+)
+  ;
 };
 
 export default ExecutionStatusDetail;

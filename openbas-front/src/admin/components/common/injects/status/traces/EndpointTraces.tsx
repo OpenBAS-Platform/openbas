@@ -56,7 +56,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
         <Typography margin="0" variant="h3">
           {t('Name')}
         </Typography>
-        {endpoint.name}
+        <Typography variant="body2">{endpoint.name}</Typography>
       </div>
 
       <div style={{

@@ -973,7 +973,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       ))}
       <div style={{ paddingTop: theme.spacing(3) }}>
         {(activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab)
-          && <ExecutionStatusDetail target={target} injectId={inject.inject_id} />}
+          && <ExecutionStatusDetail target={target} injectId={inject.inject_id}/>}
       </div>
     </>
   );

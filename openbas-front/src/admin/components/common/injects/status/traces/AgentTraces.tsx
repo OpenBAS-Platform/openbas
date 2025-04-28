@@ -116,7 +116,7 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
           </Typography>
           {tracesByAction.map((group, index) => (
             <div key={`trace-group-${index}`}>
-              <Typography variant="h4" gutterBottom>
+              <Typography variant="h3" gutterBottom>
                 {t(group.action)}
               </Typography>
               <TraceMessage traces={group.traces} />
