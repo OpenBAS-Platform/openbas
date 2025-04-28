@@ -184,6 +184,41 @@ public class InjectApi extends RestBehavior {
     return targetService.searchTargets(injectTargetTypeEnum, inject, input);
   }
 
+  @LogExecutionTime
+  @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
+  @PreAuthorize("isInjectObserver(#injectId)")
+  public List<FilterUtilsJpa.Option> targetOptions(
+          @PathVariable String injectId,
+          @PathVariable String targetType,
+          @RequestParam(required = false) final String searchText) {
+    TargetType injectTargetTypeEnum;
+
+    try {
+      injectTargetTypeEnum = TargetType.valueOf(targetType);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(String.format("Invalid target type %s", targetType));
+    }
+
+    Inject inject = injectService.inject(injectId);
+
+    return targetService.getTargetOptions(injectTargetTypeEnum, inject, searchText);
+  }
+
+  @LogExecutionTime
+  @PostMapping(path = INJECT_URI + "/targets/{targetType}/options")
+  public List<FilterUtilsJpa.Option> targetOptionsById(
+
+          @PathVariable String targetType, @RequestBody final List<String> ids) {
+    TargetType injectTargetTypeEnum;
+
+    try {
+      injectTargetTypeEnum = TargetType.valueOf(targetType);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(String.format("Invalid target type %s", targetType));
+    }
+    return targetService.getTargetOptionsByIds(injectTargetTypeEnum, ids);
+  }
+
   @PostMapping(
       path = INJECT_URI + "/import",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

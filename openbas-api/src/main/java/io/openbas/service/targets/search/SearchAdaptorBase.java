@@ -3,6 +3,7 @@ package io.openbas.service.targets.search;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTarget;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public abstract class SearchAdaptorBase {
   protected final Map<String, String> fieldTranslations = new HashMap<>();
 
   public abstract Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject);
+  public abstract List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject);
+  public abstract List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids);
 
   protected SearchPaginationInput translate(SearchPaginationInput input, Inject scopedInject) {
     SearchPaginationInput newInput = new SearchPaginationInput();

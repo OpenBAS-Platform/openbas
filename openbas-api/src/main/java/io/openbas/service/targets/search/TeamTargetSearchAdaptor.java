@@ -10,8 +10,11 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.service.TeamService;
 import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,6 +47,16 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
             .toList(),
         filteredTeams.getPageable(),
         filteredTeams.getTotalElements());
+  }
+
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
+    return scopedInject.getTeams().stream().map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName())).toList();
+  }
+
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
+    return List.of();
   }
 
   private InjectTarget convertFromTeamOutput(TeamOutput teamOutput, Inject inject) {

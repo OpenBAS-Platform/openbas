@@ -4,11 +4,14 @@ import io.openbas.database.model.*;
 import io.openbas.service.targets.search.AssetGroupTargetSearchAdaptor;
 import io.openbas.service.targets.search.EndpointTargetSearchAdaptor;
 import io.openbas.service.targets.search.TeamTargetSearchAdaptor;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +25,26 @@ public class TargetService {
     return switch (injectTargetType) {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.search(input, inject);
       case ASSETS -> endpointTargetSearchAdaptor.search(input, inject);
-      case AGENT -> null;
       case TEAMS -> teamTargetSearchAdaptor.search(input, inject);
-      case PLAYER -> null;
       default -> throw new IllegalArgumentException("Unsupported target type: " + injectTargetType);
+    };
+  }
+
+  public List<FilterUtilsJpa.Option> getTargetOptions(TargetType targetType, Inject inject, String searchText) {
+    return switch (targetType) {
+      case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsForInject(inject);
+      case ASSETS -> endpointTargetSearchAdaptor.getOptionsForInject(inject);
+      case TEAMS -> teamTargetSearchAdaptor.getOptionsForInject(inject);
+      default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
+    };
+  }
+
+  public List<FilterUtilsJpa.Option> getTargetOptionsByIds(TargetType targetType, List<String> ids) {
+    return switch (targetType) {
+      case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsByIds(ids);
+      case ASSETS -> endpointTargetSearchAdaptor.getOptionsByIds(ids);
+      case TEAMS -> teamTargetSearchAdaptor.getOptionsByIds(ids);
+      default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
     };
   }
 }

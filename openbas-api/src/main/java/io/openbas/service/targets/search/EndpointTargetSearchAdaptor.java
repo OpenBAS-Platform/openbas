@@ -2,10 +2,7 @@ package io.openbas.service.targets.search;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
-import io.openbas.database.raw.RawAssetGroupDynamicFilter;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.service.InjectExpectationService;
@@ -13,11 +10,16 @@ import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,61 +47,64 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public Page<InjectTarget> search(SearchPaginationInput input, @NotNull Inject scopedInject) {
-    // dynamic filters from target dynamic groups
-    Specification<Endpoint> dynamicFilterSpec =
-        compileFilterGroupsWithOR(
-            assetGroupRepository.rawDynamicFiltersByInjectId(scopedInject.getId()).stream()
-                .map(
-                        df -> df.getAssetGroupDynamicFilter())
-                .toList());
+    Filters.Filter assetGroupFilter = getAssetGroupFilter(input);
+    List<String> assetGroupValues = assetGroupFilter == null ? List.of() : assetGroupFilter.getValues();
 
-    // transitive targeting via explicit membership in target asset groups
-    Specification<Endpoint> transitiveTargetingSpec =
-        (root, query, criteriaBuilder) -> {
-          Subquery<Integer> subQuery = query.subquery(Integer.class);
-          Root<Inject> injectTable = subQuery.from(Inject.class);
-          Join<Inject, AssetGroup> assetGroupJoin = injectTable.join("assetGroups");
-          Join<AssetGroup, Asset> assetJoin = assetGroupJoin.join("assets");
+    Specification<Endpoint> finalSpecification = null;
+    if (assetGroupFilter == null) {
+        Specification<Endpoint> dynamicFilterSpec = getDynamicFilterSpecification(scopedInject, assetGroupValues, true);
+        // transitive targeting via explicit membership in target asset groups
+        Specification<Endpoint> transitiveTargetingSpec = getTransitiveTargetingSpecification(scopedInject, assetGroupValues, true);
+        // direct targeting
+        Specification<Endpoint> directTargetingSpec = getDirectTargetingSpecification(scopedInject);
+        finalSpecification = dynamicFilterSpec == null
+                ? transitiveTargetingSpec.or(directTargetingSpec)
+                : dynamicFilterSpec.or(transitiveTargetingSpec).or(directTargetingSpec);
+    } else {
 
-          subQuery
-              .select(criteriaBuilder.literal(1))
-              .where(
-                  criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
-                  criteriaBuilder.equal(
-                      assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
-          return criteriaBuilder.exists(subQuery);
-        };
+                switch(assetGroupFilter.getOperator()) {
+                    case contains, not_empty -> {
+                        Specification<Endpoint> dynamicFilterSpec = getDynamicFilterSpecification(scopedInject, assetGroupValues, true);
+                        // transitive targeting via explicit membership in target asset groups
+                        Specification<Endpoint> transitiveTargetingSpec = getTransitiveTargetingSpecification(scopedInject, assetGroupValues, true);
+                        finalSpecification = dynamicFilterSpec == null
+                                ? transitiveTargetingSpec
+                                : dynamicFilterSpec.or(transitiveTargetingSpec);
+                    }
+                    case not_contains -> {
+                        Specification<Endpoint> dynamicFilterSpec = ((root, query, criteriaBuilder) -> {
+                            Specification<Endpoint> positiveFilters = getDynamicFilterSpecification(scopedInject, assetGroupValues, false);
+                            if(positiveFilters == null) { return null; }
+                            Subquery<Integer> subQuery = query.subquery(Integer.class);
+                            Root<Asset> assetTable = subQuery.from(Asset.class);
 
-    // direct targeting
-    Specification<Endpoint> directTargetingSpec =
-        (root, query, criteriaBuilder) -> {
-          Subquery<Integer> subQuery = query.subquery(Integer.class);
-          Root<Inject> injectTable = subQuery.from(Inject.class);
-          Join<Inject, Asset> assetJoin = injectTable.join("assets");
-
-          subQuery
-              .select(criteriaBuilder.literal(1))
-              .where(
-                  criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
-                  criteriaBuilder.equal(
-                      assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
-          return criteriaBuilder.exists(subQuery);
-        };
-
-    Specification<Endpoint> compiledTargetingSpec = transitiveTargetingSpec.or(directTargetingSpec);
+                            subQuery
+                                    .select(criteriaBuilder.literal(1))
+                                    .where(positiveFilters.toPredicate(root, query, criteriaBuilder));
+                            return criteriaBuilder.exists(subQuery).not();
+                        });
+                        // transitive targeting via explicit membership in target asset groups
+                        Specification<Endpoint> transitiveTargetingSpec = getTransitiveTargetingSpecification(scopedInject, assetGroupValues, false);
+                        // direct targeting
+                        Specification<Endpoint> directTargetingSpec = getDirectTargetingSpecification(scopedInject);
+                        finalSpecification = dynamicFilterSpec == null
+                                ? transitiveTargetingSpec.or(directTargetingSpec)
+                                : dynamicFilterSpec.and(transitiveTargetingSpec).or(directTargetingSpec);
+                    }
+                    case empty -> finalSpecification = getDirectTargetingSpecification(scopedInject);
+                }
+            }
 
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
 
-    // special case the target_asset_group field
-
-    Page<Endpoint> eps =
+      Specification<Endpoint> finalSpecification1 = finalSpecification;
+      Page<Endpoint> eps =
         buildPaginationJPA(
             (Specification<Endpoint> specification, Pageable pageable) -> {
-              Specification<Endpoint> finalSpec =
-                  dynamicFilterSpec == null
-                      ? compiledTargetingSpec.and(specification)
-                      : dynamicFilterSpec.or(compiledTargetingSpec).and(specification);
-              return this.endpointRepository.findAll(finalSpec, pageable);
+                if (input.getFilterGroup().getMode().equals(Filters.FilterMode.and)) {
+                    return this.endpointRepository.findAll(finalSpecification1.and(specification), pageable);
+                }
+                return this.endpointRepository.findAll(finalSpecification1.or(specification), pageable);
             },
                 translatedInput,
             Endpoint.class);
@@ -110,6 +115,75 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
             .toList(),
         eps.getPageable(),
         eps.getTotalElements());
+  }
+
+    @Override
+    public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
+        throw new NotImplementedException("not implemented yet");
+    }
+
+    @Override
+    public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
+        return List.of();
+    }
+
+    private Filters.Filter getAssetGroupFilter(SearchPaginationInput input) {
+      Filters.FilterGroup filterGroup = input.getFilterGroup();
+        String key = "target_asset_groups";
+
+        return filterGroup.getFilters().stream().filter(filter -> key.equals(filter.getKey())).findFirst().orElse(null);
+      }
+
+  private Specification<Endpoint> getDirectTargetingSpecification(Inject scopedInject) {
+      return (root, query, criteriaBuilder) -> {
+          Subquery<Integer> subQuery = query.subquery(Integer.class);
+          Root<Inject> injectTable = subQuery.from(Inject.class);
+          Join<Inject, Asset> assetJoin = injectTable.join("assets");
+
+          subQuery
+                  .select(criteriaBuilder.literal(1))
+                  .where(
+                          criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
+                          criteriaBuilder.equal(
+                                  assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+          return criteriaBuilder.exists(subQuery);
+      };
+  }
+
+  private Specification<Endpoint> getTransitiveTargetingSpecification(Inject scopedInject, List<String> scopedAssetGroupIds, boolean in) {
+      return (root, query, criteriaBuilder) -> {
+          Subquery<Integer> subQuery = query.subquery(Integer.class);
+          Root<Inject> injectTable = subQuery.from(Inject.class);
+          Join<Inject, AssetGroup> assetGroupJoin = injectTable.join("assetGroups");
+          Join<AssetGroup, Asset> assetJoin = assetGroupJoin.join("assets");
+
+          List<Predicate> predicates = new ArrayList<>(List.of(
+                  criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
+                  criteriaBuilder.equal(
+                          assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id"))
+          ));
+          if(scopedAssetGroupIds != null && !scopedAssetGroupIds.isEmpty()) {
+              predicates.add(assetGroupJoin.get("id").in(scopedAssetGroupIds.stream().toList()));
+          }
+
+          subQuery
+                  .select(criteriaBuilder.literal(1))
+                  .where(predicates.toArray(new Predicate[0]));
+          return in ? criteriaBuilder.exists(subQuery) : criteriaBuilder.exists(subQuery).not();
+      };
+  }
+
+  private Specification<Endpoint> getDynamicFilterSpecification(Inject scopedInject, List<String> scopedAssetGroupIds, boolean in) {
+      return  compileFilterGroupsWithOR(
+          (
+             !scopedAssetGroupIds.isEmpty()
+               ? assetGroupRepository.rawDynamicFiltersByInjectIdAndAssetGroupIds(scopedInject.getId(), scopedAssetGroupIds)
+               : assetGroupRepository.rawDynamicFiltersByInjectId(scopedInject.getId())
+          )
+          .stream().map(df -> df.getAssetGroupDynamicFilter())
+          .filter(fg -> !fg.getFilters().isEmpty())
+          .toList()
+      );
   }
 
   private Specification<Endpoint> compileFilterGroupsWithOR(

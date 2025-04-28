@@ -64,6 +64,7 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
         queryableHelpers={pagination.queryableHelpers}
         reloadContentCount={searchReloadContentCount}
         topPagination={true}
+        contextId={props.inject_id}
       />
       {targets && targets.length > 0 ? (
         <List>
