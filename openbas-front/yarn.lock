@@ -4211,6 +4211,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:1.9.0":
+  version: 1.9.0
+  resolution: "axios@npm:1.9.0"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/9371a56886c2e43e4ff5647b5c2c3c046ed0a3d13482ef1d0135b994a628c41fbad459796f101c655e62f0c161d03883454474d2e435b2e021b1924d9f24994c
+  languageName: node
+  linkType: hard
+
 "babel-plugin-macros@npm:^3.1.0":
   version: 3.1.0
   resolution: "babel-plugin-macros@npm:3.1.0"
@@ -9573,7 +9584,7 @@ __metadata:
     "@vitest/eslint-plugin": "npm:1.1.43"
     "@xyflow/react": "npm:12.6.0"
     apexcharts: "npm:4.6.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.9.0"
     chokidar: "npm:4.0.3"
     ckeditor5: "npm:44.3.0"
     classcat: "npm:5.0.5"
