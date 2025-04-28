@@ -65,6 +65,8 @@ const AtomicTesting = () => {
 
   const [hasAssetsGroup, setHasAssetsGroup] = useState(false);
   const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
+  const [hasTeams, setHasTeams] = useState(false);
+  const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
 
   const tabConfig = useMemo(() => {
     let index = 0;
@@ -78,6 +80,14 @@ const AtomicTesting = () => {
         entityPrefix: 'asset_group_target',
       });
     }
+    if (hasTeams) {
+      tabs.push({
+        key: index++,
+        label: t('Teams'),
+        type: 'TEAMS',
+        entityPrefix: 'team_target',
+      });
+    }
 
     tabs.push({
       key: index++,
@@ -86,7 +96,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup]);
+  }, [hasAssetsGroup, hasTeams]);
 
   const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: {
@@ -128,6 +138,15 @@ const AtomicTesting = () => {
       })
       .finally(() => {
         setHasAssetsGroupChecked(true);
+      });
+    searchTargets(injectId, 'TEAMS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasTeams(true);
+        } else { setHasTeams(false); }
+      })
+      .finally(() => {
+        setHasTeamsChecked(true);
       });
   }, [injectResultOverviewOutput]);
 
@@ -225,7 +244,7 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && (
             <>
               <Tabs
                 value={activeTab}

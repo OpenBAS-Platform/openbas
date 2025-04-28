@@ -213,7 +213,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.10.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.14.6, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.25.7, @babel/runtime@npm:^7.26.10, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.10.0, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.14.6, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.25.7, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
   version: 7.26.10
   resolution: "@babel/runtime@npm:7.26.10"
   dependencies:
@@ -2572,20 +2572,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/types@npm:^7.3.1":
-  version: 7.3.1
-  resolution: "@mui/types@npm:7.3.1"
-  dependencies:
-    "@babel/runtime": "npm:^7.26.10"
-  peerDependencies:
-    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 10c0/6b9f575498de2e52f9b3536aab3f5943b2976d1ce29c526a67bd563cc33cf104fe3a937b36aef282c7248a571df18a17c95a8387644d30363428537ab5010e20
-  languageName: node
-  linkType: hard
-
 "@mui/types@npm:^7.4.1":
   version: 7.4.1
   resolution: "@mui/types@npm:7.4.1"
@@ -2600,27 +2586,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/utils@npm:^5.16.6 || ^6.0.0 || ^7.0.0 || ^7.0.0-beta":
-  version: 7.0.0-rc.0
-  resolution: "@mui/utils@npm:7.0.0-rc.0"
-  dependencies:
-    "@babel/runtime": "npm:^7.26.10"
-    "@mui/types": "npm:^7.3.1"
-    "@types/prop-types": "npm:^15.7.14"
-    clsx: "npm:^2.1.1"
-    prop-types: "npm:^15.8.1"
-    react-is: "npm:^19.0.0"
-  peerDependencies:
-    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
-    react: ^17.0.0 || ^18.0.0 || ^19.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 10c0/e04959c7bafc51ac9391697c6a548ae325bb105adf45cd220b306f9aec5861204e9092718b7b76139b164ba28e0c915694d89b7f67243c7e72bf7280385e552c
-  languageName: node
-  linkType: hard
-
-"@mui/utils@npm:^7.0.2":
+"@mui/utils@npm:^5.16.6 || ^6.0.0 || ^7.0.0, @mui/utils@npm:^7.0.2":
   version: 7.0.2
   resolution: "@mui/utils@npm:7.0.2"
   dependencies:
@@ -2640,13 +2606,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:7.28.3":
-  version: 7.28.3
-  resolution: "@mui/x-date-pickers@npm:7.28.3"
+"@mui/x-date-pickers@npm:7.29.1":
+  version: 7.29.1
+  resolution: "@mui/x-date-pickers@npm:7.29.1"
   dependencies:
     "@babel/runtime": "npm:^7.25.7"
-    "@mui/utils": "npm:^5.16.6 || ^6.0.0 || ^7.0.0 || ^7.0.0-beta"
-    "@mui/x-internals": "npm:7.28.0"
+    "@mui/utils": "npm:^5.16.6 || ^6.0.0 || ^7.0.0"
+    "@mui/x-internals": "npm:7.29.0"
     "@types/react-transition-group": "npm:^4.4.11"
     clsx: "npm:^2.1.1"
     prop-types: "npm:^15.8.1"
@@ -2654,8 +2620,8 @@ __metadata:
   peerDependencies:
     "@emotion/react": ^11.9.0
     "@emotion/styled": ^11.8.1
-    "@mui/material": ^5.15.14 || ^6.0.0 || ^7.0.0 || ^7.0.0-beta
-    "@mui/system": ^5.15.14 || ^6.0.0 || ^7.0.0 || ^7.0.0-beta
+    "@mui/material": ^5.15.14 || ^6.0.0 || ^7.0.0
+    "@mui/system": ^5.15.14 || ^6.0.0 || ^7.0.0
     date-fns: ^2.25.0 || ^3.2.0 || ^4.0.0
     date-fns-jalali: ^2.13.0-0 || ^3.2.0-0 || ^4.0.0-0
     dayjs: ^1.10.7
@@ -2684,19 +2650,19 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/55392e788408f497d8604bfff5e4cb28ed8f0ddc0e697a0034827bdc000ec55bb839b201b1cbfe1f4bca124b1e7c75716ba780b64c7b89a37b12b9961f423266
+  checksum: 10c0/31d050fea70c0887a43cce964379f04ad9f5daddf273099508d03113e258a36c7c0bfa1c5628cd40849efffe578d5a2a7e724832665f777cfa14c79baf342020
   languageName: node
   linkType: hard
 
-"@mui/x-internals@npm:7.28.0":
-  version: 7.28.0
-  resolution: "@mui/x-internals@npm:7.28.0"
+"@mui/x-internals@npm:7.29.0":
+  version: 7.29.0
+  resolution: "@mui/x-internals@npm:7.29.0"
   dependencies:
     "@babel/runtime": "npm:^7.25.7"
-    "@mui/utils": "npm:^5.16.6 || ^6.0.0 || ^7.0.0 || ^7.0.0-beta"
+    "@mui/utils": "npm:^5.16.6 || ^6.0.0 || ^7.0.0"
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/50950953fa5566890c424a8a69e935b389d810cde93cb4bf0c223331bdcae593089fe4051261033626a25df1d7fe5f61aa9e9403a76dbe75933c2f53c2b0a279
+  checksum: 10c0/adb4358ef0e29f6f57622b50ff479e9d225078761b4c82546343e2976ccb55eed687e122c37874c76a170f4ec2ea6e82f89bf8b9c0ef3b5cb35b32d026761fba
   languageName: node
   linkType: hard
 
@@ -3619,12 +3585,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.14.1":
-  version: 22.14.1
-  resolution: "@types/node@npm:22.14.1"
+"@types/node@npm:22.15.2":
+  version: 22.15.2
+  resolution: "@types/node@npm:22.15.2"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/d49c4d00403b1c2348cf0701b505fd636d80aabe18102105998dc62fdd36dcaf911e73c7a868c48c21c1022b825c67b475b65b1222d84b704d8244d152bb7f86
+  checksum: 10c0/39da31d5fc63b14fabd217bb8a921c4a7fc3d99f233440209f9fc2d5d736e8773f7efc65223e2fd0e8db8390b0baab9c0cd2e951c2ece8b237f07313ab3cf295
   languageName: node
   linkType: hard
 
@@ -4319,9 +4285,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:4.6.0":
-  version: 4.6.0
-  resolution: "apexcharts@npm:4.6.0"
+"apexcharts@npm:4.7.0":
+  version: 4.7.0
+  resolution: "apexcharts@npm:4.7.0"
   dependencies:
     "@svgdotjs/svg.draggable.js": "npm:^3.0.4"
     "@svgdotjs/svg.filter.js": "npm:^3.0.8"
@@ -4329,7 +4295,7 @@ __metadata:
     "@svgdotjs/svg.resize.js": "npm:^2.0.2"
     "@svgdotjs/svg.select.js": "npm:^4.0.1"
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
-  checksum: 10c0/2cb4a0e3bf0c814ff2d8baa3ece78760566e0bd3970ad845548ae6b49a14bdebd2dc9dcaae5f569d58dd84b58a3703d68ba3cd5cab8f3d448267859da183b832
+  checksum: 10c0/6cf22d445a233773399bb6c00bfacc51c198a1f19e4559a6a9def8c46ee604377f8954ac9dd977d734eb95ab04f5c91d37da7581fa7df17a05a2ea5faec7e5d0
   languageName: node
   linkType: hard
 
@@ -4498,6 +4464,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10c0/450993c2ba975ffccaf0d480b68839a3b2435a5469a71fa2fb0b8a55cdb2c2ae47e609360b9c1e2b2534b73dfd69e2733a1cf9f8215bee0bcd729b72f801b0ce
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.9.0":
+  version: 1.9.0
+  resolution: "axios@npm:1.9.0"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/9371a56886c2e43e4ff5647b5c2c3c046ed0a3d13482ef1d0135b994a628c41fbad459796f101c655e62f0c161d03883454474d2e435b2e021b1924d9f24994c
   languageName: node
   linkType: hard
 
@@ -6618,7 +6595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fdir@npm:^6.4.3, fdir@npm:^6.4.4":
+"fdir@npm:^6.4.4":
   version: 6.4.4
   resolution: "fdir@npm:6.4.4"
   peerDependencies:
@@ -8487,7 +8464,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"koa@npm:^2.16.0":
+"koa@npm:^2.16.1":
   version: 2.16.1
   resolution: "koa@npm:2.16.1"
   dependencies:
@@ -9489,7 +9466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:2.12.4":
+"monocart-coverage-reports@npm:2.12.4, monocart-coverage-reports@npm:^2.12.4":
   version: 2.12.4
   resolution: "monocart-coverage-reports@npm:2.12.4"
   dependencies:
@@ -9511,28 +9488,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:^2.12.3":
-  version: 2.12.3
-  resolution: "monocart-coverage-reports@npm:2.12.3"
-  dependencies:
-    acorn: "npm:^8.14.1"
-    acorn-loose: "npm:^8.4.0"
-    acorn-walk: "npm:^8.3.4"
-    commander: "npm:^13.1.0"
-    console-grid: "npm:^2.2.3"
-    eight-colors: "npm:^1.3.1"
-    foreground-child: "npm:^3.3.1"
-    istanbul-lib-coverage: "npm:^3.2.2"
-    istanbul-lib-report: "npm:^3.0.1"
-    istanbul-reports: "npm:^3.1.7"
-    lz-utils: "npm:^2.1.0"
-    monocart-locator: "npm:^1.0.2"
-  bin:
-    mcr: lib/cli.js
-  checksum: 10c0/a5faf70da8fe15ca902a84d80ab7596d3f4710a6e2958cbef9d9c4f48a37473f438c93ac2e021129e25e62ff72358b78c0d89cacdc85fe65d5a8aa4ac20d0ed8
-  languageName: node
-  linkType: hard
-
 "monocart-locator@npm:^1.0.2":
   version: 1.0.2
   resolution: "monocart-locator@npm:1.0.2"
@@ -9540,21 +9495,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-reporter@npm:2.9.17":
-  version: 2.9.17
-  resolution: "monocart-reporter@npm:2.9.17"
+"monocart-reporter@npm:2.9.18":
+  version: 2.9.18
+  resolution: "monocart-reporter@npm:2.9.18"
   dependencies:
     console-grid: "npm:^2.2.3"
     eight-colors: "npm:^1.3.1"
-    koa: "npm:^2.16.0"
+    koa: "npm:^2.16.1"
     koa-static-resolver: "npm:^1.0.6"
     lz-utils: "npm:^2.1.0"
-    monocart-coverage-reports: "npm:^2.12.3"
+    monocart-coverage-reports: "npm:^2.12.4"
     monocart-locator: "npm:^1.0.2"
-    nodemailer: "npm:^6.10.0"
+    nodemailer: "npm:^6.10.1"
   bin:
     monocart: lib/cli.js
-  checksum: 10c0/f49cd83c8d96e75c3afc6d70472d263fa456fa5a4d77bf32715efc0f4298fa3eb197b755731194deee518fa42af2b0dc8e53e63a5dff697827e53c8dee49a89d
+  checksum: 10c0/33dc340e496f6fa59968af07d016757b97cb41d8f99488bf4cbf3d59ec31e43ef4c169554dbb6cb357dcd0575b88a65949c34f35d5de8d6d62375ffe102cabea
   languageName: node
   linkType: hard
 
@@ -9663,10 +9618,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:^6.10.0":
-  version: 6.10.0
-  resolution: "nodemailer@npm:6.10.0"
-  checksum: 10c0/39fd35d65b021b94c968eeac82a66dd843021b6ba53c659d01b1dd4cda73b6a2f96e20facfe500efa4b8d3f1cb23df10245c6c86b2bde5f806691ed17ce87826
+"nodemailer@npm:^6.10.1":
+  version: 6.10.1
+  resolution: "nodemailer@npm:6.10.1"
+  checksum: 10c0/e81fde258ea4f4e5646e9e3eebe89294d007939999d2d1a8c96c5488fa00bf659e46cf76fccb2697e9aa6ef9807a1ed47ff2aef6ad30b795e3849b6997066d16
   languageName: node
   linkType: hard
 
@@ -9904,14 +9859,14 @@ __metadata:
     "@mui/lab": "npm:7.0.0-beta.11"
     "@mui/material": "npm:7.0.2"
     "@mui/system": "npm:7.0.2"
-    "@mui/x-date-pickers": "npm:7.28.3"
+    "@mui/x-date-pickers": "npm:7.29.1"
     "@playwright/test": "npm:1.52.0"
     "@redux-devtools/extension": "npm:3.3.0"
     "@stylistic/eslint-plugin": "npm:4.2.0"
     "@testing-library/dom": "npm:10.4.0"
     "@testing-library/react": "npm:16.3.0"
     "@types/d3-hierarchy": "npm:3.1.7"
-    "@types/node": "npm:22.14.1"
+    "@types/node": "npm:22.15.2"
     "@types/pdfmake": "npm:0.2.11"
     "@types/qs": "npm:6"
     "@types/react": "npm:19.1.2"
@@ -9924,8 +9879,8 @@ __metadata:
     "@vitejs/plugin-react": "npm:4.4.1"
     "@vitest/eslint-plugin": "npm:1.1.43"
     "@xyflow/react": "npm:12.6.0"
-    apexcharts: "npm:4.6.0"
-    axios: "npm:1.8.4"
+    apexcharts: "npm:4.7.0"
+    axios: "npm:1.9.0"
     chokidar: "npm:4.0.3"
     ckeditor5: "npm:45.0.0"
     classcat: "npm:5.0.5"
@@ -9960,9 +9915,9 @@ __metadata:
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.48"
     monocart-coverage-reports: "npm:2.12.4"
-    monocart-reporter: "npm:2.9.17"
+    monocart-reporter: "npm:2.9.18"
     normalizr: "npm:3.6.2"
-    pdfmake: "npm:0.2.18"
+    pdfmake: "npm:0.2.19"
     prop-types: "npm:15.8.1"
     qs: "npm:6.14.0"
     ramda: "npm:0.30.1"
@@ -9978,7 +9933,7 @@ __metadata:
     react-intl: "npm:7.1.11"
     react-markdown: "npm:9.1.0"
     react-redux: "npm:9.2.0"
-    react-router: "npm:7.5.1"
+    react-router: "npm:7.5.2"
     react-syntax-highlighter: "npm:15.6.1"
     redux: "npm:5.0.1"
     redux-thunk: "npm:3.1.0"
@@ -9992,7 +9947,7 @@ __metadata:
     typescript-eslint: "npm:8.31.0"
     usehooks-ts: "npm:3.1.1"
     uuid: "npm:11.1.0"
-    vite: "npm:6.3.2"
+    vite: "npm:6.3.3"
     vitest: "npm:3.1.2"
     zod: "npm:3.24.3"
     zustand: "npm:5.0.3"
@@ -10253,15 +10208,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfmake@npm:0.2.18":
-  version: 0.2.18
-  resolution: "pdfmake@npm:0.2.18"
+"pdfmake@npm:0.2.19":
+  version: 0.2.19
+  resolution: "pdfmake@npm:0.2.19"
   dependencies:
     "@foliojs-fork/linebreak": "npm:^1.1.2"
     "@foliojs-fork/pdfkit": "npm:^0.15.3"
     iconv-lite: "npm:^0.6.3"
-    xmldoc: "npm:^1.3.0"
-  checksum: 10c0/173c5e347d137af744a103c155822b52c58da44902a51576f0e6d151c3233c9a573a4b799fa282b5cffa3abf7f6304e75d18d7ed48ceb977d6223e823be35368
+    xmldoc: "npm:^2.0.0"
+  checksum: 10c0/1cacc11d68d56ea4b61c14a2d05d14b0dddc093deb5c9972db82a848edc1020410da7278fbe4f1908ce0a4f0690c1dd1f6e4e95a32d0ec5bd3e35ab4a239dc9a
   languageName: node
   linkType: hard
 
@@ -10682,13 +10637,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^19.0.0":
-  version: 19.0.0
-  resolution: "react-is@npm:19.0.0"
-  checksum: 10c0/d1be8e8500cf04f76df71942a21ef3a71266397a383d7ec8885f35190df818d35c65efd35aed7be47a89ad99aaff2c52e0c4e39e8930844a6b997622e50625a8
-  languageName: node
-  linkType: hard
-
 "react-is@npm:^19.1.0":
   version: 19.1.0
   resolution: "react-is@npm:19.1.0"
@@ -10784,9 +10732,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:7.5.1":
-  version: 7.5.1
-  resolution: "react-router@npm:7.5.1"
+"react-router@npm:7.5.2":
+  version: 7.5.2
+  resolution: "react-router@npm:7.5.2"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -10797,7 +10745,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/54e9f77ede0bf36c12685a59c5d965f77f2223d01cd922ce7b6ef4f8fa5435e66c796f9f5da3487bde0cb98dadd64f5a406696d4f52e031af812857aaab0f76b
+  checksum: 10c0/5972ecb783e0ac0512c500b84bd4ff475665ba49c67b69e13b79dc24c7ee0496d523858058bb43c70147367688e0cc0d6d6d0f51cabfdebfbc5556d559bff457
   languageName: node
   linkType: hard
 
@@ -12225,7 +12173,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.13":
+"tinyglobby@npm:^0.2.13":
   version: 0.2.13
   resolution: "tinyglobby@npm:0.2.13"
   dependencies:
@@ -12887,17 +12835,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:6.3.2":
-  version: 6.3.2
-  resolution: "vite@npm:6.3.2"
+"vite@npm:6.3.3":
+  version: 6.3.3
+  resolution: "vite@npm:6.3.3"
   dependencies:
     esbuild: "npm:^0.25.0"
-    fdir: "npm:^6.4.3"
+    fdir: "npm:^6.4.4"
     fsevents: "npm:~2.3.3"
     picomatch: "npm:^4.0.2"
     postcss: "npm:^8.5.3"
     rollup: "npm:^4.34.9"
-    tinyglobby: "npm:^0.2.12"
+    tinyglobby: "npm:^0.2.13"
   peerDependencies:
     "@types/node": ^18.0.0 || ^20.0.0 || >=22.0.0
     jiti: ">=1.21.0"
@@ -12938,7 +12886,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/08681e83e8338f3915cee729d8296bb9cfd53f71d6796816445d58cd84a8387396a3f5f3e179c52b09e98ccf7247ec3fabb50b95b0e7f3289a619ef8bf71bd8a
+  checksum: 10c0/7ea27d2c80a9e0b7ccf6cbd6c251455501286568160e8b632984e5332440f21a6d05f9236408212ba7653f7d2d4790f848956d8a620bbf4dd2ecb792a2fe1ab1
   languageName: node
   linkType: hard
 
@@ -13298,12 +13246,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xmldoc@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "xmldoc@npm:1.3.0"
+"xmldoc@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "xmldoc@npm:2.0.0"
   dependencies:
     sax: "npm:^1.2.4"
-  checksum: 10c0/7957c57ff77008ced62063560d3e8f80c7fdf31d3fafa12d16c9f1fe676c8255f50889e8f41b61cca4cd473b841eedf2625089dcaf3f6b8717df521b9d0acfcf
+  checksum: 10c0/d51fcbe77cb3ed97d8cc5fa964d6a7d46afe90c377ccde2f9e3b1e93afcf2ec8e30f66023b210a8e0d0fe21c496ec558c025e1091a0c2fdfbabf155687d1a28d
   languageName: node
   linkType: hard
 
