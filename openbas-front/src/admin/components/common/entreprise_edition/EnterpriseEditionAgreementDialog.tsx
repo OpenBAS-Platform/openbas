@@ -32,24 +32,31 @@ const useStyles = makeStyles()(theme => ({
 
 const EnterpriseEditionAgreementDialog = () => {
   const { t } = useFormatter();
-  const { open, closeDialog, featureDetectedInfo } = useEnterpriseEdition();
+  const { open, closeDialog, featureDetectedInfo, setFeatureDetectedInfo } = useEnterpriseEdition();
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const [enterpriseLicense, setEnterpriseLicense] = useState('');
 
+  const onCloseEnterpriseEditionDialog = () => {
+    closeDialog();
+    setFeatureDetectedInfo('');
+  };
+
   const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => {
     dispatch(updatePlatformEnterpriseEditionParameters(data));
-    closeDialog();
+    onCloseEnterpriseEditionDialog();
   };
+
   const enableEnterpriseEdition = () => updateEnterpriseEdition({ platform_enterprise_license: enterpriseLicense });
+
   return (
     <Dialog
       open={open}
-      handleClose={closeDialog}
+      handleClose={onCloseEnterpriseEditionDialog}
       title={t('OpenBAS Enterprise Edition (EE) license agreement')}
       actions={(
         <>
-          <Button onClick={closeDialog}>{t('Cancel')}</Button>
+          <Button onClick={onCloseEnterpriseEditionDialog}>{t('Cancel')}</Button>
           <Button
             color="secondary"
             onClick={enableEnterpriseEdition}

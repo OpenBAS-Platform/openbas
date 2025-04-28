@@ -1,4 +1,5 @@
 import { Tooltip } from '@mui/material';
+import { type CSSProperties } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -20,20 +21,25 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
   },
 }));
 
-const EEChip = ({ clickable = false }: {
+const EEChip = ({ clickable = false, featureDetectedInfo = null, style = {} }: {
   clickable?: boolean;
-  featureDetectedInfo?: string;
+  featureDetectedInfo?: string | null;
+  style?: CSSProperties;
 }) => {
   const { classes } = useStyles({ isClickable: clickable });
   const { t } = useFormatter();
-  const { openDialog } = useEnterpriseEdition();
+  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
   const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
+  if (featureDetectedInfo) {
+    setFeatureDetectedInfo(featureDetectedInfo);
+  }
 
   return (
     <Tooltip
       title={t('Enterprise Edition Feature')}
       className={classes.container}
       onClick={() => clickable && !isEnterpriseEdition && openDialog()}
+      style={style}
     >
       <span>
         EE

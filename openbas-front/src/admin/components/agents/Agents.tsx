@@ -20,6 +20,8 @@ import PlatformSelector from './PlatformSelector';
 
 const OPENBAS_CALDERA = 'openbas_caldera';
 const OPENBAS_AGENT = 'openbas_agent';
+const OPENBAS_CROWDSTRIKE = 'openbas_crowdstrike';
+const OPENBAS_TANIUM = 'openbas_tanium';
 
 const Executors = () => {
   // Standard hooks
@@ -47,13 +49,9 @@ const Executors = () => {
     openbas_tanium: 2,
     openbas_crowdstrike: 3,
   };
-  const sortedExecutors = executors
-    .map((executor: Executor) => ({
-      ...executor,
-      order: order[executor.executor_type as keyof typeof order],
-    }))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .sort((a: any, b: any) => a.order - b.order);
+
+  const sortedExecutors = executors.sort((a: Executor, b: Executor) => order[a.executor_type as keyof typeof order] - order[b.executor_type as keyof typeof order]);
+  const needInformationStepper = (selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA);
 
   // -- Manage Dialogs
   const steps = [t('Choose your platform'), t('Installation Instructions')];
@@ -84,6 +82,7 @@ const Executors = () => {
             <ExecutorSelector
               executor={executor}
               setSelectedExecutor={setSelectedExecutor}
+              isEEExecutor={executor.executor_type == OPENBAS_TANIUM || executor.executor_type == OPENBAS_CROWDSTRIKE}
             />
           </Grid>
         ))}
@@ -93,16 +92,16 @@ const Executors = () => {
         slots={{ transition: Transition }}
         onClose={closeInstall}
         slotProps={{ paper: { elevation: 1 } }}
-        maxWidth="md"
+        maxWidth={needInformationStepper ? 'md' : 'sm'}
       >
-        <DialogTitle style={{ padding: theme.spacing(4, 4, 4, 5) }}>
+        <DialogTitle>
           {`${selectedExecutor?.executor_name} `}
         </DialogTitle>
         <DialogContent>
-          {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
+          {needInformationStepper
             && (
               <>
-                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 3) }}>
+                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 3, 0) }}>
                   {steps.map((label, index) => (
                     <Step key={label}>
                       <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
@@ -117,7 +116,7 @@ const Executors = () => {
                 )}
               </>
             )}
-          {selectedExecutor?.executor_type !== OPENBAS_AGENT && selectedExecutor?.executor_type !== OPENBAS_CALDERA && selectedExecutor && (
+          {!needInformationStepper && selectedExecutor && (
             <ExecutorDocumentationLink executor={selectedExecutor} />
           )}
         </DialogContent>
