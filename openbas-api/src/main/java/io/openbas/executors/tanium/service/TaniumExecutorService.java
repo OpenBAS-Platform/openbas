@@ -41,7 +41,7 @@ public class TaniumExecutorService implements Runnable {
     return switch (platform) {
       case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
       case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
-      case "MacOS" -> Endpoint.PLATFORM_TYPE.MacOS;
+      case "MacOS", "Mac" -> Endpoint.PLATFORM_TYPE.MacOS;
       default -> Endpoint.PLATFORM_TYPE.Unknown;
     };
   }
