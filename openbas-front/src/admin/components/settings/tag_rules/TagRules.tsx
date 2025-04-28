@@ -110,7 +110,6 @@ const TagRules = () => {
                 tagRule={tagRule}
                 onDelete={result => setTagRules(tagRules.filter(ag => (ag.tag_rule_id !== result)))}
                 onUpdate={result => setTagRules(tagRules.map(existing => (existing.tag_rule_id !== result.tag_rule_id ? existing : result)))}
-
               />
             )}
             divider
