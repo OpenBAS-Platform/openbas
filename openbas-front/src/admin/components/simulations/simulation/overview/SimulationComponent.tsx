@@ -86,6 +86,7 @@ const SimulationComponent = () => {
             display: 'flex',
             alignItems: 'center',
             height: '100%',
+            justifyContent: 'center',
           }}
         >
           {!results

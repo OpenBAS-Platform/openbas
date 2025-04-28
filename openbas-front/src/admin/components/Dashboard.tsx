@@ -42,6 +42,7 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 4,
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   paperList: {
     height: 320,

@@ -114,7 +114,7 @@ const ResponsePie: FunctionComponent<Props> = ({
           <span
             style={{
               ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
-              fontWeight: 500,
+              fontWeight: 300,
               textAlign: 'center',
             }}
           >
