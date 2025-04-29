@@ -67,6 +67,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     }
     List<Agent> csAgents = new ArrayList<>(agents);
 
+    // Sometimes, assets from agents aren't fetched even with the EAGER property from Hibernate
+    csAgents.forEach(agent -> agent.setAsset((Asset) Hibernate.unproxy(agent.getAsset())));
+
     Injector injector =
         inject
             .getInjectorContract()
@@ -95,9 +98,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   private List<Agent> getAgentsFromOS(List<Agent> agents, Endpoint.PLATFORM_TYPE platform) {
     return agents.stream()
-        .filter(
-            agent ->
-                ((Endpoint) Hibernate.unproxy(agent.getAsset())).getPlatform().equals(platform))
+        .filter(agent -> ((Endpoint) agent.getAsset()).getPlatform().equals(platform))
         .toList();
   }
 
