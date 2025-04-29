@@ -63,6 +63,7 @@ const AttackPatternBox: FunctionComponent<{
       aria-haspopup="true"
       style={{ backgroundColor }}
       className={classes.button}
+      disabled
     >
       <div className={classes.container}>
         <Typography sx={{
