@@ -33,7 +33,7 @@ const EditionNotificationRuleForm: FunctionComponent<Props> = ({
   } = useForm<UpdateNotificationRuleInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<UpdateNotificationRuleInput>().with({ notification_rule_subject: z.string().min(1, { message: t('Should not be empty') }) }),
+      zodImplement<UpdateNotificationRuleInput>().with({ subject: z.string().min(1, { message: t('Should not be empty') }) }),
     ),
     defaultValues: editionInitialValues,
   });
@@ -62,9 +62,9 @@ const EditionNotificationRuleForm: FunctionComponent<Props> = ({
           variant="standard"
           fullWidth
           label={t('Email subject')}
-          error={!!errors.notification_rule_subject}
-          helperText={errors.notification_rule_subject?.message}
-          inputProps={register('notification_rule_subject')}
+          error={!!errors.subject}
+          helperText={errors.subject?.message}
+          inputProps={register('subject')}
           InputLabelProps={{ required: true }}
         />
 

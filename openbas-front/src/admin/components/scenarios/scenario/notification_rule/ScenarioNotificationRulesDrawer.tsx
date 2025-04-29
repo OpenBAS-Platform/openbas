@@ -53,7 +53,7 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
     });
   };
 
-  const editionInitialValues = (({ notification_rule_subject }) => ({ notification_rule_subject: notification_rule_subject ?? '' }))(notificationRule);
+  const editionInitialValues = (({ notification_rule_subject }) => ({ subject: notification_rule_subject ?? '' }))(notificationRule);
 
   const onSubmitEdition = async (data: UpdateNotificationRuleInput) => {
     await updateNotificationRule(notificationRule.notification_rule_id, data).then((result: { data: NotificationRuleOutput }) => {

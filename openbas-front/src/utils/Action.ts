@@ -81,7 +81,7 @@ export const simpleCall = (uri: string, config?: AxiosRequestConfig, defaultErro
   }
   throw error;
 });
-export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) =>
+export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = false) =>
   simpleApi.post(buildUri(uri), data, config)
     .then((response) => {
       if (defaultSuccessBehavior) {
@@ -92,7 +92,7 @@ export const simplePostCall = (uri: string, data?: unknown, config?: AxiosReques
     .catch((error) => {
       checkUnauthorized(error);
       if (defaultNotifyErrorBehavior) {
-        notifyError(error);
+        notifyErrorHandler(error);
       }
       throw error;
     });

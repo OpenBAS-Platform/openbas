@@ -4,7 +4,6 @@ import { useTheme } from '@mui/material/styles';
 import cronstrue from 'cronstrue';
 import { type FunctionComponent, lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
-import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -35,25 +34,10 @@ const ScenarioFindings = lazy(() => import('./findings/ScenarioFindings'));
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-const useStyles = makeStyles()(() => ({
-  scheduling: {
-    display: 'flex',
-    margin: '-35px 8px 0 0',
-    float: 'right',
-    alignItems: 'center',
-  },
-  flexContainer: {
-    display: 'flex',
-    margin: '-35px 8px 0 0',
-    float: 'right',
-  },
-}));
-
 const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ scenario }) => {
   const { t, ft, locale, fld } = useFormatter();
   const location = useLocation();
   const theme = useTheme();
-  const { classes } = useStyles();
   const permissionsContext: PermissionsContextType = { permissions: useScenarioPermissions(scenario.scenario_id) };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
@@ -172,8 +156,16 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               borderColor: 'divider',
               marginBottom: 2,
             }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
           >
-            <Tabs value={tabValue}>
+            <Tabs
+              style={{ flex: 1 }}
+              value={tabValue}
+              variant="scrollable"
+              scrollButtons="auto"
+            >
               <Tab
                 component={Link}
                 to={`/admin/scenarios/${scenario.scenario_id}`}
@@ -211,7 +203,11 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 label={t('Findings')}
               />
             </Tabs>
-            <div className={classes.flexContainer}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+            >
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -230,21 +226,23 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 >
                   {t('Notification rules')}
                 </Typography>
-                {openScenarioNotificationRuleDrawer && (
-                  <ScenarioNotificationRulesDrawer
-                    open={openScenarioNotificationRuleDrawer}
-                    setOpen={setOpenScenarioNotificationRuleDrawer}
-                    editing={editNotification}
-                    onCreate={onCreateNotification}
-                    onUpdate={result => setNotificationRule(result)}
-                    onDelete={onDeleteNotification}
-                    notificationRule={notificationRule}
-                    scenarioId={scenario.scenario_id}
-                    scenarioName={scenario.scenario_name}
-                  />
-                )}
+                <ScenarioNotificationRulesDrawer
+                  open={openScenarioNotificationRuleDrawer}
+                  setOpen={setOpenScenarioNotificationRuleDrawer}
+                  editing={editNotification}
+                  onCreate={onCreateNotification}
+                  onUpdate={result => setNotificationRule(result)}
+                  onDelete={onDeleteNotification}
+                  notificationRule={notificationRule}
+                  scenarioId={scenario.scenario_id}
+                  scenarioName={scenario.scenario_name}
+                />
               </div>
-              <div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              >
                 {!cronExpression && (
                   <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
                     <UpdateOutlined color="primary" />

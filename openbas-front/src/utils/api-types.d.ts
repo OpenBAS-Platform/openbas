@@ -2554,21 +2554,6 @@ export interface NetworkTraffic {
 
 export interface NotificationRuleOutput {
   /** ID of the notification rule */
-  notification_rule_id?: string;
-  /** Owner of the notification rule */
-  notification_rule_owner?: string;
-  /** Resource id of the resource associated with the rule */
-  notification_rule_resource_id?: string;
-  /** Resource type of the resource associated with the rule */
-  notification_rule_resource_type?: string;
-  /** Subject of the notification rule */
-  notification_rule_subject?: string;
-  /** Event that will trigger the notification */
-  notification_rule_trigger?: string;
-}
-
-export interface NotificationRuleOutput {
-  /** ID of the notification rule */
   notification_rule_id: string;
   /** Owner of the notification rule */
   notification_rule_owner?: string;
@@ -4285,7 +4270,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdateNotificationRuleInput {
-  notification_rule_subject: string;
+  subject: string;
 }
 
 export interface UpdateProfileInput {

@@ -10,7 +10,8 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Builder
 public class UpdateNotificationRuleInput {
-  @JsonProperty("notification_rule_subject")
+
+  @JsonProperty("subject")
   @NotNull
   private String subject;
 }

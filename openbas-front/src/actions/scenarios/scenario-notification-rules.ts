@@ -4,7 +4,7 @@ import type { CreateNotificationRuleInput, UpdateNotificationRuleInput } from '.
 const NOTIFICATION_RULE_URI = '/api/notification-rules';
 
 export const createNotificationRule = (data: CreateNotificationRuleInput) => {
-  return simplePostCall(NOTIFICATION_RULE_URI, data);
+  return simplePostCall(NOTIFICATION_RULE_URI, data, undefined, true, true);
 };
 
 export const updateNotificationRule = (notificationRuleId: string, data: UpdateNotificationRuleInput) => {
