@@ -8,7 +8,7 @@ import { makeStyles } from 'tss-react/mui';
 import {
   fetchInjectResultOverviewOutput,
   fetchTargetResult,
-  fetchTargetResultMerged
+  fetchTargetResultMerged,
 } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
@@ -31,7 +31,6 @@ import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
-import {boolean} from "zod";
 
 interface Steptarget {
   label: string;
@@ -291,13 +290,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           fontSize: 9,
         },
       })));
-      if(!target.mergedExpectations) {
+      if (!target.mergedExpectations) {
         fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId).then(
-            (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
         );
       } else {
         fetchTargetResultMerged(inject.inject_id, target.id!, target.targetType!).then(
-            (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
         );
       }
       setActiveTab(0);

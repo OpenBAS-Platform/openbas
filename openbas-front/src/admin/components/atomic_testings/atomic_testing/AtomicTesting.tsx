@@ -161,7 +161,10 @@ const AtomicTesting = () => {
   // Handles
 
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTargetLegacy({...target, mergedExpectations: false});
+    setSelectedTargetLegacy({
+      ...target,
+      mergedExpectations: false,
+    });
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
   };

@@ -100,11 +100,11 @@ public class AtomicTestingApi extends RestBehavior {
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}/merged")
   @PreAuthorize("isInjectObserver(#injectId)")
   public List<InjectExpectation> findTargetResultMerged(
-          @PathVariable String injectId,
-          @PathVariable String targetId,
-          @PathVariable String targetType) {
+      @PathVariable String injectId,
+      @PathVariable String targetId,
+      @PathVariable String targetType) {
     return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
-            injectId, targetId, targetType);
+        injectId, targetId, targetType);
   }
 
   @PutMapping("/{injectId}/tags")

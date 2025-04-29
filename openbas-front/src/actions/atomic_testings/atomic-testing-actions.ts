@@ -54,7 +54,7 @@ export const fetchTargetResult = (injectId: string, targetId: string, targetType
 };
 
 export const fetchTargetResultMerged = (injectId: string, targetId: string, targetType: string) => {
-  let uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/types/${targetType}/merged`;
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/types/${targetType}/merged`;
   return simpleCall(uri);
 };
 
