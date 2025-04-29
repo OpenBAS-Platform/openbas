@@ -35,7 +35,8 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
       gridTemplateColumns: '1fr 350px auto',
       gap: theme.spacing(2),
       alignItems: 'start',
-      marginBottom: theme.spacing(2),
+      marginBottom: theme.spacing(3),
+      borderBottom: `1px solid ${theme.palette.divider}`,
     }}
     >
       <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">

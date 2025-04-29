@@ -41,7 +41,7 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
   };
 
   return (
-    <Box mt={theme.spacing(2)}>
+    <Box mt={theme.spacing(4)}>
       <Tabs value={tabValue}>
         <Tab
           component={Link}
