@@ -66,9 +66,6 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) =
   const resolvedDataFailure = resolvedData(attackPatternMap, killChainPhaseMap, data.at(1)?.data ?? []);
 
   const [showCoveredOnly, setShowCoveredOnly] = useLocalStorage<boolean>('widget-' + widgetId, false);
-  const handleShowCoveredOnly = (checked: boolean) => {
-    setShowCoveredOnly(checked);
-  };
 
   return (
     <Box
@@ -89,7 +86,7 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) =
             control={(
               <Checkbox
                 checked={showCoveredOnly}
-                onChange={e => handleShowCoveredOnly(e.target.checked)}
+                onChange={e => setShowCoveredOnly(e.target.checked)}
                 color="primary"
               />
             )}
