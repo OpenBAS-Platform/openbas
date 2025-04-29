@@ -2,7 +2,6 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.ExecutionTrace;
 import io.openbas.database.model.ExecutionTraceAction;
-
 import java.util.List;
 
 public class ExecutionTraceFixture {
@@ -11,7 +10,8 @@ public class ExecutionTraceFixture {
     return ExecutionTrace.getNewInfoTrace("Info", ExecutionTraceAction.START);
   }
 
-  public static ExecutionTrace createDefaultExecutionTraceStartWithIdentifiers(List<String> identifiers) {
+  public static ExecutionTrace createDefaultExecutionTraceStartWithIdentifiers(
+      List<String> identifiers) {
     return ExecutionTrace.getNewInfoTrace("Info", ExecutionTraceAction.START, identifiers);
   }
 
@@ -19,7 +19,8 @@ public class ExecutionTraceFixture {
     return ExecutionTrace.getNewSuccessTrace("Success", ExecutionTraceAction.COMPLETE);
   }
 
-  public static ExecutionTrace createDefaultExecutionTraceCompleteWithIdentifiers(List<String> identifiers) {
+  public static ExecutionTrace createDefaultExecutionTraceCompleteWithIdentifiers(
+      List<String> identifiers) {
     return ExecutionTrace.getNewSuccessTrace("Success", ExecutionTraceAction.COMPLETE, identifiers);
   }
 

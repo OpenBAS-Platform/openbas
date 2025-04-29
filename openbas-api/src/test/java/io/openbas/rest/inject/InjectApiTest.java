@@ -1102,21 +1102,89 @@ class InjectApiTest extends IntegrationTest {
           .isEqualTo(mapper.writeValueAsString(expected));
     }
 
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for a team")
+    void should_fetch_execution_traces_by_target_and_inject_for_a_team() throws Exception {
+      UserComposer.Composer user =
+          userComposer.forUser(UserFixture.getUser("Bob", "TEST", "bob-test@fake.email"));
+      User savedPlayer = user.persist().get();
+
+      TeamComposer.Composer team =
+          teamComposer.forTeam(TeamFixture.getDefaultTeam()).withUser(user);
+      Team savedTeam = team.persist().get();
+
+      Inject inject =
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withTeam(team)
+              .withInjectStatus(
+                  injectStatusComposer
+                      .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
+                      .withExecutionTraces(
+                          List.of(
+                              executionTraceComposer.forExecutionTrace(
+                                  ExecutionTraceFixture
+                                      .createDefaultExecutionTraceStartWithIdentifiers(
+                                          List.of(savedPlayer.getId()))),
+                              executionTraceComposer.forExecutionTrace(
+                                  ExecutionTraceFixture
+                                      .createDefaultExecutionTraceCompleteWithIdentifiers(
+                                          List.of(savedPlayer.getId()))))))
+              .persist()
+              .get();
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedTeam.getId(),
+              TargetType.TEAMS);
+
+      List<ExecutionTraceOutput> expected = new ArrayList<>();
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.START)
+              .message("Info")
+              .status(ExecutionTraceStatus.INFO)
+              .build());
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.COMPLETE)
+              .message("Success")
+              .status(ExecutionTraceStatus.SUCCESS)
+              .build());
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .when(Option.IGNORING_EXTRA_FIELDS)
+          .whenIgnoringPaths(
+              "execution_time",
+              "execution_agent",
+              "execution_agent.agent_id",
+              "execution_agent.agent_privilege",
+              "execution_agent.agent_deployment_mode",
+              "execution_agent.agent_executed_by_user",
+              "execution_agent.agent_active",
+              "execution_agent.agent_last_seen")
+          .isEqualTo(mapper.writeValueAsString(expected));
+    }
 
     @Test
     @DisplayName("Fetch execution traces by target and inject for a player")
     void should_fetch_execution_traces_by_target_and_inject_for_a_player() throws Exception {
-      UserComposer.Composer user = userComposer.forUser(UserFixture.getUser());
+      UserComposer.Composer user =
+          userComposer.forUser(UserFixture.getUser("Alice", "TEST", "alice-test@fake.email"));
       User savedPlayer = user.persist().get();
 
       Inject inject =
           buildInjectWithTraces(
               List.of(
-                  executionTraceComposer
-                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(List.of(savedPlayer.getId()))),
-                  executionTraceComposer
-                      .forExecutionTrace(
-                          ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(List.of(savedPlayer.getId())))));
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(
+                          List.of(savedPlayer.getId()))),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(
+                          List.of(savedPlayer.getId())))));
 
       String response =
           performGetRequest(
