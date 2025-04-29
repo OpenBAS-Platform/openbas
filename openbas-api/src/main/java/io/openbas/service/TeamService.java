@@ -25,6 +25,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.function.TriFunction;
@@ -45,20 +46,12 @@ public class TeamService {
   private final TeamRepository teamRepository;
 
   public List<TeamOutput> getTeams(@NotNull List<String> teamIds) {
-    List<RawTeam> rawTeams = teamRepository.rawTeamByIds(teamIds);
+    List<RawTeam> rawTeams =
+        teamRepository.rawTeamByIds(teamIds).stream()
+            .sorted(Comparator.comparing(RawTeam::getTeam_name))
+            .toList();
     return rawTeams.stream()
-        .map(
-            rt ->
-                TeamOutput.builder()
-                    .id(rt.getTeam_id())
-                    .name(rt.getTeam_name())
-                    .tags(rt.getTeam_tags())
-                    .users(rt.getTeam_users())
-                    .description(rt.getTeam_description())
-                    .organization(rt.getTeam_organization())
-                    .scenarios(rt.getTeam_scenarios())
-                    .exercises(rt.getTeam_exercises())
-                    .build())
+        .map(rt -> TeamOutput.builder().id(rt.getTeam_id()).name(rt.getTeam_name()).build())
         .toList();
   }
 
