@@ -109,7 +109,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
               key={widget.widget_id}
               data-grid={layout}
               style={{
-                margin: 0,
+                margin: theme.spacing(-2.5),
                 borderRadius: 4,
                 display: 'flex',
                 flexDirection: 'column',
