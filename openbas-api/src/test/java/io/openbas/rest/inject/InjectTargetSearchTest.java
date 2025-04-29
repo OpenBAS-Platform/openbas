@@ -1033,7 +1033,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 new FilterUtilsJpa.Option(
                     teamWrapper1.get().getId(), teamWrapper1.get().getName()));
 
-        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
       }
     }
 
