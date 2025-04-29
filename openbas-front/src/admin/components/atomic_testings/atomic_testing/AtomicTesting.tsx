@@ -46,7 +46,7 @@ const AtomicTesting = () => {
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
-  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult & { merged: boolean }>();
+  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult & { mergedExpectations: boolean }>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
@@ -115,15 +115,6 @@ const AtomicTesting = () => {
   useEffect(() => {
     if (!injectResultOverviewOutput) return;
 
-    setSelectedTargetLegacy(
-        {
-          ...(selectedTargetLegacy
-              || currentParentTarget
-              || injectResultOverviewOutput?.inject_targets?.[0]),
-          merged: false
-        },
-    );
-
     const searchPaginationInput1Result: SearchPaginationInput = {
       filterGroup: {
         mode: 'and',
@@ -170,7 +161,7 @@ const AtomicTesting = () => {
   // Handles
 
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTargetLegacy({...target, merged: false});
+    setSelectedTargetLegacy({...target, mergedExpectations: false});
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
   };
@@ -182,7 +173,7 @@ const AtomicTesting = () => {
       targetType: target.target_type,
       // @ts-expect-error target_subtype is always within the allowed values
       platformType: target.target_subtype,
-      merged: true,
+      mergedExpectations: true,
     });
 
     setCurrentParentTarget(undefined);
@@ -303,7 +294,7 @@ const AtomicTesting = () => {
         <Paper classes={{ root: classes.paper }} variant="outlined">
           {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
-              inject={{...injectResultOverviewOutput, merged: false}}
+              inject={injectResultOverviewOutput}
               upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
               target={selectedTargetLegacy}

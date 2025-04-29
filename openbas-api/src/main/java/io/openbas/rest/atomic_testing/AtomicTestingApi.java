@@ -97,6 +97,16 @@ public class AtomicTestingApi extends RestBehavior {
         injectId, targetId, parentTargetId, targetType);
   }
 
+  @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}/merged")
+  @PreAuthorize("isInjectObserver(#injectId)")
+  public List<InjectExpectation> findTargetResultMerged(
+          @PathVariable String injectId,
+          @PathVariable String targetId,
+          @PathVariable String targetType) {
+    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+            injectId, targetId, targetType);
+  }
+
   @PutMapping("/{injectId}/tags")
   @Transactional(rollbackFor = Exception.class)
   public InjectResultOverviewOutput updateAtomicTestingTags(

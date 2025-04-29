@@ -791,6 +791,31 @@ public class InjectExpectationService {
   // -- BY TARGET TYPE
 
   public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(
+          @NotBlank final String injectId,
+          @NotBlank final String targetId,
+          @NotBlank final String targetType) {
+    try {
+      TargetType targetTypeEnum = TargetType.valueOf(targetType);
+      return switch (targetTypeEnum) {
+        case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
+        case PLAYER ->
+                injectExpectationRepository.findAllByInjectAndPlayer(
+                        injectId, targetId);
+        case AGENT ->
+                injectExpectationRepository.findAllByInjectAndAgent(
+                        injectId, targetId);
+        case ASSETS ->
+                injectExpectationRepository.findAllByInjectAndAsset(
+                        injectId, targetId);
+        case ASSETS_GROUPS ->
+                injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
+      };
+    } catch (IllegalArgumentException e) {
+      return Collections.emptyList();
+    }
+  }
+
+  public List<InjectExpectation> findExpectationsByInjectAndTargetAndTargetType(
       @NotBlank final String injectId,
       @NotBlank final String targetId,
       @NotBlank final String parentTargetId,
