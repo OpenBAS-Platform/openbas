@@ -200,7 +200,10 @@ public class V1_DataImporter implements Importer {
     resolveJsonElements(importNode, prefix + "attack_patterns")
         .forEach(
             nodeAttackPattern -> {
-              String id = nodeAttackPattern.get("attack_pattern_id").textValue();
+              JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
+              if (idNode == null) return;
+              String id = idNode.textValue();
+
               if (baseIds.get(id) != null) {
                 // Already import
                 return;
