@@ -21,7 +21,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Data
 @Entity
 @Table(name = "execution_traces")
-public class ExecutionTraces implements Base {
+public class ExecutionTrace implements Base {
   @Id
   @Column(name = "execution_trace_id")
   @JsonProperty("execution_trace_id")
@@ -93,46 +93,51 @@ public class ExecutionTraces implements Base {
     return Objects.hash(id);
   }
 
-  public static ExecutionTraces getNewErrorTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.ERROR, null, message, action, null, null);
+  public static ExecutionTrace getNewErrorTrace(String message, ExecutionTraceAction action) {
+    return new ExecutionTrace(null, ExecutionTraceStatus.ERROR, null, message, action, null, null);
   }
 
-  public static ExecutionTraces getNewErrorTrace(
+  public static ExecutionTrace getNewErrorTrace(
       String message, ExecutionTraceAction action, Agent agent) {
-    return new ExecutionTraces(
-        null, ExecutionTraceStatus.ERROR, null, message, action, agent, null);
+    return new ExecutionTrace(null, ExecutionTraceStatus.ERROR, null, message, action, agent, null);
   }
 
-  public static ExecutionTraces getNewSuccessTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(
+  public static ExecutionTrace getNewErrorTrace(
+      String message, ExecutionTraceAction action, List<String> identifiers) {
+    return new ExecutionTrace(
+        null, ExecutionTraceStatus.ERROR, identifiers, message, action, null, null);
+  }
+
+  public static ExecutionTrace getNewSuccessTrace(String message, ExecutionTraceAction action) {
+    return new ExecutionTrace(
         null, ExecutionTraceStatus.SUCCESS, null, message, action, null, null);
   }
 
-  public static ExecutionTraces getNewSuccessTrace(
+  public static ExecutionTrace getNewSuccessTrace(
       String message, ExecutionTraceAction category, List<String> identifiers) {
-    return new ExecutionTraces(
+    return new ExecutionTrace(
         null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null, null);
   }
 
-  public static ExecutionTraces getNewInfoTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.INFO, null, message, action, null, null);
+  public static ExecutionTrace getNewInfoTrace(String message, ExecutionTraceAction action) {
+    return new ExecutionTrace(null, ExecutionTraceStatus.INFO, null, message, action, null, null);
   }
 
-  public static ExecutionTraces getNewInfoTrace(
+  public static ExecutionTrace getNewInfoTrace(
       String message, ExecutionTraceAction action, List<String> identifiers) {
-    return new ExecutionTraces(
+    return new ExecutionTrace(
         null, ExecutionTraceStatus.INFO, identifiers, message, action, null, null);
   }
 
-  public static ExecutionTraces getNewInfoTrace(
+  public static ExecutionTrace getNewInfoTrace(
       String message, ExecutionTraceAction action, Agent agent, List<String> identifiers) {
-    return new ExecutionTraces(
+    return new ExecutionTrace(
         null, ExecutionTraceStatus.INFO, identifiers, message, action, agent, null);
   }
 
-  public ExecutionTraces() {}
+  public ExecutionTrace() {}
 
-  public ExecutionTraces(
+  public ExecutionTrace(
       InjectStatus injectStatus,
       ExecutionTraceStatus status,
       List<String> identifiers,

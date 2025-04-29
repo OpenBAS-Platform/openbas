@@ -79,7 +79,7 @@ public class CalderaResultCollectorService implements Runnable {
                 && resultStatus.isComplete()
                 && resultStatus.isFail()) {
               injectStatus.addTrace(
-                  new ExecutionTraces(
+                  new ExecutionTrace(
                       injectStatus,
                       ExecutionTraceStatus.MAYBE_PREVENTED,
                       List.of(),
@@ -96,7 +96,7 @@ public class CalderaResultCollectorService implements Runnable {
                 && resultStatus.isComplete()
                 && !resultStatus.isFail()) {
               injectStatus.addTrace(
-                  new ExecutionTraces(
+                  new ExecutionTrace(
                       injectStatus,
                       ExecutionTraceStatus.SUCCESS,
                       List.of(),
@@ -116,7 +116,7 @@ public class CalderaResultCollectorService implements Runnable {
                     .isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
 
               injectStatus.addTrace(
-                  new ExecutionTraces(
+                  new ExecutionTrace(
                       injectStatus,
                       ExecutionTraceStatus.MAYBE_PREVENTED,
                       List.of(),

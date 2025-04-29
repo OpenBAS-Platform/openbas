@@ -29,7 +29,7 @@ public class InjectStatus extends BaseInjectStatus {
       orphanRemoval = true,
       fetch = FetchType.EAGER)
   @JsonProperty("status_traces")
-  private List<ExecutionTraces> traces = new ArrayList<>();
+  private List<ExecutionTrace> traces = new ArrayList<>();
 
   // region transient
   public List<String> statusIdentifiers() {
@@ -51,41 +51,40 @@ public class InjectStatus extends BaseInjectStatus {
     return info;
   }
 
-  public void addTrace(ExecutionTraces trace) {
+  public void addTrace(ExecutionTrace trace) {
     this.getTraces().add(trace);
   }
 
   public void addTrace(
       ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(this, status, List.of(), message, action, agent, null);
+    ExecutionTrace newTrace =
+        new ExecutionTrace(this, status, List.of(), message, action, agent, null);
     this.getTraces().add(newTrace);
   }
 
   public void addMayBePreventedTrace(String message, ExecutionTraceAction action, Agent agent) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(
+    ExecutionTrace newTrace =
+        new ExecutionTrace(
             this, ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, action, agent, null);
     this.getTraces().add(newTrace);
   }
 
   public void addErrorTrace(String message, ExecutionTraceAction action) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(
+    ExecutionTrace newTrace =
+        new ExecutionTrace(
             this, ExecutionTraceStatus.ERROR, List.of(), message, action, null, null);
     this.getTraces().add(newTrace);
   }
 
   public void addInfoTrace(String message, ExecutionTraceAction action) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(
-            this, ExecutionTraceStatus.INFO, List.of(), message, action, null, null);
+    ExecutionTrace newTrace =
+        new ExecutionTrace(this, ExecutionTraceStatus.INFO, List.of(), message, action, null, null);
     this.getTraces().add(newTrace);
   }
 
   public void addWarningTrace(String message, ExecutionTraceAction action) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(
+    ExecutionTrace newTrace =
+        new ExecutionTrace(
             this, ExecutionTraceStatus.WARNING, List.of(), message, action, null, null);
     this.getTraces().add(newTrace);
   }

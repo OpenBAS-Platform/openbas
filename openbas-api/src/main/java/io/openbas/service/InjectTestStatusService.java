@@ -14,7 +14,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Injector;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
-import io.openbas.utils.InjectMapper;
+import io.openbas.utils.InjectStatusMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class InjectTestStatusService {
   private final InjectRepository injectRepository;
   private final ExecutionContextService executionContextService;
   private final InjectTestStatusRepository injectTestStatusRepository;
-  private final InjectMapper injectMapper;
+  private final InjectStatusMapper injectStatusMapper;
 
   @Autowired
   public void setContext(ApplicationContext context) {
@@ -61,7 +61,7 @@ public class InjectTestStatusService {
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
     InjectTestStatus injectStatus = testInject(inject, user);
-    return injectMapper.toInjectTestStatusOutput(injectStatus);
+    return injectStatusMapper.toInjectTestStatusOutput(injectStatus);
   }
 
   /**
@@ -83,7 +83,7 @@ public class InjectTestStatusService {
 
     List<InjectTestStatus> results = new ArrayList<>();
     searchResult.forEach(inject -> results.add(testInject(inject, user)));
-    return results.stream().map(injectMapper::toInjectTestStatusOutput).toList();
+    return results.stream().map(injectStatusMapper::toInjectTestStatusOutput).toList();
   }
 
   public Page<InjectTestStatusOutput> findAllInjectTestsByExerciseId(
@@ -95,7 +95,7 @@ public class InjectTestStatusService {
                     pageable),
             searchPaginationInput,
             InjectTestStatus.class)
-        .map(injectMapper::toInjectTestStatusOutput);
+        .map(injectStatusMapper::toInjectTestStatusOutput);
   }
 
   public Page<InjectTestStatusOutput> findAllInjectTestsByScenarioId(
@@ -107,11 +107,11 @@ public class InjectTestStatusService {
                     pageable),
             searchPaginationInput,
             InjectTestStatus.class)
-        .map(injectMapper::toInjectTestStatusOutput);
+        .map(injectStatusMapper::toInjectTestStatusOutput);
   }
 
   public InjectTestStatusOutput findInjectTestStatusById(String testId) {
-    return injectMapper.toInjectTestStatusOutput(
+    return injectStatusMapper.toInjectTestStatusOutput(
         injectTestStatusRepository.findById(testId).orElseThrow());
   }
 

@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.ExecutionTrace;
 import io.openbas.database.model.ExecutionTraceAction;
-import io.openbas.database.model.ExecutionTraces;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
@@ -357,11 +357,11 @@ public class LadeService {
             String eventLevel = workflowEvent.get("level").asText();
             String message = workflowEvent.get("message").asText();
             if (!message.isEmpty() && !message.equals("null")) {
-              ExecutionTraces trace;
+              ExecutionTrace trace;
               if (eventLevel.equals("error")) {
-                trace = ExecutionTraces.getNewErrorTrace(message, ExecutionTraceAction.COMPLETE);
+                trace = ExecutionTrace.getNewErrorTrace(message, ExecutionTraceAction.COMPLETE);
               } else {
-                trace = ExecutionTraces.getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE);
+                trace = ExecutionTrace.getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE);
               }
               ladeWorkflow.addTrace(trace);
             }

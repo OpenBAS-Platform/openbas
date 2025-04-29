@@ -57,27 +57,6 @@ export interface AgentOutput {
   agent_privilege?: "admin" | "standard";
 }
 
-/** Represents the output result details of an agent execution */
-export interface AgentStatusOutput {
-  agent_executor_name?: string;
-  agent_executor_type?: string;
-  agent_id: string;
-  agent_name?: string;
-  /**
-   * Execution status of the agent
-   * @example "SUCCESS, ERROR, MAYBE_PREVENTED..."
-   */
-  agent_status_name?: string;
-  /** List of agent execution traces */
-  agent_traces?: ExecutionTracesOutput[];
-  /** Endpoint ID */
-  asset_id: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
-
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -1030,7 +1009,7 @@ export interface Executable {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
-export interface ExecutionTraces {
+export interface ExecutionTrace {
   agent?: string;
   execution_action?:
     | "START"
@@ -1065,7 +1044,7 @@ export interface ExecutionTraces {
 }
 
 /** Represents a single execution trace detail */
-export interface ExecutionTracesOutput {
+export interface ExecutionTraceOutput {
   /**
    * The action that created this execution trace
    * @example "START, PREREQUISITE_CHECK, PREREQUISITE_EXECUTION, EXECUTION, CLEANUP_EXECUTION or COMPLETE"
@@ -1077,6 +1056,8 @@ export interface ExecutionTracesOutput {
     | "EXECUTION"
     | "CLEANUP_EXECUTION"
     | "COMPLETE";
+  /** List of primary agents */
+  execution_agent?: AgentOutput;
   /** A detailed message describing the execution */
   execution_message: string;
   /**
@@ -1882,7 +1863,7 @@ export interface InjectResultOutput {
   inject_id: string;
   /** Injector contract */
   inject_injector_contract?: InjectorContractSimple;
-  /** Status */
+  /** status */
   inject_status?: InjectStatusSimple;
   inject_targets?: TargetSimple[];
   /** Title of inject */
@@ -1913,7 +1894,7 @@ export interface InjectResultOverviewOutput {
   /** Indicates whether the inject is ready for use */
   inject_ready?: boolean;
   /** status */
-  inject_status?: InjectStatusOutput;
+  inject_status?: InjectStatusSimple;
   /**
    * Tags
    * @uniqueItems true
@@ -1958,7 +1939,17 @@ export interface InjectStatus {
     | "EXECUTING"
     | "PENDING";
   status_payload_output?: StatusPayload;
-  status_traces?: ExecutionTraces[];
+  status_traces?: ExecutionTrace[];
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+}
+
+export interface InjectStatusOutput {
+  status_id: string;
+  status_main_traces?: ExecutionTraceOutput[];
+  status_name?: string;
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -1966,21 +1957,11 @@ export interface InjectStatus {
 }
 
 /** status */
-export interface InjectStatusOutput {
-  status_id: string;
-  status_main_traces?: ExecutionTracesOutput[];
-  status_name?: string;
-  status_traces_by_agent?: AgentStatusOutput[];
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
-
-/** Status */
 export interface InjectStatusSimple {
   status_id: string;
   status_name?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
   /** @format date-time */
   tracking_sent_date?: string;
 }
@@ -2011,9 +1992,8 @@ export interface InjectTestStatusOutput {
   inject_title: string;
   inject_type?: string;
   status_id: string;
-  status_main_traces?: ExecutionTracesOutput[];
+  status_main_traces?: ExecutionTraceOutput[];
   status_name?: string;
-  status_traces_by_agent?: AgentStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */

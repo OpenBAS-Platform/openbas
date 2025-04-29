@@ -29,4 +29,7 @@ public class InjectStatusSimple {
 
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate;
+
+  @JsonProperty("tracking_end_date")
+  private Instant trackingEndDate;
 }

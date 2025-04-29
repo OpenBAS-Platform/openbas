@@ -1,6 +1,6 @@
 package io.openbas.injectors.email;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.injectors.email.EmailContract.EMAIL_GLOBAL;
 
 import io.openbas.config.OpenBASConfig;

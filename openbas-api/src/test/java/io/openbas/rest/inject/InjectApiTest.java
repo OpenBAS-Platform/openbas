@@ -8,6 +8,7 @@ import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
@@ -23,15 +24,16 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
+import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
-import io.openbas.utils.fixtures.composers.AgentComposer;
-import io.openbas.utils.fixtures.composers.EndpointComposer;
-import io.openbas.utils.fixtures.composers.InjectComposer;
-import io.openbas.utils.fixtures.composers.InjectStatusComposer;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
@@ -45,6 +47,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +61,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.util.ResourceUtils;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -83,6 +87,9 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ExecutionTraceComposer executionTraceComposer;
+  @Autowired private TeamComposer teamComposer;
+  @Autowired private UserComposer userComposer;
 
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
@@ -782,6 +789,7 @@ class InjectApiTest extends IntegrationTest {
     @Nested
     @DisplayName("Action Handling:")
     class ActionHandlingTest {
+
       @DisplayName("Should add trace when process is not finished")
       @Test
       void shouldAddTraceWhenProcessNotFinished() throws Exception {
@@ -838,7 +846,7 @@ class InjectApiTest extends IntegrationTest {
         assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
         assertEquals(2, injectStatusSaved.getTraces().size());
         // The status of the complete trace should be ERROR
-        List<ExecutionTraces> completeTraces =
+        List<ExecutionTrace> completeTraces =
             injectStatusSaved.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList();
@@ -914,7 +922,7 @@ class InjectApiTest extends IntegrationTest {
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
-        List<ExecutionTraces> completeTraces =
+        List<ExecutionTrace> completeTraces =
             injectStatusSaved.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList();
@@ -946,6 +954,228 @@ class InjectApiTest extends IntegrationTest {
         testAgentStatusFunction(
             "COMMAND_CANNOT_BE_EXECUTED", "MAYBE_PREVENTED", ExecutionTraceStatus.MAYBE_PREVENTED);
       }
+    }
+  }
+
+  @Nested
+  @WithMockAdminUser
+  @DisplayName("Fetch execution traces for inject/atomic overview")
+  class ShouldFetchExecutionTracesForInjectOverview {
+
+    private Inject buildInjectWithTraces(List<ExecutionTraceComposer.Composer> traces) {
+      return injectComposer
+          .forInject(InjectFixture.getDefaultInject())
+          .withInjectStatus(
+              injectStatusComposer
+                  .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
+                  .withExecutionTraces(traces))
+          .persist()
+          .get();
+    }
+
+    private String performGetRequest(
+        String baseUri, String injectId, String targetId, TargetType targetType) throws Exception {
+      MockHttpServletRequestBuilder requestBuilder =
+          get(baseUri).accept(MediaType.APPLICATION_JSON).param("injectId", injectId);
+
+      if (targetId != null) {
+        requestBuilder.param("targetId", targetId);
+        requestBuilder.param("targetType", targetType.name());
+      }
+
+      return mvc.perform(requestBuilder)
+          .andExpect(status().is2xxSuccessful())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+    }
+
+    private AgentComposer.Composer createAgentWithEndpoint() {
+      AgentComposer.Composer agent =
+          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).withAgent(agent).persist();
+      return agent;
+    }
+
+    private void assertExecutionTracesMatch(String response) {
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .inPath("[*].execution_message")
+          .isArray()
+          .contains("Info", "Success");
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .inPath("[*].execution_action")
+          .isArray()
+          .contains(ExecutionTraceAction.START, ExecutionTraceAction.COMPLETE);
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .inPath("[*].execution_status")
+          .isArray()
+          .contains(ExecutionTraceStatus.INFO, ExecutionTraceStatus.SUCCESS);
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for an asset")
+    void shouldFetchExecutionTracesByTargetAndInjectForAsset() throws Exception {
+      AgentComposer.Composer agent = createAgentWithEndpoint();
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer
+                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                      .withAgent(agent),
+                  executionTraceComposer
+                      .forExecutionTrace(
+                          ExecutionTraceFixture.createDefaultExecutionTraceComplete())
+                      .withAgent(agent)));
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              agent.get().getAsset().getId(),
+              TargetType.ASSETS);
+
+      assertExecutionTracesMatch(response);
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject")
+    void shouldFetchExecutionTracesByTargetAndInject() throws Exception {
+      AgentComposer.Composer agent = createAgentWithEndpoint();
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer
+                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                      .withAgent(agent),
+                  executionTraceComposer
+                      .forExecutionTrace(
+                          ExecutionTraceFixture.createDefaultExecutionTraceComplete())
+                      .withAgent(agent)));
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              agent.get().getId(),
+              TargetType.AGENT);
+
+      assertExecutionTracesMatch(response);
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for a team")
+    void shouldFetchExecutionTracesByTargetAndInjectForTeam() throws Exception {
+      UserComposer.Composer user =
+          userComposer.forUser(UserFixture.getUser("Bob", "TEST", "bob-test@fake.email"));
+      User savedPlayer = user.persist().get();
+      Team savedTeam =
+          teamComposer.forTeam(TeamFixture.getDefaultTeam()).withUser(user).persist().get();
+
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(
+                          List.of(savedPlayer.getId()))),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(
+                          List.of(savedPlayer.getId())))));
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedTeam.getId(),
+              TargetType.TEAMS);
+
+      assertExecutionTracesMatch(response);
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for a player")
+    void shouldFetchExecutionTracesByTargetAndInjectForPlayer() throws Exception {
+      UserComposer.Composer user =
+          userComposer.forUser(UserFixture.getUser("Alice", "TEST", "alice-test@fake.email"));
+      User savedPlayer = user.persist().get();
+
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(
+                          List.of(savedPlayer.getId()))),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(
+                          List.of(savedPlayer.getId())))));
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedPlayer.getId(),
+              TargetType.PLAYER);
+
+      assertExecutionTracesMatch(response);
+    }
+
+    @Test
+    @DisplayName("Fetch inject status with global traces by inject")
+    void shouldFetchInjectStatusWithGlobalTracesByInject() throws Exception {
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStart()),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceError())));
+
+      String response =
+          performGetRequest(INJECT_URI + "/status", inject.getId(), null, TargetType.AGENT);
+
+      List<ExecutionTraceOutput> expectedTraces =
+          List.of(
+              ExecutionTraceOutput.builder()
+                  .action(ExecutionTraceAction.START)
+                  .message("Info")
+                  .status(ExecutionTraceStatus.INFO)
+                  .build(),
+              ExecutionTraceOutput.builder()
+                  .action(ExecutionTraceAction.COMPLETE)
+                  .message("Error")
+                  .status(ExecutionTraceStatus.ERROR)
+                  .build());
+
+      InjectStatusOutput expected = InjectStatusOutput.builder().traces(expectedTraces).build();
+
+      assertThatJson(response)
+          .whenIgnoringPaths(
+              "status_id",
+              "status_name",
+              "tracking_sent_date",
+              "tracking_end_date",
+              "status_main_traces[*].execution_time")
+          .isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName("Should return 400 when target type is unsupported")
+    void shouldReturn400WhenTargetTypeIsUnsupported() throws Exception {
+      MockHttpServletRequestBuilder requestBuilder =
+          get(INJECT_URI + "/execution-traces")
+              .accept(MediaType.APPLICATION_JSON)
+              .param("injectId", "someInjectId")
+              .param("targetId", "someTargetId")
+              .param("targetType", TargetType.ASSETS_GROUPS.name());
+
+      mvc.perform(requestBuilder)
+          .andExpect(status().isBadRequest())
+          .andExpect(
+              result -> assertTrue(result.getResolvedException() instanceof BadRequestException));
     }
   }
 }

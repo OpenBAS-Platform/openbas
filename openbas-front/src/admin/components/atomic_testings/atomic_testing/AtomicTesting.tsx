@@ -1,4 +1,5 @@
-import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Divider, Grid, List, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -12,14 +13,12 @@ import Loader from '../../../../components/Loader';
 import SearchFilter from '../../../../components/SearchFilter';
 import { type InjectTarget, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
-import AtomicTestingInformation from './AtomicTestingInformation';
 import NewTargetListItem from './NewTargetListItem';
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()({
   chip: {
     fontSize: 12,
     height: 25,
@@ -28,7 +27,6 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 4,
     width: 180,
   },
-  gridContainer: { marginBottom: 20 },
   paper: {
     height: '100%',
     minHeight: '100%',
@@ -44,11 +42,12 @@ const useStyles = makeStyles()(() => ({
     left: '-10px',
   },
   tabs: { marginLeft: 'auto' },
-}));
+});
 
 const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
   const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult>();
   const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
@@ -182,7 +181,7 @@ const AtomicTesting = () => {
           selected={selectedTargetLegacy?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
         />
         {target?.children && target.children.length > 0 && (
-          <List disablePadding style={{ marginLeft: 15 }}>
+          <List disablePadding style={{ marginLeft: theme.spacing(2) }}>
             {target.children.map(child => (
               <Fragment key={child?.id}>
                 {renderTargetItem(child, target, parent)}
@@ -200,34 +199,9 @@ const AtomicTesting = () => {
   }
 
   return (
-    <GridLegacy
-      container
-      spacing={3}
-      classes={{ container: classes.gridContainer }}
-    >
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-          {t('Information')}
-        </Typography>
-        <AtomicTestingInformation injectResultOverviewOutput={injectResultOverviewOutput} />
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
-          {t('Results')}
-        </Typography>
-        <Paper
-          classes={{ root: classes.paper }}
-          variant="outlined"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
-        </Paper>
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ marginTop: 30 }}>
-        <Typography variant="h4" gutterBottom style={{ float: 'left' }} sx={{ mb: 1 }}>
+    <Grid container spacing={3} style={{ marginBottom: theme.spacing(3) }}>
+      <Grid size={6}>
+        <Typography variant="h4" gutterBottom style={{ float: 'left' }} sx={{ mb: theme.spacing(1) }}>
           {t('Targets')}
         </Typography>
         <div style={{
@@ -311,9 +285,9 @@ const AtomicTesting = () => {
             </>
           )}
         </Paper>
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ marginTop: 29 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
+      </Grid>
+      <Grid size={6}>
+        <Typography variant="h4" gutterBottom sx={{ mb: theme.spacing(1) }}>
           {t('Results by target')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
@@ -331,10 +305,9 @@ const AtomicTesting = () => {
             <Empty message={t('No target data available.')} />
           )}
         </Paper>
-      </GridLegacy>
-    </GridLegacy>
-  )
-  ;
+      </Grid>
+    </Grid>
+  );
 };
 
 export default AtomicTesting;

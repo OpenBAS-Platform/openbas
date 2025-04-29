@@ -1,8 +1,8 @@
 package io.openbas.injectors.caldera;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;

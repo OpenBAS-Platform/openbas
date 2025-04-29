@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hibernate.Hibernate;
 
 public class AgentUtils {
@@ -49,5 +50,11 @@ public class AgentUtils {
 
   public static boolean isPrimaryAgent(Agent agent) {
     return agent.getParent() == null && agent.getInject() == null;
+  }
+
+  public static List<Agent> getPrimaryAgents(Endpoint endpoint) {
+    return endpoint.getAgents().stream()
+        .filter(agent -> isPrimaryAgent(agent))
+        .collect(Collectors.toList());
   }
 }

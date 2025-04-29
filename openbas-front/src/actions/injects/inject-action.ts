@@ -92,3 +92,18 @@ export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', si
 export const searchInjectByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${INJECT_URI}/options`, ids);
 };
+
+// -- EXECUTION TRACES --
+
+export const getInjectTracesFromInjectAndTarget = (injectId: string = '', targetId: string = '', targetType: string = '') => {
+  const params = {
+    injectId,
+    targetId,
+    targetType,
+  };
+  return simpleCall(`${INJECT_URI}/execution-traces`, { params });
+};
+export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') => {
+  const params = { injectId };
+  return simpleCall(`${INJECT_URI}/status`, { params });
+};

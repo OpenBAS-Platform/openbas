@@ -1,25 +1,24 @@
 import { Card, CardContent, CardHeader, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent } from 'react';
 
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import InjectIcon from '../common/injects/InjectIcon';
-import InjectStatus from '../common/injects/status/InjectStatus';
+import GlobalExecutionTraces from '../common/injects/status/traces/GlobalExecutionTraces';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  test: InjectTestStatusOutput | undefined;
+  injectTestStatus: InjectTestStatusOutput | undefined;
 }
 
-const InjectTestDetail: FunctionComponent<Props> = ({
+const InjectTestDetail = ({
   open,
   handleClose,
-  test,
-}) => {
+  injectTestStatus,
+}: Props) => {
   const theme = useTheme();
   const { t } = useFormatter();
 
@@ -29,24 +28,23 @@ const InjectTestDetail: FunctionComponent<Props> = ({
       handleClose={handleClose}
       title={t('Test Details')}
     >
-
       <div>
-        <Card elevation={0} style={{ marginBottom: '20px' }}>
-          {test
+        <Card elevation={0} style={{ marginBottom: theme.spacing(3) }}>
+          {injectTestStatus
             ? (
                 <CardHeader
                   sx={{ backgroundColor: theme.palette.background.default }}
                   avatar={(
                     <InjectIcon
                       isPayload={false}
-                      type={test.inject_type}
+                      type={injectTestStatus.inject_type}
                       variant="list"
                     />
                   )}
 
                 />
               ) : (
-                <Paper variant="outlined" style={{ padding: '20px' }}>
+                <Paper variant="outlined" style={{ padding: theme.spacing(3) }}>
                   <Typography variant="body1">{t('No data available')}</Typography>
                 </Paper>
               )}
@@ -55,13 +53,12 @@ const InjectTestDetail: FunctionComponent<Props> = ({
             textAlign: 'center',
           }}
           >
-            {truncate(test?.inject_title, 80)}
+            {truncate(injectTestStatus?.inject_title, 80)}
           </CardContent>
         </Card>
-        <InjectStatus injectStatus={test} />
+        {injectTestStatus && <GlobalExecutionTraces injectStatus={injectTestStatus} />}
       </div>
     </Drawer>
-
   );
 };
 
