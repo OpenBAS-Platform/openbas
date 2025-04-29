@@ -823,7 +823,7 @@ public class InjectService {
         return injectStatusMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndPlayerId(injectId, targetId));
       default:
-        throw new UnsupportedOperationException("Target type " + targetType + " is not supported");
+        throw new BadRequestException("Target type " + targetType + " is not supported");
     }
   }
 

@@ -26,6 +26,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
@@ -970,14 +971,14 @@ class InjectApiTest extends IntegrationTest {
           .get();
     }
 
-    private String performGetRequest(String baseUri, String injectId, String targetId)
-        throws Exception {
+    private String performGetRequest(
+        String baseUri, String injectId, String targetId, TargetType targetType) throws Exception {
       MockHttpServletRequestBuilder requestBuilder =
           get(baseUri).accept(MediaType.APPLICATION_JSON).param("injectId", injectId);
 
       if (targetId != null) {
         requestBuilder.param("targetId", targetId);
-        requestBuilder.param("targetType", TargetType.AGENT.name());
+        requestBuilder.param("targetType", targetType.name());
       }
 
       return mvc.perform(requestBuilder)
@@ -985,6 +986,54 @@ class InjectApiTest extends IntegrationTest {
           .andReturn()
           .getResponse()
           .getContentAsString();
+    }
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for an asset")
+    void should_fetch_execution_traces_by_target_and_inject_for_an_asset() throws Exception {
+      AgentComposer.Composer agent =
+          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).withAgent(agent).persist();
+
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer
+                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                      .withAgent(agent),
+                  executionTraceComposer
+                      .forExecutionTrace(
+                          ExecutionTraceFixture.createDefaultExecutionTraceComplete())
+                      .withAgent(agent)));
+
+      Agent savedAgent = agent.get();
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedAgent.getAsset().getId(),
+              TargetType.ASSETS);
+
+      List<ExecutionTraceOutput> expected = new ArrayList<>();
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.START)
+              .message("Info")
+              .status(ExecutionTraceStatus.INFO)
+              .build());
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.COMPLETE)
+              .message("Success")
+              .status(ExecutionTraceStatus.SUCCESS)
+              .build());
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .when(Option.IGNORING_EXTRA_FIELDS)
+          .node("execution_action.execution_message.execution_status")
+          .isEqualTo(mapper.writeValueAsString(expected));
     }
 
     @Test
@@ -1008,7 +1057,11 @@ class InjectApiTest extends IntegrationTest {
 
       Agent savedAgent = agent.get();
       String response =
-          performGetRequest(INJECT_URI + "/execution-traces", inject.getId(), savedAgent.getId());
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedAgent.getId(),
+              TargetType.AGENT);
 
       List<ExecutionTraceOutput> expected = new ArrayList<>();
       expected.add(
@@ -1042,7 +1095,8 @@ class InjectApiTest extends IntegrationTest {
                   executionTraceComposer.forExecutionTrace(
                       ExecutionTraceFixture.createDefaultExecutionTraceError())));
 
-      String response = performGetRequest(INJECT_URI + "/status", inject.getId(), null);
+      String response =
+          performGetRequest(INJECT_URI + "/status", inject.getId(), null, TargetType.AGENT);
 
       List<ExecutionTraceOutput> expectedTraces = new ArrayList<>();
       expectedTraces.add(
@@ -1068,6 +1122,22 @@ class InjectApiTest extends IntegrationTest {
               "tracking_end_date",
               "status_main_traces[*].execution_time")
           .isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName("Should return 400 when target type is unsupported")
+    void shouldReturn500WhenTargetTypeIsUnsupported() throws Exception {
+      MockHttpServletRequestBuilder requestBuilder =
+          get(INJECT_URI + "/execution-traces")
+              .accept(MediaType.APPLICATION_JSON)
+              .param("injectId", "someInjectId")
+              .param("targetId", "someTargetId")
+              .param("targetType", TargetType.ASSETS_GROUPS.name());
+
+      mvc.perform(requestBuilder)
+          .andExpect(status().isBadRequest())
+          .andExpect(
+              result -> assertTrue(result.getResolvedException() instanceof BadRequestException));
     }
   }
 }
