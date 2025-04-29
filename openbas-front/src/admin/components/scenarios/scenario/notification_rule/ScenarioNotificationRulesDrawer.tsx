@@ -4,8 +4,7 @@ import { createNotificationRule, deleteNotificationRule, updateNotificationRule 
 import Drawer from '../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../components/i18n';
 import { type CreateNotificationRuleInput, type NotificationRuleOutput, type UpdateNotificationRuleInput } from '../../../../../utils/api-types';
-import CreationNotificationRuleForm from './CreationNotificationRuleForm';
-import EditionNotificationRuleForm from './EditionNotificationRuleForm';
+import NotificationRuleForm from './NotificationRuleForm';
 
 interface Props {
   open: boolean;
@@ -53,10 +52,17 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
     });
   };
 
-  const editionInitialValues = (({ notification_rule_subject }) => ({ subject: notification_rule_subject ?? '' }))(notificationRule);
+  const editionInitialValues = (({ notification_rule_subject }) => ({
+    resource_id: '',
+    resource_type: 'SCENARIO',
+    trigger: 'DIFFERENCE',
+    type: 'EMAIL',
+    subject: notification_rule_subject ?? '',
+  }))(notificationRule);
 
-  const onSubmitEdition = async (data: UpdateNotificationRuleInput) => {
-    await updateNotificationRule(notificationRule.notification_rule_id, data).then((result: { data: NotificationRuleOutput }) => {
+  const onSubmitEdition = async (data: CreateNotificationRuleInput) => {
+    const toUpdate: UpdateNotificationRuleInput = { subject: data.subject };
+    await updateNotificationRule(notificationRule.notification_rule_id, toUpdate).then((result: { data: NotificationRuleOutput }) => {
       if (result) {
         if (onUpdate) {
           onUpdate(result.data);
@@ -85,18 +91,22 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
       {
         editing
           ? (
-              <EditionNotificationRuleForm
+
+              <NotificationRuleForm
+                edition={editing}
                 onSubmit={onSubmitEdition}
-                editionInitialValues={editionInitialValues}
                 onDelete={onDeleteNotificationRule}
+                initialValues={editionInitialValues}
               />
 
             )
           : (
-              <CreationNotificationRuleForm
+              <NotificationRuleForm
+                edition={editing}
                 onSubmit={onSubmitCreation}
                 handleClose={() => setOpen(false)}
-                creationInitialValues={creationInitialValues}
+                onDelete={onDeleteNotificationRule}
+                initialValues={creationInitialValues}
               />
             )
       }
