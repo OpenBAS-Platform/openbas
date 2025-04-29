@@ -193,7 +193,7 @@ public class AssetGroupService {
     }
 
     return results.stream()
-        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .map(row -> new FilterUtilsJpa.Option((String) row[0], (String) row[1]))
         .toList();
   }
 }

@@ -115,8 +115,7 @@ public interface AssetGroupRepository
         FROM injects i
         JOIN findings f ON f.finding_inject_id = i.inject_id
         JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
-    )
-    AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
     LIMIT 50;
     """,
       nativeQuery = true)

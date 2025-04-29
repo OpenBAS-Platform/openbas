@@ -267,7 +267,7 @@ public interface InjectRepository
   @Query(
       value =
           """
-    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name, i.inject_created_at
     FROM injects i
     INNER JOIN findings f ON f.finding_inject_id = i.inject_id
     WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
@@ -280,7 +280,7 @@ public interface InjectRepository
   @Query(
       value =
           """
-    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name, i.inject_created_at
     FROM injects i
     INNER JOIN findings f ON f.finding_inject_id = i.inject_id
     LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
