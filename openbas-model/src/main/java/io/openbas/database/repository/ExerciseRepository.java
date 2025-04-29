@@ -337,14 +337,15 @@ public interface ExerciseRepository
         SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS name, e.exercise_created_at
         FROM injects i
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
-        INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
+        LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+        LEFT JOIN exercises e ON i.inject_exercise = e.exercise_id
         LEFT JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id
-        WHERE (e.exercise_id = :simulationOrScenarioId OR se.scenario_id = :simulationOrScenarioId)
+        WHERE (se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
         AND (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
         ORDER BY e.exercise_created_at DESC
         LIMIT 50
     """,
       nativeQuery = true)
   Set<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
-      @Param("simulationOrScenarioId") String simulationOrScenarioId, @Param("name") String name);
+      @Param("sourceId") String sourceId, @Param("name") String name);
 }

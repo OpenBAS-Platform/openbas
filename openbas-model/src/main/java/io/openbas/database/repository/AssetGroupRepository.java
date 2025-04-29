@@ -130,9 +130,10 @@ public interface AssetGroupRepository
         SELECT DISTINCT iag.asset_group_id
         FROM injects i
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
-        INNER JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
+        LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+        LEFT JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
         LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
-        WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId
+        WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId
     ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
     LIMIT 50
     """,

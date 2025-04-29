@@ -283,13 +283,14 @@ public interface InjectRepository
     SELECT DISTINCT i.inject_id AS id, i.inject_title AS name, i.inject_created_at
     FROM injects i
     INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
     LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
-    WHERE (i.inject_exercise = :simulationOrScenarioId OR se.scenario_id = :simulationOrScenarioId)
+    WHERE (i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
       AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
       ORDER BY i.inject_created_at DESC
     LIMIT 50
     """,
       nativeQuery = true)
   Set<Object[]> findAllByTitleLinkedToFindingsWithContext(
-      @Param("simulationOrScenarioId") String simulationOrScenarioId, @Param("title") String title);
+      @Param("sourceId") String sourceId, @Param("title") String title);
 }
