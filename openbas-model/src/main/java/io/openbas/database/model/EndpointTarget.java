@@ -1,17 +1,14 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
-import org.apache.commons.lang3.NotImplementedException;
-
 import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.lang3.NotImplementedException;
 
 public class EndpointTarget extends InjectTarget {
-  public EndpointTarget(
-      String id, String name, Set<String> tags, String subType) {
+  public EndpointTarget(String id, String name, Set<String> tags, String subType) {
     this.setId(id);
     this.setName(name);
     this.setTags(tags);
@@ -29,7 +26,8 @@ public class EndpointTarget extends InjectTarget {
     // containing asset groups since dynamic filters do not implement a relationship
     // between the Asset and AssetGroup entities.
     // This is currently only dealt with at the API Service level.
-    throw new NotImplementedException("NOT AVAILABLE; this property exists for exposing a filter only.");
+    throw new NotImplementedException(
+        "NOT AVAILABLE; this property exists for exposing a filter only.");
   }
 
   @Override

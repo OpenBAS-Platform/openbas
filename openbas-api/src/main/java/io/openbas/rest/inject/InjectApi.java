@@ -188,9 +188,9 @@ public class InjectApi extends RestBehavior {
   @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
   @PreAuthorize("isInjectObserver(#injectId)")
   public List<FilterUtilsJpa.Option> targetOptions(
-          @PathVariable String injectId,
-          @PathVariable String targetType,
-          @RequestParam(required = false) final String searchText) {
+      @PathVariable String injectId,
+      @PathVariable String targetType,
+      @RequestParam(required = false) final String searchText) {
     TargetType injectTargetTypeEnum;
 
     try {
@@ -207,8 +207,7 @@ public class InjectApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/targets/{targetType}/options")
   public List<FilterUtilsJpa.Option> targetOptionsById(
-
-          @PathVariable String targetType, @RequestBody final List<String> ids) {
+      @PathVariable String targetType, @RequestBody final List<String> ids) {
     TargetType injectTargetTypeEnum;
 
     try {

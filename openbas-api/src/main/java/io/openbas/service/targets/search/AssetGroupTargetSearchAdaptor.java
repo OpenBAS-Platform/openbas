@@ -11,8 +11,6 @@ import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
@@ -24,8 +22,9 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
   private final AssetGroupService assetGroupService;
 
   public AssetGroupTargetSearchAdaptor(
-          AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService,
-          InjectExpectationService injectExpectationService, AssetGroupService assetGroupService) {
+      AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService,
+      InjectExpectationService injectExpectationService,
+      AssetGroupService assetGroupService) {
     this.assetGroupCriteriaBuilderService = assetGroupCriteriaBuilderService;
     this.injectExpectationService = injectExpectationService;
 
@@ -50,12 +49,16 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
-    return scopedInject.getAssetGroups().stream().map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName())).toList();
+    return scopedInject.getAssetGroups().stream()
+        .map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName()))
+        .toList();
   }
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
-    return assetGroupService.assetGroups(ids).stream().map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName())).toList();
+    return assetGroupService.assetGroups(ids).stream()
+        .map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName()))
+        .toList();
   }
 
   private InjectTarget convertFromAssetGroupOutput(

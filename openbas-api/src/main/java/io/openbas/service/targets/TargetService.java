@@ -7,11 +7,10 @@ import io.openbas.service.targets.search.TeamTargetSearchAdaptor;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +29,8 @@ public class TargetService {
     };
   }
 
-  public List<FilterUtilsJpa.Option> getTargetOptions(TargetType targetType, Inject inject, String searchText) {
+  public List<FilterUtilsJpa.Option> getTargetOptions(
+      TargetType targetType, Inject inject, String searchText) {
     return switch (targetType) {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsForInject(inject);
       case ASSETS -> endpointTargetSearchAdaptor.getOptionsForInject(inject);
@@ -39,7 +39,8 @@ public class TargetService {
     };
   }
 
-  public List<FilterUtilsJpa.Option> getTargetOptionsByIds(TargetType targetType, List<String> ids) {
+  public List<FilterUtilsJpa.Option> getTargetOptionsByIds(
+      TargetType targetType, List<String> ids) {
     return switch (targetType) {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsByIds(ids);
       case ASSETS -> endpointTargetSearchAdaptor.getOptionsByIds(ids);
