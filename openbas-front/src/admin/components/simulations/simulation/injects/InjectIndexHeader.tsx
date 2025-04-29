@@ -47,7 +47,7 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 500px auto',
+      gridTemplateColumns: '1fr 350px',
       gap: theme.spacing(2),
       alignItems: 'start',
       marginBottom: theme.spacing(2),
@@ -58,7 +58,7 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
         <AtomicTestingTitle injectResultOverview={injectResultOverview} />
         <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
       </Box>
-      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
+      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
     </div>
   );
 };

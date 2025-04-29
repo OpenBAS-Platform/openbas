@@ -13,7 +13,6 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   disableChartAnimation?: boolean;
-  isReducedView?: boolean;
 }
 
 const getTotal = (distribution: ResultDistribution[]) => {
@@ -44,7 +43,6 @@ const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
   disableChartAnimation,
-  isReducedView,
 }) => {
   const { t } = useFormatter();
   const theme = useTheme();
@@ -78,68 +76,76 @@ const ResponsePie: FunctionComponent<Props> = ({
     const data = useMemo(() => (hasDistribution ? expectationResultsByType.distribution.map(e => e.value) : [1]), [expectationResultsByType]);
 
     return (
-      <Grid size={isReducedView ? 2 : 4}>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-        >
-          <Box sx={{
-            position: 'relative',
-            height: isReducedView ? 100 : 120,
-          }}
-          >
-            {renderIcon(type, hasDistribution)}
-            <Chart
-              options={
-                donutChartOptions({
-                  theme,
-                  labels,
-                  chartColors: colors,
-                  displayLegend: false,
-                  displayLabels: hasDistribution,
-                  displayValue: hasDistribution,
-                  displayTooltip: hasDistribution,
-                  isFakeData: !hasDistribution,
-                  disableAnimation: disableChartAnimation,
-                })
-              }
-              series={data}
-              type="donut"
-              height="100%"
-              width="100%"
-            />
-          </Box>
-          <span
-            style={{
-              ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
-              fontWeight: 300,
-              textAlign: 'center',
-            }}
-          >
-            {title}
-          </span>
-          {expectationResultsByType?.type === 'HUMAN_RESPONSE' && displayHumanValidationBtn && (
-            <Button
-              startIcon={<InfoOutlined />}
-              color="primary"
-              component={Link}
-              to={humanValidationLink}
-            >
-              {`${pending.length} ${t('validations needed')}`}
-            </Button>
-          )}
-        </Box>
-      </Grid>
+      <div style={{
+        width: '100%',
+        position: 'relative',
+      }}
+      >
+        {renderIcon(type, hasDistribution)}
+        <Chart
+          options={
+            donutChartOptions({
+              theme,
+              labels,
+              chartColors: colors,
+              displayLegend: false,
+              displayLabels: hasDistribution,
+              displayValue: hasDistribution,
+              displayTooltip: hasDistribution,
+              isFakeData: !hasDistribution,
+              disableAnimation: disableChartAnimation,
+            })
+          }
+          series={data}
+          type="donut"
+          width="100%"
+          height="auto"
+        />
+      </div>
     );
   }, [theme, displayHumanValidationBtn, humanValidationLink, pending]);
 
+  const pieTitle = (title: string, expectationResultsByType?: ExpectationResultsByType) => {
+    const hasDistribution = expectationResultsByType?.distribution && expectationResultsByType?.distribution.length > 0;
+    return (
+      <span
+        style={{
+          ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
+          fontWeight: 300,
+          textAlign: 'center',
+        }}
+      >
+        {title}
+      </span>
+    );
+  };
+
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{
+      display: 'grid',
+      width: '100%',
+      gridTemplateColumns: '33% 33% 33%',
+    }}
+    >
       <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
       <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
       <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
+
+      {pieTitle(t('TYPE_PREVENTION'), prevention)}
+      {pieTitle(t('TYPE_DETECTION'), detection)}
+      {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
+
+      { displayHumanValidationBtn && (
+        <Button
+          startIcon={<InfoOutlined />}
+          color="primary"
+          component={Link}
+          style={{ gridColumnStart: 3 }}
+          to={humanValidationLink}
+        >
+          {`${pending.length} ${t('validations needed')}`}
+        </Button>
+      )}
     </div>
   );
 };

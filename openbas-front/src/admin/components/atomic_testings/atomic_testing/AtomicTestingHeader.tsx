@@ -32,7 +32,7 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 500px auto',
+      gridTemplateColumns: '1fr 350px auto',
       gap: theme.spacing(2),
       alignItems: 'start',
       marginBottom: theme.spacing(2),
@@ -46,7 +46,7 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
         <AtomicTestingTitle injectResultOverview={injectResultOverview} />
         <AtomicTestingTabs injectResultOverview={injectResultOverview} />
       </Box>
-      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} isReducedView />
+      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
       <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
     </div>
   );

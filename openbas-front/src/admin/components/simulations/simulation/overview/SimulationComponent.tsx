@@ -74,7 +74,7 @@ const SimulationComponent = () => {
       <div style={{
         display: 'grid',
         gap: `0px ${theme.spacing(3)}`,
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: `calc((100% - ${theme.spacing(3)})/2) calc((100% - ${theme.spacing(3)})/2)`,
       }}
       >
         <Typography variant="h4">{t('Information')}</Typography>
