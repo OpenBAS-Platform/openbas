@@ -1,5 +1,5 @@
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, Button, Grid, type Theme } from '@mui/material';
+import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';

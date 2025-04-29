@@ -88,6 +88,8 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectStatusComposer injectStatusComposer;
   @Autowired private ExecutionTraceComposer executionTraceComposer;
+  @Autowired private TeamComposer teamComposer;
+  @Autowired private UserComposer userComposer;
 
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
@@ -1070,6 +1072,58 @@ class InjectApiTest extends IntegrationTest {
               inject.getId(),
               savedAgent.getId(),
               TargetType.AGENT);
+
+      List<ExecutionTraceOutput> expected = new ArrayList<>();
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.START)
+              .message("Info")
+              .status(ExecutionTraceStatus.INFO)
+              .build());
+      expected.add(
+          ExecutionTraceOutput.builder()
+              .action(ExecutionTraceAction.COMPLETE)
+              .message("Success")
+              .status(ExecutionTraceStatus.SUCCESS)
+              .build());
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .when(Option.IGNORING_EXTRA_FIELDS)
+          .whenIgnoringPaths(
+              "execution_time",
+              "execution_agent",
+              "execution_agent.agent_id",
+              "execution_agent.agent_privilege",
+              "execution_agent.agent_deployment_mode",
+              "execution_agent.agent_executed_by_user",
+              "execution_agent.agent_active",
+              "execution_agent.agent_last_seen")
+          .isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+
+    @Test
+    @DisplayName("Fetch execution traces by target and inject for a player")
+    void should_fetch_execution_traces_by_target_and_inject_for_a_player() throws Exception {
+      UserComposer.Composer user = userComposer.forUser(UserFixture.getUser());
+      User savedPlayer = user.persist().get();
+
+      Inject inject =
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer
+                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(List.of(savedPlayer.getId()))),
+                  executionTraceComposer
+                      .forExecutionTrace(
+                          ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(List.of(savedPlayer.getId())))));
+
+      String response =
+          performGetRequest(
+              INJECT_URI + "/execution-traces",
+              inject.getId(),
+              savedPlayer.getId(),
+              TargetType.PLAYER);
 
       List<ExecutionTraceOutput> expected = new ArrayList<>();
       expected.add(
