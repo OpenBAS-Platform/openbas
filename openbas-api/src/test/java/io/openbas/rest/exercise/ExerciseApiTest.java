@@ -226,7 +226,6 @@ public class ExerciseApiTest {
               .withInject(
                   injectComposer
                       .forInject(InjectFixture.getDefaultInject())
-                      .persist()
                       .withEndpoint(
                           endpointComposer
                               .forEndpoint(EndpointFixture.createEndpoint())

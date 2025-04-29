@@ -79,7 +79,7 @@ const SimulationComponent = () => {
       >
         <Typography variant="h4">{t('Information')}</Typography>
         <Typography variant="h4">{t('Results')}</Typography>
-        <SimulationMainInformation exercise={exercise} />
+       <SimulationMainInformation exercise={exercise} />
         <Paper
           variant="outlined"
           style={{

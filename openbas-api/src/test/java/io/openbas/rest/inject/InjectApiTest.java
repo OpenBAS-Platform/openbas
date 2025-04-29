@@ -962,7 +962,6 @@ class InjectApiTest extends IntegrationTest {
     private Inject buildInjectWithTraces(List<ExecutionTraceComposer.Composer> traces) {
       return injectComposer
           .forInject(InjectFixture.getDefaultInject())
-          .persist()
           .withInjectStatus(
               injectStatusComposer
                   .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
@@ -1028,15 +1027,7 @@ class InjectApiTest extends IntegrationTest {
       assertThatJson(response)
           .when(Option.IGNORING_ARRAY_ORDER)
           .when(Option.IGNORING_EXTRA_FIELDS)
-          .whenIgnoringPaths(
-              "execution_time",
-              "execution_agent",
-              "execution_agent.agent_id",
-              "execution_agent.agent_privilege",
-              "execution_agent.agent_deployment_mode",
-              "execution_agent.agent_executed_by_user",
-              "execution_agent.agent_active",
-              "execution_agent.agent_last_seen")
+          .node("execution_traces")
           .isEqualTo(mapper.writeValueAsString(expected));
     }
 
