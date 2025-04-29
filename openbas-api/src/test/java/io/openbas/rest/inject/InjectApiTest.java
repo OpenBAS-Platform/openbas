@@ -1106,7 +1106,7 @@ class InjectApiTest extends IntegrationTest {
     @DisplayName("Fetch execution traces by target and inject for a team")
     void should_fetch_execution_traces_by_target_and_inject_for_a_team() throws Exception {
       UserComposer.Composer user =
-          userComposer.forUser(UserFixture.getUser("Bob", "TEST", "bob-test@fake.email"));
+          userComposer.forUser(UserFixture.getUser("Bob", "TEST", "bob1-test@fake.email"));
       User savedPlayer = user.persist().get();
 
       TeamComposer.Composer team =
@@ -1114,24 +1114,14 @@ class InjectApiTest extends IntegrationTest {
       Team savedTeam = team.persist().get();
 
       Inject inject =
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withTeam(team)
-              .withInjectStatus(
-                  injectStatusComposer
-                      .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
-                      .withExecutionTraces(
-                          List.of(
-                              executionTraceComposer.forExecutionTrace(
-                                  ExecutionTraceFixture
-                                      .createDefaultExecutionTraceStartWithIdentifiers(
-                                          List.of(savedPlayer.getId()))),
-                              executionTraceComposer.forExecutionTrace(
-                                  ExecutionTraceFixture
-                                      .createDefaultExecutionTraceCompleteWithIdentifiers(
-                                          List.of(savedPlayer.getId()))))))
-              .persist()
-              .get();
+          buildInjectWithTraces(
+              List.of(
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceStartWithIdentifiers(
+                          List.of(savedPlayer.getId()))),
+                  executionTraceComposer.forExecutionTrace(
+                      ExecutionTraceFixture.createDefaultExecutionTraceCompleteWithIdentifiers(
+                          List.of(savedPlayer.getId())))));
 
       String response =
           performGetRequest(
