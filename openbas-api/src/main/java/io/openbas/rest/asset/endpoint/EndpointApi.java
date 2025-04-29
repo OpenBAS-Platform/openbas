@@ -164,6 +164,14 @@ public class EndpointApi extends RestBehavior {
         .toList();
   }
 
+  @LogExecutionTime
+  @GetMapping(ENDPOINT_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String sourceId) {
+    return endpointService.getOptionsByNameLinkedToFindings(searchText, sourceId);
+  }
+
   @PostMapping(ENDPOINT_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.endpointRepository.findAllById(ids)).stream()

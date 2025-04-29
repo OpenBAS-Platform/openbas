@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -66,4 +68,39 @@ public interface EndpointRepository
           + "   OR i.scenario.id = :simulationOrScenarioId)"
           + " ) AND (:name IS NULL OR lower(a.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
   List<Endpoint> findAllBySimulationOrScenarioIdAndName(String simulationOrScenarioId, String name);
+
+  @Query(
+      value =
+          """
+    SELECT DISTINCT a.asset_id AS id, a.asset_name AS name
+    FROM assets a
+    WHERE a.asset_id IN (
+        SELECT DISTINCT ia.asset_id
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN injects_assets ia ON ia.inject_id = i.inject_id
+    ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+    LIMIT 50;
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllByNameLinkedToFindings(@Param("name") String name);
+
+  @Query(
+      value =
+          """
+    SELECT DISTINCT a.asset_id AS id, a.asset_name AS name
+    FROM assets a
+    WHERE a.asset_id IN (
+        SELECT DISTINCT ia.asset_id
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN injects_assets ia ON ia.inject_id = i.inject_id
+        LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+        WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+    LIMIT 50
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name);
 }

@@ -21,6 +21,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +38,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -520,5 +522,26 @@ public class EndpointService {
       upgradeName = upgradeName.concat("-").concat(installationMode);
     }
     return getFileOrDownloadFromJfrog(platform, upgradeName, adminToken);
+  }
+
+  // -- OPTIONS --
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String sourceId) {
+    String trimmedSearchText = StringUtils.trimToNull(searchText);
+    String trimmedSourceId = StringUtils.trimToNull(sourceId);
+
+    Set<Object[]> results;
+
+    if (trimmedSourceId == null) {
+      results = endpointRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+    } else {
+      results =
+          endpointRepository.findAllByNameLinkedToFindingsWithContext(
+              trimmedSourceId, trimmedSearchText);
+    }
+
+    return results.stream()
+        .map(row -> new FilterUtilsJpa.Option((String) row[0], (String) row[1]))
+        .toList();
   }
 }

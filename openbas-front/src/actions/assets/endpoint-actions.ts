@@ -51,3 +51,11 @@ export const searchEndpointAsOption = (searchText: string = '', simulationOrScen
 export const searchEndpointByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${ENDPOINT_URI}/options`, ids);
 };
+
+export const searchEndpointLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
+  const params = {
+    searchText,
+    sourceId,
+  };
+  return simpleCall(`${ENDPOINT_URI}/findings/options`, { params });
+};
