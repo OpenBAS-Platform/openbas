@@ -178,20 +178,22 @@ public class AssetGroupService {
   }
 
   public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String simulationOrScenarioId) {
+      String searchText, String sourceId) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
-    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
+    String trimmedSourceId = StringUtils.trimToNull(sourceId);
 
-    Set<AssetGroup> results;
+    Set<Object[]> results;
 
-    if (trimmedSimulationOrScenarioId == null) {
+    if (trimmedSourceId == null) {
       results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText);
     } else {
       results =
           assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
-              trimmedSimulationOrScenarioId, trimmedSearchText);
+              trimmedSourceId, trimmedSearchText);
     }
 
-    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList();
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 }

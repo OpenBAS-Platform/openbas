@@ -265,16 +265,31 @@ public interface InjectRepository
       @Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
 
   @Query(
-      "SELECT i FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " WHERE (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
-  Set<Inject> findAllByTitleLinkedToFindings(String title);
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC
+    LIMIT 50
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllByTitleLinkedToFindings(@Param("title") String title);
 
   @Query(
-      "SELECT i FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
-          + " AND (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
-  Set<Inject> findAllByTitleLinkedToFindingsWithContext(
-      String simulationOrScenarioId, String title);
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS name
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+    WHERE (i.inject_exercise = :simulationOrScenarioId OR se.scenario_id = :simulationOrScenarioId)
+      AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC
+    LIMIT 50
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllByTitleLinkedToFindingsWithContext(
+      @Param("simulationOrScenarioId") String simulationOrScenarioId, @Param("title") String title);
 }

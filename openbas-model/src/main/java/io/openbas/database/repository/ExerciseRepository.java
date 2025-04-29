@@ -318,18 +318,33 @@ public interface ExerciseRepository
       @Param("scenarioId") String scenarioId);
 
   @Query(
-      "SELECT ex FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " JOIN i.exercise ex"
-          + " WHERE (:name IS NULL OR lower(ex.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
-  Set<Exercise> findAllByNameLinkedToFindings(String name);
+      value =
+          """
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS name
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
+        WHERE (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+        ORDER BY e.exercise_created_at DESC
+        LIMIT 50
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllOptionByNameLinkedToFindings(@Param("name") String name);
 
   @Query(
-      "SELECT ex FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " JOIN i.exercise ex"
-          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
-          + " AND (:name IS NULL OR lower(ex.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
-  Set<Exercise> findAllByNameLinkedToFindingsWithContext(
-      String simulationOrScenarioId, String name);
+      value =
+          """
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS name
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
+        LEFT JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id
+        WHERE (e.exercise_id = :simulationOrScenarioId OR se.scenario_id = :simulationOrScenarioId)
+        AND (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+        ORDER BY e.exercise_created_at DESC
+        LIMIT 50
+    """,
+      nativeQuery = true)
+  Set<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
+      @Param("simulationOrScenarioId") String simulationOrScenarioId, @Param("name") String name);
 }

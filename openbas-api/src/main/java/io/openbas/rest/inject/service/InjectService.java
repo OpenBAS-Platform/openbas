@@ -794,7 +794,7 @@ public class InjectService {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
 
-    Set<Inject> results;
+    Set<Object[]> results;
 
     if (trimmedSimulationOrScenarioId == null) {
       results = injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText);
@@ -804,7 +804,9 @@ public class InjectService {
               trimmedSimulationOrScenarioId, trimmedSearchText);
     }
 
-    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle())).toList();
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 
   public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(

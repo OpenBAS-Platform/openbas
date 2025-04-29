@@ -376,7 +376,7 @@ public class ExerciseApi extends RestBehavior {
   }
 
   // -- OPTION --
-
+  @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/findings/options")
   public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
@@ -384,6 +384,7 @@ public class ExerciseApi extends RestBehavior {
     return exerciseService.getOptionsByNameLinkedToFindings(searchText, scenarioId);
   }
 
+  @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.exerciseRepository.findAllById(ids)).stream()

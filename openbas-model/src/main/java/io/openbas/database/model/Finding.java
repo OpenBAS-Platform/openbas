@@ -152,7 +152,7 @@ public class Finding implements Base {
   }
 
   @JsonProperty("finding_asset_groups")
-  @Queryable(filterable = true, dynamicValues = true, path = "assets.assetGroups.id")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.assetGroups.id")
   public Set<AssetGroup> getAssetGroups() {
     return getAssets().stream()
         .flatMap(asset -> asset.getAssetGroups().stream())

@@ -13,7 +13,7 @@ const AtomicTestingFindings: FunctionComponent = () => {
   };
 
   return (
-    <FindingList filterLocalStorageKey="atm-findings" searchFindings={search} />
+    <FindingList filterLocalStorageKey="atm-findings" searchFindings={search} contextId={injectId} />
   );
 };
 
