@@ -126,6 +126,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     <div style={{
       display: 'grid',
       width: isReducedView ? '80%' : '100%',
+      padding: isReducedView ? theme.spacing(2) : 0,
       gridTemplateColumns: '33% 33% 33%',
     }}
     >
