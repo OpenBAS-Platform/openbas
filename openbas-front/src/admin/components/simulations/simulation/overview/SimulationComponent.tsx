@@ -91,7 +91,7 @@ const SimulationComponent = () => {
         >
           {!results
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/simulations/${exerciseId}/animation/validations`} />}
+            : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/simulations/${exerciseId}/animation/validations`} isReducedView />}
         </Paper>
       </div>
       {injectResults && resultAttackPatternIds.length > 0 && (

@@ -13,6 +13,7 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   disableChartAnimation?: boolean;
+  isReducedView?: boolean;
 }
 
 const getTotal = (distribution: ResultDistribution[]) => {
@@ -43,6 +44,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
   disableChartAnimation,
+  isReducedView = false,
 }) => {
   const { t } = useFormatter();
   const theme = useTheme();
@@ -123,7 +125,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   return (
     <div style={{
       display: 'grid',
-      width: '100%',
+      width: isReducedView ? '70%' : '100%',
       gridTemplateColumns: '33% 33% 33%',
     }}
     >
