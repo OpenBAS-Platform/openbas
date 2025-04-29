@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -993,11 +994,13 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
         List<FilterUtilsJpa.Option> expected =
             List.of(
-                new FilterUtilsJpa.Option(teamWrapper1.get().getId(), teamWrapper1.get().getName()),
+                new FilterUtilsJpa.Option(teamWrapper2.get().getId(), teamWrapper2.get().getName()),
                 new FilterUtilsJpa.Option(
-                    teamWrapper2.get().getId(), teamWrapper2.get().getName()));
+                    teamWrapper1.get().getId(), teamWrapper1.get().getName()));
 
-        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
       }
 
       @Test

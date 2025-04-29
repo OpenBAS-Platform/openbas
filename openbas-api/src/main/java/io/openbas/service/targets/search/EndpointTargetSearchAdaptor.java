@@ -129,12 +129,12 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
-    throw new NotImplementedException("not implemented yet");
+    throw new NotImplementedException("Implement when needed by the Agents paginated tab");
   }
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
-    return List.of();
+    throw new NotImplementedException("Implement when needed by the Agents paginated tab");
   }
 
   private Filters.Filter getAssetGroupFilter(SearchPaginationInput input) {
