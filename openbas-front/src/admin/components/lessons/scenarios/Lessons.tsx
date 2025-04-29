@@ -17,11 +17,6 @@ interface GenericSource {
   id: string;
   type: string;
   name: string;
-  communications_number: number;
-  start_date: string;
-  end_date: string;
-  users_number: number;
-  logs_number: number;
   lessons_anonymized: boolean;
   isReadOnly: boolean;
   isUpdatable: boolean;

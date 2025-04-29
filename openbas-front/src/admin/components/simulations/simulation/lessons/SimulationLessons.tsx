@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
@@ -12,6 +13,7 @@ import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/less
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
+import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type EvaluationInput, type Exercise, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type ObjectiveInput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
@@ -24,26 +26,26 @@ const SimulationLessons = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+  const { t } = useFormatter();
 
   const processToGenericSource = (exercise: Exercise) => {
     return {
       id: exercise.exercise_id,
       type: 'simulation',
       name: exercise.exercise_name,
-      score: exercise.exercise_score,
-      lessons_answers_number: exercise.exercise_lessons_answers_number,
-      communications_number: exercise.exercise_communications_number,
-      start_date: exercise.exercise_start_date,
-      end_date: exercise.exercise_end_date,
-      users_number: exercise.exercise_users_number,
-      logs_number: exercise.exercise_logs_number,
-      lessons_anonymized: exercise.exercise_lessons_anonymized,
+      score: exercise.exercise_score ?? 0,
+      lessons_answers_number: exercise.exercise_lessons_answers_number ?? 0,
+      communications_number: exercise.exercise_communications_number ?? 0,
+      start_date: exercise.exercise_start_date ?? t('Unknown'),
+      end_date: exercise.exercise_end_date ?? t('Unknown'),
+      users_number: exercise.exercise_users_number ?? 0,
+      logs_number: exercise.exercise_logs_number ?? 0,
+      lessons_anonymized: exercise.exercise_lessons_anonymized ?? false,
     };
   };
 
   const {
     exercise,
-    source,
     objectives,
     injects,
     teams,
@@ -57,7 +59,6 @@ const SimulationLessons = () => {
     const exerciseData = helper.getExercise(exerciseId);
     return {
       exercise: exerciseData,
-      source: processToGenericSource(exerciseData),
       objectives: helper.getExerciseObjectives(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
@@ -69,6 +70,12 @@ const SimulationLessons = () => {
       usersMap: helper.getUsersMap(),
     };
   });
+
+  const source = useMemo(
+    () => processToGenericSource(exercise),
+    [exercise],
+  );
+
   useDataLoader(() => {
     dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayersByExercise(exerciseId));
