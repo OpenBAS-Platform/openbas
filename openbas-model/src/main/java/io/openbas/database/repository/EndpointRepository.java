@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -97,7 +96,7 @@ public interface EndpointRepository
         INNER JOIN injects_assets ia ON ia.inject_id = i.inject_id
         LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
         WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId
-    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+    ) AND (:name IS NULL OR LOWER(ag.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
     LIMIT 50
     """,
       nativeQuery = true)
