@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
@@ -52,17 +53,12 @@ const ScenarioLessons = () => {
       id: scenario.scenario_id,
       type: 'scenario',
       name: scenario.scenario_name,
-      communications_number: scenario.scenario_communications_number,
-      start_date: scenario.scenario_recurrence_start,
-      end_date: scenario.scenario_recurrence_end,
-      users_number: scenario.scenario_users_number,
-      lessons_anonymized: scenario.scenario_lessons_anonymized,
+      lessons_anonymized: scenario.scenario_lessons_anonymized ?? false,
     };
   };
 
   const {
     scenario,
-    source,
     objectives,
     teams,
     teamsMap,
@@ -74,7 +70,6 @@ const ScenarioLessons = () => {
     const scenarioData = helper.getScenario(scenarioId);
     return {
       scenario: scenarioData,
-      source: processToGenericSource(helper.getScenario(scenarioId)),
       objectives: helper.getScenarioObjectives(scenarioId),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
@@ -93,6 +88,11 @@ const ScenarioLessons = () => {
     dispatch(fetchScenarioObjectives(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
   });
+
+  const source = useMemo(
+    () => processToGenericSource(scenario),
+    [scenario],
+  );
 
   const permissions = usePermissions(scenarioId, scenario);
 
