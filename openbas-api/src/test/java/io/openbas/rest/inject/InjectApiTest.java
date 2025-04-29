@@ -1032,7 +1032,15 @@ class InjectApiTest extends IntegrationTest {
       assertThatJson(response)
           .when(Option.IGNORING_ARRAY_ORDER)
           .when(Option.IGNORING_EXTRA_FIELDS)
-          .node("execution_action.execution_message.execution_status")
+          .whenIgnoringPaths(
+              "execution_time",
+              "execution_agent",
+              "execution_agent.agent_id",
+              "execution_agent.agent_privilege",
+              "execution_agent.agent_deployment_mode",
+              "execution_agent.agent_executed_by_user",
+              "execution_agent.agent_active",
+              "execution_agent.agent_last_seen")
           .isEqualTo(mapper.writeValueAsString(expected));
     }
 
@@ -1080,7 +1088,15 @@ class InjectApiTest extends IntegrationTest {
       assertThatJson(response)
           .when(Option.IGNORING_ARRAY_ORDER)
           .when(Option.IGNORING_EXTRA_FIELDS)
-          .node("execution_traces")
+          .whenIgnoringPaths(
+              "execution_time",
+              "execution_agent",
+              "execution_agent.agent_id",
+              "execution_agent.agent_privilege",
+              "execution_agent.agent_deployment_mode",
+              "execution_agent.agent_executed_by_user",
+              "execution_agent.agent_active",
+              "execution_agent.agent_last_seen")
           .isEqualTo(mapper.writeValueAsString(expected));
     }
 
