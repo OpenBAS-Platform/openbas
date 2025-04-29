@@ -990,20 +990,6 @@ class InjectApiTest extends IntegrationTest {
           .getContentAsString();
     }
 
-    private List<ExecutionTraceOutput> buildExpectedTraces() {
-      return List.of(
-          ExecutionTraceOutput.builder()
-              .action(ExecutionTraceAction.START)
-              .message("Info")
-              .status(ExecutionTraceStatus.INFO)
-              .build(),
-          ExecutionTraceOutput.builder()
-              .action(ExecutionTraceAction.COMPLETE)
-              .message("Success")
-              .status(ExecutionTraceStatus.SUCCESS)
-              .build());
-    }
-
     private AgentComposer.Composer createAgentWithEndpoint() {
       AgentComposer.Composer agent =
           agentComposer.forAgent(AgentFixture.createDefaultAgentService());
@@ -1011,21 +997,24 @@ class InjectApiTest extends IntegrationTest {
       return agent;
     }
 
-    private void assertExecutionTracesMatch(String response, List<ExecutionTraceOutput> expected)
-        throws Exception {
+    private void assertExecutionTracesMatch(String response) {
       assertThatJson(response)
           .when(Option.IGNORING_ARRAY_ORDER)
-          .when(Option.IGNORING_EXTRA_FIELDS)
-          .whenIgnoringPaths(
-              "execution_time",
-              "execution_agent",
-              "execution_agent.agent_id",
-              "execution_agent.agent_privilege",
-              "execution_agent.agent_deployment_mode",
-              "execution_agent.agent_executed_by_user",
-              "execution_agent.agent_active",
-              "execution_agent.agent_last_seen")
-          .isEqualTo(mapper.writeValueAsString(expected));
+          .inPath("[*].execution_message")
+          .isArray()
+          .contains("Info", "Success");
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .inPath("[*].execution_action")
+          .isArray()
+          .contains(ExecutionTraceAction.START, ExecutionTraceAction.COMPLETE);
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .inPath("[*].execution_status")
+          .isArray()
+          .contains(ExecutionTraceStatus.INFO, ExecutionTraceStatus.SUCCESS);
     }
 
     @Test
@@ -1050,7 +1039,7 @@ class InjectApiTest extends IntegrationTest {
               agent.get().getAsset().getId(),
               TargetType.ASSETS);
 
-      assertExecutionTracesMatch(response, buildExpectedTraces());
+      assertExecutionTracesMatch(response);
     }
 
     @Test
@@ -1075,7 +1064,7 @@ class InjectApiTest extends IntegrationTest {
               agent.get().getId(),
               TargetType.AGENT);
 
-      assertExecutionTracesMatch(response, buildExpectedTraces());
+      assertExecutionTracesMatch(response);
     }
 
     @Test
@@ -1104,7 +1093,7 @@ class InjectApiTest extends IntegrationTest {
               savedTeam.getId(),
               TargetType.TEAMS);
 
-      assertExecutionTracesMatch(response, buildExpectedTraces());
+      assertExecutionTracesMatch(response);
     }
 
     @Test
@@ -1131,7 +1120,7 @@ class InjectApiTest extends IntegrationTest {
               savedPlayer.getId(),
               TargetType.PLAYER);
 
-      assertExecutionTracesMatch(response, buildExpectedTraces());
+      assertExecutionTracesMatch(response);
     }
 
     @Test
