@@ -125,7 +125,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   return (
     <div style={{
       display: 'grid',
-      width: isReducedView ? '70%' : '100%',
+      width: isReducedView ? '80%' : '100%',
       gridTemplateColumns: '33% 33% 33%',
     }}
     >
@@ -142,7 +142,11 @@ const ResponsePie: FunctionComponent<Props> = ({
           startIcon={<InfoOutlined />}
           color="primary"
           component={Link}
-          style={{ gridColumnStart: 3 }}
+          style={{
+            gridColumnStart: 3,
+            textAlign: 'center',
+            fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
+          }}
           to={humanValidationLink}
         >
           {`${pending.length} ${t('validations needed')}`}
