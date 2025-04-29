@@ -44,6 +44,7 @@ import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
+import {boolean} from "zod";
 
 interface Steptarget {
   label: string;
@@ -117,7 +118,8 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 interface Props {
-  inject: InjectResultOverviewOutput;
+  // TODO: eventually make this an InjectTarget and assume `merged === true`
+  inject: InjectResultOverviewOutput & { merged: boolean};
   lastExecutionStartDate: string;
   lastExecutionEndDate: string;
   target: {

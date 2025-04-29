@@ -47,7 +47,7 @@ const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult>();
+  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult & { merged: boolean }>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
@@ -117,9 +117,12 @@ const AtomicTesting = () => {
     if (!injectResultOverviewOutput) return;
 
     setSelectedTargetLegacy(
-      selectedTargetLegacy
-      || currentParentTarget
-      || injectResultOverviewOutput?.inject_targets?.[0],
+        {
+          ...(selectedTargetLegacy
+              || currentParentTarget
+              || injectResultOverviewOutput?.inject_targets?.[0]),
+          merged: false
+        },
     );
 
     const searchPaginationInput1Result: SearchPaginationInput = {
@@ -168,21 +171,23 @@ const AtomicTesting = () => {
   // Handles
 
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTargetLegacy(target);
+    setSelectedTargetLegacy({...target, merged: false});
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
   };
 
   const handleNewTargetClick = (target: InjectTarget) => {
-    // TODO: handle the platform type for Endpoint targets
-
     setSelectedTargetLegacy({
       id: target.target_id,
       name: target.target_name,
       targetType: target.target_type,
       // @ts-expect-error target_subtype is always within the allowed values
       platformType: target.target_subtype,
+      merged: true,
     });
+
+    setCurrentParentTarget(undefined);
+    setUpperParentTarget(undefined);
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
@@ -324,7 +329,7 @@ const AtomicTesting = () => {
         <Paper classes={{ root: classes.paper }} variant="outlined">
           {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
-              inject={injectResultOverviewOutput}
+              inject={{...injectResultOverviewOutput, merged: false}}
               upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
               target={selectedTargetLegacy}
