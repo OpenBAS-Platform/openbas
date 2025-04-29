@@ -790,9 +790,9 @@ public class InjectService {
   }
 
   public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String simulationOrScenarioId) {
+      String searchText, String sourceId) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
-    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
+    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(sourceId);
 
     Set<Object[]> results;
 

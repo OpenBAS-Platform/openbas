@@ -355,8 +355,8 @@ public class InjectApi extends RestBehavior {
   @GetMapping(INJECT_URI + "/findings/options")
   public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return injectService.getOptionsByNameLinkedToFindings(searchText, simulationOrScenarioId);
+      @RequestParam(required = false) final String sourceId) {
+    return injectService.getOptionsByNameLinkedToFindings(searchText, sourceId);
   }
 
   @PostMapping(INJECT_URI + "/options")
