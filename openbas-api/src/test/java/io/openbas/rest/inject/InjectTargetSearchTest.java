@@ -3,6 +3,7 @@ package io.openbas.rest.inject;
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -60,6 +62,15 @@ public class InjectTargetSearchTest extends IntegrationTest {
             injectContractComposer
                 .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
                 .withPayload(payloadComposer.forPayload(PayloadFixture.createDefaultCommand())));
+  }
+
+  private AssetGroupComposer.Composer getAssetGroupWrapper(Filters.Filter dynamicFilter) {
+    AssetGroup dynamicAssetGroup = AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setFilters(List.of(dynamicFilter));
+    filterGroup.setMode(Filters.FilterMode.and);
+    dynamicAssetGroup.setDynamicFilter(filterGroup);
+    return assetGroupComposer.forAssetGroup(dynamicAssetGroup);
   }
 
   @Nested
@@ -121,6 +132,129 @@ public class InjectTargetSearchTest extends IntegrationTest {
   public class WithEndpointSearch {
     private final TargetType targetType = TargetType.ASSETS;
 
+    @Nested
+    @DisplayName("When getting options for inject targets")
+    public class WhenGettingOptionsForInjectTargets {
+      @Test
+      @Disabled("Not yet implemented")
+      @DisplayName("When endpoints are targets, options should return all possible targets")
+      public void whenEndpointsAreTargets_returnAllPossibleTargets() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+
+        EndpointComposer.Composer ep1Wrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+        Endpoint ep2 = EndpointFixture.createEndpoint();
+        ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+        EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+        // create a new endpoint that is not part of the above groups
+        Endpoint ep3 = EndpointFixture.createEndpoint();
+        ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+        endpointComposer.forEndpoint(ep3).persist();
+
+        injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(ep1Wrapper.get().getId(), ep1Wrapper.get().getName()),
+                new FilterUtilsJpa.Option(ep2Wrapper.get().getId(), ep2Wrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @Disabled("Not yet implemented")
+      @DisplayName(
+          "When endpoints are targets, options by id should return only options matching ids")
+      public void whenEndpointsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+
+        EndpointComposer.Composer ep1Wrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+        Endpoint ep2 = EndpointFixture.createEndpoint();
+        ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+        EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+        // create a new endpoint that is not part of the above groups
+        Endpoint ep3 = EndpointFixture.createEndpoint();
+        ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+        endpointComposer.forEndpoint(ep3).persist();
+
+        injectWrapper
+            .withAssetGroup(assetGroupWrapper)
+            .withAssetGroup(assetGroupWrapper2)
+            .persist();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<String> ids = List.of(ep1Wrapper.get().getId());
+
+        String response =
+            mvc.perform(
+                    post(INJECT_URI + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(ids)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(ep1Wrapper.get().getId(), ep1Wrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+    }
+
     @Test
     @DisplayName(
         "When endpoint is dynamic asset in group, they are targets of inject if group is a target")
@@ -129,34 +263,20 @@ public class InjectTargetSearchTest extends IntegrationTest {
       InjectComposer.Composer injectWrapper = getInjectWrapper();
 
       // dynamic group 1
-      AssetGroup dynamicAssetGroup =
-          AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
       Filters.Filter filter = new Filters.Filter();
       filter.setKey("endpoint_platform");
       filter.setMode(Filters.FilterMode.and);
       filter.setOperator(Filters.FilterOperator.eq);
       filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-      filterGroup.setFilters(List.of(filter));
-      filterGroup.setMode(Filters.FilterMode.and);
-      dynamicAssetGroup.setDynamicFilter(filterGroup);
-      AssetGroupComposer.Composer assetGroupWrapper =
-          assetGroupComposer.forAssetGroup(dynamicAssetGroup);
+      AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
 
       // 2
-      AssetGroup dynamicAssetGroup2 =
-          AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-      Filters.FilterGroup filterGroup2 = new Filters.FilterGroup();
       Filters.Filter filter2 = new Filters.Filter();
       filter2.setKey("endpoint_platform");
       filter2.setMode(Filters.FilterMode.and);
       filter2.setOperator(Filters.FilterOperator.eq);
       filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-      filterGroup2.setFilters(List.of(filter2));
-      filterGroup2.setMode(Filters.FilterMode.and);
-      dynamicAssetGroup2.setDynamicFilter(filterGroup2);
-      AssetGroupComposer.Composer assetGroupWrapper2 =
-          assetGroupComposer.forAssetGroup(dynamicAssetGroup2);
+      AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
 
       EndpointComposer.Composer ep1Wrapper =
           endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
@@ -536,6 +656,106 @@ public class InjectTargetSearchTest extends IntegrationTest {
           AssetGroupFixture.createDefaultAssetGroup(assetGroupName));
     }
 
+    @Nested
+    @DisplayName("When getting options for inject targets")
+    public class WhenGettingOptionsForInjectTargets {
+      @Test
+      @DisplayName("When asset groups are targets, options should return all possible targets")
+      public void whenEndpointsAreTargets_returnAllPossibleTargets() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+
+        injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(
+                    assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName()),
+                new FilterUtilsJpa.Option(
+                    assetGroupWrapper2.get().getId(), assetGroupWrapper2.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName(
+          "When asset groups are targets, options by id should return only options matching ids")
+      public void whenEndpointsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+
+        injectWrapper
+            .withAssetGroup(assetGroupWrapper)
+            .withAssetGroup(assetGroupWrapper2)
+            .persist();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<String> ids = List.of(assetGroupWrapper.get().getId());
+
+        String response =
+            mvc.perform(
+                    post(INJECT_URI + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(ids)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(
+                    assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+    }
+
     @Test
     @DisplayName("With no asset group targets, return no items in page")
     public void withNoAssetGroupTargets_returnNoItemsInPage() throws Exception {
@@ -743,6 +963,75 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
     private TeamComposer.Composer getTeamComposerWithName(String teamName) {
       return teamComposer.forTeam(TeamFixture.createTeamWithName(teamName));
+    }
+
+    @Nested
+    @DisplayName("When getting options for inject targets")
+    public class WhenGettingOptionsForInjectTargets {
+      @Test
+      @DisplayName("When teams are targets, options should return all possible targets")
+      public void whenTeamsAreTargets_returnAllPossibleTargets() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        TeamComposer.Composer teamWrapper1 = getTeamComposerWithName("test team");
+        TeamComposer.Composer teamWrapper2 = getTeamComposerWithName("other test team");
+
+        injectWrapper.withTeam(teamWrapper1).withTeam(teamWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(teamWrapper1.get().getId(), teamWrapper1.get().getName()),
+                new FilterUtilsJpa.Option(
+                    teamWrapper2.get().getId(), teamWrapper2.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName("When teams are targets, options by id should return only options matching ids")
+      public void whenTeamsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        TeamComposer.Composer teamWrapper1 = getTeamComposerWithName("test team");
+        TeamComposer.Composer teamWrapper2 = getTeamComposerWithName("other test team");
+
+        injectWrapper.withTeam(teamWrapper1).withTeam(teamWrapper2).persist();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<String> ids = List.of(teamWrapper1.get().getId());
+
+        String response =
+            mvc.perform(
+                    post(INJECT_URI + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(ids)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(
+                    teamWrapper1.get().getId(), teamWrapper1.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
     }
 
     @Test

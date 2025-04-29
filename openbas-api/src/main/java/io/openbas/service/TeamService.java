@@ -13,6 +13,8 @@ import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawTeam;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.team.output.TeamOutput;
@@ -40,6 +42,25 @@ public class TeamService {
   @PersistenceContext private EntityManager entityManager;
 
   private final UserRepository userRepository;
+  private final TeamRepository teamRepository;
+
+  public List<TeamOutput> getTeams(@NotNull List<String> teamIds) {
+    List<RawTeam> rawTeams = teamRepository.rawTeamByIds(teamIds);
+    return rawTeams.stream()
+        .map(
+            rt ->
+                TeamOutput.builder()
+                    .id(rt.getTeam_id())
+                    .name(rt.getTeam_name())
+                    .tags(rt.getTeam_tags())
+                    .users(rt.getTeam_users())
+                    .description(rt.getTeam_description())
+                    .organization(rt.getTeam_organization())
+                    .scenarios(rt.getTeam_scenarios())
+                    .exercises(rt.getTeam_exercises())
+                    .build())
+        .toList();
+  }
 
   public Team copyContextualTeam(Team teamToCopy) {
     Team newTeam = new Team();

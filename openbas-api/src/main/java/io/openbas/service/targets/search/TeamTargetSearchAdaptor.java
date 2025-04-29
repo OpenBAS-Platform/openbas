@@ -56,7 +56,9 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
-    return List.of();
+    return teamService.getTeams(ids).stream()
+        .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
+        .toList();
   }
 
   private InjectTarget convertFromTeamOutput(TeamOutput teamOutput, Inject inject) {
