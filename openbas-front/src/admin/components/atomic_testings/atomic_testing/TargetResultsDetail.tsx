@@ -16,7 +16,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
-import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
+import { HUMAN_EXPECTATION, isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 import InjectIcon from '../../common/injects/InjectIcon';
 import ExecutionStatusDetail from '../../common/injects/status/ExecutionStatusDetail';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
@@ -642,7 +642,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               <ItemResult label="Not Detected" status="Not Detected" />
                             )
                           }
-                          {injectExpectation.inject_expectation_status && injectExpectation.inject_expectation_results.length > 0 && (
+                          {injectExpectation.inject_expectation_status && HUMAN_EXPECTATION.includes(injectExpectation.inject_expectation_type) && (
                             <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
                           )}
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
