@@ -5,7 +5,7 @@ import { searchEndpointAsOption } from '../../../../actions/assets/endpoint-acti
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 import { searchExerciseLinkedToFindingsAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
-import {searchInjectLinkedToFindingsAsOption, searchTargetOptions} from '../../../../actions/injects/inject-action';
+import { searchInjectLinkedToFindingsAsOption, searchTargetOptions } from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';

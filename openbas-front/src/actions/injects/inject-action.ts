@@ -79,12 +79,12 @@ export const searchTargets = (injectId: string, targetType: string, searchPagina
   return simplePostCall(uri, data);
 };
 
-export const searchTargetOptions = (injectId: string, targetType: string)=> {
+export const searchTargetOptions = (injectId: string, targetType: string) => {
   const uri = `/api/injects/${injectId}/targets/${targetType}/options`;
   return simpleCall(uri);
 };
 
-export const searchTargetOptionsById = (targetType: string, ids: string[])=> {
+export const searchTargetOptionsById = (targetType: string, ids: string[]) => {
   const data = ids;
   const uri = `/api/injects/targets/${targetType}/options`;
   return simplePostCall(uri, data);

@@ -7,8 +7,7 @@ import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exerci
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import {
   searchInjectByIdAsOption,
-  searchTargetOptions,
-  searchTargetOptionsById
+  searchTargetOptionsById,
 } from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';

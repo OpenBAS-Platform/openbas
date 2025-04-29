@@ -221,7 +221,8 @@ const AtomicTesting = () => {
     return (
       <>
         {!isAllTargets && injectResultOverviewOutput && (
-          <PaginatedTargetTab key={activeTab}
+          <PaginatedTargetTab
+            key={activeTab}
             handleSelectTarget={handleNewTargetClick}
             entityPrefix={tab.entityPrefix}
             inject_id={injectResultOverviewOutput.inject_id}
