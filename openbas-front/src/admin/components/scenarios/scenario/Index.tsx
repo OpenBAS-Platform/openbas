@@ -1,25 +1,26 @@
-import { UpdateOutlined } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
+import { NotificationsOutlined, UpdateOutlined } from '@mui/icons-material';
+import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import cronstrue from 'cronstrue';
-import { type FunctionComponent, lazy, Suspense, useState } from 'react';
+import { type FunctionComponent, lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
-import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { findNotificationRuleByResource } from '../../../../actions/scenarios/scenario-notification-rules';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
-import { type Scenario } from '../../../../utils/api-types';
+import { type NotificationRuleOutput, type Scenario } from '../../../../utils/api-types';
 import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
+import ScenarioNotificationRulesDrawer from './notification_rule/ScenarioNotificationRulesDrawer';
 import injectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
 
@@ -33,20 +34,10 @@ const ScenarioFindings = lazy(() => import('./findings/ScenarioFindings'));
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-const useStyles = makeStyles()(() => ({
-  scheduling: {
-    display: 'flex',
-    margin: '-35px 8px 0 0',
-    float: 'right',
-    alignItems: 'center',
-  },
-}));
-
 const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ scenario }) => {
   const { t, ft, locale, fld } = useFormatter();
   const location = useLocation();
   const theme = useTheme();
-  const { classes } = useStyles();
   const permissionsContext: PermissionsContextType = { permissions: useScenarioPermissions(scenario.scenario_id) };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
@@ -96,6 +87,41 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
     }
     return sentence;
   };
+  const [openScenarioNotificationRuleDrawer, setOpenScenarioNotificationRuleDrawer] = useState(false);
+  const [editNotification, setEditNotification] = useState<boolean>(false);
+  const [notificationRule, setNotificationRule] = useState<NotificationRuleOutput>({
+    notification_rule_id: '',
+    notification_rule_resource_id: '',
+    notification_rule_resource_type: '',
+    notification_rule_subject: '',
+    notification_rule_trigger: '',
+  });
+
+  useEffect(() => {
+    findNotificationRuleByResource(scenario.scenario_id).then((result: { data: NotificationRuleOutput[] }) => {
+      if (result.data.length > 0) {
+        setEditNotification(true);
+        setNotificationRule(result.data[0]);
+      }
+    });
+  }, []);
+
+  const onCreateNotification = (result: NotificationRuleOutput) => {
+    setEditNotification(true);
+    setNotificationRule(result);
+  };
+
+  const onDeleteNotification = () => {
+    setEditNotification(false);
+    setNotificationRule({
+      notification_rule_id: '',
+      notification_rule_resource_id: '',
+      notification_rule_resource_type: '',
+      notification_rule_subject: '',
+      notification_rule_trigger: '',
+    });
+  };
+
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
@@ -130,8 +156,16 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               borderColor: 'divider',
               marginBottom: 2,
             }}
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
           >
-            <Tabs value={tabValue}>
+            <Tabs
+              style={{ flex: 1 }}
+              value={tabValue}
+              variant="scrollable"
+              scrollButtons="auto"
+            >
               <Tab
                 component={Link}
                 to={`/admin/scenarios/${scenario.scenario_id}`}
@@ -169,33 +203,74 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 label={t('Findings')}
               />
             </Tabs>
-            <div className={classes.scheduling}>
-              {!cronExpression && (
-                <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
-                  <UpdateOutlined color="primary" />
-                </IconButton>
-              )}
-              {cronExpression && !scenario.scenario_recurrence && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+            >
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              >
                 <IconButton
                   size="small"
-                  style={{
-                    cursor: 'default',
-                    marginRight: 5,
-                  }}
+                  style={{ marginRight: theme.spacing(1) }}
+                  onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
                 >
-                  <UpdateOutlined />
+                  <NotificationsOutlined color={editNotification ? 'success' : 'primary'} />
                 </IconButton>
-              )}
-              {cronExpression && scenario.scenario_recurrence && (
-                <Tooltip title={(t('Modify the scheduling'))}>
-                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: 5 }}>
+                <Typography
+                  variant="body1"
+                  style={{ marginRight: theme.spacing(1) }}
+                >
+                  {t('Notification rules')}
+                </Typography>
+                <ScenarioNotificationRulesDrawer
+                  open={openScenarioNotificationRuleDrawer}
+                  setOpen={setOpenScenarioNotificationRuleDrawer}
+                  editing={editNotification}
+                  onCreate={onCreateNotification}
+                  onUpdate={result => setNotificationRule(result)}
+                  onDelete={onDeleteNotification}
+                  notificationRule={notificationRule}
+                  scenarioId={scenario.scenario_id}
+                  scenarioName={scenario.scenario_name}
+                />
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              >
+                {!cronExpression && (
+                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
                     <UpdateOutlined color="primary" />
                   </IconButton>
-                </Tooltip>
-              )}
-              <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
-              {cronExpression && <span>{getHumanReadableScheduling()}</span>}
+                )}
+                {cronExpression && !scenario.scenario_recurrence && (
+                  <IconButton
+                    size="small"
+                    style={{
+                      cursor: 'default',
+                      marginRight: theme.spacing(1),
+                    }}
+                  >
+                    <UpdateOutlined />
+                  </IconButton>
+                )}
+                {cronExpression && scenario.scenario_recurrence && (
+                  <Tooltip title={(t('Modify the scheduling'))}>
+                    <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
+                      <UpdateOutlined color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
+                {cronExpression && <span>{getHumanReadableScheduling()}</span>}
+              </div>
             </div>
+
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>

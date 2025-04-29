@@ -81,14 +81,21 @@ export const simpleCall = (uri: string, config?: AxiosRequestConfig, defaultErro
   }
   throw error;
 });
-export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data, config)
-  .catch((error) => {
-    checkUnauthorized(error);
-    if (defaultNotifyErrorBehavior) {
-      notifyErrorHandler(error);
-    }
-    throw error;
-  });
+export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = false) =>
+  simpleApi.post(buildUri(uri), data, config)
+    .then((response) => {
+      if (defaultSuccessBehavior) {
+        notifySuccess('The element has been successfully created');
+      }
+      return response;
+    })
+    .catch((error) => {
+      checkUnauthorized(error);
+      if (defaultNotifyErrorBehavior) {
+        notifyErrorHandler(error);
+      }
+      throw error;
+    });
 export const simplePutCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) =>
   simpleApi.put(buildUri(uri), data, config)
     .then((response) => {

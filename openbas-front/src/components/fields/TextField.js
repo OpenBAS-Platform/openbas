@@ -12,16 +12,18 @@ const TextFieldBase = ({ askAi, control, setValue, ...props }) => {
     <MuiTextField
       {...props}
       value={currentValue ?? undefined}
-      InputProps={{
-        endAdornment: askAi && (
-          <TextFieldAskAI
-            variant="text"
-            currentValue={currentValue ?? ''}
-            setFieldValue={val => setValue(props.inputProps.name, val)}
-            format="text"
-            disabled={props.disabled}
-          />
-        ),
+      slotProps={{
+        input: {
+          endAdornment: askAi && (
+            <TextFieldAskAI
+              variant="text"
+              currentValue={currentValue ?? ''}
+              setFieldValue={val => setValue(props.inputProps.name, val)}
+              format="text"
+              disabled={props.disabled}
+            />
+          ),
+        },
       }}
     />
   );
