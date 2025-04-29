@@ -99,10 +99,15 @@ const AtomicTesting = () => {
   }, [hasAssetsGroup, hasTeams]);
 
   useEffect(() => {
-    setSelectedTargetLegacy(injectResultOverviewOutput?.inject_targets?.find(target =>
+    const selectedInject = injectResultOverviewOutput?.inject_targets?.find(target =>
       target.targetType === tabConfig.find(tab => tab.key === activeTab)?.type,
-    ) || injectResultOverviewOutput?.inject_targets?.[0]);
-  }, [tabConfig, activeTab]);
+    ) || injectResultOverviewOutput?.inject_targets?.[0];
+    setSelectedTargetLegacy(selectedInject);
+
+    if (targets && selectedInject) {
+      setSelectedTarget(targets.find(target => selectedInject.id === target.target_id));
+    }
+  }, [tabConfig, activeTab, injectResultOverviewOutput, targets]);
 
   const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: {
