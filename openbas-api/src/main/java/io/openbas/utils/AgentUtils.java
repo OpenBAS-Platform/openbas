@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import java.util.List;
+import org.hibernate.Hibernate;
 
 public class AgentUtils {
 
@@ -19,7 +20,7 @@ public class AgentUtils {
           Endpoint.PLATFORM_ARCH.arm64.name().toLowerCase());
 
   public static List<Agent> getActiveAgents(Asset asset, Inject inject) {
-    return ((Endpoint) asset)
+    return ((Endpoint) Hibernate.unproxy(asset))
         .getAgents().stream().filter(agent -> isValidAgent(inject, agent)).toList();
   }
 
