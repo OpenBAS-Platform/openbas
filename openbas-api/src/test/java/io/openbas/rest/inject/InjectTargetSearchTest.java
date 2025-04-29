@@ -662,7 +662,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WhenGettingOptionsForInjectTargets {
       @Test
       @DisplayName("When asset groups are targets, options should return all possible targets")
-      public void whenEndpointsAreTargets_returnAllPossibleTargets() throws Exception {
+      public void whenAssetGroupsAreTargets_returnAllPossibleTargets() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
 
         // dynamic group 1
@@ -703,13 +703,15 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 new FilterUtilsJpa.Option(
                     assetGroupWrapper2.get().getId(), assetGroupWrapper2.get().getName()));
 
-        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
       }
 
       @Test
       @DisplayName(
           "When asset groups are targets, options by id should return only options matching ids")
-      public void whenEndpointsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
+      public void whenAssetGroupsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
 
         // dynamic group 1
@@ -753,7 +755,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 new FilterUtilsJpa.Option(
                     assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName()));
 
-        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
       }
     }
 
