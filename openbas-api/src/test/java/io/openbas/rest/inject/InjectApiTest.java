@@ -1006,7 +1006,7 @@ class InjectApiTest extends IntegrationTest {
                           ExecutionTraceFixture.createDefaultExecutionTraceComplete())
                       .withAgent(agent)));
 
-      Agent savedAgent = inject.getStatus().get().getTraces().get(0).getAgent();
+      Agent savedAgent = agent.get();
       String response =
           performGetRequest(INJECT_URI + "/execution-traces", inject.getId(), savedAgent.getId());
 
