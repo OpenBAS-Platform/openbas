@@ -56,8 +56,8 @@ public class InjectStatusService {
     InjectStatus injectStatus =
         injectStatusRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
-    ExecutionTraces trace =
-        new ExecutionTraces(
+    ExecutionTrace trace =
+        new ExecutionTrace(
             injectStatus,
             ExecutionTraceStatus.INFO,
             null,
@@ -97,17 +97,17 @@ public class InjectStatusService {
     injectStatus.getInject().setUpdatedAt(Instant.now());
   }
 
-  public ExecutionTraces createExecutionTrace(
+  public ExecutionTrace createExecutionTrace(
       InjectStatus injectStatus, InjectExecutionInput input, Agent agent) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
-    return new ExecutionTraces(
+    return new ExecutionTrace(
         injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
   }
 
   private void computeExecutionTraceStatusIfNeeded(
-      InjectStatus injectStatus, ExecutionTraces executionTraces, Agent agent) {
-    if (agent != null && executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)) {
+      InjectStatus injectStatus, ExecutionTrace executionTrace, Agent agent) {
+    if (agent != null && executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)) {
       ExecutionTraceStatus traceStatus =
           convertExecutionStatus(
               computeStatus(
@@ -115,19 +115,19 @@ public class InjectStatusService {
                       .filter(t -> t.getAgent() != null)
                       .filter(t -> t.getAgent().getId().equals(agent.getId()))
                       .toList()));
-      executionTraces.setStatus(traceStatus);
+      executionTrace.setStatus(traceStatus);
     }
   }
 
   public void updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
 
-    ExecutionTraces executionTraces = createExecutionTrace(injectStatus, input, agent);
-    computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agent);
-    injectStatus.addTrace(executionTraces);
+    ExecutionTrace executionTrace = createExecutionTrace(injectStatus, input, agent);
+    computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
+    injectStatus.addTrace(executionTrace);
 
     synchronized (inject.getId()) {
-      if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
+      if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agent == null || isAllInjectAgentsExecuted(inject))) {
         updateFinalInjectStatus(injectStatus);
       }
@@ -166,8 +166,8 @@ public class InjectStatusService {
             .getStatus()
             .ifPresent(
                 status -> {
-                  ExecutionTraces trace =
-                      new ExecutionTraces(
+                  ExecutionTrace trace =
+                      new ExecutionTrace(
                           status,
                           ExecutionTraceStatus.ERROR,
                           null,
@@ -182,11 +182,11 @@ public class InjectStatusService {
     }
   }
 
-  public ExecutionStatus computeStatus(List<ExecutionTraces> traces) {
+  public ExecutionStatus computeStatus(List<ExecutionTrace> traces) {
     ExecutionStatus executionStatus;
     int successCount = 0, errorCount = 0, partialCount = 0, maybePreventedCount = 0;
 
-    for (ExecutionTraces trace : traces) {
+    for (ExecutionTrace trace : traces) {
       switch (trace.getStatus()) {
         case SUCCESS, WARNING -> successCount++;
         case PARTIAL -> partialCount++;
@@ -219,7 +219,7 @@ public class InjectStatusService {
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
     if (!execution.getTraces().isEmpty()) {
-      List<ExecutionTraces> traces =
+      List<ExecutionTrace> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
       injectStatus.getTraces().addAll(traces);
     }

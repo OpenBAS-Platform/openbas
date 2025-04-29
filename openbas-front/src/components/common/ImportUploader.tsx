@@ -22,10 +22,7 @@ const ImportUploader: FunctionComponent<Props> = ({
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [upload, setUpload] = useState(false);
   const handleOpenUpload = () => uploadRef.current && uploadRef.current.click();
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const onUpload = async (file: File) => {
     setUpload(true);

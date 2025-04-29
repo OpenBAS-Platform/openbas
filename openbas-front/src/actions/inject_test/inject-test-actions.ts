@@ -2,12 +2,12 @@ import { simpleCall, simpleDelCall, simplePostCall } from '../../utils/Action';
 import { type SearchPaginationInput } from '../../utils/api-types';
 
 export const searchExerciseInjectTests = (exerciseId: string, searchPaginationInput: SearchPaginationInput) => {
-  const uri = `/api/exercise/${exerciseId}/injects/test`;
+  const uri = `/api/exercises/${exerciseId}/injects/test`;
   return simplePostCall(uri, searchPaginationInput);
 };
 
 export const searchScenarioInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
-  const uri = `/api/scenario/${scenarioId}/injects/test`;
+  const uri = `/api/scenarios/${scenarioId}/injects/test`;
   return simplePostCall(uri, searchPaginationInput);
 };
 

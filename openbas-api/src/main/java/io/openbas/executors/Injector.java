@@ -1,6 +1,6 @@
 package io.openbas.executors;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

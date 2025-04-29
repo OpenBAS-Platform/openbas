@@ -56,7 +56,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
     userAdmin: boolean;
   } = useHelper((helper: TagHelper & UserHelper) => ({
     tags: helper.getTags().filter(tag => !forbiddenOptions.includes(tag.tag_name)),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   const dispatch = useAppDispatch();
 

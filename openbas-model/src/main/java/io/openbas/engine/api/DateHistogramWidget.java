@@ -22,7 +22,7 @@ public class DateHistogramWidget extends HistogramWidget {
   @Data
   public static class DateHistogramSeries {
     private String name;
-    private Filters.FilterGroup filter;
+    private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
 
   public DateHistogramWidget() {

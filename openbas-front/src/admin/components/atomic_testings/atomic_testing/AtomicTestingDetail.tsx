@@ -1,81 +1,40 @@
-import { type FunctionComponent, useContext, useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import { type FunctionComponent, useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 
-import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
-import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { getInjectStatusWithGlobalExecutionTraces } from '../../../../actions/injects/inject-action';
+import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
-import InjectStatus from '../../common/injects/status/InjectStatus';
-import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import { type InjectResultOverviewOutput, type InjectStatusOutput } from '../../../../utils/api-types';
+import GlobalExecutionTraces from '../../common/injects/status/traces/GlobalExecutionTraces';
 
 const AtomicTestingDetail: FunctionComponent = () => {
-  // Fetching data
-  const [loading, setLoading] = useState(true);
-  const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
+  const { t } = useFormatter();
+  const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
 
-  const [endpointsMap, setEndpointsMap] = useState<Map<string, EndpointOutput>>(new Map());
-
-  const extractEndpointsFromInjectResult = (injectResult: InjectResultOverviewOutput): Map<string, EndpointOutput> => {
-    const map = new Map<string, EndpointOutput>();
-    injectResult?.inject_targets.forEach((result) => {
-      if (result.targetType === 'ASSETS_GROUPS' && result.children) {
-        result.children.forEach(({ id, name, platformType }) => {
-          map.set(id, {
-            asset_id: id,
-            asset_name: name,
-            endpoint_platform: platformType,
-          } as EndpointOutput);
-        });
-      }
-      if (result.targetType === 'ASSETS') {
-        map.set(result.id, {
-          asset_id: result.id,
-          asset_name: result.name,
-          endpoint_platform: result.platformType,
-        } as EndpointOutput);
-      }
-    });
-    return map;
-  };
-
-  const findMissingEndpointIds = (injectResult: InjectResultOverviewOutput, existingMap: Map<string, EndpointOutput>): string[] => {
-    return injectResult.inject_status?.status_traces_by_agent
-      ?.filter(traceByAgent => !existingMap.has(traceByAgent.asset_id))
-      .map(traceByAgent => traceByAgent.asset_id) || [];
-  };
+  const [injectStatus, setInjectStatus] = useState<InjectStatusOutput | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!injectResultOverviewOutput) return;
-    const newEndpointsMap = extractEndpointsFromInjectResult(injectResultOverviewOutput);
-    const missingEndpointIds = findMissingEndpointIds(injectResultOverviewOutput, newEndpointsMap);
-    if (missingEndpointIds.length > 0) {
-      searchEndpoints(buildSearchPagination({
-        filterGroup: {
-          mode: 'and',
-          filters: [
-            buildFilter('asset_id', missingEndpointIds, 'eq'),
-          ],
-        },
-      })).then(({ data }) => {
-        data?.content.forEach((endpoint: EndpointOutput) => newEndpointsMap.set(endpoint.asset_id, endpoint));
-        setEndpointsMap(newEndpointsMap);
-        setLoading(false);
-      });
-    } else {
-      setEndpointsMap(newEndpointsMap);
-      setLoading(false);
+    if (injectId) {
+      setLoading(true);
+      getInjectStatusWithGlobalExecutionTraces(injectId)
+        .then(res => setInjectStatus(res.data))
+        .finally(() => {
+          setLoading(false);
+        });
     }
-  }, [injectResultOverviewOutput]);
+  }, [injectId]);
 
   if (loading) {
     return <Loader />;
   }
-  return (
-    <InjectStatus
-      injectStatus={injectResultOverviewOutput?.inject_status ?? null}
-      endpointsMap={endpointsMap}
-    />
-  );
+
+  if (!injectStatus) {
+    return <Typography variant="body1">{t('No data available')}</Typography>;
+  }
+
+  return <GlobalExecutionTraces injectStatus={injectStatus} />;
 };
 
 export default AtomicTestingDetail;

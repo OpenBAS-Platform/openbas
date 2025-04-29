@@ -1,23 +1,5 @@
 import { AddModeratorOutlined, MoreVertOutlined, PersonAddOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  GridLegacy,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  Tab, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow,
-  Tabs,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
 import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
@@ -36,6 +18,7 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 import InjectIcon from '../../common/injects/InjectIcon';
+import ExecutionStatusDetail from '../../common/injects/status/ExecutionStatusDetail';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
@@ -540,6 +523,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     setSelectedExpectationForResults(null);
   };
 
+  const canShowExecutionTab = target.targetType !== 'ASSETS_GROUPS';
+
   return (
     <>
       <div className={classes.target}>
@@ -592,25 +577,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           proOptions={proOptions}
         />
       </div>
-      {Object.keys(sortedGroupedResults).length > 0 && (
-        <Box sx={{
+      <Box
+        sx={{
           borderBottom: 1,
           borderColor: 'divider',
         }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          className={classes.tabs}
         >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            className={classes.tabs}
-          >
-            {Object.keys(sortedGroupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).length > 0
+            && Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-          </Tabs>
-        </Box>
-      )}
+          {canShowExecutionTab && <Tab label={t('Execution')} />}
+        </Tabs>
+      </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
         <div key={targetResultIndex} hidden={activeTab !== targetResultIndex}>
           {sortedGroupedResults[targetResult]
@@ -675,7 +661,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                 )
                               }
                             </GridLegacy>
-
                           )}
                       {
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
@@ -717,7 +702,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           );
                         })
                       }
-
                       {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
                         || (injectExpectation.inject_expectation_type === 'MANUAL'
                           && injectExpectation.inject_expectation_results
@@ -748,7 +732,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
                           </GridLegacy>
                         )}
-
                     </GridLegacy>
                     <div className={classes.flexContainer}>
                       <div>
@@ -972,6 +955,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
+      {(initialized && activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab) && (
+        <div style={{ paddingTop: theme.spacing(3) }}>
+          <ExecutionStatusDetail target={target} injectId={inject.inject_id} />
+        </div>
+      )}
     </>
   );
 };

@@ -42,6 +42,7 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 4,
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   paperList: {
     height: 320,
@@ -195,7 +196,7 @@ const Dashboard = () => {
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
+            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} isReducedView />}
         </Paper>
       </GridLegacy>
       <GridLegacy item={true} xs={6}>

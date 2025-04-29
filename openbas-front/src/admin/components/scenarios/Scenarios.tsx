@@ -55,7 +55,7 @@ const Scenarios = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = useMemo(() => [

@@ -54,6 +54,7 @@ public class V1_DataImporter implements Importer {
   private final ActionMetricCollector actionMetricCollector;
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
+  private final AttackPatternRepository attackPatternRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioService scenarioService;
   private final TeamRepository teamRepository;
@@ -190,6 +191,47 @@ public class V1_DataImporter implements Importer {
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
     return tag;
+  }
+
+  // -- ATTACK PATTERN --
+  private List<String> importAttackPattern(
+      JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    ArrayList<String> attackPatternIds = new ArrayList<>();
+    resolveJsonElements(importNode, prefix + "attack_patterns")
+        .forEach(
+            nodeAttackPattern -> {
+              JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
+              if (idNode == null) return;
+              String id = idNode.textValue();
+
+              if (baseIds.get(id) != null) {
+                // Already import
+                return;
+              }
+              String name = nodeAttackPattern.get("attack_pattern_external_id").textValue();
+
+              List<AttackPattern> existingAttackPattern =
+                  this.attackPatternRepository.findAllByExternalIdInIgnoreCase(List.of(name));
+              if (!existingAttackPattern.isEmpty()) {
+                baseIds.put(id, existingAttackPattern.getFirst());
+                attackPatternIds.add(id);
+              } else {
+                AttackPattern attackPatternCreated =
+                    this.attackPatternRepository.save(createAttackPattern(nodeAttackPattern));
+                baseIds.put(id, attackPatternCreated);
+                attackPatternIds.add(attackPatternCreated.getId());
+              }
+            });
+    return attackPatternIds;
+  }
+
+  private AttackPattern createAttackPattern(JsonNode jsonNode) {
+    AttackPattern attackPattern = new AttackPattern();
+    attackPattern.setStixId("attack-pattern--" + UUID.randomUUID());
+    attackPattern.setName(jsonNode.get("attack_pattern_name").textValue());
+    attackPattern.setDescription(jsonNode.get("attack_pattern_description").textValue());
+    attackPattern.setExternalId(jsonNode.get("attack_pattern_external_id").textValue());
+    return attackPattern;
   }
 
   // -- EXERCISE --
@@ -1042,6 +1084,8 @@ public class V1_DataImporter implements Importer {
     }
 
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
+    List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
+    payloadCreateInput.setAttackPatternsIds(attackPatternIds);
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
     payload.setTags(
         resolveJsonIds(payloadNode, "payload_tags").stream()

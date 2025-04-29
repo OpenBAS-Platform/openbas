@@ -1,8 +1,14 @@
+import { Tooltip } from '@mui/material';
+
 import { searchFindings } from '../../../actions/findings/finding-actions';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 import type { FindingOutput } from '../../../utils/api-types';
 import FindingList from './FindingList';
 
 const Findings = () => {
+  const { t } = useFormatter();
+
   const additionalFilterNames = [
     'finding_inject_id',
     'finding_scenario',
@@ -26,16 +32,25 @@ const Findings = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_inject?.inject_title,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
     },
   ];
   return (
-    <FindingList
-      searchFindings={searchFindings}
-      additionalHeaders={additionalHeaders}
-      additionalFilterNames={additionalFilterNames}
-      filterLocalStorageKey="findings"
-    />
+    <>
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Findings'),
+          current: true,
+        }]}
+      />
+      <FindingList
+        searchFindings={searchFindings}
+        additionalHeaders={additionalHeaders}
+        additionalFilterNames={additionalFilterNames}
+        filterLocalStorageKey="findings"
+      />
+    </>
   );
 };
 

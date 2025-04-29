@@ -25,7 +25,7 @@ const EndpointHeader = () => {
 
   // Fetching data
   const { userAdmin, endpoint } = useHelper((helper: EndpointHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
     endpoint: helper.getEndpoint(endpointId),
   }));
 

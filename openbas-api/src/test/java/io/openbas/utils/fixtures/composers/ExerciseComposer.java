@@ -140,6 +140,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
 
     @Override
     public Composer persist() {
+      exerciseRepository.save(exercise);
       this.articleComposers.forEach(ArticleComposer.Composer::persist);
       this.categoryComposers.forEach(LessonsCategoryComposer.Composer::persist);
       this.teamComposers.forEach(TeamComposer.Composer::persist);
@@ -149,7 +150,6 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.documentComposers.forEach(DocumentComposer.Composer::persist);
       this.variableComposers.forEach(VariableComposer.Composer::persist);
       this.pauseComposers.forEach(PauseComposer.Composer::persist);
-      exerciseRepository.save(exercise);
       exerciseService.createExercise(exercise);
       return this;
     }

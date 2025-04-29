@@ -137,9 +137,9 @@ class OldAttackPatternField extends Component {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    killChainPhasesMap: helper.getKillChainPhasesMap(),
-    attackPatterns: helper.getAttackPatterns(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    killChainPhasesMap: helper.getKillChainPhasesMap().toJS(),
+    attackPatterns: helper.getAttackPatterns().toJS(),
+    userAdmin: helper.getMeAdmin(),
   };
 };
 

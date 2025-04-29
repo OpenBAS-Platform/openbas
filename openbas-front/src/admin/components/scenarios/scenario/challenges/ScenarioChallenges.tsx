@@ -14,7 +14,7 @@ const ScenarioChallenges = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
-  const challenges = useHelper((helper: ChallengeHelper) => helper.getScenarioChallenges(scenarioId));
+  const { challenges } = useHelper((helper: ChallengeHelper) => ({ challenges: helper.getScenarioChallenges(scenarioId) }));
   useDataLoader(() => {
     dispatch(fetchScenarioChallenges(scenarioId));
   });

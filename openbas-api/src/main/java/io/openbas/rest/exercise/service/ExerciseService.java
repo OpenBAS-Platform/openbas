@@ -16,10 +16,12 @@ import static java.util.Optional.ofNullable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -30,10 +32,7 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.GrantService;
-import io.openbas.service.TagRuleService;
-import io.openbas.service.TeamService;
-import io.openbas.service.VariableService;
+import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
@@ -69,6 +68,7 @@ public class ExerciseService {
 
   @PersistenceContext private EntityManager entityManager;
 
+  private final Ee eeService;
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
   private final TeamService teamService;
@@ -80,6 +80,7 @@ public class ExerciseService {
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
   private final ActionMetricCollector actionMetricCollector;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
@@ -372,6 +373,13 @@ public class ExerciseService {
     setComputedAttributesWithEmptyGlobalScore(result.exercises());
 
     return getExerciseSimples(specificationCount, pageable, result);
+  }
+
+  public void throwIfExerciseNotLaunchable(Exercise exercise) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    exercise.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
   public boolean checkIfTagRulesApplies(
@@ -708,34 +716,35 @@ public class ExerciseService {
   }
 
   public boolean isThereAScoreDegradation(
-      List<AtomicTestingUtils.ExpectationResultsByType> lastSimulationResults,
-      List<AtomicTestingUtils.ExpectationResultsByType> secondLastSimulationResults) {
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap,
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+          secondLastSimulationResultsMap) {
 
-    // Map the second last results by type for quick lookup
-    Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-        secondLastSimulationResultsMap =
-            secondLastSimulationResults.stream()
-                .collect(
-                    Collectors.toMap(
-                        AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
+    for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :
+        lastSimulationResultsMap.entrySet()) {
+      ExpectationResultsByType lastSimulationResultsByType = entry.getValue();
+      ExpectationType type = entry.getKey();
 
-    for (AtomicTestingUtils.ExpectationResultsByType result : lastSimulationResults) {
       // we ignore manual expectation
-      if (ExpectationType.HUMAN_RESPONSE.equals(result.type())) {
+      if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
         break;
       }
+
+      ExpectationResultsByType secondLastSimulationResultsByType =
+          secondLastSimulationResultsMap.get(type);
 
       // we ignore if one of the 2 expectation is still PENDING
-      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(result.avgResult())
+      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              lastSimulationResultsByType.avgResult())
           || InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
-              secondLastSimulationResultsMap.get(result.type()).avgResult())) {
+              secondLastSimulationResultsByType.avgResult())) {
         break;
       }
 
-      float lastSimulationScore = ScenarioStatisticService.getRoundedPercentage(result);
+      float lastSimulationScore =
+          ScenarioStatisticService.getRoundedPercentage(lastSimulationResultsByType);
       float secondLastSimulationScore =
-          ScenarioStatisticService.getRoundedPercentage(
-              secondLastSimulationResultsMap.get(result.type()));
+          ScenarioStatisticService.getRoundedPercentage(secondLastSimulationResultsByType);
       if (lastSimulationScore < secondLastSimulationScore) {
         return true;
       }

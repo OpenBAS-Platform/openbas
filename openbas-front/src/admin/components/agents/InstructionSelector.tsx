@@ -341,7 +341,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           >
             {`${t('The agent runs in the background as a session and only executes when the user is logged in and active.')} ${t('For further details, refer to the')} `}
             <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
-              {`${selectedExecutor?.executor_name} ${t('documentation.')}`}
+              {t('{executor_name} documentation.', { executor_name: selectedExecutor?.executor_name })}
             </a>
           </Alert>
           <p>
@@ -362,7 +362,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         >
           {`${t('The agent runs in the background as a service and starts automatically when the machine powers on.')} ${t('For further details, refer to the')} `}
           <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
-            {`${selectedExecutor?.executor_name} ${t('documentation.')}`}
+            {t('{executor_name} documentation.', { executor_name: selectedExecutor?.executor_name })}
           </a>
         </Alert>
         <p>

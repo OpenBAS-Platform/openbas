@@ -223,7 +223,7 @@ const Index = () => {
   const { t } = useFormatter();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
-  const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
+  const { scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(scenarioId) }));
   useDataLoader(() => {
     setLoading(true);
     dispatch(fetchScenario(scenarioId)).finally(() => {

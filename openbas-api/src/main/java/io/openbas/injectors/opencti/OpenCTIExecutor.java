@@ -1,6 +1,6 @@
 package io.openbas.injectors.opencti;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 import io.openbas.database.model.*;

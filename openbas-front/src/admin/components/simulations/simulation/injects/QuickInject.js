@@ -1446,10 +1446,10 @@ QuickInject.propTypes = {
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
-  const documentsMap = helper.getDocumentsMap();
-  const teamsMap = helper.getTeamsMap();
+  const documentsMap = helper.getDocumentsMap().toJS();
+  const teamsMap = helper.getTeamsMap().toJS();
   const { exerciseId } = ownProps;
-  const exerciseVariables = helper.getExerciseVariables(exerciseId);
+  const exerciseVariables = helper.getExerciseVariables(exerciseId).toJS();
   return {
     documentsMap,
     teamsMap,

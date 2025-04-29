@@ -2,33 +2,27 @@ package io.openbas.rest.inject;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.specification.CommunicationSpecification.fromInject;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static java.time.Instant.now;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.authorisation.AuthorisationService;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
-import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.ExecutionContext;
-import io.openbas.execution.ExecutionContextService;
-import io.openbas.executors.Executor;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.*;
+import io.openbas.rest.inject.service.ExecutableInjectService;
+import io.openbas.rest.inject.service.InjectExportService;
+import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.rest.security.SecurityExpression;
-import io.openbas.service.*;
+import io.openbas.service.ImportService;
 import io.openbas.service.targets.TargetService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
@@ -38,15 +32,14 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -65,27 +58,11 @@ public class InjectApi extends RestBehavior {
   public static final String INJECT_URI = "/api/injects";
 
   private static final int MAX_NEXT_INJECTS = 6;
-  private static final String EXPECTATIONS = "expectations";
-  private static final String PREDEFINE_EXPECTATIONS = "predefinedExpectations";
 
-  private final Executor executor;
-  private final InjectorContractRepository injectorContractRepository;
-  private final CommunicationRepository communicationRepository;
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
   private final InjectRepository injectRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
-  private final TeamRepository teamRepository;
-  private final TagRepository tagRepository;
-  private final DocumentRepository documentRepository;
-  private final AssetService assetService;
-  private final AssetGroupService assetGroupService;
-  private final ExecutionContextService executionContextService;
-  private final ScenarioService scenarioService;
   private final InjectService injectService;
-  private final InjectSearchService injectSearchService;
-  private final InjectDuplicateService injectDuplicateService;
-  private final TagRuleService tagRuleService;
   private final InjectStatusService injectStatusService;
   private final ExecutableInjectService executableInjectService;
   private final ImportService importService;
@@ -328,7 +305,13 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody InjectInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    Inject inject = updateInject(injectId, input);
+    Inject inject = injectService.updateInject(injectId, input);
+
+    // It should not be possible to add a EE executor on inject when the exercise is already
+    // started.
+    if (exercise.getStart().isPresent()) {
+      this.injectService.throwIfInjectNotLaunchable(inject);
+    }
 
     // If Documents not yet linked directly to the exercise, attached it
     inject
@@ -340,178 +323,6 @@ public class InjectApi extends RestBehavior {
               }
             });
     this.exerciseRepository.save(exercise);
-    return injectRepository.save(inject);
-  }
-
-  // -- EXERCISES --
-
-  @LogExecutionTime
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
-    return injectRepository.findByExerciseId(exerciseId).stream()
-        .sorted(Inject.executionComparator)
-        .toList();
-  }
-
-  @LogExecutionTime
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Transactional(readOnly = true)
-  public Page<InjectResultOutput> searchExerciseInjects(
-      @PathVariable final String exerciseId,
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectSearchService.getPageOfInjectResults(exerciseId, searchPaginationInput);
-  }
-
-  @LogExecutionTime
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Transactional(readOnly = true)
-  public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
-    return injectSearchService.getListOfInjectResults(exerciseId);
-  }
-
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-  }
-
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Team> exerciseInjectTeams(
-      @PathVariable String exerciseId, @PathVariable String injectId) {
-    return injectRepository
-        .findById(injectId)
-        .orElseThrow(ElementNotFoundException::new)
-        .getTeams();
-  }
-
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/communications")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Iterable<Communication> exerciseInjectCommunications(
-      @PathVariable String exerciseId, @PathVariable String injectId) {
-    List<Communication> coms =
-        communicationRepository.findAll(
-            fromInject(injectId), Sort.by(Sort.Direction.DESC, "receivedAt"));
-    List<Communication> ackComs = coms.stream().peek(com -> com.setAck(true)).toList();
-    return communicationRepository.saveAll(ackComs);
-  }
-
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  @Transactional(rollbackFor = Exception.class)
-  public Inject createInjectForExercise(
-      @PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
-    Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    return this.injectService.createInject(exercise, null, input);
-  }
-
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject duplicateInjectForExercise(
-      @PathVariable @NotBlank final String exerciseId,
-      @PathVariable @NotBlank final String injectId) {
-    return injectDuplicateService.duplicateInjectForExerciseWithDuplicateWordInTitle(
-        exerciseId, injectId);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectStatus executeInject(
-      @PathVariable @NotBlank final String exerciseId,
-      @Valid @RequestPart("input") DirectInjectInput input,
-      @RequestPart("file") Optional<MultipartFile> file) {
-    Inject inject =
-        input.toInject(
-            this.injectorContractRepository
-                .findById(input.getInjectorContract())
-                .orElseThrow(() -> new ElementNotFoundException("Injector contract not found")));
-    inject.setUser(
-        this.userRepository
-            .findById(currentUser().getId())
-            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
-    inject.setExercise(
-        this.exerciseRepository
-            .findById(exerciseId)
-            .orElseThrow(() -> new ElementNotFoundException("Exercise not found")));
-    inject.setDependsDuration(0L);
-    Inject savedInject = this.injectRepository.save(inject);
-    Iterable<User> users = this.userRepository.findAllById(input.getUserIds());
-    List<ExecutionContext> userInjectContexts =
-        fromIterable(users).stream()
-            .map(
-                user ->
-                    this.executionContextService.executionContext(
-                        user, savedInject, "Direct execution"))
-            .collect(Collectors.toList());
-    ExecutableInject injection =
-        new ExecutableInject(
-            true,
-            true,
-            savedInject,
-            List.of(),
-            savedInject.getAssets(),
-            savedInject.getAssetGroups(),
-            userInjectContexts);
-    file.ifPresent(injection::addDirectAttachment);
-    try {
-      return executor.directExecute(injection);
-    } catch (Exception e) {
-      log.log(Level.WARNING, e.getMessage(), e);
-      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
-    }
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
-  }
-
-  @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/activation")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectActivationForExercise(
-      @PathVariable String exerciseId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectUpdateActivationInput input) {
-    return updateInjectActivation(injectId, input);
-  }
-
-  @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/trigger")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectTrigger(
-      @PathVariable String exerciseId, @PathVariable String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setTriggerNowDate(now());
-    inject.setUpdatedAt(now());
-    return injectRepository.save(inject);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/status")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject setInjectStatus(
-      @PathVariable String exerciseId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectUpdateStatusInput input) {
-    return injectStatusService.updateInjectStatus(injectId, input);
-  }
-
-  @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject updateInjectTeams(
-      @PathVariable String exerciseId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectTeamsInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    Iterable<Team> injectTeams = teamRepository.findAllById(input.getTeamIds());
-    inject.setTeams(fromIterable(injectTeams));
     return injectRepository.save(inject);
   }
 
@@ -535,88 +346,6 @@ public class InjectApi extends RestBehavior {
         .limit(size.orElse(MAX_NEXT_INJECTS))
         // Collect the result
         .toList();
-  }
-
-  // -- SCENARIOS --
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  @Transactional(rollbackFor = Exception.class)
-  public Inject createInjectForScenario(
-      @PathVariable @NotBlank final String scenarioId, @Valid @RequestBody InjectInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    return this.injectService.createInject(null, scenario, input);
-  }
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Inject duplicateInjectForScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String injectId) {
-    return injectDuplicateService.duplicateInjectForScenarioWithDuplicateWordInTitle(
-        scenarioId, injectId);
-  }
-
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
-    return this.injectRepository.findByScenarioId(scenarioId).stream()
-        .sorted(Inject.executionComparator)
-        .toList();
-  }
-
-  @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Inject scenarioInject(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String injectId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    assert scenarioId.equals(scenario.getId());
-    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Inject updateInjectForScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String injectId,
-      @Valid @RequestBody @NotNull InjectInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    Inject inject = updateInject(injectId, input);
-
-    // If Documents not yet linked directly to the exercise, attached it
-    inject
-        .getDocuments()
-        .forEach(
-            document -> {
-              if (!document.getDocument().getScenarios().contains(scenario)) {
-                scenario.getDocuments().add(document.getDocument());
-              }
-            });
-    this.scenarioService.updateScenario(scenario);
-    return injectRepository.save(inject);
-  }
-
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/activation")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Inject updateInjectActivationForScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String injectId,
-      @Valid @RequestBody InjectUpdateActivationInput input) {
-    return updateInjectActivation(injectId, input);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public void deleteInjectForScenario(
-      @PathVariable @NotBlank final String scenarioId,
-      @PathVariable @NotBlank final String injectId) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    assert scenarioId.equals(scenario.getId());
-    this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    this.injectRepository.deleteById(injectId);
   }
 
   @Operation(
@@ -695,138 +424,24 @@ public class InjectApi extends RestBehavior {
     return this.injectService.getInjectsAndCheckPermission(input, requested_grant_level);
   }
 
-  // -- PRIVATE --
-
-  private Inject updateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setUpdateAttributes(input);
-
-    // Set dependencies
-    if (input.getDependsOn() != null) {
-      input
-          .getDependsOn()
-          .forEach(
-              entry -> {
-                Optional<InjectDependency> existingDependency =
-                    inject.getDependsOn().stream()
-                        .filter(
-                            injectDependency ->
-                                injectDependency
-                                    .getCompositeId()
-                                    .getInjectParent()
-                                    .getId()
-                                    .equals(entry.getRelationship().getInjectParentId()))
-                        .findFirst();
-                if (existingDependency.isPresent()) {
-                  existingDependency
-                      .get()
-                      .getInjectDependencyCondition()
-                      .setConditions(entry.getConditions().getConditions());
-                  existingDependency
-                      .get()
-                      .getInjectDependencyCondition()
-                      .setMode(entry.getConditions().getMode());
-                } else {
-                  InjectDependency injectDependency = new InjectDependency();
-                  injectDependency.getCompositeId().setInjectChildren(inject);
-                  injectDependency
-                      .getCompositeId()
-                      .setInjectParent(
-                          injectRepository
-                              .findById(entry.getRelationship().getInjectParentId())
-                              .orElse(null));
-                  injectDependency.setInjectDependencyCondition(
-                      new InjectDependencyConditions.InjectDependencyCondition());
-                  injectDependency
-                      .getInjectDependencyCondition()
-                      .setConditions(entry.getConditions().getConditions());
-                  injectDependency
-                      .getInjectDependencyCondition()
-                      .setMode(entry.getConditions().getMode());
-                  inject.getDependsOn().add(injectDependency);
-                }
-              });
-    }
-
-    List<InjectDependency> injectDepencyToRemove = new ArrayList<>();
-    if (inject.getDependsOn() != null && !inject.getDependsOn().isEmpty()) {
-      if (input.getDependsOn() != null && !input.getDependsOn().isEmpty()) {
-        inject
-            .getDependsOn()
-            .forEach(
-                injectDependency -> {
-                  if (!input.getDependsOn().stream()
-                      .map(
-                          (injectDependencyInput ->
-                              injectDependencyInput.getRelationship().getInjectParentId()))
-                      .toList()
-                      .contains(injectDependency.getCompositeId().getInjectParent().getId())) {
-                    injectDepencyToRemove.add(injectDependency);
-                  }
-                });
-      } else {
-        injectDepencyToRemove.addAll(inject.getDependsOn());
-      }
-      inject.getDependsOn().removeAll(injectDepencyToRemove);
-    }
-
-    inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
-    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
-    inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-
-    // Set documents
-    List<InjectDocumentInput> inputDocuments = input.getDocuments();
-    List<InjectDocument> injectDocuments = inject.getDocuments();
-
-    List<String> askedDocumentIds =
-        inputDocuments.stream().map(InjectDocumentInput::getDocumentId).toList();
-    List<String> currentDocumentIds =
-        inject.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
-    // To delete
-    List<InjectDocument> toRemoveDocuments =
-        injectDocuments.stream()
-            .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
-            .toList();
-    injectDocuments.removeAll(toRemoveDocuments);
-    // To add
-    inputDocuments.stream()
-        .filter(doc -> !currentDocumentIds.contains(doc.getDocumentId()))
-        .forEach(
-            in -> {
-              Optional<Document> doc = this.documentRepository.findById(in.getDocumentId());
-              if (doc.isPresent()) {
-                InjectDocument injectDocument = new InjectDocument();
-                injectDocument.setInject(inject);
-                Document document = doc.get();
-                injectDocument.setDocument(document);
-                injectDocument.setAttached(in.isAttached());
-                InjectDocument savedInjectDoc = this.injectDocumentRepository.save(injectDocument);
-                injectDocuments.add(savedInjectDoc);
-              }
-            });
-    // Remap the attached boolean
-    injectDocuments.forEach(
-        injectDoc -> {
-          Optional<InjectDocumentInput> inputInjectDoc =
-              input.getDocuments().stream()
-                  .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId()))
-                  .findFirst();
-          Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
-          injectDoc.setAttached(attached);
-        });
-    inject.setDocuments(injectDocuments);
-
-    return inject;
+  // -- Execution Traces
+  @Operation(
+      description =
+          "Get ExecutionTraces from a specific inject and target (asset, agent, team, player)")
+  @GetMapping(INJECT_URI + "/execution-traces")
+  @LogExecutionTime
+  public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(
+      @RequestParam String injectId,
+      @RequestParam String targetId,
+      @RequestParam TargetType targetType) {
+    return this.injectService.getInjectTracesFromInjectAndTarget(injectId, targetId, targetType);
   }
 
-  private Inject updateInjectActivation(
-      @NotBlank final String injectId, @NotNull final InjectUpdateActivationInput input) {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setEnabled(input.isEnabled());
-    inject.setUpdatedAt(now());
-    return injectRepository.save(inject);
+  @Operation(description = "Get InjectStatus with global execution traces")
+  @GetMapping(INJECT_URI + "/status")
+  @LogExecutionTime
+  public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(
+      @RequestParam String injectId) {
+    return this.injectService.getInjectStatusWithGlobalExecutionTraces(injectId);
   }
 }

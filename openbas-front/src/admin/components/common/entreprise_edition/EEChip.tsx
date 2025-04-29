@@ -1,4 +1,5 @@
 import { Tooltip } from '@mui/material';
+import { type CSSProperties } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -12,22 +13,6 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
     justifyContent: 'center',
     alignItems: 'center',
     width: 21,
-    margin: 'auto',
-    borderRadius: theme.borderRadius,
-    border: `1px solid ${theme.palette.ee.main}`,
-    color: theme.palette.ee.main,
-    backgroundColor: theme.palette.ee.background,
-    cursor: isClickable ? 'pointer' : 'default',
-  },
-  containerFloating: {
-    float: 'left',
-    fontSize: 'xx-small',
-    height: 14,
-    display: 'inline-flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 21,
-    margin: '2px 0 0 6px',
     borderRadius: theme.borderRadius,
     border: `1px solid ${theme.palette.ee.main}`,
     color: theme.palette.ee.main,
@@ -36,20 +21,25 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
   },
 }));
 
-const EEChip = ({ clickable = true, floating = false, onClick = undefined }: {
+const EEChip = ({ clickable = false, featureDetectedInfo = null, style = {} }: {
   clickable?: boolean;
-  onClick?: (value: boolean) => void;
-  floating?: boolean;
+  featureDetectedInfo?: string | null;
+  style?: CSSProperties;
 }) => {
   const { classes } = useStyles({ isClickable: clickable });
   const { t } = useFormatter();
-  const isEnterpriseEdition = useEnterpriseEdition();
+  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
+  const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
+  if (featureDetectedInfo) {
+    setFeatureDetectedInfo(featureDetectedInfo);
+  }
 
   return (
     <Tooltip
       title={t('Enterprise Edition Feature')}
-      className={floating ? classes.containerFloating : classes.container}
-      onClick={() => clickable && !isEnterpriseEdition && onClick && onClick(true)}
+      className={classes.container}
+      onClick={() => clickable && !isEnterpriseEdition && openDialog()}
+      style={style}
     >
       <span>
         EE

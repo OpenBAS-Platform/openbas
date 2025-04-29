@@ -516,10 +516,10 @@ GroupPopover.propTypes = {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    organizations: helper.getOrganizations(),
-    organizationsMap: helper.getOrganizationsMap(),
-    exercises: helper.getExercises(),
-    scenarios: helper.getScenarios(),
+    organizations: helper.getOrganizations().toJS(),
+    organizationsMap: helper.getOrganizationsMap().toJS(),
+    exercises: helper.getExercises().toJS(),
+    scenarios: helper.getScenarios().toJS(),
   };
 };
 

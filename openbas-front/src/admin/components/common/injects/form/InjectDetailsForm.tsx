@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import type { TagHelper } from '../../../../../actions/helper';
 import {
   type ContractElement,
   type FieldValue,
@@ -14,7 +13,6 @@ import {
 } from '../../../../../actions/injector_contracts/InjectorContract';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
-import { useHelper } from '../../../../../store';
 import { type Inject, type InjectInput } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
 import { isEmptyField } from '../../../../../utils/utils';
@@ -72,7 +70,6 @@ const InjectDetailsForm = ({
     expectations: [],
   });
 
-  const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
   const toggleInjectContent = () => {
     setPristineOpenDetails(false);
     if (openDetails) {
@@ -285,6 +282,7 @@ const InjectDetailsForm = ({
   useEffect(() => {
     const initialValues = getInitialValues();
     setDefaultValues(initialValues);
+    setOpenDetails(false);
     reset(initialValues, { keepDirtyValues: true });
   }, [injectorContractContent]);
 
@@ -331,7 +329,6 @@ const InjectDetailsForm = ({
               inject={defaultValues}
               injectorContract={{ ...injectorContractContent }}
               handleClose={handleClose}
-              tagsMap={tagsMap}
               readOnly={permissions.readOnly}
               articlesFromExerciseOrScenario={[]}
               variablesFromExerciseOrScenario={[]}

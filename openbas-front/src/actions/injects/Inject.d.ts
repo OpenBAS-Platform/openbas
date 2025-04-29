@@ -1,34 +1,15 @@
 import { type Inject, type InjectOutput } from '../../utils/api-types';
+import { type InjectorContractConverted } from '../injector_contracts/InjectorContract';
 
 export type InjectStore = Omit<Inject, 'inject_content' | 'inject_injector_contract'> & {
-  inject_content: {
+  inject_content?: {
     expectationScore: number;
     challenges: string[] | undefined;
   };
-  inject_injector_contract: {
-    // as we don't know the type of the content of a contract we need to put any here
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    injector_contract_content_parsed: any;
-    convertedContent: {
-      label: Record<string, string>;
-      config: { expose: boolean };
-    };
-  } & Inject['inject_injector_contract'];
+  inject_injector_contract: Omit<InjectorContractConverted, 'convertedContent'> & { convertedContent: InjectorContractConverted['convertedContent'] };
 };
 
-export type InjectorContractConvertedContent = {
-  label: Record<string, string>;
-  config: { expose: boolean };
-};
-
-export type InjectOutputType = InjectOutput & {
-  inject_injector_contract: {
-    // as we don't know the type of the content of a contract we need to put any here
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    injector_contract_content_parsed: any;
-    convertedContent: InjectorContractConvertedContent;
-  } & Inject['inject_injector_contract'];
-};
+export type InjectOutputType = InjectOutput & { inject_injector_contract: { convertedContent: InjectorContractConverted['convertedContent'] } & Inject['inject_injector_contract'] };
 
 export interface ConditionElement {
   name: string;

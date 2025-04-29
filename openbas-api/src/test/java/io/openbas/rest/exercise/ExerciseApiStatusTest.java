@@ -141,7 +141,7 @@ public class ExerciseApiStatusTest {
     injectRepository.save(inject2);
     injectRepository.save(inject3);
     injectRepository.save(inject4);
-    injectRepository.save(inject5);
+    SAVED_INJECT5 = injectRepository.save(inject5);
 
     InjectStatus injectStatus = new InjectStatus();
 
@@ -490,7 +490,7 @@ public class ExerciseApiStatusTest {
 
     assertNull(JsonPath.read(response, "$.exercise_start_date"));
     assertNull(JsonPath.read(response, "$.exercise_end_date"));
-    assertEquals(Optional.empty(), injectStatusRepository.findByInject(SAVED_INJECT5));
+    assertEquals(Optional.empty(), injectStatusRepository.findByInjectId(SAVED_INJECT5.getId()));
     assertEquals(Optional.empty(), lessonsAnswerRepository.findById(LESSON_ANSWER.getId()));
     assertEquals(
         List.of(ExerciseStatus.RUNNING.name()),

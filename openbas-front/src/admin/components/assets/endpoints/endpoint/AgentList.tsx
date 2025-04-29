@@ -1,5 +1,6 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -11,6 +12,7 @@ import { useHelper } from '../../../../../store';
 import { type AgentOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import EEChip from '../../../common/entreprise_edition/EEChip';
 import AssetStatus from '../../AssetStatus';
 import AgentDeploymentMode from '../AgentDeploymentMode';
 import AgentPrivilege from '../AgentPrivilege';
@@ -44,6 +46,7 @@ interface Props { agents: AgentOutput[] }
 
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const { classes } = useStyles();
+  const theme = useTheme();
   const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
@@ -81,7 +84,9 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
                 }}
               />
             )}
-            {executor?.executor_name ?? t('Unknown')}
+            {executor.executor_name ?? t('Unknown')}
+            {(executor.executor_type == 'openbas_tanium' || executor.executor_type == 'openbas_crowdstrike')
+              && <EEChip style={{ marginLeft: theme.spacing(1) }} clickable featureDetectedInfo={executor.executor_name} />}
           </>
         );
       },

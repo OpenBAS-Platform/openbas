@@ -34,7 +34,7 @@ const ExerciseReports: FunctionComponent<ReportListProps> = ({ exerciseId, exerc
   const onCreateReportSubmit = (data: ReportInput) => dispatch(addReportForExercise(exerciseId, data)).finally(() => handleCloseCreate());
 
   // Fetching data
-  const reports = useHelper((helper: ReportsHelper) => helper.getExerciseReports(exerciseId));
+  const { reports } = useHelper((helper: ReportsHelper) => ({ reports: helper.getExerciseReports(exerciseId) }));
   useDataLoader(() => {
     dispatch(fetchReportsForExercise(exerciseId));
   });

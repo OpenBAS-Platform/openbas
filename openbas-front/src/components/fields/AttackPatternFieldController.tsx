@@ -46,7 +46,7 @@ const AttackPatternFieldController = ({ name, label }: Props) => {
   const { attackPatterns, killChainPhasesMap, userAdmin } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & UserHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
 
   const [attackPatternCreation, setAttackPatternCreation] = useState(false);

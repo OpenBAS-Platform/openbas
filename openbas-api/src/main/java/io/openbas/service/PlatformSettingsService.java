@@ -8,8 +8,10 @@ import static java.util.Optional.ofNullable;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
+import io.openbas.database.model.SettingKeys;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.ee.Ee;
@@ -63,6 +65,7 @@ public class PlatformSettingsService {
   @Resource private OpenBASConfig openBASConfig;
   @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
   @Resource private RabbitmqConfig rabbitmqConfig;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   @Autowired
   public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
@@ -308,7 +311,7 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     // License
-    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfo());
+    platformSettings.setPlatformLicense(licenseCacheManager.getEnterpriseEditionInfo());
     return platformSettings;
   }
 
@@ -371,6 +374,7 @@ public class PlatformSettingsService {
     }
     settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), certPem));
     settingRepository.saveAll(settingsToSave);
+    licenseCacheManager.refreshLicense();
     return findSettings();
   }
 
@@ -485,5 +489,14 @@ public class PlatformSettingsService {
           resolve(bannerLevelOpt, PLATFORM_BANNER + "." + banner.key(), banner.level().name());
       settingRepository.save(bannerLevel);
     }
+  }
+
+  public boolean isPlatformWhiteMarked() {
+    String defaultValue = SettingKeys.PLATFORM_WHITEMARK.defaultValue();
+    Optional<Setting> platformWhiteMarkedSetting =
+        this.setting(SettingKeys.PLATFORM_WHITEMARK.name().toLowerCase());
+    return platformWhiteMarkedSetting
+        .map(setting -> Boolean.parseBoolean(setting.getValue()))
+        .orElse(Boolean.parseBoolean(defaultValue));
   }
 }

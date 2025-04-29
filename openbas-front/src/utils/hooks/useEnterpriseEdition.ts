@@ -13,11 +13,19 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 
+import { useContext } from 'react';
+
+import EnterpriseEditionContext from '../../components/EnterpriseEditionContext';
 import useAuth from './useAuth';
 
-const useEnterpriseEdition = (): boolean => {
+const useEnterpriseEdition = () => {
   const { settings } = useAuth();
-  return settings.platform_license?.license_is_validated === true;
+  const context = useContext(EnterpriseEditionContext);
+
+  return {
+    ...context,
+    isValidated: settings.platform_license?.license_is_validated === true,
+  };
 };
 
 export default useEnterpriseEdition;

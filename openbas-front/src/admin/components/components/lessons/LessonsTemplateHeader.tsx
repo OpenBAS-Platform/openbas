@@ -26,7 +26,7 @@ const LessonsTemplateHeader = () => {
   const { lessonsTemplateId } = useParams() as { lessonsTemplateId: string };
   const { lessonsTemplate, userAdmin } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => ({
     lessonsTemplate: helper.getLessonsTemplate(lessonsTemplateId),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   return (
     <>

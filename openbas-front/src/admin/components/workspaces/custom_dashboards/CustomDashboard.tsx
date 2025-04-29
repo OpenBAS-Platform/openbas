@@ -109,7 +109,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
               key={widget.widget_id}
               data-grid={layout}
               style={{
-                margin: 0,
+                margin: theme.spacing(-2.5),
                 borderRadius: 4,
                 display: 'flex',
                 flexDirection: 'column',
@@ -148,7 +148,6 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                   )}
                   <WidgetPopover
                     className="noDrag"
-                    size="small"
                     customDashboardId={customDashboardId}
                     widget={widget}
                     onUpdate={widget => handleWidgetUpdate(widget)}

@@ -19,7 +19,10 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({ exer
   const theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectExpectations } = useHelper((helper: InjectHelper) => ({
+  const { injectsMap, injectExpectations }: {
+    injectsMap: Record<string, InjectStore>;
+    injectExpectations: InjectExpectation[];
+  } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
@@ -47,7 +50,7 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({ exer
       data: sortedInjectorContractsByTotalScore.map((i: InjectStore & { inject_total_score: number }) => ({
         x: tPick(i.inject_injector_contract?.injector_contract_labels),
         y: i.inject_total_score,
-        fillColor: i.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
+        fillColor: i.inject_injector_contract?.convertedContent?.config?.[`color_${theme.palette.mode}`],
       })),
     },
   ];

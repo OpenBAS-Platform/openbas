@@ -50,8 +50,8 @@ const Players = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { isPlanner, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
-    isPlanner: helper.getMe().user_is_planner,
+  const { me, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
+    me: helper.getMe(),
     organizationsMap: helper.getOrganizationsMap(),
   }));
 
@@ -209,7 +209,7 @@ const Players = () => {
               </ListItem>
             ))}
       </List>
-      {isPlanner
+      {me.user_is_planner
         && (
           <CreatePlayer
             onCreate={result => setPlayers([result, ...players])}

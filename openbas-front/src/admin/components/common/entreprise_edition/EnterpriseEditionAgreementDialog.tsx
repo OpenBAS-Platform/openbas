@@ -19,6 +19,7 @@ import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { SettingsEnterpriseEditionUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { isEmptyField } from '../../../../utils/utils';
 import EEChip from './EEChip';
 
@@ -29,31 +30,33 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface EnterpriseEditionAgreementProps {
-  open: boolean;
-  onClose: () => void;
-  featureDetectedInfo?: string;
-}
-
-const EnterpriseEditionAgreementDialog = ({ open, onClose, featureDetectedInfo }: EnterpriseEditionAgreementProps) => {
+const EnterpriseEditionAgreementDialog = () => {
   const { t } = useFormatter();
+  const { open, closeDialog, featureDetectedInfo, setFeatureDetectedInfo } = useEnterpriseEdition();
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const [enterpriseLicense, setEnterpriseLicense] = useState('');
 
+  const onCloseEnterpriseEditionDialog = () => {
+    closeDialog();
+    setFeatureDetectedInfo('');
+  };
+
   const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => {
     dispatch(updatePlatformEnterpriseEditionParameters(data));
-    onClose();
+    onCloseEnterpriseEditionDialog();
   };
+
   const enableEnterpriseEdition = () => updateEnterpriseEdition({ platform_enterprise_license: enterpriseLicense });
+
   return (
     <Dialog
       open={open}
-      handleClose={onClose}
+      handleClose={onCloseEnterpriseEditionDialog}
       title={t('OpenBAS Enterprise Edition (EE) license agreement')}
       actions={(
         <>
-          <Button onClick={onClose}>{t('Cancel')}</Button>
+          <Button onClick={onCloseEnterpriseEditionDialog}>{t('Cancel')}</Button>
           <Button
             color="secondary"
             onClick={enableEnterpriseEdition}
@@ -66,7 +69,7 @@ const EnterpriseEditionAgreementDialog = ({ open, onClose, featureDetectedInfo }
     >
       <div className={classes.eeDialogContainer}>
         {!isEmptyField(featureDetectedInfo) && (
-          <Alert icon={<EEChip clickable={false} />} severity="success">
+          <Alert style={{ alignItems: 'center' }} icon={<EEChip />} severity="success">
             {`${t('Enterprise Edition feature detected :')} `}
             {featureDetectedInfo}
           </Alert>

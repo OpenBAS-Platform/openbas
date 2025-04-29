@@ -69,13 +69,13 @@ const InjectTestList: FunctionComponent<Props> = ({
   const { t, fldt } = useFormatter();
   const theme = useTheme();
 
-  const [selectedTest, setSelectedTest] = useState<InjectTestStatusOutput | null>(null);
+  const [selectedInjectTestStatus, setSelectedInjectTestStatus] = useState<InjectTestStatusOutput | null>(null);
 
   // Fetching test
   useEffect(() => {
     if (statusId !== null && statusId !== undefined) {
       searchInjectTest(statusId).then((result: { data: InjectTestStatusOutput }) => {
-        setSelectedTest(result.data);
+        setSelectedInjectTestStatus(result.data);
       });
     }
   }, [statusId]);
@@ -167,8 +167,8 @@ const InjectTestList: FunctionComponent<Props> = ({
               >
                 <ListItemButton
                   classes={{ root: classes.item }}
-                  onClick={() => setSelectedTest(test)}
-                  selected={test.status_id === selectedTest?.status_id}
+                  onClick={() => setSelectedInjectTestStatus(test)}
+                  selected={test.status_id === selectedInjectTestStatus?.status_id}
                 >
                   <ListItemIcon>
                     <InjectIcon
@@ -198,8 +198,8 @@ const InjectTestList: FunctionComponent<Props> = ({
         {!tests ? (<Empty message={t('No data available')} />) : null}
       </List>
       {
-        selectedTest !== null
-        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} test={selectedTest} />
+        selectedInjectTestStatus !== null
+        && <InjectTestDetail open handleClose={() => setSelectedInjectTestStatus(null)} injectTestStatus={selectedInjectTestStatus} />
       }
     </>
   );

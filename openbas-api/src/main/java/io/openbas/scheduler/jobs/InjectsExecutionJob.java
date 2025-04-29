@@ -49,6 +49,7 @@ public class InjectsExecutionJob implements Job {
   private final Environment env;
   private int injectExecutionThreshold;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
+  private static final long delayForSimulationCompletedEvent = 3600L;
 
   private final InjectHelper injectHelper;
   private final ExerciseRepository exerciseRepository;
@@ -125,7 +126,7 @@ public class InjectsExecutionJob implements Job {
                         .resourceId(ex.getScenario().getId())
                         .timestamp(Instant.now())
                         .build(),
-                    3600L)); // add a 1 hour delay
+                    delayForSimulationCompletedEvent));
   }
 
   public void handlePendingInject() {

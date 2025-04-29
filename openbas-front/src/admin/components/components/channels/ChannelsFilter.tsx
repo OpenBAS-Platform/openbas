@@ -43,7 +43,7 @@ const ChannelsFilter: FunctionComponent<Props> = (props) => {
   useEffect(() => {
     dispatch(fetchChannels());
   }, []);
-  const channels = useHelper((helper: ChannelsHelper) => helper.getChannels());
+  const { channels } = useHelper((helper: ChannelsHelper) => ({ channels: helper.getChannels() }));
   const { onChannelsChange, onClearChannels = () => { }, fullWidth } = props;
 
   const channelColor = (type?: string) => {

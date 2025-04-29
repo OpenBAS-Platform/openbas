@@ -4,7 +4,7 @@ import { type ChangeEvent, type FunctionComponent, useContext, useState } from '
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -17,11 +17,6 @@ interface GenericSource {
   id: string;
   type: string;
   name: string;
-  communications_number: number;
-  start_date: string;
-  end_date: string;
-  users_number: number;
-  logs_number: number;
   lessons_anonymized: boolean;
   isReadOnly: boolean;
   isUpdatable: boolean;
@@ -30,7 +25,6 @@ interface GenericSource {
 interface Props {
   source: GenericSource;
   objectives: Objective[];
-  injects: Inject[];
   teamsMap: Record<string, Team>;
   teams: Team[];
   lessonsCategories: LessonsCategory[];

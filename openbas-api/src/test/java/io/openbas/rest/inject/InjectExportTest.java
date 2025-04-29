@@ -56,7 +56,6 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private TeamComposer teamComposer;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ScenarioComposer scenarioComposer;
-  @Autowired private InjectorFixture injectorFixture;
   @Autowired private PayloadComposer payloadComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;

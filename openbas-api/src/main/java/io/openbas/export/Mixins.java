@@ -2,6 +2,9 @@ package io.openbas.export;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.List;
 
 public class Mixins {
   @JsonIgnoreProperties(
@@ -34,6 +37,25 @@ public class Mixins {
 
   @JsonIgnoreProperties(value = {"inject_users", "inject_organizations"})
   public static class InjectsFileExport {}
+
+  @JsonIncludeProperties(
+      value = {
+        "attack_pattern_id",
+        "attack_pattern_name",
+        "attack_pattern_description",
+        "attack_pattern_external_id",
+      })
+  public static class AttackPattern {}
+
+  public abstract static class InjectorContract {
+    @JsonSerialize(using = JsonSerializer.None.class)
+    public abstract List<AttackPattern> getAttackPatterns();
+  }
+
+  public abstract static class Payload {
+    @JsonSerialize(using = JsonSerializer.None.class)
+    public abstract List<io.openbas.database.model.AttackPattern> getAttackPatterns();
+  }
 
   @JsonIncludeProperties(
       value = {

@@ -33,11 +33,13 @@ public class EndpointComposer extends ComposerBase<Endpoint> {
     @Override
     public Composer persist() {
       endpointRepository.save(endpoint);
+      agentComposers.forEach(AgentComposer.Composer::persist);
       return this;
     }
 
     @Override
     public Composer delete() {
+      agentComposers.forEach(AgentComposer.Composer::delete);
       endpointRepository.delete(endpoint);
       return this;
     }
