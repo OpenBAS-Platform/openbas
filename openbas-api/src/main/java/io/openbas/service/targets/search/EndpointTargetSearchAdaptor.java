@@ -167,7 +167,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findExpectationsByInjectAndTargetAndTargetTypeUnderAllParents(
+            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
                 inject.getId(), target.getId(), target.getTargetType()));
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {

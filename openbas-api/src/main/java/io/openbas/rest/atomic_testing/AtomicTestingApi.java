@@ -93,7 +93,7 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String targetId,
       @PathVariable String targetType,
       @RequestParam(required = false) String parentTargetId) {
-    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+    return injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
         injectId, targetId, parentTargetId, targetType);
   }
 
@@ -103,7 +103,7 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String injectId,
       @PathVariable String targetId,
       @PathVariable String targetType) {
-    return injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
+    return injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
         injectId, targetId, targetType);
   }
 
