@@ -101,6 +101,17 @@ public interface AssetGroupRepository
           "SELECT ag.asset_group_id as asset_group_id, "
               + "CAST(asset_group_dynamic_filter as text) as asset_group_dynamic_filter "
               + "FROM asset_groups ag "
+              + "WHERE ag.asset_group_dynamic_filter IS NOT NULL "
+              + "AND ag.asset_group_id IN :assetGroupIds ;",
+      nativeQuery = true)
+  List<RawAssetGroupDynamicFilter> rawDynamicFiltersByAssetGroupIds(
+      @Param("assetGroupIds") List<String> assetGroupIds);
+
+  @Query(
+      value =
+          "SELECT ag.asset_group_id as asset_group_id, "
+              + "CAST(asset_group_dynamic_filter as text) as asset_group_dynamic_filter "
+              + "FROM asset_groups ag "
               + "JOIN injects_asset_groups iat ON ag.asset_group_id = iat.asset_group_id "
               + "WHERE iat.inject_id = :injectId "
               + "AND ag.asset_group_dynamic_filter IS NOT NULL "

@@ -65,7 +65,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 .withPayload(payloadComposer.forPayload(PayloadFixture.createDefaultCommand())));
   }
 
-  private AssetGroupComposer.Composer getAssetGroupWrapper(Filters.Filter dynamicFilter) {
+  private AssetGroupComposer.Composer getAssetGroupWrapperWithFilter(Filters.Filter dynamicFilter) {
     AssetGroup dynamicAssetGroup = AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setFilters(List.of(dynamicFilter));
@@ -148,7 +148,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter.setMode(Filters.FilterMode.and);
         filter.setOperator(Filters.FilterOperator.eq);
         filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
 
         // 2
         Filters.Filter filter2 = new Filters.Filter();
@@ -156,7 +156,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter2.setMode(Filters.FilterMode.and);
         filter2.setOperator(Filters.FilterOperator.eq);
         filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
 
         EndpointComposer.Composer ep1Wrapper =
             endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
@@ -206,7 +206,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter.setMode(Filters.FilterMode.and);
         filter.setOperator(Filters.FilterOperator.eq);
         filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
 
         // 2
         Filters.Filter filter2 = new Filters.Filter();
@@ -214,7 +214,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter2.setMode(Filters.FilterMode.and);
         filter2.setOperator(Filters.FilterOperator.eq);
         filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
 
         EndpointComposer.Composer ep1Wrapper =
             endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
@@ -269,7 +269,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       filter.setMode(Filters.FilterMode.and);
       filter.setOperator(Filters.FilterOperator.eq);
       filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-      AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+      AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
 
       // 2
       Filters.Filter filter2 = new Filters.Filter();
@@ -277,7 +277,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       filter2.setMode(Filters.FilterMode.and);
       filter2.setOperator(Filters.FilterOperator.eq);
       filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-      AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+      AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
 
       EndpointComposer.Composer ep1Wrapper =
           endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
@@ -378,18 +378,12 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       // create two identical asset groups
       for (int i = 0; i < 2; i++) {
-        AssetGroup dynamicAssetGroup =
-            AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-        Filters.FilterGroup filterGroup = new Filters.FilterGroup();
         Filters.Filter filter = new Filters.Filter();
         filter.setKey("endpoint_platform");
         filter.setMode(Filters.FilterMode.and);
         filter.setOperator(Filters.FilterOperator.eq);
         filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-        filterGroup.setFilters(List.of(filter));
-        filterGroup.setMode(Filters.FilterMode.and);
-        dynamicAssetGroup.setDynamicFilter(filterGroup);
-        assetGroupWrappers.add(assetGroupComposer.forAssetGroup(dynamicAssetGroup));
+        assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
       }
 
       // create several endpoints; only the Windows (first) endpoint should be involved in the above
@@ -445,18 +439,12 @@ public class InjectTargetSearchTest extends IntegrationTest {
       InjectComposer.Composer injectWrapper = getInjectWrapper();
 
       List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
-      AssetGroup dynamicAssetGroup =
-          AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
       Filters.Filter filter = new Filters.Filter();
       filter.setKey("endpoint_platform");
       filter.setMode(Filters.FilterMode.and);
       filter.setOperator(Filters.FilterOperator.eq);
       filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-      filterGroup.setFilters(List.of(filter));
-      filterGroup.setMode(Filters.FilterMode.and);
-      dynamicAssetGroup.setDynamicFilter(filterGroup);
-      assetGroupWrappers.add(assetGroupComposer.forAssetGroup(dynamicAssetGroup));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
 
       // create several endpoints; only the Windows (first) endpoint should be involved in the above
       // groups
@@ -505,24 +493,18 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
     @Test
     @DisplayName(
-        "When are part of a group, 'not contains' operator on this group should exclude endpoint even if targeted otherwise")
+        "When are part of a group, 'not contains' operator on this group should exclude endpoint")
     public void whenArePartOfAGroupAndGroupFilteredOut_thenExcludeAllEndpointsOfGroup()
         throws Exception {
       InjectComposer.Composer injectWrapper = getInjectWrapper();
 
       List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
-      AssetGroup dynamicAssetGroup =
-          AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
       Filters.Filter filter = new Filters.Filter();
       filter.setKey("endpoint_platform");
       filter.setMode(Filters.FilterMode.and);
       filter.setOperator(Filters.FilterOperator.eq);
       filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-      filterGroup.setFilters(List.of(filter));
-      filterGroup.setMode(Filters.FilterMode.and);
-      dynamicAssetGroup.setDynamicFilter(filterGroup);
-      assetGroupWrappers.add(assetGroupComposer.forAssetGroup(dynamicAssetGroup));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
 
       // create several endpoints; only the Windows (first) endpoint should be involved in the above
       // groups
@@ -540,9 +522,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       endpointComposer.forEndpoint(ep3).persist();
 
       assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
-      // add two endpoints as direct targets, including the endpoint part of the excluded group
-      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep1Wrapper);
-      Inject inject = injectWrapper.persist().get();
+      Inject inject = injectWrapper.withEndpoint(ep2Wrapper).persist().get();
 
       entityManager.flush();
       entityManager.clear();
@@ -582,18 +562,12 @@ public class InjectTargetSearchTest extends IntegrationTest {
       InjectComposer.Composer injectWrapper = getInjectWrapper();
 
       List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
-      AssetGroup dynamicAssetGroup =
-          AssetGroupFixture.createDefaultAssetGroup("Dynamic Asset Group");
-      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
       Filters.Filter filter = new Filters.Filter();
       filter.setKey("endpoint_platform");
       filter.setMode(Filters.FilterMode.and);
       filter.setOperator(Filters.FilterOperator.eq);
       filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-      filterGroup.setFilters(List.of(filter));
-      filterGroup.setMode(Filters.FilterMode.and);
-      dynamicAssetGroup.setDynamicFilter(filterGroup);
-      assetGroupWrappers.add(assetGroupComposer.forAssetGroup(dynamicAssetGroup));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
 
       // create several endpoints; only the Windows (first) endpoint should be involved in the above
       // groups
@@ -671,7 +645,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter.setMode(Filters.FilterMode.and);
         filter.setOperator(Filters.FilterOperator.eq);
         filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
 
         // 2
         Filters.Filter filter2 = new Filters.Filter();
@@ -679,7 +653,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter2.setMode(Filters.FilterMode.and);
         filter2.setOperator(Filters.FilterOperator.eq);
         filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
 
         injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
         Inject inject = injectWrapper.persist().get();
@@ -720,7 +694,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter.setMode(Filters.FilterMode.and);
         filter.setOperator(Filters.FilterOperator.eq);
         filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
-        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapper(filter);
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
 
         // 2
         Filters.Filter filter2 = new Filters.Filter();
@@ -728,7 +702,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         filter2.setMode(Filters.FilterMode.and);
         filter2.setOperator(Filters.FilterOperator.eq);
         filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
-        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapper(filter2);
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
 
         injectWrapper
             .withAssetGroup(assetGroupWrapper)
