@@ -28,7 +28,7 @@ import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -413,20 +413,19 @@ public class InjectorApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT0R_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) final String searchText) {
+  public List<FilterOption> optionsByName(@RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.injectorRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 
   @PostMapping(INJECT0R_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.injectorRepository.findAllById(ids)).stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 }

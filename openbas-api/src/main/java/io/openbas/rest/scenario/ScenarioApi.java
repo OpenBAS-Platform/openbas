@@ -23,7 +23,7 @@ import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
 import io.openbas.service.TeamService;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -243,30 +243,29 @@ public class ScenarioApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(SCENARIO_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) final String searchText) {
+  public List<FilterOption> optionsByName(@RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.scenarioRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 
   @PostMapping(SCENARIO_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.scenarioRepository.findAllById(ids)).stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 
   @GetMapping(SCENARIO_URI + "/category/options")
-  public List<FilterUtilsJpa.Option> categoryOptionsByName(
+  public List<FilterOption> categoryOptionsByName(
       @RequestParam(required = false) final String searchText) {
     return this.scenarioRepository
         .findDistinctCategoriesBySearchTerm(searchText, PageRequest.of(0, 10))
         .stream()
-        .map(i -> new FilterUtilsJpa.Option(i, i))
+        .map(i -> new FilterOption(i, i))
         .toList();
   }
 

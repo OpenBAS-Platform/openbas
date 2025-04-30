@@ -3,12 +3,14 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectIndexing;
+import io.openbas.utils.FilterOption;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -271,11 +273,11 @@ public interface InjectRepository
     FROM injects i
     INNER JOIN findings f ON f.finding_inject_id = i.inject_id
     WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
-      ORDER BY i.inject_created_at DESC
-    LIMIT 50
+      ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByTitleLinkedToFindings(@Param("title") String title);
+  List<FilterOption> findAllByTitleLinkedToFindings(
+      @Param("title") String title, Pageable pageable);
 
   @Query(
       value =
@@ -287,10 +289,9 @@ public interface InjectRepository
     LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
     WHERE (i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
       AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
-      ORDER BY i.inject_created_at DESC
-    LIMIT 50
+      ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByTitleLinkedToFindingsWithContext(
-      @Param("sourceId") String sourceId, @Param("title") String title);
+  List<FilterOption> findAllByTitleLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
 }

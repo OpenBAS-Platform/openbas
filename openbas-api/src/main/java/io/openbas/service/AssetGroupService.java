@@ -12,7 +12,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,23 +178,16 @@ public class AssetGroupService {
                         .orElse(Collections.emptyList())));
   }
 
-  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String sourceId) {
+  public List<FilterOption> getOptionsByNameLinkedToFindings(
+      String searchText, String sourceId, Pageable pageable) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSourceId = StringUtils.trimToNull(sourceId);
 
-    Set<Object[]> results;
-
     if (trimmedSourceId == null) {
-      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+      return assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      results =
-          assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
-              trimmedSourceId, trimmedSearchText);
+      return assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
+          trimmedSourceId, trimmedSearchText, pageable);
     }
-
-    return results.stream()
-        .map(row -> new FilterUtilsJpa.Option((String) row[0], (String) row[1]))
-        .toList();
   }
 }

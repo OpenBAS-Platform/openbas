@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_86__Add_Index_findings extends BaseJavaMigration {
+public class V3_87__Add_Index_findings extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

@@ -21,7 +21,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.EndpointMapper;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -525,23 +525,16 @@ public class EndpointService {
   }
 
   // -- OPTIONS --
-  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String sourceId) {
+  public List<FilterOption> getOptionsByNameLinkedToFindings(
+      String searchText, String sourceId, Pageable pageable) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSourceId = StringUtils.trimToNull(sourceId);
 
-    Set<Object[]> results;
-
     if (trimmedSourceId == null) {
-      results = endpointRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+      return endpointRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      results =
-          endpointRepository.findAllByNameLinkedToFindingsWithContext(
-              trimmedSourceId, trimmedSearchText);
+      return endpointRepository.findAllByNameLinkedToFindingsWithContext(
+          trimmedSourceId, trimmedSearchText, pageable);
     }
-
-    return results.stream()
-        .map(row -> new FilterUtilsJpa.Option((String) row[0], (String) row[1]))
-        .toList();
   }
 }

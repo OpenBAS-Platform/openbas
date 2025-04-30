@@ -31,7 +31,7 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   }
 
   return (
-    <Box mt={theme.spacing(4)}>
+    <Box mt={theme.spacing(2)}>
       <Tabs value={tabValue}>
         <Tab
           component={Link}

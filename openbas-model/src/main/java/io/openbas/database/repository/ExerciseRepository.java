@@ -2,11 +2,13 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.*;
+import io.openbas.utils.FilterOption;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -325,11 +327,11 @@ public interface ExerciseRepository
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
         INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
         WHERE (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-        ORDER BY e.exercise_created_at DESC
-        LIMIT 50
+        ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  Set<Object[]> findAllOptionByNameLinkedToFindings(@Param("name") String name);
+  List<FilterOption> findAllOptionByNameLinkedToFindings(
+      @Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -342,10 +344,9 @@ public interface ExerciseRepository
         LEFT JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id
         WHERE (se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
         AND (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-        ORDER BY e.exercise_created_at DESC
-        LIMIT 50
+        ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  Set<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
-      @Param("sourceId") String sourceId, @Param("name") String name);
+  List<FilterOption> findAllOptionByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

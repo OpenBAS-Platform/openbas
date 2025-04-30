@@ -1,11 +1,12 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.utils.FilterOption;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -77,11 +78,10 @@ public interface EndpointRepository
         SELECT DISTINCT fa.asset_id
         FROM findings f
         LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
-    ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-    LIMIT 50;
+    ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByNameLinkedToFindings(@Param("name") String name);
+  List<FilterOption> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -103,10 +103,9 @@ public interface EndpointRepository
         )
         AND fa2.asset_id != :sourceId
     )
-    AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-    LIMIT 50
+    AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByNameLinkedToFindingsWithContext(
-      @Param("sourceId") String sourceId, @Param("name") String name);
+  List<FilterOption> findAllByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

@@ -30,7 +30,6 @@ import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
-import io.openbas.service.*;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.service.TagRuleService;
@@ -52,6 +51,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -789,24 +789,17 @@ public class InjectService {
     return agents;
   }
 
-  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String sourceId) {
+  public List<FilterOption> getOptionsByNameLinkedToFindings(
+      String searchText, String sourceId, Pageable pageable) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId = StringUtils.trimToNull(sourceId);
 
-    Set<Object[]> results;
-
     if (trimmedSimulationOrScenarioId == null) {
-      results = injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText);
+      return injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      results =
-          injectRepository.findAllByTitleLinkedToFindingsWithContext(
-              trimmedSimulationOrScenarioId, trimmedSearchText);
+      return injectRepository.findAllByTitleLinkedToFindingsWithContext(
+          trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
     }
-
-    return results.stream()
-        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
-        .toList();
   }
 
   public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(

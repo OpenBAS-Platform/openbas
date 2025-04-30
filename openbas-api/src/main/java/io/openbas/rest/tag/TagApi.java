@@ -12,7 +12,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -125,13 +125,13 @@ public class TagApi extends RestBehavior {
   @Operation(
       description = "Get a list of tag IDs and labels corresponding to the text search",
       summary = "Search tags by text")
-  public List<FilterUtilsJpa.Option> optionsByName(
+  public List<FilterOption> optionsByName(
       @RequestParam(required = false) @Schema(description = "Search text")
           final String searchText) {
     return fromIterable(
             this.tagRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 
@@ -141,9 +141,9 @@ public class TagApi extends RestBehavior {
   @Operation(
       description = "Get a list of tag IDs and labels corresponding to a list of IDs",
       summary = "Search tags by ids")
-  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 }

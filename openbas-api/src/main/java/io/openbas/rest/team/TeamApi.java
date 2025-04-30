@@ -29,7 +29,7 @@ import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
-import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.FilterOption;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -236,21 +236,21 @@ public class TeamApi extends RestBehavior {
 
   // -- OPTION --
   @GetMapping(TEAM_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(
+  public List<FilterOption> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId) {
     return teamRepository
         .findAllBySimulationOrScenarioIdAndName(
             StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
         .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 
   @PostMapping(TEAM_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.teamRepository.findAllById(ids)).stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .map(i -> new FilterOption(i.getId(), i.getName()))
         .toList();
   }
 

@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.raw.RawAssetGroup;
+import io.openbas.utils.FilterOption;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -115,11 +116,10 @@ public interface AssetGroupRepository
         FROM injects i
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
         INNER JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
-    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-    LIMIT 50;
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByNameLinkedToFindings(@Param("name") String name);
+  List<FilterOption> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -134,10 +134,9 @@ public interface AssetGroupRepository
         LEFT JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
         LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
         WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId
-    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
-    LIMIT 50
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  Set<Object[]> findAllByNameLinkedToFindingsWithContext(
-      @Param("sourceId") String sourceId, @Param("name") String name);
+  List<FilterOption> findAllByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

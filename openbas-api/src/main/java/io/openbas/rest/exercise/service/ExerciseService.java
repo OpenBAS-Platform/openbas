@@ -433,25 +433,18 @@ public class ExerciseService {
     return new CriteriaBuilderAndExercises(cb, exercises);
   }
 
-  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String simulationOrScenarioId) {
+  public List<FilterOption> getOptionsByNameLinkedToFindings(
+      String searchText, String simulationOrScenarioId, Pageable pageable) {
     String trimmedSearchText = org.apache.commons.lang3.StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId =
         org.apache.commons.lang3.StringUtils.trimToNull(simulationOrScenarioId);
 
-    Set<Object[]> results;
-
     if (trimmedSimulationOrScenarioId == null) {
-      results = exerciseRepository.findAllOptionByNameLinkedToFindings(trimmedSearchText);
+      return exerciseRepository.findAllOptionByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      results =
-          exerciseRepository.findAllOptionByNameLinkedToFindingsWithContext(
-              trimmedSimulationOrScenarioId, trimmedSearchText);
+      return exerciseRepository.findAllOptionByNameLinkedToFindingsWithContext(
+          trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
     }
-
-    return results.stream()
-        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
-        .toList();
   }
 
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
