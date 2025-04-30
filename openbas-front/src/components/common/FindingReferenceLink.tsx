@@ -67,7 +67,7 @@ const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
     }
 
     default:
-      return <Typography color="textSecondary">-</Typography>;
+      return '-';
   }
 };
 
