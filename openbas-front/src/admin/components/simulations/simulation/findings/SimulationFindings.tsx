@@ -20,7 +20,7 @@ const SimulationFindings = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/injects'),
+      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/injects', 30),
     },
   ];
 

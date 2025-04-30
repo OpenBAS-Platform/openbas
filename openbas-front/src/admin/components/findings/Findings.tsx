@@ -19,19 +19,19 @@ const Findings = () => {
       field: 'finding_scenario',
       label: 'Scenario',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_scenario?.scenario_name, finding.finding_scenario?.scenario_id, '/admin/scenarios'),
+      value: (finding: FindingOutput) => renderReference(finding.finding_scenario?.scenario_name, finding.finding_scenario?.scenario_id, '/admin/scenarios', 30),
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations'),
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations', 30),
     },
     {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/injects'),
+      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/injects', 30),
     },
   ];
   return (
