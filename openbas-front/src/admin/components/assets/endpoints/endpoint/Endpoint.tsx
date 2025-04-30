@@ -1,6 +1,7 @@
-import { List, Paper, Tooltip, Typography } from '@mui/material';
+import { Link as MUILink, List, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useParams } from 'react-router';
+import React from 'react';
+import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
@@ -16,7 +17,7 @@ import {
   type EndpointOverviewOutput as EndpointType, type FindingOutput,
   type SearchPaginationInput, type TargetSimple,
 } from '../../../../../utils/api-types';
-import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
+import { emptyFilled, formatIp, formatMacAddress, truncate } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -39,6 +40,33 @@ const Endpoint = () => {
   const { t } = useFormatter();
   const theme = useTheme();
 
+  const renderReference = (
+    title: string | undefined,
+    id: string | undefined,
+    path: string | undefined,
+    truncateLength = 30,
+  ) => {
+    if (!title || !id) return '-';
+
+    return (
+      <Tooltip title={title}>
+        <MUILink
+          component={Link}
+          to={`${path}/${id}`}
+          underline="hover"
+          sx={{
+            display: 'inline-block',
+            maxWidth: 200,
+          }}
+        >
+          <Typography variant="body2" noWrap>
+            {truncate(title, truncateLength)}
+          </Typography>
+        </MUILink>
+      </Tooltip>
+    );
+  };
+
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
 
@@ -52,13 +80,13 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
+      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/atomic_testings'),
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/exercises'),
     },
     {
       field: 'finding_asset_groups',
