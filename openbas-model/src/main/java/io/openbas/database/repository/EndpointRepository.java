@@ -1,7 +1,6 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -81,7 +80,8 @@ public interface EndpointRepository
     ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
+  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindings(
+      @Param("name") String name, Pageable pageable);
 
   @Query(
       value =

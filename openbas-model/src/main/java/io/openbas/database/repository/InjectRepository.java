@@ -3,7 +3,6 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectIndexing;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;

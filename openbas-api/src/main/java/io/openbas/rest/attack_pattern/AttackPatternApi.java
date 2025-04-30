@@ -20,7 +20,6 @@ import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -193,7 +192,8 @@ public class AttackPatternApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ATTACK_PATTERN_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.attackPatternRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))

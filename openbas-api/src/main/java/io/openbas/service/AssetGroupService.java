@@ -13,7 +13,6 @@ import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.utils.FilterUtilsJpa;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;

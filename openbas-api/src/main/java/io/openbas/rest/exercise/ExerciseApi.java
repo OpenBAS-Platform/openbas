@@ -32,7 +32,6 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;

@@ -23,7 +23,6 @@ import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
 import io.openbas.service.TeamService;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -243,7 +242,8 @@ public class ScenarioApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(SCENARIO_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.scenarioRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))

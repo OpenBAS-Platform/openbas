@@ -2,7 +2,6 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.*;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;

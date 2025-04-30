@@ -24,7 +24,6 @@ import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.ImportService;
 import io.openbas.service.targets.TargetService;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;

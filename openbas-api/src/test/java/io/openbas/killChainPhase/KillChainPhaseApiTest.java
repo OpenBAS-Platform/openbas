@@ -18,7 +18,6 @@ import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.KillChainPhaseSpecification;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -255,7 +254,9 @@ public class KillChainPhaseApiTest extends IntegrationTest {
 
       verify(mockKillChainPhaseRepository).findAll(spec, Sort.by(Sort.Direction.ASC, "order"));
       assertEquals(
-          killChainPhaseList.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList(),
+          killChainPhaseList.stream()
+              .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+              .toList(),
           result);
     }
   }

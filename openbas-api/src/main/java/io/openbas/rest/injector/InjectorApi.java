@@ -28,7 +28,6 @@ import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
-import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -413,7 +412,8 @@ public class InjectorApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT0R_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.injectorRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
