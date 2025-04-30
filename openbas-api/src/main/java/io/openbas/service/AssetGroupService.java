@@ -183,11 +183,18 @@ public class AssetGroupService {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSourceId = StringUtils.trimToNull(sourceId);
 
+    List<Object[]> results;
+
     if (trimmedSourceId == null) {
-      return assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
+      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      return assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
-          trimmedSourceId, trimmedSearchText, pageable);
+      results =
+          assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
+              trimmedSourceId, trimmedSearchText, pageable);
     }
+
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 }

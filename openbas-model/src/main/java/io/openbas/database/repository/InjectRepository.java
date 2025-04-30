@@ -275,8 +275,7 @@ public interface InjectRepository
       ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllByTitleLinkedToFindings(
-      @Param("title") String title, Pageable pageable);
+  List<Object[]> findAllByTitleLinkedToFindings(@Param("title") String title, Pageable pageable);
 
   @Query(
       value =
@@ -291,6 +290,6 @@ public interface InjectRepository
       ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllByTitleLinkedToFindingsWithContext(
+  List<Object[]> findAllByTitleLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
 }

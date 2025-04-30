@@ -439,12 +439,18 @@ public class ExerciseService {
     String trimmedSimulationOrScenarioId =
         org.apache.commons.lang3.StringUtils.trimToNull(simulationOrScenarioId);
 
+    List<Object[]> results;
+
     if (trimmedSimulationOrScenarioId == null) {
-      return exerciseRepository.findAllOptionByNameLinkedToFindings(trimmedSearchText, pageable);
+      results = exerciseRepository.findAllOptionByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      return exerciseRepository.findAllOptionByNameLinkedToFindingsWithContext(
-          trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
+      results =
+          exerciseRepository.findAllOptionByNameLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
     }
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}

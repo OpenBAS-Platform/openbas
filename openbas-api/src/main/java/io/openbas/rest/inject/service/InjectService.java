@@ -794,12 +794,19 @@ public class InjectService {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId = StringUtils.trimToNull(sourceId);
 
+    List<Object[]> results;
+
     if (trimmedSimulationOrScenarioId == null) {
-      return injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText, pageable);
+      results = injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText, pageable);
     } else {
-      return injectRepository.findAllByTitleLinkedToFindingsWithContext(
-          trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
+      results =
+          injectRepository.findAllByTitleLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
     }
+
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 
   public List<ExecutionTraceOutput> getInjectTracesFromInjectAndTarget(

@@ -118,8 +118,7 @@ public interface AssetGroupRepository
     ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindings(
-      @Param("name") String name, Pageable pageable);
+  List<Object[]> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -137,6 +136,6 @@ public interface AssetGroupRepository
     ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindingsWithContext(
+  List<Object[]> findAllByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

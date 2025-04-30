@@ -329,8 +329,7 @@ public interface ExerciseRepository
         ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllOptionByNameLinkedToFindings(
-      @Param("name") String name, Pageable pageable);
+  List<Object[]> findAllOptionByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -346,6 +345,6 @@ public interface ExerciseRepository
         ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterUtilsJpa.Option> findAllOptionByNameLinkedToFindingsWithContext(
+  List<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }
