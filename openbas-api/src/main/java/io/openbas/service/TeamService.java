@@ -13,6 +13,8 @@ import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
+import io.openbas.database.raw.RawTeam;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.team.output.TeamOutput;
@@ -23,6 +25,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.function.TriFunction;
@@ -40,6 +43,17 @@ public class TeamService {
   @PersistenceContext private EntityManager entityManager;
 
   private final UserRepository userRepository;
+  private final TeamRepository teamRepository;
+
+  public List<TeamOutput> getTeams(@NotNull List<String> teamIds) {
+    List<RawTeam> rawTeams =
+        teamRepository.rawTeamByIds(teamIds).stream()
+            .sorted(Comparator.comparing(RawTeam::getTeam_name))
+            .toList();
+    return rawTeams.stream()
+        .map(rt -> TeamOutput.builder().id(rt.getTeam_id()).name(rt.getTeam_name()).build())
+        .toList();
+  }
 
   public Team copyContextualTeam(Team teamToCopy) {
     Team newTeam = new Team();

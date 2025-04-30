@@ -91,7 +91,7 @@ const PaginationComponentV2 = <T extends object>({
         setProperties(propertySchemas);
       });
     }
-  }, []);
+  }, [entityPrefix]);
 
   useEffect(() => {
     // Modify URI

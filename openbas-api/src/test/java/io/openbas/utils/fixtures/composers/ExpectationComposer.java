@@ -14,6 +14,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     private final InjectExpectation injectExpectation;
     private Optional<AssetGroupComposer.Composer> assetGroupComposer = Optional.empty();
     private Optional<TeamComposer.Composer> teamComposer = Optional.empty();
+    private Optional<EndpointComposer.Composer> endpointComposer = Optional.empty();
 
     public Composer(InjectExpectation injectExpectation) {
       this.injectExpectation = injectExpectation;
@@ -31,9 +32,16 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
       return this;
     }
 
+    public Composer withEndpoint(EndpointComposer.Composer endpointComposer) {
+      this.endpointComposer = Optional.of(endpointComposer);
+      this.injectExpectation.setAsset(endpointComposer.get());
+      return this;
+    }
+
     @Override
     public Composer persist() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::persist);
+      endpointComposer.ifPresent(EndpointComposer.Composer::persist);
       teamComposer.ifPresent(TeamComposer.Composer::persist);
       injectExpectationRepository.save(injectExpectation);
       return this;
@@ -42,6 +50,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     @Override
     public InnerComposerBase<InjectExpectation> delete() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::delete);
+      endpointComposer.ifPresent(EndpointComposer.Composer::delete);
       teamComposer.ifPresent(TeamComposer.Composer::delete);
       injectExpectationRepository.delete(injectExpectation);
       return this;

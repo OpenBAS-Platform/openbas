@@ -70,17 +70,32 @@ public interface InjectExpectationRepository
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.team.id = :teamId and i.user.id = :playerId")
+          "select i from InjectExpectation i "
+              + "where i.inject.id = :injectId "
+              + "and i.team.id = :teamId "
+              + "and i.user.id = :playerId "
+              + "ORDER BY i.type, i.createdAt")
   List<InjectExpectation> findAllByInjectAndTeamAndPlayer(
       @Param("injectId") @NotBlank final String injectId,
       @Param("teamId") @NotBlank final String teamId,
       @Param("playerId") @NotBlank final String playerId);
 
   @Query(
+      value =
+          "select i from InjectExpectation i "
+              + "where i.inject.id = :injectId "
+              + "and i.user.id = :playerId "
+              + "ORDER BY i.type, i.createdAt")
+  List<InjectExpectation> findAllByInjectAndPlayer(
+      @Param("injectId") @NotBlank final String injectId,
+      @Param("playerId") @NotBlank final String playerId);
+
+  @Query(
       "select ie from InjectExpectation ie "
           + "where ie.inject.id = :injectId "
           + "and ie.team.id = :teamId "
-          + "and ie.name = :expectationName ")
+          + "and ie.name = :expectationName "
+          + "ORDER BY ie.type, ie.createdAt")
   List<InjectExpectation> findAllByInjectAndTeamAndExpectationName(
       final String injectId, final String teamId, final String expectationName);
 
@@ -116,6 +131,15 @@ public interface InjectExpectationRepository
       value =
           "SELECT i FROM InjectExpectation i "
               + "WHERE i.inject.id = :injectId "
+              + "AND i.agent.id = :agentId "
+              + "ORDER BY i.type, i.createdAt")
+  List<InjectExpectation> findAllByInjectAndAgent(
+      @Param("injectId") @NotBlank String injectId, @Param("agentId") @NotBlank String agentId);
+
+  @Query(
+      value =
+          "SELECT i FROM InjectExpectation i "
+              + "WHERE i.inject.id = :injectId "
               + "AND ((:assetGroupId IS NULL AND i.assetGroup IS NULL) OR (:assetGroupId IS NOT NULL AND i.assetGroup.id = :assetGroupId)) "
               + "AND i.asset.id = :assetId "
               + "AND i.agent IS NULL")
@@ -123,6 +147,16 @@ public interface InjectExpectationRepository
       @Param("injectId") @NotBlank String injectId,
       @Param("assetGroupId") @Nullable String assetGroupId,
       @Param("assetId") @NotBlank String assetId);
+
+  @Query(
+      value =
+          "SELECT i FROM InjectExpectation i "
+              + "WHERE i.inject.id = :injectId "
+              + "AND i.asset.id = :assetId "
+              + "AND i.agent IS NULL "
+              + "ORDER BY i.type, i.createdAt")
+  List<InjectExpectation> findAllByInjectAndAsset(
+      @Param("injectId") @NotBlank String injectId, @Param("assetId") @NotBlank String assetId);
 
   @Query(
       value =

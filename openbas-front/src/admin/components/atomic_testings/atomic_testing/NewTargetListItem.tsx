@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from 'tss-react/mui';
 
+import PlatformIcon from '../../../../components/PlatformIcon';
 import type { InjectTarget } from '../../../../utils/api-types';
 import NewAtomicTestingResult from './NewAtomicTestingResult';
 
@@ -33,6 +34,7 @@ const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
     const iconMap = {
       // TODO: for Endpoints and Agents, check the targetSubType attribute
       ASSETS_GROUPS: <SelectGroup />,
+      ASSETS: <PlatformIcon platform={target?.target_subtype ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />,
       TEAMS: <Groups3Outlined />,
       PLAYER: <PersonOutlined fontSize="small" />,
     };

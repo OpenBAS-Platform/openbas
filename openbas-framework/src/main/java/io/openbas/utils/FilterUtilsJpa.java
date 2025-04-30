@@ -32,7 +32,7 @@ public class FilterUtilsJpa {
 
   public record Option(String id, String label) {}
 
-  private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
+  public static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
   @SuppressWarnings("unchecked")
   public static <T> Specification<T> computeFilterGroupJpa(
