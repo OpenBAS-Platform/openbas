@@ -18,6 +18,7 @@ import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.KillChainPhaseSpecification;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
