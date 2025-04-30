@@ -103,5 +103,5 @@ export const isFeatureEnabled = (feature: '_RESERVED' | 'AGENT_EXPECTATION_UI' |
     return { settings: helper.getPlatformSettings() };
   });
 
-  return (settings.enabled_dev_features || []).includes(feature);
+  return (settings.enabled_dev_features ?? []).includes(feature);
 };
