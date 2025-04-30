@@ -3,7 +3,12 @@ import { type FunctionComponent } from 'react';
 import { Link } from 'react-router';
 
 import { type FindingOutput } from '../../utils/api-types';
-import { ATOMIC_BASE_URL, INJECT, SCENARIO, SCENARIO_BASE_URL, SIMULATION, SIMULATION_BASE_URL, truncate } from '../../utils/String';
+import { truncate } from '../../utils/String';
+import { INJECT, SCENARIO, SIMULATION } from '../../utils/utils';
+
+const ATOMIC_BASE_URL = '/admin/atomic_testings';
+const SIMULATION_BASE_URL = '/admin/simulations';
+const SCENARIO_BASE_URL = '/admin/scenarios';
 
 interface Props {
   finding: FindingOutput;

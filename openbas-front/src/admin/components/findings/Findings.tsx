@@ -3,7 +3,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import FindingReferenceLink from '../../../components/common/FindingReferenceLink';
 import { useFormatter } from '../../../components/i18n';
 import type { FindingOutput } from '../../../utils/api-types';
-import { INJECT, SCENARIO, SIMULATION } from '../../../utils/String';
+import { INJECT, SCENARIO, SIMULATION } from '../../../utils/utils';
 import FindingList from './FindingList';
 
 const Findings = () => {

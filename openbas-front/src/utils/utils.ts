@@ -4,6 +4,10 @@ import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
 import { MESSAGING$ } from './Environment';
 
+export const INJECT = 'INJECT';
+export const SIMULATION = 'SIMULATION';
+export const SCENARIO = 'SCENARIO';
+
 export const export_max_size = 50000;
 
 export const isNotEmptyField = <T>(field: T | null | undefined): field is T => !R.isEmpty(field) && !R.isNil(field);

@@ -94,10 +94,3 @@ export const formatMacAddress = (mac) => {
 export const formatIp = (ip) => {
   return ip.toUpperCase();
 };
-
-export const INJECT = 'inject';
-export const SIMULATION = 'simulation';
-export const SCENARIO = 'scenario';
-export const ATOMIC_BASE_URL = '/admin/atomic_testings';
-export const SIMULATION_BASE_URL = '/admin/simulations';
-export const SCENARIO_BASE_URL = '/admin/scenarios';

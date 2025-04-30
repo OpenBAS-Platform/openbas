@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import { searchFindingsForSimulations } from '../../../../../actions/findings/finding-actions';
 import FindingReferenceLink from '../../../../../components/common/FindingReferenceLink';
 import type { Exercise, FindingOutput, SearchPaginationInput } from '../../../../../utils/api-types';
-import { INJECT } from '../../../../../utils/String';
+import { INJECT } from '../../../../../utils/utils';
 import FindingList from '../../../findings/FindingList';
 
 const SimulationFindings = () => {

@@ -14,7 +14,8 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
-import { emptyFilled, formatIp, formatMacAddress, INJECT, SIMULATION } from '../../../../../utils/String';
+import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
+import { INJECT, SIMULATION } from '../../../../../utils/utils';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
