@@ -1,6 +1,7 @@
 package io.openbas.rest.log;
 
 import static io.openbas.utils.LogUtils.*;
+import static java.util.logging.Level.*;
 
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.log.form.LogDetailsInput;
@@ -27,7 +28,7 @@ public class LogApi extends RestBehavior {
       hidden = true,
       summary = "Log message details",
       description =
-          "This endpoint allows you to log messages with different severity levels (INFO, WARN, DEBUG, ERROR).",
+          "This endpoint allows you to log messages with different severity levels (INFO, WARN, SEVERE).",
       responses = {
         @ApiResponse(
             responseCode = "200",
@@ -35,7 +36,7 @@ public class LogApi extends RestBehavior {
             content = @Content(mediaType = "application/json")),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid input provided",
+            description = "Invalid level",
             content = @Content(mediaType = "application/json"))
       })
   public ResponseEntity<String> logDetails(
@@ -45,22 +46,18 @@ public class LogApi extends RestBehavior {
           @Valid
           @RequestBody
           LogDetailsInput logDetailsInput) {
-    LogLevel level = LogLevel.valueOf(logDetailsInput.getLevel());
+    String level = logDetailsInput.getLevel();
 
-    switch (level) {
-      case WARN:
-        logger.warn(buildLogMessage(logDetailsInput, level));
-        break;
-      case INFO:
-        logger.info(buildLogMessage(logDetailsInput, level));
-        break;
-      case DEBUG:
-        logger.debug(buildLogMessage(logDetailsInput, level));
-        break;
-      case ERROR:
-      default:
-        logger.error(buildLogMessage(logDetailsInput, level));
-        break;
+    if (WARNING.getName().equals(level)) {
+      logger.warn(buildLogMessage(logDetailsInput, level));
+    } else if (INFO.getName().equals(level)) {
+      logger.info(buildLogMessage(logDetailsInput, level));
+    } else if (SEVERE.getName().equals(level)) {
+      logger.error(buildLogMessage(logDetailsInput, level));
+    } else {
+      String invalidLevel = "Invalid level: " + level;
+      logger.error(invalidLevel + level);
+      return new ResponseEntity<>(invalidLevel + level, HttpStatus.BAD_REQUEST);
     }
 
     return new ResponseEntity<>("Log message processed successfully", HttpStatus.OK);

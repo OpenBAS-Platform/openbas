@@ -25,7 +25,7 @@ public class LogDetailsInput {
   @Schema(
       name = "level",
       type = "string",
-      description = "The log level (INFO, WARN, DEBUG, ERROR)",
+      description = "The log level (INFO, WARN, SEVERE)",
       example = "INFO")
   private String level;
 }

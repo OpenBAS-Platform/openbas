@@ -4,22 +4,7 @@ import io.openbas.rest.log.form.LogDetailsInput;
 
 public class LogUtils {
 
-  public enum LogLevel {
-    INFO,
-    WARN,
-    DEBUG,
-    ERROR;
-  }
-
-  public static LogLevel fromString(String level) {
-    try {
-      return LogLevel.valueOf(level.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      return LogLevel.ERROR;
-    }
-  }
-
-  public static String buildLogMessage(LogDetailsInput logDetailsInput, LogLevel level) {
+  public static String buildLogMessage(LogDetailsInput logDetailsInput, String level) {
     return "Message "
         + level
         + " received: "

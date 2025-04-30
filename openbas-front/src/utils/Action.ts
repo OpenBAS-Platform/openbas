@@ -252,7 +252,7 @@ export const sendErrorToBackend = async (error: Error, stack: ErrorInfo) => {
     message: OPENBAS_FRONTEND + error.message,
     stack: stack.componentStack,
     timestamp: new Date().toISOString(),
-    level: 'ERROR',
+    level: 'SEVERE',
   };
   simplePostCall('/api/logs', errorDetails);
 };
