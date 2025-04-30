@@ -1,12 +1,8 @@
 import { useParams } from 'react-router';
 
 import { searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
-import type {
-  FindingOutput,
-  Scenario,
-  SearchPaginationInput,
-} from '../../../../../utils/api-types';
-import { renderReference, simulationBaseUrl } from '../../../../../utils/String';
+import type { FindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
+import { renderReference, SIMULATION } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 
 const ScenarioFindings = () => {
@@ -26,7 +22,7 @@ const ScenarioFindings = () => {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, simulationBaseUrl),
+      value: (finding: FindingOutput) => renderReference(finding, SIMULATION),
     },
   ];
 

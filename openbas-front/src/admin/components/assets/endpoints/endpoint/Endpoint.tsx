@@ -13,7 +13,7 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
-import { atomicBaseUrl, emptyFilled, formatIp, formatMacAddress, renderReference, simulationBaseUrl } from '../../../../../utils/String';
+import { emptyFilled, formatIp, formatMacAddress, INJECT, renderReference, SIMULATION } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -49,13 +49,13 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, atomicBaseUrl),
+      value: (finding: FindingOutput) => renderReference(finding, INJECT),
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, simulationBaseUrl),
+      value: (finding: FindingOutput) => renderReference(finding, SIMULATION),
     },
     {
       field: 'finding_asset_groups',

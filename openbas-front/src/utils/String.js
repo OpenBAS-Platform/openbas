@@ -98,32 +98,62 @@ export const formatIp = (ip) => {
   return ip.toUpperCase();
 };
 
-export const atomicBaseUrl = '/admin/atomic_testings';
-export const simulationBaseUrl = '/admin/simulations';
-export const scenarioBaseUrl = '/admin/scenarios';
+export const INJECT = 'inject';
+export const SIMULATION = 'simulation';
+export const SCENARIO = 'scenario';
+export const ATOMIC_BASE_URL = '/admin/atomic_testings';
+export const SIMULATION_BASE_URL = '/admin/simulations';
+export const SCENARIO_BASE_URL = '/admin/scenarios';
 
-export const renderReference = (
-  title,
-  id,
-  path,
-) => {
-  if (!title || !id) return '-';
+const renderLink = (title, url) => (
+  <Tooltip title={title}>
+    <MUILink
+      component={Link}
+      to={url}
+      underline="hover"
+      sx={{
+        display: 'inline-block',
+        maxWidth: 200,
+      }}
+    >
+      <Typography variant="body2" noWrap>
+        {truncate(title, 30)}
+      </Typography>
+    </MUILink>
+  </Tooltip>
+);
 
-  return (
-    <Tooltip title={title}>
-      <MUILink
-        component={Link}
-        to={`${path}/${id}`}
-        underline="hover"
-        sx={{
-          display: 'inline-block',
-          maxWidth: 200,
-        }}
-      >
-        <Typography variant="body2" noWrap>
-          {truncate(title, 30)}
-        </Typography>
-      </MUILink>
-    </Tooltip>
-  );
+export const renderReference = (finding, type) => {
+  switch (type) {
+    case INJECT: {
+      const title = finding.finding_inject?.inject_title;
+      const injectId = finding.finding_inject?.inject_id;
+      const simulationId = finding.finding_simulation?.exercise_id;
+
+      if (!title || !injectId) return '-';
+      const isAtomic = !simulationId;
+      const url = isAtomic
+        ? `${ATOMIC_BASE_URL}/${injectId}`
+        : `${SIMULATION_BASE_URL}/${simulationId}/injects/${injectId}`;
+
+      return renderLink(title, url);
+    }
+
+    case SIMULATION: {
+      const title = finding.finding_simulation?.exercise_name;
+      const id = finding.finding_simulation?.exercise_id;
+      if (!title || !id) return '-';
+      return renderLink(title, `${SIMULATION_BASE_URL}/${id}`);
+    }
+
+    case SCENARIO: {
+      const title = finding.finding_scenario?.scenario_name;
+      const id = finding.finding_scenario?.scenario_id;
+      if (!title || !id) return '-';
+      return renderLink(title, `${SCENARIO_BASE_URL}/${id}`);
+    }
+
+    default:
+      return '-';
+  }
 };
