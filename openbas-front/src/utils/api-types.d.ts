@@ -3291,7 +3291,7 @@ export interface PlatformSettings {
   /** Reply to mail to use by default for injects */
   default_reply_to?: string;
   /** List of enabled dev features */
-  enabled_dev_features?: ("_RESERVED" | "AGENT_EXPECTATION_UI")[];
+  enabled_dev_features?: ("_RESERVED" | "TARGET_PAGINATION")[];
   /** True if the Caldera Executor is enabled */
   executor_caldera_enable?: boolean;
   /** Url of the Caldera Executor */
