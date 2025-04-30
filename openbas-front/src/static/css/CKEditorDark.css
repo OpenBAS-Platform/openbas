@@ -1,5 +1,7 @@
 html[data-theme="dark"],
-body[data-theme="dark"] {
+body[data-theme="dark"],
+html[data-theme="auto"],
+body[data-theme="auto"]{
   --ck-z-modal: 3000 !important;
   --ck-z-panel: 3000 !important;
 
