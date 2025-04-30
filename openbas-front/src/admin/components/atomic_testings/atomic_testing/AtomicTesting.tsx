@@ -99,13 +99,13 @@ const AtomicTesting = () => {
   }, [hasAssetsGroup, hasTeams]);
 
   useEffect(() => {
-    const selectedInject = injectResultOverviewOutput?.inject_targets?.find(target =>
+    const currentSelectedTarget = injectResultOverviewOutput?.inject_targets?.find(target =>
       target.targetType === tabConfig.find(tab => tab.key === activeTab)?.type,
     ) || injectResultOverviewOutput?.inject_targets?.[0];
-    setSelectedTargetLegacy(selectedInject);
+    setSelectedTargetLegacy(currentSelectedTarget);
 
-    if (targets && selectedInject) {
-      setSelectedTarget(targets.find(target => selectedInject.id === target.target_id));
+    if (targets && currentSelectedTarget) {
+      setSelectedTarget(targets.find(target => currentSelectedTarget.id === target.target_id));
     }
   }, [tabConfig, activeTab, injectResultOverviewOutput, targets]);
 
