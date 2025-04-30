@@ -322,7 +322,7 @@ public interface ExerciseRepository
   @Query(
       value =
           """
-        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS name, e.exercise_created_at
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS label, e.exercise_created_at
         FROM injects i
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
         INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
@@ -336,7 +336,7 @@ public interface ExerciseRepository
   @Query(
       value =
           """
-        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS name, e.exercise_created_at
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS label, e.exercise_created_at
         FROM injects i
         INNER JOIN findings f ON f.finding_inject_id = i.inject_id
         LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id

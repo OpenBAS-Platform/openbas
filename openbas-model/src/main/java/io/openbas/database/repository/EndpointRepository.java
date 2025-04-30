@@ -72,7 +72,7 @@ public interface EndpointRepository
   @Query(
       value =
           """
-    SELECT DISTINCT a.asset_id AS id, a.asset_name AS name
+    SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
     FROM assets a
     WHERE a.asset_id IN (
         SELECT DISTINCT fa.asset_id
@@ -86,7 +86,7 @@ public interface EndpointRepository
   @Query(
       value =
           """
-    SELECT DISTINCT a.asset_id AS id, a.asset_name AS name
+    SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
     FROM assets a
     WHERE a.asset_id IN (
         SELECT DISTINCT fa2.asset_id

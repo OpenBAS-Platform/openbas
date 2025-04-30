@@ -109,7 +109,7 @@ public interface AssetGroupRepository
   @Query(
       value =
           """
-    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS name
+    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS label
     FROM asset_groups ag
     WHERE ag.asset_group_id IN (
         SELECT DISTINCT iag.asset_group_id
@@ -124,7 +124,7 @@ public interface AssetGroupRepository
   @Query(
       value =
           """
-    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS name
+    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS label
     FROM asset_groups ag
     WHERE ag.asset_group_id IN (
         SELECT DISTINCT iag.asset_group_id
