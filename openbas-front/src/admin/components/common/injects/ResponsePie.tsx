@@ -1,7 +1,7 @@
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useCallback, useMemo } from 'react';
+import { type FunctionComponent, memo, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
@@ -13,7 +13,8 @@ interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
   disableChartAnimation?: boolean;
-  isReducedView?: boolean;
+  hasTitles?: boolean;
+  forceSize?: number;
 }
 
 const getTotal = (distribution: ResultDistribution[]) => {
@@ -32,22 +33,23 @@ const getColor = (theme: Theme, result: string | undefined): string => {
   return colorMap[result ?? ''] ?? theme.palette.error.main ?? '';
 };
 
-const iconOverlay = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  fontSize: 35,
-};
-
 const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
   disableChartAnimation,
-  isReducedView = false,
+  forceSize,
+  hasTitles = true,
 }) => {
   const { t } = useFormatter();
   const theme = useTheme();
+
+  const iconOverlay = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    fontSize: forceSize ? forceSize * 0.3 : 35,
+  };
 
   const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
   const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');
@@ -79,8 +81,10 @@ const ResponsePie: FunctionComponent<Props> = ({
 
     return (
       <div style={{
-        width: '100%',
         position: 'relative',
+        width: '100%',
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
       }}
       >
         {renderIcon(type, hasDistribution)}
@@ -100,8 +104,8 @@ const ResponsePie: FunctionComponent<Props> = ({
           }
           series={data}
           type="donut"
-          width="100%"
-          height={isReducedView ? '100%' : 'auto'}
+          height={forceSize ? forceSize : 120}
+          width={forceSize ? forceSize : '100%'}
         />
       </div>
     );
@@ -125,20 +129,23 @@ const ResponsePie: FunctionComponent<Props> = ({
   return (
     <div style={{
       display: 'grid',
-      width: isReducedView ? '80%' : '100%',
-      padding: isReducedView ? theme.spacing(2) : 0,
-      gridTemplateColumns: '33% 33% 33%',
+      gridTemplateColumns: '33% 34% 33%',
+      width: '100%',
     }}
     >
       <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
       <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
       <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
 
-      {pieTitle(t('TYPE_PREVENTION'), prevention)}
-      {pieTitle(t('TYPE_DETECTION'), detection)}
-      {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
+      {hasTitles && (
+        <>
+          {pieTitle(t('TYPE_PREVENTION'), prevention)}
+          {pieTitle(t('TYPE_DETECTION'), detection)}
+          {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
+        </>
+      )}
 
-      { displayHumanValidationBtn && (
+      {displayHumanValidationBtn && (
         <Button
           startIcon={<InfoOutlined />}
           color="primary"
@@ -157,4 +164,4 @@ const ResponsePie: FunctionComponent<Props> = ({
   );
 };
 
-export default ResponsePie;
+export default memo(ResponsePie);
