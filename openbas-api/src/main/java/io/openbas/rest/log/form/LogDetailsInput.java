@@ -1,11 +1,9 @@
 package io.openbas.rest.log.form;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class LogDetailsInput {
 
   @Schema(
