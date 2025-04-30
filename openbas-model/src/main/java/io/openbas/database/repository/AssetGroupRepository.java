@@ -106,18 +106,36 @@ public interface AssetGroupRepository
       String simulationOrScenarioId, String name);
 
   @Query(
-      "SELECT ag FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " JOIN i.assetGroups ag"
-          + " WHERE (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
-  Set<AssetGroup> findAllByNameLinkedToFindings(String name);
+      value =
+          """
+    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS label
+    FROM asset_groups ag
+    WHERE ag.asset_group_id IN (
+        SELECT DISTINCT iag.asset_group_id
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
-      "SELECT ag FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " JOIN i.assetGroups ag"
-          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
-          + " AND (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
-  Set<AssetGroup> findAllByNameLinkedToFindingsWithContext(
-      String simulationOrScenarioId, String name);
+      value =
+          """
+    SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS label
+    FROM asset_groups ag
+    WHERE ag.asset_group_id IN (
+        SELECT DISTINCT iag.asset_group_id
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+        LEFT JOIN injects_asset_groups iag ON iag.inject_id = i.inject_id
+        LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+        WHERE i.inject_id = :sourceId OR i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId
+    ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

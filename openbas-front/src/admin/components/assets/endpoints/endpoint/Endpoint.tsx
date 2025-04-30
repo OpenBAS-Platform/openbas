@@ -150,6 +150,7 @@ const Endpoint = () => {
           searchFindings={search}
           additionalHeaders={additionalHeaders}
           additionalFilterNames={additionalFilterNames}
+          contextId={endpointId}
         />
       </Paper>
     </div>

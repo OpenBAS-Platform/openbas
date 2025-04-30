@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,13 +161,16 @@ public class AssetGroupApi extends RestBehavior {
         .toList();
   }
 
+  @LogExecutionTime
   @GetMapping(ASSET_GROUP_URI + "/findings/options")
   public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return assetGroupService.getOptionsByNameLinkedToFindings(searchText, simulationOrScenarioId);
+      @RequestParam(required = false) final String sourceId) {
+    return assetGroupService.getOptionsByNameLinkedToFindings(
+        searchText, sourceId, PageRequest.of(0, 50));
   }
 
+  @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.assetGroupRepository.findAllById(ids)).stream()
