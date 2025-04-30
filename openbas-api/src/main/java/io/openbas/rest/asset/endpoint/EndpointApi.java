@@ -167,7 +167,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/findings/options")
-  public Page<FilterOption> optionsByNameLinkedToFindings(
+  public List<FilterOption> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String sourceId) {
     return endpointService.getOptionsByNameLinkedToFindings(
