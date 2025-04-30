@@ -1,7 +1,7 @@
 package io.openbas.rest;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +41,7 @@ public class LogApiTest extends IntegrationTest {
             .getResponse()
             .getContentAsString();
 
-    assertThatJson(response).isEqualTo("Log message processed successfully");
+    assertThat(response).isEqualTo("Log message processed successfully");
   }
 
   @Test
