@@ -101,7 +101,7 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
             )}
           </>
         );
-      }
+      },
     },
     {
       field: 'agent_privilege',
