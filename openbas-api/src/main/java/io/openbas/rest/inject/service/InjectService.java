@@ -789,7 +789,7 @@ public class InjectService {
     return agents;
   }
 
-  public List<FilterOption> getOptionsByNameLinkedToFindings(
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
       String searchText, String sourceId, Pageable pageable) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId = StringUtils.trimToNull(sourceId);

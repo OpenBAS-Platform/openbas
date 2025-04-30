@@ -30,6 +30,8 @@ public class FilterUtilsJpa {
 
   private FilterUtilsJpa() {}
 
+  public record Option(String id, String label) {}
+
   private static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
 
   @SuppressWarnings("unchecked")

@@ -17,7 +17,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -97,19 +97,19 @@ public class OrganizationApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ORGANIZATION_URI + "/options")
-  public List<FilterOption> optionsByName(@RequestParam(required = false) final String searchText) {
+  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.organizationRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 
   @PostMapping(ORGANIZATION_URI + "/options")
-  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.organizationRepository.findAllById(ids)).stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 }

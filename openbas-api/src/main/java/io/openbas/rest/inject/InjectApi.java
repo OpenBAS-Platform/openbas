@@ -24,7 +24,7 @@ import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.ImportService;
 import io.openbas.service.targets.TargetService;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -354,7 +354,7 @@ public class InjectApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT_URI + "/findings/options")
-  public List<FilterOption> optionsByTitleLinkedToFindings(
+  public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String sourceId) {
     return injectService.getOptionsByNameLinkedToFindings(
@@ -362,9 +362,9 @@ public class InjectApi extends RestBehavior {
   }
 
   @PostMapping(INJECT_URI + "/options")
-  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.injectRepository.findAllById(ids)).stream()
-        .map(i -> new FilterOption(i.getId(), i.getTitle()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
         .toList();
   }
 

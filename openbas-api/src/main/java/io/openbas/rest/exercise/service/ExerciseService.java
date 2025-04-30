@@ -433,7 +433,7 @@ public class ExerciseService {
     return new CriteriaBuilderAndExercises(cb, exercises);
   }
 
-  public List<FilterOption> getOptionsByNameLinkedToFindings(
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
       String searchText, String simulationOrScenarioId, Pageable pageable) {
     String trimmedSearchText = org.apache.commons.lang3.StringUtils.trimToNull(searchText);
     String trimmedSimulationOrScenarioId =

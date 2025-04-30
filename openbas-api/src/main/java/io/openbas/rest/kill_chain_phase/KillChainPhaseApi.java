@@ -13,7 +13,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpsertInput;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -130,19 +130,19 @@ public class KillChainPhaseApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(KILL_CHAIN_PHASE_URI + "/options")
-  public List<FilterOption> optionsByName(@RequestParam(required = false) final String searchText) {
+  public List<FilterUtilsJpa.Option> optionsByName(@RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.killChainPhaseRepository.findAll(
                 byName(searchText), Sort.by(Sort.Direction.ASC, "order")))
         .stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 
   @PostMapping(KILL_CHAIN_PHASE_URI + "/options")
-  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.killChainPhaseRepository.findAllById(ids)).stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 }

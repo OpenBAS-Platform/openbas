@@ -2,7 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.*;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -330,7 +330,7 @@ public interface ExerciseRepository
         ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterOption> findAllOptionByNameLinkedToFindings(
+  List<FilterUtilsJpa.Option> findAllOptionByNameLinkedToFindings(
       @Param("name") String name, Pageable pageable);
 
   @Query(
@@ -347,6 +347,6 @@ public interface ExerciseRepository
         ORDER BY e.exercise_created_at DESC;
     """,
       nativeQuery = true)
-  List<FilterOption> findAllOptionByNameLinkedToFindingsWithContext(
+  List<FilterUtilsJpa.Option> findAllOptionByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

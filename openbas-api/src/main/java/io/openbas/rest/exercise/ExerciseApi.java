@@ -32,7 +32,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -379,7 +379,7 @@ public class ExerciseApi extends RestBehavior {
   // -- OPTION --
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/findings/options")
-  public List<FilterOption> optionsByNameLinkedToFindings(
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String scenarioId) {
     return exerciseService.getOptionsByNameLinkedToFindings(
@@ -388,9 +388,9 @@ public class ExerciseApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/options")
-  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.exerciseRepository.findAllById(ids)).stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 

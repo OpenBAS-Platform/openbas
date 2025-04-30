@@ -2,7 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.raw.RawAssetGroup;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -119,7 +119,7 @@ public interface AssetGroupRepository
     ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  List<FilterOption> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
+  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
@@ -137,6 +137,6 @@ public interface AssetGroupRepository
     ) AND (:name IS NULL OR LOWER(ag.asset_group_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
     """,
       nativeQuery = true)
-  List<FilterOption> findAllByNameLinkedToFindingsWithContext(
+  List<FilterUtilsJpa.Option> findAllByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

@@ -19,7 +19,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
-import io.openbas.utils.FilterOption;
+import io.openbas.utils.FilterUtilsJpa.Option;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -150,20 +150,20 @@ public class AssetGroupApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ASSET_GROUP_URI + "/options")
-  public List<FilterOption> optionsByName(
+  public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId) {
     return assetGroupRepository
         .findAllBySimulationOrScenarioIdAndName(
             StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
         .stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 
   @LogExecutionTime
   @GetMapping(ASSET_GROUP_URI + "/findings/options")
-  public List<FilterOption> optionsByNameLinkedToFindings(
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String sourceId) {
     return assetGroupService.getOptionsByNameLinkedToFindings(
@@ -172,9 +172,9 @@ public class AssetGroupApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/options")
-  public List<FilterOption> optionsById(@RequestBody final List<String> ids) {
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.assetGroupRepository.findAllById(ids)).stream()
-        .map(i -> new FilterOption(i.getId(), i.getName()))
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
 }
