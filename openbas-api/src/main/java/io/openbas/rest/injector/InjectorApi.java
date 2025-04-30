@@ -28,6 +28,7 @@ import io.openbas.rest.injector.response.InjectorConnection;
 import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

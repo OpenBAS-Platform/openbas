@@ -23,6 +23,7 @@ import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
 import io.openbas.service.TeamService;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

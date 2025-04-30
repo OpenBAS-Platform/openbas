@@ -19,6 +19,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

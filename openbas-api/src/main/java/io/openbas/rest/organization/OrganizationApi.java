@@ -17,6 +17,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;

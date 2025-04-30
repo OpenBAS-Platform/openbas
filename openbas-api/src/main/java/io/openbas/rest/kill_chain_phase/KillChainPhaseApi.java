@@ -13,6 +13,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseCreateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpdateInput;
 import io.openbas.rest.kill_chain_phase.form.KillChainPhaseUpsertInput;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
