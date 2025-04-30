@@ -1,7 +1,6 @@
-import { Link as MUILink, List, Paper, Tooltip, Typography } from '@mui/material';
+import { List, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
@@ -13,11 +12,8 @@ import ItemTags from '../../../../../components/ItemTags';
 import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
-import {
-  type EndpointOverviewOutput as EndpointType, type FindingOutput,
-  type SearchPaginationInput, type TargetSimple,
-} from '../../../../../utils/api-types';
-import { emptyFilled, formatIp, formatMacAddress, truncate } from '../../../../../utils/String';
+import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
+import { emptyFilled, formatIp, formatMacAddress, renderReference } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -40,33 +36,6 @@ const Endpoint = () => {
   const { t } = useFormatter();
   const theme = useTheme();
 
-  const renderReference = (
-    title: string | undefined,
-    id: string | undefined,
-    path: string | undefined,
-    truncateLength = 30,
-  ) => {
-    if (!title || !id) return '-';
-
-    return (
-      <Tooltip title={title}>
-        <MUILink
-          component={Link}
-          to={`${path}/${id}`}
-          underline="hover"
-          sx={{
-            display: 'inline-block',
-            maxWidth: 200,
-          }}
-        >
-          <Typography variant="body2" noWrap>
-            {truncate(title, truncateLength)}
-          </Typography>
-        </MUILink>
-      </Tooltip>
-    );
-  };
-
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
 
@@ -86,7 +55,7 @@ const Endpoint = () => {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/exercises'),
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations'),
     },
     {
       field: 'finding_asset_groups',
@@ -184,5 +153,4 @@ const Endpoint = () => {
     </div>
   );
 };
-
 export default Endpoint;

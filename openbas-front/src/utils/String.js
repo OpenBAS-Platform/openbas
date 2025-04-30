@@ -1,3 +1,6 @@
+import { Link as MUILink, Tooltip, Typography } from '@mui/material';
+import { Link } from 'react-router';
+
 import colorStyles from '../components/Color';
 import { isNotEmptyField } from './utils';
 
@@ -93,4 +96,31 @@ export const formatMacAddress = (mac) => {
 
 export const formatIp = (ip) => {
   return ip.toUpperCase();
+};
+
+export const renderReference = (
+  title,
+  id,
+  path,
+  truncateLength,
+) => {
+  if (!title || !id) return '-';
+
+  return (
+    <Tooltip title={title}>
+      <MUILink
+        component={Link}
+        to={`${path}/${id}`}
+        underline="hover"
+        sx={{
+          display: 'inline-block',
+          maxWidth: 200,
+        }}
+      >
+        <Typography variant="body2" noWrap>
+          {truncate(title, truncateLength)}
+        </Typography>
+      </MUILink>
+    </Tooltip>
+  );
 };

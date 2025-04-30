@@ -1,9 +1,8 @@
-import { Tooltip } from '@mui/material';
-
 import { searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import type { FindingOutput } from '../../../utils/api-types';
+import { renderReference } from '../../../utils/String';
 import FindingList from './FindingList';
 
 const Findings = () => {
@@ -20,19 +19,19 @@ const Findings = () => {
       field: 'finding_scenario',
       label: 'Scenario',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_scenario?.scenario_name || '-',
+      value: (finding: FindingOutput) => renderReference(finding.finding_scenario?.scenario_name, finding.finding_scenario?.scenario_id, '/admin/scenarios'),
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations'),
     },
     {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
+      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/injects'),
     },
   ];
   return (
