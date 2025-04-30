@@ -22,7 +22,9 @@ public class IncludeMembersOfAssetGroups {
     Specification<Endpoint> transitiveMembershipSpec =
         getTransitiveTargetingSpecification(assetGroupIds);
 
-    return dynamicFiltersSpec == null ? transitiveMembershipSpec : dynamicFiltersSpec.or(transitiveMembershipSpec);
+    return dynamicFiltersSpec == null
+        ? transitiveMembershipSpec
+        : dynamicFiltersSpec.or(transitiveMembershipSpec);
   }
 
   private Specification<Endpoint> getDynamicFilterSpecification(List<String> assetGroupIds) {

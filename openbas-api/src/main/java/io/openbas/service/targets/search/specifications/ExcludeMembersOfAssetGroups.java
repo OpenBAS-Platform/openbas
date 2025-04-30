@@ -22,7 +22,9 @@ public class ExcludeMembersOfAssetGroups {
     Specification<Endpoint> transitiveMembershipSpec =
         getTransitiveTargetingSpecification(assetGroupIds);
 
-    return dynamicFiltersSpec == null ? transitiveMembershipSpec : dynamicFiltersSpec.and(transitiveMembershipSpec);
+    return dynamicFiltersSpec == null
+        ? transitiveMembershipSpec
+        : dynamicFiltersSpec.and(transitiveMembershipSpec);
   }
 
   private Specification<Endpoint> getDynamicFilterSpecification(List<String> assetGroupIds) {
