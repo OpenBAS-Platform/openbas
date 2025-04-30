@@ -1,12 +1,14 @@
 package io.openbas.rest;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -19,6 +21,8 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,6 +43,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ExpectationComposer expectationComposer;
   @Autowired private ExecutorFixture executorFixture;
 
   @Autowired private MockMvc mvc;
@@ -46,6 +51,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectStatusRepository injectStatusRepository;
   @Autowired private EntityManager entityManager;
+  @Autowired private ObjectMapper mapper;
 
   @BeforeEach
   void before() {
@@ -60,7 +66,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
-  private Inject getAtomicTesting(
+  private InjectComposer.Composer getAtomicTestingWrapper(
       @Nullable InjectStatus injectStatus, @Nullable Executor executor) {
     InjectStatus injectStatusToSet =
         (injectStatus == null) ? InjectStatusFixture.createDraftInjectStatus() : injectStatus;
@@ -72,9 +78,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
                 .forEndpoint(EndpointFixture.createEndpoint())
                 .withAgent(
                     agentComposer.forAgent(AgentFixture.createDefaultAgentSession(executorToRun))))
-        .withInjectStatus(injectStatusComposer.forInjectStatus(injectStatusToSet))
-        .persist()
-        .get();
+        .withInjectStatus(injectStatusComposer.forInjectStatus(injectStatusToSet));
   }
 
   @Test
@@ -148,7 +152,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Launch an Atomic Testing")
   @WithMockAdminUser
   void launchAtomicTesting() throws Exception {
-    Inject atomicTesting = getAtomicTesting(null, null);
+    Inject atomicTesting = getAtomicTestingWrapper(null, null).persist().get();
 
     entityManager.flush();
     entityManager.clear();
@@ -162,7 +166,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Relaunch an Atomic Testing")
   @WithMockAdminUser
   void relaunchAtomicTesting() throws Exception {
-    Inject atomicTesting = getAtomicTesting(InjectStatusFixture.createQueuingInjectStatus(), null);
+    Inject atomicTesting =
+        getAtomicTestingWrapper(InjectStatusFixture.createQueuingInjectStatus(), null)
+            .persist()
+            .get();
 
     String relaunchedInject =
         mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/relaunch"))
@@ -186,7 +193,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
     @Test
     @DisplayName("Throw license restricted error when launch with crowdstrike")
     void given_crowdstrike_should_not_LaunchAtomicTesting() throws Exception {
-      Inject atomicTesting = getAtomicTesting(null, executorFixture.getCrowdstrikeExecutor());
+      Inject atomicTesting =
+          getAtomicTestingWrapper(null, executorFixture.getCrowdstrikeExecutor()).persist().get();
 
       mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/launch"))
           .andExpect(status().isForbidden())
@@ -197,8 +205,11 @@ public class AtomicTestingApiTest extends IntegrationTest {
     @DisplayName("Throw license restricted error when relaunch with Tanium")
     void given_tanium_should_not_relaunchAtomicTesting() throws Exception {
       Inject atomicTesting =
-          getAtomicTesting(
-              InjectStatusFixture.createQueuingInjectStatus(), executorFixture.getTaniumExecutor());
+          getAtomicTestingWrapper(
+                  InjectStatusFixture.createQueuingInjectStatus(),
+                  executorFixture.getTaniumExecutor())
+              .persist()
+              .get();
 
       mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/relaunch"))
           .andExpect(status().isForbidden())
@@ -223,5 +234,317 @@ public class AtomicTestingApiTest extends IntegrationTest {
             .getContentAsString();
     // -- ASSERT --
     assertEquals("", response);
+  }
+
+  @Nested
+  @DisplayName("Expectation results computation")
+  @WithMockAdminUser
+  public class ExpectationResultsComputation {
+    @Nested
+    @DisplayName("When target has multiple sets of expectations and must be merged")
+    public class WhenTargetHasMultipleSetsOfExpectationsAndMerged {
+      @Test
+      @DisplayName("Merged expectations have superset of results of all expectations of same type")
+      public void mergedExpectationsHaveSupersetOfExpectationsAndMerged() throws Exception {
+        List<InjectExpectationResult> resultSet1 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(20.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build());
+
+        List<InjectExpectationResult> resultSet2 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(40.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        EndpointComposer.Composer endpointWrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+        InjectExpectation detection1 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        detection1.setResults(resultSet1);
+        InjectExpectation detection2 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        detection2.setResults(resultSet2);
+        InjectComposer.Composer injectWrapper =
+            injectComposer
+                .forInject(InjectFixture.getDefaultInject())
+                .withEndpoint(endpointWrapper)
+                .withExpectation(
+                    expectationComposer.forExpectation(detection1).withEndpoint(endpointWrapper))
+                .withExpectation(
+                    expectationComposer.forExpectation(detection2).withEndpoint(endpointWrapper));
+
+        injectWrapper.persist();
+
+        entityManager.flush();
+        entityManager.flush();
+
+        String response =
+            mvc.perform(
+                    get(ATOMIC_TESTINGS_URI
+                            + "/"
+                            + injectWrapper.get().getId()
+                            + "/target_results/"
+                            + endpointWrapper.get().getId()
+                            + "/types/ASSETS/merged")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<InjectExpectationResult> expectedSuperset =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(20.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(40.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("[0].inject_expectation_results")
+            .isEqualTo(mapper.writeValueAsString(expectedSuperset));
+        assertThatJson(response).node("[0].inject_expectation_score").isEqualTo("100.0");
+      }
+
+      @Test
+      @DisplayName("Merged expectations are separated by type")
+      public void mergedExpectationsAreSeparatedByType() throws Exception {
+
+        // DETECTION
+        List<InjectExpectationResult> detectionResultSet1 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(20.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build());
+
+        List<InjectExpectationResult> detectionResultSet2 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(40.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        InjectExpectation detection1 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        detection1.setResults(detectionResultSet1);
+        detection1.setExpectedScore(100.0);
+        InjectExpectation detection2 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        detection2.setResults(detectionResultSet2);
+        detection2.setExpectedScore(100.0);
+
+        // PREVENTION
+
+        List<InjectExpectationResult> preventionResultSet1 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(0.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(17.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build());
+
+        List<InjectExpectationResult> preventionResultSet2 =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(0.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(32.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        InjectExpectation prevention1 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        prevention1.setResults(preventionResultSet1);
+        prevention1.setExpectedScore(100.0);
+        InjectExpectation prevention2 =
+            InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+        prevention2.setResults(preventionResultSet2);
+        prevention2.setExpectedScore(100.0);
+
+        EndpointComposer.Composer endpointWrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+        InjectComposer.Composer injectWrapper =
+            injectComposer
+                .forInject(InjectFixture.getDefaultInject())
+                .withEndpoint(endpointWrapper)
+                .withExpectation(
+                    expectationComposer.forExpectation(detection1).withEndpoint(endpointWrapper))
+                .withExpectation(
+                    expectationComposer.forExpectation(detection2).withEndpoint(endpointWrapper))
+                .withExpectation(
+                    expectationComposer.forExpectation(prevention1).withEndpoint(endpointWrapper))
+                .withExpectation(
+                    expectationComposer.forExpectation(prevention2).withEndpoint(endpointWrapper));
+
+        injectWrapper.persist();
+
+        entityManager.flush();
+        entityManager.flush();
+
+        String response =
+            mvc.perform(
+                    get(ATOMIC_TESTINGS_URI
+                            + "/"
+                            + injectWrapper.get().getId()
+                            + "/target_results/"
+                            + endpointWrapper.get().getId()
+                            + "/types/ASSETS/merged")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<InjectExpectationResult> expectedDetectionSuperset =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(100.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(20.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(40.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        List<InjectExpectationResult> expectedPreventionSuperset =
+            List.of(
+                InjectExpectationResult.builder()
+                    .sourceId("collector id")
+                    .sourceType("collector")
+                    .score(0.0)
+                    .sourceName("test collector")
+                    .result("Success")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(17.0)
+                    .sourceName("test SIEM")
+                    .result("Meh...")
+                    .build(),
+                InjectExpectationResult.builder()
+                    .sourceId("siem id")
+                    .sourceType("security-platform")
+                    .score(32.0)
+                    .sourceName("test SIEM")
+                    .result("Meh better...")
+                    .build());
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("[1].inject_expectation_results")
+            .isEqualTo(mapper.writeValueAsString(expectedDetectionSuperset));
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("[0].inject_expectation_results")
+            .isEqualTo(mapper.writeValueAsString(expectedPreventionSuperset));
+        assertThatJson(response).node("[1].inject_expectation_score").isEqualTo("100.0");
+        // assertThatJson(response).node("[0].inject_expectation_score").isEqualTo("0.0");
+      }
+    }
   }
 }

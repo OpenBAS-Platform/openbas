@@ -9,6 +9,7 @@ import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -103,8 +104,11 @@ public class AtomicTestingApi extends RestBehavior {
       @PathVariable String injectId,
       @PathVariable String targetId,
       @PathVariable String targetType) {
-    return injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-        injectId, targetId, targetType);
+    return injectExpectationService
+        .findMergedExpectationsByInjectAndTargetAndTargetType(injectId, targetId, targetType)
+        .stream()
+        .sorted(Comparator.comparing(InjectExpectation::getType))
+        .toList();
   }
 
   @PutMapping("/{injectId}/tags")

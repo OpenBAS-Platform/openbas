@@ -850,7 +850,13 @@ public class InjectExpectationService {
 
       for (InjectExpectationResult expectationResult : expectation.getResults()) {
         if (!notCopiedSourceTypes.contains(expectationResult.getSourceType())) {
-          electedExpectations.get(expectation.getType()).getResults().add(expectationResult);
+          electedExpectations
+              .get(expectation.getType())
+              .setResults(
+                  Stream.concat(
+                          electedExpectations.get(expectation.getType()).getResults().stream(),
+                          Stream.of(expectationResult))
+                      .toList());
         }
       }
     }
