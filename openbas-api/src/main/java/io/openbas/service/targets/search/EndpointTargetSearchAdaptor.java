@@ -3,7 +3,6 @@ package io.openbas.service.targets.search;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.service.targets.search.specifications.ExcludeMembersOfAssetGroups;
@@ -12,11 +11,8 @@ import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGro
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.criteria.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -28,29 +24,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   private final EndpointRepository endpointRepository;
-  private final AssetGroupRepository assetGroupRepository;
   private final InjectExpectationService injectExpectationService;
   private final IncludeMembersOfAssetGroups includeMembersOfAssetGroups;
   private final ExcludeMembersOfAssetGroups excludeMembersOfAssetGroups;
   private final IncludeDirectEndpointTargets includeDirectEndpointTargets;
 
-  @Getter
-  @RequiredArgsConstructor
-  private class AssetGroupSplit {
-    private final List<AssetGroup> includedAssetGroups;
-    private final List<AssetGroup> excludedAssetGroups;
-    private final Filters.FilterOperator filterOperator;
-  }
+  private record AssetGroupSplit(
+      List<AssetGroup> includedAssetGroups,
+      List<AssetGroup> excludedAssetGroups,
+      Filters.FilterOperator filterOperator) {}
 
   public EndpointTargetSearchAdaptor(
       EndpointRepository endpointRepository,
-      AssetGroupRepository assetGroupRepository,
       InjectExpectationService injectExpectationService,
       IncludeMembersOfAssetGroups includeMembersOfAssetGroups,
       ExcludeMembersOfAssetGroups excludeMembersOfAssetGroups,
       IncludeDirectEndpointTargets includeDirectEndpointTargets) {
     this.endpointRepository = endpointRepository;
-    this.assetGroupRepository = assetGroupRepository;
     this.injectExpectationService = injectExpectationService;
     this.includeMembersOfAssetGroups = includeMembersOfAssetGroups;
     this.excludeMembersOfAssetGroups = excludeMembersOfAssetGroups;
