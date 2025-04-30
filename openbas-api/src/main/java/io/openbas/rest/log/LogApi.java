@@ -56,8 +56,8 @@ public class LogApi extends RestBehavior {
       logger.error(buildLogMessage(logDetailsInput, level));
     } else {
       String invalidLevel = "Invalid level: " + level;
-      logger.error(invalidLevel + level);
-      return new ResponseEntity<>(invalidLevel + level, HttpStatus.BAD_REQUEST);
+      logger.error(invalidLevel);
+      return new ResponseEntity<>(invalidLevel, HttpStatus.BAD_REQUEST);
     }
 
     return new ResponseEntity<>("Log message processed successfully", HttpStatus.OK);
