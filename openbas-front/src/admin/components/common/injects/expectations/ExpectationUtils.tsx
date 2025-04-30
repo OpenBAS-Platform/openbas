@@ -5,6 +5,8 @@ import { ExpectationType } from './Expectation';
 
 export const FAILED = 'Failed';
 
+export const HUMAN_EXPECTATION = ['MANUAL', 'CHALLENGE', 'ARTICLE'];
+
 export const isAutomatic = (type: string) => {
   return [ExpectationType.ARTICLE.toString(), ExpectationType.PREVENTION.toString(), ExpectationType.DETECTION.toString()].includes(type);
 };

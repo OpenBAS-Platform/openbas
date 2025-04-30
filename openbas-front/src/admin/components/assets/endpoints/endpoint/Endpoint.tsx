@@ -93,7 +93,7 @@ const Endpoint = () => {
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_seen_ip)}</Typography>
         <span style={{ display: 'flex' }}>
           <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
-            &nbsp;
+          &nbsp;
           {endpoint.endpoint_platform}
         </span>
 
@@ -103,22 +103,34 @@ const Endpoint = () => {
         <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
 
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_arch)}</Typography>
-        <Typography variant="body2" gutterBottom>
-          {endpoint.endpoint_ips?.map((ip: string) => (
-            <>
-              {formatIp(ip)}
-              <br />
-            </>
-          ))}
-        </Typography>
-        <Typography variant="body2" gutterBottom>
-          {endpoint.endpoint_mac_addresses?.map((mac: string) => (
-            <>
-              {formatMacAddress(mac)}
-              <br />
-            </>
-          ))}
-        </Typography>
+        <div style={{
+          maxHeight: theme.spacing(20),
+          overflowY: 'auto',
+          marginRight: theme.spacing(1.5),
+        }}
+        >
+          <Typography variant="body2" gutterBottom>
+            {endpoint.endpoint_ips?.map((ip: string, index: number) => (
+              <div key={index}>
+                {formatIp(ip)}
+              </div>
+            ))}
+          </Typography>
+        </div>
+        <div style={{
+          maxHeight: theme.spacing(20),
+          overflowY: 'auto',
+          marginRight: theme.spacing(1),
+        }}
+        >
+          <Typography variant="body2" gutterBottom>
+            {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
+              <div key={index}>
+                {formatMacAddress(mac)}
+              </div>
+            ))}
+          </Typography>
+        </div>
         <ItemTags variant="list" tags={endpoint.asset_tags} />
       </Paper>
       <Typography variant="h4">{t('Agents')}</Typography>

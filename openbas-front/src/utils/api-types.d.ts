@@ -695,11 +695,11 @@ export interface CreateExerciseInput {
 }
 
 export interface CreateNotificationRuleInput {
-  resource_id?: string;
-  resource_type?: string;
-  subject?: string;
-  trigger?: string;
-  type?: string;
+  resource_id: string;
+  resource_type: string;
+  subject: string;
+  trigger: string;
+  type: string;
 }
 
 export interface CreateUserInput {
@@ -2548,7 +2548,7 @@ export interface NetworkTraffic {
 
 export interface NotificationRuleOutput {
   /** ID of the notification rule */
-  notification_rule_id?: string;
+  notification_rule_id: string;
   /** Owner of the notification rule */
   notification_rule_owner?: string;
   /** Resource id of the resource associated with the rule */
@@ -3305,7 +3305,7 @@ export interface PlatformSettings {
   /** Reply to mail to use by default for injects */
   default_reply_to?: string;
   /** List of enabled dev features */
-  enabled_dev_features?: ("_RESERVED" | "AGENT_EXPECTATION_UI")[];
+  enabled_dev_features?: ("_RESERVED" | "TARGET_PAGINATION")[];
   /** True if the Caldera Executor is enabled */
   executor_caldera_enable?: boolean;
   /** Url of the Caldera Executor */
@@ -4264,7 +4264,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdateNotificationRuleInput {
-  notification_rule_subject?: string;
+  subject: string;
 }
 
 export interface UpdateProfileInput {

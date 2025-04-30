@@ -9,6 +9,7 @@ interface Props {
   multiline?: boolean;
   rows?: number;
   required?: boolean;
+  disabled?: boolean;
   style?: CSSProperties;
   variant?: TextFieldVariants;
   placeholder?: string;
@@ -18,7 +19,7 @@ interface Props {
 
 const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
 
-const TextFieldController = ({ name, label, multiline, rows, required, style = {}, size, variant, placeholder = '', adornmentLabel }: Props) => {
+const TextFieldController = ({ name, label, multiline, rows, disabled, required, style = {}, size, variant, placeholder = '', adornmentLabel }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
 
@@ -38,6 +39,7 @@ const TextFieldController = ({ name, label, multiline, rows, required, style = {
           rows={rows}
           aria-label={label}
           required={required}
+          disabled={disabled}
           placeholder={placeholder}
           style={style}
           variant={variant || 'standard'}

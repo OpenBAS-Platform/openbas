@@ -2,32 +2,19 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   AttachmentOutlined,
-  CrisisAlertOutlined,
-  DescriptionOutlined,
-  EmojiEventsOutlined,
-  OutlinedFlagOutlined,
   PendingActionsOutlined,
-  SportsScoreOutlined,
 } from '@mui/icons-material';
 import {
   Alert,
-  Avatar,
   Button,
-  Card,
-  CardActionArea,
-  CardContent,
-  CardHeader,
-  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
-  GridLegacy,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -41,6 +28,7 @@ import { makeStyles } from 'tss-react/mui';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
 import { fetchPlayerDocuments } from '../../../actions/Document';
+import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import Transition from '../../../components/common/Transition';
@@ -68,21 +56,6 @@ const useStyles = makeStyles()(() => ({
     margin: '0 auto',
     width: '90%',
   },
-  flag: {
-    fontSize: 12,
-    float: 'left',
-    marginRight: 7,
-    maxWidth: 300,
-  },
-  card: { position: 'relative' },
-  footer: {
-    width: '100%',
-    position: 'absolute',
-    padding: '0 15px 0 15px',
-    left: 0,
-    bottom: 10,
-  },
-  button: { cursor: 'default' },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -316,108 +289,46 @@ const ChallengesPlayer = () => {
               <Empty message={t('No challenge in this simulation yet.')} />
             </div>
           )}
-          {Object.keys(sortedChallenges).map((category) => {
-            return (
-              <div key={category}>
-                <Typography variant="h1" style={{ margin: '40px 0 30px 0' }}>
-                  {category !== 'null' ? category : t('No category')}
-                </Typography>
-                <GridLegacy container={true} spacing={3}>
-                  {sortedChallenges[category].map((challengeEntry) => {
-                    const challenge = challengeEntry.challenge_detail;
-                    const expectation = challengeEntry.challenge_expectation;
-                    return (
-                      <GridLegacy key={challenge.challenge_id} item={true} xs={4}>
-                        <Card
-                          variant="outlined"
-                          classes={{ root: classes.card }}
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                          }}
+          {Object.keys(sortedChallenges).map(category => (
+            <div key={category}>
+              <Typography variant="h1" style={{ margin: '40px 0 30px 0' }}>
+                {category !== 'null' ? category : t('No category')}
+              </Typography>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: theme.spacing(3),
+              }}
+              >
+                {sortedChallenges[category].map((challengeEntry) => {
+                  const challenge = challengeEntry.challenge_detail;
+                  const expectation = challengeEntry.challenge_expectation;
+                  return (
+                    <ChallengeCard
+                      key={challenge.challenge_id}
+                      challenge={challenge}
+                      onClick={() => {
+                        setCurrentChallengeEntry(challengeEntry);
+                      }}
+                      clickable
+                      actionHeader={(
+                        <IconButton
+                          size="large"
+                          color={
+                            (expectation?.inject_expectation_results?.length ?? 0) > 0
+                              ? 'success'
+                              : 'inherit'
+                          }
                         >
-                          <CardActionArea
-                            onClick={() => setCurrentChallengeEntry(challengeEntry)}
-                          >
-                            <CardHeader
-                              avatar={(
-                                <Avatar sx={{ bgcolor: '#e91e63' }}>
-                                  <EmojiEventsOutlined />
-                                </Avatar>
-                              )}
-                              title={challenge.challenge_name}
-                              subheader={challenge.challenge_category}
-                              action={(
-                                <IconButton
-                                  size="large"
-                                  color={
-                                    (expectation?.inject_expectation_results?.length ?? 0) > 0
-                                      ? 'success'
-                                      : 'inherit'
-                                  }
-                                >
-                                  <PendingActionsOutlined fontSize="large" />
-                                </IconButton>
-                              )}
-                            />
-                            <CardContent style={{ margin: '-20px 0 30px 0' }}>
-                              <ExpandableMarkdown
-                                source={challenge.challenge_content}
-                                limit={500}
-                                controlled={true}
-                              />
-                              <div className={classes.footer}>
-                                <div style={{ float: 'left' }}>
-                                  {challenge.challenge_flags.map((flag) => {
-                                    return (
-                                      <Tooltip
-                                        key={flag.flag_id}
-                                        title={t(flag.flag_type)}
-                                      >
-                                        <Chip
-                                          icon={<OutlinedFlagOutlined />}
-                                          classes={{ root: classes.flag }}
-                                          variant="outlined"
-                                          label={t(flag.flag_type)}
-                                        />
-                                      </Tooltip>
-                                    );
-                                  })}
-                                </div>
-                                <div style={{ float: 'right' }}>
-                                  <Button
-                                    size="small"
-                                    startIcon={<SportsScoreOutlined />}
-                                    className={classes.button}
-                                  >
-                                    {challenge.challenge_score || 0}
-                                  </Button>
-                                  <Button
-                                    size="small"
-                                    startIcon={<CrisisAlertOutlined />}
-                                    className={classes.button}
-                                  >
-                                    {challenge.challenge_max_attempts || 0}
-                                  </Button>
-                                  <Button
-                                    size="small"
-                                    startIcon={<DescriptionOutlined />}
-                                    className={classes.button}
-                                  >
-                                    {challenge.challenge_documents.length || 0}
-                                  </Button>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </CardActionArea>
-                        </Card>
-                      </GridLegacy>
-                    );
-                  })}
-                </GridLegacy>
+                          <PendingActionsOutlined fontSize="large" />
+                        </IconButton>
+                      )}
+                    />
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
         <Dialog
           TransitionComponent={Transition}

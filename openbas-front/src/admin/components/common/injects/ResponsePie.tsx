@@ -101,7 +101,7 @@ const ResponsePie: FunctionComponent<Props> = ({
           series={data}
           type="donut"
           width="100%"
-          height="auto"
+          height={isReducedView ? '100%' : 'auto'}
         />
       </div>
     );
