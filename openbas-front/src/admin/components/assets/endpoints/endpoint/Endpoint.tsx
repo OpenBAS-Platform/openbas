@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import { searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import FindingReferenceLink from '../../../../../components/common/FindingReferenceLink';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
@@ -13,7 +14,7 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
-import { emptyFilled, formatIp, formatMacAddress, INJECT, renderReference, SIMULATION } from '../../../../../utils/String';
+import { emptyFilled, formatIp, formatMacAddress, INJECT, SIMULATION } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -49,13 +50,13 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, INJECT),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={INJECT} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, SIMULATION),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_asset_groups',

@@ -1,8 +1,9 @@
 import { searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import FindingReferenceLink from '../../../components/common/FindingReferenceLink';
 import { useFormatter } from '../../../components/i18n';
 import type { FindingOutput } from '../../../utils/api-types';
-import { INJECT, renderReference, SCENARIO, SIMULATION } from '../../../utils/String';
+import { INJECT, SCENARIO, SIMULATION } from '../../../utils/String';
 import FindingList from './FindingList';
 
 const Findings = () => {
@@ -19,19 +20,19 @@ const Findings = () => {
       field: 'finding_scenario',
       label: 'Scenario',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, SCENARIO),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={SCENARIO} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, SIMULATION),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, INJECT),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={INJECT} />,
     },
   ];
   return (

@@ -1,8 +1,9 @@
 import { useParams } from 'react-router';
 
 import { searchFindingsForSimulations } from '../../../../../actions/findings/finding-actions';
+import FindingReferenceLink from '../../../../../components/common/FindingReferenceLink';
 import type { Exercise, FindingOutput, SearchPaginationInput } from '../../../../../utils/api-types';
-import { INJECT, renderReference } from '../../../../../utils/String';
+import { INJECT } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 
 const SimulationFindings = () => {
@@ -20,7 +21,7 @@ const SimulationFindings = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding, INJECT),
+      value: (finding: FindingOutput) => <FindingReferenceLink finding={finding} type={INJECT} />,
     },
   ];
 
