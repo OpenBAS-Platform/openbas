@@ -26,19 +26,19 @@ import SimulationList from './simulations/SimulationList';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   paper: {
     height: '100%',
     minHeight: '100%',
-    margin: '10px 0 0 0',
-    padding: 15,
+    margin: theme.spacing(1, 0),
+    padding: theme.spacing(2),
     borderRadius: 4,
   },
   paperWithChart: {
     height: 320,
     minHeight: 320,
-    margin: '10px 0 0 0',
-    padding: 15,
+    margin: theme.spacing(1, 0),
+    padding: theme.spacing(2),
     borderRadius: 4,
     display: 'flex',
     alignItems: 'center',
@@ -47,15 +47,14 @@ const useStyles = makeStyles()(() => ({
   paperList: {
     height: 320,
     minHeight: 320,
-    margin: '10px 0 0 0',
-    padding: 0,
+    margin: theme.spacing(1, 0),
     borderRadius: 4,
   },
   paperChart: {
     height: 320,
     minHeight: 320,
-    margin: '10px 0 0 0',
-    padding: 15,
+    margin: theme.spacing(1, 0),
+    padding: theme.spacing(2),
     borderRadius: 4,
   },
 }));
