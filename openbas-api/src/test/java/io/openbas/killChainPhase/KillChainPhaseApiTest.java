@@ -18,6 +18,7 @@ import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.repository.KillChainPhaseRepository;
 import io.openbas.database.specification.KillChainPhaseSpecification;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
+import io.openbas.utils.FilterOption;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -250,11 +251,11 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     try (MockedStatic<KillChainPhaseSpecification> mocked =
         Mockito.mockStatic(KillChainPhaseSpecification.class)) {
       when(KillChainPhaseSpecification.byName(SEARCH_INPUT)).thenReturn(spec);
-      List<Option> result = killChainPhaseApi.optionsByName(SEARCH_INPUT);
+      List<FilterOption> result = killChainPhaseApi.optionsByName(SEARCH_INPUT);
 
       verify(mockKillChainPhaseRepository).findAll(spec, Sort.by(Sort.Direction.ASC, "order"));
       assertEquals(
-          killChainPhaseList.stream().map(i -> new Option(i.getId(), i.getName())).toList(),
+          killChainPhaseList.stream().map(i -> new FilterOption(i.getId(), i.getName())).toList(),
           result);
     }
   }
