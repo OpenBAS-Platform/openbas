@@ -75,6 +75,14 @@ public class InjectsFileExport extends FileExportBase {
         inject -> {
           allTags.addAll(inject.getTags());
           inject
+              .getPayload()
+              .ifPresent(
+                  payload ->
+                      payload.getOutputParsers().stream()
+                          .flatMap(parser -> parser.getContractOutputElements().stream())
+                          .flatMap(element -> element.getTags().stream())
+                          .forEach(allTags::add));
+          inject
               .getInjectorContract()
               .ifPresent(
                   injectorContract -> {
