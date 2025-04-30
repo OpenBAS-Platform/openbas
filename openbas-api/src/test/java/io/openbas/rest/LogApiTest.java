@@ -46,8 +46,13 @@ public class LogApiTest extends IntegrationTest {
   @DisplayName("Should return 400 when target type is unsupported")
   void given_unsupported_level_should_return_400() throws Exception {
 
-    LogDetailsInput logDetailsInput = LogFixture.getDefaultLogDetailsInput("SEVERE");
+    LogDetailsInput logDetailsInput = LogFixture.getDefaultLogDetailsInput("OTHER");
 
-    mvc.perform(post(LOG_URI + "/")).andExpect(status().is4xxClientError());
+    mvc.perform(
+            post(LOG_URI + "/")
+                .content(asJsonString(logDetailsInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
   }
 }
