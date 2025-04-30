@@ -6,8 +6,8 @@ import type {
   Scenario,
   SearchPaginationInput,
 } from '../../../../../utils/api-types';
+import { renderReference, simulationBaseUrl } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
-import { renderReference } from '../../../../../utils/String';
 
 const ScenarioFindings = () => {
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
@@ -26,7 +26,7 @@ const ScenarioFindings = () => {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations', 30),
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, simulationBaseUrl),
     },
   ];
 

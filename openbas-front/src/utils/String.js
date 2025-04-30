@@ -98,11 +98,14 @@ export const formatIp = (ip) => {
   return ip.toUpperCase();
 };
 
+export const atomicBaseUrl = '/admin/atomic_testings';
+export const simulationBaseUrl = '/admin/simulations';
+export const scenarioBaseUrl = '/admin/scenarios';
+
 export const renderReference = (
   title,
   id,
   path,
-  truncateLength,
 ) => {
   if (!title || !id) return '-';
 
@@ -118,7 +121,7 @@ export const renderReference = (
         }}
       >
         <Typography variant="body2" noWrap>
-          {truncate(title, truncateLength)}
+          {truncate(title, 30)}
         </Typography>
       </MUILink>
     </Tooltip>

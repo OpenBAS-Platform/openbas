@@ -13,7 +13,7 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
-import { emptyFilled, formatIp, formatMacAddress, renderReference } from '../../../../../utils/String';
+import { atomicBaseUrl, emptyFilled, formatIp, formatMacAddress, renderReference, simulationBaseUrl } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -49,13 +49,13 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, '/admin/atomic_testings', 30),
+      value: (finding: FindingOutput) => renderReference(finding.finding_inject?.inject_title, finding.finding_inject?.inject_id, atomicBaseUrl),
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, '/admin/simulations', 30),
+      value: (finding: FindingOutput) => renderReference(finding.finding_simulation?.exercise_name, finding.finding_simulation?.exercise_id, simulationBaseUrl),
     },
     {
       field: 'finding_asset_groups',
