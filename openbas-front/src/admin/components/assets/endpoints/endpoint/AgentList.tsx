@@ -69,24 +69,36 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
       label: 'Executor',
       isSortable: false,
       value: (agent: AgentOutput) => {
-        const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
+        const executorId = agent.agent_executor?.executor_id;
+        const executor = executorId ? executorsMap[executorId] : undefined;
+
+        if (!executor) {
+          return <>{t('Unknown')}</>;
+        }
+
+        const { executor_type, executor_name } = executor;
+        const showEEChip = executor_type === 'openbas_tanium' || executor_type === 'openbas_crowdstrike';
+
         return (
           <>
-            {executor && (
-              <img
-                src={`/api/images/executors/icons/${executor.executor_type}`}
-                alt={executor.executor_type}
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 4,
-                  marginRight: 10,
-                }}
+            <img
+              src={`/api/images/executors/icons/${executor_type}`}
+              alt={executor_type}
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 4,
+                marginRight: theme.spacing(1),
+              }}
+            />
+            {executor_name}
+            {showEEChip && (
+              <EEChip
+                style={{ marginLeft: theme.spacing(1) }}
+                clickable
+                featureDetectedInfo={executor_name}
               />
             )}
-            {executor.executor_name ?? t('Unknown')}
-            {(executor.executor_type == 'openbas_tanium' || executor.executor_type == 'openbas_crowdstrike')
-              && <EEChip style={{ marginLeft: theme.spacing(1) }} clickable featureDetectedInfo={executor.executor_name} />}
           </>
         );
       },
