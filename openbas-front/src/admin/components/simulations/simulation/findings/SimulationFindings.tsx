@@ -1,8 +1,8 @@
 import { useParams } from 'react-router';
 
 import { searchFindingsForSimulations } from '../../../../../actions/findings/finding-actions';
+import { INJECT } from '../../../../../constants/Entities';
 import type { Exercise, FindingOutput, SearchPaginationInput } from '../../../../../utils/api-types';
-import { INJECT } from '../../../../../utils/utils';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 

@@ -1,8 +1,8 @@
 import { searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
+import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
 import type { FindingOutput } from '../../../utils/api-types';
-import { INJECT, SCENARIO, SIMULATION } from '../../../utils/utils';
 import FindingContextLink from './FindingContextLink';
 import FindingList from './FindingList';
 
