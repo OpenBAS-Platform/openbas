@@ -1,10 +1,8 @@
-import { Link as MUILink, Tooltip, Typography } from '@mui/material';
 import { type FunctionComponent } from 'react';
-import { Link } from 'react-router';
 
-import { type FindingOutput } from '../../utils/api-types';
-import { truncate } from '../../utils/String';
-import { INJECT, SCENARIO, SIMULATION } from '../../utils/utils';
+import ContextLink from '../../../components/ContextLink';
+import { type FindingOutput } from '../../../utils/api-types';
+import { INJECT, SCENARIO, SIMULATION } from '../../../utils/utils';
 
 const ATOMIC_BASE_URL = '/admin/atomic_testings';
 const SIMULATION_BASE_URL = '/admin/simulations';
@@ -15,23 +13,7 @@ interface Props {
   type: string;
 }
 
-const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
-  const renderLink = (title: string, url: string) => (
-    <Tooltip title={title}>
-      <MUILink
-        component={Link}
-        to={url}
-      >
-        <Typography
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {truncate(title, 30)}
-        </Typography>
-      </MUILink>
-    </Tooltip>
-  );
-
+const FindingContextLink: FunctionComponent<Props> = ({ finding, type }) => {
   switch (type) {
     case INJECT: {
       const title = finding.finding_inject?.inject_title;
@@ -45,7 +27,7 @@ const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
         ? `${ATOMIC_BASE_URL}/${injectId}`
         : `${SIMULATION_BASE_URL}/${simulationId}/injects/${injectId}`;
 
-      return renderLink(title, url);
+      return <ContextLink title={title} url={url} />;
     }
 
     case SIMULATION: {
@@ -54,7 +36,7 @@ const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
 
       if (!title || !id) return '-';
 
-      return renderLink(title, `${SIMULATION_BASE_URL}/${id}`);
+      return <ContextLink title={title} url={`${SIMULATION_BASE_URL}/${id}`} />;
     }
 
     case SCENARIO: {
@@ -63,7 +45,7 @@ const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
 
       if (!title || !id) return '-';
 
-      return renderLink(title, `${SCENARIO_BASE_URL}/${id}`);
+      return <ContextLink title={title} url={`${SCENARIO_BASE_URL}/${id}`} />;
     }
 
     default:
@@ -71,4 +53,4 @@ const FindingReferenceLink: FunctionComponent<Props> = ({ finding, type }) => {
   }
 };
 
-export default FindingReferenceLink;
+export default FindingContextLink;
