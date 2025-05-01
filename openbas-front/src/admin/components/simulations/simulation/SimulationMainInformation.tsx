@@ -1,9 +1,9 @@
-import { Chip, GridLegacy, Link as MUILink, Paper, Typography, useTheme } from '@mui/material';
+import { Chip, GridLegacy, Paper, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
 import { type FunctionComponent } from 'react';
-import { Link } from 'react-router';
 
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import ContextLink from '../../../../components/ContextLink';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
@@ -11,9 +11,9 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import { SCENARIO_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type Exercise, type KillChainPhase } from '../../../../utils/api-types';
-import { truncate } from '../../../../utils/String';
 
 interface Props { exercise: Exercise }
 
@@ -21,7 +21,6 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
-  const scenarioBaseUri = '/admin/scenarios';
   const { scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(exercise.exercise_scenario || '') }));
 
   return (
@@ -48,19 +47,7 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
           >
             {t('Parent scenario')}
           </Typography>
-          {scenario ? (
-            <MUILink
-              component={Link}
-              to={scenarioBaseUri + '/' + scenario.scenario_id}
-            >
-              <Typography
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {truncate(scenario.scenario_name, 30)}
-              </Typography>
-            </MUILink>
-          ) : '-'}
+          {scenario ? (<ContextLink title={scenario.scenario_name} url={`${SCENARIO_BASE_URL}/${scenario.scenario_id}`} />) : '-'}
         </GridLegacy>
         <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography

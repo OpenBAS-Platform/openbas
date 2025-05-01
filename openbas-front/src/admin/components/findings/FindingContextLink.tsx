@@ -1,12 +1,9 @@
 import { type FunctionComponent } from 'react';
 
 import ContextLink from '../../../components/ContextLink';
+import { ATOMIC_BASE_URL, SCENARIO_BASE_URL, SIMULATION_BASE_URL } from '../../../constants/BaseUrls';
 import { type FindingOutput } from '../../../utils/api-types';
 import { INJECT, SCENARIO, SIMULATION } from '../../../utils/utils';
-
-const ATOMIC_BASE_URL = '/admin/atomic_testings';
-const SIMULATION_BASE_URL = '/admin/simulations';
-const SCENARIO_BASE_URL = '/admin/scenarios';
 
 interface Props {
   finding: FindingOutput;
