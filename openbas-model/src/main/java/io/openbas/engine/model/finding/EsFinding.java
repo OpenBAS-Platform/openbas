@@ -16,9 +16,11 @@ public class EsFinding extends EsBase {
   /* Except relationships, they should have same name on every model! */
 
   @Queryable(label = "finding value", filterable = true)
+  @EsQueryable(keyword = true)
   private String finding_value;
 
   @Queryable(label = "finding type", filterable = true, refEnumClazz = ContractOutputType.class)
+  @EsQueryable(keyword = true)
   private String finding_type;
 
   @Queryable(label = "field")
