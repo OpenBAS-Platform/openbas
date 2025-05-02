@@ -30,25 +30,32 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
   ];
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 350px auto',
-      gap: theme.spacing(2),
-      alignItems: 'start',
-      marginBottom: theme.spacing(2),
-    }}
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: 'divider',
+        marginBottom: 2,
+      }}
     >
-      <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
-        <Breadcrumbs
-          variant="object"
-          elements={breadcrumbs}
-        />
-        <AtomicTestingTitle injectResultOverview={injectResultOverview} />
-        <AtomicTestingTabs injectResultOverview={injectResultOverview} />
-      </Box>
-      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
-      <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
-    </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto auto',
+        gap: theme.spacing(2),
+        alignItems: 'start',
+      }}
+      >
+        <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
+          <Breadcrumbs
+            variant="object"
+            elements={breadcrumbs}
+          />
+          <AtomicTestingTitle injectResultOverview={injectResultOverview} />
+          <AtomicTestingTabs injectResultOverview={injectResultOverview} />
+        </Box>
+        <ResponsePie hasTitles={false} forceSize={112} expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+        <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
+      </div>
+    </Box>
   );
 };
 
