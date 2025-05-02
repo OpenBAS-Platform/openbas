@@ -54,15 +54,15 @@ const FilterChipValues: FunctionComponent<Props> = ({
     }
   }, [filter]);
 
-  const or = (
+  const i18nMode = (mode: Filter['mode']) => (
     <div className={classes.mode}>
-      {t('OR')}
+      {t(mode === 'and' ? 'AND' : 'OR')}
     </div>
   );
 
-  const toValues = (opts: Option[]) => opts.map((o, idx) => (
+  const toValues = (opts: Option[], mode: Filter['mode']) => opts.map((o, idx) => (
     <Fragment key={o.id}>
-      {idx > 0 && or}
+      {idx > 0 && i18nMode(mode)}
       <span>
         {' '}
         {propertySchema?.schema_property_type.includes('instant') || !o.label ? (o.label) : t(o.label)}
@@ -121,7 +121,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
           overflow: 'hidden',
         }}
         >
-          {toValues(options)}
+          {toValues(options, filter.mode)}
         </Box>
       </span>
     )

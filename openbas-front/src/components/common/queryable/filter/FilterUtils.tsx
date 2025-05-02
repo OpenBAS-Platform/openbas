@@ -3,14 +3,14 @@ import * as R from 'ramda';
 import { type Filter, type FilterGroup, type PropertySchemaDTO } from '../../../../utils/api-types';
 
 export const emptyFilterGroup: FilterGroup = {
-  mode: 'and',
+  mode: 'or',
   filters: [],
 };
 
 export const buildEmptyFilter = (key: string, operator: Filter['operator']) => {
   return {
     key,
-    mode: 'and' as Filter['mode'],
+    mode: 'or' as Filter['mode'],
     values: [],
     operator,
   };
@@ -19,7 +19,7 @@ export const buildEmptyFilter = (key: string, operator: Filter['operator']) => {
 export const buildFilter = (key: string, values: string[], operator: Filter['operator']) => {
   return {
     key,
-    mode: 'and' as Filter['mode'],
+    mode: 'or' as Filter['mode'],
     values,
     operator,
   };
