@@ -35,7 +35,7 @@ public class FindingHandler implements Handler<EsFinding> {
               esFinding.setBase_representative(finding.getFinding_value());
               esFinding.setBase_created_at(finding.getFinding_created_at());
               esFinding.setBase_updated_at(finding.getFinding_updated_at());
-              esFinding.setBase_restrictions(buildRestrictions(finding.getInject_scenario()));
+              esFinding.setBase_restrictions(buildRestrictions(finding.getScenario_id()));
               // Specific
               esFinding.setFinding_type(finding.getFinding_type());
               esFinding.setFinding_field(finding.getFinding_field());
@@ -46,9 +46,9 @@ public class FindingHandler implements Handler<EsFinding> {
                 dependencies.add(finding.getFinding_inject_id());
                 esFinding.setBase_inject_side(finding.getFinding_inject_id());
               }
-              if (hasText(finding.getInject_scenario())) {
-                dependencies.add(finding.getInject_scenario());
-                esFinding.setBase_scenario_side(finding.getInject_scenario());
+              if (hasText(finding.getScenario_id())) {
+                dependencies.add(finding.getScenario_id());
+                esFinding.setBase_scenario_side(finding.getScenario_id());
               }
               esFinding.setBase_dependencies(dependencies);
               return esFinding;
