@@ -219,7 +219,8 @@ public class EsService {
     try {
       SearchResponse<EsBase> response =
           elasticClient.search(
-              b -> b.index(engineConfig.getIndexPrefix() + "*").query(query), EsBase.class);
+              b -> b.index(engineConfig.getIndexPrefix() + "*").size(ids.size()).query(query),
+              EsBase.class);
       List<Hit<EsBase>> hits = response.hits().hits();
       return hits.stream()
           .map(Hit::source)
@@ -379,7 +380,11 @@ public class EsService {
     Buckets<StringTermsBucket> buckets = aggregate.sterms().buckets();
     Map<String, String> resolutions = new HashMap<>();
     if (isSideAggregation) {
-      List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
+      List<String> ids =
+          buckets.array().stream()
+              .flatMap(s -> Arrays.stream(s.key().stringValue().split(",")))
+              .distinct()
+              .toList();
       resolutions.putAll(resolveIdsRepresentative(user, ids));
     }
     List<EsSeriesData> data =
