@@ -29,7 +29,7 @@ public class InjectTestStatusApi extends RestBehavior {
   private final InjectService injectService;
 
   @Transactional(rollbackFor = Exception.class)
-  @GetMapping("/api/injects/{injectId}/test")
+  @GetMapping("/api/injects/{injectId}/test") // add role by context?
   public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
