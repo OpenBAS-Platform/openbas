@@ -1,9 +1,9 @@
-import { Tooltip } from '@mui/material';
-
 import { searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
+import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
 import type { FindingOutput } from '../../../utils/api-types';
+import FindingContextLink from './FindingContextLink';
 import FindingList from './FindingList';
 
 const Findings = () => {
@@ -20,19 +20,19 @@ const Findings = () => {
       field: 'finding_scenario',
       label: 'Scenario',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_scenario?.scenario_name || '-',
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SCENARIO} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
   ];
   return (

@@ -1,11 +1,9 @@
 import { useParams } from 'react-router';
 
 import { searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
-import type {
-  FindingOutput,
-  Scenario,
-  SearchPaginationInput,
-} from '../../../../../utils/api-types';
+import { SIMULATION } from '../../../../../constants/Entities';
+import type { FindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
+import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 
 const ScenarioFindings = () => {
@@ -25,7 +23,7 @@ const ScenarioFindings = () => {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
   ];
 
