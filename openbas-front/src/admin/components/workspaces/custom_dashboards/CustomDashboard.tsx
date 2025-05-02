@@ -9,6 +9,7 @@ import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_da
 import { ErrorBoundary } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
+import CustomDashboardHeader from './CustomDashboardHeader';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
 import { getWidgetTitle } from './widgets/WidgetUtils';
@@ -79,108 +80,115 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
   };
 
   return (
-    <div id="container">
-      <ReactGridLayout
-        className="layout"
-        margin={[20, 20]}
-        rowHeight={50}
-        cols={12}
-        draggableCancel=".noDrag"
-        isDraggable={true}
-        isResizable={true}
-        onLayoutChange={onLayoutChange}
-        onResizeStart={(_, { i }) => handleResize(i)}
-        onResizeStop={() => handleResize(null)}
-      >
-        {customDashboardValue?.custom_dashboard_widgets?.map((widget) => {
-          const layout = {
-            i: widget.widget_id,
-            x: widget.widget_layout?.widget_layout_x,
-            y: widget.widget_layout?.widget_layout_y,
-            w: widget.widget_layout?.widget_layout_w,
-            h: widget.widget_layout?.widget_layout_h,
-          };
-          const setFullscreen = (fullscreen: boolean) => setFullscreenWidgets({
-            ...fullscreenWidgets,
-            [widget.widget_id]: fullscreen,
-          });
-          return (
-            <Paper
-              key={widget.widget_id}
-              data-grid={layout}
-              style={{
-                margin: theme.spacing(-2.5),
-                borderRadius: 4,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-              variant="outlined"
-            >
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="space-between"
-                alignItems="center"
+    <div style={{
+      display: 'grid',
+      gap: theme.spacing(2),
+    }}
+    >
+      <CustomDashboardHeader customDashboard={customDashboard} />
+      {/* Not perfect to use negative margin here, but I don't find a better solution to align items */}
+      <div id="container" style={{ margin: theme.spacing(-2.5) }}>
+        <ReactGridLayout
+          className="layout"
+          margin={[20, 20]}
+          rowHeight={50}
+          cols={12}
+          draggableCancel=".noDrag"
+          isDraggable={true}
+          isResizable={true}
+          onLayoutChange={onLayoutChange}
+          onResizeStart={(_, { i }) => handleResize(i)}
+          onResizeStop={() => handleResize(null)}
+        >
+          {customDashboardValue?.custom_dashboard_widgets?.map((widget) => {
+            const layout = {
+              i: widget.widget_id,
+              x: widget.widget_layout?.widget_layout_x,
+              y: widget.widget_layout?.widget_layout_y,
+              w: widget.widget_layout?.widget_layout_w,
+              h: widget.widget_layout?.widget_layout_h,
+            };
+            const setFullscreen = (fullscreen: boolean) => setFullscreenWidgets({
+              ...fullscreenWidgets,
+              [widget.widget_id]: fullscreen,
+            });
+            return (
+              <Paper
+                key={widget.widget_id}
+                data-grid={layout}
+                style={{
+                  borderRadius: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+                variant="outlined"
               >
-                <Typography
-                  variant="h4"
-                  sx={{
-                    margin: 0,
-                    paddingLeft: theme.spacing(2),
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
-                </Typography>
                 <Box
                   display="flex"
                   flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
-                  {widget.widget_type === 'security-coverage' && (
-                    <IconButton
-                      color="primary"
-                      className="noDrag"
-                      onClick={() => setFullscreen(true)}
-                      size="small"
-                    >
-                      <OpenInFullOutlined fontSize="small" />
-                    </IconButton>
-                  )}
-                  <WidgetPopover
-                    className="noDrag"
-                    customDashboardId={customDashboardId}
-                    widget={widget}
-                    onUpdate={widget => handleWidgetUpdate(widget)}
-                    onDelete={widgetId => handleWidgetDelete(widgetId)}
-                  />
-                </Box>
-              </Box>
-              <ErrorBoundary>
-                {widget.widget_id === idToResize ? (<div />) : (
-                  <Box
-                    flex={1}
-                    display="flex"
-                    flexDirection="column"
-                    minHeight={0}
-                    padding={theme.spacing(0, 2)}
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      margin: 0,
+                      paddingLeft: theme.spacing(2),
+                      textTransform: 'uppercase',
+                    }}
                   >
-                    <WidgetViz
+                    {getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
+                  </Typography>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                  >
+                    {widget.widget_type === 'security-coverage' && (
+                      <IconButton
+                        color="primary"
+                        className="noDrag"
+                        onClick={() => setFullscreen(true)}
+                        size="small"
+                      >
+                        <OpenInFullOutlined fontSize="small" />
+                      </IconButton>
+                    )}
+                    <WidgetPopover
+                      className="noDrag"
+                      customDashboardId={customDashboardId}
                       widget={widget}
-                      fullscreen={fullscreenWidgets[widget.widget_id]}
-                      setFullscreen={setFullscreen}
+                      onUpdate={widget => handleWidgetUpdate(widget)}
+                      onDelete={widgetId => handleWidgetDelete(widgetId)}
                     />
                   </Box>
-                )}
-              </ErrorBoundary>
-            </Paper>
-          );
-        })}
-      </ReactGridLayout>
-      <WidgetCreation
-        customDashboardId={customDashboardId}
-        widgets={customDashboardValue?.custom_dashboard_widgets ?? []}
-        onCreate={widget => handleWidgetCreate(widget)}
-      />
+                </Box>
+                <ErrorBoundary>
+                  {widget.widget_id === idToResize ? (<div />) : (
+                    <Box
+                      flex={1}
+                      display="flex"
+                      flexDirection="column"
+                      minHeight={0}
+                      padding={theme.spacing(0, 2)}
+                    >
+                      <WidgetViz
+                        widget={widget}
+                        fullscreen={fullscreenWidgets[widget.widget_id]}
+                        setFullscreen={setFullscreen}
+                      />
+                    </Box>
+                  )}
+                </ErrorBoundary>
+              </Paper>
+            );
+          })}
+        </ReactGridLayout>
+        <WidgetCreation
+          customDashboardId={customDashboardId}
+          widgets={customDashboardValue?.custom_dashboard_widgets ?? []}
+          onCreate={widget => handleWidgetCreate(widget)}
+        />
+      </div>
     </div>
   );
 };

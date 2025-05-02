@@ -127,6 +127,7 @@ const CustomDashboards = () => {
                           customDashboard={customDashboard}
                           onUpdate={handleUpdate}
                           onDelete={handleDelete}
+                          inList
                         />
                       )}
                       disablePadding
