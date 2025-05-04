@@ -71,7 +71,7 @@ public class Mixins {
 
   public abstract static class Payload {
     @JsonSerialize(using = JsonSerializer.None.class)
-    public abstract List<AttackPattern> getAttackPatterns();
+    public abstract List<io.openbas.database.model.AttackPattern> getAttackPatterns();
   }
 
   @JsonIncludeProperties(
