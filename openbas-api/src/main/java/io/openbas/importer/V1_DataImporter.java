@@ -55,6 +55,7 @@ public class V1_DataImporter implements Importer {
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
   private final AttackPatternRepository attackPatternRepository;
+  private final KillChainPhaseRepository killChainPhaseRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioService scenarioService;
   private final TeamRepository teamRepository;
@@ -214,10 +215,13 @@ public class V1_DataImporter implements Importer {
                   this.attackPatternRepository.findAllByExternalIdInIgnoreCase(List.of(name));
               if (!existingAttackPattern.isEmpty()) {
                 baseIds.put(id, existingAttackPattern.getFirst());
-                attackPatternIds.add(id);
+                attackPatternIds.add(existingAttackPattern.getFirst().getId());
               } else {
                 AttackPattern attackPatternCreated =
-                    this.attackPatternRepository.save(createAttackPattern(nodeAttackPattern));
+                    this.attackPatternRepository.save(
+                        createAttackPattern(
+                            nodeAttackPattern,
+                            importKillChainPhase(nodeAttackPattern, "attack_pattern_", baseIds)));
                 baseIds.put(id, attackPatternCreated);
                 attackPatternIds.add(attackPatternCreated.getId());
               }
@@ -225,13 +229,58 @@ public class V1_DataImporter implements Importer {
     return attackPatternIds;
   }
 
-  private AttackPattern createAttackPattern(JsonNode jsonNode) {
+  private AttackPattern createAttackPattern(
+      JsonNode jsonNode, List<KillChainPhase> killChainPhases) {
     AttackPattern attackPattern = new AttackPattern();
     attackPattern.setStixId("attack-pattern--" + UUID.randomUUID());
     attackPattern.setName(jsonNode.get("attack_pattern_name").textValue());
     attackPattern.setDescription(jsonNode.get("attack_pattern_description").textValue());
     attackPattern.setExternalId(jsonNode.get("attack_pattern_external_id").textValue());
+    attackPattern.setKillChainPhases(killChainPhases);
     return attackPattern;
+  }
+
+  private List<KillChainPhase> importKillChainPhase(
+      JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    List<KillChainPhase> killChainPhases = new ArrayList<>();
+    resolveJsonElements(importNode, prefix + "kill_chain_phases")
+        .forEach(
+            nodeKillChainPhase -> {
+              JsonNode idNode = nodeKillChainPhase.get("phase_external_id");
+              if (idNode == null) return;
+              String id = idNode.textValue();
+
+              if (baseIds.get(id) != null) {
+                // Already imported
+                return;
+              }
+              String name = nodeKillChainPhase.get("phase_external_id").textValue();
+
+              List<KillChainPhase> existingKillChainPhases =
+                  this.killChainPhaseRepository.findAllByExternalIdInIgnoreCase(List.of(name));
+              if (!existingKillChainPhases.isEmpty()) {
+                baseIds.put(id, existingKillChainPhases.getFirst());
+                killChainPhases.add(existingKillChainPhases.getFirst());
+              } else {
+                KillChainPhase killChainPhaseCreated =
+                    this.killChainPhaseRepository.save(createKillChainPhase(nodeKillChainPhase));
+                baseIds.put(id, killChainPhaseCreated);
+                killChainPhases.add(killChainPhaseCreated);
+              }
+            });
+    return killChainPhases;
+  }
+
+  private KillChainPhase createKillChainPhase(JsonNode killChainPhaseNode) {
+    KillChainPhase killChainPhase = new KillChainPhase();
+    killChainPhase.setKillChainName(killChainPhaseNode.get("phase_kill_chain_name").textValue());
+    killChainPhase.setShortName(killChainPhaseNode.get("phase_shortname").textValue());
+    killChainPhase.setDescription(killChainPhaseNode.get("phase_description").textValue());
+    killChainPhase.setName(killChainPhaseNode.get("phase_name").textValue());
+    killChainPhase.setStixId(killChainPhaseNode.get("phase_stix_id").textValue());
+    killChainPhase.setExternalId(killChainPhaseNode.get("phase_external_id").textValue());
+    killChainPhase.setOrder(killChainPhaseNode.get("phase_order").asLong());
+    return killChainPhase;
   }
 
   // -- EXERCISE --

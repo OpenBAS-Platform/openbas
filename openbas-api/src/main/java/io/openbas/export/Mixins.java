@@ -44,8 +44,25 @@ public class Mixins {
         "attack_pattern_name",
         "attack_pattern_description",
         "attack_pattern_external_id",
+        "attack_pattern_kill_chain_phases",
       })
-  public static class AttackPattern {}
+  public abstract static class AttackPattern {
+    @JsonSerialize(using = JsonSerializer.None.class)
+    public abstract List<io.openbas.database.model.KillChainPhase> getKillChainPhases();
+  }
+
+  @JsonIncludeProperties(
+      value = {
+        "phase_id",
+        "phase_external_id",
+        "phase_stix_id",
+        "phase_name",
+        "phase_shortname",
+        "phase_kill_chain_name",
+        "phase_description",
+        "phase_order",
+      })
+  public static class KillChainPhase {}
 
   public abstract static class InjectorContract {
     @JsonSerialize(using = JsonSerializer.None.class)
@@ -54,7 +71,7 @@ public class Mixins {
 
   public abstract static class Payload {
     @JsonSerialize(using = JsonSerializer.None.class)
-    public abstract List<io.openbas.database.model.AttackPattern> getAttackPatterns();
+    public abstract List<AttackPattern> getAttackPatterns();
   }
 
   @JsonIncludeProperties(

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface KillChainPhaseRepository
     extends CrudRepository<KillChainPhase, String>, JpaSpecificationExecutor<KillChainPhase> {
 
+  List<KillChainPhase> findAllByExternalIdInIgnoreCase(List<String> externalIds);
+
   @NotNull
   Optional<KillChainPhase> findById(@NotNull String id);
 

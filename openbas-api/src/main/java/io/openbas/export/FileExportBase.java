@@ -46,6 +46,7 @@ public class FileExportBase {
     this.objectMapper.addMixIn(InjectorContract.class, Mixins.InjectorContract.class);
     this.objectMapper.addMixIn(AttackPattern.class, Mixins.AttackPattern.class);
     this.objectMapper.addMixIn(Payload.class, Mixins.Payload.class);
+    this.objectMapper.addMixIn(KillChainPhase.class, Mixins.KillChainPhase.class);
 
     // default options
     // variables with no value
