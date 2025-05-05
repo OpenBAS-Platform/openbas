@@ -594,7 +594,7 @@ public class DocumentApi extends RestBehavior {
         });
   }
 
-  // -- EXERCISE & SENARIO--
+  // -- EXERCISE & SCENARIO--
 
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
   public List<Document> playerDocuments(
