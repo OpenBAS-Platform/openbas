@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchDocuments } from '../../../../actions/Document';
+import { fetchDocuments } from '../../../../actions/Document.js';
 import Autocomplete from '../../../../components/Autocomplete';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
 import OldTextField from '../../../../components/fields/OldTextField';
