@@ -24,8 +24,8 @@ import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
-import { fetchObserverChallenges, tryChallenge } from '../../../actions/Challenge';
-import { fetchPlayerDocuments } from '../../../actions/Document';
+import { fetchSimulationObserverChallenges, tryChallenge } from '../../../actions/Challenge';
+import { fetchSimulationPlayerDocuments } from '../../../actions/Document.js';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import Transition from '../../../components/common/Transition';
@@ -146,8 +146,8 @@ const ChallengesPreview = () => {
   };
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchObserverChallenges(exerciseId, userId));
-    dispatch(fetchPlayerDocuments(exerciseId, userId));
+    dispatch(fetchSimulationObserverChallenges(exerciseId, userId));
+    dispatch(fetchSimulationPlayerDocuments(exerciseId, userId));
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);

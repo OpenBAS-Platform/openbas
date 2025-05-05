@@ -17,7 +17,7 @@ import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../../actions/Document';
+import { fetchDocuments } from '../../../../actions/Document.js';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
