@@ -29,7 +29,7 @@ import { withStyles } from 'tss-react/mui';
 import { findEndpoints } from '../../../../../actions/assets/endpoint-actions.js';
 import { fetchChallenges } from '../../../../../actions/Challenge.js';
 import { fetchChannels } from '../../../../../actions/channels/channel-action.js';
-import { fetchDocuments } from '../../../../../actions/Document';
+import { fetchDocuments } from '../../../../../actions/Document.js';
 import { fetchInjectTeams } from '../../../../../actions/Inject';
 import { storeHelper } from '../../../../../actions/Schema.js';
 import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
