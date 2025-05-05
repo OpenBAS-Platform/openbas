@@ -6,7 +6,7 @@ import { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
-import { addDocument, fetchDocument } from '../../../../actions/Document';
+import { addDocument, fetchDocument } from '../../../../actions/Document.js';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import inject18n from '../../../../components/i18n';

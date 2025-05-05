@@ -544,12 +544,6 @@ export interface ChallengeTryInput {
   challenge_value?: string;
 }
 
-export interface ChallengesReader {
-  exercise_challenges?: ChallengeInformation[];
-  exercise_id?: string;
-  exercise_information?: PublicExercise;
-}
-
 export interface ChangePasswordInput {
   /** The new password */
   password: string;
@@ -3894,9 +3888,15 @@ export interface PublicChallengeFlag {
 }
 
 export interface PublicExercise {
-  exercise_description?: string;
-  exercise_id?: string;
-  exercise_name?: string;
+  description?: string;
+  id?: string;
+  name?: string;
+}
+
+export interface PublicScenario {
+  description?: string;
+  id?: string;
+  name?: string;
 }
 
 export interface RawAttackPattern {
@@ -4159,6 +4159,12 @@ export interface Scenario {
   scenario_users_number?: number;
 }
 
+export interface ScenarioChallengesReader {
+  scenario_challenges?: ChallengeInformation[];
+  scenario_id?: string;
+  scenario_information?: PublicScenario;
+}
+
 export interface ScenarioInput {
   scenario_category?: string;
   scenario_description?: string;
@@ -4293,6 +4299,12 @@ export interface SettingsUpdateInput {
   platform_name: string;
   /** Theme of the platform */
   platform_theme: string;
+}
+
+export interface SimulationChallengesReader {
+  exercise_challenges?: ChallengeInformation[];
+  exercise_id?: string;
+  exercise_information?: PublicExercise;
 }
 
 export interface SimulationDetails {

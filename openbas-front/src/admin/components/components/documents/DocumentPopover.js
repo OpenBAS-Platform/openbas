@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconBu
 import * as R from 'ramda';
 import { useState } from 'react';
 
-import { deleteDocument, updateDocument } from '../../../../actions/Document';
+import { deleteDocument, updateDocument } from '../../../../actions/Document.js';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';

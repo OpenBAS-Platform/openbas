@@ -17,17 +17,19 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
 import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
-import io.openbas.rest.challenge.response.ChallengesReader;
+import io.openbas.rest.challenge.response.SimulationChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.service.challenge.ChallengeAttemptService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +43,8 @@ public class ChallengeService {
   private final InjectExpectationService injectExpectationService;
   private final InjectExpectationRepository injectExpectationRepository;
   private final ChallengeAttemptService challengeAttemptService;
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
     List<Inject> injects =
@@ -93,10 +96,10 @@ public class ChallengeService {
     return new ChallengeResult(false);
   }
 
-  public ChallengesReader playerChallenges(String exerciseId, User user) {
+  public SimulationChallengesReader playerChallenges(String exerciseId, User user) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    ChallengesReader reader = new ChallengesReader(exercise);
+    SimulationChallengesReader reader = new SimulationChallengesReader(exercise);
     List<InjectExpectation> challengeExpectations =
         injectExpectationRepository.findChallengeExpectationsByExerciseAndUser(
             exerciseId, user.getId());
@@ -140,7 +143,7 @@ public class ChallengeService {
     return reader;
   }
 
-  public ChallengesReader validateChallenge(
+  public SimulationChallengesReader validateChallenge(
       String exerciseId, String challengeId, ChallengeTryInput input, User user) {
     ChallengeResult challengeResult = tryChallenge(challengeId, input);
     if (challengeResult.isResult()) {
@@ -164,8 +167,8 @@ public class ChallengeService {
             // Adjust the score based on the current attempt number
             double score =
                 playerExpectation.getChallenge().getMaxAttempts() == null
-                        || challengeAttempt.getAttempt()
-                            < playerExpectation.getChallenge().getMaxAttempts()
+                    || challengeAttempt.getAttempt()
+                    < playerExpectation.getChallenge().getMaxAttempts()
                     ? playerExpectation.getExpectedScore()
                     : 0;
 
