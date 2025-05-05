@@ -22,6 +22,11 @@ public class PaginationUtils {
 
   // -- JPA --
 
+  public static <T> Pageable buildPageable(
+      @NotNull final SearchPaginationInput input, @NotNull final Class<T> clazz) {
+    return PageRequest.of(input.getPage(), input.getSize(), toSortJpa(input.getSorts(), clazz));
+  }
+
   public static <T> Page<T> buildPaginationJPA(
       @NotNull final BiFunction<Specification<T>, Pageable, Page<T>> findAll,
       @NotNull final SearchPaginationInput input,
@@ -31,8 +36,7 @@ public class PaginationUtils {
     Specification<T> searchSpecifications = computeSearchJpa(input.getTextSearch());
 
     // Pageable
-    Pageable pageable =
-        PageRequest.of(input.getPage(), input.getSize(), toSortJpa(input.getSorts(), clazz));
+    Pageable pageable = buildPageable(input, clazz);
 
     return findAll.apply(filterSpecifications.and(searchSpecifications), pageable);
   }

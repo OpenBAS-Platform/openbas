@@ -4,10 +4,12 @@ import { type FunctionComponent, type ReactNode, useEffect, useState } from 'rea
 
 import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
-import { type PlatformSettings } from '../utils/api-types';
+import { type PlatformSettings, type User } from '../utils/api-types';
 import { useFormatter } from './i18n';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
+
+export const scaleFactor = 8;
 
 interface Props { children: ReactNode }
 
@@ -21,54 +23,60 @@ const localeMap = {
 const AppThemeProvider: FunctionComponent<Props> = ({ children }) => {
   const [muiLocale, setMuiLocale] = useState<Localization>(enUS);
   const { locale } = useFormatter();
-  const { theme, dark, light }: {
-    theme: string;
-    dark: PlatformSettings['platform_dark_theme'];
-    light: PlatformSettings['platform_light_theme'];
-  } = useHelper((helper: LoggedHelper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const rawPlatformTheme = settings.platform_theme ?? 'auto';
-    const rawUserTheme = me?.user_theme ?? 'default';
-    return {
-      theme: rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme,
-      dark: settings.platform_dark_theme,
-      light: settings.platform_light_theme,
-    };
-  });
+  const [theme, setTheme] = useState('dark');
+  const { me, settings }: {
+    me: User;
+    settings: PlatformSettings;
+  } = useHelper((helper: LoggedHelper) => ({
+    me: helper.getMe(),
+    settings: helper.getPlatformSettings(),
+  }));
+
   useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-  });
+    const rawPlatformTheme = settings.platform_theme ?? 'dark';
+    const rawUserTheme = me?.user_theme ?? 'default';
+    const themeToSet = rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme;
+    document.body.setAttribute('data-theme', themeToSet);
+    setTheme(themeToSet);
+  }, [settings, me]);
 
   useEffect(() => {
     setMuiLocale(localeMap[locale as keyof typeof localeMap]);
   }, [locale]);
 
+  const dark = settings.platform_dark_theme;
   let muiTheme = createTheme(
-    themeDark(
-      dark?.logo_url,
-      dark?.logo_url_collapsed,
-      dark?.background_color,
-      dark?.paper_color,
-      dark?.navigation_color,
-      dark?.primary_color,
-      dark?.secondary_color,
-      dark?.accent_color,
-    ),
+    {
+      spacing: scaleFactor,
+      ...themeDark(
+        dark?.logo_url,
+        dark?.logo_url_collapsed,
+        dark?.background_color,
+        dark?.paper_color,
+        dark?.navigation_color,
+        dark?.primary_color,
+        dark?.secondary_color,
+        dark?.accent_color,
+      ),
+    },
     muiLocale,
   );
   if (theme === 'light') {
+    const light = settings.platform_light_theme;
     muiTheme = createTheme(
-      themeLight(
-        light?.logo_url,
-        light?.logo_url_collapsed,
-        light?.background_color,
-        light?.paper_color,
-        light?.navigation_color,
-        light?.primary_color,
-        light?.secondary_color,
-        light?.accent_color,
-      ),
+      {
+        spacing: scaleFactor,
+        ...themeLight(
+          light?.logo_url,
+          light?.logo_url_collapsed,
+          light?.background_color,
+          light?.paper_color,
+          light?.navigation_color,
+          light?.primary_color,
+          light?.secondary_color,
+          light?.accent_color,
+        ),
+      },
       muiLocale,
     );
   }

@@ -15,6 +15,7 @@ import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -41,7 +42,8 @@ public class Executor {
       throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     String jsonInject = mapper.writeValueAsString(executableInject);
-    InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
+    InjectStatus injectStatus =
+        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     queueService.publish(injector.getType(), jsonInject);
     injectStatus.addInfoTrace(
         "The inject has been published and is now waiting to be consumed.",
@@ -57,7 +59,8 @@ public class Executor {
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
-    InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
+    InjectStatus injectStatus =
+        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
     return injectStatusRepository.save(completeStatus);
   }
@@ -108,7 +111,13 @@ public class Executor {
     }
     // If inject is too old, reject the execution
     if (isScheduledInject && !isInInjectableRange(inject)) {
-      throw new UnsupportedOperationException("Inject is now too old for execution");
+      throw new UnsupportedOperationException(
+          "Inject is now too old for execution: id "
+              + inject.getId()
+              + ", launch date "
+              + inject.getDate()
+              + ", now date "
+              + Instant.now());
     }
 
     return this.execute(executableInject);

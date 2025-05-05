@@ -54,7 +54,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useFormatter();
-  const isEnterpriseEdition = useEnterpriseEdition();
+  const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
   const { enabled, configured } = useAI();
   const [content, setContent] = useState('');
   const [disableResponse, setDisableResponse] = useState(false);
@@ -515,7 +515,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
       <div style={style || {
         position: 'absolute',
         top: 15,
-        right: 20,
+        right: 5,
       }}
       >
         {renderButton()}
@@ -526,8 +526,8 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
     return (
       <div style={style || {
         position: 'absolute',
-        top: 64,
-        right: 20,
+        top: -10,
+        right: 0,
       }}
       >
         {renderButton()}

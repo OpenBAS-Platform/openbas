@@ -16,9 +16,13 @@ public @interface Queryable {
 
   boolean sortable() default false;
 
+  String label() default "";
+
   String path() default "";
 
   String[] paths() default {};
 
-  Class clazz() default String.class;
+  Class clazz() default Void.class;
+
+  Class refEnumClazz() default Void.class;
 }

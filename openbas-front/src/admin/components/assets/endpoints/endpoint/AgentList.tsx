@@ -1,5 +1,6 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -11,6 +12,7 @@ import { useHelper } from '../../../../../store';
 import { type AgentOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import EEChip from '../../../common/entreprise_edition/EEChip';
 import AssetStatus from '../../AssetStatus';
 import AgentDeploymentMode from '../AgentDeploymentMode';
 import AgentPrivilege from '../AgentPrivilege';
@@ -44,6 +46,7 @@ interface Props { agents: AgentOutput[] }
 
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const { classes } = useStyles();
+  const theme = useTheme();
   const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
@@ -66,22 +69,36 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
       label: 'Executor',
       isSortable: false,
       value: (agent: AgentOutput) => {
-        const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
+        const executorId = agent.agent_executor?.executor_id;
+        const executor = executorId ? executorsMap[executorId] : undefined;
+
+        if (!executor) {
+          return <>{t('Unknown')}</>;
+        }
+
+        const { executor_type, executor_name } = executor;
+        const showEEChip = executor_type === 'openbas_tanium' || executor_type === 'openbas_crowdstrike';
+
         return (
           <>
-            {executor && (
-              <img
-                src={`/api/images/executors/icons/${executor.executor_type}`}
-                alt={executor.executor_type}
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 4,
-                  marginRight: 10,
-                }}
+            <img
+              src={`/api/images/executors/icons/${executor_type}`}
+              alt={executor_type}
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 4,
+                marginRight: theme.spacing(1),
+              }}
+            />
+            {executor_name}
+            {showEEChip && (
+              <EEChip
+                style={{ marginLeft: theme.spacing(1) }}
+                clickable
+                featureDetectedInfo={executor_name}
               />
             )}
-            {executor?.executor_name ?? t('Unknown')}
           </>
         );
       },

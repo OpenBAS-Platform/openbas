@@ -1,5 +1,5 @@
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Grid, Typography } from '@mui/material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, GridLegacy, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
@@ -130,9 +130,9 @@ const ChannelMicroblogging = ({ channelReader }) => {
                 limit={200}
                 controlled={true}
               />
-              <Grid container={true} spacing={3}>
+              <GridLegacy container={true} spacing={3}>
                 {docs.map(doc => (
-                  <Grid key={doc.document_id} item={true} xs={columns}>
+                  <GridLegacy key={doc.document_id} item={true} xs={columns}>
                     {doc.document_type.includes('image/') && (
                       <CardMedia
                         component="img"
@@ -148,9 +148,9 @@ const ChannelMicroblogging = ({ channelReader }) => {
                         controls={true}
                       />
                     )}
-                  </Grid>
+                  </GridLegacy>
                 ))}
-              </Grid>
+              </GridLegacy>
               <div className={classes.footer}>
                 <div style={{ float: 'right' }}>
                   <Button

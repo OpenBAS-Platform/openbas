@@ -83,7 +83,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openExportDialog, setOpenExportDialog] = useState(false);
 
-  const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
+  const { isExercise } = useHelper((helper: ExercisesHelper) => ({ isExercise: helper.isExercise(exerciseOrScenarioId!) }));
 
   const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

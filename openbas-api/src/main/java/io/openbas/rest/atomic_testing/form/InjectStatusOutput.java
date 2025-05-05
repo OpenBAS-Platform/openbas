@@ -1,19 +1,20 @@
 package io.openbas.rest.atomic_testing.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static lombok.AccessLevel.NONE;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@JsonInclude(NON_NULL)
 @SuperBuilder
 public class InjectStatusOutput {
 
@@ -29,13 +30,8 @@ public class InjectStatusOutput {
     return name != null ? name : ExecutionStatus.DRAFT.name();
   }
 
-  @Builder.Default
   @JsonProperty("status_main_traces")
-  private List<ExecutionTracesOutput> traces = new ArrayList<>();
-
-  @Builder.Default
-  @JsonProperty("status_traces_by_agent")
-  private List<AgentStatusOutput> tracesByAgent = new ArrayList<>();
+  private List<ExecutionTraceOutput> traces;
 
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate;

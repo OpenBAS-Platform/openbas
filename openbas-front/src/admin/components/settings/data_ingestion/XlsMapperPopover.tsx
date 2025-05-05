@@ -1,11 +1,10 @@
 import { type FunctionComponent, useState } from 'react';
 
 import { deleteMapper, duplicateMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
-import { type PopoverEntry } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
-import IconPopover from '../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../components/i18n';
 import { type RawPaginationImportMapper } from '../../../../utils/api-types';
 import { download } from '../../../../utils/utils';
@@ -100,7 +99,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      <IconPopover entries={entries} />
+      <ButtonPopover entries={entries} variant="icon" />
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}

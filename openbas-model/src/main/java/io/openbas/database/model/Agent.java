@@ -13,9 +13,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Setter
@@ -45,11 +45,10 @@ public class Agent implements Base {
 
   @Id
   @Column(name = "agent_id")
-  @GeneratedValue(generator = "UUID")
-  @UuidGenerator
   @JsonProperty("agent_id")
   @NotBlank
-  private String id;
+  // ID is UUID by default and external reference for CrowdStrike agent
+  private String id = UUID.randomUUID().toString();
 
   @Queryable(sortable = true)
   @ManyToOne

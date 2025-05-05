@@ -1,10 +1,10 @@
 package io.openbas.utils.pagination;
 
-import static io.openbas.utils.schema.SchemaUtils.getSortableProperties;
+import static io.openbas.schema.SchemaUtils.getSortableProperties;
 import static org.springframework.util.StringUtils.hasText;
 
-import io.openbas.utils.schema.PropertySchema;
-import io.openbas.utils.schema.SchemaUtils;
+import io.openbas.schema.PropertySchema;
+import io.openbas.schema.SchemaUtils;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import javax.annotation.Nullable;

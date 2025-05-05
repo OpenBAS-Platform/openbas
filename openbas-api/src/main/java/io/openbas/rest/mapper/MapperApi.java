@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -49,6 +50,7 @@ import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
 @RestController
 @RequiredArgsConstructor
+@Log
 public class MapperApi extends RestBehavior {
 
   private final ImportMapperRepository importMapperRepository;
@@ -119,6 +121,7 @@ public class MapperApi extends RestBehavior {
       mapperService.importMappers(
           mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {}));
     } catch (Exception e) {
+      log.severe(e.getMessage());
       throw new ImportException("Mapper import", "Error during import");
     }
   }

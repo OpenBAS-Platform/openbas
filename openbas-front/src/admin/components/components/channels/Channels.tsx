@@ -104,7 +104,7 @@ const Channels = () => {
     userAdmin: boolean;
   } = useHelper((helper: ChannelsHelper & UserHelper) => ({
     channels: helper.getChannels(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   useDataLoader(() => {
     dispatch(fetchChannels());

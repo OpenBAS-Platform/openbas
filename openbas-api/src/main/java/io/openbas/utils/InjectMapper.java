@@ -2,21 +2,20 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.inject.output.InjectSimple;
+import io.openbas.rest.payload.output.PayloadSimple;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class InjectMapper {
 
+  private final InjectStatusMapper injectStatusMapper;
   private final InjectUtils injectUtils;
   private final ResultUtils resultUtils;
-
-  private final ApplicationContext context;
 
   public InjectResultOverviewOutput toInjectResultOverviewOutput(Inject inject) {
     // --
@@ -37,7 +36,7 @@ public class InjectMapper {
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
         .injectorContract(toInjectorContractOutput(injectorContract))
-        .status(toInjectStatusOutput(inject.getStatus()))
+        .status(injectStatusMapper.toInjectStatusSimple(inject.getStatus()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
@@ -95,94 +94,6 @@ public class InjectMapper {
         .orElse(null);
   }
 
-  // -- STATUS to STATUSIMPLE --
-  private <T extends InjectStatusOutput> T buildInjectStatusOutput(
-      T output, BaseInjectStatus status, List<ExecutionTraces> executionTraces) {
-    output.setId(status.getId());
-    output.setName(status.getName().name());
-    output.setTraces(
-        toExecutionTracesOutput(
-            executionTraces.stream().filter(trace -> trace.getAgent() == null).toList()));
-    output.setTracesByAgent(
-        groupTracesByAgent(
-            executionTraces.stream().filter(trace -> trace.getAgent() != null).toList()));
-    output.setTrackingSentDate(status.getTrackingSentDate());
-    output.setTrackingEndDate(status.getTrackingEndDate());
-    return output;
-  }
-
-  public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
-    return injectStatus
-        .map(
-            status ->
-                this.<InjectStatusOutput>buildInjectStatusOutput(
-                    InjectStatusOutput.builder().build(), status, status.getTraces()))
-        .orElseGet(() -> InjectStatusOutput.builder().build());
-  }
-
-  public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestStatus injectTestStatus) {
-    InjectTestStatusOutput output = InjectTestStatusOutput.builder().build();
-    buildInjectStatusOutput(output, injectTestStatus, injectTestStatus.getTraces());
-
-    output.setInjectId(injectTestStatus.getInject().getId());
-    output.setInjectType(
-        injectTestStatus
-            .getInject()
-            .getInjectorContract()
-            .map(InjectorContract::getInjector)
-            .map(Injector::getType)
-            .orElse(null));
-    output.setInjectTitle(injectTestStatus.getInject().getTitle());
-
-    return output;
-  }
-
-  public List<ExecutionTracesOutput> toExecutionTracesOutput(List<ExecutionTraces> traces) {
-    return traces.stream()
-        .map(
-            trace ->
-                ExecutionTracesOutput.builder()
-                    .status(trace.getStatus())
-                    .time(trace.getTime())
-                    .message(trace.getMessage())
-                    .action(trace.getAction())
-                    .build())
-        .toList();
-  }
-
-  private List<AgentStatusOutput> groupTracesByAgent(List<ExecutionTraces> traces) {
-    return traces.stream()
-        .collect(Collectors.groupingBy(ExecutionTraces::getAgent))
-        .entrySet()
-        .stream()
-        .map(
-            entry -> {
-              ExecutionTraces finalTrace =
-                  entry.getValue().stream()
-                      .filter(t -> t.getAction() == ExecutionTraceAction.COMPLETE)
-                      .findFirst()
-                      .orElse(null);
-              Agent agent = entry.getKey();
-              return AgentStatusOutput.builder()
-                  .assetId(agent.getAsset().getId())
-                  .agentId(agent.getId())
-                  .agentExecutorName(agent.getExecutor().getName())
-                  .agentExecutorType(agent.getExecutor().getType())
-                  .agentName(agent.getExecutedByUser())
-                  .statusName(finalTrace != null ? finalTrace.getStatus().name() : null)
-                  .trackingEndDate(finalTrace != null ? finalTrace.getTime() : null)
-                  .trackingSentDate(
-                      entry.getValue().stream()
-                          .filter(t -> t.getAction() == ExecutionTraceAction.START)
-                          .findFirst()
-                          .map(ExecutionTraces::getTime)
-                          .orElse(null))
-                  .agentTraces(toExecutionTracesOutput(entry.getValue()))
-                  .build();
-            })
-        .toList();
-  }
-
   // -- EXPECTATIONS to EXPECTATIONSIMPLE
   public List<InjectExpectationSimple> toInjectExpectationSimples(
       List<InjectExpectation> expectations) {
@@ -211,19 +122,7 @@ public class InjectMapper {
         .build();
   }
 
-  // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
-  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .filter(Objects::nonNull)
-        .map(this::toAttackPatternSimple)
-        .toList();
-  }
-
-  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimple.builder()
-        .id(attackPattern.getId())
-        .name(attackPattern.getName())
-        .externalId(attackPattern.getExternalId())
-        .build();
+  public InjectSimple toInjectSimple(Inject inject) {
+    return InjectSimple.builder().id(inject.getId()).title(inject.getTitle()).build();
   }
 }

@@ -1,15 +1,11 @@
 import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import {
-  type Exercise,
-  type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput,
-  type InjectExportRequestInput, type InjectImportInput,
-  type Scenario,
-  type SearchPaginationInput,
-} from '../../utils/api-types';
+import { type Exercise, type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
+
+const INJECT_URI = '/api/injects';
 
 export const testInject = (injectId: string) => {
   const uri = `/api/injects/${injectId}/test`;
@@ -73,4 +69,41 @@ export const fetchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id']) 
 export const searchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id'], input: SearchPaginationInput) => {
   const uri = `/api/scenarios/${scenarioId}/injects/simple`;
   return simplePostCall(uri, input);
+};
+
+// -- TARGETS --
+
+export const searchTargets = (injectId: string, targetType: string, searchPaginationInput: SearchPaginationInput) => {
+  const data = searchPaginationInput;
+  const uri = `/api/injects/${injectId}/targets/${targetType}/search`;
+  return simplePostCall(uri, data);
+};
+
+// -- OPTION --
+
+export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
+  const params = {
+    searchText,
+    sourceId,
+  };
+  return simpleCall(`${INJECT_URI}/findings/options`, { params });
+};
+
+export const searchInjectByIdAsOption = (ids: string[]) => {
+  return simplePostCall(`${INJECT_URI}/options`, ids);
+};
+
+// -- EXECUTION TRACES --
+
+export const getInjectTracesFromInjectAndTarget = (injectId: string = '', targetId: string = '', targetType: string = '') => {
+  const params = {
+    injectId,
+    targetId,
+    targetType,
+  };
+  return simpleCall(`${INJECT_URI}/execution-traces`, { params });
+};
+export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') => {
+  const params = { injectId };
+  return simpleCall(`${INJECT_URI}/status`, { params });
 };

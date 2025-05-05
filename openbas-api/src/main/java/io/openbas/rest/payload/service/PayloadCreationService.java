@@ -43,7 +43,7 @@ public class PayloadCreationService {
     switch (payloadType) {
       case COMMAND:
         Command commandPayload = new Command();
-        payloadUtils.copyProperties(input, commandPayload);
+        payloadUtils.copyProperties(input, commandPayload, false);
         commandPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -52,7 +52,7 @@ public class PayloadCreationService {
         return commandPayload;
       case EXECUTABLE:
         Executable executablePayload = new Executable();
-        payloadUtils.copyProperties(input, executablePayload);
+        payloadUtils.copyProperties(input, executablePayload, false);
         executablePayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -63,7 +63,7 @@ public class PayloadCreationService {
         return executablePayload;
       case FILE_DROP:
         FileDrop fileDropPayload = new FileDrop();
-        payloadUtils.copyProperties(input, fileDropPayload);
+        payloadUtils.copyProperties(input, fileDropPayload, false);
         fileDropPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -78,7 +78,7 @@ public class PayloadCreationService {
         return fileDropPayload;
       case DNS_RESOLUTION:
         DnsResolution dnsResolutionPayload = new DnsResolution();
-        payloadUtils.copyProperties(input, dnsResolutionPayload);
+        payloadUtils.copyProperties(input, dnsResolutionPayload, false);
         dnsResolutionPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -87,7 +87,7 @@ public class PayloadCreationService {
         return dnsResolutionPayload;
       case NETWORK_TRAFFIC:
         NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        payloadUtils.copyProperties(input, networkTrafficPayload);
+        payloadUtils.copyProperties(input, networkTrafficPayload, false);
         networkTrafficPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));

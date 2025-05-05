@@ -1,23 +1,5 @@
 import { AddModeratorOutlined, MoreVertOutlined, PersonAddOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  Tab, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow,
-  Tabs,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
 import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
@@ -28,14 +10,15 @@ import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
-import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
+import { HUMAN_EXPECTATION, isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 import InjectIcon from '../../common/injects/InjectIcon';
+import ExecutionStatusDetail from '../../common/injects/status/ExecutionStatusDetail';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
@@ -120,7 +103,12 @@ interface Props {
   inject: InjectResultOverviewOutput;
   lastExecutionStartDate: string;
   lastExecutionEndDate: string;
-  target: InjectTargetWithResult;
+  target: {
+    id: string;
+    name?: string;
+    targetType: string;
+    platformType?: string;
+  };
   parentTargetId?: string;
   upperParentTargetId?: string;
 }
@@ -533,6 +521,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     setSelectedExpectationForResults(null);
   };
 
+  const canShowExecutionTab = target.targetType !== 'ASSETS_GROUPS';
+
   return (
     <>
       <div className={classes.target}>
@@ -585,25 +575,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           proOptions={proOptions}
         />
       </div>
-      {Object.keys(sortedGroupedResults).length > 0 && (
-        <Box sx={{
+      <Box
+        sx={{
           borderBottom: 1,
           borderColor: 'divider',
         }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          className={classes.tabs}
         >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            className={classes.tabs}
-          >
-            {Object.keys(sortedGroupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).length > 0
+            && Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-          </Tabs>
-        </Box>
-      )}
+          {canShowExecutionTab && <Tab label={t('Execution')} />}
+        </Tabs>
+      </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
         <div key={targetResultIndex} hidden={activeTab !== targetResultIndex}>
           {sortedGroupedResults[targetResult]
@@ -623,14 +614,14 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               return (
                 <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
                   <Paper variant="outlined" classes={{ root: classes.paperResults }}>
-                    <Grid container={true} spacing={2} style={{ alignItems: 'baseline' }}>
-                      <Grid item={true} xs={6}>
+                    <GridLegacy container={true} spacing={2} style={{ alignItems: 'baseline' }}>
+                      <GridLegacy item={true} xs={6}>
                         <Typography variant="h5">
                           {injectExpectation.inject_expectation_name}
                         </Typography>
-                      </Grid>
+                      </GridLegacy>
                       {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
-                        <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
+                        <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
                               <ItemResult label="Prevented" status="Prevented" />
@@ -651,14 +642,14 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               <ItemResult label="Not Detected" status="Not Detected" />
                             )
                           }
-                          {injectExpectation.inject_expectation_status && injectExpectation.inject_expectation_results.length > 0 && (
+                          {injectExpectation.inject_expectation_status && HUMAN_EXPECTATION.includes(injectExpectation.inject_expectation_type) && (
                             <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
                           )}
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
-                        </Grid>
+                        </GridLegacy>
                       )
                         : (
-                            <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
+                            <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                               {
                                 injectExpectation.inject_expectation_created_at && (
                                   <ExpirationChip
@@ -667,14 +658,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   />
                                 )
                               }
-                            </Grid>
-
+                            </GridLegacy>
                           )}
                       {
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
                           return (
                             <>
-                              <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
+                              <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
                                 <IconButton
                                   color="primary"
                                   onClick={(ev) => {
@@ -705,18 +695,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                     {t('Delete')}
                                   </MenuItem>
                                 </Menu>
-                              </Grid>
+                              </GridLegacy>
                             </>
                           );
                         })
                       }
-
                       {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
                         || (injectExpectation.inject_expectation_type === 'MANUAL'
                           && injectExpectation.inject_expectation_results
                           && injectExpectation.inject_expectation_results.length === 0))
                         && (
-                          <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
+                          <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
                             <Tooltip title={t('Add a result')}>
                               <IconButton
                                 aria-label="Add"
@@ -739,10 +728,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               </IconButton>
                             </Tooltip>
 
-                          </Grid>
+                          </GridLegacy>
                         )}
-
-                    </Grid>
+                    </GridLegacy>
                     <div className={classes.flexContainer}>
                       <div>
                         <Typography variant="h4">
@@ -769,16 +757,22 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           </TableHead>
                           <TableBody>
                             {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                              const isResultSecurityPlatform: boolean = !!(
+                                injectExpectation.inject_expectation_agent
+                                && injectExpectation.inject_expectation_status === 'SUCCESS'
+                                && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected')
+                                && expectationResult.sourceType === 'collector'
+                              );
                               return (
                                 <TableRow
                                   key={index}
-                                  hover={true}
+                                  hover={isResultSecurityPlatform}
                                   onClick={() => {
-                                    if (injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector') {
+                                    if (isResultSecurityPlatform) {
                                       handleClickSecurityPlatformResult(injectExpectation, expectationResult);
                                     }
                                   }}
-                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
+                                  sx={{ cursor: `${isResultSecurityPlatform ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
                                   <TableCell className={classes.tableFontSize}>
@@ -959,6 +953,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
+      {(initialized && activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab) && (
+        <div style={{ paddingTop: theme.spacing(3) }}>
+          <ExecutionStatusDetail target={target} injectId={inject.inject_id} />
+        </div>
+      )}
     </>
   );
 };

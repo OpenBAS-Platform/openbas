@@ -10,7 +10,7 @@ public class InjectionUtils {
 
   public static boolean isInInjectableRange(Injection injection) {
     Instant now = Instant.now();
-    Instant start = now.minus(Duration.parse("PT2M"));
+    Instant start = now.minus(Duration.parse("PT4M"));
     Instant injectWhen = injection.getDate().orElseThrow();
     return injectWhen.isAfter(start) && injectWhen.isBefore(now);
   }

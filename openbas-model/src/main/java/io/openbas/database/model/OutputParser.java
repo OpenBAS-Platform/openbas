@@ -44,8 +44,13 @@ public class OutputParser implements Base {
   @NotNull
   private ParserType type;
 
-  @OneToMany(mappedBy = "outputParser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(
+      mappedBy = "outputParser",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("output_parser_contract_output_elements")
+  @NotNull
   private Set<ContractOutputElement> contractOutputElements = new HashSet<>();
 
   @Column(name = "output_parser_created_at")
@@ -57,6 +62,18 @@ public class OutputParser implements Base {
   @JsonProperty("output_parser_updated_at")
   @NotNull
   private Instant updatedAt = now();
+
+  public void setContractOutputElements(final Set<ContractOutputElement> contractOutputElements) {
+    this.contractOutputElements.clear();
+    contractOutputElements.forEach(this::addContractOutputElement);
+  }
+
+  public void addContractOutputElement(final ContractOutputElement contractOutputElement) {
+    if (contractOutputElement != null) {
+      contractOutputElement.setOutputParser(this);
+      this.contractOutputElements.add(contractOutputElement);
+    }
+  }
 
   @Override
   public int hashCode() {

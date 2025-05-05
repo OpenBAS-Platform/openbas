@@ -69,6 +69,20 @@ export const dryImportXlsForExercise = (exerciseId: Exercise['exercise_id'], imp
     });
 };
 
+// -- OPTION --
+
+export const searchExerciseLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
+  const params = {
+    searchText,
+    sourceId,
+  };
+  return simpleCall(`${EXERCISE_URI}/findings/options`, { params });
+};
+
+export const searchExerciseByIdAsOption = (ids: string[]) => {
+  return simplePostCall(`${EXERCISE_URI}/options`, ids);
+};
+
 // -- LESSONS --
 
 export const fetchLessonsCategories = (exerciseId: string) => (dispatch: Dispatch) => {

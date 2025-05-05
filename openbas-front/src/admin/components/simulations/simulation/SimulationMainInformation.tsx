@@ -1,9 +1,9 @@
-import { Chip, Grid, Link as MUILink, Paper, Typography, useTheme } from '@mui/material';
+import { Chip, GridLegacy, Paper, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
 import { type FunctionComponent } from 'react';
-import { Link } from 'react-router';
 
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import ContextLink from '../../../../components/ContextLink';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
@@ -11,9 +11,9 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import { SCENARIO_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type Exercise, type KillChainPhase } from '../../../../utils/api-types';
-import { truncate } from '../../../../utils/String';
 
 interface Props { exercise: Exercise }
 
@@ -21,13 +21,12 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
-  const scenarioBaseUri = '/admin/scenarios';
   const { scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(exercise.exercise_scenario || '') }));
 
   return (
     <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
-      <Grid id="main_information" container spacing={3}>
-        <Grid item xs={8} style={{ paddingTop: 10 }}>
+      <GridLegacy id="main_information" container spacing={3}>
+        <GridLegacy item xs={8} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -39,8 +38,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
             source={exercise.exercise_description}
             limit={300}
           />
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -48,21 +47,9 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
           >
             {t('Parent scenario')}
           </Typography>
-          {scenario ? (
-            <MUILink
-              component={Link}
-              to={scenarioBaseUri + '/' + scenario.scenario_id}
-            >
-              <Typography
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {truncate(scenario.scenario_name, 30)}
-              </Typography>
-            </MUILink>
-          ) : '-'}
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+          {scenario ? (<ContextLink title={scenario.scenario_name} url={`${SCENARIO_BASE_URL}/${scenario.scenario_id}`} />) : '-'}
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -72,8 +59,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
             {t('Severity')}
           </Typography>
           <ItemSeverity severity={exercise.exercise_severity} label={t(exercise.exercise_severity ?? 'Unknown')} />
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -82,8 +69,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
             {t('Category')}
           </Typography>
           <ItemCategory category={exercise?.exercise_category ?? ''} label={t(exercise.exercise_category ?? 'Unknown')} />
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -92,8 +79,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
             {t('Main Focus')}
           </Typography>
           <ItemMainFocus mainFocus={exercise?.exercise_main_focus ?? ''} label={t(exercise.exercise_main_focus ?? 'Unknown')} />
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -102,8 +89,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
             {t('Tags')}
           </Typography>
           <ItemTags tags={exercise.exercise_tags} limit={10} />
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -116,8 +103,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
           ) : exercise.exercise_platforms?.map(
             (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
           )}
-        </Grid>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -142,8 +129,8 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
               label={killChainPhase.phase_name}
             />
           ))}
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
     </Paper>
   );
 };

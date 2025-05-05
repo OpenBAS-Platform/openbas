@@ -31,4 +31,8 @@ public class AssetService {
   public Iterable<Asset> assetFromIds(@NotNull final List<String> assetIds) {
     return this.assetRepository.findAllById(assetIds);
   }
+
+  public Iterable<Asset> saveAllAssets(List<Asset> assets) {
+    return this.assetRepository.saveAll(assets);
+  }
 }

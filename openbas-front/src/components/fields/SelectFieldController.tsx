@@ -27,7 +27,7 @@ const SelectFieldController = ({ name, label, items, style, required, disabled }
           <InputLabel id={`select-label-${name}`}>{`${label}${required ? ' *' : ''}`}</InputLabel>
           <Select
             {...field}
-            labelId="demo-simple-select-standard-label"
+            labelId={`select-label-${name}`}
             id={`select-label-${name}`}
             style={style}
             disabled={disabled}

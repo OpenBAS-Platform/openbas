@@ -1,4 +1,4 @@
-import { DevicesOtherOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
@@ -9,7 +9,6 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
 import { type ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import { type UserHelper } from '../../../../actions/helper';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
 import { initSorting } from '../../../../components/common/queryable/Page';
@@ -20,9 +19,10 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type EndpointOutput, type ExecutorOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type ExecutorOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -68,12 +68,11 @@ const Endpoints = () => {
 
   // Fetching data
   const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
     executorsMap: helper.getExecutorsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
-    dispatch(fetchTags());
   });
 
   const availableFilterNames = [
@@ -98,6 +97,13 @@ const Endpoints = () => {
     ],
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
+  };
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const searchEndpointsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchEndpoints(input).finally(() => setLoading(false));
   };
 
   const getActiveMsgTooltip = (endpoint: EndpointOutput) => {
@@ -285,7 +291,7 @@ const Endpoints = () => {
         .
       </Alert>
       <PaginationComponentV2
-        fetch={searchEndpoints}
+        fetch={searchEndpointsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
         entityPrefix="asset"
@@ -312,55 +318,56 @@ const Endpoints = () => {
             )}
           />
         </ListItem>
-        {endpoints.map((endpoint: EndpointOutput) => {
-          return (
-            <ListItem
-              key={endpoint.asset_id}
-              classes={{ root: classes.item }}
-              divider
-              secondaryAction={
-                (userAdmin
-                  && (
-                    <EndpointPopover
-                      inline
-                      endpoint={{
-                        ...endpoint,
-                        type: 'static',
-                      }}
-                      onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
-                    />
-                  ))
-              }
-              disablePadding
-            >
-              <ListItemButton
-                component={Link}
-                to={`/admin/assets/endpoints/${endpoint.asset_id}`}
-              >
-                <ListItemIcon>
-                  <DevicesOtherOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div style={bodyItemsStyles.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          style={{
-                            ...bodyItemsStyles.bodyItem,
-                            ...inlineStyles[header.field],
-                          }}
-                        >
-                          {header.value(endpoint)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+        {
+          loading
+            ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+            : endpoints.map((endpoint: EndpointOutput) => {
+                return (
+                  <ListItem
+                    key={endpoint.asset_id}
+                    divider
+                    secondaryAction={
+                      (userAdmin
+                        && (
+                          <EndpointPopover
+                            inline
+                            endpoint={{ ...endpoint }}
+                            onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                          />
+                        ))
+                    }
+                    disablePadding
+                  >
+                    <ListItemButton
+                      component={Link}
+                      to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+                      classes={{ root: classes.item }}
+                    >
+                      <ListItemIcon>
+                        <DevicesOtherOutlined color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <div style={bodyItemsStyles.bodyItems}>
+                            {headers.map(header => (
+                              <div
+                                key={header.field}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
+                              >
+                                {header.value(endpoint)}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
+        }
       </List>
     </>
   );

@@ -1,10 +1,10 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid2, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -17,11 +17,6 @@ interface GenericSource {
   id: string;
   type: string;
   name: string;
-  communications_number: number;
-  start_date: string;
-  end_date: string;
-  users_number: number;
-  logs_number: number;
   lessons_anonymized: boolean;
   isReadOnly: boolean;
   isUpdatable: boolean;
@@ -30,7 +25,6 @@ interface GenericSource {
 interface Props {
   source: GenericSource;
   objectives: Objective[];
-  injects: Inject[];
   teamsMap: Record<string, Team>;
   teams: Team[];
   lessonsCategories: LessonsCategory[];
@@ -103,8 +97,8 @@ const Lessons: FunctionComponent<Props> = ({
           }
         </Typography>
         <Paper variant="outlined" sx={{ padding: theme.spacing(3) }}>
-          <Grid2 container spacing={3}>
-            <Grid2 size={{ xs: 6 }}>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Questionnaire mode')}</Typography>
               <FormControlLabel
                 control={(
@@ -123,8 +117,8 @@ const Lessons: FunctionComponent<Props> = ({
                 )}
                 label={t('Anonymize answers')}
               />
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Template')}</Typography>
               <Button
                 startIcon={<ContentPasteGoOutlined />}
@@ -134,8 +128,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Apply')}
               </Button>
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Check')}</Typography>
               <Button
                 startIcon={<VisibilityOutlined />}
@@ -146,8 +140,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Preview')}
               </Button>
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">
                 {t('Categories and questions')}
               </Typography>
@@ -159,8 +153,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Clear out')}
               </Button>
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </Paper>
         <LessonsObjectives
           objectives={objectives}

@@ -1,22 +1,18 @@
 import {
-  CrisisAlertOutlined,
-  DescriptionOutlined,
-  EmojiEventsOutlined,
-  OutlinedFlagOutlined,
   SlowMotionVideoOutlined,
-  SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../../components/Empty';
-import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { ChallengeContext } from '../Context';
+import ChallengeCard from './ChallengeCard.js';
 
 const useStyles = makeStyles()(() => ({
   flag: {
@@ -45,6 +41,7 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
 
   // Context
   const { previewChallengeUrl } = useContext(ChallengeContext);
@@ -95,81 +92,14 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
         )}
         />
       )}
-      <Grid container={true} spacing={3}>
-        {sortedChallenges.map((challenge, index) => {
-          return (
-            <Grid key={challenge.challenge_id} item={true} xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
-              <Card
-                variant="outlined"
-                classes={{ root: classes.card }}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                }}
-              >
-                <CardHeader
-                  avatar={(
-                    <Avatar sx={{ bgcolor: '#e91e63' }}>
-                      <EmojiEventsOutlined />
-                    </Avatar>
-                  )}
-                  title={challenge.challenge_name}
-                  subheader={challenge.challenge_category}
-                />
-                <CardContent style={{ margin: '-20px 0 30px 0' }}>
-                  <ExpandableMarkdown
-                    source={challenge.challenge_content}
-                    limit={500}
-                    controlled={true}
-                  />
-                  <div className={classes.footer}>
-                    <div style={{ float: 'left' }}>
-                      {challenge.challenge_flags.map((flag) => {
-                        return (
-                          <Tooltip
-                            key={flag.flag_id}
-                            title={t(flag.flag_type)}
-                          >
-                            <Chip
-                              icon={<OutlinedFlagOutlined />}
-                              classes={{ root: classes.flag }}
-                              variant="outlined"
-                              label={t(flag.flag_type)}
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </div>
-                    <div style={{ float: 'right' }}>
-                      <Button
-                        size="small"
-                        startIcon={<SportsScoreOutlined />}
-                        className={classes.button}
-                      >
-                        {challenge.challenge_score || 0}
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<CrisisAlertOutlined />}
-                        className={classes.button}
-                      >
-                        {challenge.challenge_max_attempts || 0}
-                      </Button>
-                      <Button
-                        size="small"
-                        startIcon={<DescriptionOutlined />}
-                        className={classes.button}
-                      >
-                        {challenge.challenge_documents.length || 0}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: theme.spacing(3),
+      }}
+      >
+        {sortedChallenges.map(challenge => <ChallengeCard showTags key={challenge.challenge_id} challenge={challenge} />)}
+      </div>
     </>
   );
 };

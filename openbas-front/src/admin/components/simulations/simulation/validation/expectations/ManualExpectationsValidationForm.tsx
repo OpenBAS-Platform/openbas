@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, Chip, GridLegacy, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -110,8 +110,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
         )}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
-        <Grid container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
-          <Grid item xs={6}>
+        <GridLegacy container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
+          <GridLegacy item xs={6}>
             <MuiTextField
               variant="standard"
               fullWidth
@@ -127,8 +127,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
                 },
               }}
             />
-          </Grid>
-          <Grid item xs={6}>
+          </GridLegacy>
+          <GridLegacy item xs={6}>
             <Select
               fullWidth
               value={watch('expectation_score') < expectation.inject_expectation_expected_score ? 'Failed' : 'Success'}
@@ -141,8 +141,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
               <MenuItem value="Success">{t('Success')}</MenuItem>
               <MenuItem value="Failed">{t('Failed')}</MenuItem>
             </Select>
-          </Grid>
-        </Grid>
+          </GridLegacy>
+        </GridLegacy>
         <Slider
           size="small"
           value={watch('expectation_score')}

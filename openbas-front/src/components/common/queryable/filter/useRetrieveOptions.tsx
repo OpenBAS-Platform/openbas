@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
+import { searchInjectByIdAsOption } from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
@@ -31,6 +33,7 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'payload_attack_patterns':
+      case 'base_attack_patterns_side':
         searchAttackPatternsByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
@@ -41,17 +44,21 @@ const useRetrieveOptions = () => {
       case 'inject_tags':
       case 'payload_tags':
       case 'scenario_tags':
+      case 'target_tags':
       case 'team_tags':
+      case 'finding_tags':
       case 'user_tags':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
+      case 'finding_asset_groups':
       case 'inject_asset_groups':
         searchAssetGroupByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
+      case 'finding_assets':
       case 'inject_assets':
         searchEndpointByIdAsOption(ids).then((response) => {
           setOptions(response.data);
@@ -62,6 +69,17 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_inject_id':
+        searchInjectByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_simulation':
+        searchExerciseByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_scenario' :
       case 'exercise_scenario':
         searchScenarioByIdAsOption(ids).then((response) => {
           setOptions(response.data);

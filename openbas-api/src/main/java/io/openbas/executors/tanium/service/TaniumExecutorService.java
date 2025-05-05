@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaniumExecutorService implements Runnable {
 
-  private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
+  public static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
   public static final String TANIUM_EXECUTOR_NAME = "Tanium";
   private static final String TANIUM_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#tanium-agent";
@@ -41,7 +41,7 @@ public class TaniumExecutorService implements Runnable {
     return switch (platform) {
       case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
       case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
-      case "MacOS" -> Endpoint.PLATFORM_TYPE.MacOS;
+      case "MacOS", "Mac" -> Endpoint.PLATFORM_TYPE.MacOS;
       default -> Endpoint.PLATFORM_TYPE.Unknown;
     };
   }

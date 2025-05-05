@@ -1,5 +1,5 @@
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
-import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { GridLegacy, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -136,9 +136,9 @@ const ExerciseInjects: FunctionComponent = () => {
                 </ToggleButton>
               </Tooltip>
             </ToggleButtonGroup>
-            <Grid container spacing={3}>
-              <Grid container item spacing={3}>
-                <Grid
+            <GridLegacy container spacing={3}>
+              <GridLegacy container item spacing={3}>
+                <GridLegacy
                   item
                   xs={6}
                   sx={{
@@ -152,8 +152,8 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <InjectDistributionByType exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-                <Grid
+                </GridLegacy>
+                <GridLegacy
                   item
                   xs={6}
                   sx={{
@@ -167,8 +167,8 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <InjectDistributionByTeam exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-                <Grid
+                </GridLegacy>
+                <GridLegacy
                   item
                   xs={3}
                   sx={{
@@ -184,8 +184,8 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-                <Grid
+                </GridLegacy>
+                <GridLegacy
                   item
                   xs={3}
                   sx={{
@@ -199,8 +199,8 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-                <Grid
+                </GridLegacy>
+                <GridLegacy
                   item
                   xs={3}
                   sx={{
@@ -214,8 +214,8 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-                <Grid
+                </GridLegacy>
+                <GridLegacy
                   item
                   xs={3}
                   sx={{
@@ -229,9 +229,9 @@ const ExerciseInjects: FunctionComponent = () => {
                   <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                     <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
                   </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
+                </GridLegacy>
+              </GridLegacy>
+            </GridLegacy>
           </div>
         )}
       </ViewModeContext.Provider>

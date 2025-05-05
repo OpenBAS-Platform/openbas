@@ -1,7 +1,7 @@
 package io.openbas.injectors.lade;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Execution;

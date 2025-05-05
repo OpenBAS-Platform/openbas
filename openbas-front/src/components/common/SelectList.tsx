@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Chip, GridLegacy, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type ReactElement, useMemo } from 'react';
 
 import { truncate } from '../../utils/String';
@@ -52,8 +52,8 @@ const SelectList = <T extends object>({
   return (
     <>
       {paginationComponent}
-      <Grid container spacing={3}>
-        <Grid item xs={8}>
+      <GridLegacy container spacing={3}>
+        <GridLegacy item xs={8}>
           <List>
             {values.map((value) => {
               const id = getIdFn(value);
@@ -95,8 +95,8 @@ const SelectList = <T extends object>({
             })}
             {buttonComponent}
           </List>
-        </Grid>
-        <Grid item xs={4}>
+        </GridLegacy>
+        <GridLegacy item xs={4}>
           <Box
             sx={{
               minHeight: '100%',
@@ -117,8 +117,8 @@ const SelectList = <T extends object>({
               );
             })}
           </Box>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
     </>
   );
 };

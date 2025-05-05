@@ -183,7 +183,7 @@ public class CalderaInjectorClient {
       httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
       return httpClient.execute(httpGet, response -> EntityUtils.toString(response.getEntity()));
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + url);
+      throw new ClientProtocolException("Unexpected response for request on: " + url, e);
     }
   }
 
@@ -199,7 +199,7 @@ public class CalderaInjectorClient {
 
       return httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity()));
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + url);
+      throw new ClientProtocolException("Unexpected response for request on: " + url, e);
     }
   }
 
@@ -214,7 +214,7 @@ public class CalderaInjectorClient {
       httpPatch.setEntity(entity);
       httpClient.execute(httpPatch);
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + url);
+      throw new ClientProtocolException("Unexpected response for request on: " + url, e);
     }
   }
 
@@ -225,7 +225,7 @@ public class CalderaInjectorClient {
       httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
       httpClient.execute(httpdelete);
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + url);
+      throw new ClientProtocolException("Unexpected response for request on: " + url, e);
     }
   }
 }

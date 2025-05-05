@@ -1,3 +1,4 @@
+import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import TagField from './TagField';
@@ -5,9 +6,10 @@ import TagField from './TagField';
 interface Props {
   name: string;
   label: string;
+  style?: CSSProperties;
 }
 
-const TagFieldController = ({ name, label }: Props) => {
+const TagFieldController = ({ name, label, style = {} }: Props) => {
   const { control } = useFormContext();
 
   return (
@@ -20,6 +22,7 @@ const TagFieldController = ({ name, label }: Props) => {
           fieldValue={value ?? []}
           fieldOnChange={onChange}
           error={error}
+          style={style}
         />
       )}
     />

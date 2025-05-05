@@ -1,9 +1,9 @@
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluation } from '../../../../../actions/Evaluation';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
-import { fetchScenarioInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
@@ -53,19 +53,13 @@ const ScenarioLessons = () => {
       id: scenario.scenario_id,
       type: 'scenario',
       name: scenario.scenario_name,
-      communications_number: scenario.scenario_communications_number,
-      start_date: scenario.scenario_recurrence_start,
-      end_date: scenario.scenario_recurrence_end,
-      users_number: scenario.scenario_users_number,
-      lessons_anonymized: scenario.scenario_lessons_anonymized,
+      lessons_anonymized: scenario.scenario_lessons_anonymized ?? false,
     };
   };
 
   const {
     scenario,
-    source,
     objectives,
-    injects,
     teams,
     teamsMap,
     lessonsCategories,
@@ -76,9 +70,7 @@ const ScenarioLessons = () => {
     const scenarioData = helper.getScenario(scenarioId);
     return {
       scenario: scenarioData,
-      source: processToGenericSource(helper.getScenario(scenarioId)),
       objectives: helper.getScenarioObjectives(scenarioId),
-      injects: helper.getScenarioInjects(scenarioId),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
       lessonsTemplates: helper.getLessonsTemplates(),
@@ -94,9 +86,13 @@ const ScenarioLessons = () => {
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
     dispatch(fetchScenarioObjectives(scenarioId));
-    dispatch(fetchScenarioInjects(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
   });
+
+  const source = useMemo(
+    () => processToGenericSource(scenario),
+    [scenario],
+  );
 
   const permissions = usePermissions(scenarioId, scenario);
 
@@ -145,7 +141,6 @@ const ScenarioLessons = () => {
           isUpdatable: permissions.canWrite,
         }}
         objectives={objectives}
-        injects={injects}
         teamsMap={teamsMap}
         teams={teams}
         lessonsCategories={lessonsCategories}

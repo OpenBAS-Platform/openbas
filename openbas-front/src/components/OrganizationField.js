@@ -116,7 +116,7 @@ class OrganizationField extends Component {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  return { organizations: helper.getOrganizations() };
+  return { organizations: helper.getOrganizations().toJS() };
 };
 
 export default R.compose(

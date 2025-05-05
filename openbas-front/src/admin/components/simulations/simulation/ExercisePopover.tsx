@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -116,7 +116,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Button Popover
   const entries = [];
@@ -152,7 +152,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_description: data.exercise_description,
       exercise_main_focus: data.exercise_main_focus,
       exercise_tags: data.exercise_tags,
-      exercise_start_date: data.exercise_start_date,
       exercise_mails_reply_to: data.exercise_mails_reply_to,
       exercise_mail_from: data.exercise_mail_from,
       exercise_message_header: data.exercise_message_header,

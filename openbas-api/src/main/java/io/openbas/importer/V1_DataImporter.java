@@ -22,7 +22,10 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
+import io.openbas.rest.payload.form.ContractOutputElementInput;
+import io.openbas.rest.payload.form.OutputParserInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.rest.payload.form.RegexGroupInput;
 import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
@@ -54,6 +57,7 @@ public class V1_DataImporter implements Importer {
   private final ActionMetricCollector actionMetricCollector;
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
+  private final AttackPatternRepository attackPatternRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioService scenarioService;
   private final TeamRepository teamRepository;
@@ -190,6 +194,47 @@ public class V1_DataImporter implements Importer {
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
     return tag;
+  }
+
+  // -- ATTACK PATTERN --
+  private List<String> importAttackPattern(
+      JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    ArrayList<String> attackPatternIds = new ArrayList<>();
+    resolveJsonElements(importNode, prefix + "attack_patterns")
+        .forEach(
+            nodeAttackPattern -> {
+              JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
+              if (idNode == null) return;
+              String id = idNode.textValue();
+
+              if (baseIds.get(id) != null) {
+                // Already import
+                return;
+              }
+              String name = nodeAttackPattern.get("attack_pattern_external_id").textValue();
+
+              List<AttackPattern> existingAttackPattern =
+                  this.attackPatternRepository.findAllByExternalIdInIgnoreCase(List.of(name));
+              if (!existingAttackPattern.isEmpty()) {
+                baseIds.put(id, existingAttackPattern.getFirst());
+                attackPatternIds.add(id);
+              } else {
+                AttackPattern attackPatternCreated =
+                    this.attackPatternRepository.save(createAttackPattern(nodeAttackPattern));
+                baseIds.put(id, attackPatternCreated);
+                attackPatternIds.add(attackPatternCreated.getId());
+              }
+            });
+    return attackPatternIds;
+  }
+
+  private AttackPattern createAttackPattern(JsonNode jsonNode) {
+    AttackPattern attackPattern = new AttackPattern();
+    attackPattern.setStixId("attack-pattern--" + UUID.randomUUID());
+    attackPattern.setName(jsonNode.get("attack_pattern_name").textValue());
+    attackPattern.setDescription(jsonNode.get("attack_pattern_description").textValue());
+    attackPattern.setExternalId(jsonNode.get("attack_pattern_external_id").textValue());
+    return attackPattern;
   }
 
   // -- EXERCISE --
@@ -1027,6 +1072,65 @@ public class V1_DataImporter implements Importer {
     }
   }
 
+  public static ContractOutputType formatStringToContractOutputType(String value) {
+    for (ContractOutputType type : ContractOutputType.values()) {
+      if (type.label.equalsIgnoreCase(value)) {
+        return type;
+      }
+    }
+    throw new IllegalArgumentException("Unknown ContractOutputType: " + value);
+  }
+
+  private ContractOutputElementInput buildOuputElementFromJsonNode(
+      JsonNode node, Map<String, Base> baseIds) {
+    ContractOutputElementInput outputElement = new ContractOutputElementInput();
+    outputElement.setFinding(node.get("contract_output_element_is_finding").asBoolean());
+    outputElement.setRule(node.get("contract_output_element_rule").textValue());
+    outputElement.setName(node.get("contract_output_element_name").textValue());
+    outputElement.setKey(node.get("contract_output_element_key").textValue());
+    outputElement.setType(
+        formatStringToContractOutputType(node.get("contract_output_element_type").textValue()));
+    importTags(node, "contract_output_element_tags", baseIds);
+    outputElement.setTagIds(
+        resolveJsonIds(node, "contract_output_element_tags").stream()
+            .map(tid -> baseIds.get(tid).getId())
+            .toList());
+    ArrayNode regexGroupNodes = (ArrayNode) node.get("contract_output_element_regex_groups");
+    for (JsonNode regexGroupNode : regexGroupNodes) {
+      RegexGroupInput regexGroup = new RegexGroupInput();
+      regexGroup.setField(regexGroupNode.get("regex_group_field").textValue());
+      regexGroup.setIndexValues(regexGroupNode.get("regex_group_index_values").textValue());
+      outputElement.getRegexGroups().add(regexGroup);
+    }
+    return outputElement;
+  }
+
+  private OutputParserInput buildOutputParserFromJsonNode(
+      JsonNode node, Map<String, Base> baseIds) {
+    OutputParserInput parser = new OutputParserInput();
+    parser.setType(ParserType.valueOf(node.get("output_parser_type").textValue()));
+    parser.setMode(ParserMode.valueOf(node.get("output_parser_mode").textValue()));
+    ArrayNode outputElementNodes = (ArrayNode) node.get("output_parser_contract_output_elements");
+    for (JsonNode outputElementNode : outputElementNodes) {
+      parser
+          .getContractOutputElements()
+          .add(buildOuputElementFromJsonNode(outputElementNode, baseIds));
+    }
+    return parser;
+  }
+
+  private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
+      JsonNode payloadNode, Map<String, Base> baseIds) {
+    Set<OutputParserInput> outputParserInputs = new HashSet<>();
+    if (!payloadNode.has("payload_output_parsers")) return outputParserInputs;
+
+    ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
+    for (JsonNode outputParserNode : outputParserNodes) {
+      outputParserInputs.add(buildOutputParserFromJsonNode(outputParserNode, baseIds));
+    }
+    return outputParserInputs;
+  }
+
   private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {
     // swap executable file id or file drop file id
     if (payloadNode.has("executable_file")) {
@@ -1042,6 +1146,11 @@ public class V1_DataImporter implements Importer {
     }
 
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
+    payloadCreateInput.setOutputParsers(
+        buildOutputParsersFromPayloadJsonNode(payloadNode, baseIds));
+
+    List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
+    payloadCreateInput.setAttackPatternsIds(attackPatternIds);
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
     payload.setTags(
         resolveJsonIds(payloadNode, "payload_tags").stream()

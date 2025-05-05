@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.openbas.opencti.OpenCTIApi;
 import io.openbas.rest.attack_pattern.AttackPatternApi;
 import io.openbas.rest.inject.InjectApi;
+import io.openbas.rest.inject.ScenarioInjectApi;
 import io.openbas.rest.injector_contract.InjectorContractApi;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
 import io.openbas.rest.scenario.ScenarioApi;
@@ -47,6 +48,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class OpenCTIApiTest {
 
   @Mock InjectApi injectApi;
+  @Mock ScenarioInjectApi scenarioInjectApi;
   @Mock ScenarioApi scenarioApi;
   @Mock KillChainPhaseApi killChainPhaseApi;
   @Mock AttackPatternApi attackPatternApi;
@@ -67,6 +69,7 @@ class OpenCTIApiTest {
                 attackPatternApi,
                 injectorContractApi,
                 scenarioApi,
+                scenarioInjectApi,
                 injectApi,
                 openCTIApi)
             .build();

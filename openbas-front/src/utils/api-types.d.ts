@@ -10,6 +10,8 @@
  * ---------------------------------------------------------------
  */
 
+type UtilRequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export interface Agent {
   agent_active?: boolean;
   agent_asset: string;
@@ -53,27 +55,6 @@ export interface AgentOutput {
   agent_last_seen?: string;
   /** Agent privilege */
   agent_privilege?: "admin" | "standard";
-}
-
-/** Represents the output result details of an agent execution */
-export interface AgentStatusOutput {
-  agent_executor_name?: string;
-  agent_executor_type?: string;
-  agent_id: string;
-  agent_name?: string;
-  /**
-   * Execution status of the agent
-   * @example "SUCCESS, ERROR, MAYBE_PREVENTED..."
-   */
-  agent_status_name?: string;
-  /** List of agent execution traces */
-  agent_traces?: ExecutionTracesOutput[];
-  /** Endpoint ID */
-  asset_id: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
 }
 
 export interface AiGenericTextInput {
@@ -181,7 +162,9 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
+  asset_group_injects?: string[];
   asset_group_name: string;
   asset_group_tags?: string[];
   /** @format date-time */
@@ -207,6 +190,27 @@ export interface AssetGroupOutput {
   asset_group_name: string;
   /** @uniqueItems true */
   asset_group_tags?: string[];
+}
+
+/** Asset groups linked to endpoints */
+export interface AssetGroupSimple {
+  /** Asset group Id */
+  asset_group_id: string;
+  /** Asset group Name */
+  asset_group_name: string;
+}
+
+export interface AssetGroupTarget {
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_id: string;
+  target_name?: string;
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_subtype?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
 }
 
 /** Full contract */
@@ -290,6 +294,23 @@ export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
 
+interface BaseInjectTarget {
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_id: string;
+  target_name?: string;
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_subtype?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
+}
+
+type BaseInjectTargetTargetTypeMapping<Key, Type> = {
+  target_type: Key;
+} & Type;
+
 interface BasePayload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -359,6 +380,8 @@ export interface ChallengeFlag {
 }
 
 export interface ChallengeInformation {
+  /** @format int32 */
+  challenge_attempt?: number;
   challenge_detail?: PublicChallenge;
   challenge_expectation?: InjectExpectation;
 }
@@ -605,7 +628,7 @@ export interface ContractOutputElement {
   contract_output_element_key: string;
   contract_output_element_name: string;
   /** @uniqueItems true */
-  contract_output_element_regex_groups?: RegexGroup[];
+  contract_output_element_regex_groups: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -616,6 +639,7 @@ export interface ContractOutputElement {
 
 /** List of Contract output elements */
 export interface ContractOutputElementInput {
+  contract_output_element_id?: string;
   /** Indicates whether this contract output element can be used to generate a finding */
   contract_output_element_is_finding: boolean;
   /** Key */
@@ -635,6 +659,49 @@ export interface ContractOutputElementInput {
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
+/** Represents the rules for parsing the output of an execution. */
+export interface ContractOutputElementSimple {
+  contract_output_element_id: string;
+  /** Represents a unique key identifier. */
+  contract_output_element_key: string;
+  /** Represents the name of the rule. */
+  contract_output_element_name: string;
+  /** @uniqueItems true */
+  contract_output_element_regex_groups: RegexGroupSimple[];
+  /** The rule to apply for parsing the output, for example, can be a regex. */
+  contract_output_element_rule: string;
+  contract_output_element_tags?: string[];
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   */
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+}
+
+export interface CreateExerciseInput {
+  exercise_category?: string;
+  exercise_description?: string;
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  exercise_severity?: string;
+  /** @format date-time */
+  exercise_start_date?: string | null;
+  exercise_subtitle?: string;
+  exercise_tags?: string[];
+}
+
+export interface CreateNotificationRuleInput {
+  resource_id: string;
+  resource_type: string;
+  subject: string;
+  trigger: string;
+  type: string;
+}
+
 export interface CreateUserInput {
   /** True if the user is admin */
   user_admin?: boolean;
@@ -651,6 +718,36 @@ export interface CreateUserInput {
   /** Tags of the user */
   user_tags?: string[];
 }
+
+export interface CustomDashboard {
+  /** @format date-time */
+  custom_dashboard_created_at: string;
+  custom_dashboard_description?: string;
+  custom_dashboard_id: string;
+  custom_dashboard_name: string;
+  /** @format date-time */
+  custom_dashboard_updated_at: string;
+  custom_dashboard_widgets?: Widget[];
+  listened?: boolean;
+}
+
+export interface CustomDashboardInput {
+  custom_dashboard_description?: string;
+  custom_dashboard_name: string;
+}
+
+export interface DateHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+  end: string;
+  interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  series: DateHistogramSeries[];
+  start: string;
+};
 
 export interface DirectInjectInput {
   inject_content?: object;
@@ -762,6 +859,8 @@ export interface EndpointOutput {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  /** The endpoint is associated with an asset group, either statically or dynamically. */
+  is_static?: boolean;
 }
 
 export interface EndpointOverviewOutput {
@@ -825,10 +924,41 @@ export interface EndpointRegisterInput {
   seenIp?: string;
 }
 
+/** Endpoint linked to finding */
+export interface EndpointSimple {
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+}
+
 export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
   asset_tags?: string[];
+}
+
+export interface EsSearch {
+  base_created_at?: string;
+  base_entity?: string;
+  base_id: string;
+  base_representative?: string;
+  /** @format double */
+  base_score?: number;
+  base_updated_at?: string;
+}
+
+export interface EsSeries {
+  color?: string;
+  data?: EsSeriesData[];
+  label?: string;
+}
+
+export interface EsSeriesData {
+  key?: string;
+  label?: string;
+  /** @format int64 */
+  value?: number;
 }
 
 export interface Evaluation {
@@ -879,7 +1009,7 @@ export interface Executable {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
-export interface ExecutionTraces {
+export interface ExecutionTrace {
   agent?: string;
   execution_action?:
     | "START"
@@ -914,7 +1044,7 @@ export interface ExecutionTraces {
 }
 
 /** Represents a single execution trace detail */
-export interface ExecutionTracesOutput {
+export interface ExecutionTraceOutput {
   /**
    * The action that created this execution trace
    * @example "START, PREREQUISITE_CHECK, PREREQUISITE_EXECUTION, EXECUTION, CLEANUP_EXECUTION or COMPLETE"
@@ -926,6 +1056,8 @@ export interface ExecutionTracesOutput {
     | "EXECUTION"
     | "CLEANUP_EXECUTION"
     | "COMPLETE";
+  /** List of primary agents */
+  execution_agent?: AgentOutput;
   /** A detailed message describing the execution */
   execution_message: string;
   /**
@@ -1041,35 +1173,33 @@ export interface Exercise {
   listened?: boolean;
 }
 
-export interface ExerciseInput {
-  exercise_category?: string;
-  exercise_description?: string;
-  exercise_mail_from?: string;
-  exercise_mails_reply_to?: string[];
-  exercise_main_focus?: string;
-  exercise_message_footer?: string;
-  exercise_message_header?: string;
-  exercise_name: string;
-  exercise_severity?: string;
-  /** @format date-time */
-  exercise_start_date?: string | null;
-  exercise_subtitle?: string;
-  exercise_tags?: string[];
-}
-
 export interface ExerciseSimple {
+  /** Exercise Category */
   exercise_category?: string;
   exercise_global_score: ExpectationResultsByType[];
+  /** Exercise Id */
   exercise_id: string;
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
+  /** Exercise status */
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
+  /** Exercise Subtitle */
   exercise_subtitle?: string;
-  /** @uniqueItems true */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -1195,6 +1325,8 @@ export interface FilterGroup {
 }
 
 export interface Finding {
+  /** @uniqueItems true */
+  finding_asset_groups?: AssetGroup[];
   finding_assets?: string[];
   /** @format date-time */
   finding_created_at: string;
@@ -1203,6 +1335,9 @@ export interface Finding {
   finding_inject_id?: string;
   /** @deprecated */
   finding_labels?: string[];
+  finding_name?: string;
+  finding_scenario?: Scenario;
+  finding_simulation?: Exercise;
   finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -1218,6 +1353,44 @@ export interface FindingInput {
   finding_inject_id?: string;
   finding_labels?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_value: string;
+}
+
+export interface FindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding field that corresponds to the key of the output parser */
+  finding_field: string;
+  /** Finding Id */
+  finding_id: string;
+  /** Inject linked to finding */
+  finding_inject: InjectSimple;
+  /** Finding Name */
+  finding_name: string;
+  /** Scenario linked to inject */
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /**
+   * Tags that correspond to the output parser tags
+   * @uniqueItems true
+   */
+  finding_tags?: string[];
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   */
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  /** Finding Value */
   finding_value: string;
 }
 
@@ -1292,6 +1465,14 @@ export interface GroupGrantInput {
 
 export interface GroupUpdateUsersInput {
   group_users?: string[];
+}
+
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: "structural" | "temporal";
+  stacked?: boolean;
+  title?: string;
 }
 
 export interface ImportMapper {
@@ -1504,6 +1685,10 @@ export interface InjectExpectation {
   target_id?: string;
 }
 
+export interface InjectExpectationBulkUpdateInput {
+  inputs: Record<string, InjectExpectationUpdateInput>;
+}
+
 export interface InjectExpectationResult {
   date?: string;
   metadata?: Record<string, string>;
@@ -1550,6 +1735,10 @@ export interface InjectExpectationTrace {
   /** @format date-time */
   inject_expectation_trace_updated_at: string;
   listened?: boolean;
+}
+
+export interface InjectExpectationTraceBulkInsertInput {
+  expectation_traces: InjectExpectationTraceInput[];
 }
 
 export interface InjectExpectationTraceInput {
@@ -1674,7 +1863,7 @@ export interface InjectResultOutput {
   inject_id: string;
   /** Injector contract */
   inject_injector_contract?: InjectorContractSimple;
-  /** Status */
+  /** status */
   inject_status?: InjectStatusSimple;
   inject_targets?: TargetSimple[];
   /** Title of inject */
@@ -1705,7 +1894,7 @@ export interface InjectResultOverviewOutput {
   /** Indicates whether the inject is ready for use */
   inject_ready?: boolean;
   /** status */
-  inject_status?: InjectStatusOutput;
+  inject_status?: InjectStatusSimple;
   /**
    * Tags
    * @uniqueItems true
@@ -1728,6 +1917,14 @@ export interface InjectResultOverviewOutput {
   injects_tags?: string[];
 }
 
+/** Inject linked to finding */
+export interface InjectSimple {
+  /** Inject Id */
+  inject_id: string;
+  /** Inject Title */
+  inject_title: string;
+}
+
 export interface InjectStatus {
   listened?: boolean;
   status_id?: string;
@@ -1742,7 +1939,17 @@ export interface InjectStatus {
     | "EXECUTING"
     | "PENDING";
   status_payload_output?: StatusPayload;
-  status_traces?: ExecutionTraces[];
+  status_traces?: ExecutionTrace[];
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+}
+
+export interface InjectStatusOutput {
+  status_id: string;
+  status_main_traces?: ExecutionTraceOutput[];
+  status_name?: string;
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -1750,24 +1957,20 @@ export interface InjectStatus {
 }
 
 /** status */
-export interface InjectStatusOutput {
+export interface InjectStatusSimple {
   status_id: string;
-  status_main_traces?: ExecutionTracesOutput[];
   status_name?: string;
-  status_traces_by_agent?: AgentStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
   tracking_sent_date?: string;
 }
 
-/** Status */
-export interface InjectStatusSimple {
-  status_id: string;
-  status_name?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
+export type InjectTarget = BaseInjectTarget &
+  (
+    | BaseInjectTargetTargetTypeMapping<"ASSETS_GROUPS", AssetGroupTarget>
+    | BaseInjectTargetTargetTypeMapping<"TEAMS", TeamTarget>
+  );
 
 /** Results of expectations for each target */
 export interface InjectTargetWithResult {
@@ -1789,9 +1992,8 @@ export interface InjectTestStatusOutput {
   inject_title: string;
   inject_type?: string;
   status_id: string;
-  status_main_traces?: ExecutionTracesOutput[];
+  status_main_traces?: ExecutionTraceOutput[];
   status_name?: string;
-  status_traces_by_agent?: AgentStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -2206,6 +2408,30 @@ export interface LessonsTemplateQuestionInput {
   lessons_template_question_order: number;
 }
 
+/** Platform licensing */
+export interface License {
+  license_creator?: string;
+  license_customer?: string;
+  /** @format date-time */
+  license_expiration_date?: string;
+  /** @format int64 */
+  license_extra_expiration_days?: number;
+  license_is_by_configuration?: boolean;
+  license_is_enterprise?: boolean;
+  license_is_expired?: boolean;
+  license_is_extra_expiration?: boolean;
+  license_is_global?: boolean;
+  license_is_platform_match?: boolean;
+  license_is_prevention?: boolean;
+  license_is_valid_cert?: boolean;
+  license_is_valid_product?: boolean;
+  license_is_validated?: boolean;
+  license_platform?: string;
+  /** @format date-time */
+  license_start_date?: string;
+  license_type?: "trial" | "nfr" | "standard" | "lts";
+}
+
 export interface Log {
   listened?: boolean;
   log_content: string;
@@ -2306,6 +2532,21 @@ export interface NetworkTraffic {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
+export interface NotificationRuleOutput {
+  /** ID of the notification rule */
+  notification_rule_id: string;
+  /** Owner of the notification rule */
+  notification_rule_owner?: string;
+  /** Resource id of the resource associated with the rule */
+  notification_rule_resource_id?: string;
+  /** Resource type of the resource associated with the rule */
+  notification_rule_resource_type?: string;
+  /** Subject of the notification rule */
+  notification_rule_subject?: string;
+  /** Event that will trigger the notification */
+  notification_rule_trigger?: string;
+}
+
 /** List of Saml2 providers */
 export interface OAuthProvider {
   provider_login?: string;
@@ -2377,7 +2618,7 @@ export interface OrganizationUpdateInput {
 export interface OutputParser {
   listened?: boolean;
   /** @uniqueItems true */
-  output_parser_contract_output_elements?: ContractOutputElement[];
+  output_parser_contract_output_elements: ContractOutputElement[];
   /** @format date-time */
   output_parser_created_at: string;
   output_parser_id: string;
@@ -2394,9 +2635,21 @@ export interface OutputParserInput {
    * @uniqueItems true
    */
   output_parser_contract_output_elements: ContractOutputElementInput[];
+  output_parser_id?: string;
   /** Paser Mode: STDOUT, STDERR, READ_FILE */
   output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
   /** Parser Type: REGEX */
+  output_parser_type: "REGEX";
+}
+
+/** Represents a single output parser */
+export interface OutputParserSimple {
+  /** @uniqueItems true */
+  output_parser_contract_output_elements: ContractOutputElementSimple[];
+  output_parser_id: string;
+  /** Mode of parser, which output will be parsed, for now only STDOUT is supported */
+  output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
+  /** Type of parser, for now only REGEX is supported */
   output_parser_type: "REGEX";
 }
 
@@ -2421,6 +2674,25 @@ export interface PageAssetGroupOutput {
 
 export interface PageAttackPattern {
   content?: AttackPattern[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageCustomDashboard {
+  content?: CustomDashboard[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2476,8 +2748,8 @@ export interface PageExerciseSimple {
   totalPages?: number;
 }
 
-export interface PageFinding {
-  content?: Finding[];
+export interface PageFindingOutput {
+  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2535,6 +2807,25 @@ export interface PageGroup {
 
 export interface PageInjectResultOutput {
   content?: InjectResultOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageInjectTarget {
+  content?: InjectTarget[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2630,6 +2921,25 @@ export interface PageLessonsTemplate {
 
 export interface PageMitigation {
   content?: Mitigation[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageNotificationRuleOutput {
+  content?: NotificationRuleOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2981,7 +3291,7 @@ export interface PlatformSettings {
   /** Reply to mail to use by default for injects */
   default_reply_to?: string;
   /** List of enabled dev features */
-  enabled_dev_features?: ("_RESERVED" | "AGENT_EXPECTATION_UI")[];
+  enabled_dev_features?: ("_RESERVED" | "TARGET_PAGINATION")[];
   /** True if the Caldera Executor is enabled */
   executor_caldera_enable?: boolean;
   /** Url of the Caldera Executor */
@@ -3040,10 +3350,12 @@ export interface PlatformSettings {
   platform_base_url?: string;
   /** Definition of the dark theme */
   platform_dark_theme?: ThemeInput;
-  /** 'true' if the platform has Enterprise Edition activated */
-  platform_enterprise_edition?: string;
+  /** id of the platform */
+  platform_id?: string;
   /** Language of the platform */
   platform_lang?: string;
+  /** Platform licensing */
+  platform_license?: License;
   /** Definition of the dark theme */
   platform_light_theme?: ThemeInput;
   /** Name of the platform */
@@ -3126,7 +3438,9 @@ export interface PolicyInput {
 }
 
 export interface PropertySchemaDTO {
+  schema_property_entity: string;
   schema_property_has_dynamic_value?: boolean;
+  schema_property_label: string;
   schema_property_name: string;
   schema_property_type: string;
   schema_property_type_array?: boolean;
@@ -3162,16 +3476,19 @@ export interface PublicExercise {
 }
 
 export interface RawAttackPattern {
+  /** @format date-time */
   attack_pattern_created_at?: string;
   attack_pattern_description?: string;
   attack_pattern_external_id?: string;
   attack_pattern_id?: string;
+  /** @uniqueItems true */
   attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name?: string;
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id?: string;
+  /** @format date-time */
   attack_pattern_updated_at?: string;
 }
 
@@ -3248,7 +3565,17 @@ export interface RegexGroup {
 export interface RegexGroupInput {
   /** Field */
   regex_group_field: string;
+  regex_group_id?: string;
   /** Index of the group from the regex match: $index0$index1 */
+  regex_group_index_values: string;
+}
+
+/** Represents the groups defined by the regex pattern. */
+export interface RegexGroupSimple {
+  /** Represents the field name of specific captured groups. */
+  regex_group_field: string;
+  regex_group_id: string;
+  /** Represents the indexes of specific captured groups. */
   regex_group_index_values: string;
 }
 
@@ -3423,6 +3750,7 @@ export interface ScenarioRecurrenceInput {
   scenario_recurrence_start?: string;
 }
 
+/** Scenario linked to inject */
 export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
@@ -3516,8 +3844,8 @@ export interface SecurityPlatformUpsertInput {
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
-  /** 'true' if enterprise edition is activated */
-  platform_enterprise_edition: string;
+  /** cert of enterprise edition */
+  platform_enterprise_license?: string;
 }
 
 export interface SettingsPlatformWhitemarkUpdateInput {
@@ -3639,13 +3967,6 @@ export interface StatusPayloadOutput {
   executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: StatusPayloadDocument;
   file_drop_file?: StatusPayloadDocument;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPatternSimple[];
   payload_cleanup_executor?: string;
@@ -3655,12 +3976,24 @@ export interface StatusPayloadOutput {
   payload_external_id?: string;
   payload_name?: string;
   payload_obfuscator?: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParserSimple[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
   payload_tags?: string[];
   payload_type?: string;
 }
+
+export interface StructuralHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+  series: StructuralHistogramSeries[];
+};
 
 export interface Tag {
   listened?: boolean;
@@ -3732,6 +4065,7 @@ export interface Team {
   /** ID of the team */
   team_id: string;
   team_inject_expectations?: string[];
+  team_injects?: string[];
   /**
    * Number of expectations linked to this team
    * @format int64
@@ -3836,6 +4170,19 @@ export interface TeamOutput {
   team_users_number?: number;
 }
 
+export interface TeamTarget {
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_id: string;
+  target_name?: string;
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_subtype?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
+}
+
 export interface TeamUpdateInput {
   /** Description of the team */
   team_description?: string;
@@ -3893,8 +4240,6 @@ export interface UpdateExerciseInput {
   exercise_message_header?: string;
   exercise_name: string;
   exercise_severity?: string;
-  /** @format date-time */
-  exercise_start_date?: string | null;
   exercise_subtitle?: string;
   exercise_tags?: string[];
 }
@@ -3902,6 +4247,10 @@ export interface UpdateExerciseInput {
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
+}
+
+export interface UpdateNotificationRuleInput {
+  subject: string;
 }
 
 export interface UpdateProfileInput {
@@ -4111,4 +4460,34 @@ export interface ViolationErrorBag {
   message?: string;
   /** The type of error */
   type?: string;
+}
+
+export interface Widget {
+  listened?: boolean;
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  /** @format date-time */
+  widget_created_at: string;
+  widget_custom_dashboard?: string;
+  widget_id: string;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  /** @format date-time */
+  widget_updated_at: string;
+}
+
+export interface WidgetInput {
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+}
+
+export interface WidgetLayout {
+  /** @format int32 */
+  widget_layout_h: number;
+  /** @format int32 */
+  widget_layout_w: number;
+  /** @format int32 */
+  widget_layout_x: number;
+  /** @format int32 */
+  widget_layout_y: number;
 }

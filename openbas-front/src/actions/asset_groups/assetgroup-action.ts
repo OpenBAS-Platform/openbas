@@ -58,12 +58,26 @@ export const fetchAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => (
   return getReferential(assetGroup, uri)(dispatch);
 };
 
+export const searchEndpointsFromAssetGroup = (searchPaginationInput: SearchPaginationInput, assetGroupId: string) => {
+  const data = searchPaginationInput;
+  const uri = `${ASSET_GROUP_URI}/${assetGroupId}/assets/search`;
+  return simplePostCall(uri, data);
+};
+
 export const searchAssetGroupAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
   const params = {
     searchText,
     simulationOrScenarioId,
   };
   return simpleCall(`${ASSET_GROUP_URI}/options`, { params });
+};
+
+export const searchAssetGroupLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
+  const params = {
+    searchText,
+    sourceId,
+  };
+  return simpleCall(`${ASSET_GROUP_URI}/findings/options`, { params });
 };
 
 export const searchAssetGroupByIdAsOption = (ids: string[]) => {

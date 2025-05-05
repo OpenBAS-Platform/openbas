@@ -1,3 +1,4 @@
+import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
@@ -5,7 +6,8 @@ import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useCon
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { exportInjectSearch } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
@@ -19,6 +21,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import {
   type Article,
@@ -26,7 +29,7 @@ import {
   type Inject,
   type InjectBulkUpdateOperation, type InjectExportFromSearchRequestInput,
   type InjectInput,
-  type InjectTestStatusOutput,
+  type InjectTestStatusOutput, type SearchPaginationInput,
   type Team,
   type Variable,
 } from '../../../../utils/api-types';
@@ -121,7 +124,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_type',
       label: 'Type',
       isSortable: false,
-      value: (_: InjectOutputType, injectContract: InjectorContractConvertedContent) => {
+      value: (_: InjectOutputType, injectContract: InjectorContractConverted['convertedContent']) => {
         const injectorContractName = tPick(injectContract?.label);
         return injectContract
           ? (
@@ -138,13 +141,13 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Title',
       isSortable: true,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <>{inject.inject_title}</>,
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => <>{inject.inject_title}</>,
     },
     {
       field: 'inject_depends_duration',
       label: 'Trigger',
       isSortable: true,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => {
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => {
         const duration = splitDuration(
           inject.inject_depends_duration || 0,
         );
@@ -163,7 +166,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_platforms',
       label: 'Platform(s)',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => (
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => (
         <>
           {
             inject.inject_injector_contract?.injector_contract_platforms?.map(
@@ -184,7 +187,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_enabled',
       label: 'Status',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => {
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => {
         let injectStatus = inject.inject_enabled
           ? t('Enabled')
           : t('Disabled');
@@ -206,7 +209,7 @@ const Injects: FunctionComponent<Props> = ({
       field: 'inject_tags',
       label: 'Tags',
       isSortable: false,
-      value: (inject: InjectOutputType, _: InjectorContractConvertedContent) => <ItemTags variant="list" tags={inject.inject_tags} />,
+      value: (inject: InjectOutputType, _: InjectorContractConverted['convertedContent']) => <ItemTags variant="list" tags={inject.inject_tags} />,
     },
   ], []);
 
@@ -237,10 +240,16 @@ const Injects: FunctionComponent<Props> = ({
     size: 20,
   }));
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchInjectsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return injectContext.searchInjects(input).finally(() => setLoading(false));
+  };
+
   // Injects
   // scoped to page
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
-  // Bulk loading indcator for tests and delete
+  // Bulk loading indicator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
@@ -501,7 +510,7 @@ const Injects: FunctionComponent<Props> = ({
   return (
     <>
       <PaginationComponentV2
-        fetch={input => injectContext.searchInjects(input)}
+        fetch={searchInjectsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}
         entityPrefix="inject"
@@ -568,86 +577,87 @@ const Injects: FunctionComponent<Props> = ({
               )}
             />
           </ListItem>
-          {injects.map((inject: InjectOutputType, index) => {
-            const injectContract = inject.inject_injector_contract?.convertedContent;
-            const isContractExposed = injectContract?.config.expose;
-            return (
-              <ListItem
-                key={inject.inject_id}
-                divider
-                classes={{ root: classes.item }}
-                secondaryAction={(
-                  <InjectPopover
-                    inject={inject}
-                    exerciseOrScenarioId={exerciseOrScenarioId}
-                    canBeTested
-                    setSelectedInjectId={setSelectedInjectId}
-                    isDisabled={!injectContract || !isContractExposed}
-                    onCreate={onCreate}
-                    onUpdate={onUpdate}
-                    onDelete={onDelete}
-                  />
-                )}
-                disablePadding
-              >
-                <ListItemButton
-                  onClick={() => {
-                    if (injectContract && isContractExposed) {
-                      setSelectedInjectId(inject.inject_id);
-                    }
-                  }}
-                >
-                  <ListItemIcon
-                    style={{ minWidth: 40 }}
-                    onClick={event => (event.shiftKey
-                      ? onRowShiftClick(index, inject, event)
-                      : onToggleEntity(inject, event))}
-                  >
-                    <Checkbox
-                      edge="start"
-                      checked={
-                        (selectAll && !(inject.inject_id
-                          in (deSelectedElements || {})))
-                          || inject.inject_id in (selectedElements || {})
-                      }
-                      disableRipple
-                    />
-                  </ListItemIcon>
-                  <ListItemIcon style={{ paddingTop: 5 }}>
-                    <InjectIcon
-                      isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
-                      type={
-                        inject.inject_injector_contract?.injector_contract_payload
-                          ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
-                          || inject.inject_injector_contract?.injector_contract_payload?.payload_type
-                          : inject.inject_type
-                      }
-                      disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={(
-                      <div className={(!injectContract || !isContractExposed
-                        || !inject.inject_enabled) ? classes.disabled : ''}
-                      >
-                        <div className={classes.bodyItems}>
-                          {headers.map(header => (
-                            <div
-                              key={header.field}
-                              className={classes.bodyItem}
-                              style={inlineStyles[header.field]}
-                            >
-                              {header.value(inject, injectContract)}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+          {loading
+            ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+            : injects.map((inject: InjectOutputType, index) => {
+                const injectContract = inject.inject_injector_contract?.convertedContent;
+                const isContractExposed = injectContract?.config.expose;
+                return (
+                  <ListItem
+                    key={inject.inject_id}
+                    divider
+                    secondaryAction={(
+                      <InjectPopover
+                        inject={inject}
+                        exerciseOrScenarioId={exerciseOrScenarioId}
+                        canBeTested
+                        setSelectedInjectId={setSelectedInjectId}
+                        isDisabled={!injectContract || !isContractExposed}
+                        onCreate={onCreate}
+                        onUpdate={onUpdate}
+                        onDelete={onDelete}
+                      />
                     )}
-                  />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
+                    disablePadding
+                  >
+                    <ListItemButton
+                      onClick={() => {
+                        if (injectContract && isContractExposed) {
+                          setSelectedInjectId(inject.inject_id);
+                        }
+                      }}
+                    >
+                      <ListItemIcon
+                        style={{ minWidth: 40 }}
+                        onClick={event => (event.shiftKey
+                          ? onRowShiftClick(index, inject, event)
+                          : onToggleEntity(inject, event))}
+                      >
+                        <Checkbox
+                          edge="start"
+                          checked={
+                            (selectAll && !(inject.inject_id
+                              in (deSelectedElements || {})))
+                              || inject.inject_id in (selectedElements || {})
+                          }
+                          disableRipple
+                        />
+                      </ListItemIcon>
+                      <ListItemIcon style={{ paddingTop: 5 }}>
+                        <InjectIcon
+                          isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
+                          type={
+                            inject.inject_injector_contract?.injector_contract_payload
+                              ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                              || inject.inject_injector_contract?.injector_contract_payload?.payload_type
+                              : inject.inject_type
+                          }
+                          disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <div className={(!injectContract || !isContractExposed
+                            || !inject.inject_enabled) ? classes.disabled : ''}
+                          >
+                            <div className={classes.bodyItems}>
+                              {headers.map(header => (
+                                <div
+                                  key={header.field}
+                                  className={classes.bodyItem}
+                                  style={inlineStyles[header.field]}
+                                >
+                                  {header.value(inject, injectContract)}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
         </List>
       )}
       {permissions.canWrite && (
@@ -676,35 +686,42 @@ const Injects: FunctionComponent<Props> = ({
             setPresetInjectDuration(0);
           }}
           />
-          <ToolBar
-            numberOfSelectedElements={numberOfSelectedElements}
-            totalNumberOfElements={queryableHelpers.paginationHelpers.getTotalElements()}
-            selectedElements={selectedElements}
-            deSelectedElements={deSelectedElements}
-            selectAll={selectAll}
-            handleClearSelectedElements={handleClearSelectedElements}
-            teamsFromExerciseOrScenario={teams}
-            id={exerciseOrScenarioId}
-            handleUpdate={massUpdateInjects}
-            handleBulkDelete={bulkDeleteInjects}
-            handleBulkTest={massTestInjects}
-            handleExport={handleExport}
-          />
-          <CreateInject
-            title={t('Create a new inject')}
-            open={openCreateDrawer}
-            handleClose={() => setOpenCreateDrawer(false)}
-            onCreateInject={onCreateInject}
-            presetInjectDuration={presetInjectDuration}
-            // @ts-expect-error typing
-            teamsFromExerciseOrScenario={teams}
-            articlesFromExerciseOrScenario={articles}
-            variablesFromExerciseOrScenario={variables}
-            uriVariable={uriVariable}
-            allUsersNumber={allUsersNumber}
-            usersNumber={usersNumber}
-            teamsUsers={teamsUsers}
-          />
+          {
+            numberOfSelectedElements > 0 && (
+              <ToolBar
+                numberOfSelectedElements={numberOfSelectedElements}
+                totalNumberOfElements={queryableHelpers.paginationHelpers.getTotalElements()}
+                selectedElements={selectedElements}
+                deSelectedElements={deSelectedElements}
+                selectAll={selectAll}
+                handleClearSelectedElements={handleClearSelectedElements}
+                teamsFromExerciseOrScenario={teams}
+                id={exerciseOrScenarioId}
+                handleUpdate={massUpdateInjects}
+                handleBulkDelete={bulkDeleteInjects}
+                handleBulkTest={massTestInjects}
+                handleExport={handleExport}
+              />
+            )
+          }
+          {openCreateDrawer
+            && (
+              <CreateInject
+                title={t('Create a new inject')}
+                open
+                handleClose={() => setOpenCreateDrawer(false)}
+                onCreateInject={onCreateInject}
+                presetInjectDuration={presetInjectDuration}
+                // @ts-expect-error typing
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+              />
+            )}
         </>
       )}
     </>

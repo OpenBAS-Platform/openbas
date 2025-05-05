@@ -24,7 +24,7 @@ const AtomicTestings = () => {
   const navigate = useNavigate();
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
 
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const onCreateAtomicTesting = async (data: AtomicTestingInput) => {
     const toCreate = R.pipe(

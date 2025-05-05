@@ -12,7 +12,6 @@ import { fetchTags } from '../actions/Tag';
 import { errorWrapper } from '../components/Error';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
-import SystemBanners from '../public/components/systembanners/SystemBanners';
 import { computeBannerSettings } from '../public/components/systembanners/utils';
 import { useHelper } from '../store';
 import { useAppDispatch } from '../utils/hooks';
@@ -24,6 +23,7 @@ import InjectIndex from './components/simulations/simulation/injects/InjectIndex
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
+const Findings = lazy(() => import('./components/findings/Findings'));
 const Exercises = lazy(() => import('./components/simulations/Simulations'));
 const IndexExercise = lazy(() => import('./components/simulations/simulation/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
@@ -35,6 +35,8 @@ const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const IndexAgents = lazy(() => import('./components/agents/Agents'));
+const CustomDashboards = lazy(() => import('./components/workspaces/custom_dashboards/CustomDashboards'));
+const IndexCustomDashboard = lazy(() => import('./components/workspaces/custom_dashboards/Index'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
@@ -77,7 +79,6 @@ const Index = () => {
   const { bannerHeight } = computeBannerSettings(settings);
   return (
     <>
-      <SystemBanners settings={settings} />
       <Box
         sx={{
           display: 'flex',
@@ -95,6 +96,7 @@ const Index = () => {
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
+              <Route path="findings" element={errorWrapper(Findings)()} />
               <Route path="simulations" element={errorWrapper(Exercises)()} />
               <Route path="simulations/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="simulations/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
@@ -105,6 +107,8 @@ const Index = () => {
               <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
+              <Route path="workspaces/custom_dashboards" element={errorWrapper(CustomDashboards)()} />
+              <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={errorWrapper(IndexCustomDashboard)()} />
               <Route path="payloads" element={errorWrapper(Payloads)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />

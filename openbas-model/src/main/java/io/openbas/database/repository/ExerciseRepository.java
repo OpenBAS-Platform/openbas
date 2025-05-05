@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -316,4 +317,34 @@ public interface ExerciseRepository
       nativeQuery = true)
   List<RawFinishedExerciseWithInjects> rawLatestFinishedExercisesWithInjectsByScenarioId(
       @Param("scenarioId") String scenarioId);
+
+  @Query(
+      value =
+          """
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS label, e.exercise_created_at
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        INNER JOIN exercises e ON i.inject_exercise = e.exercise_id
+        WHERE (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+        ORDER BY e.exercise_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllOptionByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
+
+  @Query(
+      value =
+          """
+        SELECT DISTINCT e.exercise_id AS id, e.exercise_name AS label, e.exercise_created_at
+        FROM injects i
+        INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+        LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+        LEFT JOIN exercises e ON i.inject_exercise = e.exercise_id
+        LEFT JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id
+        WHERE (se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
+        AND (:name IS NULL OR LOWER(e.exercise_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')))
+        ORDER BY e.exercise_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 }

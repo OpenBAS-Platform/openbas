@@ -97,6 +97,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       'payload_attack_patterns',
       'payload_tags',
       'payload_execution_arch',
+      'payload_output_parsers',
     ]),
     R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('executable_file', R.head(payloadExecutableFiles)),

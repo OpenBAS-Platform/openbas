@@ -23,6 +23,8 @@ public class InjectComposer extends ComposerBase<Inject> {
     private Optional<InjectStatusComposer.Composer> injectStatusComposers = Optional.empty();
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
     private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
+    private final List<AssetGroupComposer.Composer> assetGroupComposers = new ArrayList<>();
+    private final List<ExpectationComposer.Composer> expectationComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -82,6 +84,23 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
+    public Composer withAssetGroup(AssetGroupComposer.Composer assetGroupComposer) {
+      assetGroupComposers.add(assetGroupComposer);
+      List<AssetGroup> tempAssetGroups = this.inject.getAssetGroups();
+      tempAssetGroups.add(assetGroupComposer.get());
+      this.inject.setAssetGroups(tempAssetGroups);
+      return this;
+    }
+
+    public Composer withExpectation(ExpectationComposer.Composer expectationComposer) {
+      expectationComposers.add(expectationComposer);
+      List<InjectExpectation> tempExpectations = this.inject.getExpectations();
+      tempExpectations.add(expectationComposer.get());
+      expectationComposer.get().setInject(this.inject);
+      this.inject.setExpectations(tempExpectations);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.injectorContractComposer.ifPresent(
@@ -89,12 +108,13 @@ public class InjectComposer extends ComposerBase<Inject> {
             composer.persist();
             this.inject.setContent(composer.getInjectContent());
           });
+      assetGroupComposers.forEach(AssetGroupComposer.Composer::persist);
       endpointComposers.forEach(EndpointComposer.Composer::persist);
-      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       teamComposers.forEach(TeamComposer.Composer::persist);
       documentComposers.forEach(DocumentComposer.Composer::persist);
       injectRepository.save(inject);
+      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       injectDocumentRepository.saveAll(inject.getDocuments());
       return this;
     }
@@ -105,6 +125,7 @@ public class InjectComposer extends ComposerBase<Inject> {
       documentComposers.forEach(DocumentComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
       endpointComposers.forEach(EndpointComposer.Composer::delete);
+      assetGroupComposers.forEach(AssetGroupComposer.Composer::delete);
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::delete);
       teamComposers.forEach(TeamComposer.Composer::delete);
       injectorContractComposer.ifPresent(InjectorContractComposer.Composer::delete);

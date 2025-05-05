@@ -53,6 +53,10 @@ public class AssetGroup implements Base {
   @Queryable(filterable = true, sortable = true)
   private String description;
 
+  @Column(name = "asset_group_external_reference")
+  @JsonProperty("asset_group_external_reference")
+  private String externalReference;
+
   // -- ASSET --
 
   @Type(JsonType.class)
@@ -94,6 +98,19 @@ public class AssetGroup implements Base {
   @JsonProperty("asset_group_tags")
   @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
+
+  // -- INJECT --
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "injects_asset_groups",
+      joinColumns = @JoinColumn(name = "asset_group_id"),
+      inverseJoinColumns = @JoinColumn(name = "inject_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("asset_group_injects")
+  @Queryable(filterable = true, dynamicValues = true, path = "injects.id")
+  private List<Inject> injects = new ArrayList<>();
 
   // -- AUDIT --
 

@@ -1,4 +1,4 @@
-import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
+import { Card, CardContent, Chip, GridLegacy, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
@@ -85,10 +85,10 @@ const Collectors = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <Grid container={true} spacing={3}>
+      <GridLegacy container={true} spacing={3}>
         {sortedCollectors.map((collector: Collector) => {
           return (
-            <Grid key={collector.collector_id} item={true} xs={3}>
+            <GridLegacy key={collector.collector_id} item={true} xs={3}>
               <Card classes={{ root: classes.card }} variant="outlined">
                 <CardContent className={classes.content}>
                   <div style={{ display: 'flex' }}>
@@ -147,10 +147,10 @@ const Collectors = () => {
                   </div>
                 </CardContent>
               </Card>
-            </Grid>
+            </GridLegacy>
           );
         })}
-      </Grid>
+      </GridLegacy>
     </>
   );
 };

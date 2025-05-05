@@ -59,10 +59,6 @@ public class ExerciseFixture {
     return exercise;
   }
 
-  public static Exercise createDefaultAttackExercise() {
-    return createDefaultAttackExercise(Instant.now());
-  }
-
   public static Exercise createDefaultAttackExercise(Instant startTime) {
     Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -91,10 +87,6 @@ public class ExerciseFixture {
     return exercise;
   }
 
-  public static Exercise createCanceledAttackExercise() {
-    return createCanceledAttackExercise(Instant.now());
-  }
-
   public static Exercise createCanceledAttackExercise(Instant startTime) {
     Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -107,10 +99,6 @@ public class ExerciseFixture {
     return exercise;
   }
 
-  public static Exercise createFinishedAttackExercise() {
-    return createFinishedAttackExercise(Instant.now());
-  }
-
   public static Exercise createFinishedAttackExercise(Instant startTime) {
     Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -121,10 +109,6 @@ public class ExerciseFixture {
     exercise.setStatus(ExerciseStatus.FINISHED);
     exercise.setStart(startTime);
     return exercise;
-  }
-
-  public static Exercise createPausedAttackExercise() {
-    return createPausedAttackExercise(Instant.now());
   }
 
   public static Exercise createPausedAttackExercise(Instant startTime) {

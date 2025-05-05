@@ -2,6 +2,7 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ExerciseSpecification.*;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -15,10 +16,13 @@ import static java.util.Optional.ofNullable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -26,18 +30,12 @@ import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.GrantService;
-import io.openbas.service.TagRuleService;
-import io.openbas.service.TeamService;
-import io.openbas.service.VariableService;
+import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.InjectMapper;
-import io.openbas.utils.ResultUtils;
-import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -70,6 +68,7 @@ public class ExerciseService {
 
   @PersistenceContext private EntityManager entityManager;
 
+  private final Ee eeService;
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
   private final TeamService teamService;
@@ -81,6 +80,7 @@ public class ExerciseService {
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
   private final ActionMetricCollector actionMetricCollector;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
@@ -375,6 +375,13 @@ public class ExerciseService {
     return getExerciseSimples(specificationCount, pageable, result);
   }
 
+  public void throwIfExerciseNotLaunchable(Exercise exercise) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    exercise.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
+  }
+
   public boolean checkIfTagRulesApplies(
       @NotNull final Exercise exercise, @NotNull final List<String> newTags) {
     return tagRuleService.checkIfRulesApply(
@@ -424,6 +431,26 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     return new CriteriaBuilderAndExercises(cb, exercises);
+  }
+
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String simulationOrScenarioId, Pageable pageable) {
+    String trimmedSearchText = org.apache.commons.lang3.StringUtils.trimToNull(searchText);
+    String trimmedSimulationOrScenarioId =
+        org.apache.commons.lang3.StringUtils.trimToNull(simulationOrScenarioId);
+
+    List<Object[]> results;
+
+    if (trimmedSimulationOrScenarioId == null) {
+      results = exerciseRepository.findAllOptionByNameLinkedToFindings(trimmedSearchText, pageable);
+    } else {
+      results =
+          exerciseRepository.findAllOptionByNameLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText, pageable);
+    }
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
@@ -678,5 +705,51 @@ public class ExerciseService {
     }
     exercise.setUpdatedAt(now());
     return exerciseRepository.save(exercise);
+  }
+
+  public Exercise previousFinishedSimulation(
+      @NotBlank final String scenarioId, @NotNull final Instant instant) {
+    return this.exerciseRepository
+        .findAll(fromScenario(scenarioId).and(finished()).and(closestBefore(instant)))
+        .stream()
+        .findFirst()
+        .orElse(null);
+  }
+
+  public boolean isThereAScoreDegradation(
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap,
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+          secondLastSimulationResultsMap) {
+
+    for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :
+        lastSimulationResultsMap.entrySet()) {
+      ExpectationResultsByType lastSimulationResultsByType = entry.getValue();
+      ExpectationType type = entry.getKey();
+
+      // we ignore manual expectation
+      if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
+        break;
+      }
+
+      ExpectationResultsByType secondLastSimulationResultsByType =
+          secondLastSimulationResultsMap.get(type);
+
+      // we ignore if one of the 2 expectation is still PENDING
+      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              lastSimulationResultsByType.avgResult())
+          || InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              secondLastSimulationResultsByType.avgResult())) {
+        break;
+      }
+
+      float lastSimulationScore =
+          ScenarioStatisticService.getRoundedPercentage(lastSimulationResultsByType);
+      float secondLastSimulationScore =
+          ScenarioStatisticService.getRoundedPercentage(secondLastSimulationResultsByType);
+      if (lastSimulationScore < secondLastSimulationScore) {
+        return true;
+      }
+    }
+    return false;
   }
 }

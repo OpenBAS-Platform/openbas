@@ -2,6 +2,7 @@ package io.openbas.rest.payload;
 
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
+import static io.openbas.utils.StringUtils.duplicateString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,7 +10,9 @@ import io.openbas.database.model.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -97,9 +100,8 @@ public class PayloadUtils {
       payloadCreateInput.setCleanupCommand(payloadNode.get("payload_cleanup_command").textValue());
     }
 
-    // TODO: tag & attack pattern
+    // TODO: tag
     payloadCreateInput.setTagIds(new ArrayList<>());
-    payloadCreateInput.setAttackPatternsIds(new ArrayList<>());
     return payloadCreateInput;
   }
 
@@ -112,23 +114,43 @@ public class PayloadUtils {
     }
   }
 
-  // -- COPY PROPERTIES --
-  public Payload copyProperties(Object payloadInput, Payload target) {
+  public <T extends Payload> void duplicateCommonProperties(
+      @NotNull final T origin, @NotNull T duplicate) {
+    BeanUtils.copyProperties(
+        origin, duplicate, "outputParsers", "tags", "attackPatterns", "arguments", "prerequisites");
+    duplicate.setId(null);
+    duplicate.setName(duplicateString(origin.getName()));
+    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
+    duplicate.setExternalId(null);
+    duplicate.setArguments(
+        Optional.ofNullable(origin.getArguments()).map(ArrayList::new).orElseGet(ArrayList::new));
+    duplicate.setPrerequisites(
+        Optional.ofNullable(origin.getPrerequisites())
+            .map(ArrayList::new)
+            .orElseGet(ArrayList::new));
+    duplicate.setTags(new HashSet<>(origin.getTags()));
+    duplicate.setCollector(null);
+    duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
+    duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
+    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
+  }
+
+  public Payload copyProperties(Object payloadInput, Payload target, boolean copyId) {
     if (payloadInput == null) {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
 
-    BeanUtils.copyProperties(payloadInput, target);
+    BeanUtils.copyProperties(payloadInput, target, "outputParsers", "tags", "attackPatterns");
 
     if (payloadInput instanceof PayloadCreateInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadCreateInput) payloadInput).getOutputParsers(), target);
+          ((PayloadCreateInput) payloadInput).getOutputParsers(), target, copyId);
     } else if (payloadInput instanceof PayloadUpdateInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target);
+          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target, copyId);
     } else if (payloadInput instanceof PayloadUpsertInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target);
+          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target, copyId);
     } else {
       throw new IllegalArgumentException("Unsupported payload input type");
     }

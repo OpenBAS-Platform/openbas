@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography } from '@mui/material';
+import { GridLegacy, Paper, Typography } from '@mui/material';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -52,14 +52,14 @@ const Policies: FunctionComponent = () => {
             current: true,
           }]}
         />
-        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+        <GridLegacy item={true} xs={6} style={{ marginTop: 30 }}>
           <Typography variant="h4" gutterBottom={true}>
             {t('Login messages')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             <PolicyForm onSubmit={onUpdate} initialValues={initialValues}></PolicyForm>
           </Paper>
-        </Grid>
+        </GridLegacy>
       </div>
       <SecurityMenu />
     </div>

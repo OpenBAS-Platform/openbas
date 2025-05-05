@@ -5,6 +5,9 @@ import static io.openbas.database.model.Scenario.SEVERITY.critical;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +15,12 @@ public class ScenarioFixture {
 
   public static Scenario getScenario() {
     return getScenario(null, null);
+  }
+
+  public static Scenario getScheduledScenario() {
+    Scenario scenario = getScenario(null, null);
+    scenario.setRecurrenceStart(Instant.now().plus(1, ChronoUnit.DAYS));
+    return scenario;
   }
 
   public static Scenario getScenario(List<Team> scenarioTeams, Set<Inject> scenarioInjects) {
@@ -26,6 +35,7 @@ public class ScenarioFixture {
     if (scenarioInjects != null) {
       scenario.setInjects(scenarioInjects);
     }
+    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 
@@ -36,6 +46,7 @@ public class ScenarioFixture {
     scenario.setSubtitle("A crisis scenario");
     scenario.setFrom("scenario@mail.fr");
     scenario.setCategory("crisis-communication");
+    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 
@@ -47,6 +58,7 @@ public class ScenarioFixture {
     scenario.setFrom("scenario@mail.fr");
     scenario.setCategory("incident-response");
     scenario.setSeverity(critical);
+    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 }

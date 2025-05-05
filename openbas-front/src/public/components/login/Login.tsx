@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { makeStyles } from 'tss-react/mui';
 
-import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
+import { askToken, checkKerberos } from '../../../actions/Application';
 import { type LoggedHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
@@ -83,7 +83,6 @@ const Login = () => {
     return () => window.removeEventListener('resize', updateWindowDimensions);
   });
   useEffect(() => {
-    dispatch(fetchPlatformParameters());
     dispatch(checkKerberos());
   });
   const onSubmit = (data: {
@@ -102,7 +101,7 @@ const Login = () => {
     : settings?.platform_light_theme?.logo_login_url;
 
   const isWhitemarkEnable = settings.platform_whitemark === 'true'
-    && settings.platform_enterprise_edition === 'true';
+    && settings.platform_license?.license_is_validated === true;
 
   // POLICIES
   const loginMessage = settings.platform_policies?.platform_login_message;

@@ -18,7 +18,7 @@ const ChannelHeader = () => {
   const { channelId } = useParams();
   const { channel, userAdmin } = useHelper(helper => ({
     channel: helper.getChannel(channelId),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   return (
     <div className={classes.container}>

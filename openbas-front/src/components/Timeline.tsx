@@ -118,8 +118,6 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
       if (
         inject.inject_injector_contract?.convertedContent
         && 'fields' in inject.inject_injector_contract.convertedContent
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         && inject.inject_injector_contract.convertedContent.fields.some(
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           (field: any) => field.key === 'teams',
@@ -266,9 +264,9 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                           return (
                             <InjectIcon
                               key={inject.inject_id}
-                              isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                              isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
                               type={
-                                inject.inject_injector_contract.injector_contract_payload
+                                inject.inject_injector_contract?.injector_contract_payload
                                   ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
                                   || inject.inject_injector_contract.injector_contract_payload?.payload_type
                                   : inject.inject_type

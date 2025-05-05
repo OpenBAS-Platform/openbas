@@ -51,7 +51,7 @@ const TagField: FunctionComponent<Props> = ({
     userAdmin: boolean;
   } = useHelper((helper: TagHelper & UserHelper) => ({
     tags: helper.getTags(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   const dispatch = useAppDispatch();
 
@@ -92,7 +92,11 @@ const TagField: FunctionComponent<Props> = ({
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{
+      position: 'relative',
+      ...style,
+    }}
+    >
       <MuiAutocomplete
         value={values()}
         size="small"
@@ -120,7 +124,6 @@ const TagField: FunctionComponent<Props> = ({
             label={label}
             variant="standard"
             fullWidth
-            style={style}
             error={!!error}
             slotProps={{
               input: {

@@ -32,6 +32,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -294,7 +296,7 @@ public class ExerciseApi extends RestBehavior {
 
   // region exercises
   @PostMapping(EXERCISE_URI)
-  public Exercise createExercise(@Valid @RequestBody ExerciseInput input) {
+  public Exercise createExercise(@Valid @RequestBody CreateExerciseInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
     }
@@ -326,6 +328,16 @@ public class ExerciseApi extends RestBehavior {
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
+  @Deprecated(since = "1.16.0")
+  public Exercise deprecatedUpdateExerciseStart(
+      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
+      throws InputValidationException {
+    return this.updateExerciseStart(exerciseId, input);
+  }
+
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/start-date")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseStart(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
       throws InputValidationException {
@@ -335,6 +347,7 @@ public class ExerciseApi extends RestBehavior {
       String message = "Change date is only possible in scheduling state";
       throw new InputValidationException("exercise_start_date", message);
     }
+    exerciseService.throwIfExerciseNotLaunchable(exercise);
     exercise.setUpdateAttributes(input);
     return exerciseRepository.save(exercise);
   }
@@ -361,6 +374,24 @@ public class ExerciseApi extends RestBehavior {
     exercise.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
     exercise.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
     return exerciseRepository.save(exercise);
+  }
+
+  // -- OPTION --
+  @LogExecutionTime
+  @GetMapping(EXERCISE_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String scenarioId) {
+    return exerciseService.getOptionsByNameLinkedToFindings(
+        searchText, scenarioId, PageRequest.of(0, 50));
+  }
+
+  @LogExecutionTime
+  @PostMapping(EXERCISE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.exerciseRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/lessons")
@@ -580,6 +611,7 @@ public class ExerciseApi extends RestBehavior {
     // In case of manual start
     if (ExerciseStatus.SCHEDULED.equals(exercise.getStatus())
         && ExerciseStatus.RUNNING.equals(status)) {
+      exerciseService.throwIfExerciseNotLaunchable(exercise);
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
       actionMetricCollector.addSimulationPlayedCount();

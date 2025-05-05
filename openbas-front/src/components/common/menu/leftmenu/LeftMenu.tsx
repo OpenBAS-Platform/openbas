@@ -16,7 +16,8 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
   const theme = useTheme();
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
-
+  const isWhitemarkEnable = settings.platform_whitemark === 'true'
+    && settings.platform_license?.license_is_validated === true;
   const { state, helpers } = useLeftMenu(entries);
 
   return (
@@ -65,10 +66,12 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
       </div>
       <div style={{ marginTop: 'auto' }}>
         <MenuList component="nav">
-          <MenuItemLogo
-            navOpen={state.navOpen}
-            onClick={() => window.open('https://filigran.io/', '_blank')}
-          />
+          {!isWhitemarkEnable && (
+            <MenuItemLogo
+              navOpen={state.navOpen}
+              onClick={() => window.open('https://filigran.io/', '_blank')}
+            />
+          )}
           <MenuItemToggle
             navOpen={state.navOpen}
             onClick={helpers.handleToggleDrawer}

@@ -1,15 +1,29 @@
-import { DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, MovieFilterOutlined, OnlinePredictionOutlined, PersonOutlined, RowingOutlined, SchoolOutlined, SettingsOutlined, SmartButtonOutlined, SubscriptionsOutlined, TerminalOutlined } from '@mui/icons-material';
-import { NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
+import {
+  DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, InsertChartOutlined, MovieFilterOutlined,
+  OnlinePredictionOutlined,
+  PersonOutlined,
+  RowingOutlined,
+  SchoolOutlined,
+  SettingsOutlined,
+  SmartButtonOutlined,
+  SubscriptionsOutlined,
+  TerminalOutlined,
+} from '@mui/icons-material';
+import {
+  Binoculars,
+  NewspaperVariantMultipleOutline,
+  PostOutline,
+  SecurityNetwork,
+  SelectGroup,
+  Target,
+} from 'mdi-material-ui';
 
 import { type UserHelper } from '../../../actions/helper';
 import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
 import { useHelper } from '../../../store';
 
 const LeftBar = () => {
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const entries = [
     {
       items: [
@@ -17,6 +31,16 @@ const LeftBar = () => {
           path: `/admin`,
           icon: () => (<DashboardOutlined />),
           label: 'Home',
+        },
+        {
+          path: `/admin/workspaces/custom_dashboards`,
+          icon: () => (<InsertChartOutlined />),
+          label: 'Dashboards',
+        },
+        {
+          path: '/admin/findings',
+          icon: () => (<Binoculars />),
+          label: 'Findings',
         },
       ],
     },
@@ -124,7 +148,6 @@ const LeftBar = () => {
           icon: () => (<SubscriptionsOutlined />),
           label: 'Payloads',
         },
-        // { path: `/admin/mitigations`, icon: () => (<DynamicFormOutlined />), label: 'Mitigations', },
         {
           path: `/admin/integrations`,
           icon: () => (<DnsOutlined />),
@@ -160,9 +183,8 @@ const LeftBar = () => {
           href: 'settings',
           subItems: [
             {
-              link: '/admin/settings',
+              link: '/admin/settings/parameters',
               label: 'Parameters',
-              exact: true,
             },
             {
               link: '/admin/settings/security',

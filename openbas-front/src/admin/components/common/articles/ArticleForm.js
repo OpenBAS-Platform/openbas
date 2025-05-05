@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
-import { Box, Button, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { Box, Button, GridLegacy, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
@@ -250,8 +250,8 @@ const ArticleForm = ({
               askAi={true}
               inArticle={true}
             />
-            <Grid container spacing={3} style={{ marginTop: 0 }}>
-              <Grid item xs={4}>
+            <GridLegacy container spacing={3} style={{ marginTop: 0 }}>
+              <GridLegacy item xs={4}>
                 <OldTextField
                   variant="standard"
                   name="article_comments"
@@ -259,8 +259,8 @@ const ArticleForm = ({
                   type="number"
                   label={t('Comments')}
                 />
-              </Grid>
-              <Grid item xs={4}>
+              </GridLegacy>
+              <GridLegacy item xs={4}>
                 <OldTextField
                   variant="standard"
                   name="article_shares"
@@ -268,8 +268,8 @@ const ArticleForm = ({
                   type="number"
                   label={t('Shares')}
                 />
-              </Grid>
-              <Grid item xs={4}>
+              </GridLegacy>
+              <GridLegacy item xs={4}>
                 <OldTextField
                   variant="standard"
                   name="article_likes"
@@ -277,8 +277,8 @@ const ArticleForm = ({
                   type="number"
                   label={t('Likes')}
                 />
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
             <Typography variant="h2" style={{ marginTop: 30 }}>
               {t('Documents')}
             </Typography>

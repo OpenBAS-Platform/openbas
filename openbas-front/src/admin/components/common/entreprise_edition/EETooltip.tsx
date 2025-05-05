@@ -6,7 +6,6 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useAI from '../../../../utils/hooks/useAI';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 
 const EETooltip = ({
   children,
@@ -18,14 +17,11 @@ const EETooltip = ({
   forAi?: boolean;
 }) => {
   const { t } = useFormatter();
-  const [feedbackCreation, setFeedbackCreation] = useState(false);
+  const { openDialog: openEnterpriseEditionDialog } = useEnterpriseEdition();
   const [openEnableAI, setOpenEnableAI] = useState(false);
   const [openConfigAI, setOpenConfigAI] = useState(false);
-  const userAdmin = useHelper((helper: UserHelper) => {
-    const me = helper.getMe();
-    return me?.user_admin ?? false;
-  });
-  const isEnterpriseEdition = useEnterpriseEdition();
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
+  const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
   const { enabled, configured } = useAI();
   if (isEnterpriseEdition && (!forAi || (forAi && enabled && configured))) {
     return <Tooltip title={title ? t(title) : undefined}>{children}</Tooltip>;
@@ -100,7 +96,9 @@ const EETooltip = ({
     <>
       <Tooltip title={title ? t(title) : undefined}>
         <span onClick={(e) => {
-          setFeedbackCreation(true);
+          if (userAdmin) {
+            openEnterpriseEditionDialog();
+          }
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -108,12 +106,6 @@ const EETooltip = ({
           {children}
         </span>
       </Tooltip>
-      {userAdmin && (
-        <EnterpriseEditionAgreement
-          open={feedbackCreation}
-          onClose={() => setFeedbackCreation(false)}
-        />
-      )}
     </>
   );
 };

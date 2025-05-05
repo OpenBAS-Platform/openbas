@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,6 +163,15 @@ public class EndpointApi extends RestBehavior {
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  @LogExecutionTime
+  @GetMapping(ENDPOINT_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String sourceId) {
+    return endpointService.getOptionsByNameLinkedToFindings(
+        searchText, sourceId, PageRequest.of(0, 50));
   }
 
   @PostMapping(ENDPOINT_URI + "/options")

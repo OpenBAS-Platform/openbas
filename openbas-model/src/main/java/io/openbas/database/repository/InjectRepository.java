@@ -2,12 +2,14 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
+import io.openbas.database.raw.RawInjectIndexing;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,6 +31,21 @@ public interface InjectRepository
 
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
+
+  @Query(
+      value =
+          "SELECT f.inject_id, f.inject_title, f.inject_scenario, f.inject_exercise, f.inject_created_at, f.inject_updated_at, f.inject_injector_contract, "
+              + "array_agg(icap.attack_pattern_id) FILTER ( WHERE icap.attack_pattern_id IS NOT NULL ) as inject_attack_patterns, "
+              + "array_agg(ap.phase_id) FILTER ( WHERE ap.phase_id IS NOT NULL ) as inject_kill_chain_phases, "
+              + "coalesce(array_agg(ins.status_name) FILTER ( WHERE ins.status_name IS NOT NULL ), '{}') as inject_status_name "
+              + "FROM injects f "
+              + "LEFT JOIN injects_statuses ins ON ins.status_inject = f.inject_id "
+              + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
+              + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
+              + "LEFT JOIN attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
+              + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT 500 ",
+      nativeQuery = true)
+  List<RawInjectIndexing> findForIndexing(@Param("from") Instant from);
 
   @Query(
       value =
@@ -247,4 +264,32 @@ public interface InjectRepository
   @Transactional
   void removeTeamsForScenario(
       @Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
+
+  @Query(
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS label, i.inject_created_at
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByTitleLinkedToFindings(@Param("title") String title, Pageable pageable);
+
+  @Query(
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS label, i.inject_created_at
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+    LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+    WHERE (i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
+      AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByTitleLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
 }

@@ -2,20 +2,24 @@ package io.openbas.executors.crowdstrike.service;
 
 import static io.openbas.utils.Time.toInstant;
 
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
+import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
+import io.openbas.executors.crowdstrike.model.CrowdStrikeHostGroup;
+import io.openbas.executors.crowdstrike.model.CrowdstrikeError;
+import io.openbas.executors.crowdstrike.model.ResourcesGroups;
 import io.openbas.executors.model.AgentRegisterInput;
+import io.openbas.service.AgentService;
+import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,8 +38,10 @@ public class CrowdStrikeExecutorService implements Runnable {
   private static final String CROWDSTRIKE_EXECUTOR_BACKGROUND_COLOR = "#E12E37";
 
   private final CrowdStrikeExecutorClient client;
-
+  private final CrowdStrikeExecutorConfig config;
   private final EndpointService endpointService;
+  private final AgentService agentService;
+  private final AssetGroupService assetGroupService;
 
   private Executor executor = null;
 
@@ -61,9 +67,14 @@ public class CrowdStrikeExecutorService implements Runnable {
       ExecutorService executorService,
       CrowdStrikeExecutorClient client,
       CrowdStrikeExecutorConfig config,
-      EndpointService endpointService) {
+      EndpointService endpointService,
+      AgentService agentService,
+      AssetGroupService assetGroupService) {
     this.client = client;
+    this.config = config;
     this.endpointService = endpointService;
+    this.agentService = agentService;
+    this.assetGroupService = assetGroupService;
     try {
       if (config.isEnable()) {
         this.executor =
@@ -91,20 +102,62 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices =
-        this.client.devices().getResources().stream()
-            .filter(device -> device.getHostname() != null)
-            .toList();
-    List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
-    log.info(
-        "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
-
-    for (AgentRegisterInput input : endpointRegisterList) {
-      endpointService.registerAgentEndpoint(input);
+    List<String> hostGroups = Stream.of(this.config.getHostGroup().split(",")).distinct().toList();
+    ResourcesGroups crowdStrikeResourceGroup;
+    CrowdStrikeHostGroup crowdStrikeHostGroup;
+    for (String hostGroup : hostGroups) {
+      crowdStrikeResourceGroup = this.client.hostGroup(hostGroup);
+      if (crowdStrikeResourceGroup.getErrors() != null
+          && !crowdStrikeResourceGroup.getErrors().isEmpty()) {
+        logErrors(crowdStrikeResourceGroup.getErrors(), hostGroup);
+        continue;
+      }
+      List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
+      if (!devices.isEmpty()) {
+        Optional<AssetGroup> existingAssetGroup =
+            assetGroupService.findByExternalReference(hostGroup);
+        AssetGroup assetGroup;
+        if (existingAssetGroup.isPresent()) {
+          assetGroup = existingAssetGroup.get();
+        } else {
+          assetGroup = new AssetGroup();
+          assetGroup.setExternalReference(hostGroup);
+        }
+        crowdStrikeHostGroup = crowdStrikeResourceGroup.getResources().getFirst();
+        assetGroup.setName(crowdStrikeHostGroup.getName());
+        assetGroup.setDescription(crowdStrikeHostGroup.getDescription());
+        log.info(
+            "CrowdStrike executor provisioning based on "
+                + devices.size()
+                + " assets for the host group "
+                + assetGroup.getName());
+        List<Asset> assets =
+            endpointService.syncAgentsEndpoints(
+                toAgentEndpoint(devices),
+                agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE));
+        assetGroup.setAssets(assets);
+        assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
+      }
     }
   }
 
   // -- PRIVATE --
+
+  private void logErrors(List<CrowdstrikeError> errors, String hostGroup) {
+    StringBuilder msg =
+        new StringBuilder(
+            "Error occurred while getting Crowdstrike hostGroup API request for id "
+                + hostGroup
+                + ".");
+    for (CrowdstrikeError error : errors) {
+      msg.append("\nCode: ")
+          .append(error.getCode())
+          .append(", message: ")
+          .append(error.getMessage())
+          .append(".");
+    }
+    log.log(Level.SEVERE, msg.toString());
+  }
 
   private List<AgentRegisterInput> toAgentEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {
     return devices.stream()

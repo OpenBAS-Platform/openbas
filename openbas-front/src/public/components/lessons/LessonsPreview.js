@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, Typography } from '@mui/material';
+import { Button, GridLegacy, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
@@ -164,12 +164,12 @@ const LessonsPreview = (props) => {
                           classes={{ root: classes.paper }}
                           style={{ marginTop: 14 }}
                         >
-                          <Grid
+                          <GridLegacy
                             container
                             spacing={3}
                             style={{ marginTop: -10 }}
                           >
-                            <Grid item xs={3}>
+                            <GridLegacy item xs={3}>
                               <Typography
                                 variant="h4"
                                 style={{ marginBottom: 15 }}
@@ -185,8 +185,8 @@ const LessonsPreview = (props) => {
                                 {question.lessons_question_explanation
                                   || t('No explanation')}
                               </Typography>
-                            </Grid>
-                            <Grid item xs={3}>
+                            </GridLegacy>
+                            <GridLegacy item xs={3}>
                               <Typography
                                 variant="h4"
                                 style={{ marginBottom: 15 }}
@@ -205,8 +205,8 @@ const LessonsPreview = (props) => {
                                 max={100}
                                 defaultValue={0}
                               />
-                            </Grid>
-                            <Grid item xs={3}>
+                            </GridLegacy>
+                            <GridLegacy item xs={3}>
                               <Typography variant="h4">
                                 {t('What worked well')}
                               </Typography>
@@ -218,8 +218,8 @@ const LessonsPreview = (props) => {
                                 rows={2}
                                 fullWidth
                               />
-                            </Grid>
-                            <Grid item xs={3}>
+                            </GridLegacy>
+                            <GridLegacy item xs={3}>
                               <Typography variant="h4">
                                 {t('What didn\'t work well')}
                               </Typography>
@@ -231,8 +231,8 @@ const LessonsPreview = (props) => {
                                 fullWidth
                                 rows={2}
                               />
-                            </Grid>
-                          </Grid>
+                            </GridLegacy>
+                          </GridLegacy>
                         </Paper>
                       );
                     })}

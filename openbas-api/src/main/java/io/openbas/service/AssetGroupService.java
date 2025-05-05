@@ -12,6 +12,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -19,6 +20,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +60,10 @@ public class AssetGroupService {
     return computeDynamicAssets(assetGroup);
   }
 
+  public Optional<AssetGroup> findByExternalReference(String externalReference) {
+    return this.assetGroupRepository.findByExternalReference(externalReference);
+  }
+
   public AssetGroup updateAssetGroup(@NotNull final AssetGroup assetGroup) {
     assetGroup.setUpdatedAt(now());
     AssetGroup assetGroupUpdated = this.assetGroupRepository.save(assetGroup);
@@ -74,6 +81,10 @@ public class AssetGroupService {
 
   public void deleteAssetGroup(@NotBlank final String assetGroupId) {
     this.assetGroupRepository.deleteById(assetGroupId);
+  }
+
+  public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(AssetGroup assetGroup) {
+    return this.assetGroupRepository.save(assetGroup);
   }
 
   // -- ASSET --
@@ -165,5 +176,25 @@ public class AssetGroupService {
                                   .toList();
                             })
                         .orElse(Collections.emptyList())));
+  }
+
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String sourceId, Pageable pageable) {
+    String trimmedSearchText = StringUtils.trimToNull(searchText);
+    String trimmedSourceId = StringUtils.trimToNull(sourceId);
+
+    List<Object[]> results;
+
+    if (trimmedSourceId == null) {
+      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
+    } else {
+      results =
+          assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
+              trimmedSourceId, trimmedSearchText, pageable);
+    }
+
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 }

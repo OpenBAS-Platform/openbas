@@ -4,7 +4,6 @@ import { type Schema } from 'normalizr';
 import * as R from 'ramda';
 import { createIntl, createIntlCache } from 'react-intl';
 import { type Dispatch } from 'redux';
-import Immutable from 'seamless-immutable';
 
 import { LANG } from '../components/AppIntlProvider';
 import * as Constants from '../constants/ActionTypes';
@@ -12,6 +11,7 @@ import { DATA_FETCH_ERROR } from '../constants/ActionTypes';
 import { api } from '../network';
 import { store } from '../store';
 import { MESSAGING$ } from './Environment';
+import { notifyErrorHandler } from './error/errorHandlerUtil';
 import enOpenBAS from './lang/en.json';
 import frOpenBAS from './lang/fr.json';
 import zhOpenBAS from './lang/zh.json';
@@ -49,30 +49,6 @@ const buildError = (data: AxiosError) => {
   return errorsExtractor(data);
 };
 
-const notifyError = (error: AxiosError) => {
-  const intl = createIntl({
-    locale: LANG,
-    messages: langOpenBAS[LANG as keyof typeof langOpenBAS],
-  }, cache);
-  if (error.status === 401 || error.status === 404) {
-    // Do not notify the user, as a 401 error will already trigger a disconnection, as 404 already handle inside the app
-  } else if (error.status === 409) {
-    MESSAGING$.notifyError(intl.formatMessage({ id: 'The element already exists' }));
-  } else if (error.status === 400) {
-    if (error.message) {
-      MESSAGING$.notifyError(intl.formatMessage({ id: error.message }));
-    } else {
-      MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
-    }
-  } else if (error.status === 500) {
-    MESSAGING$.notifyError(intl.formatMessage({ id: 'Internal error' }));
-  } else if (error.message) {
-    MESSAGING$.notifyError(error.message);
-  } else {
-    MESSAGING$.notifyError(intl.formatMessage({ id: 'Something went wrong. Please refresh the page or try again later.' }));
-  }
-};
-
 const notifySuccess = (message: string) => {
   const messages = langOpenBAS[LANG as keyof typeof langOpenBAS] as Record<string, string>;
   const intl = createIntl({
@@ -101,18 +77,25 @@ const simpleApi = api();
 export const simpleCall = (uri: string, config?: AxiosRequestConfig, defaultErrorBehavior: boolean = true) => simpleApi.get(buildUri(uri), config).catch((error) => {
   checkUnauthorized(error);
   if (defaultErrorBehavior) {
-    notifyError(error);
+    notifyErrorHandler(error);
   }
   throw error;
 });
-export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data, config)
-  .catch((error) => {
-    checkUnauthorized(error);
-    if (defaultNotifyErrorBehavior) {
-      notifyError(error);
-    }
-    throw error;
-  });
+export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = false) =>
+  simpleApi.post(buildUri(uri), data, config)
+    .then((response) => {
+      if (defaultSuccessBehavior) {
+        notifySuccess('The element has been successfully created');
+      }
+      return response;
+    })
+    .catch((error) => {
+      checkUnauthorized(error);
+      if (defaultNotifyErrorBehavior) {
+        notifyErrorHandler(error);
+      }
+      throw error;
+    });
 export const simplePutCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) =>
   simpleApi.put(buildUri(uri), data, config)
     .then((response) => {
@@ -124,7 +107,7 @@ export const simplePutCall = (uri: string, data?: unknown, config?: AxiosRequest
     .catch((error) => {
       checkUnauthorized(error);
       if (defaultNotifyErrorBehavior) {
-        notifyError(error);
+        notifyErrorHandler(error);
       }
       throw error;
     });
@@ -139,7 +122,7 @@ export const simpleDelCall = (uri: string, config?: AxiosRequestConfig, defaultN
     .catch((error) => {
       checkUnauthorized(error);
       if (defaultNotifyErrorBehavior) {
-        notifyError(error);
+        notifyErrorHandler(error);
       }
       throw error;
     });
@@ -160,7 +143,7 @@ export const getReferential = (schema: Schema, uri: string) => (dispatch: Dispat
         type: Constants.DATA_FETCH_ERROR,
         payload: error,
       });
-      notifyError(error);
+      notifyErrorHandler(error);
       throw error;
     });
 };
@@ -181,12 +164,12 @@ export const putReferential = (schema: Schema, uri: string, data: unknown) => (d
       notifySuccess('The element has been successfully updated');
       return response.data;
     })
-    .catch((error: AxiosError) => {
+    .catch((error) => {
       dispatch({
         type: Constants.DATA_FETCH_ERROR,
         payload: error,
       });
-      notifyError(error);
+      notifyErrorHandler(error);
       return buildError(error);
     });
 };
@@ -208,7 +191,7 @@ export const postReferential = (schema: Schema | null, uri: string, data: unknow
         type: Constants.DATA_FETCH_ERROR,
         payload: error,
       });
-      notifyError(error);
+      notifyErrorHandler(error);
       return buildError(error);
     });
 };
@@ -220,10 +203,10 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
     .then(() => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({
+        payload: {
           type,
           id,
-        }),
+        },
       });
       notifySuccess('The element has been successfully deleted');
     })
@@ -232,7 +215,7 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
         type: Constants.DATA_FETCH_ERROR,
         payload: error,
       });
-      notifyError(error);
+      notifyErrorHandler(error);
       throw error;
     });
 };
@@ -244,10 +227,10 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
     .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({
+        payload: {
           type,
           data,
-        }),
+        },
       });
       return response.data;
     })
@@ -256,7 +239,7 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
         type: Constants.DATA_FETCH_ERROR,
         payload: error,
       });
-      notifyError(error);
+      notifyErrorHandler(error);
       throw error;
     });
 };

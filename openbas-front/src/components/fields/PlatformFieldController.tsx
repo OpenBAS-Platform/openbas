@@ -57,13 +57,13 @@ const PlatformFieldController: FunctionComponent<Props> = ({
       rules={{ required: `${label} is required` }}
       render={({ field, fieldState: { error } }) => (
         <Autocomplete
-          size="medium"
           multiple
           options={platformsOptions}
           openOnFocus
           autoHighlight
           style={style}
           noOptionsText={t('No available options')}
+          slotProps={{ chip: { sx: { maxHeight: '24px' } } }}
           renderInput={
             params => (
               <TextField

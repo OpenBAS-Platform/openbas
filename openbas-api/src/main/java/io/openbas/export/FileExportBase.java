@@ -43,6 +43,9 @@ public class FileExportBase {
     this.objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
     this.objectMapper.addMixIn(Challenge.class, Mixins.Challenge.class);
     this.objectMapper.addMixIn(Tag.class, Mixins.Tag.class);
+    this.objectMapper.addMixIn(InjectorContract.class, Mixins.InjectorContract.class);
+    this.objectMapper.addMixIn(AttackPattern.class, Mixins.AttackPattern.class);
+    this.objectMapper.addMixIn(Payload.class, Mixins.Payload.class);
 
     // default options
     // variables with no value

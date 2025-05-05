@@ -7,7 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
+  GridLegacy,
   List,
   ListItemButton,
   ListItemIcon,
@@ -187,24 +187,24 @@ const ArticleAddDocuments = (props) => {
         >
           <DialogTitle>{t('Add documents in this media pressure article')}</DialogTitle>
           <DialogContent>
-            <Grid container spacing={3} style={{ marginTop: -15 }}>
-              <Grid item xs={8}>
-                <Grid container spacing={3}>
-                  <Grid item xs={6}>
+            <GridLegacy container spacing={3} style={{ marginTop: -15 }}>
+              <GridLegacy item xs={8}>
+                <GridLegacy container spacing={3}>
+                  <GridLegacy item xs={6}>
                     <SearchFilter
                       onChange={handleSearchDocuments}
                       fullWidth
                     />
-                  </Grid>
-                  <Grid item xs={6}>
+                  </GridLegacy>
+                  <GridLegacy item xs={6}>
                     <TagsFilter
                       onAddTag={handleAddTag}
                       onClearTag={handleClearTag}
                       currentTags={tags}
                       fullWidth
                     />
-                  </Grid>
-                </Grid>
+                  </GridLegacy>
+                </GridLegacy>
                 <List>
                   {finalDocuments.map((document) => {
                     const disabled = documentsIds.includes(document.document_id)
@@ -239,8 +239,8 @@ const ArticleAddDocuments = (props) => {
                     filters={filters}
                   />
                 </List>
-              </Grid>
-              <Grid item xs={4}>
+              </GridLegacy>
+              <GridLegacy item xs={4}>
                 <Box className={classes.box}>
                   {documentsIds.map((documentId) => {
                     const document = documents[documentId];
@@ -255,8 +255,8 @@ const ArticleAddDocuments = (props) => {
                     );
                   })}
                 </Box>
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>{t('Cancel')}</Button>

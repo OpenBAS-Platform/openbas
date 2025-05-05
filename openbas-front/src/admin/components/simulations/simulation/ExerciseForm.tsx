@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import { Alert, AlertTitle, Autocomplete, Button, Chip, GridLegacy, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
@@ -9,14 +9,14 @@ import SelectField from '../../../../components/fields/SelectField';
 import TagField from '../../../../components/fields/TagField';
 import TextField from '../../../../components/fields/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import { type ExerciseInput } from '../../../../utils/api-types';
+import { type CreateExerciseInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import { scenarioCategories } from '../../scenarios/constants';
 
 interface Props {
-  onSubmit: SubmitHandler<ExerciseInput>;
+  onSubmit: SubmitHandler<CreateExerciseInput>;
   handleClose: () => void;
-  initialValues?: ExerciseInput;
+  initialValues?: CreateExerciseInput;
   disabled?: boolean;
   edit: boolean;
 }
@@ -50,10 +50,10 @@ const ExerciseForm: FunctionComponent<Props> = ({
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
     setValue,
-  } = useForm<ExerciseInput>({
+  } = useForm<CreateExerciseInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ExerciseInput>().with({
+      zodImplement<CreateExerciseInput>().with({
         exercise_name: z.string().min(1, { message: t('Should not be empty') }),
         exercise_subtitle: z.string().optional(),
         exercise_category: z.string().optional(),
@@ -94,8 +94,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={7}>
+      <GridLegacy container spacing={2}>
+        <GridLegacy item xs={7}>
           <SelectField
             variant="standard"
             fullWidth={true}
@@ -112,8 +112,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
               </MenuItem>
             ))}
           </SelectField>
-        </Grid>
-        <Grid item xs={5}>
+        </GridLegacy>
+        <GridLegacy item xs={5}>
           <SelectField
             variant="standard"
             fullWidth={true}
@@ -143,8 +143,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
               {t('Strategic Reaction')}
             </MenuItem>
           </SelectField>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
 
       <SelectField
         variant="standard"
@@ -183,30 +183,32 @@ const ExerciseForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <Controller
-        control={control}
-        name="exercise_start_date"
-        render={({ field }) => (
-          <MuiDateTimePicker
-            value={field.value ? new Date(field.value) : null}
-            label={t('Start date (optional)')}
-            minDateTime={new Date()}
-            slotProps={{
-              textField: {
-                variant: 'standard',
-                fullWidth: true,
-                style: { marginTop: 20 },
-                error: !!errors.exercise_start_date,
-                helperText: errors.exercise_start_date?.message,
-              },
-            }}
-            onChange={date => field.onChange(date?.toISOString())}
-            ampm={false}
-            format="yyyy-MM-dd HH:mm:ss"
+      {!edit
+        && (
+          <Controller
+            control={control}
+            name="exercise_start_date"
+            render={({ field }) => (
+              <MuiDateTimePicker
+                value={field.value ? new Date(field.value) : null}
+                label={t('Start date (optional)')}
+                minDateTime={new Date()}
+                slotProps={{
+                  textField: {
+                    variant: 'standard',
+                    fullWidth: true,
+                    style: { marginTop: 20 },
+                    error: !!errors.exercise_start_date,
+                    helperText: errors.exercise_start_date?.message,
+                  },
+                }}
+                onChange={date => field.onChange(date?.toISOString())}
+                ampm={false}
+                format="yyyy-MM-dd HH:mm:ss"
+              />
+            )}
           />
         )}
-      />
-
       <Controller
         control={control}
         name="exercise_tags"
