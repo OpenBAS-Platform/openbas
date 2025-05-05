@@ -65,6 +65,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
+import org.hibernate.Hibernate;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -355,6 +356,7 @@ public class ScenarioService {
 
   // -- EXPORT --
 
+  @Transactional
   public void exportScenario(
       @NotBlank final String scenarioId,
       final boolean isWithTeams,
@@ -489,6 +491,23 @@ public class ScenarioService {
     scenarioFileExport.setTags(scenarioTags.stream().distinct().toList());
     objectMapper.addMixIn(Tag.class, Mixins.Tag.class);
 
+    // Add Attackpattern and kill chain phases
+    objectMapper.addMixIn(KillChainPhase.class, Mixins.KillChainPhase.class);
+    objectMapper.addMixIn(AttackPattern.class, Mixins.AttackPattern.class);
+    objectMapper.addMixIn(InjectorContract.class, Mixins.InjectorContract.class);
+    objectMapper.addMixIn(Payload.class, Mixins.Payload.class);
+
+    // load the killchainphases
+    scenario.getInjects().stream()
+        .map(Inject::getPayload)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .flatMap(payload -> payload.getAttackPatterns().stream())
+        .distinct()
+        .toList()
+        .stream()
+        .forEach(attackPattern -> Hibernate.initialize(attackPattern.getKillChainPhases()));
+
     // Build the response
     String infos =
         "("
@@ -498,6 +517,7 @@ public class ScenarioService {
             + " & "
             + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
             + ")";
+
     String zipName = (scenario.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
