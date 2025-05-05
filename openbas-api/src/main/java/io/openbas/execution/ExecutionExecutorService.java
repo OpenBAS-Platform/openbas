@@ -76,23 +76,25 @@ public class ExecutionExecutorService {
       atLeastOneTraceAdded.set(true);
     }
     // Manage Crowdstrike agents for batch execution
-    try {
-      ExecutorContextService executorContextService =
-          context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
-      crowdstrikeAgents =
-          executorContextService.launchBatchExecutorSubprocess(
-              inject, crowdstrikeAgents, injectStatus);
-      atLeastOneExecution.set(true);
-    } catch (Exception e) {
-      log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
-      crowdstrikeAgents.forEach(
-          agent ->
-              injectStatus.addTrace(
-                  ExecutionTraceStatus.ERROR,
-                  e.getMessage(),
-                  ExecutionTraceAction.COMPLETE,
-                  agent));
-      atLeastOneTraceAdded.set(true);
+    if (!crowdstrikeAgents.isEmpty()) {
+      try {
+        ExecutorContextService executorContextService =
+            context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
+        crowdstrikeAgents =
+            executorContextService.launchBatchExecutorSubprocess(
+                inject, crowdstrikeAgents, injectStatus);
+        atLeastOneExecution.set(true);
+      } catch (Exception e) {
+        log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
+        crowdstrikeAgents.forEach(
+            agent ->
+                injectStatus.addTrace(
+                    ExecutionTraceStatus.ERROR,
+                    e.getMessage(),
+                    ExecutionTraceAction.COMPLETE,
+                    agent));
+        atLeastOneTraceAdded.set(true);
+      }
     }
     // Manage remaining agents
     agents.forEach(

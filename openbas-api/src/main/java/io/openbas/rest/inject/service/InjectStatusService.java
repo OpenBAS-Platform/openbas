@@ -224,7 +224,7 @@ public class InjectStatusService {
       injectStatus.getTraces().addAll(traces);
     }
 
-    if (execution.isAsync()) {
+    if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
       updateFinalInjectStatus(injectStatus);
