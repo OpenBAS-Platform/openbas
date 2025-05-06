@@ -1,8 +1,8 @@
 package io.openbas.telemetry;
 
 import io.pyroscope.javaagent.PyroscopeAgent;
-import io.pyroscope.labels.LabelsSet;
-import io.pyroscope.labels.Pyroscope;
+import io.pyroscope.labels.v2.LabelsSet;
+import io.pyroscope.labels.v2.Pyroscope;
 import io.swagger.v3.oas.annotations.Operation;
 import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
