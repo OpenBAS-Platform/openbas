@@ -122,20 +122,16 @@ public class InjectStatusService {
     }
   }
 
-    public Inject updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
+  public Inject updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace = createExecutionTrace(injectStatus, input, agent);
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
-    synchronized (inject.getId()) {
-      if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-          && (agent == null || isAllInjectAgentsExecuted(inject))) {
-        updateFinalInjectStatus(injectStatus);
-      }
-
-      injectRepository.save(inject);
+    if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
+        && (agent == null || isAllInjectAgentsExecuted(inject))) {
+      updateFinalInjectStatus(injectStatus);
     }
     return inject;
   }
