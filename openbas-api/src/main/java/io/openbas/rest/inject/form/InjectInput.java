@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @Getter
 public class InjectInput {
 
-  @NotNull
+  @NotBlank
   @JsonProperty("inject_title")
   private String title;
 

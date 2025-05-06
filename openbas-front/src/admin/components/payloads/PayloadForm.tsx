@@ -23,7 +23,8 @@ const PayloadForm = ({
   handleClose,
   editing,
   initialValues = {
-    payload_type: undefined,
+    // @ts-expect-error set payload type to null to get a controlled component from the start
+    payload_type: null,
     payload_name: '',
     payload_platforms: [],
     payload_description: '',

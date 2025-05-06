@@ -1,11 +1,8 @@
 import moment, { type MomentInput } from 'moment-timezone';
 
-export const ONE_MINUTE = 60 * 1000;
 export const FIVE_SECONDS = 5000;
-export const ONE_SECOND = 1000;
 
 export const utcDate = (date?: MomentInput) => (date ? moment(date).utc() : moment().utc());
-export const now = () => utcDate().toISOString();
 
 const minTwoDigits = (n: number): string => (n < 10 ? '0' : '') + n;
 
@@ -27,6 +24,3 @@ export const splitDuration = (duration = 0) => {
 };
 
 export const minutesInFuture = (minutes: number) => moment().utc().add(minutes, 'minutes');
-export const minutesAgo = (minutes: number) => moment().utc().subtract(minutes, 'minutes');
-export const hoursAgo = (hours: number) => moment().utc().subtract(hours, 'hours');
-export const daysAgo = (days: number) => moment().utc().subtract(days, 'days');

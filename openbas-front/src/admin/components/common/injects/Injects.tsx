@@ -507,6 +507,7 @@ const Injects: FunctionComponent<Props> = ({
   if (isBulkLoading) {
     return <Loader />;
   }
+  // @ts-ignore
   return (
     <>
       <PaginationComponentV2
@@ -712,6 +713,15 @@ const Injects: FunctionComponent<Props> = ({
                 handleClose={() => setOpenCreateDrawer(false)}
                 onCreateInject={onCreateInject}
                 presetInjectDuration={presetInjectDuration}
+                // TODO remove useless props after InjectDefinition refacto
+                // @ts-expect-error waiting for InjectDefinition refacto
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
               />
             )}
         </>

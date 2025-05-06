@@ -2,12 +2,7 @@
 
 import type * as ApiTypes from './api-types';
 
-export type DateHistogramWidget = ApiTypes.UtilRequiredKeys<ApiTypes.BaseHistogramWidget, 'mode' | 'field'> & {
-  end: string;
-  interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
-  series: DateHistogramSeries[];
-  start: string;
-};
+export type DateHistogramWidget = ApiTypes.UtilRequiredKeys<ApiTypes.BaseHistogramWidget, 'mode' | 'field'> & Pick<ApiTypes.DateHistogramWidget, 'end' | 'interval' | 'series' | 'start'>;
 export type HistogramWidget = ApiTypes.BaseHistogramWidget &
   (
     | ApiTypes.BaseHistogramWidgetModeMapping<'temporal', DateHistogramWidget>
