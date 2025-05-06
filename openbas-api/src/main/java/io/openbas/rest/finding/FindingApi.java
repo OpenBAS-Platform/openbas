@@ -35,6 +35,7 @@ public class FindingApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/search")
+  @PreAuthorize("isObserver()")
   public Page<FindingOutput> findings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(this.findingRepository::findAll, searchPaginationInput, Finding.class)
@@ -106,11 +107,13 @@ public class FindingApi extends RestBehavior {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("isObserver()")
   public ResponseEntity<Finding> finding(@PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingService.finding(id));
   }
 
   @PostMapping
+  @PreAuthorize("isPlanner()")
   public ResponseEntity<Finding> createFinding(
       @RequestBody @Valid @NotNull final FindingInput input) {
     return ResponseEntity.ok(
@@ -118,6 +121,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PutMapping("/{id}")
+  @PreAuthorize("isPlanner()")
   public ResponseEntity<Finding> updateFinding(
       @PathVariable @NotNull final String id,
       @RequestBody @Valid @NotNull final FindingInput input) {
@@ -128,6 +132,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("isPlanner()")
   public ResponseEntity<Void> deleteFinding(@PathVariable @NotNull final String id) {
     this.findingService.deleteFinding(id);
     return ResponseEntity.noContent().build();

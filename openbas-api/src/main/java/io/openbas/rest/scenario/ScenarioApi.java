@@ -64,6 +64,7 @@ public class ScenarioApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI)
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scenario input cannot be null");
@@ -75,11 +76,13 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario duplicateScenario(@PathVariable @NotBlank final String scenarioId) {
     return scenarioService.getDuplicateScenario(scenarioId);
   }
 
   @GetMapping(SCENARIO_URI)
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<ScenarioSimple> scenarios() {
     return this.scenarioService.scenarios();
   }
@@ -243,6 +246,7 @@ public class ScenarioApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(SCENARIO_URI + "/options")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -254,6 +258,7 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/options")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.scenarioRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
@@ -261,6 +266,7 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/category/options")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<FilterUtilsJpa.Option> categoryOptionsByName(
       @RequestParam(required = false) final String searchText) {
     return this.scenarioRepository
@@ -297,6 +303,7 @@ public class ScenarioApi extends RestBehavior {
         @ApiResponse(responseCode = "200", description = "Returns whether or not the rules apply")
       })
   @Operation(summary = "Check rules", description = "Check if the rules apply to a scenario update")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public CheckScenarioRulesOutput checkIfRuleApplies(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final CheckScenarioRulesInput input) {

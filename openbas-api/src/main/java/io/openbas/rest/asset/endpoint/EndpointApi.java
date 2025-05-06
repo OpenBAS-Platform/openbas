@@ -116,6 +116,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
+  @PreAuthorize("isPlanner()")
   public Page<EndpointOutput> endpoints(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     Page<Endpoint> endpointPage = endpointService.searchEndpoints(searchPaginationInput);
@@ -129,6 +130,7 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
   @Transactional(readOnly = true)
+  @PreAuthorize("isObserver()")
   public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
     return this.endpointRepository.findAll(fromIds(endpointIds));
   }
@@ -146,6 +148,7 @@ public class EndpointApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @Transactional(rollbackFor = Exception.class)
+  @PreAuthorize("isPlanner()")
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
   }
@@ -153,6 +156,7 @@ public class EndpointApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ENDPOINT_URI + "/options")
+  @PreAuthorize("isPlanner()")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId) {
@@ -165,6 +169,7 @@ public class EndpointApi extends RestBehavior {
   }
 
   @PostMapping(ENDPOINT_URI + "/options")
+  @PreAuthorize("isPlanner()")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.endpointRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
