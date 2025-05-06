@@ -90,10 +90,7 @@ public class InjectSpecification {
     return (root, query, cb) -> {
       Instant thresholdInstant = Instant.now().minus(Duration.ofMinutes(thresholdMinutes));
       return cb.and(
-          cb.or(
-                  cb.equal(root.get("status").get("name"), ExecutionStatus.PENDING),
-                  cb.equal(root.get("status").get("name"), ExecutionStatus.EXECUTING)
-                  ),
+          cb.equal(root.get("status").get("name"), ExecutionStatus.PENDING),
           cb.lessThan(root.get("status").get("trackingSentDate"), thresholdInstant));
     };
   }
