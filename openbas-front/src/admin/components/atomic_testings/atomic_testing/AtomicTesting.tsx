@@ -104,6 +104,17 @@ const AtomicTesting = () => {
     return tabs;
   }, [hasAssetsGroup, hasTeams]);
 
+  useEffect(() => {
+    const currentSelectedTarget = injectResultOverviewOutput?.inject_targets?.find(target =>
+      target.targetType === tabConfig.find(tab => tab.key === activeTab)?.type,
+    ) || injectResultOverviewOutput?.inject_targets?.[0];
+    setSelectedTargetLegacy(currentSelectedTarget);
+
+    if (targets && currentSelectedTarget) {
+      setSelectedTarget(targets.find(target => currentSelectedTarget.id === target.target_id));
+    }
+  }, [tabConfig, activeTab, injectResultOverviewOutput, targets]);
+
   const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: {
       mode: 'and',
@@ -124,12 +135,6 @@ const AtomicTesting = () => {
       page: 0,
       size: 20,
     });
-
-    setSelectedTargetLegacy(
-      selectedTargetLegacy
-      || currentParentTarget
-      || injectResultOverviewOutput?.inject_targets?.[0],
-    );
 
     const searchPaginationInput1Result = {
       ...searchPaginationInput,
