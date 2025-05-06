@@ -17,7 +17,6 @@
         <bcpg-jdk18on.version>1.80</bcpg-jdk18on.version>
         <commons-collections4.version>4.5.0</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
-        <opensaml.version>4.3.2</opensaml.version>
         <springdoc.version>2.6.0</springdoc.version>
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <cron-utils.version>9.2.1</cron-utils.version>
@@ -178,21 +177,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-saml2-service-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml-core</artifactId>
-            <version>${opensaml.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml-saml-api</artifactId>
-            <version>${opensaml.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml-saml-impl</artifactId>
-            <version>${opensaml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
