@@ -58,7 +58,7 @@ public class InjectTraceQueueService {
 
     connection = factory.newConnection();
     channel = connection.createChannel();
-    channel.basicQos(10); // Per consumer limit
+    channel.basicQos(30); // Per consumer limit
     exchangeName = rabbitmqConfig.getPrefix() + InjectTraceQueueService.EXCHANGE_KEY;
     routingKey = rabbitmqConfig.getPrefix() + InjectTraceQueueService.ROUTING_KEY;
     queueName = rabbitmqConfig.getPrefix() + InjectTraceQueueService.QUEUE_NAME;
@@ -74,7 +74,7 @@ public class InjectTraceQueueService {
   private void setupConsumer() throws IOException {
     Channel consumerChannel = connection.createChannel();
     // Limiter le nombre de messages non acquittés
-    consumerChannel.basicQos(50);
+    consumerChannel.basicQos(30);
 
     DeliverCallback deliverCallback =
         (consumerTag, delivery) -> {
@@ -87,8 +87,9 @@ public class InjectTraceQueueService {
 
             InjectExecutionCallback injectExecutionCallback =
                 mapper.readValue(message, InjectExecutionCallback.class);
-
-            queue.put(injectExecutionCallback);
+            synchronized (batchLock) {
+              queue.put(injectExecutionCallback);
+            }
 
             if (queue.size() > 200) {
               processBufferedBatch();
