@@ -404,7 +404,7 @@ export interface ChallengeResult {
 }
 
 export interface ChallengeTryInput {
-  challenge_value?: string;
+  challenge_value: string;
 }
 
 export interface ChangePasswordInput {
