@@ -111,8 +111,7 @@ public class Agent implements Base {
 
   @JsonProperty("agent_active")
   public boolean isActive() {
-    return this.getLastSeen() != null
-        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+    return false;
   }
 
   /** Used for Caldera only */
