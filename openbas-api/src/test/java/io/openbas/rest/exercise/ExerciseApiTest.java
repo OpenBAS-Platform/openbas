@@ -288,6 +288,7 @@ public class ExerciseApiTest {
               .get();
 
       InjectInput input = new InjectInput();
+      input.setTitle(exercise.getInjects().getFirst().getTitle());
       input.setAssets(List.of(assetToAdd.getId()));
 
       mvc.perform(
