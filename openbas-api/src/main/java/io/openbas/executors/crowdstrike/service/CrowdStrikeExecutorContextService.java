@@ -5,6 +5,7 @@ import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorServic
 
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.ExecutionTraceRepository;
 import io.openbas.ee.Ee;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.ExecutorHelper;
@@ -50,6 +51,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
   private final Ee eeService;
   private final LicenseCacheManager licenseCacheManager;
+  private final ExecutionTraceRepository executionTraceRepository;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
@@ -114,17 +116,25 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
                         || ((Endpoint) agent.getAsset()).getArch() == null)
             .toList();
     csAgents.removeAll(withoutPlatformAgents);
-    // Agents with no platform or unknown platform
-    for (Agent agent : withoutPlatformAgents) {
-      injectStatus.addTrace(
-          ExecutionTraceStatus.ERROR,
-          "Unsupported platform: "
-              + ((Endpoint) agent.getAsset()).getPlatform()
-              + " (arch:"
-              + ((Endpoint) agent.getAsset()).getArch()
-              + ")",
-          ExecutionTraceAction.COMPLETE,
-          agent);
+    // Agents with no platform or unknown platform, traces to save
+    if (!withoutPlatformAgents.isEmpty()) {
+      executionTraceRepository.saveAll(
+          withoutPlatformAgents.stream()
+              .map(
+                  agent ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.ERROR,
+                          List.of(),
+                          "Unsupported platform: "
+                              + ((Endpoint) agent.getAsset()).getPlatform()
+                              + " (arch:"
+                              + ((Endpoint) agent.getAsset()).getArch()
+                              + ")",
+                          ExecutionTraceAction.COMPLETE,
+                          agent,
+                          null))
+              .toList());
     }
     return csAgents;
   }
