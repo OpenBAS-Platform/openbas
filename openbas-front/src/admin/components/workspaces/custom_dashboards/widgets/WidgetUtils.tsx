@@ -1,7 +1,8 @@
 import { TableChart } from '@mui/icons-material';
 import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
-import { type Filter, type FilterGroup, type HistogramWidget, type InjectExpectation, type StructuralHistogramSeries, type Widget, type WidgetInput } from '../../../../../utils/api-types';
+import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import { type HistogramWidget, type Widget, type WidgetInput } from '../../../../../utils/api-types-custom';
 
 export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;
 export type StepType = ('type' | 'series' | 'parameters');

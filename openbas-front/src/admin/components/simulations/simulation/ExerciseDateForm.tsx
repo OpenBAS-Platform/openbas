@@ -46,9 +46,6 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
   };
 
   const [checked, setChecked] = useState(!initialValues?.exercise_start_date);
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
-  };
 
   const submit = (data: ExerciseStartDateAndTime) => {
     if (checked) {
@@ -67,37 +64,19 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
     handleSubmit,
     clearErrors,
     getValues,
+    reset,
   } = useForm<ExerciseStartDateAndTime>({
     defaultValues: defaultFormValues(),
     resolver: zodResolver(
       zodImplement<ExerciseStartDateAndTime>().with({
-        date: z.string().refine(
-          (data) => {
-            if (!checked) {
-              return !!data;
-            }
-            return true;
-          },
-          { message: t('Required') },
-        ),
-
-        time: z.any().refine(
-          (data) => {
-            if (!checked) {
-              return !!data;
-            }
-            return true;
-          },
-          { message: t('Required') },
-        ),
+        date: z.string(),
+        time: z.string(),
       })
         .refine(
           (data) => {
-            if (!checked) {
-              return new Date(new Date().setHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
-                || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
-            }
-            return true;
+            if (checked) return true;
+            return new Date(new Date().setHours(0, 0, 0, 0)).getTime() !== new Date(data.date).getTime()
+              || (new Date().getTime() + _MS_DELAY_TOO_CLOSE) < new Date(data.time).getTime();
           },
           {
             message: t('The time and start date do not match, as the time provided is either too close to the current moment or in the past'),
@@ -106,12 +85,10 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
         )
         .refine(
           (data) => {
-            if (!checked) {
-              const time = new Date(data.time);
-              return new Date(new Date(data.date).setHours(time.getHours(), time.getMinutes(), time.getSeconds(), 0)).getTime()
-                >= new Date(new Date().setHours(0, 0, 0, 0)).getTime();
-            }
-            return true;
+            if (checked) return true;
+            const time = new Date(data.time);
+            return new Date(new Date(data.date).setHours(time.getHours(), time.getMinutes(), time.getSeconds(), 0)).getTime()
+              >= new Date(new Date().setHours(0, 0, 0, 0)).getTime();
           },
           {
             message: t('Date should be at least today'),
@@ -120,6 +97,13 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
         ),
     ),
   });
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      reset(defaultFormValues());
+    }
+    setChecked(event.target.checked);
+  };
 
   return (
     <form id="exerciseDateForm" onSubmit={handleSubmit(submit)}>
