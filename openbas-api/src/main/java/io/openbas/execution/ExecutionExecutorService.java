@@ -4,6 +4,7 @@ import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorServic
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 
 import io.openbas.database.model.*;
+import io.openbas.database.repository.ExecutionTraceRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.rest.exception.AgentException;
@@ -26,6 +27,7 @@ public class ExecutionExecutorService {
 
   private final InjectStatusRepository injectStatusRepository;
   private final InjectService injectService;
+  private final ExecutionTraceRepository executionTraceRepository;
 
   public void launchExecutorContext(Inject inject) {
     // First, get the agents of this injects
@@ -115,7 +117,7 @@ public class ExecutionExecutorService {
     // if launchExecutorContextForAgent fail for every agent we throw to manually set injectStatus
     // to error
     if (atLeastOneTraceAdded.get()) {
-      this.injectStatusRepository.save(injectStatus);
+      executionTraceRepository.saveAll(injectStatus.getTraces());
     }
     if (!atLeastOneExecution.get()) {
       throw new ExecutionExecutorException("No asset executed");
