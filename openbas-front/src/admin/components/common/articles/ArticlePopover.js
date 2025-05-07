@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { ArticleContext, PermissionsContext } from '../Context';
 import ArticleForm from './ArticleForm';
 
-const ArticlePopover = ({ article, onRemoveArticle = null }) => {
+const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
   // Standard hooks
   const { t } = useFormatter();
 
@@ -76,7 +76,8 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   return (
     <Fragment>
       <IconButton
-        disabled={!permissions.canWrite}
+        color="primary"
+        disabled={!permissions.canWrite || disabled}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
         size="large"

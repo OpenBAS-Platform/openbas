@@ -7,8 +7,6 @@ public enum ContractFieldType {
   Text("text"),
   @JsonProperty("number")
   Number("number"),
-  @JsonProperty("tuple")
-  Tuple("tuple"),
   @JsonProperty("checkbox")
   Checkbox("checkbox"),
   @JsonProperty("textarea")

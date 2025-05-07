@@ -7,9 +7,10 @@ interface Props {
   name: string;
   label: string;
   style?: CSSProperties;
+  disabled?: boolean;
 }
 
-const TagFieldController = ({ name, label, style = {} }: Props) => {
+const TagFieldController = ({ name, label, style = {}, disabled }: Props) => {
   const { control } = useFormContext();
 
   return (
@@ -23,6 +24,7 @@ const TagFieldController = ({ name, label, style = {} }: Props) => {
           fieldOnChange={onChange}
           error={error}
           style={style}
+          disabled={disabled}
         />
       )}
     />

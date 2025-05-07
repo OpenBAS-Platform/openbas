@@ -10,10 +10,6 @@ import { type ExpectationInput, type ExpectationInputForm } from './Expectation'
 import ExpectationFormCreate from './ExpectationFormCreate';
 
 const useStyles = makeStyles()(theme => ({
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -24,11 +20,13 @@ const useStyles = makeStyles()(theme => ({
 interface InjectAddExpectationProps {
   predefinedExpectations: ExpectationInput[];
   handleAddExpectation: (data: ExpectationInput) => void;
+  disabled?: boolean;
 }
 
 const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   predefinedExpectations,
   handleAddExpectation,
+  disabled = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -55,11 +53,10 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   return (
     <>
       <ListItemButton
-        classes={{ root: classes.item }}
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly}
+        disabled={permissions.readOnly || disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

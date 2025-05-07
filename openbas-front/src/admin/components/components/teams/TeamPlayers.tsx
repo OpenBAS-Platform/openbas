@@ -197,7 +197,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
     R.map((user: UserStore) => {
       if (checkUserEnabled) {
         return ({
-          user_enabled: checkUserEnabled(teamId, user.user_id),
+          user_enabled: checkUserEnabled(teamId, user?.user_id),
           ...user,
         });
       }
@@ -420,7 +420,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
         && (
           <TeamAddPlayers
             teamId={teamId}
-            addedUsersIds={users.map(u => u.user_id)}
+            addedUsersIds={users.map(u => u?.user_id)}
           />
         )
       }

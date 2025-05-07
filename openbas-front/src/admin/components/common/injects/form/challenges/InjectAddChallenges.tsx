@@ -14,23 +14,22 @@ import {
   ListItemText,
 } from '@mui/material';
 import * as R from 'ramda';
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchChallenges } from '../../../../actions/Challenge';
-import { type ChallengeHelper } from '../../../../actions/helper';
-import Transition from '../../../../components/common/Transition';
-import { useFormatter } from '../../../../components/i18n';
-import SearchFilter from '../../../../components/SearchFilter';
-import { useHelper } from '../../../../store';
-import { type Challenge } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { type Option } from '../../../../utils/Option';
-import { truncate } from '../../../../utils/String';
-import CreateChallenge from '../../components/challenges/CreateChallenge';
-import { PermissionsContext } from '../Context';
-import TagsFilter from '../filters/TagsFilter';
+import { fetchChallenges } from '../../../../../../actions/Challenge';
+import { type ChallengeHelper } from '../../../../../../actions/helper';
+import Transition from '../../../../../../components/common/Transition';
+import { useFormatter } from '../../../../../../components/i18n';
+import SearchFilter from '../../../../../../components/SearchFilter';
+import { useHelper } from '../../../../../../store';
+import { type Challenge } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import { type Option } from '../../../../../../utils/Option';
+import { truncate } from '../../../../../../utils/String';
+import CreateChallenge from '../../../../components/challenges/CreateChallenge';
+import TagsFilter from '../../../filters/TagsFilter';
 
 const useStyles = makeStyles()(theme => ({
   box: {
@@ -40,10 +39,6 @@ const useStyles = makeStyles()(theme => ({
     border: '1px dashed rgba(255, 255, 255, 0.3)',
   },
   chip: { margin: '0 10px 10px 0' },
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,
@@ -54,17 +49,18 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   handleAddChallenges: (challengeIds: string[]) => void;
   injectChallengesIds: string[];
+  disabled?: boolean;
 }
 
 const InjectAddChallenges: FunctionComponent<Props> = ({
   handleAddChallenges,
   injectChallengesIds,
+  disabled = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { permissions } = useContext(PermissionsContext);
 
   const { challenges, challengesMap } = useHelper((helper: ChallengeHelper) => ({
     challenges: helper.getChallenges(),
@@ -140,13 +136,12 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
     R.take(10),
   )(challenges);
   return (
-    <div>
+    <>
       <ListItemButton
-        classes={{ root: classes.item }}
         divider
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly}
+        disabled={disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />
@@ -248,7 +243,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

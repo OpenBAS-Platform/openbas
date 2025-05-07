@@ -5,7 +5,7 @@ import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type Contract } from '../../../../../actions/contract/contract';
+import { type ContractVariable } from '../../../../../actions/contract/contract';
 import { type UserHelper } from '../../../../../actions/helper';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
@@ -75,13 +75,13 @@ interface AvailableVariablesDialogProps {
   open: boolean;
   handleClose: () => void;
   variables: Variable[];
-  injectorContract: Contract;
+  variablesFromInjectorContract: ContractVariable[];
   uriVariable: string;
 }
 
 const AvailableVariablesDialog: FunctionComponent<
   AvailableVariablesDialogProps
-> = ({ open, handleClose, variables, injectorContract, uriVariable }) => {
+> = ({ open, handleClose, variables, uriVariable, variablesFromInjectorContract }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const [tab, setTab] = useState('1');
@@ -133,7 +133,7 @@ const AvailableVariablesDialog: FunctionComponent<
             }}
           >
             <List>
-              {injectorContract.variables.map((variable) => {
+              {variablesFromInjectorContract.map((variable) => {
                 return (
                   <div key={variable.key}>
                     <VariableChildItem

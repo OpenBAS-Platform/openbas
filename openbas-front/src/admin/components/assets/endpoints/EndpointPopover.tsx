@@ -21,6 +21,7 @@ export interface EndpointPopoverProps {
   openEditOnInit?: boolean;
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
+  disabled?: boolean;
 }
 
 const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
@@ -33,6 +34,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   openEditOnInit = false,
   onUpdate,
   onDelete,
+  disabled = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -125,7 +127,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
 
   return entries.length > 0 && (
     <>
-      <ButtonPopover entries={entries} variant={inline ? 'icon' : 'toggle'} />
+      <ButtonPopover disabled={disabled} entries={entries} variant={inline ? 'icon' : 'toggle'} />
       {inline ? (
         <Dialog
           open={edition}

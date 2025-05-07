@@ -320,6 +320,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
             inject_injector_contract: {
               injector_contract_id: selectedContract?.injector_contract_id ?? '',
               injector_contract_arch: selectedContract?.injector_contract_arch,
+              injector_contract_platforms: selectedContract?.injector_contract_platforms,
             } as InjectorContract,
             inject_type: selectedContract?.injector_contract_content?.config?.type,
             inject_teams: [],

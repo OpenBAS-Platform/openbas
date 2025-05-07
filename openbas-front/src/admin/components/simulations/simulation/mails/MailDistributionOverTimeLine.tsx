@@ -12,7 +12,7 @@ import { type Communication, type Exercise, type Team } from '../../../../../uti
 import { lineChartOptions } from '../../../../../utils/Charts';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { getTeamsColors } from '../../../common/injects/teams/utils';
+import { getTeamsColors } from '../../../teams/utils';
 
 interface Props { exerciseId: Exercise['exercise_id'] }
 

@@ -201,7 +201,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                       >
                         <VisibilityOutlined />
                       </IconButton>
-                      <ArticlePopover article={article} />
+                      <ArticlePopover article={article} onRemoveArticle={undefined} />
                     </Fragment>
                   )}
                 />

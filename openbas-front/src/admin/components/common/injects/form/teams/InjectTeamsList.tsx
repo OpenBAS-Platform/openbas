@@ -1,0 +1,123 @@
+import { GroupsOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
+
+import { findTeams } from '../../../../../../actions/teams/team-actions';
+import { useFormatter } from '../../../../../../components/i18n';
+import ItemTags from '../../../../../../components/ItemTags';
+import { type TeamOutput } from '../../../../../../utils/api-types';
+import TeamPopover from '../../../../components/teams/TeamPopover';
+import { TeamContext } from '../../../Context';
+import InjectAddTeams from './InjectAddTeams';
+
+const useStyles = makeStyles()(theme => ({
+  column: {
+    display: 'grid',
+    gridTemplateColumns: '2fr 1fr 1fr 2fr',
+  },
+  bodyItem: { fontSize: theme.typography.h3.fontSize },
+}));
+
+interface Props {
+  allTeamsEnabledUsers?: number;
+  allTeamsUsersNumber?: number;
+  readOnly?: boolean;
+}
+
+const InjectTeamsList: FunctionComponent<Props> = ({
+  allTeamsEnabledUsers,
+  allTeamsUsersNumber,
+  readOnly = false,
+}) => {
+  // Standard hooks
+  const { classes } = useStyles();
+  const { t } = useFormatter();
+  const { control, setValue } = useFormContext();
+  const { computeTeamUsersEnabled } = useContext(TeamContext);
+
+  // -- TEAMS VALUES --
+  const allTeams = useWatch({
+    control,
+    name: 'inject_all_teams',
+  });
+  const injectTeamIds = useWatch({
+    control,
+    name: 'inject_teams',
+  });
+  const [teams, setTeams] = useState<TeamOutput[]>([]);
+
+  useEffect(() => {
+    findTeams(injectTeamIds).then(result =>
+      setTeams(result.data.sort((a: TeamOutput, b: TeamOutput) => a.team_name.localeCompare(b.team_name))));
+  }, [injectTeamIds]);
+
+  // -- ACTIONS --
+  const onTeamsChange = (teamIds: string[]) => setValue('inject_teams', teamIds);
+
+  const onRemoveTeam = (teamId: string) => {
+    const updatedTeamIds = injectTeamIds.filter((id: string) => id !== teamId);
+    setValue('inject_teams', updatedTeamIds);
+  };
+
+  const teamListItem = (team: TeamOutput, userEnabled: number) => (
+    <ListItem
+      key={team.team_id}
+      divider
+      secondaryAction={!allTeams && (
+        <TeamPopover
+          team={team}
+          onRemoveTeamFromInject={onRemoveTeam}
+          disabled={readOnly}
+        />
+      )}
+    >
+      <ListItemIcon>
+        <GroupsOutlined />
+      </ListItemIcon>
+      <ListItemText
+        primary={(
+          <div className={classes.column}>
+            <div className={classes.bodyItem}>
+              {team.team_name}
+            </div>
+            <Tooltip title={t('Number of user')} className={classes.bodyItem}>
+              <span>{team.team_users_number}</span>
+            </Tooltip>
+            <Tooltip title={t('Number of enable user')} className={classes.bodyItem}>
+              <span>{userEnabled}</span>
+            </Tooltip>
+            <div className={classes.bodyItem}>
+              <ItemTags variant="reduced-view" tags={team.team_tags} />
+            </div>
+          </div>
+        )}
+      />
+    </ListItem>
+  );
+
+  return (
+    <>
+      <List>
+        {!allTeams && teams.map((team) => {
+          const allEnabled = computeTeamUsersEnabled?.(team.team_id); // TODO do not work
+          // console.log('allEnabled', allEnabled, team);
+          return teamListItem(team, allEnabled || 0);
+        })}
+        {allTeams && teamListItem({
+          team_id: 'all',
+          team_name: t('All teams'),
+          team_users_number: allTeamsUsersNumber,
+          team_tags: [],
+          team_exercises: [],
+          team_scenarios: [],
+          team_updated_at: '',
+        }, allTeamsEnabledUsers ?? 0)}
+      </List>
+      {!allTeams && <InjectAddTeams disabled={readOnly} handleModifyTeams={onTeamsChange} injectTeamsIds={injectTeamIds} />}
+    </>
+  );
+};
+
+export default InjectTeamsList;

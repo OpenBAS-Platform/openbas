@@ -13,9 +13,10 @@ interface Props {
   style?: CSSProperties;
   required?: boolean;
   disabled?: boolean;
+  multiple?: boolean;
 }
 
-const SelectFieldController = ({ name, label, items, style, required, disabled }: Props) => {
+const SelectFieldController = ({ name, label, items, style, multiple = false, required, disabled }: Props) => {
   const { control } = useFormContext();
 
   return (
@@ -31,6 +32,10 @@ const SelectFieldController = ({ name, label, items, style, required, disabled }
             id={`select-label-${name}`}
             style={style}
             disabled={disabled}
+            multiple={multiple}
+            renderValue={(v: string | string[]) => Array.isArray(v)
+              ? items.filter(item => v.includes(item.value)).map(item => item.label).join(', ')
+              : items.find(item => item.value === v)?.label || ''}
           >
             {items.map(item => (
               <MenuItem key={item.value} value={item.value}>
