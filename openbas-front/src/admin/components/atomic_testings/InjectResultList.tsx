@@ -175,7 +175,7 @@ const InjectResultList: FunctionComponent<Props> = ({
         queryableHelpers={queryableHelpers}
         contextId={contextId}
         reloadContentCount={reloadCount}
-        topBarButtons={(
+        topBarButtons={showActions ? (
           <Tooltip title={t('inject_import_json_action')}>
             <ToggleButton
               value="import"
@@ -189,7 +189,7 @@ const InjectResultList: FunctionComponent<Props> = ({
               />
             </ToggleButton>
           </Tooltip>
-        )}
+        ) : null}
       />
       <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleCloseJsonImportDialog} handleSubmit={handleSubmitJsonImportFile} />
       <List>
