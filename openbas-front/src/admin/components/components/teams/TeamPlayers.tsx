@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
