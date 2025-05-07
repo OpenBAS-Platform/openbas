@@ -507,7 +507,6 @@ const Injects: FunctionComponent<Props> = ({
   if (isBulkLoading) {
     return <Loader />;
   }
-  // @ts-ignore
   return (
     <>
       <PaginationComponentV2
