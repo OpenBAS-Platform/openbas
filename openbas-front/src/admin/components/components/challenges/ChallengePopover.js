@@ -16,7 +16,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) => {
+const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline, disabled = false }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -82,7 +82,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
   )(challenge);
   return (
     <>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
+      <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
         <MoreVert />
       </IconButton>
       <Menu

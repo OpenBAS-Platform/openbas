@@ -32,6 +32,7 @@ export interface AssetGroupPopoverProps {
   openEditOnInit?: boolean;
   onUpdate?: (result: AssetGroup) => void;
   onDelete?: (result: string) => void;
+  disabled?: boolean;
 }
 
 const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
@@ -43,7 +44,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   openEditOnInit = false,
   onUpdate,
   onDelete,
-
+  disabled = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -128,6 +129,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
         }}
         aria-haspopup="true"
         size="large"
+        disabled={disabled}
       >
         <MoreVert />
       </IconButton>

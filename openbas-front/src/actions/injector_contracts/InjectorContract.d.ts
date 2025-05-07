@@ -1,6 +1,8 @@
+import type { ExpectationInput } from '../../admin/components/common/injects/expectations/Expectation';
 import { type InjectorContract } from '../../utils/api-types';
+import { type ContractVariable } from '../contract/contract';
 
-export type ContractType = 'text' | 'number' | 'tuple' | 'checkbox' | 'textarea' | 'select' | 'article' | 'challenge' | 'dependency-select' | 'attachment' | 'team' | 'expectation' | 'asset' | 'asset-group' | 'payload';
+export type ContractType = 'text' | 'number' | 'checkbox' | 'textarea' | 'tags' | 'select' | 'choice' | 'article' | 'challenge' | 'dependency-select' | 'attachment' | 'team' | 'expectation' | 'asset' | 'asset-group' | 'payload';
 
 interface LinkedFieldModel {
   key: string;
@@ -32,6 +34,13 @@ export interface ContractElement {
   defaultValue: string | string[];
   richText?: boolean;
   tupleFilePrefix?: string;
+  predefinedExpectations?: ExpectationInput[];
+  dependencyField?: string;
+  choices?: Record<string, string> | {
+    label: string;
+    value: string;
+    information: string;
+  }[];
 }
 
 export type InjectorContractConverted = Omit<InjectorContract, 'convertedContent'> & {
@@ -46,5 +55,6 @@ export type InjectorContractConverted = Omit<InjectorContract, 'convertedContent
       label: Record<string, string>;
     };
     label: Record<string, string>;
+    variables?: ContractVariable[];
   };
 };

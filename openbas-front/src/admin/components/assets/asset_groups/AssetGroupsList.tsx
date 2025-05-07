@@ -1,6 +1,6 @@
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement, useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, type ReactElement, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { findAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
@@ -8,7 +8,7 @@ import ListLoader from '../../../../components/common/loader/ListLoader';
 import { type Header } from '../../../../components/common/SortHeadersList';
 import ItemTags from '../../../../components/ItemTags';
 import { type AssetGroupOutput } from '../../../../utils/api-types';
-import { type AssetGroupPopoverProps } from './AssetGroupPopover';
+import type { EndpointPopoverProps } from '../endpoints/EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
   item: { height: 50 },
@@ -29,18 +29,18 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   assetGroupIds: string[];
-  actions: ReactElement<AssetGroupPopoverProps>;
+  renderActions: ((endpoint: AssetGroupOutput) => ReactElement<EndpointPopoverProps>);
 }
 
 const AssetGroupsList: FunctionComponent<Props> = ({
   assetGroupIds = [],
-  actions,
+  renderActions,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
 
   const component = (assetGroup: AssetGroupOutput) => {
-    return cloneElement(actions, { assetGroup });
+    return renderActions(assetGroup);
   };
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -84,6 +84,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
                       key={assetGroup.asset_group_id}
                       classes={{ root: classes.item }}
                       divider
+                      secondaryAction={component(assetGroup)}
                     >
                       <ListItemIcon>
                         <SelectGroup color="primary" />
@@ -103,9 +104,6 @@ const AssetGroupsList: FunctionComponent<Props> = ({
                           </>
                         )}
                       />
-                      <ListItemSecondaryAction>
-                        {component(assetGroup)}
-                      </ListItemSecondaryAction>
                     </ListItem>
                   );
                 })}

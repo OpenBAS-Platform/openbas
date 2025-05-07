@@ -36,6 +36,10 @@ const InjectGlobalInfosForm = ({ readOnly, isAtomic }: Props) => {
       key: 'inject_title',
       type: 'text',
       label: t('Title'),
+      settings: {
+        rows: 2,
+        required: true,
+      },
     },
     {
       key: 'inject_description',
@@ -64,7 +68,6 @@ const InjectGlobalInfosForm = ({ readOnly, isAtomic }: Props) => {
       type: 'number',
       label: t('Minutes'),
     },
-
   ];
 
   const renderField = (field: InjectField) => (

@@ -48,7 +48,7 @@ import ItemBoolean from '../../../../../components/ItemBoolean';
 import ItemTags from '../../../../../components/ItemTags';
 import { isExerciseReadOnly, isExerciseUpdatable, secondsFromToNow } from '../../../../../utils/Exercise';
 import InjectExpectations from '../../../common/injects/expectations/InjectExpectations';
-import InjectAddTeams from '../../../common/injects/InjectAddTeams';
+import InjectAddTeams from '../../../common/injects/form/teams/InjectAddTeams.js';
 import DocumentPopover from '../../../components/documents/DocumentPopover';
 import DocumentType from '../../../components/documents/DocumentType';
 import TeamPopover from '../../../components/teams/TeamPopover';

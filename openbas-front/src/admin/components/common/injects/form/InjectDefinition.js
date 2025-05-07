@@ -51,11 +51,11 @@ import InjectAddEndpoints from '../../../simulations/simulation/injects/endpoint
 import AvailableVariablesDialog from '../../../simulations/simulation/variables/AvailableVariablesDialog';
 import ArticlePopover from '../../articles/ArticlePopover';
 import InjectExpectations from '../expectations/InjectExpectations';
-import InjectAddArticles from '../InjectAddArticles';
-import InjectAddChallenges from '../InjectAddChallenges';
-import InjectAddTeams from '../InjectAddTeams';
-import InjectTeamsList from '../teams/InjectTeamsList';
+import InjectAddArticles from './articles/InjectAddArticles.js';
+import InjectAddChallenges from './challenges/InjectAddChallenges.js';
 import InjectContentFieldComponent from './InjectContentFieldComponent';
+import InjectAddTeams from './teams/InjectAddTeams.js';
+import InjectTeamsList from './teams/InjectTeamsList';
 
 const styles = theme => ({
   header: {
@@ -635,6 +635,7 @@ class InjectDefinition extends Component {
                   <InjectAddTeams
                     injectTeamsIds={teamsIds}
                     handleModifyTeams={this.handleModifyTeams.bind(this)}
+
                   />
                 </>
               )}
