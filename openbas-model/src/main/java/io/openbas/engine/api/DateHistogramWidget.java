@@ -1,7 +1,5 @@
 package io.openbas.engine.api;
 
-import static io.openbas.engine.api.HistogramWidget.HistogramConfigMode.TEMPORAL;
-
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -14,8 +12,10 @@ import lombok.Setter;
 @Setter
 public class DateHistogramWidget extends HistogramWidget {
 
+  public static final String TEMPORAL_MODE = "temporal";
+
   @NotNull List<DateHistogramSeries> series = new ArrayList<>();
-  private HistogramInterval interval = HistogramInterval.day;
+  @NotNull private HistogramInterval interval = HistogramInterval.day;
   @NotNull private String start; // Date or $custom_dashboard_start
   @NotNull private String end; // Date or $custom_dashboard_end
 
@@ -26,6 +26,6 @@ public class DateHistogramWidget extends HistogramWidget {
   }
 
   public DateHistogramWidget() {
-    super(TEMPORAL);
+    super(TEMPORAL_MODE);
   }
 }

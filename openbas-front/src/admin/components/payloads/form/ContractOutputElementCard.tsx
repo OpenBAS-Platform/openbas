@@ -108,7 +108,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
         style={{ gridColumn: 'span 4' }}
         name={`${prefixName}.${index}.contract_output_element_rule` as const}
         required
-        adornmentLabel="/gm"
+        endAdornmentLabel="/gm"
       />
       {regexGroupsField.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">

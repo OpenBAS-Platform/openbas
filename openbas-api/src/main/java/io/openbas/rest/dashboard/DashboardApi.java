@@ -2,8 +2,6 @@ package io.openbas.rest.dashboard;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.engine.api.HistogramWidget.HistogramConfigMode.STRUCTURAL;
-import static io.openbas.engine.api.HistogramWidget.HistogramConfigMode.TEMPORAL;
 
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
@@ -54,7 +52,7 @@ public class DashboardApi extends RestBehavior {
   @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
-    if (TEMPORAL.equals(widget.getHistogramWidget().getMode())) {
+    if (DateHistogramWidget.TEMPORAL_MODE.equals(widget.getHistogramWidget().getMode())) {
       DateHistogramWidget config = (DateHistogramWidget) widget.getHistogramWidget();
       Map<String, String> parameters = new HashMap<>();
       Instant end = Instant.now();
@@ -65,7 +63,8 @@ public class DashboardApi extends RestBehavior {
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
-    } else if (STRUCTURAL.equals(widget.getHistogramWidget().getMode())) {
+    } else if (StructuralHistogramWidget.STRUCTURAL_MODE.equals(
+        widget.getHistogramWidget().getMode())) {
       StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();
       Map<String, String> parameters = new HashMap<>();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());

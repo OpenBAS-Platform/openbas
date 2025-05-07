@@ -76,9 +76,9 @@ const PlatformFieldController: FunctionComponent<Props> = ({
               />
             )
           }
-          value={platformsOptions.filter(p => field.value?.map((v: Option) => v.id)?.includes(p.id)) ?? null}
+          value={platformsOptions.filter(p => field.value?.map((v: string) => v)?.includes(p.id)) ?? null}
           onChange={(_event, platform) => {
-            field.onChange(platform);
+            field.onChange(platform.map(p => p.id));
           }}
           renderOption={(props, option) => (
             <Box component="li" {...props}>

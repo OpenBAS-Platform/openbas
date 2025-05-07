@@ -4,7 +4,8 @@ import { type FunctionComponent } from 'react';
 
 import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type StructuralHistogramSeries, type Widget } from '../../../../../utils/api-types';
+import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import { type Widget } from '../../../../../utils/api-types-custom';
 import WidgetCreationSeries from './WidgetCreationSeries';
 import { getCurrentSeriesLimit } from './WidgetUtils';
 
