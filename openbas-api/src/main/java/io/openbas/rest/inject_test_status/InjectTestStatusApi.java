@@ -22,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class InjectTestStatusApi extends RestBehavior {
 
@@ -30,7 +29,7 @@ public class InjectTestStatusApi extends RestBehavior {
   private final InjectService injectService;
 
   @Transactional(rollbackFor = Exception.class)
-  @GetMapping("/api/injects/{injectId}/test")
+  @GetMapping("/api/injects/{injectId}/test") // add role by context?
   public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
