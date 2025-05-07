@@ -52,7 +52,7 @@ class CreatePayload extends Component {
     const inputValues = R.pipe(
       R.assoc('payload_source', 'MANUAL'),
       R.assoc('payload_status', 'VERIFIED'),
-      R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
+      R.assoc('payload_platforms', data.payload_platforms),
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),

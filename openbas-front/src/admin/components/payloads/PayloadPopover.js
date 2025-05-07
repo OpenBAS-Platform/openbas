@@ -9,7 +9,7 @@ import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
-import { documentOptions, platformOptions } from '../../../utils/Option';
+import { documentOptions } from '../../../utils/Option';
 import PayloadForm from './PayloadForm';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
@@ -39,7 +39,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       return null;
     }
     const inputValues = R.pipe(
-      R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
+      R.assoc('payload_platforms', data.payload_platforms),
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
@@ -81,7 +81,6 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       handleCloseDuplicate();
     });
   };
-  const payloadPlatforms = platformOptions(payload.payload_platforms);
   const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
   const initialValues = R.pipe(
     R.pick([
@@ -98,8 +97,8 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       'payload_tags',
       'payload_execution_arch',
       'payload_output_parsers',
+      'payload_platforms',
     ]),
-    R.assoc('payload_platforms', payloadPlatforms),
     R.assoc('executable_file', R.head(payloadExecutableFiles)),
     R.assoc('payload_cleanup_executor', payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor),
     R.assoc('payload_cleanup_command', payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command),
