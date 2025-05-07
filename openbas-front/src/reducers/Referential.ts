@@ -17,7 +17,7 @@ export const entitiesInitializer = Map({
     comchecks: Map({}),
     comcheckstatuses: Map({}),
     channelreaders: Map({}),
-    challengesreaders: Map({}),
+    simulationchallengesreaders: Map({}),
     teams: Map({}),
     injects: Map({}),
     atomics: Map({}),
