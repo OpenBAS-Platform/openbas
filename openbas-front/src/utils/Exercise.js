@@ -18,7 +18,7 @@ export const isExerciseReadOnly = (exercise, overrideStatus = false) => {
 
 export const isExerciseUpdatable = (exercise, overrideStatus = false) => !isExerciseReadOnly(exercise, overrideStatus);
 
-export const usePermissions = (exerciseId, fullExercise = null) => {
+export const usePermissions = (exerciseId, fullExercise) => {
   const { exercise, me, logged } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),

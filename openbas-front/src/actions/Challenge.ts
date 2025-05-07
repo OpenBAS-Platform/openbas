@@ -3,7 +3,7 @@ import { type Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import { type ChallengeInput, type ChallengeTryInput } from '../utils/api-types';
-import { challengesReader } from './Schema';
+import { simulationChallengesReaders } from './Schema';
 
 const challenge = new schema.Entity(
   'challenges',
@@ -37,7 +37,7 @@ export const addChallenge = (data: ChallengeInput) => (dispatch: Dispatch) => po
 export const tryChallenge = (challengeId: string, data: ChallengeTryInput) => (dispatch: Dispatch) => postReferential(null, `/api/challenges/${challengeId}/try`, data)(dispatch);
 
 export const validateChallenge = (exerciseId: string, challengeId: string, userId: string, data: ChallengeTryInput) => (dispatch: Dispatch) => postReferential(
-  challengesReader,
+  simulationChallengesReaders,
   `/api/player/challenges/${exerciseId}/${challengeId}/validate?userId=${userId}`,
   data,
 )(dispatch);
@@ -49,12 +49,12 @@ export const deleteChallenge = (channelId: string) => (dispatch: Dispatch) => {
 
 export const fetchSimulationPlayerChallenges = (simulationId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/player/simulations/${simulationId}/documents?userId=${userId}`;
-  return getReferential(challengesReader, uri)(dispatch);
+  return getReferential(simulationChallengesReaders, uri)(dispatch);
 };
 
 export const fetchSimulationObserverChallenges = (simulationId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/observer/simulations/${simulationId}/challenges?userId=${userId}`;
-  return getReferential(challengesReader, uri)(dispatch);
+  return getReferential(simulationChallengesReaders, uri)(dispatch);
 };
 
 // -- SCENARIOS --
@@ -64,8 +64,8 @@ export const fetchScenarioChallenges = (scenarioId: string) => (dispatch: Dispat
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
-export const fetchScenarioObserverChallenges = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+/* export const fetchScenarioObserverChallenges = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/observer/scenarios/${scenarioId}/challenges?userId=${userId}`;
   return getReferential(challengesReader, uri)(dispatch);
-};
+}; */
 // observer for scenario (frontend and api)
