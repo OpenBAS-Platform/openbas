@@ -14,7 +14,7 @@
     <description>OpenBAS model</description>
 
     <properties>
-        <elasticsearch.version>8.18.0</elasticsearch.version>
+        <elasticsearch.version>8.18.1</elasticsearch.version>
     </properties>
 
     <dependencies>
