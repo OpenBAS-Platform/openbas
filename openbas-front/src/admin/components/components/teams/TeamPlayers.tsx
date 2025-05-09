@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { IconButton, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -185,16 +185,14 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
   const sort = R.sortWith(
     orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
   );
-  const sortedUsers: UserStoreExtended[] = R.pipe(
-    R.filter(
-      (user: UserStore) => tags.length === 0
-        || R.any(
-          (filter: Option['id']) => R.includes(filter, user.user_tags),
-          R.pluck('id', tags),
-        ),
-    ),
-    R.filter(filterByKeyword),
-    R.map((user: UserStore) => {
+  const sortedUsers: UserStoreExtended[] = users
+    .filter(u => !!u)
+    .filter((user: UserStore) => tags.length === 0
+      || R.any(
+        (filter: Option['id']) => R.includes(filter, user.user_tags),
+        R.pluck('id', tags),
+      )).filter(filterByKeyword)
+    .map((user: UserStore) => {
       if (checkUserEnabled) {
         return ({
           user_enabled: checkUserEnabled(teamId, user.user_id),
@@ -202,9 +200,8 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
         });
       }
       return user;
-    }),
-    sort,
-  )(users);
+    })
+    .sort(sort);
 
   const sortHeader = (field: string, label: string, isSortable: boolean) => {
     const sortComponent = orderAsc
@@ -303,13 +300,15 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
               </>
             )}
           />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedUsers.map(user => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}
-            divider={true}
+            divider
+            secondaryAction={permissions.canWrite
+              ? (<PlayerPopover user={user} teamId={teamId} />)
+              : <span> &nbsp; </span>}
           >
             <ListItemIcon>
               <PersonOutlined />
@@ -402,16 +401,6 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                 </>
               )}
             />
-            <ListItemSecondaryAction>
-              {permissions.canWrite
-                ? (
-                    <PlayerPopover
-                      user={user}
-                      teamId={teamId}
-                    />
-                  )
-                : <span> &nbsp; </span>}
-            </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
@@ -420,7 +409,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
         && (
           <TeamAddPlayers
             teamId={teamId}
-            addedUsersIds={users.map(u => u.user_id)}
+            addedUsersIds={users.filter(u => !!u).map(u => u.user_id)}
           />
         )
       }
