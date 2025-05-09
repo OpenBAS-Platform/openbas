@@ -4,7 +4,7 @@ import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorServic
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.ExecutionTraceRepository;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.rest.exception.AgentException;
 import io.openbas.rest.inject.service.InjectService;
@@ -24,7 +24,7 @@ public class ExecutionExecutorService {
 
   private final ApplicationContext context;
 
-  private final InjectStatusRepository injectStatusRepository;
+  private final ExecutionTraceRepository executionTraceRepository;
   private final InjectService injectService;
 
   public void launchExecutorContext(Inject inject) {
@@ -46,34 +46,43 @@ public class ExecutionExecutorService {
     InjectStatus injectStatus =
         inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
-    AtomicBoolean atLeastOneTraceAdded = new AtomicBoolean(false);
     // Manage inactive agents
     if (!inactiveAgents.isEmpty()) {
-      inactiveAgents.forEach(
-          agent ->
-              injectStatus.addTrace(
-                  ExecutionTraceStatus.AGENT_INACTIVE,
-                  "Agent "
-                      + agent.getExecutedByUser()
-                      + " is inactive for the asset "
-                      + agent.getAsset().getName(),
-                  ExecutionTraceAction.COMPLETE,
-                  agent));
-      atLeastOneTraceAdded.set(true);
+      executionTraceRepository.saveAll(
+          inactiveAgents.stream()
+              .map(
+                  agent ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.AGENT_INACTIVE,
+                          List.of(),
+                          "Agent "
+                              + agent.getExecutedByUser()
+                              + " is inactive for the asset "
+                              + agent.getAsset().getName(),
+                          ExecutionTraceAction.COMPLETE,
+                          agent,
+                          null))
+              .toList());
     }
     // Manage without executor agents
     if (!agentsWithoutExecutor.isEmpty()) {
-      agentsWithoutExecutor.forEach(
-          agent ->
-              injectStatus.addTrace(
-                  ExecutionTraceStatus.ERROR,
-                  "Cannot find the executor for the agent "
-                      + agent.getExecutedByUser()
-                      + " from the asset "
-                      + agent.getAsset().getName(),
-                  ExecutionTraceAction.COMPLETE,
-                  agent));
-      atLeastOneTraceAdded.set(true);
+      executionTraceRepository.saveAll(
+          agentsWithoutExecutor.stream()
+              .map(
+                  agent ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.ERROR,
+                          List.of(),
+                          "Cannot find the executor for the agent "
+                              + agent.getExecutedByUser()
+                              + " from the asset "
+                              + agent.getAsset().getName(),
+                          ExecutionTraceAction.COMPLETE,
+                          agent,
+                          null))
+              .toList());
     }
     // Manage Crowdstrike agents for batch execution
     if (!crowdstrikeAgents.isEmpty()) {
@@ -86,14 +95,19 @@ public class ExecutionExecutorService {
         atLeastOneExecution.set(true);
       } catch (Exception e) {
         log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
-        crowdstrikeAgents.forEach(
-            agent ->
-                injectStatus.addTrace(
-                    ExecutionTraceStatus.ERROR,
-                    e.getMessage(),
-                    ExecutionTraceAction.COMPLETE,
-                    agent));
-        atLeastOneTraceAdded.set(true);
+        executionTraceRepository.saveAll(
+            crowdstrikeAgents.stream()
+                .map(
+                    agent ->
+                        new ExecutionTrace(
+                            injectStatus,
+                            ExecutionTraceStatus.ERROR,
+                            List.of(),
+                            e.getMessage(),
+                            ExecutionTraceAction.COMPLETE,
+                            agent,
+                            null))
+                .toList());
       }
     }
     // Manage remaining agents
@@ -104,19 +118,17 @@ public class ExecutionExecutorService {
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
             log.severe("launchExecutorContextForAgent error: " + e.getMessage());
-            injectStatus.addTrace(
-                ExecutionTraceStatus.ERROR,
-                e.getMessage(),
-                ExecutionTraceAction.COMPLETE,
-                e.getAgent());
-            atLeastOneTraceAdded.set(true);
+            executionTraceRepository.save(
+                new ExecutionTrace(
+                    injectStatus,
+                    ExecutionTraceStatus.ERROR,
+                    List.of(),
+                    e.getMessage(),
+                    ExecutionTraceAction.COMPLETE,
+                    e.getAgent(),
+                    null));
           }
         });
-    // if launchExecutorContextForAgent fail for every agent we throw to manually set injectStatus
-    // to error
-    if (atLeastOneTraceAdded.get()) {
-      this.injectStatusRepository.save(injectStatus);
-    }
     if (!atLeastOneExecution.get()) {
       throw new ExecutionExecutorException("No asset executed");
     }
