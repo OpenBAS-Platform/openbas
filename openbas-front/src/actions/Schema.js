@@ -388,7 +388,7 @@ export const storeHelper = state => ({
   // injector contracts
   getInjectorContract: (id) => {
     const i = entity(id, 'injector_contracts', state);
-    if (i.isEmpty()) {
+    if (!i || i.isEmpty()) {
       return i;
     }
     return i.merge(fromJS(JSON.parse(i.get('injector_contract_content'))));
