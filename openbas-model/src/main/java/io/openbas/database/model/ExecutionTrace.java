@@ -8,15 +8,13 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
 
 @Data
 @Entity
@@ -25,7 +23,6 @@ public class ExecutionTrace implements Base {
   @Id
   @Column(name = "execution_trace_id")
   @JsonProperty("execution_trace_id")
-  @GeneratedValue
   @UuidGenerator
   @NotNull
   private String id;
@@ -149,7 +146,7 @@ public class ExecutionTrace implements Base {
     this.status = status;
     this.identifiers = identifiers == null ? new String[0] : identifiers.toArray(new String[0]);
     this.message = message;
-    this.time = time == null ? Instant.now() : time;
+    this.time = time == null ? now() : time;
     this.action = action;
     this.agent = agent;
   }
