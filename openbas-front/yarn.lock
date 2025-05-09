@@ -2678,13 +2678,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:8.2.0":
-  version: 8.2.0
-  resolution: "@mui/x-date-pickers@npm:8.2.0"
+"@mui/x-date-pickers@npm:8.3.0":
+  version: 8.3.0
+  resolution: "@mui/x-date-pickers@npm:8.3.0"
   dependencies:
-    "@babel/runtime": "npm:^7.27.0"
+    "@babel/runtime": "npm:^7.27.1"
     "@mui/utils": "npm:^7.0.2"
-    "@mui/x-internals": "npm:8.2.0"
+    "@mui/x-internals": "npm:8.3.0"
     "@types/react-transition-group": "npm:^4.4.12"
     clsx: "npm:^2.1.1"
     prop-types: "npm:^15.8.1"
@@ -2722,19 +2722,19 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/ee9d0a2a0edcb181a6300a3323687db171632fc822158764c4bb103fd4cd2d2d8e671e2726431f813b26448cc67575088bfda18d6f28f69d96464b998b2c3ce2
+  checksum: 10c0/19675e41be8ba38ca29955b3e4e98abd7b5ef96277c827773ef4420d8f20e8f69484f25421bb736e168e34f83766e9430de082e0447b87c8d1729f0a4700677f
   languageName: node
   linkType: hard
 
-"@mui/x-internals@npm:8.2.0":
-  version: 8.2.0
-  resolution: "@mui/x-internals@npm:8.2.0"
+"@mui/x-internals@npm:8.3.0":
+  version: 8.3.0
+  resolution: "@mui/x-internals@npm:8.3.0"
   dependencies:
-    "@babel/runtime": "npm:^7.27.0"
+    "@babel/runtime": "npm:^7.27.1"
     "@mui/utils": "npm:^7.0.2"
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/de3beb8eb4048df138683e77fa37d724999491266e5cffd9474e50139f11cbec9532948a22a3b9271d98eb72911fe45d4a9aca8677bd4998bfb50bf9ab579f56
+  checksum: 10c0/330e7d8b5a5d35b4327e905739526bc0ff3485c47e89886858baab5666436c537eff4df3b18e2506d079938ad032a7345a6490f4655fb40da76d137a8f5eca57
   languageName: node
   linkType: hard
 
@@ -9969,7 +9969,7 @@ __metadata:
     "@mui/lab": "npm:7.0.0-beta.12"
     "@mui/material": "npm:7.1.0"
     "@mui/system": "npm:7.1.0"
-    "@mui/x-date-pickers": "npm:8.2.0"
+    "@mui/x-date-pickers": "npm:8.3.0"
     "@playwright/test": "npm:1.52.0"
     "@redux-devtools/extension": "npm:3.3.0"
     "@stylistic/eslint-plugin": "npm:4.2.0"
