@@ -672,7 +672,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
           className={`${classes.container} chainedTimeline`}
           style={{
             width: '100%',
-            height: 510,
+            height: 'calc(100vh - 400px)',
           }}
         >
           <ReactFlow
