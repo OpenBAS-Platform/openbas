@@ -2,13 +2,13 @@ import { LoadingButton } from '@mui/lab';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 // As we can ask AI after and follow up, there is a dependency lifecycle here that can be accepted
 // TODO: Cleanup a bit in upcoming version
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { type FunctionComponent, useEffect, useRef } from 'react';
 
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../../components/CKEditor';
 import { useFormatter } from '../../components/i18n';

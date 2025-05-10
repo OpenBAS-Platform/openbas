@@ -20,7 +20,7 @@ export const computeBanners = (settings: PlatformSettings): BannerMessage => {
   return bannerLevel;
 };
 
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import-x/prefer-default-export
 export const computeBannerSettings = (settings: PlatformSettings) => {
   const bannerByLevel = computeBanners(settings);
   const isBannerActivated = bannerByLevel !== undefined && isNotEmptyField(recordKeys(bannerByLevel));
