@@ -137,7 +137,7 @@ const ChallengesPlayer = () => {
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const { exerciseId } = useParams();
   const { challengesReader, documentsMap } = useHelper(helper => ({
-    challengesReader: helper.getChallengesReader(exerciseId),
+    challengesReader: helper.getSimulationChallengesReader(exerciseId),
     documentsMap: helper.getDocumentsMap(),
   }));
   const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};

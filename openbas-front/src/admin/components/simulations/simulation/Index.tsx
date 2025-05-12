@@ -33,6 +33,7 @@ const MailsInject = lazy(() => import('./mails/Inject'));
 const Logs = lazy(() => import('./logs/Logs'));
 const Chat = lazy(() => import('./chat/Chat'));
 const Validations = lazy(() => import('./validation/Validations'));
+const SimulationChallengesPreview = lazy(() => import('./challenges/SimulationChallengesPreview'));
 
 const useStyles = makeStyles()(() => ({
   scheduling: {
@@ -73,6 +74,9 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
+        <Routes>
+          <Route path="/challenges?preview=true" element={errorWrapper(SimulationChallengesPreview)()} />
+        </Routes>
         <div style={{ paddingRight: ['/results', '/animation'].some(el => location.pathname.includes(el)) ? 200 : 0 }}>
           <Breadcrumbs
             variant="object"
