@@ -233,7 +233,7 @@ const InjectContentForm = ({
       show: fieldsMap.has('asset'),
     },
     {
-      title: t('Targeted assets groups'),
+      title: t('Targeted asset groups'),
       render: renderTargetedAssetGroups,
       show: fieldsMap.has('asset-group'),
     },
