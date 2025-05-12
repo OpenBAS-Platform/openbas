@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { useEffect, useState } from 'react';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -14,18 +14,20 @@ import { fetchSimulationObserverChallenges, tryChallenge } from '../../../../act
 import { fetchSimulationPlayerDocuments } from '../../../../actions/Document';
 import { fetchExercise } from '../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import type { DocumentHelper, SimulationChallengesReaderHelper } from '../../../../actions/helper';
+import type { SimulationChallengesReaderHelper } from '../../../../actions/helper';
 import Dialog from '../../../../components/common/Dialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { useHelper } from '../../../../store';
-import { type Challenge, type ChallengeResult, type ChallengeTryInput, type Exercise as ExerciseType, type SimulationChallengesReader } from '../../../../utils/api-types';
+import { type Challenge, type ChallengeInformation, type ChallengeResult, type ChallengeTryInput, type Exercise as ExerciseType, type Scenario, type SimulationChallengesReader } from '../../../../utils/api-types';
 import { useQueryParameter } from '../../../../utils/Environment';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { isNotEmptyField } from '../../../../utils/utils';
 import ChallengeTryForm from '../../components/challenges/ChallengeTryForm';
+import { PreviewChallengeContext } from '../Context';
 import ChallengeCard from './ChallengeCard';
 import ChallengesPreviewDocumentsList from './ChallengesPreviewDocumentsList';
 
@@ -45,42 +47,54 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-const ChallengesPreview = () => {
+interface Props {
+  challenges: ChallengeInformation[] | undefined;
+  permissions: {
+    canRead: boolean;
+    isRunning: boolean;
+    isLoggedIn: boolean;
+  };
+}
+
+const ChallengesPreview: FunctionComponent<Props> = ({
+  challenges,
+  permissions,
+}) => {
   const theme = useTheme();
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [currentResult, setCurrentResult] = useState<ChallengeResult | null>(null);
-  const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
+  const value = useContext(PreviewChallengeContext);
 
-  const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
+  /* const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
   const { challengesReader, fullExercise }: {
     fullExercise: ExerciseType;
     challengesReader: SimulationChallengesReader;
-  } = useHelper((helper: SimulationChallengesReaderHelper & DocumentHelper & ExercisesHelper) => ({
+  } = useHelper((helper: SimulationChallengesReaderHelper & ExercisesHelper) => ({
     fullExercise: helper.getExercise(exerciseId),
-    challengesReader: helper.getChallengesReader(exerciseId),
-  }));
+    challengesReader: helper.getSimulationChallengesReader(exerciseId),
+  })); */
 
-  const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
+  // const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
 
   // Pass the full exercise because the exercise is never loaded in the store at this point
-  const permissions = usePermissions(exerciseId, fullExercise);
+  // const permissions = usePermissions(exerciseId, fullExercise);
 
   const handleClose = () => {
     setCurrentChallenge(null);
     setCurrentResult(null);
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     dispatch(fetchMe());
     if (exerciseId) {
       dispatch(fetchExercise(exerciseId));
       dispatch(fetchSimulationObserverChallenges(exerciseId, userId));
       dispatch(fetchSimulationPlayerDocuments(exerciseId, userId));
     }
-  }, [dispatch, exerciseId, userId]);
+  }, [dispatch, exerciseId, userId]); */
 
   const submit = (cid: string | undefined, data: ChallengeTryInput) => {
     if (cid) {
@@ -91,19 +105,19 @@ const ChallengesPreview = () => {
     return null;
   };
 
-  if (exercise) {
+  if (value.scenarioOrExercise) {
     const groupChallenges = R.groupBy(
       R.path(['challenge_detail', 'challenge_category']),
     );
     const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canRead && isNotEmptyField(value.linkToPlayerMode) && (
           <Button
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=false`}
+            to={value.linkToPlayerMode()}
             style={{
               position: 'absolute',
               top: theme.spacing(2),
@@ -118,7 +132,7 @@ const ChallengesPreview = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/simulations/${exerciseId}/definition/challenges`}
+            to={value.linkToAdministrationMode()}
             style={{
               position: 'absolute',
               top: theme.spacing(2),
@@ -143,13 +157,13 @@ const ChallengesPreview = () => {
               fontSize: 40,
             }}
           >
-            {exercise.name}
+            {value.scenarioOrExercise.name}
           </Typography>
           <Typography
             variant="h2"
             style={{ textAlign: 'center' }}
           >
-            {exercise.description}
+            {value.scenarioOrExercise.description}
           </Typography>
           {challenges && challenges.length === 0 && (
             <div style={{ marginTop: theme.spacing(19) }}>

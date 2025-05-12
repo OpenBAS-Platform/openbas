@@ -3,7 +3,7 @@ import { type Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
 import { type ChallengeInput, type ChallengeTryInput } from '../utils/api-types';
-import { simulationChallengesReaders } from './Schema';
+import { scenarioChallengesReaders, simulationChallengesReaders } from './Schema';
 
 const challenge = new schema.Entity(
   'challenges',
@@ -64,8 +64,8 @@ export const fetchScenarioChallenges = (scenarioId: string) => (dispatch: Dispat
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
-/* export const fetchScenarioObserverChallenges = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
+export const fetchScenarioObserverChallenges = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/observer/scenarios/${scenarioId}/challenges?userId=${userId}`;
-  return getReferential(challengesReader, uri)(dispatch);
-}; */
+  return getReferential(scenarioChallengesReaders, uri)(dispatch);
+};
 // observer for scenario (frontend and api)

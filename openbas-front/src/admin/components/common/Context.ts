@@ -25,7 +25,7 @@ import {
   type LessonsQuestionUpdateInput,
   type LessonsSendInput,
   type Objective,
-  type ObjectiveInput,
+  type ObjectiveInput, type PublicExercise, type PublicScenario,
   type Report,
   type ReportInput,
   type SearchPaginationInput,
@@ -53,6 +53,12 @@ export type ArticleContextType = {
 };
 
 export type ChallengeContextType = { previewChallengeUrl: () => string };
+
+export type PreviewChallengeContextType = {
+  linkToPlayerMode: () => string;
+  linkToAdministrationMode: () => string;
+  scenarioOrExercise: PublicScenario | PublicExercise | undefined;
+};
 
 export type DocumentContextType = {
   onInitDocument: () => {
@@ -187,6 +193,19 @@ export const ArticleContext = createContext<ArticleContextType>({
 export const ChallengeContext = createContext<ChallengeContextType>({
   previewChallengeUrl(): string {
     return '';
+  },
+});
+export const PreviewChallengeContext = createContext<PreviewChallengeContextType>({
+  linkToPlayerMode(): string {
+    return '';
+  },
+  linkToAdministrationMode(): string {
+    return '';
+  },
+  scenarioOrExercise: {
+    description: '',
+    id: '',
+    name: '',
   },
 });
 export const DocumentContext = createContext<DocumentContextType>({
