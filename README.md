@@ -119,11 +119,11 @@ To improve the features and the performances of OpenBAS, the platform collects a
 usage and health.
 
 You can find all the details on collected data and associated usage in
-the [usage telemetry documentation](https://docs.openbas.io/latest/reference/usage-telemetry/).
+the [usage telemetry documentation](https://docs.openbas.io/latest/reference/deployment/telemetry/).
 
 #### OpenStreetMap server
 
-To provide OpenCTI users with cartography features, the platform uses a dedicated OpenStreetMap
+To provide OpenBAS users with cartography features, the platform uses a dedicated OpenStreetMap
 server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this
 server (including IP addresses).
 
