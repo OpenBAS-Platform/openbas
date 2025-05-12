@@ -290,6 +290,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           fontSize: 9,
         },
       })));
+      // target results are currently one of two modes:
+      // either only present the results native to the specific expectation (legacy behaviour)
+      // or present the aggregation of all results (= "merged") across all expectations belonging to the same
+      // target in paginated tabs (new behaviour)
+      // TODO: drop this switch when we drop the "All targets" tab for inject targets
       if (!target.mergedExpectations) {
         fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId).then(
           (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),

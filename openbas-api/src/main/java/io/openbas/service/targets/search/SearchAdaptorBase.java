@@ -40,7 +40,10 @@ public abstract class SearchAdaptorBase {
       }
     }
 
-    // avoid double adding this filter if it's already in the collection
+    // the POST payload might or might not have a caller-defined "target_injects" filter
+    // this filter is useful for some (not all) target entity types and is added
+    // dynamically here when missing to enable scoping the search on a specific inject.
+    // Also avoid double adding this filter if it's already in the collection
     if (fieldTranslations.containsKey("target_injects")
         && newFilters.stream()
             .noneMatch(filter -> filter.getKey().equals(fieldTranslations.get("target_injects")))) {
