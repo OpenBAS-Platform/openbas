@@ -132,7 +132,8 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
               assetGroupFilter.getOperator());
       case not_empty ->
           new AssetGroupSplit(allTargetAssetGroups, List.of(), assetGroupFilter.getOperator());
-      case empty -> new AssetGroupSplit(List.of(), allTargetAssetGroups, null);
+      case empty ->
+          new AssetGroupSplit(List.of(), allTargetAssetGroups, assetGroupFilter.getOperator());
       case not_contains ->
           new AssetGroupSplit(
               allTargetAssetGroups.stream()

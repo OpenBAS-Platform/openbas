@@ -455,20 +455,25 @@ public class InjectTargetSearchTest extends IntegrationTest {
       ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
       EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
 
-      // create a new endpoint that is not part of the above groups
+      // create a new endpoint that is both part of the above groups and also will be targeted
+      // explicitly
       Endpoint ep3 = EndpointFixture.createEndpoint();
-      ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
-      endpointComposer.forEndpoint(ep3).persist();
+      EndpointComposer.Composer ep3Wrapper = endpointComposer.forEndpoint(ep3).persist();
+
+      // create a new endpoint that is not part of the above groups
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(notTarget).persist();
 
       assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
-      injectWrapper.withEndpoint(ep2Wrapper);
+      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep3Wrapper);
       Inject inject = injectWrapper.persist().get();
 
       entityManager.flush();
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleFilter("target_asset_groups", "", Filters.FilterOperator.empty);
+          PaginationFixture.simpleFilter("target_asset_groups", null, Filters.FilterOperator.empty);
 
       String response =
           mvc.perform(

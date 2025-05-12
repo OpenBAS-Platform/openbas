@@ -16,7 +16,7 @@ public class PaginationFixture {
       String key, String value, Filters.FilterOperator operator) {
     Filters.Filter filter = new Filters.Filter();
     filter.setKey(key);
-    filter.setValues(List.of(value));
+    filter.setValues(value == null ? List.of() : List.of(value));
     filter.setOperator(operator);
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.and);
