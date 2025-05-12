@@ -177,7 +177,6 @@ public class InjectsExecutionJob implements Job {
    *
    * @param exerciseId the id of the exercise
    * @param inject the inject to check
-   * @return an optional of list of error message
    */
   private void checkErrorMessagesPreExecution(String exerciseId, Inject inject)
       throws ErrorMessagesPreExecutionException {
@@ -303,14 +302,32 @@ public class InjectsExecutionJob implements Job {
       handleAutoStartExercises();
       // Get all injects to execute grouped by exercise.
       List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+
       Map<String, List<ExecutableInject>> byExercises =
           injects.stream()
+              .filter(
+                  executableInject ->
+                      executableInject.getInjection().getInject().getDependsOn() == null
+                          || !intersect(
+                              injects.stream()
+                                  .map(execInject -> execInject.getInjection().getId())
+                                  .toList(),
+                              executableInject.getInjection().getInject().getDependsOn().stream()
+                                  .map(
+                                      injectDependency ->
+                                          injectDependency
+                                              .getCompositeId()
+                                              .getInjectParent()
+                                              .getInject()
+                                              .getId())
+                                  .toList()))
               .collect(
                   groupingBy(
                       ex ->
                           ex.getInjection().getExercise() == null
                               ? "atomic"
                               : ex.getInjection().getExercise().getId()));
+
       // Execute injects in parallel for each exercise.
       byExercises.entrySet().parallelStream()
           .forEach(
@@ -339,5 +356,13 @@ public class InjectsExecutionJob implements Job {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       throw new JobExecutionException(e);
     }
+  }
+
+  private boolean intersect(List<String> firstList, List<String> secondList) {
+    return !firstList.stream()
+        .distinct()
+        .filter(secondList::contains)
+        .collect(Collectors.toSet())
+        .isEmpty();
   }
 }
