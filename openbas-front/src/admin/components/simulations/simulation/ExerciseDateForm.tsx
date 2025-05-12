@@ -132,6 +132,7 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
                   fullWidth: true,
                   error: !!fieldState.error,
                   helperText: fieldState.error?.message,
+                  variant: 'standard',
                 },
               }}
             />
@@ -158,6 +159,7 @@ const ExerciseDateForm: FunctionComponent<Props> = ({
                   fullWidth: true,
                   error: !!fieldState.error,
                   helperText: fieldState.error?.message,
+                  variant: 'standard',
                 },
               }}
             />
