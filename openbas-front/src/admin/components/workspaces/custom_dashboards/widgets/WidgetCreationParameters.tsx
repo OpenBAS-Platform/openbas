@@ -196,6 +196,7 @@ const WidgetCreationParameters: FunctionComponent<{
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,
+                    variant: 'standard',
                   },
                 }}
               />
@@ -216,6 +217,7 @@ const WidgetCreationParameters: FunctionComponent<{
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,
+                    variant: 'standard',
                   },
                 }}
               />
