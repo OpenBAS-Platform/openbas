@@ -21,7 +21,7 @@ public class OpenCTIConfig {
     return (apiUrl != null && !apiUrl.isBlank()) ? apiUrl : url + "/graphql";
   }
 
-  public String getPublicUrl() {
+  public String getUrl() {
     return url;
   }
 }
