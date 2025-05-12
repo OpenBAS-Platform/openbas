@@ -571,6 +571,68 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
     @Test
     @DisplayName(
+        "When endpoints are explicitly targeted, 'not empty' Asset group filter should only return those that are in any group'")
+    public void whenEndpointsAreExplicitlyTargeted_thenReturnOnlyEndpointsWithGroup()
+        throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      EndpointComposer.Composer ep1Wrapper =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+      // create a new endpoint that is not part of the above groups
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(notTarget).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      injectWrapper.withEndpoint(ep2Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter(
+              "target_asset_groups", null, Filters.FilterOperator.not_empty);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      EndpointTarget expectedTarget =
+          new EndpointTarget(
+              ep1Wrapper.get().getId(),
+              ep1Wrapper.get().getName(),
+              ep1Wrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+              ep1Wrapper.get().getPlatform().name());
+      List<EndpointTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
         "When are part of a group, 'not contains' operator on this group should exclude endpoint")
     public void whenArePartOfAGroupAndGroupFilteredOut_thenExcludeAllEndpointsOfGroup()
         throws Exception {
