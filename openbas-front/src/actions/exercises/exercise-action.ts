@@ -71,10 +71,10 @@ export const dryImportXlsForExercise = (exerciseId: Exercise['exercise_id'], imp
 
 // -- OPTION --
 
-export const searchExerciseLinkedToFindingsAsOption = (searchText: string = '', scenarioId: string = '') => {
+export const searchExerciseLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
   const params = {
     searchText,
-    scenarioId,
+    sourceId,
   };
   return simpleCall(`${EXERCISE_URI}/findings/options`, { params });
 };

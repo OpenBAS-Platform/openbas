@@ -195,7 +195,7 @@ const Dashboard = () => {
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} isReducedView />}
+            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
         </Paper>
       </GridLegacy>
       <GridLegacy item={true} xs={6}>

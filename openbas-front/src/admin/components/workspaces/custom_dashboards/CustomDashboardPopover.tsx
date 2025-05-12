@@ -10,11 +10,12 @@ import CustomDashboardForm from './CustomDashboardForm';
 
 interface Props {
   customDashboard: CustomDashboard;
-  onUpdate: (result: CustomDashboard) => void;
-  onDelete: (result: string) => void;
+  onUpdate?: (result: CustomDashboard) => void;
+  onDelete?: (result: string) => void;
+  inList?: boolean;
 }
 
-const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onUpdate, onDelete }) => {
+const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onUpdate, onDelete, inList = false }) => {
   // Standard hooks
   const { t } = useFormatter();
 
@@ -31,7 +32,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
       try {
         const response = await updateCustomDashboard(customDashboard.custom_dashboard_id, data);
         if (response.data) {
-          onUpdate(response.data);
+          onUpdate?.(response.data);
         }
       } finally {
         toggleModal(null);
@@ -43,7 +44,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
   const submitDelete = useCallback(async () => {
     try {
       await deleteCustomDashboard(customDashboard.custom_dashboard_id);
-      onDelete(customDashboard.custom_dashboard_id);
+      onDelete?.(customDashboard.custom_dashboard_id);
     } finally {
       toggleModal(null);
     }
@@ -62,7 +63,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
 
   return (
     <>
-      <ButtonPopover entries={entries} variant="icon" />
+      <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
       <Drawer
         open={modal === 'edit'}
         handleClose={() => toggleModal(null)}

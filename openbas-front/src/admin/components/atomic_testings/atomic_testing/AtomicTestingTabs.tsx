@@ -1,5 +1,4 @@
-import { Box, Tab, Tabs } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Tab, Tabs } from '@mui/material';
 import { Link, useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -21,7 +20,6 @@ const openbasNmap = 'openbas_nmap';
 
 const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   const { classes } = useStyles();
-  const theme = useTheme();
   const { t } = useFormatter();
   const location = useLocation();
 
@@ -31,43 +29,41 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   }
 
   return (
-    <Box mt={theme.spacing(2)}>
-      <Tabs value={tabValue}>
+    <Tabs value={tabValue}>
+      <Tab
+        component={Link}
+        to={`/admin/atomic_testings/${injectResultOverview.inject_id}`}
+        value={`/admin/atomic_testings/${injectResultOverview.inject_id}`}
+        label={t('Overview')}
+        className={classes.item}
+      />
+      {(injectResultOverview.inject_injector_contract?.injector_contract_payload
+        || injectResultOverview.inject_type === openbasNmap) && (
         <Tab
           component={Link}
-          to={`/admin/atomic_testings/${injectResultOverview.inject_id}`}
-          value={`/admin/atomic_testings/${injectResultOverview.inject_id}`}
-          label={t('Overview')}
+          to={`/admin/atomic_testings/${injectResultOverview.inject_id}/findings`}
+          value={`/admin/atomic_testings/${injectResultOverview.inject_id}/findings`}
+          label={t('Findings')}
           className={classes.item}
         />
-        {(injectResultOverview.inject_injector_contract?.injector_contract_payload
-          || injectResultOverview.inject_type === openbasNmap) && (
-          <Tab
-            component={Link}
-            to={`/admin/atomic_testings/${injectResultOverview.inject_id}/findings`}
-            value={`/admin/atomic_testings/${injectResultOverview.inject_id}/findings`}
-            label={t('Findings')}
-            className={classes.item}
-          />
-        )}
+      )}
+      <Tab
+        component={Link}
+        to={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
+        value={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
+        label={t('Inject Execution details')}
+        className={classes.item}
+      />
+      {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
         <Tab
           component={Link}
-          to={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
-          value={`/admin/atomic_testings/${injectResultOverview.inject_id}/detail`}
-          label={t('Inject Execution details')}
+          to={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
+          value={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
+          label={t('Payload info')}
           className={classes.item}
         />
-        {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
-          <Tab
-            component={Link}
-            to={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
-            value={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
-            label={t('Payload info')}
-            className={classes.item}
-          />
-        )}
-      </Tabs>
-    </Box>
+      )}
+    </Tabs>
   );
 };
 export default AtomicTestingTabs;

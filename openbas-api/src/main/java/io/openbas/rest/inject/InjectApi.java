@@ -40,6 +40,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -389,8 +390,9 @@ public class InjectApi extends RestBehavior {
   @GetMapping(INJECT_URI + "/findings/options")
   public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return injectService.getOptionsByNameLinkedToFindings(searchText, simulationOrScenarioId);
+      @RequestParam(required = false) final String sourceId) {
+    return injectService.getOptionsByNameLinkedToFindings(
+        searchText, sourceId, PageRequest.of(0, 50));
   }
 
   @PostMapping(INJECT_URI + "/options")

@@ -43,7 +43,22 @@
       "matchPackageNames": [
         "react-apexcharts"
       ],
-      "commitMessagePrefix": "[DANGER]"
+      "commitMessagePrefix": "[DANGER]",
+      "commitMessageSuffix": "(react-apexcharts has a yarn patch)"
+    },
+    {
+      "matchPackageNames": [
+        "cronstrue"
+      ],
+      "commitMessagePrefix": "[DANGER]",
+      "commitMessageSuffix": "(cronstrue will remove a functionality we use on a future release https://github.com/bradymholt/cRonstrue/pull/336)"
+    },
+    {
+      "matchPackageNames": [
+        "swagger-typescript-api"
+      ],
+      "commitMessagePrefix": "[DANGER]",
+      "commitMessageSuffix": "(swagger-typescript-api new version does not work on linux)"
     },
     {
       "matchJsonata": ["$exists(isVulnerabilityAlert)"],

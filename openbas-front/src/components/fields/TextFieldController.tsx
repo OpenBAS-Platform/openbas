@@ -1,4 +1,8 @@
-import { InputAdornment, TextField, type TextFieldVariants } from '@mui/material';
+import {
+  InputAdornment,
+  TextField,
+  type TextFieldVariants,
+} from '@mui/material';
 import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -14,12 +18,26 @@ interface Props {
   variant?: TextFieldVariants;
   placeholder?: string;
   size?: 'medium' | 'small';
-  adornmentLabel?: string;
+  endAdornmentLabel?: string;
+  startAdornmentLabel?: string;
 }
 
 const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
 
-const TextFieldController = ({ name, label, multiline, rows, disabled, required, style = {}, size, variant, placeholder = '', adornmentLabel }: Props) => {
+const TextFieldController = ({
+  name,
+  label,
+  multiline,
+  rows,
+  disabled,
+  required,
+  style = {},
+  size,
+  variant,
+  placeholder = '',
+  endAdornmentLabel,
+  startAdornmentLabel,
+}: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
 
@@ -44,7 +62,28 @@ const TextFieldController = ({ name, label, multiline, rows, disabled, required,
           style={style}
           variant={variant || 'standard'}
           size={size || 'medium'}
-          slotProps={adornmentLabel ? { input: { endAdornment: <InputAdornment position="end">{adornmentLabel}</InputAdornment> } } : {}}
+          slotProps={{
+            input: {
+              ...(endAdornmentLabel
+                ? {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {endAdornmentLabel}
+                      </InputAdornment>
+                    ),
+                  }
+                : {}),
+              ...(startAdornmentLabel
+                ? {
+                    startAdornment: (
+                      <InputAdornment sx={{ alignSelf: 'flex-start' }} position="start">
+                        {startAdornmentLabel}
+                      </InputAdornment>
+                    ),
+                  }
+                : {}),
+            },
+          }}
         />
       )}
     />

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -265,16 +266,30 @@ public interface InjectRepository
       @Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
 
   @Query(
-      "SELECT i FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " WHERE (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
-  Set<Inject> findAllByTitleLinkedToFindings(String title);
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS label, i.inject_created_at
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByTitleLinkedToFindings(@Param("title") String title, Pageable pageable);
 
   @Query(
-      "SELECT i FROM Inject i"
-          + " INNER JOIN i.findings f"
-          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
-          + " AND (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
-  Set<Inject> findAllByTitleLinkedToFindingsWithContext(
-      String simulationOrScenarioId, String title);
+      value =
+          """
+    SELECT DISTINCT i.inject_id AS id, i.inject_title AS label, i.inject_created_at
+    FROM injects i
+    INNER JOIN findings f ON f.finding_inject_id = i.inject_id
+    LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+    LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+    WHERE (i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
+      AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      ORDER BY i.inject_created_at DESC;
+    """,
+      nativeQuery = true)
+  List<Object[]> findAllByTitleLinkedToFindingsWithContext(
+      @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
 }

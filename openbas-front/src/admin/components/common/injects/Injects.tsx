@@ -712,7 +712,8 @@ const Injects: FunctionComponent<Props> = ({
                 handleClose={() => setOpenCreateDrawer(false)}
                 onCreateInject={onCreateInject}
                 presetInjectDuration={presetInjectDuration}
-                // @ts-expect-error typing
+                // TODO remove useless props after InjectDefinition refacto
+                // @ts-expect-error waiting for InjectDefinition refacto
                 teamsFromExerciseOrScenario={teams}
                 articlesFromExerciseOrScenario={articles}
                 variablesFromExerciseOrScenario={variables}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { searchAssetGroupAsOption, searchAssetGroupLinkedToFindingsAsOption } from '../../../../actions/asset_groups/assetgroup-action';
-import { searchEndpointAsOption } from '../../../../actions/assets/endpoint-actions';
+import { searchEndpointAsOption, searchEndpointLinkedToFindingsAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 import { searchExerciseLinkedToFindingsAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
@@ -77,6 +77,10 @@ const useSearchOptions = () => {
         });
         break;
       case 'finding_assets':
+        searchEndpointLinkedToFindingsAsOption(search, contextId).then((response) => {
+          setOptions(response.data);
+        });
+        break;
       case 'inject_assets':
         searchEndpointAsOption(search, contextId).then((response) => {
           setOptions(response.data);

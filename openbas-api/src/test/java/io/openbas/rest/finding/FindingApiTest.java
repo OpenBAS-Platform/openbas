@@ -59,7 +59,25 @@ class FindingApiTest extends IntegrationTest {
 
   @BeforeEach
   void setup() {
-    injectComposer1 = injectComposer.forInject(InjectFixture.getDefaultInject());
+    endpointComposer1 = endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+
+    savedEndpoint =
+        endpointComposer1
+            .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
+            .persist()
+            .get();
+
+    AssetGroupComposer.Composer assetGroupComposer =
+        this.assetGroupComposer
+            .forAssetGroup(AssetGroupFixture.createDefaultAssetGroup("asset-group"))
+            .withAsset(endpointComposer1);
+
+    savedAssetGroup = assetGroupComposer.persist().get();
+
+    injectComposer1 =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withAssetGroup(assetGroupComposer);
 
     simulationComposer1 =
         simulationComposer
@@ -74,21 +92,6 @@ class FindingApiTest extends IntegrationTest {
             .get();
 
     savedSimulation = savedScenario.getExercises().getFirst();
-
-    endpointComposer1 = endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
-
-    savedEndpoint =
-        endpointComposer1
-            .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
-            .persist()
-            .get();
-
-    savedAssetGroup =
-        assetGroupComposer
-            .forAssetGroup(AssetGroupFixture.createDefaultAssetGroup("asset-group"))
-            .withAsset(endpointComposer1)
-            .persist()
-            .get();
   }
 
   @DisplayName("Search global findings")

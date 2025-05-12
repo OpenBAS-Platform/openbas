@@ -263,18 +263,6 @@ const AtomicTesting = () => {
         <Typography variant="h4" gutterBottom style={{ float: 'left' }} sx={{ mb: theme.spacing(1) }}>
           {t('Targets')}
         </Typography>
-        <div style={{
-          float: 'right',
-          marginTop: -15,
-        }}
-        >
-          <SearchFilter
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-            placeholder={t('Search by target name')}
-            variant="thin"
-          />
-        </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
           {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && (

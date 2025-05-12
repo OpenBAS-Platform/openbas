@@ -72,7 +72,7 @@ const SystemBanners = (settings: { settings: PlatformSettings }) => {
 
         return (
           <div key={key} className={topBannerClasses}>
-            {bannerLevel[key].map((message) => {
+            {bannerLevel[key].map((message: string) => {
               return (
                 <div key={`${key}.${message}`} className={classes.container}>
                   <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />

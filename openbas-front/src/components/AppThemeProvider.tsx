@@ -4,7 +4,7 @@ import { type FunctionComponent, type ReactNode, useEffect, useState } from 'rea
 
 import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
-import { type PlatformSettings } from '../utils/api-types';
+import { type PlatformSettings, type User } from '../utils/api-types';
 import { useFormatter } from './i18n';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
@@ -23,29 +23,28 @@ const localeMap = {
 const AppThemeProvider: FunctionComponent<Props> = ({ children }) => {
   const [muiLocale, setMuiLocale] = useState<Localization>(enUS);
   const { locale } = useFormatter();
-  const { theme, dark, light }: {
-    theme: string;
-    dark: PlatformSettings['platform_dark_theme'];
-    light: PlatformSettings['platform_light_theme'];
-  } = useHelper((helper: LoggedHelper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const rawPlatformTheme = settings.platform_theme ?? 'auto';
-    const rawUserTheme = me?.user_theme ?? 'default';
-    return {
-      theme: rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme,
-      dark: settings.platform_dark_theme,
-      light: settings.platform_light_theme,
-    };
-  });
+  const [theme, setTheme] = useState('dark');
+  const { me, settings }: {
+    me: User;
+    settings: PlatformSettings;
+  } = useHelper((helper: LoggedHelper) => ({
+    me: helper.getMe(),
+    settings: helper.getPlatformSettings(),
+  }));
+
   useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-  });
+    const rawPlatformTheme = settings.platform_theme ?? 'dark';
+    const rawUserTheme = me?.user_theme ?? 'default';
+    const themeToSet = rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme;
+    document.body.setAttribute('data-theme', themeToSet);
+    setTheme(themeToSet);
+  }, [settings, me]);
 
   useEffect(() => {
     setMuiLocale(localeMap[locale as keyof typeof localeMap]);
   }, [locale]);
 
+  const dark = settings.platform_dark_theme;
   let muiTheme = createTheme(
     {
       spacing: scaleFactor,
@@ -63,6 +62,7 @@ const AppThemeProvider: FunctionComponent<Props> = ({ children }) => {
     muiLocale,
   );
   if (theme === 'light') {
+    const light = settings.platform_light_theme;
     muiTheme = createTheme(
       {
         spacing: scaleFactor,

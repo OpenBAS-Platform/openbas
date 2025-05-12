@@ -45,21 +45,28 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
   });
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 350px',
-      gap: theme.spacing(2),
-      alignItems: 'start',
-      marginBottom: theme.spacing(2),
-    }}
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: 'divider',
+        marginBottom: 2,
+      }}
     >
-      <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
-        <Breadcrumbs variant="object" elements={breadcrumbs} />
-        <AtomicTestingTitle injectResultOverview={injectResultOverview} />
-        <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
-      </Box>
-      <ResponsePie expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
-    </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr auto',
+        gap: theme.spacing(2),
+        alignItems: 'start',
+      }}
+      >
+        <Box display="flex" flexDirection="column" justifyContent="left" alignItems="flex-start">
+          <Breadcrumbs variant="object" elements={breadcrumbs} />
+          <AtomicTestingTitle injectResultOverview={injectResultOverview} />
+          <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
+        </Box>
+        <ResponsePie hasTitles={false} forceSize={112} expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+      </div>
+    </Box>
   );
 };
 

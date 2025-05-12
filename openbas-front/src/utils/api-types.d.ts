@@ -242,7 +242,7 @@ export interface AtomicTestingInput {
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_title?: string;
+  inject_title: string;
 }
 
 export interface AtomicTestingUpdateTagsInput {
@@ -294,6 +294,18 @@ export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
 
+interface BaseHistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: string;
+  stacked?: boolean;
+  title?: string;
+}
+
+type BaseHistogramWidgetModeMapping<Key, Type> = {
+  mode: Key;
+} & Type;
+
 interface BaseInjectTarget {
   target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
@@ -329,7 +341,7 @@ interface BasePayload {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -339,6 +351,36 @@ interface BasePayload {
   payload_updated_at: string;
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
+
+interface BasePayloadCreateInput {
+  command_content?: string | null;
+  command_executor?: string | null;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
+  payload_description?: string;
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  payload_tags?: string[];
+  payload_type: string;
+}
+
+type BasePayloadCreateInputPayloadTypeMapping<Key, Type> = {
+  payload_type: Key;
+} & Type;
 
 type BasePayloadPayloadTypeMapping<Key, Type> = {
   payload_type: Key;
@@ -581,7 +623,7 @@ export interface Command {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -744,7 +786,7 @@ export interface DateHistogramSeries {
 
 export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   end: string;
-  interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
   start: string;
 };
@@ -777,7 +819,7 @@ export interface DnsResolution {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -1011,7 +1053,7 @@ export interface Executable {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -1283,7 +1325,7 @@ export interface ExportOptionsInput {
 }
 
 export interface FileDrop {
-  file_drop_file?: string;
+  file_drop_file: string;
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
@@ -1301,7 +1343,7 @@ export interface FileDrop {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -1480,13 +1522,11 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
-export interface HistogramWidget {
-  display_legend?: boolean;
-  field: string;
-  mode: "structural" | "temporal";
-  stacked?: boolean;
-  title?: string;
-}
+export type HistogramWidget = BaseHistogramWidget &
+  (
+    | BaseHistogramWidgetModeMapping<"temporal", DateHistogramWidget>
+    | BaseHistogramWidgetModeMapping<"structural", StructuralHistogramWidget>
+  );
 
 export interface ImportMapper {
   /** @format date-time */
@@ -1837,7 +1877,7 @@ export interface InjectInput {
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_title?: string;
+  inject_title: string;
 }
 
 export interface InjectOutput {
@@ -2535,7 +2575,7 @@ export interface NetworkTraffic {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
@@ -3195,31 +3235,14 @@ export interface PayloadCommandBlock {
   payload_cleanup_command?: string[];
 }
 
-export interface PayloadCreateInput {
-  command_content?: string | null;
-  command_executor?: string | null;
-  dns_resolution_hostname?: string;
-  executable_file?: string;
-  file_drop_file?: string;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: string[];
-  payload_cleanup_command?: string | null;
-  payload_cleanup_executor?: string | null;
-  payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  payload_name: string;
-  /**
-   * Set of output parsers
-   * @uniqueItems true
-   */
-  payload_output_parsers?: OutputParserInput[];
-  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-  payload_tags?: string[];
-  payload_type: string;
-}
+export type PayloadCreateInput = BasePayloadCreateInput &
+  (
+    | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
+    | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
+    | BasePayloadCreateInputPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
+    | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
+  );
 
 export interface PayloadPrerequisite {
   check_command?: string;
@@ -3245,7 +3268,7 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
    * Set of output parsers
@@ -4005,7 +4028,7 @@ export interface StructuralHistogramSeries {
   name?: string;
 }
 
-export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+export type StructuralHistogramWidget = UtilRequiredKeys<BaseHistogramWidget, "mode" | "field"> & {
   series: StructuralHistogramSeries[];
 };
 

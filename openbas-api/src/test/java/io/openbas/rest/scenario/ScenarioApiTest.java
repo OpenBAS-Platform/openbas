@@ -337,6 +337,7 @@ public class ScenarioApiTest extends IntegrationTest {
           .persist();
 
       InjectInput input = new InjectInput();
+      input.setTitle(scenario.getInjects().getFirst().getTitle());
       input.setAssetGroups(List.of(dynamicAssetGroupSaved.getId()));
 
       mvc.perform(

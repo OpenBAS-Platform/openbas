@@ -1,8 +1,12 @@
 package io.openbas.engine.api;
 
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,6 +14,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(
+    discriminatorProperty = "mode",
+    oneOf = {
+      DateHistogramWidget.class,
+      StructuralHistogramWidget.class,
+    },
+    discriminatorMapping = {
+      @DiscriminatorMapping(
+          value = DateHistogramWidget.TEMPORAL_MODE,
+          schema = DateHistogramWidget.class),
+      @DiscriminatorMapping(
+          value = StructuralHistogramWidget.STRUCTURAL_MODE,
+          schema = StructuralHistogramWidget.class),
+    })
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -21,20 +39,10 @@ import lombok.Setter;
 })
 public abstract class HistogramWidget {
 
-  public enum HistogramConfigMode {
-    @JsonProperty("structural")
-    STRUCTURAL("structural"),
-    @JsonProperty("temporal")
-    TEMPORAL("temporal");
+  @Setter(NONE)
+  @NotNull
+  private final String mode;
 
-    public final String mode;
-
-    HistogramConfigMode(@NotNull final String mode) {
-      this.mode = mode;
-    }
-  }
-
-  @NotNull private final HistogramConfigMode mode;
   private String title;
   @NotBlank private String field;
   private boolean stacked;
@@ -42,7 +50,7 @@ public abstract class HistogramWidget {
   @JsonProperty("display_legend")
   private boolean displayLegend;
 
-  HistogramWidget(HistogramConfigMode mode) {
+  HistogramWidget(String mode) {
     this.mode = mode;
   }
 }

@@ -1,4 +1,4 @@
-import { List, Paper, Tooltip, Typography } from '@mui/material';
+import { List, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -11,12 +11,11 @@ import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
+import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
-import {
-  type EndpointOverviewOutput as EndpointType, type FindingOutput,
-  type SearchPaginationInput, type TargetSimple,
-} from '../../../../../utils/api-types';
+import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
+import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
 
@@ -52,13 +51,13 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_inject?.inject_title}><span>{finding.finding_inject?.inject_title}</span></Tooltip>,
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_asset_groups',
@@ -150,10 +149,10 @@ const Endpoint = () => {
           searchFindings={search}
           additionalHeaders={additionalHeaders}
           additionalFilterNames={additionalFilterNames}
+          contextId={endpointId}
         />
       </Paper>
     </div>
   );
 };
-
 export default Endpoint;

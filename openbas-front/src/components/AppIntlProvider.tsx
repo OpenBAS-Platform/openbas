@@ -3,7 +3,7 @@ import 'cronstrue/locales/en';
 import 'cronstrue/locales/zh_CN';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { enUS as dateFnsEnUSLocale, fr as dateFnsFrLocale, zhCN as dateFnsZhCNLocale } from 'date-fns/locale';
 import moment from 'moment';
 import { type FunctionComponent, type ReactElement, useEffect } from 'react';

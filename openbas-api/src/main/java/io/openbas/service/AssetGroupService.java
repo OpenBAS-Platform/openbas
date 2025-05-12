@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -178,20 +179,22 @@ public class AssetGroupService {
   }
 
   public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
-      String searchText, String simulationOrScenarioId) {
+      String searchText, String sourceId, Pageable pageable) {
     String trimmedSearchText = StringUtils.trimToNull(searchText);
-    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
+    String trimmedSourceId = StringUtils.trimToNull(sourceId);
 
-    Set<AssetGroup> results;
+    List<Object[]> results;
 
-    if (trimmedSimulationOrScenarioId == null) {
-      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+    if (trimmedSourceId == null) {
+      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText, pageable);
     } else {
       results =
           assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
-              trimmedSimulationOrScenarioId, trimmedSearchText);
+              trimmedSourceId, trimmedSearchText, pageable);
     }
 
-    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList();
+    return results.stream()
+        .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
+        .toList();
   }
 }

@@ -92,7 +92,6 @@ const MarkdownDisplay: FunctionComponent<
   const markdownElement = () => {
     return (
       <Markdown
-        className="markdown"
         disallowedElements={disallowedElements}
         unwrapDisallowed={true}
       >
@@ -104,7 +103,6 @@ const MarkdownDisplay: FunctionComponent<
     if (remarkPlugins) {
       return (
         <Markdown
-          className="markdown"
           remarkPlugins={remarkPlugins}
           disallowedElements={disallowedElements}
           unwrapDisallowed={true}
@@ -116,7 +114,6 @@ const MarkdownDisplay: FunctionComponent<
     if (markdownComponents) {
       return (
         <Markdown
-          className="markdown"
           remarkPlugins={
             [
               remarkGfm,
@@ -134,7 +131,6 @@ const MarkdownDisplay: FunctionComponent<
     }
     return (
       <Markdown
-        className="markdown"
         remarkPlugins={
           [
             remarkGfm,

@@ -92,10 +92,10 @@ export const searchTargetOptionsById = (targetType: string, ids: string[]) => {
 
 // -- OPTION --
 
-export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
+export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', sourceId: string = '') => {
   const params = {
     searchText,
-    simulationOrScenarioId,
+    sourceId,
   };
   return simpleCall(`${INJECT_URI}/findings/options`, { params });
 };

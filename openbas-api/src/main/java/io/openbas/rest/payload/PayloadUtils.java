@@ -100,9 +100,8 @@ public class PayloadUtils {
       payloadCreateInput.setCleanupCommand(payloadNode.get("payload_cleanup_command").textValue());
     }
 
-    // TODO: tag & attack pattern
+    // TODO: tag
     payloadCreateInput.setTagIds(new ArrayList<>());
-    payloadCreateInput.setAttackPatternsIds(new ArrayList<>());
     return payloadCreateInput;
   }
 

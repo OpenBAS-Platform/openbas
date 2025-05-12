@@ -2,6 +2,7 @@ import { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { FORM_ERROR } from 'final-form';
 import { type Schema } from 'normalizr';
 import * as R from 'ramda';
+import { type ErrorInfo } from 'react';
 import { createIntl, createIntlCache } from 'react-intl';
 import { type Dispatch } from 'redux';
 
@@ -242,4 +243,16 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
       notifyErrorHandler(error);
       throw error;
     });
+};
+
+const OPENBAS_FRONTEND = '[OPENBAS-FRONTEND]';
+
+export const sendErrorToBackend = async (error: Error, stack: ErrorInfo) => {
+  const errorDetails = {
+    message: OPENBAS_FRONTEND + error.message,
+    stack: stack.componentStack,
+    timestamp: new Date().toISOString(),
+    level: 'SEVERE',
+  };
+  simplePostCall('/api/logs', errorDetails);
 };
