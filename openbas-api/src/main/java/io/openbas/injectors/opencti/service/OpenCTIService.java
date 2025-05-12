@@ -34,7 +34,7 @@ public class OpenCTIService {
       throws Exception {
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       // Prepare the query
-      HttpPost httpPost = new HttpPost(config.getUrl());
+      HttpPost httpPost = new HttpPost(config.getApiUrl());
       httpPost.addHeader("Authorization", "Bearer " + config.getToken());
       httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
       httpPost.addHeader("Accept", "application/json");
@@ -63,7 +63,7 @@ public class OpenCTIService {
           });
     } catch (IOException e) {
       throw new ClientProtocolException(
-          "Unexpected response for request on: " + config.getUrl(), e);
+          "Unexpected response for request on: " + config.getApiUrl(), e);
     }
   }
 
@@ -72,7 +72,7 @@ public class OpenCTIService {
       throws Exception {
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       // Prepare the query
-      HttpPost httpPost = new HttpPost(config.getUrl());
+      HttpPost httpPost = new HttpPost(config.getApiUrl());
       httpPost.addHeader("Authorization", "Bearer " + config.getToken());
       httpPost.addHeader("Content-Type", "application/json; charset=utf-8");
       httpPost.addHeader("Accept", "application/json");
@@ -102,7 +102,7 @@ public class OpenCTIService {
           });
     } catch (IOException e) {
       throw new ClientProtocolException(
-          "Unexpected response for request on: " + config.getUrl(), e);
+          "Unexpected response for request on: " + config.getApiUrl(), e);
     }
   }
 }
