@@ -20,22 +20,14 @@ const useStyles = makeStyles()(theme => ({
   bodyItem: { fontSize: theme.typography.h3.fontSize },
 }));
 
-interface Props {
-  allTeamsEnabledUsers?: number;
-  allTeamsUsersNumber?: number;
-  readOnly?: boolean;
-}
+interface Props { readOnly?: boolean }
 
-const InjectTeamsList: FunctionComponent<Props> = ({
-  allTeamsEnabledUsers,
-  allTeamsUsersNumber,
-  readOnly = false,
-}) => {
+const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
   const { control, setValue } = useFormContext();
-  const { computeTeamUsersEnabled } = useContext(TeamContext);
+  const { computeTeamUsersEnabled, allUsersNumber, allUsersEnabledNumber } = useContext(TeamContext);
 
   // -- TEAMS VALUES --
   const allTeams = useWatch({
@@ -101,19 +93,17 @@ const InjectTeamsList: FunctionComponent<Props> = ({
     <>
       <List>
         {!allTeams && teams.map((team) => {
-          const allEnabled = computeTeamUsersEnabled?.(team.team_id); // TODO do not work
-          // console.log('allEnabled', allEnabled, team);
-          return teamListItem(team, allEnabled || 0);
+          return teamListItem(team, computeTeamUsersEnabled?.(team.team_id) ?? 0);
         })}
         {allTeams && teamListItem({
           team_id: 'all',
           team_name: t('All teams'),
-          team_users_number: allTeamsUsersNumber,
+          team_users_number: allUsersNumber,
           team_tags: [],
           team_exercises: [],
           team_scenarios: [],
           team_updated_at: '',
-        }, allTeamsEnabledUsers ?? 0)}
+        }, allUsersEnabledNumber ?? 0)}
       </List>
       {!allTeams && <InjectAddTeams disabled={readOnly} handleModifyTeams={onTeamsChange} injectTeamsIds={injectTeamIds} />}
     </>

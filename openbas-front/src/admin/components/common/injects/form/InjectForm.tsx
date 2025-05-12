@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
-import { Avatar, Button } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { type ReactNode, type RefObject, useContext, useEffect, useState } from 'react';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { type RefObject, useContext, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import {
@@ -11,14 +11,47 @@ import {
   type FieldValue,
   type InjectorContractConverted,
 } from '../../../../../actions/injector_contracts/InjectorContract';
+import TagFieldController from '../../../../../components/fields/TagFieldController';
+import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type Article, type Inject, type InjectInput, type Variable } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
 import { PermissionsContext } from '../../Context';
-import InjectCardComponent from '../InjectCardComponent';
 import InjectContentForm from './InjectContentForm';
-import InjectGlobalInfosForm from './InjectGlobalInfosForm';
+
+const useStyles = makeStyles()(theme => ({
+  injectFormContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(2),
+  },
+  injectFormButtonsContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: theme.spacing(1),
+  },
+  injectContentButton: {
+    width: '100%',
+    height: theme.spacing(5),
+  },
+  triggerBox: {
+    borderRadius: 4,
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(1),
+    textWrap: 'nowrap',
+    gap: theme.spacing(3),
+  },
+  triggerBoxColor: { border: `1px solid ${theme.palette.primary.main}` },
+  triggerBoxColorDisabled: { border: `1px solid ${theme.palette.action.disabled}` },
+  triggerText: {
+    fontFamily: 'Consolas, monaco, monospace',
+    fontSize: 12,
+  },
+  triggerTextColor: { color: theme.palette.primary.main },
+  triggerTextColorDisabled: { color: theme.palette.action.disabled },
+}));
 
 type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
   inject_depends_duration_days: number;
@@ -27,10 +60,6 @@ type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
 };
 
 interface Props {
-  injectContractIcon: ReactNode | undefined;
-  injectHeaderAction: ReactNode;
-  injectHeaderTitle: string;
-  injectorContractLabel?: string;
   handleClose: () => void;
   openDetail?: boolean;
   disabled?: boolean;
@@ -40,18 +69,13 @@ interface Props {
   defaultInject: Inject | Omit<Inject, 'inject_id' | 'inject_created_at' | 'inject_updated_at'>;
   onSubmitInject: (data: InjectInput) => Promise<void>;
   injectorContractContent?: InjectorContractConverted['convertedContent'];
-  allUsersNumber: number;
-  usersNumber: number;
+  articlesFromExerciseOrScenario: Article[];
+
   uriVariable: string;
   variablesFromExerciseOrScenario: Variable[];
-  articlesFromExerciseOrScenario: Article[];
 }
 
 const InjectForm = ({
-  injectContractIcon,
-  injectHeaderAction,
-  injectHeaderTitle,
-  injectorContractLabel = '',
   handleClose,
   openDetail = false,
   disabled = false,
@@ -61,13 +85,11 @@ const InjectForm = ({
   defaultInject = {} as Inject,
   injectorContractContent,
   onSubmitInject,
-  allUsersNumber,
-  usersNumber,
+  articlesFromExerciseOrScenario,
   uriVariable,
   variablesFromExerciseOrScenario,
-  articlesFromExerciseOrScenario,
 }: Props) => {
-  const theme = useTheme();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
@@ -193,7 +215,7 @@ const InjectForm = ({
     defaultValues: defaultValues,
   });
 
-  const { handleSubmit, reset, formState: { isDirty, isSubmitting, errors } } = methods;
+  const { handleSubmit, reset, formState: { isSubmitting } } = methods;
 
   useEffect(() => {
     const initialValues = getInitialValues();
@@ -211,36 +233,27 @@ const InjectForm = ({
       <form
         id="injectForm"
         noValidate // disabled tooltip
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: theme.spacing(2),
-        }}
+        className={classes.injectFormContainer}
         onSubmit={handleSubmit(onSubmit)}
       >
-        <InjectCardComponent
-          avatar={injectContractIcon ?? (
-            <Avatar sx={{
-              width: 24,
-              height: 24,
-            }}
-            >
-              <HelpOutlined />
-            </Avatar>
-          )}
-          title={injectHeaderTitle}
-          action={injectHeaderAction}
-          content={injectorContractLabel}
-          disabled={disabled}
-        />
-        <InjectGlobalInfosForm isAtomic={isAtomic} readOnly={isSubmitting || disabled || permissions.readOnly} />
+        <TextFieldController name="inject_title" label={t('Title')} required disabled={isSubmitting || disabled || permissions.readOnly} />
+        <TextFieldController name="inject_description" label={t('Description')} multiline rows={2} disabled={isSubmitting || disabled || permissions.readOnly} />
+        <TagFieldController name="inject_tags" label={t('Tags')} disabled={isSubmitting || disabled || permissions.readOnly} />
+
+        {!isAtomic && (
+          <div className={`${classes.triggerBox} ${isSubmitting || disabled || permissions.readOnly ? classes.triggerBoxColorDisabled : classes.triggerBoxColor}`}>
+            <div className={`${classes.triggerText} ${isSubmitting || disabled || permissions.readOnly ? classes.triggerTextColorDisabled : classes.triggerTextColor}`}>{t('Trigger after')}</div>
+            <TextFieldController name="inject_depends_duration_days" label={t('Days')} type="number" />
+            <TextFieldController name="inject_depends_duration_hours" label={t('Hours')} type="number" />
+            <TextFieldController name="inject_depends_duration_minutes" label={t('Minutes')} type="number" />
+          </div>
+        )}
+
         {injectorContractContent && openDetails && (
           <InjectContentForm
             injectorContractContent={injectorContractContent}
             readOnly={isSubmitting || disabled || permissions.readOnly}
             isAtomic={isAtomic}
-            allUsersNumber={allUsersNumber}
-            allEnabledUsers={usersNumber}
             uriVariable={uriVariable}
             variables={variablesFromExerciseOrScenario}
             articles={articlesFromExerciseOrScenario}
@@ -250,35 +263,27 @@ const InjectForm = ({
           <Button
             variant="outlined"
             onClick={toggleInjectContent}
-            style={{
-              width: '100%',
-              height: theme.spacing(5),
-            }}
+            className={classes.injectContentButton}
           >
             {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
             {t('Inject content')}
           </Button>
         )}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row-reverse',
-          gap: theme.spacing(1),
-        }}
-        >
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-            disabled={isSubmitting || !isDirty || disabled || permissions.readOnly}
-          >
-            {isCreation ? t('Create') : t('Update')}
-          </Button>
+        <div className={classes.injectFormButtonsContainer}>
           <Button
             variant="contained"
             onClick={handleClose}
             disabled={isSubmitting}
           >
             {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={isSubmitting || disabled || permissions.readOnly}
+          >
+            {isCreation ? t('Create') : t('Update')}
           </Button>
         </div>
       </form>

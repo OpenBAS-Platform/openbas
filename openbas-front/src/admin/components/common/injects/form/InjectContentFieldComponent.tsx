@@ -6,7 +6,6 @@ import {
   useWatch,
 } from 'react-hook-form';
 
-import { type ContractElement } from '../../../../../actions/injector_contracts/InjectorContract';
 import RichTextField from '../../../../../components/fields/RichTextField';
 import SelectFieldController from '../../../../../components/fields/SelectFieldController';
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';

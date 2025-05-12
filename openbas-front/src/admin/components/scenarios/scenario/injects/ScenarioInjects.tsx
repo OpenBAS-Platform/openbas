@@ -42,7 +42,7 @@ const ScenarioInjects: FunctionComponent = () => {
   });
 
   const articleContext = articleContextForScenario(scenarioId);
-  const teamContext = teamContextForScenario(scenarioId, scenario.scenario_teams_users);
+  const teamContext = teamContextForScenario(scenarioId, scenario.scenario_teams_users, scenario.scenario_all_users_number, scenario.scenario_users_number);
 
   const [viewMode, setViewMode] = useState(() => {
     const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
@@ -64,10 +64,6 @@ const ScenarioInjects: FunctionComponent = () => {
             articles={articles}
             variables={variables}
             uriVariable={`/admin/scenarios/${scenarioId}/definition`}
-            allUsersNumber={scenario.scenario_all_users_number}
-            usersNumber={scenario.scenario_users_number}
-            // @ts-expect-error typing
-            teamsUsers={scenario.scenario_teams_users}
             setViewMode={handleViewMode}
             availableButtons={availableButtons}
           />

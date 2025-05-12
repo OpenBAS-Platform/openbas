@@ -6,7 +6,7 @@ import { type Scenario, type ScenarioTeamUser, type SearchPaginationInput, type 
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { type UserStore } from '../../../teams/players/Player';
 
-const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTeamsUsers: Scenario['scenario_teams_users']) => {
+const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTeamsUsers: Scenario['scenario_teams_users'], allUsersNumber = 0, allUsersEnabledNumber = 0) => {
   const dispatch = useAppDispatch();
 
   return {
@@ -24,6 +24,8 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
         team_scenarios: [scenarioId],
       }));
     },
+    allUsersEnabledNumber: allUsersEnabledNumber,
+    allUsersNumber: allUsersNumber,
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
       return (scenarioTeamsUsers ?? [])?.filter((o: ScenarioTeamUser) => o.scenario_id === scenarioId && o.team_id === teamId && userId === o.user_id).length > 0;
     },

@@ -65,7 +65,7 @@ const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
     setSortedArticles(articles);
   }, [injectArticlesIds]);
 
-  const addArticles = (ids: string[]) => setValue('inject_content.articles', [...ids, ...injectArticlesIds]);
+  const addArticles = (ids: string[]) => setValue('inject_content.articles', [...ids, ...(injectArticlesIds ?? [])]);
   const removeArticle = (articleId: string) => setValue('inject_content.articles', injectArticlesIds.filter(id => id !== articleId));
 
   return (

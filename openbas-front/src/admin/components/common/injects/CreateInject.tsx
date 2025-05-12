@@ -1,5 +1,6 @@
-import { HighlightOffOutlined, KeyboardArrowRight } from '@mui/icons-material';
+import { HelpOutlined, HighlightOffOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import {
+  Avatar,
   Chip, IconButton,
   List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip,
 } from '@mui/material';
@@ -23,16 +24,18 @@ import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import {
+  type Article,
   type AtomicTestingInput,
   type AttackPattern,
   type FilterGroup,
   type InjectInput, type InjectorContract,
   type InjectorContractOutput,
-  type KillChainPhase,
+  type KillChainPhase, type Variable,
 } from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectForm from './form/InjectForm';
+import InjectCardComponent from './InjectCardComponent';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles()(theme => ({
@@ -68,9 +71,22 @@ interface Props {
   open?: boolean;
   handleClose: () => void;
   presetInjectDuration?: number;
+  articlesFromExerciseOrScenario?: Article[];
+  uriVariable?: string;
+  variablesFromExerciseOrScenario?: Variable[];
 }
 
-const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetInjectDuration = 0, ...props }) => {
+const CreateInject: FunctionComponent<Props> = ({
+  title,
+  onCreateInject,
+  open = false,
+  handleClose,
+  isAtomic = false,
+  presetInjectDuration = 0,
+  articlesFromExerciseOrScenario = [],
+  uriVariable = '',
+  variablesFromExerciseOrScenario = [],
+}) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
@@ -224,13 +240,13 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       variant="full"
       PaperProps={{ ref: drawerRef }}
       disableEnforceFocus
-    >
-      <div style={{
+      containerStyle={{
         display: 'grid',
         gridTemplateColumns: '60% 40%',
         gap: theme.spacing(2),
       }}
-      >
+    >
+      <>
         <div>
           <PaginationComponentV2
             fetch={searchInjectorContracts}
@@ -297,46 +313,66 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
             })}
           </List>
         </div>
-        <InjectForm
-          injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
-          injectContractIcon={selectedContract ? (
-            <InjectIcon
-              type={selectedContract.injector_contract_payload_type ?? selectedContract.injector_contract_injector_type}
-              isPayload={isNotEmptyField(selectedContract?.injector_contract_payload_type)}
-            />
-          ) : undefined}
-          injectHeaderAction={(
-            <IconButton aria-label="delete" disabled={!selectedContract} onClick={() => setSelectedContract(null)}>
-              <HighlightOffOutlined />
-            </IconButton>
-          )}
-          injectHeaderTitle={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name || ''}
-          isAtomic={isAtomic}
-          disabled={!selectedContract}
-          defaultInject={{
-            inject_title: tPick(selectedContract?.injector_contract_labels),
-            inject_description: '',
-            inject_depends_duration: presetInjectDuration,
-            inject_injector_contract: {
-              injector_contract_id: selectedContract?.injector_contract_id ?? '',
-              injector_contract_arch: selectedContract?.injector_contract_arch,
-              injector_contract_platforms: selectedContract?.injector_contract_platforms,
-            } as InjectorContract,
-            inject_type: selectedContract?.injector_contract_content?.config?.type,
-            inject_teams: [],
-            inject_assets: [],
-            inject_asset_groups: [],
-            inject_documents: [],
-          }}
-          injectorContractContent={selectedContract?.injector_contract_content}
-          drawerRef={drawerRef}
-          handleClose={handleClose}
-          onSubmitInject={onCreateInject}
-          isCreation
-          {...props}
-        />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(2),
+        }}
+        >
+          <InjectCardComponent
+            avatar={selectedContract ? (
+              <InjectIcon
+                type={selectedContract.injector_contract_payload_type ?? selectedContract.injector_contract_injector_type}
+                isPayload={isNotEmptyField(selectedContract?.injector_contract_payload_type)}
+              />
+            ) : (
+              <Avatar sx={{
+                width: 24,
+                height: 24,
+              }}
+              >
+                <HelpOutlined />
+              </Avatar>
+            )}
+            title={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name || ''}
+            action={(
+              <IconButton aria-label="delete" disabled={!selectedContract} onClick={() => setSelectedContract(null)}>
+                <HighlightOffOutlined />
+              </IconButton>
+            )}
+            content={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
+          />
 
-      </div>
+          <InjectForm
+            handleClose={handleClose}
+            disabled={!selectedContract}
+            isAtomic={isAtomic}
+            isCreation
+            drawerRef={drawerRef}
+            defaultInject={{
+              inject_title: tPick(selectedContract?.injector_contract_labels),
+              inject_description: '',
+              inject_depends_duration: presetInjectDuration,
+              inject_injector_contract: {
+                injector_contract_id: selectedContract?.injector_contract_id ?? '',
+                injector_contract_arch: selectedContract?.injector_contract_arch,
+                injector_contract_platforms: selectedContract?.injector_contract_platforms,
+              } as InjectorContract,
+              inject_type: selectedContract?.injector_contract_content?.config?.type,
+              inject_teams: [],
+              inject_assets: [],
+              inject_asset_groups: [],
+              inject_documents: [],
+            }}
+            injectorContractContent={selectedContract?.injector_contract_content}
+            onSubmitInject={onCreateInject}
+            articlesFromExerciseOrScenario={articlesFromExerciseOrScenario}
+            uriVariable={uriVariable}
+            variablesFromExerciseOrScenario={variablesFromExerciseOrScenario}
+          />
+
+        </div>
+      </>
     </Drawer>
   );
 };

@@ -30,8 +30,6 @@ import InjectTeamsList from './teams/InjectTeamsList';
 interface Props {
   injectorContractContent: InjectorContractConverted['convertedContent'];
   isAtomic: boolean;
-  allUsersNumber?: number;
-  allEnabledUsers?: number;
   readOnly?: boolean;
   articles?: Article[];
   uriVariable?: string;
@@ -41,8 +39,6 @@ interface Props {
 const InjectContentForm = ({
   injectorContractContent,
   isAtomic,
-  allUsersNumber,
-  allEnabledUsers,
   readOnly,
   articles = [],
   uriVariable = '',
@@ -61,8 +57,6 @@ const InjectContentForm = ({
   // -- TEAMS --
   const renderTeams = (
     <InjectTeamsList
-      allTeamsUsersNumber={allUsersNumber}
-      allTeamsEnabledUsers={allEnabledUsers}
       readOnly={fieldsMap.get('team')?.readOnly || readOnly}
     />
   );

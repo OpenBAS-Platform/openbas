@@ -72,7 +72,7 @@ const ExerciseInjects: FunctionComponent = () => {
   });
 
   const articleContext = articleContextForExercise(exerciseId);
-  const teamContext = teamContextForExercise(exerciseId, exercise.exercise_teams_users);
+  const teamContext = teamContextForExercise(exerciseId, exercise.exercise_teams_users, exercise.exercise_all_users_number, exercise.exercise_users_number);
 
   return (
     <ViewModeContext.Provider value={viewMode}>
@@ -80,18 +80,13 @@ const ExerciseInjects: FunctionComponent = () => {
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
             <Injects
-              isExercise={true}
               exerciseOrScenarioId={exerciseId}
+              setViewMode={handleViewMode}
+              availableButtons={availableButtons}
               teams={teams}
               articles={articles}
               variables={variables}
               uriVariable={`/admin/simulations/${exerciseId}/definition`}
-              allUsersNumber={exercise.exercise_all_users_number}
-              usersNumber={exercise.exercise_users_number}
-              // @ts-expect-error typing
-              teamsUsers={exercise.exercise_teams_users}
-              setViewMode={handleViewMode}
-              availableButtons={availableButtons}
             />
           </TeamContext.Provider>
         </ArticleContext.Provider>

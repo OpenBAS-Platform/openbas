@@ -4,11 +4,15 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
+import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import { type InjectStore } from '../../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
+import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
@@ -60,17 +64,23 @@ const TimelineOverview = () => {
     exercise,
     injects,
     teams,
-  } = useHelper((helper: InjectHelper & ExercisesHelper) => {
+    articles,
+    variables,
+  } = useHelper((helper: InjectHelper & ExercisesHelper & ArticlesHelper & VariablesHelper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       teams: helper.getExerciseTeams(exerciseId),
+      articles: helper.getExerciseArticles(exerciseId),
+      variables: helper.getExerciseVariables(exerciseId),
     };
   });
 
   // Fetching Data
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
+    dispatch(fetchExerciseArticles(exerciseId));
+    dispatch(fetchVariablesForExercise(exerciseId));
     dispatch(fetchExerciseInjects(exerciseId));
   });
 
@@ -293,6 +303,9 @@ const TimelineOverview = () => {
             injectId={selectedInjectId}
             isAtomic={false}
             injects={injects}
+            articlesFromExerciseOrScenario={articles}
+            uriVariable={`/admin/simulations/${exerciseId}/definition`}
+            variablesFromExerciseOrScenario={variables}
           />
         </TeamContext.Provider>
       )}
