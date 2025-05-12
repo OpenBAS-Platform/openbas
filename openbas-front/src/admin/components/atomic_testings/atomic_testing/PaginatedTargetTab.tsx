@@ -68,7 +68,9 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
           ))}
         </List>
       ) : (
-        <Empty message={t('No target configured.')} />
+        <div>
+          <Empty message={t('No target configured.')} />
+        </div>
       )}
     </>
   );
