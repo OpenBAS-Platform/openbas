@@ -11,7 +11,8 @@ public interface RawAssetGroup {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       return objectMapper.readValue(getAsset_group_dynamic_filter(), Filters.FilterGroup.class);
-    } catch (JsonProcessingException e) {
+    } catch (JsonProcessingException | IllegalArgumentException e) {
+      // null value in filter column triggers IAE
       return null;
     }
   }
