@@ -10,6 +10,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.service.TeamService;
 import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -46,14 +47,29 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
         filteredTeams.getTotalElements());
   }
 
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
+    return scopedInject.getTeams().stream()
+        .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
+        .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
+        .toList();
+  }
+
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
+    return teamService.getTeams(ids).stream()
+        .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
+        .toList();
+  }
+
   private InjectTarget convertFromTeamOutput(TeamOutput teamOutput, Inject inject) {
     TeamTarget target =
         new TeamTarget(teamOutput.getId(), teamOutput.getName(), teamOutput.getTags());
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), "not applicable", target.getTargetType()));
+            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
+                inject.getId(), target.getId(), target.getTargetType()));
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {

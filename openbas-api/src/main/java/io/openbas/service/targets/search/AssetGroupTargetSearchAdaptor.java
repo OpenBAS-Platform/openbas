@@ -5,8 +5,10 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTarget;
 import io.openbas.rest.asset_group.AssetGroupCriteriaBuilderService;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
+import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -17,10 +19,12 @@ import org.springframework.stereotype.Component;
 public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
   private final AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService;
   private final InjectExpectationService injectExpectationService;
+  private final AssetGroupService assetGroupService;
 
   public AssetGroupTargetSearchAdaptor(
       AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService,
-      InjectExpectationService injectExpectationService) {
+      InjectExpectationService injectExpectationService,
+      AssetGroupService assetGroupService) {
     this.assetGroupCriteriaBuilderService = assetGroupCriteriaBuilderService;
     this.injectExpectationService = injectExpectationService;
 
@@ -28,6 +32,7 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
     this.fieldTranslations.put("target_name", "asset_group_name");
     this.fieldTranslations.put("target_tags", "asset_group_tags");
     this.fieldTranslations.put("target_injects", "asset_group_injects");
+    this.assetGroupService = assetGroupService;
   }
 
   @Override
@@ -42,6 +47,21 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
         filteredAssetGroups.getTotalElements());
   }
 
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
+    return scopedInject.getAssetGroups().stream()
+        .filter(ag -> ag.getName().toLowerCase().contains(textSearch.toLowerCase()))
+        .map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName()))
+        .toList();
+  }
+
+  @Override
+  public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
+    return assetGroupService.assetGroups(ids).stream()
+        .map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName()))
+        .toList();
+  }
+
   private InjectTarget convertFromAssetGroupOutput(
       AssetGroupOutput assetGroupOutput, Inject inject) {
     AssetGroupTarget target =
@@ -50,8 +70,8 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), "not applicable", target.getTargetType()));
+            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
+                inject.getId(), target.getId(), target.getTargetType()));
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {

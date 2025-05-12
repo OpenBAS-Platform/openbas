@@ -30,12 +30,14 @@ public class AssetGroupComposer extends ComposerBase<AssetGroup> {
 
     @Override
     public Composer persist() {
+      endpointComposers.forEach(EndpointComposer.Composer::persist);
       assetGroupRepository.save(assetGroup);
       return this;
     }
 
     @Override
     public Composer delete() {
+      endpointComposers.forEach(EndpointComposer.Composer::delete);
       assetGroupRepository.delete(assetGroup);
       return this;
     }

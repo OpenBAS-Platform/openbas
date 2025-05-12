@@ -974,6 +974,19 @@ export interface EndpointSimple {
   asset_name: string;
 }
 
+export interface EndpointTarget {
+  target_detection_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_execution_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_human_response_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_id: string;
+  target_name?: string;
+  target_prevention_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
+  target_subtype?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
+}
+
 export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
@@ -2009,6 +2022,7 @@ export interface InjectStatusSimple {
 export type InjectTarget = BaseInjectTarget &
   (
     | BaseInjectTargetTargetTypeMapping<"ASSETS_GROUPS", AssetGroupTarget>
+    | BaseInjectTargetTargetTypeMapping<"ASSETS", EndpointTarget>
     | BaseInjectTargetTargetTypeMapping<"TEAMS", TeamTarget>
   );
 
