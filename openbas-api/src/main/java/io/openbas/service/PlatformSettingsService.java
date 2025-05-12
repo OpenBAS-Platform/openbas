@@ -227,7 +227,7 @@ public class PlatformSettingsService {
       platformSettings.setPlatformBaseUrl(openBASConfig.getBaseUrl());
       platformSettings.setPlatformAgentUrl(openBASConfig.getBaseUrlForAgent());
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
-      platformSettings.setXtmOpenctiUrl(openCTIConfig.getPublicUrl());
+      platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
       platformSettings.setAiEnabled(aiConfig.isEnabled());
       platformSettings.setAiHasToken(StringUtils.hasText(aiConfig.getToken()));
       platformSettings.setAiType(aiConfig.getType());
