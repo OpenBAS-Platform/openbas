@@ -7,7 +7,6 @@ import { searchTargets } from '../../../../actions/injects/inject-action';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import SearchFilter from '../../../../components/SearchFilter';
 import { type InjectTarget, type InjectTargetWithResult, type SearchPaginationInput } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isFeatureEnabled } from '../../../../utils/utils';
