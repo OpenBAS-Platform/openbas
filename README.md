@@ -82,7 +82,7 @@ improvements, and how to build and test your changes to OpenBAS.
 ### Beginner friendly issues
 
 To help you get you familiar with our contribution process, we have a list
-of [beginner friendly issues](https://github.com/OpenBAS-Platform/openbas/labels/beginner%20friendly%20issue) which are
+of [beginner friendly issues](https://github.com/OpenBAS-Platform/openbas/labels/good%20first%20issue) which are
 fairly easy to implement. This is a great place to get started.
 
 ### Development
@@ -119,16 +119,4 @@ To improve the features and the performances of OpenBAS, the platform collects a
 usage and health.
 
 You can find all the details on collected data and associated usage in
-the [usage telemetry documentation](https://docs.openbas.io/latest/reference/usage-telemetry/).
-
-#### OpenStreetMap server
-
-To provide OpenCTI users with cartography features, the platform uses a dedicated OpenStreetMap
-server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this
-server (including IP addresses).
-
-By using this server, you authorize Filigran to collect this information. Otherwise, you are free to deploy your own
-OpenStreetMap server and modify the platform configuration accordingly.
-
-If you have started using the Filigran server and change your mind, you have the right to access, limit, rectify, erase
-and receive your data. To exercise your rights, please send your request to privacy@filigran.io.
+the [usage telemetry documentation](https://docs.openbas.io/latest/reference/deployment/telemetry/).
