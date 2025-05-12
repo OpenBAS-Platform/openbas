@@ -120,15 +120,3 @@ usage and health.
 
 You can find all the details on collected data and associated usage in
 the [usage telemetry documentation](https://docs.openbas.io/latest/reference/deployment/telemetry/).
-
-#### OpenStreetMap server
-
-To provide OpenBAS users with cartography features, the platform uses a dedicated OpenStreetMap
-server (https://map.openbas.io). To monitor usage and adapt services performances, Filigran collects access log to this
-server (including IP addresses).
-
-By using this server, you authorize Filigran to collect this information. Otherwise, you are free to deploy your own
-OpenStreetMap server and modify the platform configuration accordingly.
-
-If you have started using the Filigran server and change your mind, you have the right to access, limit, rectify, erase
-and receive your data. To exercise your rights, please send your request to privacy@filigran.io.
