@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -179,7 +180,8 @@ public class InjectApi extends RestBehavior {
 
     Inject inject = injectService.inject(injectId);
 
-    return targetService.getTargetOptions(injectTargetTypeEnum, inject, searchText);
+    return targetService.getTargetOptions(
+        injectTargetTypeEnum, inject, StringUtils.trimToEmpty(searchText));
   }
 
   @LogExecutionTime

@@ -48,8 +48,9 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   @Override
-  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
     return scopedInject.getTeams().stream()
+        .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
         .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
         .toList();
   }

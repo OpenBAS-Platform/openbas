@@ -138,8 +138,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WhenGettingOptionsForInjectTargets {
       @Test
       @Disabled("Not yet implemented")
-      @DisplayName("When endpoints are targets, options should return all possible targets")
-      public void whenEndpointsAreTargets_returnAllPossibleTargets() throws Exception {
+      @DisplayName("/options should return all possible targets")
+      public void whenEndpointsAreFilters_returnAllPossibleTargets() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
 
         // dynamic group 1
@@ -195,9 +195,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       @Test
       @Disabled("Not yet implemented")
-      @DisplayName(
-          "When endpoints are targets, options by id should return only options matching ids")
-      public void whenEndpointsAreTargets_returnOnlyOptionsMatchingIds() throws Exception {
+      @DisplayName("/options by id should return only options matching ids")
+      public void whenEndpointsAreFilters_returnOnlyOptionsMatchingIds() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
 
         // dynamic group 1
@@ -427,6 +426,80 @@ public class InjectTargetSearchTest extends IntegrationTest {
               ep1Wrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
               ep1Wrapper.get().getPlatform().name());
       List<EndpointTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When no applied AssetGroup filter, at most a full page of targeted endpoints should be returned")
+    public void whenNoAppliedAssetGroupFilter_returnPageOfAllTargetedEndpoints() throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      EndpointComposer.Composer ep1Wrapper =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+      // create a new endpoint that is both part of the above groups and also will be targeted
+      // explicitly
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      EndpointComposer.Composer ep3Wrapper = endpointComposer.forEndpoint(ep3).persist();
+
+      // create a new endpoint that is not part of the above groups
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(notTarget).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep3Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search = PaginationFixture.getDefault().build();
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<EndpointTarget> expected =
+          List.of(
+              new EndpointTarget(
+                  ep1Wrapper.get().getId(),
+                  ep1Wrapper.get().getName(),
+                  ep1Wrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+                  ep1Wrapper.get().getPlatform().name()),
+              new EndpointTarget(
+                  ep2Wrapper.get().getId(),
+                  ep2Wrapper.get().getName(),
+                  ep2Wrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+                  ep2Wrapper.get().getPlatform().name()),
+              new EndpointTarget(
+                  ep3Wrapper.get().getId(),
+                  ep3Wrapper.get().getName(),
+                  ep3Wrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+                  ep3Wrapper.get().getPlatform().name()));
 
       assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
     }
@@ -679,6 +752,58 @@ public class InjectTargetSearchTest extends IntegrationTest {
             List.of(
                 new FilterUtilsJpa.Option(
                     assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName()),
+                new FilterUtilsJpa.Option(
+                    assetGroupWrapper2.get().getId(), assetGroupWrapper2.get().getName()));
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName(
+          "When asset groups are targets, options should return all possible targets matching search text")
+      public void whenAssetGroupsAreTargets_returnAllPossibleTargetsMatchingSearchText()
+          throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
+        // tweak the name of the assetGroup to use as search criteria
+        assetGroupWrapper2.get().setName(assetGroupWrapper.get().getName() + "ReturnThis");
+
+        injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        // keep lower case for case-insensitive search
+                        .queryParam("searchText", "returnthis")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
                 new FilterUtilsJpa.Option(
                     assetGroupWrapper2.get().getId(), assetGroupWrapper2.get().getName()));
 
@@ -980,6 +1105,42 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 new FilterUtilsJpa.Option(teamWrapper2.get().getId(), teamWrapper2.get().getName()),
                 new FilterUtilsJpa.Option(
                     teamWrapper1.get().getId(), teamWrapper1.get().getName()));
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName(
+          "When teams are targets, options should return all possible targets matching search text")
+      public void whenTeamsAreTargets_returnAllPossibleTargetsMatchingSearchText()
+          throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        TeamComposer.Composer teamWrapper1 = getTeamComposerWithName("test team");
+        TeamComposer.Composer teamWrapper2 = getTeamComposerWithName("other test team");
+
+        injectWrapper.withTeam(teamWrapper1).withTeam(teamWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .queryParam("searchText", "Other")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(
+                    teamWrapper2.get().getId(), teamWrapper2.get().getName()));
 
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)

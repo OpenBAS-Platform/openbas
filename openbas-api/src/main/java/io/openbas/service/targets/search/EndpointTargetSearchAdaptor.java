@@ -104,7 +104,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   @Override
-  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
     throw new NotImplementedException("Implement when needed by the Agents paginated tab");
   }
 

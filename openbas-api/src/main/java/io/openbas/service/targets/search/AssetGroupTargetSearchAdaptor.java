@@ -48,8 +48,9 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   @Override
-  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject) {
+  public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
     return scopedInject.getAssetGroups().stream()
+        .filter(ag -> ag.getName().toLowerCase().contains(textSearch.toLowerCase()))
         .map(ag -> new FilterUtilsJpa.Option(ag.getId(), ag.getName()))
         .toList();
   }

@@ -21,6 +21,14 @@ public class TargetService {
 
   public Page<InjectTarget> searchTargets(
       TargetType injectTargetType, Inject inject, SearchPaginationInput input) {
+
+    // handle defaults if filter group is null
+    if (input.getFilterGroup() == null) {
+      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+      filterGroup.setMode(Filters.FilterMode.and);
+      filterGroup.setFilters(List.of());
+      input.setFilterGroup(filterGroup);
+    }
     return switch (injectTargetType) {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.search(input, inject);
       case ASSETS -> endpointTargetSearchAdaptor.search(input, inject);
@@ -30,11 +38,11 @@ public class TargetService {
   }
 
   public List<FilterUtilsJpa.Option> getTargetOptions(
-      TargetType targetType, Inject inject, String searchText) {
+      TargetType targetType, Inject inject, String textSearch) {
     return switch (targetType) {
-      case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsForInject(inject);
-      case ASSETS -> endpointTargetSearchAdaptor.getOptionsForInject(inject);
-      case TEAMS -> teamTargetSearchAdaptor.getOptionsForInject(inject);
+      case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
+      case ASSETS -> endpointTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
+      case TEAMS -> teamTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
       default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
     };
   }

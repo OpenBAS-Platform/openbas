@@ -19,7 +19,8 @@ public abstract class SearchAdaptorBase {
 
   public abstract Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject);
 
-  public abstract List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject);
+  public abstract List<FilterUtilsJpa.Option> getOptionsForInject(
+      Inject scopedInject, String textSearch);
 
   public abstract List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids);
 
