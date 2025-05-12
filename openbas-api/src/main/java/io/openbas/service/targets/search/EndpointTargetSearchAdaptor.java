@@ -5,9 +5,9 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.service.targets.search.specifications.ExcludeMembersOfAssetGroups;
-import io.openbas.service.targets.search.specifications.IncludeDirectEndpointTargets;
-import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGroups;
+import io.openbas.service.targets.search.specifications.ExcludeMembersOfAssetGroupsSpecification;
+import io.openbas.service.targets.search.specifications.IncludeDirectEndpointTargetsSpecification;
+import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGroupsSpecification;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   private final EndpointRepository endpointRepository;
   private final InjectExpectationService injectExpectationService;
-  private final IncludeMembersOfAssetGroups includeMembersOfAssetGroups;
-  private final ExcludeMembersOfAssetGroups excludeMembersOfAssetGroups;
-  private final IncludeDirectEndpointTargets includeDirectEndpointTargets;
+  private final IncludeMembersOfAssetGroupsSpecification includeMembersOfAssetGroupsSpecification;
+  private final ExcludeMembersOfAssetGroupsSpecification excludeMembersOfAssetGroupsSpecification;
+  private final IncludeDirectEndpointTargetsSpecification includeDirectEndpointTargetsSpecification;
 
   private record AssetGroupSplit(
       List<AssetGroup> includedAssetGroups,
@@ -37,14 +37,14 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   public EndpointTargetSearchAdaptor(
       EndpointRepository endpointRepository,
       InjectExpectationService injectExpectationService,
-      IncludeMembersOfAssetGroups includeMembersOfAssetGroups,
-      ExcludeMembersOfAssetGroups excludeMembersOfAssetGroups,
-      IncludeDirectEndpointTargets includeDirectEndpointTargets) {
+      IncludeMembersOfAssetGroupsSpecification includeMembersOfAssetGroupsSpecification,
+      ExcludeMembersOfAssetGroupsSpecification excludeMembersOfAssetGroupsSpecification,
+      IncludeDirectEndpointTargetsSpecification includeDirectEndpointTargetsSpecification) {
     this.endpointRepository = endpointRepository;
     this.injectExpectationService = injectExpectationService;
-    this.includeMembersOfAssetGroups = includeMembersOfAssetGroups;
-    this.excludeMembersOfAssetGroups = excludeMembersOfAssetGroups;
-    this.includeDirectEndpointTargets = includeDirectEndpointTargets;
+    this.includeMembersOfAssetGroupsSpecification = includeMembersOfAssetGroupsSpecification;
+    this.excludeMembersOfAssetGroupsSpecification = excludeMembersOfAssetGroupsSpecification;
+    this.includeDirectEndpointTargetsSpecification = includeDirectEndpointTargetsSpecification;
     // field name translations
     this.fieldTranslations.put("target_name", "asset_name");
     this.fieldTranslations.put("target_tags", "asset_tags");
@@ -57,28 +57,28 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     Specification<Endpoint> overallSpec =
         switch (split.filterOperator) {
           case null ->
-              includeMembersOfAssetGroups
+              includeMembersOfAssetGroupsSpecification
                   .buildSpecification(
                       split.includedAssetGroups.stream().map(AssetGroup::getId).toList())
-                  .or(includeDirectEndpointTargets.buildSpecification(scopedInject));
+                  .or(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
 
           case contains, not_empty ->
-              includeMembersOfAssetGroups.buildSpecification(
+              includeMembersOfAssetGroupsSpecification.buildSpecification(
                   split.includedAssetGroups.stream().map(AssetGroup::getId).toList());
 
           case empty ->
-              excludeMembersOfAssetGroups
+              excludeMembersOfAssetGroupsSpecification
                   .buildSpecification(
                       split.excludedAssetGroups.stream().map(AssetGroup::getId).toList())
-                  .and(includeDirectEndpointTargets.buildSpecification(scopedInject));
+                  .and(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
           case not_contains ->
-              includeMembersOfAssetGroups
+              includeMembersOfAssetGroupsSpecification
                   .buildSpecification(
                       split.includedAssetGroups.stream().map(AssetGroup::getId).toList())
                   .and(
-                      excludeMembersOfAssetGroups.buildSpecification(
+                      excludeMembersOfAssetGroupsSpecification.buildSpecification(
                           split.excludedAssetGroups.stream().map(AssetGroup::getId).toList()))
-                  .or(includeDirectEndpointTargets.buildSpecification(scopedInject));
+                  .or(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
           default -> throw new IllegalArgumentException();
         };
 

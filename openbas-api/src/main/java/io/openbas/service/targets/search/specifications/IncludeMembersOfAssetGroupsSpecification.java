@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ExcludeMembersOfAssetGroups {
+public class IncludeMembersOfAssetGroupsSpecification {
   private final AssetGroupRepository assetGroupRepository;
 
   public Specification<Endpoint> buildSpecification(List<String> assetGroupIds) {
@@ -24,32 +24,15 @@ public class ExcludeMembersOfAssetGroups {
 
     return dynamicFiltersSpec == null
         ? transitiveMembershipSpec
-        : dynamicFiltersSpec.and(transitiveMembershipSpec);
+        : dynamicFiltersSpec.or(transitiveMembershipSpec);
   }
 
   private Specification<Endpoint> getDynamicFilterSpecification(List<String> assetGroupIds) {
-    Specification<Endpoint> positiveSpec =
-        compileFilterGroupsWithOR(
-            assetGroupRepository.rawDynamicFiltersByAssetGroupIds(assetGroupIds).stream()
-                .map(df -> df.getAssetGroupDynamicFilter())
-                .filter(fg -> !fg.getFilters().isEmpty())
-                .toList());
-
-    return ((root, query, criteriaBuilder) -> {
-      if (positiveSpec == null) {
-        return null;
-      }
-      Subquery<Integer> subQuery = query.subquery(Integer.class);
-      Root<Asset> assetTable = subQuery.from(Asset.class);
-
-      subQuery
-          .select(criteriaBuilder.literal(1))
-          .where(
-              positiveSpec.toPredicate(root, query, criteriaBuilder),
-              criteriaBuilder.equal(
-                  assetTable.get("id"), query.getRoots().stream().findFirst().get().get("id")));
-      return criteriaBuilder.exists(subQuery).not();
-    });
+    return compileFilterGroupsWithOR(
+        assetGroupRepository.rawDynamicFiltersByAssetGroupIds(assetGroupIds).stream()
+            .map(df -> df.getAssetGroupDynamicFilter())
+            .filter(fg -> !fg.getFilters().isEmpty())
+            .toList());
   }
 
   private Specification<Endpoint> compileFilterGroupsWithOR(
@@ -77,8 +60,8 @@ public class ExcludeMembersOfAssetGroups {
           .where(
               criteriaBuilder.equal(
                   assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")),
-              assetGroupTable.get("id").in(assetGroupIds.stream().toList()));
-      return criteriaBuilder.exists(subQuery).not();
+              assetGroupTable.get("id").in(assetGroupIds));
+      return criteriaBuilder.exists(subQuery);
     };
   }
 }

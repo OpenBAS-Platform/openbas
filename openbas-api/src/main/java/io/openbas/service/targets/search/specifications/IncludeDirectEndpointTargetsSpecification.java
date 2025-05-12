@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class IncludeDirectEndpointTargets {
+public class IncludeDirectEndpointTargetsSpecification {
   public Specification<Endpoint> buildSpecification(Inject scopedInject) {
     return getDirectTargetingSpecification(scopedInject);
   }
