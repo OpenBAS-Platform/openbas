@@ -54,9 +54,9 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
-  inject_depends_duration_days: number;
-  inject_depends_duration_hours: number;
-  inject_depends_duration_minutes: number;
+  inject_depends_duration_days?: string;
+  inject_depends_duration_hours?: string;
+  inject_depends_duration_minutes?: string;
 };
 
 interface Props {
@@ -196,9 +196,9 @@ const InjectForm = ({
 
   const strictKeys = {
     inject_title: z.string().min(1, { message: t('This field is required.') }),
-    inject_depends_duration_days: z.number().int().min(1, { message: t('This field is required.') }).optional(),
-    inject_depends_duration_hours: z.number().int().min(1, { message: t('This field is required.') }).optional(),
-    inject_depends_duration_minutes: z.number().int().min(1, { message: t('This field is required.') }).optional(),
+    inject_depends_duration_days: z.string().min(1, { message: t('This field is required.') }).optional(),
+    inject_depends_duration_hours: z.string().min(1, { message: t('This field is required.') }).optional(),
+    inject_depends_duration_minutes: z.string().min(1, { message: t('This field is required.') }).optional(),
   };
 
   const methods = useForm<InjectInputForm>({
