@@ -41,11 +41,13 @@ const ExportPdfButton: FunctionComponent<Props> = ({ getPdfDocDefinition, pdfNam
       },
     },
   });
+  const timeout = (ms: number) => new Promise(res => setTimeout(res, ms));
 
   const onExportPdf = async () => {
     setExporting(true);
     if (user.user_theme !== 'light') {
       changeUserTheme('light');
+      await timeout(500);
     }
     getPdfDocDefinition()
       .then((pdfDocDefinition: TDocumentDefinitions) => {

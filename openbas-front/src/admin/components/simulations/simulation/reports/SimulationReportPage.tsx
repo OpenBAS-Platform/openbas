@@ -113,11 +113,11 @@ const SimulationReportPage: FunctionComponent = () => {
       <div
         id={`reportId_${report.report_id}`}
         style={{
-          padding: 20,
           display: 'flex',
           flexFlow: 'wrap',
           maxWidth: '1400px',
           margin: 'auto',
+          gap: theme.spacing(2),
         }}
       >
         <div style={{
@@ -125,18 +125,13 @@ const SimulationReportPage: FunctionComponent = () => {
           textAlign: 'center',
           fontSize: 25,
           fontWeight: 500,
-          margin: '10px',
         }}
         >
           {report.report_name}
         </div>
         {displayModule(ReportInformationType.MAIN_INFORMATION)
           && (
-            <div style={{
-              width: '50%',
-              paddingRight: '25px',
-            }}
-            >
+            <div style={{ width: `calc(50% - ${theme.spacing(1)})` }}>
               <Typography variant="h4" gutterBottom>
                 {t('General information')}
               </Typography>
@@ -145,11 +140,12 @@ const SimulationReportPage: FunctionComponent = () => {
           )}
         {displayModule(ReportInformationType.SCORE_DETAILS)
           && (
-            <div style={{
-              width: '50%',
-              display: 'grid',
-              gridTemplateRows: 'auto 1fr',
-            }}
+            <div
+              style={{
+                width: `calc(50% - ${theme.spacing(1)})`,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
             >
               <Typography variant="h4" gutterBottom>
                 {t('Results')}
@@ -159,6 +155,7 @@ const SimulationReportPage: FunctionComponent = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  flex: 1,
                 }}
               >
                 <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation />
@@ -171,20 +168,13 @@ const SimulationReportPage: FunctionComponent = () => {
               canEditComment={canEditReport}
               injectsComments={report?.report_injects_comments}
               injects={reportData.injects}
-              style={{
-                width: '100%',
-                marginTop: 20,
-              }}
+              style={{ width: '100%' }}
               onCommentSubmit={value => dispatch(updateReportInjectCommentForExercise(exerciseId, report.report_id, value))}
             />
           )}
         {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
           && (
-            <div style={{
-              width: '100%',
-              marginTop: 20,
-            }}
-            >
+            <div style={{ width: '100%' }}>
               <Typography variant="h4" gutterBottom>
                 {t('Global observation')}
               </Typography>
@@ -197,10 +187,7 @@ const SimulationReportPage: FunctionComponent = () => {
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
           && (
             <LessonsCategories
-              style={{
-                marginTop: theme.spacing(3),
-                width: '100%',
-              }}
+              style={{ width: '100%' }}
               lessonsCategories={reportData.lessonsCategories}
               lessonsAnswers={reportData.lessonsAnswers}
               lessonsQuestions={reportData.lessonsQuestions}

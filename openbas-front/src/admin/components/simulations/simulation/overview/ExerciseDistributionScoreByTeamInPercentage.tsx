@@ -59,8 +59,8 @@ const ExerciseDistributionScoreByTeamInPercentage: FunctionComponent<Props> = ({
       name: t('Percent of reached score'),
       data: sortedTeamsByPercentScore.map((a: Team & { team_total_percent_score: number }) => ({
         x: a.team_name,
-        y: a.team_total_percent_score,
-        fillColor: teamsColors[a.team_id],
+        y: a.team_total_percent_score || null,
+        fillColor: teamsColors[a.team_id] ?? '',
       })),
     },
   ];

@@ -7,6 +7,7 @@ import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../..
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { fetchTeams } from '../../../../../actions/teams/team-actions';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
@@ -55,7 +56,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
     const fetchPromises = [
       dispatch(fetchExerciseInjectExpectations(exerciseId)),
       dispatch(fetchExerciseInjects(exerciseId)),
-      dispatch(fetchExerciseTeams(exerciseId)),
+      dispatch(fetchTeams()),
     ];
     Promise.all(fetchPromises)
       .finally(() => {

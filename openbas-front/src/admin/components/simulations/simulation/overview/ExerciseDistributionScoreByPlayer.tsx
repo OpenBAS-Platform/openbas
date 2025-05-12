@@ -47,8 +47,8 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({ exerciseI
     {
       name: t('Total score'),
       data: sortedUsersByTotalScore.map((u: User & { user_total_score: number }) => ({
-        x: resolveUserName(u),
-        y: u.user_total_score,
+        x: resolveUserName(u) ?? '',
+        y: u.user_total_score || null,
       })),
     },
   ];
