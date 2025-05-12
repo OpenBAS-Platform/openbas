@@ -363,6 +363,7 @@ const CreateInject: FunctionComponent<Props> = ({
               inject_assets: [],
               inject_asset_groups: [],
               inject_documents: [],
+              inject_content: { expectations: selectedContract?.injector_contract_content.fields.find(f => f.type == 'expectation')?.predefinedExpectations },
             }}
             injectorContractContent={selectedContract?.injector_contract_content}
             onSubmitInject={onCreateInject}

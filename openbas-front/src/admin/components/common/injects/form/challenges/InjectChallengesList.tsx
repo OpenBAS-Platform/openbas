@@ -33,10 +33,10 @@ const InjectChallengesList = ({ readOnly = false }: Props) => {
   const { classes } = useStyles();
   const [sortedChallenges, setSortedChallenges] = useState<Challenge[]>([]);
 
-  const injectChallengeIds = useWatch({
+  const injectChallengeIds: string[] = (useWatch({
     control,
     name: 'inject_content.challenges',
-  }) as string[];
+  })) ?? [];
   const { challengesMap } = useHelper((helper: ChallengeHelper) => ({ challengesMap: helper.getChallengesMap() }));
 
   useEffect(() => {

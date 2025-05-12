@@ -283,7 +283,7 @@ const InjectContentForm = ({
     {
       title: t('Inject documents'),
       render: renderDocuments,
-      show: fieldsMap.has('attachment'),
+      show: !isAtomic,
     },
   ];
 

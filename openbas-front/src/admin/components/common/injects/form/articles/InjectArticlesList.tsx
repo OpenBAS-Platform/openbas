@@ -34,10 +34,10 @@ const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
   const { t } = useFormatter();
   const { control, setValue } = useFormContext();
   const { classes } = useStyles();
-  const injectArticlesIds = useWatch({
+  const injectArticlesIds: string[] = (useWatch({
     control,
     name: 'inject_content.articles',
-  }) as string[];
+  })) ?? [];
 
   const [sortedArticles, setSortedArticles] = useState<(Article & {
     article_channel_type: string;
@@ -65,7 +65,7 @@ const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
     setSortedArticles(articles);
   }, [injectArticlesIds]);
 
-  const addArticles = (ids: string[]) => setValue('inject_content.articles', [...ids, ...(injectArticlesIds ?? [])]);
+  const addArticles = (ids: string[]) => setValue('inject_content.articles', [...ids, ...injectArticlesIds]);
   const removeArticle = (articleId: string) => setValue('inject_content.articles', injectArticlesIds.filter(id => id !== articleId));
 
   return (

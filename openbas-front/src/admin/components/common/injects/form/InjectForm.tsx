@@ -70,7 +70,6 @@ interface Props {
   onSubmitInject: (data: InjectInput) => Promise<void>;
   injectorContractContent?: InjectorContractConverted['convertedContent'];
   articlesFromExerciseOrScenario: Article[];
-
   uriVariable: string;
   variablesFromExerciseOrScenario: Variable[];
 }
@@ -103,7 +102,6 @@ const InjectForm = ({
     'attachments',
     'expectations',
   ];
-
   const toggleInjectContent = () => {
     if (openDetails && drawerRef.current) {
       drawerRef.current.scrollTop = 0;

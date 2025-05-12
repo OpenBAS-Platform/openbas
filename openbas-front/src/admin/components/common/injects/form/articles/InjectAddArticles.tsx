@@ -31,7 +31,6 @@ import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { truncate } from '../../../../../../utils/String';
 import ChannelIcon from '../../../../components/channels/ChannelIcon';
 import CreateArticle from '../../../articles/CreateArticle';
-import { PermissionsContext } from '../../../Context';
 
 const useStyles = makeStyles()(theme => ({
   box: {
