@@ -82,7 +82,7 @@ improvements, and how to build and test your changes to OpenBAS.
 ### Beginner friendly issues
 
 To help you get you familiar with our contribution process, we have a list
-of [beginner friendly issues](https://github.com/OpenBAS-Platform/openbas/labels/beginner%20friendly%20issue) which are
+of [beginner friendly issues](https://github.com/OpenBAS-Platform/openbas/labels/good%20first%20issue) which are
 fairly easy to implement. This is a great place to get started.
 
 ### Development
