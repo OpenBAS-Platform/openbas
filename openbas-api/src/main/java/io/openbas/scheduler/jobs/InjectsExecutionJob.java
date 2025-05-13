@@ -358,6 +358,13 @@ public class InjectsExecutionJob implements Job {
     }
   }
 
+  /**
+   * Return true if some elements are in the two lists
+   *
+   * @param firstList the first list to test
+   * @param secondList the second list to test
+   * @return true if some elements are present in both the lists
+   */
   private boolean intersect(List<String> firstList, List<String> secondList) {
     return !firstList.stream()
         .distinct()
