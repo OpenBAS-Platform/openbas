@@ -22,11 +22,6 @@ export const fetchExerciseChallenges = (exerciseId: string) => (dispatch: Dispat
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
-/* export const fetchChallenge = (challengeId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/challenges/${challengeId}`;
-  return getReferential(challengeId, uri)(dispatch);
-}; */
-
 export const updateChallenge = (challengeId: string, data: ChallengeInput) => (dispatch: Dispatch) => {
   const uri = `/api/challenges/${challengeId}`;
   return putReferential(challenge, uri, data)(dispatch);
@@ -68,4 +63,3 @@ export const fetchScenarioObserverChallenges = (scenarioId: string, userId: stri
   const uri = `/api/observer/scenarios/${scenarioId}/challenges?userId=${userId}`;
   return getReferential(scenarioChallengesReaders, uri)(dispatch);
 };
-// observer for scenario (frontend and api)

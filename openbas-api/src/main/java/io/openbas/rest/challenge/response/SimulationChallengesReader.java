@@ -3,11 +3,10 @@ package io.openbas.rest.challenge.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Exercise;
 import io.openbas.rest.exercise.response.PublicExercise;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -26,5 +25,4 @@ public class SimulationChallengesReader {
     this.id = exercise.getId();
     this.exercise = new PublicExercise(exercise);
   }
-
 }

@@ -3,11 +3,10 @@ package io.openbas.rest.challenge.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Scenario;
 import io.openbas.rest.scenario.response.PublicScenario;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -26,5 +25,4 @@ public class ScenarioChallengesReader {
     this.id = scenario.getId();
     this.scenario = new PublicScenario(scenario);
   }
-
 }

@@ -5,27 +5,18 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { type FunctionComponent, useContext, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { type FunctionComponent, useContext, useState } from 'react';
+import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchMe } from '../../../../actions/Application';
-import { fetchSimulationObserverChallenges, tryChallenge } from '../../../../actions/Challenge';
-import { fetchSimulationPlayerDocuments } from '../../../../actions/Document';
-import { fetchExercise } from '../../../../actions/Exercise';
-import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import type { SimulationChallengesReaderHelper } from '../../../../actions/helper';
+import { tryChallenge } from '../../../../actions/Challenge';
 import Dialog from '../../../../components/common/Dialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { useHelper } from '../../../../store';
-import { type Challenge, type ChallengeInformation, type ChallengeResult, type ChallengeTryInput, type Exercise as ExerciseType, type Scenario, type SimulationChallengesReader } from '../../../../utils/api-types';
-import { useQueryParameter } from '../../../../utils/Environment';
-import { usePermissions } from '../../../../utils/Exercise';
+import { type Challenge, type ChallengeInformation, type ChallengeResult, type ChallengeTryInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { isNotEmptyField } from '../../../../utils/utils';
 import ChallengeTryForm from '../../components/challenges/ChallengeTryForm';
 import { PreviewChallengeContext } from '../Context';
 import ChallengeCard from './ChallengeCard';
@@ -68,38 +59,15 @@ const ChallengesPreview: FunctionComponent<Props> = ({
   const [currentResult, setCurrentResult] = useState<ChallengeResult | null>(null);
   const value = useContext(PreviewChallengeContext);
 
-  /* const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
-  const { challengesReader, fullExercise }: {
-    fullExercise: ExerciseType;
-    challengesReader: SimulationChallengesReader;
-  } = useHelper((helper: SimulationChallengesReaderHelper & ExercisesHelper) => ({
-    fullExercise: helper.getExercise(exerciseId),
-    challengesReader: helper.getSimulationChallengesReader(exerciseId),
-  })); */
-
-  // const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
-
-  // Pass the full exercise because the exercise is never loaded in the store at this point
-  // const permissions = usePermissions(exerciseId, fullExercise);
-
   const handleClose = () => {
     setCurrentChallenge(null);
     setCurrentResult(null);
   };
 
-  /* useEffect(() => {
-    dispatch(fetchMe());
-    if (exerciseId) {
-      dispatch(fetchExercise(exerciseId));
-      dispatch(fetchSimulationObserverChallenges(exerciseId, userId));
-      dispatch(fetchSimulationPlayerDocuments(exerciseId, userId));
-    }
-  }, [dispatch, exerciseId, userId]); */
-
   const submit = (cid: string | undefined, data: ChallengeTryInput) => {
     if (cid) {
-      return dispatch(tryChallenge(cid, data)).then((result: { result: ChallengeResult }) => {
-        setCurrentResult(result.result);
+      return dispatch(tryChallenge(cid, data)).then((result: ChallengeResult) => {
+        setCurrentResult(result);
       });
     }
     return null;
@@ -112,12 +80,12 @@ const ChallengesPreview: FunctionComponent<Props> = ({
     const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && isNotEmptyField(value.linkToPlayerMode) && (
+        {permissions.isLoggedIn && permissions.canRead && !R.isEmpty(value.linkToPlayerMode) && (
           <Button
             color="secondary"
             variant="outlined"
             component={Link}
-            to={value.linkToPlayerMode()}
+            to={value.linkToPlayerMode}
             style={{
               position: 'absolute',
               top: theme.spacing(2),
@@ -132,7 +100,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
             color="primary"
             variant="outlined"
             component={Link}
-            to={value.linkToAdministrationMode()}
+            to={value.linkToAdministrationMode}
             style={{
               position: 'absolute',
               top: theme.spacing(2),

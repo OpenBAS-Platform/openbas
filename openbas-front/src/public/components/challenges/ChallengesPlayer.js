@@ -132,7 +132,7 @@ const ChallengesPlayer = () => {
   const { t } = useFormatter();
   const [currentChallengeEntry, setCurrentChallengeEntry] = useState(null);
   const [currentResult, setCurrentResult] = useState(null);
-  const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
+  const [userId] = useQueryParameter(['user']);
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const { exerciseId } = useParams();
@@ -236,7 +236,7 @@ const ChallengesPlayer = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=true`}
+            to={`/admin/simulations/${exerciseId}/challenges?preview=true`}
             style={{
               position: 'absolute',
               top: 20,

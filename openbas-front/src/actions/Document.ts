@@ -37,6 +37,5 @@ export const fetchSimulationPlayerDocuments = (simulationId: string, userId = nu
 
 export const fetchScenarioPlayerDocuments = (scenarioId: string, userId = null) => (dispatch: Dispatch) => getReferential(
   schema.arrayOfDocuments,
-  `/api/player/scenarios/{scenarioId}/documents${userId ? `?userId=${userId}` : ''}`,
+  `/api/player/scenarios/${scenarioId}/documents${userId ? `?userId=${userId}` : ''}`,
 )(dispatch);
-// fetchPlayerDocument for scenario (frontend and backend)

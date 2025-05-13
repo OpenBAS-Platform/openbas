@@ -30,6 +30,8 @@ const SimulationReport = lazy(() => import('./admin/components/simulations/simul
 const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
 const ExerciseViewLessons = lazy(() => import('./public/components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./public/components/lessons/ScenarioViewLessons'));
+const SimulationChallengesPreview = lazy(() => import('./admin/components/simulations/simulation/challenges/SimulationChallengesPreview'));
+const ScenarioChallengesPreview = lazy(() => import('./admin/components/scenarios/scenario/challenges/ScenarioChallengesPreview'));
 
 const Root = () => {
   const { logged, me, settings } = useHelper((helper: LoggedHelper) => {
@@ -88,6 +90,9 @@ const Root = () => {
                   <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                   <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                   <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />
+                  <Route path="admin/simulations/:exerciseId/challenges" element={errorWrapper(SimulationChallengesPreview)()} />
+                  <Route path="admin/scenarios/:scenarioId/challenges" element={errorWrapper(ScenarioChallengesPreview)()} />
+
                   {/* Not found */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
