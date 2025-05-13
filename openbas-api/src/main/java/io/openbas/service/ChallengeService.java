@@ -24,12 +24,10 @@ import io.openbas.service.challenge.ChallengeAttemptService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +41,7 @@ public class ChallengeService {
   private final InjectExpectationService injectExpectationService;
   private final InjectExpectationRepository injectExpectationRepository;
   private final ChallengeAttemptService challengeAttemptService;
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
     List<Inject> injects =
@@ -167,8 +164,8 @@ public class ChallengeService {
             // Adjust the score based on the current attempt number
             double score =
                 playerExpectation.getChallenge().getMaxAttempts() == null
-                    || challengeAttempt.getAttempt()
-                    < playerExpectation.getChallenge().getMaxAttempts()
+                        || challengeAttempt.getAttempt()
+                            < playerExpectation.getChallenge().getMaxAttempts()
                     ? playerExpectation.getExpectedScore()
                     : 0;
 

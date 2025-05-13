@@ -55,8 +55,8 @@ export type ArticleContextType = {
 export type ChallengeContextType = { previewChallengeUrl: () => string };
 
 export type PreviewChallengeContextType = {
-  linkToPlayerMode: () => string;
-  linkToAdministrationMode: () => string;
+  linkToPlayerMode: string;
+  linkToAdministrationMode: string;
   scenarioOrExercise: PublicScenario | PublicExercise | undefined;
 };
 
@@ -194,12 +194,8 @@ export const ChallengeContext = createContext<ChallengeContextType>({
   },
 });
 export const PreviewChallengeContext = createContext<PreviewChallengeContextType>({
-  linkToPlayerMode(): string {
-    return '';
-  },
-  linkToAdministrationMode(): string {
-    return '';
-  },
+  linkToPlayerMode: '',
+  linkToAdministrationMode: '',
   scenarioOrExercise: {
     description: '',
     id: '',
