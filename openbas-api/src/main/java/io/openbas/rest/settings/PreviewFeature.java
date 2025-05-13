@@ -11,8 +11,7 @@ package io.openbas.rest.settings;
  */
 public enum PreviewFeature {
   // Reserved for internal use.
-  _RESERVED,
-  TARGET_PAGINATION;
+  _RESERVED;
 
   public static PreviewFeature fromStringIgnoreCase(String str) {
     for (PreviewFeature feature : PreviewFeature.values()) {
