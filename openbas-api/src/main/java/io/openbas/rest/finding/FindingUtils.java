@@ -1,9 +1,14 @@
 package io.openbas.rest.finding;
 
+import static io.openbas.database.model.ContractOutputType.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
+import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -19,6 +24,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class FindingUtils {
+
+  @Resource private final ObjectMapper mapper;
 
   private final FindingRepository findingRepository;
 
@@ -91,15 +98,12 @@ public class FindingUtils {
   }
 
   public String buildValue(ContractOutputElement contractOutputElement, Matcher matcher) {
-    Map<String, List<String>> fieldValuesMap = new LinkedHashMap<>();
-
-    // If there are no specific fields, extract all matched groups
+    JsonNode resultNode;
     if (contractOutputElement.getType().fields == null) {
       List<String> extractedValues = extractValues(contractOutputElement.getRegexGroups(), matcher);
-
-      fieldValuesMap.put(null, extractedValues);
+      resultNode = mapper.valueToTree(extractedValues);
     } else {
-      // Extract values for each defined field
+      ObjectNode objectNode = mapper.createObjectNode();
       for (ContractOutputField field : contractOutputElement.getType().fields) {
         List<String> extractedValues =
             extractValues(
@@ -107,11 +111,13 @@ public class FindingUtils {
                     .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
                     .collect(Collectors.toSet()),
                 matcher);
-        fieldValuesMap.put(field.getKey(), extractedValues);
+        ArrayNode arrayNode = mapper.valueToTree(extractedValues);
+        objectNode.set(field.getKey(), arrayNode);
       }
+      resultNode = objectNode;
     }
 
-    return formatFinalValue(contractOutputElement.getType(), fieldValuesMap);
+    return contractOutputElement.getType().toFindingValue.apply(resultNode);
   }
 
   private List<String> extractValues(Set<RegexGroup> regexGroups, Matcher matcher) {
@@ -210,31 +216,5 @@ public class FindingUtils {
     } else {
       log.warning("Retry failed: Finding still not found after race condition.");
     }
-  }
-
-  private String formatFinalValue(
-      ContractOutputType type, Map<String, List<String>> fieldValuesMap) {
-    switch (type) {
-      case Credentials:
-        String username = buildString(fieldValuesMap, "username");
-        String password = buildString(fieldValuesMap, "password");
-        return username + ":" + password;
-      case PortsScan:
-        String host = buildString(fieldValuesMap, "host");
-        String port = buildString(fieldValuesMap, "port");
-        String service =
-            fieldValuesMap.getOrDefault("service", List.of("")).isEmpty()
-                ? ""
-                : " (" + String.join(" ", fieldValuesMap.get("service")) + ")";
-        return host + ":" + port + service;
-      default:
-        return fieldValuesMap.values().stream()
-            .map(list -> String.join(" ", list))
-            .collect(Collectors.joining(" "));
-    }
-  }
-
-  private String buildString(Map<String, List<String>> fieldValuesMap, String key) {
-    return String.join(" ", fieldValuesMap.getOrDefault(key, List.of("")));
   }
 }
