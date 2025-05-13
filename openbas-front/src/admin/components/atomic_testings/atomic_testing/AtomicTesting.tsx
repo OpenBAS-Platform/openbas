@@ -61,6 +61,8 @@ const AtomicTesting = () => {
   const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
   const [hasEndpoints, setHasEndpoints] = useState(false);
   const [hasEndpointsChecked, setHasEndpointsChecked] = useState(false);
+  const [hasAgents, setHasAgents] = useState(false);
+  const [hasAgentsChecked, setHasAgentsChecked] = useState(false);
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
@@ -101,6 +103,14 @@ const AtomicTesting = () => {
           label: t('Endpoints'),
           type: 'ASSETS',
           entityPrefix: 'endpoint_target',
+        });
+      }
+      if (hasAgents) {
+        tabs.push({
+          key: index++,
+          label: t('Agents'),
+          type: 'AGENT',
+          entityPrefix: 'agent_target',
         });
       }
     }
@@ -158,6 +168,16 @@ const AtomicTesting = () => {
       .finally(() => {
         setHasTeamsChecked(true);
       });
+
+    searchTargets(injectId, 'AGENT', searchPaginationInput1Result)
+        .then((response) => {
+          if (response.data.content.length > 0) {
+            setHasAgents(true);
+          } else { setHasAgents(false); }
+        })
+        .finally(() => {
+          setHasAgentsChecked(true);
+        });
 
     setReloadContentCount(reloadContentCount + 1);
     setActiveTab(0);
@@ -264,7 +284,7 @@ const AtomicTesting = () => {
         </Typography>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && (
             <>
               <Tabs
                 value={activeTab}
