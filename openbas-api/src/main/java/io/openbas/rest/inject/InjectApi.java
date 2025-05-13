@@ -4,8 +4,11 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.authorisation.AuthorisationService;
+import io.openbas.config.OpenBASConfig;
+import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -27,6 +30,7 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -70,9 +74,25 @@ public class InjectApi extends RestBehavior {
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final TargetService targetService;
-  private final UserRepository userRepository;
+  private final InjectStatusService injectStatusService;
 
-  private final InjectTraceQueueService injectTraceQueueService;
+  private final RabbitmqConfig rabbitmqConfig;
+  private final ObjectMapper objectMapper;
+
+  private final OpenBASConfig openBASConfig;
+
+  private InjectTraceQueueService<InjectExecutionCallback> injectTraceQueueService;
+
+  @PostConstruct
+  public void init() throws IOException, TimeoutException {
+    injectTraceQueueService =
+        new InjectTraceQueueService<>(
+            InjectExecutionCallback.class,
+            injectStatusService::handleInjectExecutionCallbackList,
+            rabbitmqConfig,
+            objectMapper,
+            openBASConfig.getQueueConfig().get("inject-trace"));
+  }
 
   // -- INJECTS --
 
@@ -330,8 +350,7 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input)
-      throws IOException, TimeoutException {
-
+      throws IOException {
     var inputAsString =
         mapper.writeValueAsString(
             InjectExecutionCallback.builder()
