@@ -2,7 +2,7 @@ import { ForwardToInbox } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
-import { bulkTestInjects } from '../../../actions/injects/inject-action';
+import { bulkTestInjects } from '../../../actions/inject_test/inject-test-actions';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';

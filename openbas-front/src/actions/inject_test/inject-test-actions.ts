@@ -1,14 +1,18 @@
 import { simpleCall, simpleDelCall, simplePostCall } from '../../utils/Action';
-import { type SearchPaginationInput } from '../../utils/api-types';
+import { type InjectBulkProcessingInput } from '../../utils/api-types';
+import { MESSAGING$ } from '../../utils/Environment';
 
-export const searchExerciseInjectTests = (exerciseId: string, searchPaginationInput: SearchPaginationInput) => {
-  const uri = `/api/exercises/${exerciseId}/injects/test`;
-  return simplePostCall(uri, searchPaginationInput);
+export const testInject = (injectId: string) => {
+  const uri = `/api/injects/${injectId}/test`;
+  return simpleCall(uri);
 };
 
-export const searchScenarioInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
-  const uri = `/api/scenarios/${scenarioId}/injects/test`;
-  return simplePostCall(uri, searchPaginationInput);
+export const bulkTestInjects = (data: InjectBulkProcessingInput) => {
+  const uri = '/api/injects/test';
+  return simplePostCall(uri, data, undefined, false).catch((error) => {
+    MESSAGING$.notifyError('Can\'t be tested');
+    throw error;
+  });
 };
 
 export const fetchInjectTestStatus = (testId: string | undefined) => {

@@ -2,8 +2,7 @@ import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
-import { deleteInjectTest } from '../../../actions/inject_test/inject-test-actions';
-import { testInject } from '../../../actions/injects/inject-action';
+import { deleteInjectTest, testInject } from '../../../actions/inject_test/inject-test-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';

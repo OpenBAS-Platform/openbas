@@ -9,8 +9,9 @@ import {
   updateInjectActivationForScenario,
   updateInjectForScenario,
 } from '../../../../actions/Inject';
+import { bulkTestInjects } from '../../../../actions/inject_test/scenario-inject-test-actions';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import { bulkTestInjects, importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
+import { importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 import {
   dryImportXlsForScenario,
   fetchScenario,
@@ -95,7 +96,7 @@ const injectContextForScenario = (scenario: Scenario) => {
       uri: string;
       data: InjectTestStatusOutput[];
     }> {
-      return bulkTestInjects(param).then(result => ({
+      return bulkTestInjects(scenario.scenario_id, param).then(result => ({
         uri: `/admin/scenarios/${scenario.scenario_id}/tests`,
         data: result.data,
       }));
