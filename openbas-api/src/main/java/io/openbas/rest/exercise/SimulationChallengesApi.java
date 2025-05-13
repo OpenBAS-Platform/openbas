@@ -1,5 +1,9 @@
 package io.openbas.rest.exercise;
 
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ChallengeRepository;
@@ -11,20 +15,15 @@ import io.openbas.rest.challenge.response.SimulationChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @RestController
 @RequiredArgsConstructor
@@ -113,7 +112,8 @@ public class SimulationChallengesApi extends RestBehavior {
   public SimulationChallengesReader observerChallenges(@PathVariable String simulationId) {
     Exercise exercise =
         exerciseRepository.findById(simulationId).orElseThrow(ElementNotFoundException::new);
-    SimulationChallengesReader simulationChallengesReader = new SimulationChallengesReader(exercise);
+    SimulationChallengesReader simulationChallengesReader =
+        new SimulationChallengesReader(exercise);
     Iterable<Challenge> challenges = challengeService.getExerciseChallenges(simulationId);
     simulationChallengesReader.setExerciseChallenges(
         fromIterable(challenges).stream()
@@ -121,5 +121,4 @@ public class SimulationChallengesApi extends RestBehavior {
             .toList());
     return simulationChallengesReader;
   }
-
 }

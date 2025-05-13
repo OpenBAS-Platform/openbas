@@ -1,6 +1,6 @@
 package io.openbas.rest.challenge;
 
-//Implement for PublicExercise(exercise package) and ScenarioExercise(scenario challenge)
+// Implement for PublicExercise(exercise package) and ScenarioExercise(scenario challenge)
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -18,6 +18,4 @@ public class PublicEntity {
 
   @JsonProperty("description")
   private String description;
-
-
 }
