@@ -83,6 +83,7 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
         />
       ) : (
         <Empty
+          id="exercise_distribution_score_over_time_by_inject"
           message={t(
             'No data to display or the simulation has not started yet',
           )}

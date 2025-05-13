@@ -1,5 +1,6 @@
-const Empty = ({ message }) => (
+const Empty = ({ message, id = '' }) => (
   <div
+    id={id}
     style={{
       display: 'table',
       height: '100%',
