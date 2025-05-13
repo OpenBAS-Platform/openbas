@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
