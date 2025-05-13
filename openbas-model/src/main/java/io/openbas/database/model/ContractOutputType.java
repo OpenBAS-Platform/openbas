@@ -123,6 +123,7 @@ public enum ContractOutputType {
       ContractOutputTechnicalType.Object,
       new ArrayList<>(
           List.of(
+              new ContractOutputField("asset_id", ContractOutputTechnicalType.Text, false),
               new ContractOutputField("id", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("host", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
@@ -137,7 +138,12 @@ public enum ContractOutputType {
         String severity = buildString(jsonNode, "severity");
         return host + ":" + id + " (" + severity + ")";
       },
-      null,
+      (JsonNode jsonNode) -> {
+        if (jsonNode.get("asset_id") != null) {
+          return List.of(jsonNode.get("asset_id").asText());
+        }
+        return new ArrayList<>();
+      },
       null,
       null);
 
