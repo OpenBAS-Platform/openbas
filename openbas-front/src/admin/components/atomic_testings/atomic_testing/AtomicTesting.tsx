@@ -9,7 +9,6 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectTarget, type InjectTargetWithResult, type SearchPaginationInput } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { isFeatureEnabled } from '../../../../utils/utils';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import PaginatedTargetTab from './PaginatedTargetTab';
 import TargetListItem from './TargetListItem';
