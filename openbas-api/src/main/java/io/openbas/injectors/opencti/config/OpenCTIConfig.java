@@ -1,6 +1,7 @@
 package io.openbas.injectors.opencti.config;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -10,14 +11,15 @@ import org.springframework.stereotype.Component;
 @Data
 public class OpenCTIConfig {
 
-  @NotBlank private Boolean enable;
+  @NotNull private Boolean enable;
 
   @NotBlank private String url;
+
   private String apiUrl;
 
   @NotBlank private String token;
 
-  public String getUrl() {
+  public String getApiUrl() {
     return (apiUrl != null && !apiUrl.isBlank()) ? apiUrl : url + "/graphql";
   }
 }
