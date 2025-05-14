@@ -1,5 +1,7 @@
 package io.openbas.service;
 
+import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
+import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeSuccessMessage;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.InjectExpectationUtils.*;
@@ -633,7 +635,9 @@ public class InjectExpectationService {
         sourceId,
         sourceType,
         sourceName,
-        successScoreResult ? "SUCCESS" : "FAILED",
+        successScoreResult
+            ? computeSuccessMessage(expectation.getType())
+            : computeFailedMessage(expectation.getType()),
         successScoreResult ? finalScore : 0.0,
         null);
     expectation.setScore(finalScore);
