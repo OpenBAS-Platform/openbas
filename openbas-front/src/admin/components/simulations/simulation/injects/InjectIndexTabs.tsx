@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
+import { externalContractTypesWithFindings } from '../../../../../utils/injector_contract/InjectorContractUtils';
 
 const useStyles = makeStyles()(theme => ({
   item: {
@@ -21,8 +22,6 @@ interface Props {
   backlabel?: string | null;
   backuri?: string | null;
 }
-
-const openbasNmap = 'openbas_nmap';
 
 const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }: Props) => {
   const { classes } = useStyles();
@@ -48,7 +47,7 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
         className={classes.item}
       />
       {(injectResultOverview.inject_injector_contract?.injector_contract_payload
-        || injectResultOverview.inject_type === openbasNmap) && (
+        || externalContractTypesWithFindings.includes(injectResultOverview.inject_type ?? '')) && (
         <Tab
           component={Link}
           to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/findings`)}

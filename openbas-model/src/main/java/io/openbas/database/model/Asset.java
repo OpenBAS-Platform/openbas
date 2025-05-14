@@ -43,7 +43,7 @@ public class Asset implements Base {
   @Setter(NONE)
   private String type;
 
-  @Queryable(searchable = true, sortable = true)
+  @Queryable(searchable = true, sortable = true, filterable = true)
   @Column(name = "asset_name")
   @JsonProperty("asset_name")
   @NotBlank

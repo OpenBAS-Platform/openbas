@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -159,7 +160,42 @@ public class InjectApi extends RestBehavior {
 
     Inject inject = injectService.inject(injectId);
 
-    return targetService.injectTargets(injectTargetTypeEnum, inject, input);
+    return targetService.searchTargets(injectTargetTypeEnum, inject, input);
+  }
+
+  @LogExecutionTime
+  @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
+  @PreAuthorize("isInjectObserver(#injectId)")
+  public List<FilterUtilsJpa.Option> targetOptions(
+      @PathVariable String injectId,
+      @PathVariable String targetType,
+      @RequestParam(required = false) final String searchText) {
+    TargetType injectTargetTypeEnum;
+
+    try {
+      injectTargetTypeEnum = TargetType.valueOf(targetType);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(String.format("Invalid target type %s", targetType));
+    }
+
+    Inject inject = injectService.inject(injectId);
+
+    return targetService.getTargetOptions(
+        injectTargetTypeEnum, inject, StringUtils.trimToEmpty(searchText));
+  }
+
+  @LogExecutionTime
+  @PostMapping(path = INJECT_URI + "/targets/{targetType}/options")
+  public List<FilterUtilsJpa.Option> targetOptionsById(
+      @PathVariable String targetType, @RequestBody final List<String> ids) {
+    TargetType injectTargetTypeEnum;
+
+    try {
+      injectTargetTypeEnum = TargetType.valueOf(targetType);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(String.format("Invalid target type %s", targetType));
+    }
+    return targetService.getTargetOptionsByIds(injectTargetTypeEnum, ids);
   }
 
   @PostMapping(

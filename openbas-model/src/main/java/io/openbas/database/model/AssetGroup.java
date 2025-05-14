@@ -65,7 +65,7 @@ public class AssetGroup implements Base {
   private FilterGroup dynamicFilter;
 
   @ArraySchema(schema = @Schema(type = "string"))
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "asset_groups_assets",
       joinColumns = @JoinColumn(name = "asset_group_id"),

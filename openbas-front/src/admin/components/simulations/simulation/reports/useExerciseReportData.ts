@@ -115,11 +115,10 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
           const sortedInjects = result.data.sort((a: InjectResultOutput, b: InjectResultOutput) => {
             const dateA = a.inject_status?.tracking_sent_date;
             const dateB = b.inject_status?.tracking_sent_date;
-            if (dateA === undefined && dateB !== undefined) return 1;
-            if (dateA !== undefined && dateB === undefined) return -1;
-            if (dateA === undefined && dateB === undefined) return 0;
-            // @ts-expect-error dateA and dateB has been checked for undefined
-            return dateA.localeCompare(dateB);
+            if ((dateA === undefined || dateA === null) && (dateB !== undefined && dateB !== null)) return 1;
+            if ((dateA !== undefined && dateA !== null) && (dateB === undefined || dateB === null)) return -1;
+            if ((dateA === undefined || dateA === null) && (dateB === undefined || dateB === null)) return 0;
+            return dateA!.localeCompare(dateB!); // non-null assertion since we've checked above
           });
           setInjects(sortedInjects);
         }));

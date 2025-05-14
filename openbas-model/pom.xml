@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.16.0</version>
+        <version>1.16.1</version>
     </parent>
 
     <artifactId>openbas-model</artifactId>
@@ -14,7 +14,7 @@
     <description>OpenBAS model</description>
 
     <properties>
-        <elasticsearch.version>8.18.0</elasticsearch.version>
+        <elasticsearch.version>8.18.1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations-jakarta</artifactId>
-            <version>2.2.30</version>
+            <version>2.2.31</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

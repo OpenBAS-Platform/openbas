@@ -192,6 +192,7 @@ const ScenarioRecurringFormDialog: FunctionComponent<Props> = ({ onSubmit, selec
                       fullWidth: true,
                       error: !!fieldState.error,
                       helperText: fieldState.error?.message,
+                      variant: 'standard',
                     },
                   }}
                   label={t('Start date')}
@@ -291,6 +292,7 @@ const ScenarioRecurringFormDialog: FunctionComponent<Props> = ({ onSubmit, selec
                       fullWidth: true,
                       error: !!fieldState.error,
                       helperText: fieldState.error?.message,
+                      variant: 'standard',
                     },
                   }}
                 />
@@ -315,6 +317,7 @@ const ScenarioRecurringFormDialog: FunctionComponent<Props> = ({ onSubmit, selec
                           fullWidth: true,
                           error: !!fieldState.error,
                           helperText: fieldState.error?.message,
+                          variant: 'standard',
                         },
                       }}
                       label={t('End date')}

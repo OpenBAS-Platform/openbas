@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import java.util.*;
@@ -41,12 +42,13 @@ class FindingUtilsTest {
   public static final String ASSET_2 = "asset2";
 
   @Mock private FindingRepository findingRepository;
+  private final ObjectMapper mapper = new ObjectMapper();
 
   private FindingUtils findingUtils;
 
   @BeforeEach
   void setup() {
-    findingUtils = new FindingUtils(findingRepository);
+    findingUtils = new FindingUtils(mapper, findingRepository);
   }
 
   private Matcher getMatcher(String regex, String input) {
@@ -128,24 +130,41 @@ class FindingUtilsTest {
   void given_raw_output_tasklist_should_return_credentials() {
     // username:RID:LM_Hash:NTLM_Hash:::
     String rawOutput =
-        "SMB                      192.168.11.23   415    CASSANOVAS          [+] workgroup\\\\savacano:savacano (Pwn3d!)\\n";
+        "{\n"
+            + "  \"severity\": \"critical\",\n"
+            + "  \"host\": \"192.168.56.23\",\n"
+            + "  \"classification\": {\n"
+            + "    \"cve-id\": [\n"
+            + "      \"cve-2023-35078\"\n"
+            + "    ]\n"
+            + "  }\n"
+            + "}";
 
     RegexGroup regexGroup1 = new RegexGroup();
-    regexGroup1.setField("username");
-    regexGroup1.setIndexValues("$2");
+    regexGroup1.setField("severity");
+    regexGroup1.setIndexValues("$1");
 
     RegexGroup regexGroup2 = new RegexGroup();
-    regexGroup2.setField("password");
-    regexGroup2.setIndexValues("$3");
+    regexGroup2.setField("host");
+    regexGroup2.setIndexValues("$2");
 
-    Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2);
+    RegexGroup regexGroup3 = new RegexGroup();
+    regexGroup3.setField("id");
+    regexGroup3.setIndexValues("$3");
+
+    Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2, regexGroup3);
+
+    String regex =
+        "\"severity\"\\s*:\\s*\"([^\"]+)\"[\\s\\S]*?"
+            + "\"host\"\\s*:\\s*\"([^\"]+)\"[\\s\\S]*?"
+            + "\"cve-id\"\\s*:\\s*\\[\\s*((?:\"[^\"]+\"\\s*,?\\s*)+)";
 
     this.testRegexExtraction(
         rawOutput,
         regexGroups,
-        ContractOutputType.Credentials,
-        "(\\S+)\\\\(\\S+):(\\S+)",
-        "savacano:savacano");
+        ContractOutputType.CVE,
+        regex,
+        "192.168.56.23:cve-2023-35078 (critical)");
   }
 
   @Test
@@ -229,6 +248,30 @@ class FindingUtilsTest {
         ContractOutputType.IPv6,
         ipv6Regex,
         "fe80::1b03:a1ff:ccdb:b464%66\nfe80::1b04:a1ff:ccdb:b464%66\nfe80::1b03:a1ff:ccdb:b464%66\nfe80::6168:894c:9ee9:d02a%27");
+  }
+
+  @Test
+  @DisplayName("Should get host:cve (severity) from raw output command")
+  void given_raw_output_cve_should_return_cve() {
+    String rawOutput =
+        "SMB                      192.168.11.23   415    CASSANOVAS          [+] workgroup\\\\savacano:savacano (Pwn3d!)\\n";
+
+    RegexGroup regexGroup1 = new RegexGroup();
+    regexGroup1.setField("username");
+    regexGroup1.setIndexValues("$2");
+
+    RegexGroup regexGroup2 = new RegexGroup();
+    regexGroup2.setField("password");
+    regexGroup2.setIndexValues("$3");
+
+    Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2);
+
+    this.testRegexExtraction(
+        rawOutput,
+        regexGroups,
+        ContractOutputType.Credentials,
+        "(\\S+)\\\\(\\S+):(\\S+)",
+        "savacano:savacano");
   }
 
   private void testRegexExtraction(

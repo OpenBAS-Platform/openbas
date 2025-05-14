@@ -5,7 +5,11 @@ import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, use
 import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import {
+  fetchInjectResultOverviewOutput,
+  fetchTargetResult,
+  fetchTargetResultMerged,
+} from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -100,6 +104,7 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 interface Props {
+  // TODO: eventually make this an InjectTarget and assume `merged === true`
   inject: InjectResultOverviewOutput;
   lastExecutionStartDate: string;
   lastExecutionEndDate: string;
@@ -108,6 +113,7 @@ interface Props {
     name?: string;
     targetType: string;
     platformType?: string;
+    mergedExpectations: boolean;
   };
   parentTargetId?: string;
   upperParentTargetId?: string;
@@ -284,9 +290,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           fontSize: 9,
         },
       })));
-      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId).then(
-        (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
-      );
+      // target results are currently one of two modes:
+      // either only present the results native to the specific expectation (legacy behaviour)
+      // or present the aggregation of all results (= "merged") across all expectations belonging to the same
+      // target in paginated tabs (new behaviour)
+      // TODO: drop this switch when we drop the "All targets" tab for inject targets
+      if (!target.mergedExpectations) {
+        fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId).then(
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+        );
+      } else {
+        fetchTargetResultMerged(inject.inject_id, target.id!, target.targetType!).then(
+          (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
+        );
+      }
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }

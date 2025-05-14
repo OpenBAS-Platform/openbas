@@ -5,7 +5,10 @@ import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
-import { searchInjectByIdAsOption } from '../../../../actions/injects/inject-action';
+import {
+  searchInjectByIdAsOption,
+  searchTargetOptionsById,
+} from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
@@ -35,6 +38,16 @@ const useRetrieveOptions = () => {
       case 'payload_attack_patterns':
       case 'base_attack_patterns_side':
         searchAttackPatternsByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'target_asset_groups':
+        searchTargetOptionsById('ASSETS_GROUPS', ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'target_assets':
+        searchTargetOptionsById('ASSETS', ids).then((response) => {
           setOptions(response.data);
         });
         break;

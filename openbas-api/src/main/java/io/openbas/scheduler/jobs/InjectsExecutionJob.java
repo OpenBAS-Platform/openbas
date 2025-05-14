@@ -312,24 +312,26 @@ public class InjectsExecutionJob implements Job {
                               ? "atomic"
                               : ex.getInjection().getExercise().getId()));
       // Execute injects in parallel for each exercise.
-      byExercises.forEach(
-          (exercise, executableInjects) -> {
-            // Execute each inject for the exercise in order.
-            executableInjects.forEach(
-                executableInject -> {
-                  try {
-                    this.executeInject(executableInject);
-                  } catch (Exception e) {
-                    Inject inject = executableInject.getInjection().getInject();
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
-                    injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
-                  }
-                });
-            // Update the exercise
-            if (!exercise.equals("atomic")) {
-              updateExercise(exercise);
-            }
-          });
+      byExercises.entrySet().parallelStream()
+          .forEach(
+              (entry) -> {
+                // Execute each inject for the exercise in order.
+                entry.getValue().parallelStream()
+                    .forEach(
+                        executableInject -> {
+                          try {
+                            this.executeInject(executableInject);
+                          } catch (Exception e) {
+                            Inject inject = executableInject.getInjection().getInject();
+                            LOGGER.log(Level.WARNING, e.getMessage(), e);
+                            injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+                          }
+                        });
+                // Update the exercise
+                if (!entry.getKey().equals("atomic")) {
+                  updateExercise(entry.getKey());
+                }
+              });
       // Change status of finished exercises.
       handleAutoClosingExercises();
       handlePendingInject();
