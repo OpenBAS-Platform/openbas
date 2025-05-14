@@ -44,6 +44,12 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
     props.handleSelectTarget(target);
   };
 
+  useEffect(() => {
+    if (targets && targets.length > 0) {
+      handleSelectTarget(targets[0]);
+    }
+  }, [targets]);
+
   return (
     <>
       <PaginationComponentV2
