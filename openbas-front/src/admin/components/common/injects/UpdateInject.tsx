@@ -1,20 +1,28 @@
-import { Tab, Tabs } from '@mui/material';
+import { HelpOutlined } from '@mui/icons-material';
+import { Avatar, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
-import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type AttackPattern, type Inject, type InjectInput, type KillChainPhase } from '../../../../utils/api-types';
+import {
+  type Article,
+  type AttackPattern,
+  type Inject,
+  type InjectInput,
+  type KillChainPhase, type Variable,
+} from '../../../../utils/api-types';
+import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isNotEmptyField } from '../../../../utils/utils';
-import InjectDetailsForm from './form/InjectDetailsForm';
+import InjectForm from './form/InjectForm';
+import InjectCardComponent from './InjectCardComponent';
 import InjectIcon from './InjectIcon';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 interface Props {
@@ -25,9 +33,23 @@ interface Props {
   injectId: string;
   isAtomic?: boolean;
   injects?: InjectOutputType[];
+  articlesFromExerciseOrScenario?: Article[];
+  uriVariable?: string;
+  variablesFromExerciseOrScenario?: Variable[];
 }
 
-const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
+const UpdateInject: React.FC<Props> = ({
+  open,
+  handleClose,
+  onUpdateInject,
+  massUpdateInject,
+  injectId,
+  isAtomic = false,
+  injects,
+  articlesFromExerciseOrScenario = [],
+  uriVariable = '',
+  variablesFromExerciseOrScenario = [],
+}) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -73,10 +95,15 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
       title={t('Update the inject')}
       PaperProps={{ ref: drawerRef }}
       disableEnforceFocus
+      containerStyle={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing(2),
+      }}
     >
       <>
         {!isAtomic && (
-          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ marginBottom: theme.spacing(2) }}>
+          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
             {availableTabs.map((tab) => {
               return (
                 <Tab key={tab} label={tab} value={tab} />
@@ -84,45 +111,50 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             })}
           </Tabs>
         )}
-        {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
-          <InjectDetailsForm
-            injectorContractLabel={inject?.inject_title}
-            injectContractIcon={
-              injectorContractContent ? (
+        <InjectCardComponent
+          avatar={injectorContractContent
+            ? (
                 <InjectIcon
                   type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
                   isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
                 />
-              ) : undefined
-            }
-            injectHeaderAction={(
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              >
-                {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                  platform => (
-                    <PlatformIcon
-                      key={String(platform)}
-                      width={20}
-                      platform={String(platform)}
-                      marginRight={theme.spacing(2)}
-                    />
-                  ),
-                )}
-              </div>
-            )}
-            injectHeaderTitle={getInjectHeaderTitle()}
+              ) : (
+                <Avatar sx={{
+                  width: 24,
+                  height: 24,
+                }}
+                >
+                  <HelpOutlined />
+                </Avatar>
+              )}
+          title={getInjectHeaderTitle()}
+          action={(
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            >
+              {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+                platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
+              )}
+            </div>
+          )}
+          content={inject?.inject_title}
+        />
+
+        {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
+          <InjectForm
+            handleClose={handleClose}
+            openDetail
             disabled={!injectorContractContent}
+            drawerRef={drawerRef}
             isAtomic={isAtomic}
             defaultInject={inject}
-            drawerRef={drawerRef}
-            handleClose={handleClose}
             injectorContractContent={injectorContractContent}
             onSubmitInject={(data: InjectInput) => onUpdateInject(data as Inject)}
-            openDetail
-            {...props}
+            articlesFromExerciseOrScenario={articlesFromExerciseOrScenario}
+            uriVariable={uriVariable}
+            variablesFromExerciseOrScenario={variablesFromExerciseOrScenario}
           />
         )}
         {(!isInjectLoading && !isAtomic && activeTab === 'Logical chains') && (
@@ -131,7 +163,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             handleClose={handleClose}
             onUpdateInject={massUpdateInject}
             injects={injects}
-            {...props}
           />
         )}
       </>

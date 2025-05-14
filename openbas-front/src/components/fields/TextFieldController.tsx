@@ -20,23 +20,25 @@ interface Props {
   size?: 'medium' | 'small';
   endAdornmentLabel?: string;
   startAdornmentLabel?: string;
+  type?: 'number' | 'text';
 }
 
 const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
 
 const TextFieldController = ({
   name,
-  label,
-  multiline,
+  label = '',
+  multiline = false,
   rows,
-  disabled,
-  required,
+  required = false,
+  disabled = false,
   style = {},
-  size,
-  variant,
+  variant = 'standard',
   placeholder = '',
+  size = 'medium',
   endAdornmentLabel,
   startAdornmentLabel,
+  type = 'text',
 }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
@@ -48,8 +50,9 @@ const TextFieldController = ({
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
+          type={type}
           className={classes.root}
-          label={label || ''}
+          label={label}
           fullWidth
           error={!!error}
           helperText={error ? error.message : null}
@@ -60,8 +63,8 @@ const TextFieldController = ({
           disabled={disabled}
           placeholder={placeholder}
           style={style}
-          variant={variant || 'standard'}
-          size={size || 'medium'}
+          variant={variant}
+          size={size}
           slotProps={{
             input: {
               ...(endAdornmentLabel

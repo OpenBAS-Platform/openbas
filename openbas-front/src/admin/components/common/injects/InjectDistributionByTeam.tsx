@@ -12,7 +12,7 @@ import { type Exercise, type Team } from '../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { getTeamsColors } from './teams/utils';
+import { getTeamsColors } from '../../teams/utils';
 
 interface Props { exerciseId: Exercise['exercise_id'] }
 

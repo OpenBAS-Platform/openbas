@@ -1,17 +1,12 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../../components/i18n';
 import AssetGroupDialogAdding from '../../../../assets/asset_groups/AssetGroupDialogAdding';
-import { PermissionsContext } from '../../../../common/Context';
 
 const useStyles = makeStyles()(theme => ({
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -22,16 +17,17 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   assetGroupIds: string[];
   onSubmit: (assetGroupIds: string[]) => void;
+  disabled?: boolean;
 }
 
 const InjectAddAssetGroups: FunctionComponent<Props> = ({
   assetGroupIds,
   onSubmit,
+  disabled = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const { permissions } = useContext(PermissionsContext);
 
   // Dialog
   const [openDialog, setOpenDialog] = useState(false);
@@ -41,11 +37,10 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
   return (
     <>
       <ListItemButton
-        classes={{ root: classes.item }}
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly}
+        disabled={disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

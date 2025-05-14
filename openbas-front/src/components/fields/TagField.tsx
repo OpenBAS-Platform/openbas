@@ -32,6 +32,7 @@ interface Props {
   fieldOnChange: (values: string[]) => void;
   error?: GlobalError;
   style?: CSSProperties;
+  disabled?: boolean;
 }
 
 const TagField: FunctionComponent<Props> = ({
@@ -40,6 +41,7 @@ const TagField: FunctionComponent<Props> = ({
   fieldOnChange,
   error,
   style = {},
+  disabled = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -105,6 +107,7 @@ const TagField: FunctionComponent<Props> = ({
         autoHighlight
         clearOnBlur={false}
         clearOnEscape={false}
+        disabled={disabled}
         options={tagsOptions}
         onChange={(_, value) => {
           fieldOnChange(value.map(v => v.id));
@@ -135,6 +138,7 @@ const TagField: FunctionComponent<Props> = ({
                         position: 'absolute',
                         right: '35px',
                       }}
+                      disabled={disabled}
                       onClick={() => handleOpenTagCreation()}
                     >
                       <AddOutlined />

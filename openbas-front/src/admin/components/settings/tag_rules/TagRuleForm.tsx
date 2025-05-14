@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Typography } from '@mui/material';
-import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useContext, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -10,6 +10,7 @@ import { type TagRuleInput, type TagRuleOutput } from '../../../../utils/api-typ
 import { zodImplement } from '../../../../utils/Zod';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
+import { PermissionsContext } from '../../common/Context';
 import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import OPEN_CTI_TAG_NAME from './TagRuleConstants';
 
@@ -29,6 +30,7 @@ const TagRuleForm: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   const [assetGroupIds] = useState<string[]>(Object.keys(initialValues.asset_groups ?? []));
 
@@ -57,94 +59,91 @@ const TagRuleForm: FunctionComponent<Props> = ({
   };
 
   return (
-    <>
-      <form id="tagForm" onSubmit={handleSubmitWithoutPropagation}>
-        <>
-          <Typography
-            variant="h5"
-            style={{
-              fontWeight: 500,
-              marginTop: 0,
-            }}
-          >
-            {t('Tag')}
-          </Typography>
-          <Controller
-            control={control}
-            name="tag_name"
-            render={({ field: { onChange, value } }) => {
-              return (
-                <TagFieldSingle
-                  name="tag_name"
-                  label={t('Select a Tag')}
-                  fieldValue={value}
-                  fieldOnChange={onChange}
-                  errors={errors}
-                  style={{ marginTop: 20 }}
-                  disabled={value == OPEN_CTI_TAG_NAME}
-                  forbiddenOptions={value !== OPEN_CTI_TAG_NAME ? [OPEN_CTI_TAG_NAME] : []}
-                />
-              );
-            }}
-          />
-          <Typography
-            variant="h5"
-            style={{
-              fontWeight: 500,
-              marginTop: 50,
-            }}
-          >
-            {t('Asset groups')}
-          </Typography>
-          <Controller
-            name="asset_groups"
-            control={control}
-            render={({ field: { onChange, value } }) => {
-              const assetGroupIds = value ?? [];
-
-              return (
-                <>
-                  <AssetGroupsList
-                    assetGroupIds={assetGroupIds}
-                    actions={(
-                      // @ts-expect-error: assetGroup property handle by AssetGroupsList
-                      <AssetGroupPopover
-                        inline
-                        onRemoveAssetGroupFromList={result =>
-                          onChange(assetGroupIds.filter(ag => ag !== result))}
-                        onDelete={result => onChange(assetGroupIds.filter(ag => ag !== result))}
-                        removeAssetGroupFromListMessage="Remove from the Asset Rule"
-                      />
-                    )}
-                  />
-                  <InjectAddAssetGroups
-                    assetGroupIds={assetGroupIds}
-                    onSubmit={(result) => {
-                      onChange(result);
-                    }}
-                  />
-                </>
-
-              );
-            }}
-          />
-        </>
-
-        <div style={{
-          float: 'right',
-          marginTop: 20,
+    <form id="tagForm" onSubmit={handleSubmitWithoutPropagation}>
+      <Typography
+        variant="h5"
+        style={{
+          fontWeight: 500,
+          marginTop: 0,
         }}
+      >
+        {t('Tag')}
+      </Typography>
+      <Controller
+        control={control}
+        name="tag_name"
+        render={({ field: { onChange, value } }) => {
+          return (
+            <TagFieldSingle
+              name="tag_name"
+              label={t('Select a Tag')}
+              fieldValue={value}
+              fieldOnChange={onChange}
+              errors={errors}
+              style={{ marginTop: 20 }}
+              disabled={value == OPEN_CTI_TAG_NAME}
+              forbiddenOptions={value !== OPEN_CTI_TAG_NAME ? [OPEN_CTI_TAG_NAME] : []}
+            />
+          );
+        }}
+      />
+      <Typography
+        variant="h5"
+        style={{
+          fontWeight: 500,
+          marginTop: 50,
+        }}
+      >
+        {t('Asset groups')}
+      </Typography>
+      <Controller
+        name="asset_groups"
+        control={control}
+        render={({ field: { onChange, value } }) => {
+          const assetGroupIds = value ?? [];
+
+          return (
+            <>
+              <AssetGroupsList
+                assetGroupIds={assetGroupIds}
+                renderActions={assetGroup => (
+                  <AssetGroupPopover
+                    inline
+                    assetGroup={assetGroup}
+                    onRemoveAssetGroupFromList={result =>
+                      onChange(assetGroupIds.filter(ag => ag !== result))}
+                    onDelete={result => onChange(assetGroupIds.filter(ag => ag !== result))}
+                    removeAssetGroupFromListMessage="Remove from the Asset Rule"
+                    disabled={permissions.readOnly}
+                  />
+                )}
+              />
+              <InjectAddAssetGroups
+                assetGroupIds={assetGroupIds}
+                onSubmit={(result) => {
+                  onChange(result);
+                }}
+                disabled={permissions.readOnly}
+              />
+            </>
+          );
+        }}
+      />
+
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
+        <Button
+          variant="contained"
+          color="secondary"
+          type="submit"
         >
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-          >
-            {editing ? t('Update') : t('Create')}
-          </Button>
-        </div>
-      </form>
-    </>
+          {editing ? t('Update') : t('Create')}
+        </Button>
+      </div>
+    </form>
   );
 };
 

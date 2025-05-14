@@ -1,5 +1,7 @@
 // FILE TO REFERENCE ALL CUSTOM TYPES DERIVATIVE FROM API-TYPES
 
+import type { ContractVariable } from '../actions/contract/contract';
+import type { ExpectationInput } from '../admin/components/common/injects/expectations/Expectation';
 import type * as ApiTypes from './api-types';
 
 export type DateHistogramWidget = ApiTypes.UtilRequiredKeys<ApiTypes.BaseHistogramWidget, 'mode' | 'field'> & {
@@ -32,3 +34,47 @@ export type PayloadCreateInput = Omit<ApiTypes.BasePayload, PayloadCreateInputOm
     | Omit<ApiTypes.FileDrop, PayloadCreateInputOmit> & PayloadCreateInputMore & { payload_type: 'FileDrop' }
     | Omit<ApiTypes.DnsResolution, PayloadCreateInputOmit> & PayloadCreateInputMore & { payload_type: 'DnsResolution' }
     );
+
+export type ContractType = 'text' | 'number' | 'checkbox' | 'textarea' | 'tags' | 'select' | 'choice' | 'article' | 'challenge' | 'dependency-select' | 'attachment' | 'team' | 'expectation' | 'asset' | 'asset-group' | 'payload';
+
+export interface ContractElement {
+  key: string;
+  mandatory: boolean;
+  type: ContractType;
+  label: string;
+  readOnly: boolean;
+  mandatoryGroups?: string[];
+  mandatoryConditionField?: string;
+  linkedFields?: {
+    key: string;
+    type: string;
+  }[];
+  linkedValues?: string[];
+  cardinality: '1' | 'n';
+  defaultValue: string | string[];
+  richText?: boolean;
+  tupleFilePrefix?: string;
+  predefinedExpectations?: ExpectationInput[];
+  dependencyField?: string;
+  choices?: Record<string, string> | {
+    label: string;
+    value: string;
+    information: string;
+  }[];
+}
+
+export type InjectorContractConverted = Omit<InjectorContract, 'convertedContent'> & {
+  convertedContent: {
+    fields: ContractElement[];
+    contract_id: string;
+    config: {
+      type: string;
+      color_dark: string;
+      color_light: string;
+      expose: boolean;
+      label: Record<string, string>;
+    };
+    label: Record<string, string>;
+    variables?: ContractVariable[];
+  };
+};
