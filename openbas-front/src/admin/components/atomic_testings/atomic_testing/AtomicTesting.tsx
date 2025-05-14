@@ -116,7 +116,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, hasTeams, hasEndpoints]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
