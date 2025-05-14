@@ -50,7 +50,7 @@ public class Agent implements Base {
   // ID is UUID by default and external reference for CrowdStrike agent
   private String id = UUID.randomUUID().toString();
 
-  @Queryable(sortable = true)
+  @Queryable(sortable = true, filterable = true, path = "asset.id")
   @ManyToOne
   @JoinColumn(name = "agent_asset")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -73,7 +73,7 @@ public class Agent implements Base {
   @NotNull
   private DEPLOYMENT_MODE deploymentMode;
 
-  @Queryable(sortable = true)
+  @Queryable(sortable = true, filterable = true)
   @Column(name = "agent_executed_by_user")
   @JsonProperty("agent_executed_by_user")
   @NotBlank

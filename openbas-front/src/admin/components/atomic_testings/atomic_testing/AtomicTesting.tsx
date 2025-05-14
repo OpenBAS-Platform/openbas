@@ -170,14 +170,14 @@ const AtomicTesting = () => {
       });
 
     searchTargets(injectId, 'AGENT', searchPaginationInput1Result)
-        .then((response) => {
-          if (response.data.content.length > 0) {
-            setHasAgents(true);
-          } else { setHasAgents(false); }
-        })
-        .finally(() => {
-          setHasAgentsChecked(true);
-        });
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasAgents(true);
+        } else { setHasAgents(false); }
+      })
+      .finally(() => {
+        setHasAgentsChecked(true);
+      });
 
     setReloadContentCount(reloadContentCount + 1);
     setActiveTab(0);

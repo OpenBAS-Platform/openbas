@@ -1271,6 +1271,7 @@
   "Tags": "Tags",
   "Target": "Cible",
   "target_asset_groups": "Groupes d'actifs",
+  "target_endpoint": "Endpoint",
   "target_name": "Nom",
   "target_tags": "Tags",
   "Targeted asset groups": "Groupes d'assets ciblés",

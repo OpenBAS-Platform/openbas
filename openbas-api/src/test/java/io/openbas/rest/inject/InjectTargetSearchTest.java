@@ -19,10 +19,7 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
@@ -45,6 +42,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
   @Autowired private EntityManager entityManager;
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private ExecutorComposer executorComposer;
+  @Autowired private ExecutorFixture executorFixture;
 
   @BeforeEach
   public void beforeEach() {
@@ -54,6 +54,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
     assetGroupComposer.reset();
     expectationComposer.reset();
     endpointComposer.reset();
+    agentComposer.reset();
+    executorComposer.reset();
   }
 
   private InjectComposer.Composer getInjectWrapper() {
@@ -129,15 +131,15 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
   @Nested
   @WithMockAdminUser
-  @DisplayName("With endpoint search")
-  public class WithEndpointSearch {
-    private final TargetType targetType = TargetType.ASSETS;
+  @DisplayName("With agent search")
+  public class WithAgentSearch {
+    private final TargetType targetType = TargetType.AGENT;
 
     @Nested
     @DisplayName("When getting options for inject targets")
     public class WhenGettingOptionsForInjectTargets {
       @Test
-      @Disabled("Not yet implemented")
+      @Disabled("not implemented")
       @DisplayName("/options should return all possible targets")
       public void whenEndpointsAreFilters_returnAllPossibleTargets() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
@@ -194,7 +196,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       }
 
       @Test
-      @Disabled("Not yet implemented")
+      @Disabled("not implemented")
       @DisplayName("/options by id should return only options matching ids")
       public void whenEndpointsAreFilters_returnOnlyOptionsMatchingIds() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();
@@ -220,7 +222,762 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
         Endpoint ep2 = EndpointFixture.createEndpoint();
         ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+        endpointComposer.forEndpoint(ep2).persist();
+
+        // create a new endpoint that is not part of the above groups
+        Endpoint ep3 = EndpointFixture.createEndpoint();
+        ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+        endpointComposer.forEndpoint(ep3).persist();
+
+        injectWrapper
+            .withAssetGroup(assetGroupWrapper)
+            .withAssetGroup(assetGroupWrapper2)
+            .persist();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<String> ids = List.of(ep1Wrapper.get().getId());
+
+        String response =
+            mvc.perform(
+                    post(INJECT_URI + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(ids)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(ep1Wrapper.get().getId(), ep1Wrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+    }
+
+    @Test
+    @DisplayName(
+        "When agent belongs to dynamic asset in group, they are targets of inject if group is a target")
+    public void whenAgentBelongsToDynamicAssetInGroup_thenTargetIsDynamicAssetInGroup()
+        throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      // dynamic group 1
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
+
+      // 2
+      Filters.Filter filter2 = new Filters.Filter();
+      filter2.setKey("endpoint_platform");
+      filter2.setMode(Filters.FilterMode.and);
+      filter2.setOperator(Filters.FilterOperator.eq);
+      filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+      AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
+
+      AgentComposer.Composer agent1Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(agent1Wrapper)
+          .persist();
+
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      injectWrapper
+          .withAssetGroup(assetGroupWrapper)
+          .withExpectation(
+              expectationComposer
+                  .forExpectation(
+                      InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                          InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                          InjectExpectation.EXPECTATION_STATUS.SUCCESS))
+                  .withAgent(agent1Wrapper))
+          .withExpectation(
+              expectationComposer
+                  .forExpectation(
+                      InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                          InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+                          InjectExpectation.EXPECTATION_STATUS.PARTIAL))
+                  .withAgent(agent1Wrapper))
+          .withAssetGroup(assetGroupWrapper2)
+          .withExpectation(
+              expectationComposer
+                  .forExpectation(
+                      InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                          InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                          InjectExpectation.EXPECTATION_STATUS.SUCCESS))
+                  .withAgent(agent2Wrapper))
+          .withExpectation(
+              expectationComposer
+                  .forExpectation(
+                      InjectExpectationFixture.createExpectationWithTypeAndStatus(
+                          InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+                          InjectExpectation.EXPECTATION_STATUS.PARTIAL))
+                  .withAgent(agent2Wrapper));
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search = PaginationFixture.getDefault().build();
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget1 =
+          new AgentTarget(
+              agent1Wrapper.get().getId(),
+              agent1Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent1Wrapper.get().getAsset().getId(),
+              agent1Wrapper.get().getExecutor().getType());
+      expectedTarget1.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+      expectedTarget1.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
+      expectedTarget1.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
+      expectedTarget1.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
+      AgentTarget expectedTarget2 =
+          new AgentTarget(
+              agent2Wrapper.get().getId(),
+              agent2Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent2Wrapper.get().getAsset().getId(),
+              agent2Wrapper.get().getExecutor().getType());
+      expectedTarget2.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+      expectedTarget2.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
+      expectedTarget2.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
+      expectedTarget2.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
+      // expect two out of three endpoints in the resultset, i.e. not the extra one
+      List<AgentTarget> expected = List.of(expectedTarget1, expectedTarget2);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName("When dynamic groups intersect, common agents are returned only once")
+    public void whenDynamicGroupsIntersect_thenReturnCommonAgentsOnce() throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+
+      // create two identical asset groups
+      for (int i = 0; i < 2; i++) {
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+      }
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      AgentComposer.Composer agent1Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(agent1Wrapper)
+          .persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter("target_name", "", Filters.FilterOperator.contains);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget =
+          new AgentTarget(
+              agent1Wrapper.get().getId(),
+              agent1Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent1Wrapper.get().getAsset().getId(),
+              agent1Wrapper.get().getExecutor().getType());
+      List<AgentTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When no applied AssetGroup filter, at most a full page of targeted agents should be returned")
+    public void whenNoAppliedAssetGroupFilter_returnPageOfAllTargetedAgents() throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      AgentComposer.Composer agent1Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(agent1Wrapper)
+          .persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper =
+          endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is both part of the above groups and also will be targeted
+      // explicitly
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      EndpointComposer.Composer ep3Wrapper =
+          endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer
+          .forEndpoint(notTarget)
+          .withAgent(
+              agentComposer
+                  .forAgent(AgentFixture.createDefaultAgentService())
+                  .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor())))
+          .persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep3Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search = PaginationFixture.getDefault().build();
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<AgentTarget> expected =
+          List.of(
+              new AgentTarget(
+                  agent1Wrapper.get().getId(),
+                  agent1Wrapper.get().getExecutedByUser(),
+                  Set.of(),
+                  agent1Wrapper.get().getAsset().getId(),
+                  agent1Wrapper.get().getExecutor().getType()),
+              new AgentTarget(
+                  agent2Wrapper.get().getId(),
+                  agent2Wrapper.get().getExecutedByUser(),
+                  Set.of(),
+                  agent2Wrapper.get().getAsset().getId(),
+                  agent2Wrapper.get().getExecutor().getType()),
+              new AgentTarget(
+                  agent3Wrapper.get().getId(),
+                  agent3Wrapper.get().getExecutedByUser(),
+                  Set.of(),
+                  agent3Wrapper.get().getAsset().getId(),
+                  agent3Wrapper.get().getExecutor().getType()));
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When endpoints are explicitly targeted, 'is empty' Asset group filter should only return agents from endpoints that are not in any group'")
+    public void whenEndpointsAreExplicitlyTargeted_thenReturnOnlyAgentsFromEndpointsWithNoGroup()
+        throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(
+              agentComposer
+                  .forAgent(AgentFixture.createDefaultAgentService())
+                  .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor())))
+          .persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper =
+          endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is both part of the above groups and also will be targeted
+      // explicitly
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      EndpointComposer.Composer ep3Wrapper =
+          endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer
+          .forEndpoint(notTarget)
+          .withAgent(
+              agentComposer
+                  .forAgent(AgentFixture.createDefaultAgentService())
+                  .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor())))
+          .persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep3Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter("target_asset_groups", null, Filters.FilterOperator.empty);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget =
+          new AgentTarget(
+              agent2Wrapper.get().getId(),
+              agent2Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent2Wrapper.get().getAsset().getId(),
+              agent2Wrapper.get().getExecutor().getType());
+      List<AgentTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When endpoints are explicitly targeted, 'not empty' Asset group filter should only return agents that belong to endpoints in any group'")
+    public void whenEndpointsAreExplicitlyTargeted_thenReturnOnlyAgentsFromEndpointsWithGroup()
+        throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      AgentComposer.Composer agent1Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(agent1Wrapper)
+          .persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper =
+          endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint notTarget = EndpointFixture.createEndpoint();
+      notTarget.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(notTarget).withAgent(agent3Wrapper).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      injectWrapper.withEndpoint(ep2Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter(
+              "target_asset_groups", null, Filters.FilterOperator.not_empty);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget =
+          new AgentTarget(
+              agent1Wrapper.get().getId(),
+              agent1Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent1Wrapper.get().getAsset().getId(),
+              agent1Wrapper.get().getExecutor().getType());
+      List<AgentTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When are part of a group, 'not contains' operator on this group should exclude agents of member endpoints")
+    public void whenArePartOfAGroupAndGroupFilteredOut_thenExcludeAllAgentsFromEndpointsOfGroup()
+        throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(
+              agentComposer
+                  .forAgent(AgentFixture.createDefaultAgentService())
+                  .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor())))
+          .persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper =
+          endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      Inject inject = injectWrapper.withEndpoint(ep2Wrapper).persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter(
+              "target_asset_groups",
+              assetGroupWrappers.getFirst().get().getId(),
+              Filters.FilterOperator.not_contains);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget =
+          new AgentTarget(
+              agent2Wrapper.get().getId(),
+              agent2Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent2Wrapper.get().getAsset().getId(),
+              agent2Wrapper.get().getExecutor().getType());
+      List<AgentTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
+    @Test
+    @DisplayName(
+        "When are part of a group, 'contains' operator on this group should include agents from endpoints of this group and exclude others")
+    public void
+        whenArePartOfAGroupAndGroupSelectedAsFilter_thenIncludeOnlyAgentsFromEndpointsOfGroup()
+            throws Exception {
+      InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+      List<AssetGroupComposer.Composer> assetGroupWrappers = new ArrayList<>();
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("endpoint_platform");
+      filter.setMode(Filters.FilterMode.and);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+      assetGroupWrappers.add(getAssetGroupWrapperWithFilter(filter));
+
+      // create several endpoints; only the Windows (first) endpoint should be involved in the above
+      // groups
+      AgentComposer.Composer agent1Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      EndpointComposer.Composer ep1Wrapper =
+          endpointComposer
+              .forEndpoint(EndpointFixture.createEndpoint())
+              .withAgent(agent1Wrapper)
+              .persist();
+
+      // create a new endpoint that is not part of the above groups but will be targeted explicitly
+      AgentComposer.Composer agent2Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep2 = EndpointFixture.createEndpoint();
+      ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+      EndpointComposer.Composer ep2Wrapper =
+          endpointComposer.forEndpoint(ep2).withAgent(agent2Wrapper).persist();
+
+      // create a new endpoint that is not part of the above groups
+      AgentComposer.Composer agent3Wrapper =
+          agentComposer
+              .forAgent(AgentFixture.createDefaultAgentService())
+              .withExecutor(executorComposer.forExecutor(executorFixture.getDefaultExecutor()));
+      Endpoint ep3 = EndpointFixture.createEndpoint();
+      ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+      endpointComposer.forEndpoint(ep3).withAgent(agent3Wrapper).persist();
+
+      assetGroupWrappers.forEach(injectWrapper::withAssetGroup);
+      // add two endpoints as direct targets, including the endpoint part of the excluded group
+      injectWrapper.withEndpoint(ep2Wrapper).withEndpoint(ep1Wrapper);
+      Inject inject = injectWrapper.persist().get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter(
+              "target_asset_groups",
+              assetGroupWrappers.getFirst().get().getId(),
+              Filters.FilterOperator.contains);
+
+      String response =
+          mvc.perform(
+                  post(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      AgentTarget expectedTarget =
+          new AgentTarget(
+              agent1Wrapper.get().getId(),
+              agent1Wrapper.get().getExecutedByUser(),
+              Set.of(),
+              agent1Wrapper.get().getAsset().getId(),
+              agent1Wrapper.get().getExecutor().getType());
+      List<AgentTarget> expected = List.of(expectedTarget);
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+  }
+
+  @Nested
+  @WithMockAdminUser
+  @DisplayName("With endpoint search")
+  public class WithEndpointSearch {
+    private final TargetType targetType = TargetType.ASSETS;
+
+    @Nested
+    @DisplayName("When getting options for inject targets")
+    public class WhenGettingOptionsForInjectTargets {
+      @Test
+      @DisplayName("/options should return all possible targets")
+      public void whenEndpointsAreFilters_returnAllPossibleTargets() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
+
+        EndpointComposer.Composer ep1Wrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+        Endpoint ep2 = EndpointFixture.createEndpoint();
+        ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
         EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+        // create a new endpoint that is not part of the above groups
+        Endpoint ep3 = EndpointFixture.createEndpoint();
+        ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+        endpointComposer.forEndpoint(ep3).persist();
+
+        injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(ep1Wrapper.get().getId(), ep1Wrapper.get().getName()),
+                new FilterUtilsJpa.Option(ep2Wrapper.get().getId(), ep2Wrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName("/options by id should return only options matching ids")
+      public void whenEndpointsAreFilters_returnOnlyOptionsMatchingIds() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
+
+        EndpointComposer.Composer ep1Wrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+        Endpoint ep2 = EndpointFixture.createEndpoint();
+        ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+        endpointComposer.forEndpoint(ep2).persist();
 
         // create a new endpoint that is not part of the above groups
         Endpoint ep3 = EndpointFixture.createEndpoint();
@@ -329,8 +1086,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.flush();
       entityManager.clear();
 
-      SearchPaginationInput search =
-          PaginationFixture.simpleFilter("target_name", "", Filters.FilterOperator.contains);
+      SearchPaginationInput search = PaginationFixture.getDefault().build();
 
       String response =
           mvc.perform(
@@ -393,7 +1149,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       // create a new endpoint that is not part of the above groups
       Endpoint ep2 = EndpointFixture.createEndpoint();
       ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
-      EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+      endpointComposer.forEndpoint(ep2).persist();
 
       // create a new endpoint that is not part of the above groups
       Endpoint ep3 = EndpointFixture.createEndpoint();
@@ -648,8 +1404,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       // create several endpoints; only the Windows (first) endpoint should be involved in the above
       // groups
-      EndpointComposer.Composer ep1Wrapper =
-          endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
 
       // create a new endpoint that is not part of the above groups but will be targeted explicitly
       Endpoint ep2 = EndpointFixture.createEndpoint();

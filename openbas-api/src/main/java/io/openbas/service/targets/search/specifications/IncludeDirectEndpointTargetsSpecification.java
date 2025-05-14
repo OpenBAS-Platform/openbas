@@ -1,34 +1,37 @@
 package io.openbas.service.targets.search.specifications;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
+import static io.openbas.service.targets.search.specifications.SearchSpecificationUtils.createJoinedFrom;
+
 import io.openbas.database.model.Inject;
-import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class IncludeDirectEndpointTargetsSpecification {
-  public Specification<Endpoint> buildSpecification(Inject scopedInject) {
-    return getDirectTargetingSpecification(scopedInject);
+public class IncludeDirectEndpointTargetsSpecification<T> {
+
+  public Specification<T> buildSpecification(Inject scopedInject, List<String> joinPath) {
+    return getDirectTargetingSpecification(scopedInject, joinPath);
   }
 
-  private Specification<Endpoint> getDirectTargetingSpecification(Inject scopedInject) {
+  private Specification<T> getDirectTargetingSpecification(
+      Inject scopedInject, List<String> joinPath) {
     return (root, query, criteriaBuilder) -> {
       Subquery<Integer> subQuery = query.subquery(Integer.class);
       Root<Inject> injectTable = subQuery.from(Inject.class);
-      Join<Inject, Asset> assetJoin = injectTable.join("assets");
+      From<?, ?> finalFrom = createJoinedFrom(injectTable, joinPath);
 
       subQuery
           .select(criteriaBuilder.literal(1))
           .where(
               criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
               criteriaBuilder.equal(
-                  assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+                  finalFrom.get("id"), query.getRoots().stream().findFirst().get().get("id")));
       return criteriaBuilder.exists(subQuery);
     };
   }
