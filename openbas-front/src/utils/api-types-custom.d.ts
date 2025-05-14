@@ -3,7 +3,6 @@
 import type { ContractVariable } from '../actions/contract/contract';
 import type { ExpectationInput } from '../admin/components/common/injects/expectations/Expectation';
 import type * as ApiTypes from './api-types';
-import type { InjectorContract } from './api-types';
 
 export type DateHistogramWidget = ApiTypes.UtilRequiredKeys<ApiTypes.BaseHistogramWidget, 'mode' | 'field'> & {
   end: string;
