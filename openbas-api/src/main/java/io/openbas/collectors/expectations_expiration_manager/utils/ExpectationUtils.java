@@ -11,6 +11,8 @@ import java.time.temporal.ChronoUnit;
 
 public class ExpectationUtils {
 
+  public static final String FAILED = "FAILED";
+
   private ExpectationUtils() {}
 
   public static boolean isExpired(@NotNull final InjectExpectation expectation) {
@@ -19,9 +21,15 @@ public class ExpectationUtils {
     return expectation.getCreatedAt().isBefore(expirationTime);
   }
 
+  public static String computeSuccessMessage(@NotNull final EXPECTATION_TYPE expectationType) {
+    return DETECTION.equals(expectationType)
+        ? "Detected"
+        : PREVENTION.equals(expectationType) ? "Prevented" : FAILED;
+  }
+
   public static String computeFailedMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
         ? "Not Detected"
-        : PREVENTION.equals(expectationType) ? "Not Prevented" : "FAILED";
+        : PREVENTION.equals(expectationType) ? "Not Prevented" : FAILED;
   }
 }
