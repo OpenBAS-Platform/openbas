@@ -757,7 +757,8 @@ export interface ContractOutputElement {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** @format date-time */
   contract_output_element_updated_at: string;
   listened?: boolean;
@@ -789,7 +790,8 @@ export interface ContractOutputElementInput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
 }
 
 /** Represents the rules for parsing the output of an execution. */
@@ -815,7 +817,8 @@ export interface ContractOutputElementSimple {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
 }
 
 export interface CreateExerciseInput {
@@ -1622,7 +1625,8 @@ export interface Finding {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** @format date-time */
   finding_updated_at: string;
   finding_users?: string[];
@@ -1641,7 +1645,8 @@ export interface FindingInput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   finding_value: string;
 }
 
@@ -1685,7 +1690,8 @@ export interface FindingOutput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** Finding Value */
   finding_value: string;
 }

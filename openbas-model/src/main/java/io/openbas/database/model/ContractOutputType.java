@@ -1,7 +1,11 @@
 package io.openbas.database.model;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +20,7 @@ public enum ContractOutputType {
       null,
       true,
       Objects::nonNull,
-      JsonNode::asText,
+      ContractOutputType::buildString,
       null,
       null,
       null),
@@ -27,7 +31,7 @@ public enum ContractOutputType {
       null,
       true,
       Objects::nonNull,
-      JsonNode::asText,
+      ContractOutputType::buildString,
       null,
       null,
       null),
@@ -38,7 +42,7 @@ public enum ContractOutputType {
       null,
       true,
       Objects::nonNull,
-      JsonNode::asText,
+      ContractOutputType::buildString,
       null,
       null,
       null),
@@ -58,10 +62,10 @@ public enum ContractOutputType {
               && jsonNode.get("port") != null
               && jsonNode.get("service") != null,
       (JsonNode jsonNode) -> {
-        String host = jsonNode.get("host").asText();
-        String port = jsonNode.get("port").asText();
-        String service = jsonNode.get("service").asText();
-        return host + ":" + port + " (" + service + ")";
+        String host = buildString(jsonNode, "host");
+        String port = buildString(jsonNode, "port");
+        String service = buildString(jsonNode, "service");
+        return host + ":" + port + (hasText(service) ? " (" + service + ")" : "");
       },
       (JsonNode jsonNode) -> {
         if (jsonNode.get("asset_id") != null) {
@@ -79,7 +83,7 @@ public enum ContractOutputType {
       true,
       (JsonNode jsonNode) ->
           InetAddressValidator.getInstance().isValidInet4Address(jsonNode.asText()),
-      JsonNode::asText,
+      ContractOutputType::buildString,
       null,
       null,
       null),
@@ -91,7 +95,7 @@ public enum ContractOutputType {
       true,
       (JsonNode jsonNode) ->
           InetAddressValidator.getInstance().isValidInet6Address(jsonNode.asText()),
-      JsonNode::asText,
+      ContractOutputType::buildString,
       null,
       null,
       null),
@@ -106,11 +110,40 @@ public enum ContractOutputType {
       true,
       (JsonNode jsonNode) -> jsonNode.get("username") != null && jsonNode.get("password") != null,
       (JsonNode jsonNode) -> {
-        String username = jsonNode.get("username").asText();
-        String password = jsonNode.get("password").asText();
+        String username = buildString(jsonNode, "username");
+        String password = buildString(jsonNode, "password");
         return username + ":" + password;
       },
       null,
+      null,
+      null),
+  @JsonProperty("cve")
+  CVE(
+      "cve",
+      ContractOutputTechnicalType.Object,
+      new ArrayList<>(
+          List.of(
+              new ContractOutputField("asset_id", ContractOutputTechnicalType.Text, false),
+              new ContractOutputField("id", ContractOutputTechnicalType.Text, true),
+              new ContractOutputField("host", ContractOutputTechnicalType.Text, true),
+              new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
+      true,
+      (JsonNode jsonNode) ->
+          jsonNode.get("id") != null
+              && jsonNode.get("host") != null
+              && jsonNode.get("severity") != null,
+      (JsonNode jsonNode) -> {
+        String id = buildString(jsonNode, "id");
+        String host = buildString(jsonNode, "host");
+        String severity = buildString(jsonNode, "severity");
+        return host + ":" + id + " (" + severity + ")";
+      },
+      (JsonNode jsonNode) -> {
+        if (jsonNode.get("asset_id") != null) {
+          return List.of(jsonNode.get("asset_id").asText());
+        }
+        return new ArrayList<>();
+      },
       null,
       null);
 
@@ -143,5 +176,28 @@ public enum ContractOutputType {
     this.toFindingAssets = toFindingAssets;
     this.toFindingUsers = toFindingUsers;
     this.toFindingTeams = toFindingTeams;
+  }
+
+  private static String buildString(@NotNull final JsonNode jsonNode) {
+    if (jsonNode.isArray()) {
+      List<String> values = new ArrayList<>();
+      for (JsonNode element : jsonNode) {
+        values.add(trimQuotes(element.asText()));
+      }
+      return String.join(" ", values);
+    }
+    return trimQuotes(jsonNode.asText());
+  }
+
+  private static String buildString(@NotNull final JsonNode jsonNode, @NotBlank final String key) {
+    JsonNode valueNode = jsonNode.get(key);
+    if (valueNode == null || valueNode.isNull()) {
+      return "";
+    }
+    return buildString(valueNode);
+  }
+
+  private static String trimQuotes(@NotBlank final String value) {
+    return value.replaceAll("^\"|\"$", "");
   }
 }
