@@ -1,6 +1,7 @@
 import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
@@ -39,10 +40,11 @@ const ScenarioInjects: FunctionComponent = () => {
     dispatch(fetchScenarioInjectsSimple(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
     dispatch(fetchVariablesForScenario(scenarioId));
+    dispatch(fetchScenarioArticles(scenarioId));
   });
 
   const articleContext = articleContextForScenario(scenarioId);
-  const teamContext = teamContextForScenario(scenarioId, []);
+  const teamContext = teamContextForScenario(scenarioId, scenario.scenario_teams_users, scenario.scenario_all_users_number, scenario.scenario_users_number);
 
   const [viewMode, setViewMode] = useState(() => {
     const storedValue = localStorage.getItem('scenario_or_exercise_view_mode');
@@ -55,28 +57,21 @@ const ScenarioInjects: FunctionComponent = () => {
   };
 
   return (
-    <>
-      <ViewModeContext.Provider value={viewMode}>
-        <ArticleContext.Provider value={articleContext}>
-          <TeamContext.Provider value={teamContext}>
-            <Injects
-              exerciseOrScenarioId={scenarioId}
-              teams={teams}
-              articles={articles}
-              variables={variables}
-              uriVariable={`/admin/scenarios/${scenarioId}/definition`}
-              allUsersNumber={scenario.scenario_all_users_number}
-              usersNumber={scenario.scenario_users_number}
-              // @ts-expect-error typing
-              teamsUsers={scenario.scenario_teams_users}
-              setViewMode={handleViewMode}
-              availableButtons={availableButtons}
-            />
-          </TeamContext.Provider>
-        </ArticleContext.Provider>
-      </ViewModeContext.Provider>
-    </>
-
+    <ViewModeContext.Provider value={viewMode}>
+      <ArticleContext.Provider value={articleContext}>
+        <TeamContext.Provider value={teamContext}>
+          <Injects
+            exerciseOrScenarioId={scenarioId}
+            teams={teams}
+            articles={articles}
+            variables={variables}
+            uriVariable={`/admin/scenarios/${scenarioId}/definition`}
+            setViewMode={handleViewMode}
+            availableButtons={availableButtons}
+          />
+        </TeamContext.Provider>
+      </ArticleContext.Provider>
+    </ViewModeContext.Provider>
   );
 };
 

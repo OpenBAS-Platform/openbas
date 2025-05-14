@@ -58,9 +58,9 @@ const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({ exe
     {
       name: t('Total score'),
       data: sortedOrganizationsByTotalScore.map((o: Organization & { organization_total_score: number }) => ({
-        x: o.organization_name,
-        y: o.organization_total_score,
-        fillColor: organizationsColors[o.organization_id],
+        x: o.organization_name ?? '',
+        y: o.organization_total_score || null,
+        fillColor: organizationsColors[o.organization_id] ?? '',
       })),
     },
   ];
@@ -78,6 +78,7 @@ const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({ exe
         />
       ) : (
         <Empty
+          id="exercise_distribution_total_score_by_organization"
           message={t(
             'No data to display or the simulation has not started yet',
           )}

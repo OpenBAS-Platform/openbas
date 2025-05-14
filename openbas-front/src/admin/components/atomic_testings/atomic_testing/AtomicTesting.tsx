@@ -9,7 +9,6 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectTarget, type InjectTargetWithResult, type SearchPaginationInput } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { isFeatureEnabled } from '../../../../utils/utils';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import PaginatedTargetTab from './PaginatedTargetTab';
 import TargetListItem from './TargetListItem';
@@ -67,8 +66,6 @@ const AtomicTesting = () => {
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
 
-  const paginationEnabled = isFeatureEnabled('TARGET_PAGINATION');
-
   const tabConfig: {
     key: number;
     label: string;
@@ -78,41 +75,37 @@ const AtomicTesting = () => {
     let index = 0;
     const tabs = [];
 
-    // enable these tabs only when the TARGET_PAGINATION
-    // preview feature is set.
-    if (paginationEnabled) {
-      if (hasAssetsGroup) {
-        tabs.push({
-          key: index++,
-          label: t('Asset groups'),
-          type: 'ASSETS_GROUPS',
-          entityPrefix: 'asset_group_target',
-        });
-      }
-      if (hasTeams) {
-        tabs.push({
-          key: index++,
-          label: t('Teams'),
-          type: 'TEAMS',
-          entityPrefix: 'team_target',
-        });
-      }
-      if (hasEndpoints) {
-        tabs.push({
-          key: index++,
-          label: t('Endpoints'),
-          type: 'ASSETS',
-          entityPrefix: 'endpoint_target',
-        });
-      }
-      if (hasAgents) {
-        tabs.push({
-          key: index++,
-          label: t('Agents'),
-          type: 'AGENT',
-          entityPrefix: 'agent_target',
-        });
-      }
+    if (hasAssetsGroup) {
+      tabs.push({
+        key: index++,
+        label: t('Asset groups'),
+        type: 'ASSETS_GROUPS',
+        entityPrefix: 'asset_group_target',
+      });
+    }
+    if (hasTeams) {
+      tabs.push({
+        key: index++,
+        label: t('Teams'),
+        type: 'TEAMS',
+        entityPrefix: 'team_target',
+      });
+    }
+    if (hasEndpoints) {
+      tabs.push({
+        key: index++,
+        label: t('Endpoints'),
+        type: 'ASSETS',
+        entityPrefix: 'endpoint_target',
+      });
+    }
+    if (hasAgents) {
+      tabs.push({
+        key: index++,
+        label: t('Agents'),
+        type: 'AGENT',
+        entityPrefix: 'agent_target',
+      });
     }
 
     tabs.push({

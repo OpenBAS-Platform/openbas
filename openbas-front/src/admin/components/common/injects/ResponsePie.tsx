@@ -127,11 +127,13 @@ const ResponsePie: FunctionComponent<Props> = ({
   };
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '33% 34% 33%',
-      width: '100%',
-    }}
+    <div
+      id="score_details"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '33% 34% 33%',
+        width: '100%',
+      }}
     >
       <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
       <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />

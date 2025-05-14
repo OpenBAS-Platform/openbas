@@ -1,5 +1,4 @@
-import { HelpOutlined } from '@mui/icons-material';
-import { Avatar, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import arrayMutators from 'final-form-arrays';
 import { type FunctionComponent } from 'react';
@@ -8,13 +7,9 @@ import { Form } from 'react-final-form';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type AttackPattern, type Inject, type InjectDependency, type KillChainPhase } from '../../../../utils/api-types';
-import { isNotEmptyField } from '../../../../utils/utils';
-import InjectCardComponent from './InjectCardComponent';
+import { type Inject, type InjectDependency } from '../../../../utils/api-types';
 import InjectChainsForm from './InjectChainsForm';
-import InjectIcon from './InjectIcon';
 
 interface Props {
   inject: InjectStore;
@@ -96,88 +91,52 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
 
     handleClose();
   };
-  const injectorContractContent = inject.inject_injector_contract?.injector_contract_content ? JSON.parse(inject.inject_injector_contract?.injector_contract_content) : undefined;
-  const contractPayload = inject.inject_injector_contract?.injector_contract_payload;
-  const injectorContract = inject?.inject_injector_contract;
-  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
 
   return (
-    <>
-      <InjectCardComponent
-        avatar={injectorContractContent
-          ? (
-              <InjectIcon
-                type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
-                isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
-              />
-            ) : (
-              <Avatar sx={{
-                width: 24,
-                height: 24,
-              }}
+    <Form
+      keepDirtyOnReinitialize={true}
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      mutators={{
+        ...arrayMutators,
+        setValue: ([field, value], state, { changeValue }) => {
+          changeValue(state, field, () => value);
+        },
+      }}
+    >
+      {({ form, handleSubmit, values, errors }) => {
+        return (
+          <form id="injectContentForm" onSubmit={handleSubmit}>
+            <InjectChainsForm
+              form={form}
+              values={values}
+              injects={injects}
+            />
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: theme.spacing(1),
+            }}
+            >
+              <Button
+                variant="contained"
+                onClick={handleClose}
               >
-                <HelpOutlined />
-              </Avatar>
-            )}
-        title={injectorContract?.injector_contract_needs_executor ? cardTitle : inject?.inject_injector_contract?.injector_contract_injector_type_name}
-        action={(
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          >
-            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-              platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
-            )}
-          </div>
-        )}
-        content={inject?.inject_title}
-      />
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        mutators={{
-          ...arrayMutators,
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ form, handleSubmit, values, errors }) => {
-          return (
-            <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
-              <InjectChainsForm
-                form={form}
-                values={values}
-                injects={injects}
-              />
-              <div style={{
-                float: 'right',
-                marginTop: 20,
-              }}
+                {t('Cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                type="submit"
+                disabled={errors !== undefined && Object.keys(errors).length > 0}
               >
-                <Button
-                  variant="contained"
-                  onClick={handleClose}
-                  style={{ marginRight: 10 }}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  type="submit"
-                  disabled={errors !== undefined && Object.keys(errors).length > 0}
-                >
-                  {t('Update')}
-                </Button>
-              </div>
-            </form>
-          );
-        }}
-      </Form>
-    </>
+                {t('Update')}
+              </Button>
+            </div>
+          </form>
+        );
+      }}
+    </Form>
   );
 };
 

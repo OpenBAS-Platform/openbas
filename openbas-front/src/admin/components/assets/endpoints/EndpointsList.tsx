@@ -1,7 +1,7 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
+import { type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import ItemTags from '../../../../components/ItemTags';
@@ -41,13 +41,13 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   endpoints: EndpointOutput[];
-  actions: ReactElement<EndpointPopoverProps>;
+  renderActions: ((endpoint: EndpointOutput) => ReactElement<EndpointPopoverProps>);
   loading?: boolean;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
   endpoints,
-  actions,
+  renderActions,
   loading = false,
 }) => {
   // Standard hooks
@@ -55,7 +55,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   const theme = useTheme();
 
   const component = (endpoint: EndpointOutput) => {
-    return cloneElement(actions, { endpoint });
+    return renderActions(endpoint);
   };
 
   const headers = [

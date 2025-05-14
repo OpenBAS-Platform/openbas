@@ -18,6 +18,7 @@ interface ExpectationPopoverProps {
   expectation: ExpectationInput;
   handleUpdate: (data: ExpectationInput, idx: number) => void;
   handleDelete: (idx: number) => void;
+  disabled?: boolean;
 }
 
 const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
@@ -25,6 +26,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   expectation,
   handleUpdate,
   handleDelete,
+  disabled = false,
 }) => {
   // Standard hooks
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
@@ -94,7 +96,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
         onClick={event => handlePopoverOpen(event)}
         aria-haspopup="true"
         size="large"
-        disabled={permissions.readOnly}
+        disabled={permissions.readOnly || disabled}
       >
         <MoreVert />
       </IconButton>

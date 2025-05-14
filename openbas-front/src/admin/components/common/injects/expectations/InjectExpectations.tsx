@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import * as R from 'ramda';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -11,10 +11,6 @@ import { isAutomatic, typeIcon } from './ExpectationUtils';
 import InjectAddExpectation from './InjectAddExpectation';
 
 const useStyles = makeStyles()(theme => ({
-  item: {
-    paddingLeft: 10,
-    height: 50,
-  },
   column: {
     display: 'grid',
     gridTemplateColumns: '2fr 1fr 1fr 1fr',
@@ -26,12 +22,14 @@ interface InjectExpectationsProps {
   predefinedExpectationDatas: ExpectationInput[];
   expectationDatas: ExpectationInput[];
   handleExpectations: (expectations: ExpectationInput[]) => void;
+  readOnly?: boolean;
 }
 
 const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   predefinedExpectationDatas = [],
   expectationDatas,
   handleExpectations,
+  readOnly = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -90,8 +88,16 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
         {sortedExpectations.map((expectation, idx) => (
           <ListItem
             key={expectation.expectation_name}
-            classes={{ root: classes.item }}
-            divider={true}
+            divider
+            secondaryAction={(
+              <ExpectationPopover
+                index={idx}
+                expectation={expectation}
+                handleUpdate={handleUpdateExpectation}
+                handleDelete={handleRemoveExpectation}
+                disabled={readOnly}
+              />
+            )}
           >
             <ListItemIcon>
               {typeIcon(expectation.expectation_type)}
@@ -114,20 +120,13 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
                 </div>
               )}
             />
-            <ListItemSecondaryAction>
-              <ExpectationPopover
-                index={idx}
-                expectation={expectation}
-                handleUpdate={handleUpdateExpectation}
-                handleDelete={handleRemoveExpectation}
-              />
-            </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
       <InjectAddExpectation
         handleAddExpectation={handleAddExpectation}
         predefinedExpectations={predefinedExpectations}
+        disabled={readOnly}
       />
     </>
   );

@@ -74,6 +74,7 @@ const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({ exer
         />
       ) : (
         <Empty
+          id="exercise_distribution_total_score_by_inject_type"
           message={t(
             'No data to display or the simulation has not started yet',
           )}

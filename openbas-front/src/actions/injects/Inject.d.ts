@@ -1,12 +1,12 @@
-import { type Inject, type InjectOutput } from '../../utils/api-types';
-import { type InjectorContractConverted } from '../injector_contracts/InjectorContract';
+import { type Inject, type InjectorContract, type InjectOutput } from '../../utils/api-types';
+import { type InjectorContractConverted } from '../../utils/api-types-custom';
 
 export type InjectStore = Omit<Inject, 'inject_content' | 'inject_injector_contract'> & {
   inject_content?: {
     expectationScore: number;
     challenges: string[] | undefined;
   };
-  inject_injector_contract: Omit<InjectorContractConverted, 'convertedContent'> & { convertedContent: InjectorContractConverted['convertedContent'] };
+  inject_injector_contract: Omit<InjectorContract, 'convertedContent'> & { convertedContent: InjectorContractConverted['convertedContent'] };
 };
 
 export type InjectOutputType = InjectOutput & { inject_injector_contract: { convertedContent: InjectorContractConverted['convertedContent'] } & Inject['inject_injector_contract'] };

@@ -33,7 +33,6 @@ const useStyles = makeStyles()(() => ({
   importerStyle: {
     display: 'flex',
     alignItems: 'center',
-    marginTop: 20,
   },
   labelExecutionCondition: { color: '#7c8088' },
 }));

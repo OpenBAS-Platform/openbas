@@ -99,6 +99,8 @@ export type TeamContextType = {
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean;
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number;
   searchTeams: (input: SearchPaginationInput, contextualOnly?: boolean) => Promise<{ data: Page<TeamOutput> }>;
+  allUsersEnabledNumber?: number;
+  allUsersNumber?: number;
 };
 
 export type InjectContextType = {

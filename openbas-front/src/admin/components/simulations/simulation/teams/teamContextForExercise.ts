@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import { type TeamContextType } from '../../../common/Context';
 import { type UserStore } from '../../../teams/players/Player';
 
-const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTeamsUsers: Exercise['exercise_teams_users']): TeamContextType => {
+const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTeamsUsers: Exercise['exercise_teams_users'], allUsersNumber = 0, allUsersEnabledNumber = 0): TeamContextType => {
   const dispatch = useAppDispatch();
 
   return {
@@ -25,6 +25,8 @@ const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTea
         team_exercises: [exerciseId],
       }));
     },
+    allUsersEnabledNumber: allUsersEnabledNumber,
+    allUsersNumber: allUsersNumber,
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
       return (exerciseTeamsUsers ?? []).filter((o: ExerciseTeamUser) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
     },

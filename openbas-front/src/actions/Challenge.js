@@ -10,6 +10,11 @@ const challenge = new schema.Entity(
 );
 const arrayOfChallenges = new schema.Array(challenge);
 
+export const findChallenges = challengeIds => (dispatch) => {
+  const uri = '/api/challenges/find';
+  return postReferential(arrayOfChallenges, uri, challengeIds)(dispatch);
+};
+
 export const fetchChallenges = () => (dispatch) => {
   const uri = '/api/challenges';
   return getReferential(arrayOfChallenges, uri)(dispatch);
@@ -18,11 +23,6 @@ export const fetchChallenges = () => (dispatch) => {
 export const fetchExerciseChallenges = exerciseId => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/challenges`;
   return getReferential(arrayOfChallenges, uri)(dispatch);
-};
-
-export const fetchChallenge = challengeId => (dispatch) => {
-  const uri = `/api/challenges/${challengeId}`;
-  return getReferential(challengeId, uri)(dispatch);
 };
 
 export const updateChallenge = (challengeId, data) => (dispatch) => {

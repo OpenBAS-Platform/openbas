@@ -757,7 +757,8 @@ export interface ContractOutputElement {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** @format date-time */
   contract_output_element_updated_at: string;
   listened?: boolean;
@@ -789,7 +790,8 @@ export interface ContractOutputElementInput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
 }
 
 /** Represents the rules for parsing the output of an execution. */
@@ -815,7 +817,8 @@ export interface ContractOutputElementSimple {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
 }
 
 export interface CreateExerciseInput {
@@ -1622,7 +1625,8 @@ export interface Finding {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** @format date-time */
   finding_updated_at: string;
   finding_users?: string[];
@@ -1641,7 +1645,8 @@ export interface FindingInput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   finding_value: string;
 }
 
@@ -1685,7 +1690,8 @@ export interface FindingOutput {
     | "portscan"
     | "ipv4"
     | "ipv6"
-    | "credentials";
+    | "credentials"
+    | "cve";
   /** Finding Value */
   finding_value: string;
 }
@@ -3630,7 +3636,7 @@ export interface PlatformSettings {
   /** Reply to mail to use by default for injects */
   default_reply_to?: string;
   /** List of enabled dev features */
-  enabled_dev_features?: ("_RESERVED" | "TARGET_PAGINATION")[];
+  enabled_dev_features?: "_RESERVED"[];
   /** True if the Caldera Executor is enabled */
   executor_caldera_enable?: boolean;
   /** Url of the Caldera Executor */

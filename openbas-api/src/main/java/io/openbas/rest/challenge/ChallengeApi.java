@@ -2,14 +2,13 @@ package io.openbas.rest.challenge;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.ChallengeSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
-import io.openbas.database.model.Challenge;
-import io.openbas.database.model.ChallengeFlag;
+import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.*;
 import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
 import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
@@ -22,6 +21,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +47,14 @@ public class ChallengeApi extends RestBehavior {
     return fromIterable(challengeRepository.findAll()).stream()
         .map(challengeService::enrichChallengeWithExercisesOrScenarios)
         .toList();
+  }
+
+  @LogExecutionTime
+  @PostMapping("/api/challenges/find")
+  @org.springframework.transaction.annotation.Transactional(readOnly = true)
+  public List<Challenge> findEndpoints(
+      @RequestBody @Valid @NotNull final List<String> challengeIds) {
+    return this.challengeRepository.findAll(fromIds(challengeIds));
   }
 
   @PreAuthorize("isPlanner()")
