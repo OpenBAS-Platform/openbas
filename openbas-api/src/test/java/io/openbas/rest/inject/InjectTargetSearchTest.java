@@ -952,6 +952,63 @@ public class InjectTargetSearchTest extends IntegrationTest {
       }
 
       @Test
+      @DisplayName("/options should return all targets matching search text")
+      public void whenEndpointsAreFilters_returnAllTargetsMatchingSearchText() throws Exception {
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+
+        // dynamic group 1
+        Filters.Filter filter = new Filters.Filter();
+        filter.setKey("endpoint_platform");
+        filter.setMode(Filters.FilterMode.and);
+        filter.setOperator(Filters.FilterOperator.eq);
+        filter.setValues(List.of(Endpoint.PLATFORM_TYPE.Windows.name()));
+        AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupWrapperWithFilter(filter);
+
+        // 2
+        Filters.Filter filter2 = new Filters.Filter();
+        filter2.setKey("endpoint_platform");
+        filter2.setMode(Filters.FilterMode.and);
+        filter2.setOperator(Filters.FilterOperator.eq);
+        filter2.setValues(List.of(Endpoint.PLATFORM_TYPE.Linux.name()));
+        AssetGroupComposer.Composer assetGroupWrapper2 = getAssetGroupWrapperWithFilter(filter2);
+
+        EndpointComposer.Composer ep1Wrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+
+        Endpoint ep2 = EndpointFixture.createEndpoint();
+        ep2.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+        ep2.setName("search this name!");
+        EndpointComposer.Composer ep2Wrapper = endpointComposer.forEndpoint(ep2).persist();
+
+        // create a new endpoint that is not part of the above groups
+        Endpoint ep3 = EndpointFixture.createEndpoint();
+        ep3.setPlatform(Endpoint.PLATFORM_TYPE.MacOS);
+        endpointComposer.forEndpoint(ep3).persist();
+
+        injectWrapper.withAssetGroup(assetGroupWrapper).withAssetGroup(assetGroupWrapper2);
+        Inject inject = injectWrapper.persist().get();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI + "/" + inject.getId() + "/targets/" + targetType + "/options")
+                        .queryParam("searchText", "search this")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(ep2Wrapper.get().getId(), ep2Wrapper.get().getName()));
+
+        assertThatJson(response).isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
       @DisplayName("/options by id should return only options matching ids")
       public void whenEndpointsAreFilters_returnOnlyOptionsMatchingIds() throws Exception {
         InjectComposer.Composer injectWrapper = getInjectWrapper();

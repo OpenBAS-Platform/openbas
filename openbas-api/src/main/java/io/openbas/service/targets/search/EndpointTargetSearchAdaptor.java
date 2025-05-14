@@ -86,10 +86,11 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
                 includeDirectEndpointTargetsSpecification.buildSpecification(
                     scopedInject, joinPath));
 
-    // Specification<Endpoint> nameSpec = (root, query, criteriaBuilder) ->
-    // criteriaBuilder.like(root.get("asset_name"), "%" + textSearch + "%");
+    Specification<Endpoint> nameSpec =
+        (root, query, criteriaBuilder) ->
+            criteriaBuilder.like(root.get("name"), "%" + textSearch + "%");
 
-    return this.endpointRepository.findAll(spec).stream()
+    return this.endpointRepository.findAll(spec.and(nameSpec)).stream()
         .map(ep -> new FilterUtilsJpa.Option(ep.getId(), ep.getName()))
         .toList();
   }
