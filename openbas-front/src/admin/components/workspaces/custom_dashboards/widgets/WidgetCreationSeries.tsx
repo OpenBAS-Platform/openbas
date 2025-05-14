@@ -14,7 +14,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
-import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from './WidgetUtils';
+import { BASE_ENTITY_FILTER_KEY } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
