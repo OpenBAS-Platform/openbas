@@ -47,10 +47,14 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupOutput[]>([]);
   useEffect(() => {
     setLoading(true);
-    findAssetGroups(assetGroupIds).then((result) => {
-      setAssetGroupValues(result.data);
+    if (assetGroupIds.length > 0) {
+      findAssetGroups(assetGroupIds).then((result) => {
+        setAssetGroupValues(result.data);
+        setLoading(false);
+      });
+    } else {
       setLoading(false);
-    });
+    }
   }, [assetGroupIds]);
 
   // Headers

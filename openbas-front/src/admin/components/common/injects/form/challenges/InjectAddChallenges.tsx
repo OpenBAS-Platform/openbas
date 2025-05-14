@@ -61,6 +61,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const [open, setopen] = useState(false);
 
   const { challenges, challengesMap } = useHelper((helper: ChallengeHelper) => ({
     challenges: helper.getChallenges(),
@@ -68,10 +69,11 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   }));
 
   useDataLoader(() => {
-    dispatch(fetchChallenges());
-  });
+    if (open) {
+      dispatch(fetchChallenges());
+    }
+  }, [open]);
 
-  const [open, setopen] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [challengesIds, setChallengesIds] = useState<string[]>([]);
   const [tags, setTags] = useState<Option[]>([]);

@@ -9,7 +9,6 @@ import { type CSSProperties, type FunctionComponent, useMemo, useRef, useState }
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import { type InjectorHelper } from '../../../../actions/injectors/injector-helper';
 import { type KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
@@ -32,6 +31,7 @@ import {
   type InjectorContractOutput,
   type KillChainPhase, type Variable,
 } from '../../../../utils/api-types';
+import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectForm from './form/InjectForm';

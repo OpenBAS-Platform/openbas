@@ -1,5 +1,5 @@
 import { type Inject, type InjectOutput } from '../../utils/api-types';
-import { type InjectorContractConverted } from '../injector_contracts/InjectorContract';
+import { type InjectorContractConverted } from '../../utils/api-types-custom';
 
 export type InjectStore = Omit<Inject, 'inject_content' | 'inject_injector_contract'> & {
   inject_content?: {

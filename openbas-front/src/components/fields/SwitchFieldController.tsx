@@ -5,12 +5,12 @@ import { Controller, useFormContext } from 'react-hook-form';
 interface Props {
   label: React.ReactNode;
   name: string;
-  disabled?: boolean;
   size?: 'small' | 'medium';
   required?: boolean;
+  disabled?: boolean;
 }
 
-const SwitchFieldController = ({ name, label, disabled, size = 'medium', required }: Props) => {
+const SwitchFieldController = ({ name, label, size = 'medium', required = false, disabled = false }: Props) => {
   const { control } = useFormContext();
 
   return (

@@ -27,18 +27,18 @@ const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': {
 
 const TextFieldController = ({
   name,
-  label,
-  multiline,
+  label = '',
+  multiline = false,
   rows,
-  disabled,
-  required,
+  required = false,
+  disabled = false,
   style = {},
-  size,
-  variant,
+  variant = 'standard',
   placeholder = '',
+  size = 'medium',
   endAdornmentLabel,
   startAdornmentLabel,
-  type,
+  type = 'text',
 }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
@@ -50,9 +50,9 @@ const TextFieldController = ({
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
-          type={type ?? 'text'}
+          type={type}
           className={classes.root}
-          label={label ?? ''}
+          label={label}
           fullWidth
           error={!!error}
           helperText={error ? error.message : null}
@@ -63,8 +63,8 @@ const TextFieldController = ({
           disabled={disabled}
           placeholder={placeholder}
           style={style}
-          variant={variant ?? 'standard'}
-          size={size ?? 'medium'}
+          variant={variant}
+          size={size}
           slotProps={{
             input: {
               ...(endAdornmentLabel

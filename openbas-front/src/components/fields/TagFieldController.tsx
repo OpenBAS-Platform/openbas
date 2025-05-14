@@ -10,7 +10,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const TagFieldController = ({ name, label, style = {}, disabled }: Props) => {
+const TagFieldController = ({ name, label, style = {}, disabled = false }: Props) => {
   const { control } = useFormContext();
 
   return (

@@ -6,7 +6,6 @@ import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useCon
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { exportInjectSearch } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
@@ -33,6 +32,7 @@ import {
   type Team,
   type Variable,
 } from '../../../../utils/api-types';
+import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';

@@ -4,11 +4,14 @@ import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
+import { findChallenges } from '../../../../../../actions/Challenge';
 import { type ChallengeHelper } from '../../../../../../actions/helper';
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemTags from '../../../../../../components/ItemTags';
 import { useHelper } from '../../../../../../store';
 import type { Challenge } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import ChallengePopover from '../../../../components/challenges/ChallengePopover';
 import InjectAddChallenges from './InjectAddChallenges';
 
@@ -29,8 +32,9 @@ interface Props { readOnly?: boolean }
 
 const InjectChallengesList = ({ readOnly = false }: Props) => {
   const { t } = useFormatter();
-  const { control, setValue } = useFormContext();
   const { classes } = useStyles();
+  const dispatch = useAppDispatch();
+  const { control, setValue } = useFormContext();
   const [sortedChallenges, setSortedChallenges] = useState<Challenge[]>([]);
 
   const injectChallengeIds: string[] = (useWatch({
@@ -39,6 +43,12 @@ const InjectChallengesList = ({ readOnly = false }: Props) => {
   })) ?? [];
   const { challengesMap } = useHelper((helper: ChallengeHelper) => ({ challengesMap: helper.getChallengesMap() }));
 
+  useDataLoader(() => {
+    if (injectChallengeIds.length > 0) {
+      dispatch(findChallenges(injectChallengeIds));
+    }
+  }, [injectChallengeIds]);
+
   useEffect(() => {
     const challenges: Challenge[] = (injectChallengeIds ?? [])
       .map(a => challengesMap[a])
@@ -46,7 +56,7 @@ const InjectChallengesList = ({ readOnly = false }: Props) => {
       .toSorted((a, b) => (a.challenge_name ?? '').localeCompare(b.challenge_name ?? ''));
 
     setSortedChallenges(challenges);
-  }, [injectChallengeIds]);
+  }, [injectChallengeIds, challengesMap]);
 
   const addChallenge = (ids: string[]) => setValue('inject_content.challenges', [...ids, ...injectChallengeIds]);
   const removeChallenge = (challengeId: string) => setValue('inject_content.challenges', injectChallengeIds.filter(id => id !== challengeId));

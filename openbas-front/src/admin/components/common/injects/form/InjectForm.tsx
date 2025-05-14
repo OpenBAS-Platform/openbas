@@ -6,16 +6,18 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
-import {
-  type ContractElement,
-  type FieldValue,
-  type InjectorContractConverted,
-} from '../../../../../actions/injector_contracts/InjectorContract';
 import TagFieldController from '../../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
-import { type Article, type Inject, type InjectInput, type Variable } from '../../../../../utils/api-types';
+import {
+  type Article,
+  type AttackPattern,
+  type Inject,
+  type InjectInput,
+  type Variable,
+} from '../../../../../utils/api-types';
+import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
 import { splitDuration } from '../../../../../utils/Time';
 import { PermissionsContext } from '../../Context';
 import InjectContentForm from './InjectContentForm';
@@ -52,6 +54,17 @@ const useStyles = makeStyles()(theme => ({
   triggerTextColor: { color: theme.palette.primary.main },
   triggerTextColorDisabled: { color: theme.palette.action.disabled },
 }));
+
+type FieldValue = string | number | boolean | string[] | AttackPattern[] | object | {
+  key: string;
+  value: string;
+  type?: string;
+}
+| {
+  key: string;
+  value: string;
+  type?: string;
+}[];
 
 type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
   inject_depends_duration_days?: string;

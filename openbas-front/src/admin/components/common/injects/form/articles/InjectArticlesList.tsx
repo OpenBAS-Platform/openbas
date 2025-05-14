@@ -4,10 +4,13 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { type ArticlesHelper } from '../../../../../../actions/channels/article-helper';
+import { fetchChannels } from '../../../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
 import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
 import type { Article } from '../../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import ChannelIcon from '../../../../components/channels/ChannelIcon';
 import ArticlePopover from '../../../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
@@ -32,6 +35,7 @@ interface Props {
 
 const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
   const { t } = useFormatter();
+  const dispatch = useAppDispatch();
   const { control, setValue } = useFormContext();
   const { classes } = useStyles();
   const injectArticlesIds: string[] = (useWatch({
@@ -49,6 +53,12 @@ const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
     channelsMap: helper.getChannelsMap(),
   }));
 
+  useDataLoader(() => {
+    if (injectArticlesIds.length > 0) {
+      dispatch(fetchChannels());
+    }
+  }, [injectArticlesIds]);
+
   useEffect(() => {
     const articles: (Article & {
       article_channel_type: string;
@@ -63,7 +73,7 @@ const InjectArticlesList = ({ allArticles = [], readOnly = false }: Props) => {
       }))
       .toSorted((a, b) => (a.article_name ?? '').localeCompare(b.article_name ?? ''));
     setSortedArticles(articles);
-  }, [injectArticlesIds]);
+  }, [injectArticlesIds, channelsMap]);
 
   const addArticles = (ids: string[]) => setValue('inject_content.articles', [...ids, ...injectArticlesIds]);
   const removeArticle = (articleId: string) => setValue('inject_content.articles', injectArticlesIds.filter(id => id !== articleId));

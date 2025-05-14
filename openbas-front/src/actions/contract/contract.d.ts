@@ -1,3 +1,5 @@
+import { type ContractElement } from '../../utils/api-types-custom';
+
 export interface Contract {
   config: ContractConfig;
   context: Record<string, string>;
@@ -15,30 +17,6 @@ export interface ContractConfig {
   expose?: boolean;
   label?: Record<string, string>;
   type?: string;
-}
-
-export interface ContractElement {
-  key?: string;
-  label?: string;
-  linkedFields?: LinkedFieldModel[];
-  linkedValues?: string[];
-  mandatory?: boolean;
-  mandatoryGroups?: string[];
-  type?:
-    | 'text'
-    | 'number'
-    | 'tuple'
-    | 'checkbox'
-    | 'textarea'
-    | 'select'
-    | 'article'
-    | 'challenge'
-    | 'dependency-select'
-    | 'attachment'
-    | 'team'
-    | 'expectation'
-    | 'asset'
-    | 'asset-group';
 }
 
 export interface ContractVariable {

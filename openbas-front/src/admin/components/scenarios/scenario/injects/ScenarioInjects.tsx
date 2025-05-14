@@ -1,6 +1,7 @@
 import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
@@ -39,6 +40,7 @@ const ScenarioInjects: FunctionComponent = () => {
     dispatch(fetchScenarioInjectsSimple(scenarioId));
     dispatch(fetchScenarioTeams(scenarioId));
     dispatch(fetchVariablesForScenario(scenarioId));
+    dispatch(fetchScenarioArticles(scenarioId));
   });
 
   const articleContext = articleContextForScenario(scenarioId);

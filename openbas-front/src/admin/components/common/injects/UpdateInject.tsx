@@ -4,7 +4,6 @@ import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
-import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
@@ -18,6 +17,7 @@ import {
   type InjectInput,
   type KillChainPhase, type Variable,
 } from '../../../../utils/api-types';
+import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isNotEmptyField } from '../../../../utils/utils';

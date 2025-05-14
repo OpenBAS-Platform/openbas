@@ -5,13 +5,10 @@ import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { findEndpoints } from '../../../../../actions/assets/endpoint-actions';
-import {
-  type ContractElement,
-  type InjectorContractConverted,
-} from '../../../../../actions/injector_contracts/InjectorContract';
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Article, EndpointOutput, Variable } from '../../../../../utils/api-types';
+import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
@@ -58,6 +55,7 @@ const InjectContentForm = ({
   const renderTeams = (
     <InjectTeamsList
       readOnly={fieldsMap.get('team')?.readOnly || readOnly}
+      hideEnabledUsersNumber={isAtomic}
     />
   );
 
@@ -68,7 +66,9 @@ const InjectContentForm = ({
   }) as string[];
   const [injectAsset, setInjectAsset] = useState<EndpointOutput[]>([]);
   useEffect(() => {
-    findEndpoints(injectAssetIds).then(result => setInjectAsset(result.data));
+    if (fieldsMap.has('asset') && injectAssetIds.length > 0) {
+      findEndpoints(injectAssetIds).then(result => setInjectAsset(result.data));
+    }
   }, [injectAssetIds]);
 
   const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds);

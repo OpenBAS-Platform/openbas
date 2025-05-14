@@ -41,7 +41,9 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
 
   const [endpointValues, setEndpointValues] = useState<Endpoint[]>([]);
   useEffect(() => {
-    findEndpoints(initialState).then(result => setEndpointValues(result.data));
+    if (open) {
+      findEndpoints(initialState).then(result => setEndpointValues(result.data));
+    }
   }, [open, initialState]);
 
   const addEndpoint = (_endpointId: string, endpoint: Endpoint) => {

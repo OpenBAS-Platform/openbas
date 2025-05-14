@@ -40,12 +40,13 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
+  const [open, setOpen] = useState(false);
 
   useDataLoader(() => {
-    dispatch(fetchDocuments());
-  });
-
-  const [open, setOpen] = useState(false);
+    if (open) {
+      dispatch(fetchDocuments());
+    }
+  }, [open]);
 
   const handleOpen = () => setOpen(true);
 

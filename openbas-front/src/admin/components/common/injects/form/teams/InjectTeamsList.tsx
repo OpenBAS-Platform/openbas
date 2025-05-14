@@ -20,9 +20,12 @@ const useStyles = makeStyles()(theme => ({
   bodyItem: { fontSize: theme.typography.h3.fontSize },
 }));
 
-interface Props { readOnly?: boolean }
+interface Props {
+  readOnly?: boolean;
+  hideEnabledUsersNumber?: boolean;
+}
 
-const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false }) => {
+const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabledUsersNumber = false }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -41,8 +44,10 @@ const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false }) => {
   const [teams, setTeams] = useState<TeamOutput[]>([]);
 
   useEffect(() => {
-    findTeams(injectTeamIds).then(result =>
-      setTeams(result.data.sort((a: TeamOutput, b: TeamOutput) => a.team_name.localeCompare(b.team_name))));
+    if (injectTeamIds.length > 0) {
+      findTeams(injectTeamIds).then(result =>
+        setTeams(result.data.sort((a: TeamOutput, b: TeamOutput) => a.team_name.localeCompare(b.team_name))));
+    }
   }, [injectTeamIds]);
 
   // -- ACTIONS --
@@ -74,12 +79,14 @@ const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false }) => {
             <div className={classes.bodyItem}>
               {team.team_name}
             </div>
-            <Tooltip title={t('Number of user')} className={classes.bodyItem}>
+            <Tooltip title={t('Number of users')} className={classes.bodyItem}>
               <span>{team.team_users_number}</span>
             </Tooltip>
-            <Tooltip title={t('Number of enable user')} className={classes.bodyItem}>
-              <span>{userEnabled}</span>
-            </Tooltip>
+            {!hideEnabledUsersNumber && (
+              <Tooltip title={t('Number of enable user')} className={classes.bodyItem}>
+                <span>{userEnabled}</span>
+              </Tooltip>
+            )}
             <div className={classes.bodyItem}>
               <ItemTags variant="reduced-view" tags={team.team_tags} />
             </div>
