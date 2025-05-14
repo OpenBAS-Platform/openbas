@@ -47,8 +47,8 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({ exerciseI
     {
       name: t('Total score'),
       data: sortedUsersByTotalScore.map((u: User & { user_total_score: number }) => ({
-        x: resolveUserName(u),
-        y: u.user_total_score,
+        x: resolveUserName(u) ?? '',
+        y: u.user_total_score || null,
       })),
     },
   ];
@@ -66,6 +66,7 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({ exerciseI
         />
       ) : (
         <Empty
+          id="exercise_distribution_total_score_by_player"
           message={t(
             'No data to display or the simulation has not started yet',
           )}

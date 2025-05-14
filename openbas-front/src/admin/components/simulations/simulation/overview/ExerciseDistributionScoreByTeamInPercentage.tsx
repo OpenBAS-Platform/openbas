@@ -59,8 +59,8 @@ const ExerciseDistributionScoreByTeamInPercentage: FunctionComponent<Props> = ({
       name: t('Percent of reached score'),
       data: sortedTeamsByPercentScore.map((a: Team & { team_total_percent_score: number }) => ({
         x: a.team_name,
-        y: a.team_total_percent_score,
-        fillColor: teamsColors[a.team_id],
+        y: a.team_total_percent_score || null,
+        fillColor: teamsColors[a.team_id] ?? '',
       })),
     },
   ];
@@ -78,6 +78,7 @@ const ExerciseDistributionScoreByTeamInPercentage: FunctionComponent<Props> = ({
         />
       ) : (
         <Empty
+          id="exercise_distribution_score_by_team"
           message={t(
             'No data to display or the simulation has not started yet',
           )}

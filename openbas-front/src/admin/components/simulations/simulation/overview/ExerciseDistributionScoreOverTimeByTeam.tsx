@@ -76,6 +76,7 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({ exe
         />
       ) : (
         <Empty
+          id="exercise_distribution_score_over_time_by_team"
           message={t(
             'No data to display or the simulation has not started yet',
           )}
