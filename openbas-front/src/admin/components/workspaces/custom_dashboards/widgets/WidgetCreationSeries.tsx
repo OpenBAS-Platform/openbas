@@ -79,7 +79,7 @@ const WidgetCreationSeries: FunctionComponent<{
   };
 
   // Filters
-  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({ filterGroup: excludeBaseEntities(series.filter) }));
+  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
   useEffect(() => {
     onChange({
       ...series,
