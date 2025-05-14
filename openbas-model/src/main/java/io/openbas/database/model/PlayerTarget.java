@@ -6,20 +6,24 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
-public class TeamTarget extends InjectTarget {
-  public TeamTarget(String id, String name, Set<String> tags) {
+public class PlayerTarget extends InjectTarget {
+  public PlayerTarget(String id, String name, Set<String> tags, Set<String> teams) {
     this.setId(id);
     this.setName(name);
     this.setTags(tags);
-    this.setTargetType("TEAMS");
+    this.setTeams(teams);
+    this.setTargetType("PLAYERS");
   }
 
   @JsonProperty("target_name")
-  @Queryable(filterable = true, searchable = true, sortable = true)
   private String name;
 
   @Override
   protected String getTargetSubtype() {
     return this.getTargetType();
   }
+
+  @JsonProperty("target_teams")
+  @Queryable(filterable = true, searchable = true, sortable = true, dynamicValues = true)
+  private Set<String> teams;
 }

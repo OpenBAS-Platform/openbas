@@ -9,10 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.helper.UserHelper;
+import io.openbas.helper.*;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -183,6 +180,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("user_teams")
+  @Queryable(dynamicValues = true, filterable = true, sortable = true, path = "teams.id")
   private List<Team> teams = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(description = "Tag IDs of the user", type = "string"))
@@ -207,6 +205,20 @@ public class User implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("user_communications")
   private List<Communication> communications = new ArrayList<>();
+
+  @ArraySchema(
+      schema =
+          @Schema(
+              description = "List of 3-tuple linking simulation IDs and team IDs to this user ID",
+              type = "string"))
+  @OneToMany(
+      mappedBy = "user",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @JsonProperty("team_exercises_users")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
 
   @Setter
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

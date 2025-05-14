@@ -4,6 +4,6 @@ public enum TargetType {
   AGENT,
   ASSETS,
   ASSETS_GROUPS,
-  PLAYER,
+  PLAYERS,
   TEAMS
 }

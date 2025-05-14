@@ -346,7 +346,6 @@ interface BaseInjectTarget {
     | "UNKNOWN"
     | "SUCCESS";
   target_id: string;
-  target_name?: string;
   target_prevention_status?:
     | "FAILED"
     | "PENDING"
@@ -2283,6 +2282,7 @@ export type InjectTarget = BaseInjectTarget &
     | BaseInjectTargetTargetTypeMapping<"ASSETS_GROUPS", AssetGroupTarget>
     | BaseInjectTargetTargetTypeMapping<"ASSETS", EndpointTarget>
     | BaseInjectTargetTargetTypeMapping<"TEAMS", TeamTarget>
+    | BaseInjectTargetTargetTypeMapping<"PLAYERS", PlayerTarget>
   );
 
 /** Results of expectations for each target */
@@ -2301,7 +2301,7 @@ export interface InjectTargetWithResult {
     | "Generic"
     | "Internal"
     | "Unknown";
-  targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYERS" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -3765,11 +3765,49 @@ export interface PlayerOutput {
   user_firstname?: string;
   user_id: string;
   user_lastname?: string;
+  user_name?: string;
   user_organization?: string;
   user_pgp_key?: string;
   user_phone?: string;
   /** @uniqueItems true */
   user_tags?: string[];
+  /** @uniqueItems true */
+  user_teams?: string[];
+}
+
+export interface PlayerTarget {
+  target_detection_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+  target_execution_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+  target_human_response_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+  target_id: string;
+  target_name?: string;
+  target_prevention_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+  target_subtype?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  /** @uniqueItems true */
+  target_teams?: string[];
+  target_type?: string;
 }
 
 /** Policies of the platform */
@@ -4407,7 +4445,7 @@ export interface TagUpdateInput {
 export interface TargetSimple {
   target_id: string;
   target_name?: string;
-  target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYERS" | "TEAMS";
 }
 
 export interface Team {
