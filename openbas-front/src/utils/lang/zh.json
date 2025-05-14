@@ -156,6 +156,8 @@
   "backuri": "后台URI",
   "Bad request": "錯誤嘅請求",
   "base_attack_patterns_side": "攻击模式",
+  "base_created_at": "创建于",
+  "base_updated_at": "更新于",
   "Bash": "Bash",
   "Best regards": "此致",
   "Bitter": "痛苦",

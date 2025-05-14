@@ -156,6 +156,8 @@
   "backuri": "backuri",
   "Bad request": "Bad request",
   "base_attack_patterns_side": "Attack patterns",
+  "base_created_at": "Created at",
+  "base_updated_at": "Updated at",
   "Bash": "Bash",
   "Best regards": "Best regards",
   "Bitter": "Bitter",
