@@ -93,7 +93,7 @@
     "@vitest/eslint-plugin": "1.1.44",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
-    "esbuild": "0.25.3",
+    "esbuild": "0.25.4",
     "eslint": "9.26.0",
     "eslint-import-resolver-oxc": "0.14.0",
     "eslint-plugin-custom-rules": "workspace:*",
