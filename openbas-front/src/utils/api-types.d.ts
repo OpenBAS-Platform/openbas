@@ -631,7 +631,7 @@ export interface ContractOutputElement {
   contract_output_element_regex_groups: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
-  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
   /** @format date-time */
   contract_output_element_updated_at: string;
   listened?: boolean;
@@ -656,7 +656,7 @@ export interface ContractOutputElementInput {
   /** List of tags */
   contract_output_element_tags?: string[];
   /** Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials */
-  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
 }
 
 /** Represents the rules for parsing the output of an execution. */
@@ -675,7 +675,7 @@ export interface ContractOutputElementSimple {
    * Represents the data type being extracted.
    * @example "text, number, port, portscan, ipv4, ipv6, credentials"
    */
-  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
 }
 
 export interface CreateExerciseInput {
@@ -1340,7 +1340,7 @@ export interface Finding {
   finding_simulation?: Exercise;
   finding_tags?: string[];
   finding_teams?: string[];
-  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
   /** @format date-time */
   finding_updated_at: string;
   finding_users?: string[];
@@ -1352,7 +1352,7 @@ export interface FindingInput {
   finding_field: string;
   finding_inject_id?: string;
   finding_labels?: string[];
-  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
   finding_value: string;
 }
 
@@ -1389,7 +1389,7 @@ export interface FindingOutput {
    * Represents the data type being extracted.
    * @example "text, number, port, portscan, ipv4, ipv6, credentials"
    */
-  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials" | "cve";
   /** Finding Value */
   finding_value: string;
 }

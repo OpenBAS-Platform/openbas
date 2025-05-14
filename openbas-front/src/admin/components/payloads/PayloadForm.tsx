@@ -67,7 +67,7 @@ const PayloadForm = ({
     contract_output_element_is_finding: z.boolean().optional(),
     contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
-    contract_output_element_type: z.enum(['text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials'], { message: t('Should not be empty') }),
+    contract_output_element_type: z.enum(['text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials', 'cve'], { message: t('Should not be empty') }),
     contract_output_element_tags: z.string().array().optional(),
     contract_output_element_rule: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_regex_groups: z.array(regexGroupObject),
