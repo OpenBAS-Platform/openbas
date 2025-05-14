@@ -289,7 +289,7 @@ public class AtomicTestingUtils {
                               : calculateResultsFromChildren(
                                   groupedByTeamAndUser.get(entry.getKey()),
                                   rawUserMap,
-                                  TargetType.PLAYER,
+                                  TargetType.PLAYERS,
                                   RawInjectExpectation::getUser_id,
                                   RawUser::computeName,
                                   null),

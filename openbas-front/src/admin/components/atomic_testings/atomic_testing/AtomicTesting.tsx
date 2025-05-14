@@ -63,6 +63,8 @@ const AtomicTesting = () => {
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
+  const [hasPlayers, setHasPlayers] = useState(false);
+  const [hasPlayersChecked, setHasPlayersChecked] = useState(false);
 
   const tabConfig: {
     key: number;
@@ -97,6 +99,14 @@ const AtomicTesting = () => {
         entityPrefix: 'endpoint_target',
       });
     }
+    if (hasPlayers) {
+      tabs.push({
+        key: index++,
+        label: t('Players'),
+        type: 'PLAYERS',
+        entityPrefix: 'player_target',
+      });
+    }
 
     tabs.push({
       key: index++,
@@ -106,7 +116,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, hasTeams, hasEndpoints]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasPlayers]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -150,6 +160,16 @@ const AtomicTesting = () => {
       })
       .finally(() => {
         setHasTeamsChecked(true);
+      });
+
+    searchTargets(injectId, 'PLAYERS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasPlayers(true);
+        } else { setHasPlayers(false); }
+      })
+      .finally(() => {
+        setHasPlayersChecked(true);
       });
 
     setReloadContentCount(reloadContentCount + 1);

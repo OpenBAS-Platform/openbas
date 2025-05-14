@@ -821,7 +821,7 @@ public class InjectService {
       case TEAMS:
         return injectStatusMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndTeamId(injectId, targetId));
-      case PLAYER:
+      case PLAYERS:
         return injectStatusMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndPlayerId(injectId, targetId));
       default:
