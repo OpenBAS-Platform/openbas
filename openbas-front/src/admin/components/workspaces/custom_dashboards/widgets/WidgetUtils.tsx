@@ -83,15 +83,6 @@ export const BASE_ENTITY_FILTER_KEY = 'base_entity';
 export const getBaseEntities = (filterGroup: FilterGroup | undefined) => {
   return filterGroup?.filters?.filter(f => f.key === BASE_ENTITY_FILTER_KEY).map(f => f.values ?? []).flat();
 };
-export const excludeBaseEntities = (filterGroup: FilterGroup | undefined) => {
-  if (!filterGroup) {
-    return undefined;
-  }
-  return {
-    mode: filterGroup.mode,
-    filters: filterGroup.filters?.filter(f => f.key !== BASE_ENTITY_FILTER_KEY) ?? [],
-  };
-};
 
 // -- MATRIX MITRE --
 const entityFilter: Filter = {
