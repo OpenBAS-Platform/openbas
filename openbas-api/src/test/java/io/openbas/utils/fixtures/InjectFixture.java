@@ -51,6 +51,14 @@ public class InjectFixture {
     return inject;
   }
 
+  public static Inject getInjectWithAllTeams() {
+    Inject inject = createInjectWithTitle(INJECT_EMAIL_NAME);
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    inject.setAllTeams(true);
+    return inject;
+  }
+
   public static Inject getDefaultInject() {
     Inject inject = createInjectWithDefaultTitle();
     inject.setEnabled(true);
