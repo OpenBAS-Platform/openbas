@@ -1,13 +1,9 @@
 package io.openbas.service.targets.search.specifications;
 
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Filters;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.*;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.criteria.From;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +24,61 @@ public class SearchSpecificationUtils<T> {
       List<AssetGroup> includedAssetGroups,
       List<AssetGroup> excludedAssetGroups,
       Filters.FilterOperator filterOperator) {}
+
+  public Specification<T> compileSpecificationForTags(
+      SearchPaginationInput input, List<String> joinPath) {
+
+    Filters.Filter tagsFilter = getTagsFilter(input);
+    if (tagsFilter == null) {
+      return null;
+    }
+
+    Filters.FilterGroup filterConfig = getFilterAsFilterGroup(input.getFilterGroup(), tagsFilter);
+    Specification<Endpoint> spec = FilterUtilsJpa.computeFilterGroupJpa(filterConfig);
+
+    return ((root, query, criteriaBuilder) -> {
+      Subquery<Integer> subQuery = query.subquery(Integer.class);
+      Root<Endpoint> assetTable = subQuery.from(Endpoint.class);
+      From<?, ?> finalJoin =
+          createJoinedFrom(
+              assetTable, joinPath.stream().filter(path -> !"assets".equals(path)).toList());
+
+      subQuery
+          .select(criteriaBuilder.literal(1))
+          .where(
+              spec.toPredicate(assetTable, query, criteriaBuilder),
+              criteriaBuilder.equal(
+                  finalJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+      return criteriaBuilder.exists(subQuery);
+    });
+  }
+
+  private Filters.FilterGroup getFilterAsFilterGroup(
+      Filters.FilterGroup filterGroup, Filters.Filter filter) {
+    Filters.FilterGroup fg = new Filters.FilterGroup();
+    fg.setMode(filterGroup.getMode());
+    if (filter != null) {
+      Filters.Filter newFilter = new Filters.Filter();
+      newFilter.setOperator(filter.getOperator());
+      newFilter.setKey("asset_tags");
+      newFilter.setOperator(filter.getOperator());
+      newFilter.setValues(filter.getValues());
+      fg.setFilters(List.of(newFilter));
+    } else {
+      fg.setFilters(List.of());
+    }
+    return fg;
+  }
+
+  private Filters.Filter getTagsFilter(SearchPaginationInput input) {
+    Filters.FilterGroup filterGroup = input.getFilterGroup();
+    String key = "target_tags";
+
+    return filterGroup.getFilters().stream()
+        .filter(filter -> key.equals(filter.getKey()))
+        .findFirst()
+        .orElse(null);
+  }
 
   public Specification<T> compileSpecificationForAssetGroupMembership(
       Inject scopedInject, SearchPaginationInput input, List<String> joinPath) {
@@ -101,7 +152,7 @@ public class SearchSpecificationUtils<T> {
     };
   }
 
-  private static Filters.Filter getAssetGroupFilter(SearchPaginationInput input) {
+  private Filters.Filter getAssetGroupFilter(SearchPaginationInput input) {
     Filters.FilterGroup filterGroup = input.getFilterGroup();
     String key = "target_asset_groups";
 
@@ -126,7 +177,7 @@ public class SearchSpecificationUtils<T> {
     return result;
   }
 
-  public static From<?, ?> createJoinedFrom(Root<?> root, List<String> joinPath) {
+  public static From<?, ?> createJoinedFrom(From<?, ?> root, List<String> joinPath) {
     From<?, ?> finalJoin = root;
     for (String path : joinPath) {
       finalJoin = finalJoin.join(path);
