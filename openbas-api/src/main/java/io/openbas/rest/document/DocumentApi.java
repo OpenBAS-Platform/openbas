@@ -26,13 +26,11 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -288,10 +286,10 @@ public class DocumentApi extends RestBehavior {
     List<Document> securityPlatformLogos = securityPlatformRepository.securityPlatformLogo();
     if (user.isAdmin()) {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) ->
-              this.documentRepository.findAll(specification, pageable),
-          searchPaginationInput,
-          Document.class)
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(specification, pageable),
+              searchPaginationInput,
+              Document.class)
           .map(
               (document) -> {
                 var rawPaginationDocument = new RawPaginationDocument(document);
@@ -301,11 +299,11 @@ public class DocumentApi extends RestBehavior {
               });
     } else {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) ->
-              this.documentRepository.findAll(
-                  findGrantedFor(user.getId()).and(specification), pageable),
-          searchPaginationInput,
-          Document.class)
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(
+                      findGrantedFor(user.getId()).and(specification), pageable),
+              searchPaginationInput,
+              Document.class)
           .map(
               (document) -> {
                 var rawPaginationDocument = new RawPaginationDocument(document);
