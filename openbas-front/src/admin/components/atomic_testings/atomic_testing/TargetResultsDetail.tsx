@@ -623,26 +623,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
-                              <ItemResult label="Prevented" status="Prevented" />
+                              <ItemResult label={t('Prevented')} status="Prevented" />
                             )
                           }
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'DETECTION' && (
-                              <ItemResult label="Detected" status="Detected" />
+                              <ItemResult label={t('Detected')} status="Detected" />
                             )
                           }
                           {
                             injectExpectation.inject_expectation_status === 'FAILED' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
-                              <ItemResult label="Not Prevented" status="Not Prevented" />
+                              <ItemResult label={t('Not Prevented')} status="Not Prevented" />
                             )
                           }
                           {
                             injectExpectation.inject_expectation_status === 'FAILED' && injectExpectation.inject_expectation_type === 'DETECTION' && (
-                              <ItemResult label="Not Detected" status="Not Detected" />
+                              <ItemResult label={t('Not Detected')} status="Not Detected" />
                             )
                           }
                           {injectExpectation.inject_expectation_status && HUMAN_EXPECTATION.includes(injectExpectation.inject_expectation_type) && (
-                            <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
+                            <ItemResult label={t(injectExpectation.inject_expectation_status)} status={injectExpectation.inject_expectation_status} />
                           )}
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
                         </GridLegacy>
@@ -789,7 +789,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                     </div>
                                   </TableCell>
                                   <TableCell>
-                                    <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                                    <ItemResult label={t(expectationResult.result)} status={expectationResult.result} />
                                   </TableCell>
                                   <TableCell className={classes.tableFontSize}>
                                     {
