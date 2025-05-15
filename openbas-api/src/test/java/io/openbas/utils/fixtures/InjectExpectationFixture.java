@@ -1,9 +1,6 @@
 package io.openbas.utils.fixtures;
 
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.model.Team;
+import io.openbas.database.model.*;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import java.util.Map;
 

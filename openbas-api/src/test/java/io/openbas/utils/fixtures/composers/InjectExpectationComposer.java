@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExpectationComposer extends ComposerBase<InjectExpectation> {
+public class InjectExpectationComposer extends ComposerBase<InjectExpectation> {
   @Autowired private InjectExpectationRepository injectExpectationRepository;
 
   public class Composer extends InnerComposerBase<InjectExpectation> {
@@ -15,6 +15,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     private Optional<AssetGroupComposer.Composer> assetGroupComposer = Optional.empty();
     private Optional<TeamComposer.Composer> teamComposer = Optional.empty();
     private Optional<EndpointComposer.Composer> endpointComposer = Optional.empty();
+    private Optional<AgentComposer.Composer> agentComposer = Optional.empty();
 
     public Composer(InjectExpectation injectExpectation) {
       this.injectExpectation = injectExpectation;
@@ -38,10 +39,17 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
       return this;
     }
 
+    public Composer withAgent(AgentComposer.Composer agentComposer) {
+      this.agentComposer = Optional.of(agentComposer);
+      this.injectExpectation.setAgent(agentComposer.get());
+      return this;
+    }
+
     @Override
     public Composer persist() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::persist);
       endpointComposer.ifPresent(EndpointComposer.Composer::persist);
+      agentComposer.ifPresent(AgentComposer.Composer::persist);
       teamComposer.ifPresent(TeamComposer.Composer::persist);
       injectExpectationRepository.save(injectExpectation);
       return this;
@@ -51,6 +59,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     public InnerComposerBase<InjectExpectation> delete() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::delete);
       endpointComposer.ifPresent(EndpointComposer.Composer::delete);
+      agentComposer.ifPresent(AgentComposer.Composer::delete);
       teamComposer.ifPresent(TeamComposer.Composer::delete);
       injectExpectationRepository.delete(injectExpectation);
       return this;
