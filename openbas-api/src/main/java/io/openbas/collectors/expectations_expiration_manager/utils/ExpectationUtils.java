@@ -12,6 +12,10 @@ import java.time.temporal.ChronoUnit;
 public class ExpectationUtils {
 
   public static final String FAILED = "FAILED";
+  public static final String PREVENTED = "Prevented";
+  public static final String DETECTED = "Detected";
+  public static final String NOT_DETECTED = "Not Detected";
+  public static final String NOT_PREVENTED = "Not Prevented";
 
   private ExpectationUtils() {}
 
@@ -23,13 +27,13 @@ public class ExpectationUtils {
 
   public static String computeSuccessMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
-        ? "Detected"
-        : PREVENTION.equals(expectationType) ? "Prevented" : FAILED;
+        ? DETECTED
+        : PREVENTION.equals(expectationType) ? PREVENTED : FAILED;
   }
 
   public static String computeFailedMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
-        ? "Not Detected"
-        : PREVENTION.equals(expectationType) ? "Not Prevented" : FAILED;
+        ? NOT_DETECTED
+        : PREVENTION.equals(expectationType) ? NOT_PREVENTED : FAILED;
   }
 }

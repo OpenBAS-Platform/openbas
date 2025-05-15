@@ -43,7 +43,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectStatusComposer injectStatusComposer;
-  @Autowired private ExpectationComposer expectationComposer;
+  @Autowired private InjectExpectationComposer injectExpectationComposer;
   @Autowired private ExecutorFixture executorFixture;
 
   @Autowired private MockMvc mvc;
@@ -297,9 +297,13 @@ public class AtomicTestingApiTest extends IntegrationTest {
                 .forInject(InjectFixture.getDefaultInject())
                 .withEndpoint(endpointWrapper)
                 .withExpectation(
-                    expectationComposer.forExpectation(detection1).withEndpoint(endpointWrapper))
+                    injectExpectationComposer
+                        .forExpectation(detection1)
+                        .withEndpoint(endpointWrapper))
                 .withExpectation(
-                    expectationComposer.forExpectation(detection2).withEndpoint(endpointWrapper));
+                    injectExpectationComposer
+                        .forExpectation(detection2)
+                        .withEndpoint(endpointWrapper));
 
         injectWrapper.persist();
 
@@ -459,13 +463,21 @@ public class AtomicTestingApiTest extends IntegrationTest {
                 .forInject(InjectFixture.getDefaultInject())
                 .withEndpoint(endpointWrapper)
                 .withExpectation(
-                    expectationComposer.forExpectation(detection1).withEndpoint(endpointWrapper))
+                    injectExpectationComposer
+                        .forExpectation(detection1)
+                        .withEndpoint(endpointWrapper))
                 .withExpectation(
-                    expectationComposer.forExpectation(detection2).withEndpoint(endpointWrapper))
+                    injectExpectationComposer
+                        .forExpectation(detection2)
+                        .withEndpoint(endpointWrapper))
                 .withExpectation(
-                    expectationComposer.forExpectation(prevention1).withEndpoint(endpointWrapper))
+                    injectExpectationComposer
+                        .forExpectation(prevention1)
+                        .withEndpoint(endpointWrapper))
                 .withExpectation(
-                    expectationComposer.forExpectation(prevention2).withEndpoint(endpointWrapper));
+                    injectExpectationComposer
+                        .forExpectation(prevention2)
+                        .withEndpoint(endpointWrapper));
 
         injectWrapper.persist();
 

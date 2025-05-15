@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExpectationComposer extends ComposerBase<InjectExpectation> {
+public class InjectExpectationComposer extends ComposerBase<InjectExpectation> {
   @Autowired private InjectExpectationRepository injectExpectationRepository;
 
   public class Composer extends InnerComposerBase<InjectExpectation> {
