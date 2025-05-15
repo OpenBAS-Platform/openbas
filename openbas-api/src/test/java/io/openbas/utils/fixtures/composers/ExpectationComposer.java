@@ -14,6 +14,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     private final InjectExpectation injectExpectation;
     private Optional<AssetGroupComposer.Composer> assetGroupComposer = Optional.empty();
     private Optional<TeamComposer.Composer> teamComposer = Optional.empty();
+    private Optional<UserComposer.Composer> userComposer = Optional.empty();
     private Optional<EndpointComposer.Composer> endpointComposer = Optional.empty();
 
     public Composer(InjectExpectation injectExpectation) {
@@ -23,6 +24,12 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     public Composer withTeam(TeamComposer.Composer teamComposer) {
       this.teamComposer = Optional.of(teamComposer);
       this.injectExpectation.setTeam(teamComposer.get());
+      return this;
+    }
+
+    public Composer withUser(UserComposer.Composer userComposer) {
+      this.userComposer = Optional.of(userComposer);
+      this.injectExpectation.setUser(userComposer.get());
       return this;
     }
 
@@ -43,6 +50,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::persist);
       endpointComposer.ifPresent(EndpointComposer.Composer::persist);
       teamComposer.ifPresent(TeamComposer.Composer::persist);
+      userComposer.ifPresent(UserComposer.Composer::persist);
       injectExpectationRepository.save(injectExpectation);
       return this;
     }
@@ -52,6 +60,7 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::delete);
       endpointComposer.ifPresent(EndpointComposer.Composer::delete);
       teamComposer.ifPresent(TeamComposer.Composer::delete);
+      userComposer.ifPresent(UserComposer.Composer::delete);
       injectExpectationRepository.delete(injectExpectation);
       return this;
     }
