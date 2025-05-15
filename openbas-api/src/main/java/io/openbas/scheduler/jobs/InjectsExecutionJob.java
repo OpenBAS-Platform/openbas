@@ -303,10 +303,19 @@ public class InjectsExecutionJob implements Job {
       // Get all injects to execute grouped by exercise.
       List<ExecutableInject> injects = injectHelper.getInjectsToRun();
 
+      // We're grouping the injects to run by exercises but also making sure no injects
+      // run in the same batch as it's parents
       Map<String, List<ExecutableInject>> byExercises =
           injects.stream()
               .filter(
                   executableInject ->
+                      // If we got dependencies, we check that the parents are not part of the
+                      // current batch of injects running. If so, we're filtering them out and
+                      // they'll be part of the next batch of launched injects. Do note that this is
+                      // an edge case as it's not allowed to add a dependency less than a minute
+                      // after a parent but can happen if the platform was restarted after some time
+                      // out. It'll then start the injects that were not started because the
+                      // platform was down.
                       executableInject.getInjection().getInject().getDependsOn() == null
                           || !intersect(
                               injects.stream()
