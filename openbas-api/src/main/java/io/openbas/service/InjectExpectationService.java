@@ -858,10 +858,16 @@ public class InjectExpectationService {
                           electedExpectations.get(expectation.getType()).getResults().stream(),
                           Stream.of(expectationResult))
                       .toList());
+          electedExpectations
+              .get(expectation.getType())
+              .setScore(
+                  Collections.max(
+                      electedExpectations.get(expectation.getType()).getResults().stream()
+                          .map(InjectExpectationResult::getScore)
+                          .toList()));
         }
       }
     }
-
     return electedExpectations.values().stream().toList();
   }
 
