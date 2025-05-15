@@ -1,47 +1,82 @@
 package io.openbas.service.targets.search;
 
-import static io.openbas.database.specification.TeamSpecification.contextual;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTarget;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.TeamTarget;
-import io.openbas.rest.team.output.TeamOutput;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.service.TeamService;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.criteria.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
   private final TeamService teamService;
+  private final TeamRepository teamRepository;
   private final InjectExpectationService injectExpectationService;
 
   public TeamTargetSearchAdaptor(
-      TeamService teamService, InjectExpectationService injectExpectationService) {
+      TeamService teamService,
+      TeamRepository teamRepository,
+      InjectExpectationService injectExpectationService) {
     this.teamService = teamService;
+    this.teamRepository = teamRepository;
     this.injectExpectationService = injectExpectationService;
 
     // field name translations
     this.fieldTranslations.put("target_name", "team_name");
     this.fieldTranslations.put("target_tags", "team_tags");
-    this.fieldTranslations.put("target_injects", "team_injects");
+  }
+
+  private static Specification<Team> teamsSpecificationFromInject(Inject scopedInject) {
+    return (root, query, builder) -> {
+      if (scopedInject.isAtomicTesting()) {
+        Path<Object> injectPath = root.join("injects").get("id");
+        return builder.equal(injectPath, scopedInject.getId());
+      } else {
+        if (scopedInject.isAllTeams()) {
+          Path<Object> exerciseTeamUsersPath =
+              root.get("exerciseTeamUsers").get("exercise").get("id");
+          Path<Object> injectPath = root.join("exercises").get("injects").get("id");
+          return builder.and(
+              builder.equal(injectPath, scopedInject.getId()),
+              builder.equal(exerciseTeamUsersPath, scopedInject.getExercise().getId()));
+        } else {
+          Path<Object> exerciseTeamUsersPath =
+              root.get("exerciseTeamUsers").get("exercise").get("id");
+          Path<Object> injectPath = root.join("injects").get("id");
+          return builder.and(
+              builder.equal(injectPath, scopedInject.getId()),
+              builder.equal(exerciseTeamUsersPath, scopedInject.getExercise().getId()));
+        }
+      }
+    };
   }
 
   @Override
   public Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject) {
-    final Specification<Team> teamSpecification = contextual(false);
-    Page<TeamOutput> filteredTeams =
-        teamService.teamPagination(this.translate(input, scopedInject), teamSpecification);
+    SearchPaginationInput translatedInput = this.translate(input, scopedInject);
+
+    Page<Team> filteredTeams =
+        buildPaginationJPA(
+            (Specification<Team> specification, Pageable pageable) ->
+                this.teamRepository.findAll(
+                    teamsSpecificationFromInject(scopedInject).and(specification), pageable),
+            translatedInput,
+            Team.class);
+
     return new PageImpl<>(
         filteredTeams.getContent().stream()
-            .map(teamOutput -> convertFromTeamOutput(teamOutput, scopedInject))
+            .map(team -> convertFromTeamOutput(team, scopedInject))
             .toList(),
         filteredTeams.getPageable(),
         filteredTeams.getTotalElements());
@@ -49,10 +84,17 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
-    return scopedInject.getTeams().stream()
-        .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
-        .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
-        .toList();
+    if (scopedInject.isAllTeams()) {
+      return scopedInject.getExercise().getTeams().stream()
+          .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
+          .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
+          .toList();
+    } else {
+      return scopedInject.getTeams().stream()
+          .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
+          .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
+          .toList();
+    }
   }
 
   @Override
@@ -62,9 +104,12 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
         .toList();
   }
 
-  private InjectTarget convertFromTeamOutput(TeamOutput teamOutput, Inject inject) {
+  private InjectTarget convertFromTeamOutput(Team team, Inject inject) {
     TeamTarget target =
-        new TeamTarget(teamOutput.getId(), teamOutput.getName(), teamOutput.getTags());
+        new TeamTarget(
+            team.getId(),
+            team.getName(),
+            team.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(
