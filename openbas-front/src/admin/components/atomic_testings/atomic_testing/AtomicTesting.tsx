@@ -204,6 +204,10 @@ const AtomicTesting = () => {
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     setReloadContentCount(reloadContentCount + 1);
+
+    if (tabConfig[newValue].type == 'ALL_TARGETS') {
+      handleTargetClick(sortedTargets[0]);
+    }
   };
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
