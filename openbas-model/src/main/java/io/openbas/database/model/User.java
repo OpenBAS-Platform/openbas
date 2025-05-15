@@ -302,6 +302,15 @@ public class User implements Base {
     return getFirstname() + " " + getLastname();
   }
 
+  @JsonIgnore
+  public String getNameOrEmail() {
+    if (getFirstname() != null && getLastname() != null) {
+      return getName();
+    } else {
+      return getEmail();
+    }
+  }
+
   @JsonProperty("user_is_only_player")
   @Schema(description = "True if the user is only a player")
   public boolean isOnlyPlayer() {

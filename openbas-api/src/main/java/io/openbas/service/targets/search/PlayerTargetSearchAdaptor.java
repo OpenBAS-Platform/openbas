@@ -92,7 +92,7 @@ public class PlayerTargetSearchAdaptor extends SearchAdaptorBase {
     PlayerTarget target =
         new PlayerTarget(
             player.getId(),
-            player.getName(),
+            player.getNameOrEmail(),
             player.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
             player.getTeams().stream().map(Team::getId).collect(Collectors.toSet()));
 
