@@ -22,9 +22,11 @@ import io.openbas.service.ChallengeService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +40,6 @@ public class ChallengeApi extends RestBehavior {
   private final ChallengeFlagRepository challengeFlagRepository;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
-  private final ExerciseRepository exerciseRepository;
   private final ChallengeService challengeService;
   private final UserRepository userRepository;
 
@@ -109,31 +110,6 @@ public class ChallengeApi extends RestBehavior {
     challenge.setFlags(challengeFlags);
     return challengeRepository.save(challenge);
   }
-
-  /*@GetMapping("/api/player/challenges/{exerciseId}")
-  public SimulationChallengesReader playerChallenges(
-      @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    final User user = impersonateUser(userRepository, userId);
-    if (user.getId().equals(ANONYMOUS)) {
-      throw new UnsupportedOperationException("User must be logged or dynamic player is required");
-    }
-    return challengeService.playerChallenges(exerciseId, user);
-  }*/
-
-  /* /api/observer/simulations/{simulationId}/challenges (in SimulationChallengesApi)*/
-  /* /api/observer/scenarios/{scenarioId}/challenges (in ScenarioChallengesApi)*/
-  /*@GetMapping("/api/observer/challenges/{exerciseId}")
-  public SimulationChallengesReader observerChallenges(@PathVariable String exerciseId) {
-    Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    SimulationChallengesReader simulationChallengesReader = new SimulationChallengesReader(exercise);
-    Iterable<Challenge> challenges = challengeService.getExerciseChallenges(exerciseId);
-    simulationChallengesReader.setExerciseChallenges(
-        fromIterable(challenges).stream()
-            .map(challenge -> new ChallengeInformation(challenge, null, 0))
-            .toList());
-    return simulationChallengesReader;
-  }*/
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")

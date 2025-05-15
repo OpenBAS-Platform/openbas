@@ -17,6 +17,11 @@ export const fetchChallenges = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfChallenges, uri)(dispatch);
 };
 
+export const findChallenges = (challengeIds: string[]) => (dispatch: Dispatch) => {
+  const uri = '/api/challenges/find';
+  return postReferential(arrayOfChallenges, uri, challengeIds)(dispatch);
+};
+
 export const fetchExerciseChallenges = (exerciseId: string) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/challenges`;
   return getReferential(arrayOfChallenges, uri)(dispatch);
