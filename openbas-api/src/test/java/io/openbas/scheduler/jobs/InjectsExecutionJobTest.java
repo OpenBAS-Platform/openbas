@@ -12,8 +12,6 @@ import io.openbas.utils.fixtures.composers.EndpointComposer;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectStatusComposer;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +48,6 @@ class InjectsExecutionJobTest {
   @Order(1)
   void given_cron_in_one_minute_should_not_start_children_injects() throws JobExecutionException {
     // -- PREPARE --
-    ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
-
     Exercise exercise = ExerciseFixture.getExercise();
     exercise.setStart(Instant.now().minus(1, ChronoUnit.MINUTES));
     Exercise exerciseSaved = this.exerciseService.createExercise(exercise);
@@ -79,18 +75,13 @@ class InjectsExecutionJobTest {
             .withInjectStatus(
                 injectStatusComposer.forInjectStatus(
                     InjectStatusFixture.createPendingInjectStatus()))
+            .withDependsOn(injectParent)
             .persist()
             .get();
     injectParent.setExercise(exerciseSaved);
     injectChildren.setExercise(exerciseSaved);
     injectParent.setStatus(null);
     injectChildren.setStatus(null);
-    InjectDependency injectDependency = new InjectDependency();
-    InjectDependencyId injectDependencyId = new InjectDependencyId();
-    injectDependencyId.setInjectParent(injectParent);
-    injectDependencyId.setInjectChildren(injectChildren);
-    injectDependency.setCompositeId(injectDependencyId);
-    injectChildren.setDependsOn(List.of(injectDependency));
     exerciseSaved.setInjects(List.of(injectParent, injectChildren));
     EXERCISE_ID = exerciseSaved.getId();
 
@@ -99,6 +90,7 @@ class InjectsExecutionJobTest {
     // -- EXECUTE --
     this.job.execute(null);
 
+    // -- ASSERT --
     List<Inject> injectsSaved = injectRepository.findByExerciseId(EXERCISE_ID);
     Optional<Inject> savedInjectParent =
         injectsSaved.stream()
@@ -109,6 +101,7 @@ class InjectsExecutionJobTest {
             .filter(inject -> inject.getId().equals(injectChildren.getId()))
             .findFirst();
 
+    // Checking that only the parent inject has a status
     assertTrue(savedInjectParent.isPresent());
     assertTrue(savedInjectChildren.isPresent());
 
