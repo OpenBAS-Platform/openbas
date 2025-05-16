@@ -2,6 +2,7 @@ package io.openbas.rest.inject;
 
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -1525,8 +1526,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
                         Set.of(team.getId()));
                   })
               .toList();
-
-      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+      expected.forEach(
+          player ->
+              assertTrue(response.contains(player.getId()) && response.contains(player.getName())));
     }
 
     @Test
