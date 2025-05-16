@@ -217,6 +217,7 @@ const Injects: FunctionComponent<Props> = ({
     'inject_assets',
     'inject_asset_groups',
     'inject_teams',
+    'inject_tags',
   ];
 
   const quickFilter: FilterGroup = {
