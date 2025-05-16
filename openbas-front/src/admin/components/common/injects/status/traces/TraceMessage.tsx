@@ -34,7 +34,7 @@ const TraceMessage = ({ traces }: Props) => {
         padding: theme.spacing(0.1),
       }}
     >
-      <ul style={{ paddingLeft: theme.spacing(2) }}>
+      <ul style={{ padding: theme.spacing(0, 2) }}>
         {sorted.map((tr, index) => {
           const isExpanded = expandedMessages.has(index);
           const isTruncated = tr.execution_message.length > truncateLength;
@@ -53,41 +53,39 @@ const TraceMessage = ({ traces }: Props) => {
               {tr.execution_message.startsWith('LICENSE RESTRICTION') && <EEChip clickable featureDetectedInfo={tr.execution_message.replace('LICENSE RESTRICTION - ', '')} />}
               <strong>{tr.execution_status}</strong>
               {' '}
-              <span>
-                {displayMessage}
-                {isTruncated && (
-                  <div
+              {displayMessage}
+              {isTruncated && (
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Button
+                    size="small"
+                    onClick={() => toggleMessage(index)}
                     style={{
-                      width: '100%',
+                      padding: theme.spacing(1, 2),
                       display: 'flex',
-                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: theme.spacing(1),
                     }}
                   >
-                    <Button
-                      size="small"
-                      onClick={() => toggleMessage(index)}
-                      style={{
-                        padding: theme.spacing(1, 2),
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: theme.spacing(1),
-                      }}
-                    >
-                      {isExpanded ? (
-                        <>
-                          <ArrowDropUpOutlined fontSize="small" />
-                          {t('See Less')}
-                        </>
-                      ) : (
-                        <>
-                          <ArrowDropDownOutlined fontSize="small" />
-                          {t('See More')}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </span>
+                    {isExpanded ? (
+                      <>
+                        <ArrowDropUpOutlined fontSize="small" />
+                        {t('See Less')}
+                      </>
+                    ) : (
+                      <>
+                        <ArrowDropDownOutlined fontSize="small" />
+                        {t('See More')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </li>
           );
         })}
