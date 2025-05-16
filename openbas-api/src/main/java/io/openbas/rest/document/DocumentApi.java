@@ -595,7 +595,6 @@ public class DocumentApi extends RestBehavior {
   }
 
   // -- EXERCISE & SENARIO--
-
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
   public List<Document> playerDocuments(
       @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId) {

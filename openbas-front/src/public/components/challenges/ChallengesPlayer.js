@@ -26,8 +26,8 @@ import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
-import { fetchPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
-import { fetchPlayerDocuments } from '../../../actions/Document';
+import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
+import { fetchSimulationPlayerDocuments } from '../../../actions/Document.js';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
@@ -132,12 +132,12 @@ const ChallengesPlayer = () => {
   const { t } = useFormatter();
   const [currentChallengeEntry, setCurrentChallengeEntry] = useState(null);
   const [currentResult, setCurrentResult] = useState(null);
-  const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
+  const [userId] = useQueryParameter(['user']);
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const { exerciseId } = useParams();
   const { challengesReader, documentsMap } = useHelper(helper => ({
-    challengesReader: helper.getChallengesReader(exerciseId),
+    challengesReader: helper.getSimulationChallengesReader(exerciseId),
     documentsMap: helper.getDocumentsMap(),
   }));
   const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
@@ -154,8 +154,8 @@ const ChallengesPlayer = () => {
   };
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchPlayerChallenges(exerciseId, userId));
-    dispatch(fetchPlayerDocuments(exerciseId, userId));
+    dispatch(fetchSimulationPlayerChallenges(exerciseId, userId));
+    dispatch(fetchSimulationPlayerDocuments(exerciseId, userId));
   }, []);
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
@@ -236,7 +236,7 @@ const ChallengesPlayer = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=true`}
+            to={`/admin/simulations/${exerciseId}/challenges?preview=true`}
             style={{
               position: 'absolute',
               top: 20,
