@@ -12,10 +12,10 @@ import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service(CALDERA_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class CalderaExecutorContextService extends ExecutorContextService {

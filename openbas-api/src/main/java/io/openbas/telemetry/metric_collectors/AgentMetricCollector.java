@@ -11,10 +11,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgentMetricCollector {

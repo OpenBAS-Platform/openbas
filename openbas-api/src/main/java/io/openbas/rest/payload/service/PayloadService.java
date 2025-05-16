@@ -33,18 +33,16 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class PayloadService {
-
-  private static final Logger LOGGER = Logger.getLogger(PayloadService.class.getName());
 
   @Resource protected ObjectMapper mapper;
 
@@ -222,8 +220,7 @@ public class PayloadService {
         getExternalIdsToDeprecate(payloadExternalIds, processedPayloadExternalIds);
     payloadRepository.setPayloadStatusByExternalIds(
         String.valueOf(Payload.PAYLOAD_STATUS.DEPRECATED), payloadExternalIdsToDeprecate);
-    LOGGER.log(
-        Level.INFO, "Number of deprecated Payloads: " + payloadExternalIdsToDeprecate.size());
+    log.info("Number of deprecated Payloads: {}", payloadExternalIdsToDeprecate.size());
   }
 
   private static List<String> getExternalIdsToDeprecate(

@@ -3,12 +3,12 @@ package io.openbas.migration;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
-@Log
+@Slf4j
 @Component
 public class V3_16__Add_array_union_agg_method extends BaseJavaMigration {
 

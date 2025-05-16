@@ -5,10 +5,10 @@ import io.openbas.injectors.openbas.OpenBASImplantContract;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ActionMetricCollector {
@@ -95,7 +95,8 @@ public class ActionMetricCollector {
         addInjectPlayedWithoutAgentsCount();
       }
     } catch (Exception e) {
-      log.severe("Error during incrementing inject played count: " + e);
+      log.error(
+          String.format("Error during incrementing inject played count: %s", e.getMessage()), e);
     }
   }
 }

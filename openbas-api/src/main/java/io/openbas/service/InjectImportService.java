@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
@@ -49,7 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectImportService {
 
   private final InjectRepository injectRepository;
@@ -103,8 +103,7 @@ public class InjectImportService {
       tempDir.toFile().deleteOnExit();
       tempFile.toFile().deleteOnExit();
     } catch (Exception ex) {
-      log.severe("Error while importing an xls file");
-      log.severe(Arrays.toString(ex.getStackTrace()));
+      log.error("Error while importing an xls file", ex);
       throw new BadRequestException("File seems to be corrupt");
     }
 
@@ -423,8 +422,7 @@ public class InjectImportService {
             }
           });
     } catch (IOException ex) {
-      log.severe("Error while importing an xls file");
-      log.severe(Arrays.toString(ex.getStackTrace()));
+      log.error("Error while importing an xls file", ex);
       throw new BadRequestException();
     }
 
@@ -596,8 +594,8 @@ public class InjectImportService {
         try {
           injectTime.setRelativeDayNumber(Integer.parseInt(relativeDayMatcher.group(1)));
         } catch (NumberFormatException ex) {
-          log.warning(
-              String.format("Can't format %s into an integer", relativeDayMatcher.group(1)));
+          log.warn(
+              String.format("Can't format %s into an integer", relativeDayMatcher.group(1)), ex);
         }
       }
       injectTime.setRelativeHour(relativeHour);
@@ -607,8 +605,8 @@ public class InjectImportService {
         try {
           injectTime.setRelativeHourNumber(Integer.parseInt(relativeHourMatcher.group(1)));
         } catch (NumberFormatException ex) {
-          log.warning(
-              String.format("Can't format %s into an integer", relativeHourMatcher.group(1)));
+          log.warn(
+              String.format("Can't format %s into an integer", relativeHourMatcher.group(1)), ex);
         }
       }
       injectTime.setRelativeMinute(relativeMinute);
@@ -618,8 +616,8 @@ public class InjectImportService {
         try {
           injectTime.setRelativeMinuteNumber(Integer.parseInt(relativeMinuteMatcher.group(1)));
         } catch (NumberFormatException ex) {
-          log.warning(
-              String.format("Can't format %s into an integer", relativeMinuteMatcher.group(1)));
+          log.warn(
+              String.format("Can't format %s into an integer", relativeMinuteMatcher.group(1)), ex);
         }
       }
 

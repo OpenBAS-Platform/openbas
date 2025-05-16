@@ -39,10 +39,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -52,7 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Log
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ExerciseInjectApi extends RestBehavior {
@@ -249,7 +248,7 @@ public class ExerciseInjectApi extends RestBehavior {
     try {
       return executor.directExecute(injection);
     } catch (Exception e) {
-      log.log(Level.WARNING, e.getMessage(), e);
+      log.warn(e.getMessage(), e);
       return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
     }
   }

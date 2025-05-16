@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -53,9 +53,8 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableRetry
 @RequiredArgsConstructor
+@Slf4j
 public class ElasticDriver {
-
-  private static final Logger LOGGER = Logger.getLogger(ElasticDriver.class.getName());
   public static final String ES_MODEL_VERSION = "1.0";
   public static final String ES_ILM_POLICY = "-ilm-policy";
   public static final String ES_CORE_SETTINGS = "-core-settings";
@@ -277,14 +276,14 @@ public class ElasticDriver {
       backoff = @Backoff(delay = 30000))
   @Bean
   public <T extends EsBase> ElasticsearchClient elasticClient() throws Exception {
-    LOGGER.info("Creating ElasticClient");
+    log.info("Creating ElasticClient");
     ElasticsearchClient elasticClient = getElasticClient();
     // Try to client configuration
     try {
       InfoResponse info = elasticClient.info();
-      LOGGER.info("ElasticClient ready for " + info.name() + " - " + info.version());
+      log.info("ElasticClient ready for {} - {}", info.name(), info.version());
     } catch (Exception e) {
-      LOGGER.severe("Error activating Elasticsearch engine: " + e.getMessage());
+      log.error(String.format("Error activating Elasticsearch engine: %s", e.getMessage()), e);
       throw new IllegalStateException("Failed to connect to Elasticsearch", e);
     }
     // TODO enable telemetry ?
@@ -305,7 +304,7 @@ public class ElasticDriver {
             esModel -> {
               Map<String, Property> mappings = mappingGeneratorForClass(esModel);
               try {
-                LOGGER.info("Creating Index " + esModel.getName());
+                log.info("Creating Index {}", esModel.getName());
                 createIndex(elasticClient, esModel.getName(), ES_MODEL_VERSION, mappings);
               } catch (IOException e) {
                 throw new RuntimeException(e);

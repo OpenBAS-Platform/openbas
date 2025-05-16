@@ -19,15 +19,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ExportService {
-  private static final Logger LOGGER = Logger.getLogger(ExportService.class.getName());
   @Resource protected ObjectMapper mapper;
   @Resource private DocumentRepository documentRepository;
   @Resource private ChallengeService challengeService;
@@ -88,7 +87,7 @@ public class ExportService {
                   zipExport.write(data);
                   zipExport.closeEntry();
                 } catch (IOException e) {
-                  LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                  log.error(e.getMessage(), e);
                 }
               }
             });
