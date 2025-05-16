@@ -3986,23 +3986,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xyflow/react@npm:12.6.1":
-  version: 12.6.1
-  resolution: "@xyflow/react@npm:12.6.1"
+"@xyflow/react@npm:12.6.4":
+  version: 12.6.4
+  resolution: "@xyflow/react@npm:12.6.4"
   dependencies:
-    "@xyflow/system": "npm:0.0.58"
+    "@xyflow/system": "npm:0.0.61"
     classcat: "npm:^5.0.3"
     zustand: "npm:^4.4.0"
   peerDependencies:
     react: ">=17"
     react-dom: ">=17"
-  checksum: 10c0/dfdf1bd51661e3e60b361a196c906ea1dd3f884b43ede5d6ee5a13d91b09b8c5e6dddc6c904b493e151269b759024a2ba6b2713ab97753ef44d4a2c0fcab16a1
+  checksum: 10c0/2783a6f8a079cc0e068580ad1b69a6c914f47377f1c5a908af28d98c24a6fec1ff088f8ec42b5f343338167aeff4feecc692cce20bf251fe54f22a20c0d544f4
   languageName: node
   linkType: hard
 
-"@xyflow/system@npm:0.0.58":
-  version: 0.0.58
-  resolution: "@xyflow/system@npm:0.0.58"
+"@xyflow/system@npm:0.0.61":
+  version: 0.0.61
+  resolution: "@xyflow/system@npm:0.0.61"
   dependencies:
     "@types/d3-drag": "npm:^3.0.7"
     "@types/d3-selection": "npm:^3.0.10"
@@ -4011,7 +4011,7 @@ __metadata:
     d3-drag: "npm:^3.0.0"
     d3-selection: "npm:^3.0.0"
     d3-zoom: "npm:^3.0.0"
-  checksum: 10c0/0252e8b9510c1238785c570d9b0edd94cc27d6c63f49b582e20f6662c15ede09fab26a8908c8889d23a6cb26f36a6d048ca30fcab7d127dbbb2da1317a0c9a0d
+  checksum: 10c0/63c04973462aa98cb7d53118cf3b458b6dc79c2dbc468dbd553b1df4ec11afab91dfef490ac18f804815ab40fa6709d70fc0d0a446d12e420918a7590bbdc88d
   languageName: node
   linkType: hard
 
@@ -9841,7 +9841,7 @@ __metadata:
     "@uiw/react-md-editor": "npm:4.0.6"
     "@vitejs/plugin-react": "npm:4.4.1"
     "@vitest/eslint-plugin": "npm:1.1.44"
-    "@xyflow/react": "npm:12.6.1"
+    "@xyflow/react": "npm:12.6.4"
     apexcharts: "npm:4.7.0"
     axios: "npm:1.9.0"
     chokidar: "npm:4.0.3"
