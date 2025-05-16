@@ -37,6 +37,17 @@ const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
       ASSETS: <PlatformIcon platform={target?.target_subtype ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />,
       TEAMS: <Groups3Outlined />,
       PLAYER: <PersonOutlined fontSize="small" />,
+      AGENT: (
+        <img
+          src={`/api/images/executors/icons/${target.target_subtype}`}
+          alt={target.target_subtype}
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: 4,
+          }}
+        />
+      ),
     };
 
     return iconMap[target.target_type];

@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.Agent;
 import io.openbas.database.repository.AgentRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,19 +12,28 @@ public class AgentComposer extends ComposerBase<Agent> {
 
   public class Composer extends InnerComposerBase<Agent> {
     private final Agent agent;
+    private Optional<ExecutorComposer.Composer> executorComposer = Optional.empty();
 
     public Composer(Agent agent) {
       this.agent = agent;
     }
 
+    public Composer withExecutor(ExecutorComposer.Composer executorComposer) {
+      this.executorComposer = Optional.of(executorComposer);
+      this.agent.setExecutor(executorComposer.get());
+      return this;
+    }
+
     @Override
     public AgentComposer.Composer persist() {
+      executorComposer.ifPresent(ExecutorComposer.Composer::persist);
       agentRepository.save(agent);
       return this;
     }
 
     @Override
     public AgentComposer.Composer delete() {
+      executorComposer.ifPresent(ExecutorComposer.Composer::delete);
       agentRepository.delete(agent);
       return this;
     }

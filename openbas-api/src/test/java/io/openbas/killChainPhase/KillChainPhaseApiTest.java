@@ -173,7 +173,7 @@ public class KillChainPhaseApiTest extends IntegrationTest {
         given_search_input_with_name_and_equals_operator_should_return_a_page_of_kill_chain_phases()
             throws Exception {
       SearchPaginationInput searchPaginationInput =
-          PaginationFixture.simpleFilter("phase_name", "NAME2", eq);
+          PaginationFixture.simpleSearchWithAndOperator("phase_name", "NAME2", eq);
 
       mvc.perform(
               post("/api/kill_chain_phases/search")
@@ -189,7 +189,7 @@ public class KillChainPhaseApiTest extends IntegrationTest {
         given_search_input_with_name_and_contains_operator_should_return_a_page_of_kill_chain_phases()
             throws Exception {
       SearchPaginationInput searchPaginationInput =
-          PaginationFixture.simpleFilter("phase_name", "2", contains);
+          PaginationFixture.simpleSearchWithAndOperator("phase_name", "2", contains);
 
       mvc.perform(
               post("/api/kill_chain_phases/search")

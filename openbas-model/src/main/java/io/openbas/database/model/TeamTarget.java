@@ -12,6 +12,6 @@ public class TeamTarget extends InjectTarget {
 
   @Override
   protected String getTargetSubtype() {
-    return this.getTargetType();
+    return "N/A";
   }
 }

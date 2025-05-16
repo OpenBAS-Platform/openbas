@@ -47,6 +47,7 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'target_assets':
+      case 'target_endpoint':
         searchTargetOptionsById('ASSETS', ids).then((response) => {
           setOptions(response.data);
         });

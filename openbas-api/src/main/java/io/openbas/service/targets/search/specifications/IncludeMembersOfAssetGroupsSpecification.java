@@ -1,65 +1,75 @@
 package io.openbas.service.targets.search.specifications;
 
+import static io.openbas.service.targets.search.specifications.SearchSpecificationUtils.compileFilterGroupsWithOR;
+import static io.openbas.service.targets.search.specifications.SearchSpecificationUtils.createJoinedFrom;
+
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetGroupRepository;
-import io.openbas.utils.FilterUtilsJpa;
-import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class IncludeMembersOfAssetGroupsSpecification {
+public class IncludeMembersOfAssetGroupsSpecification<T> {
   private final AssetGroupRepository assetGroupRepository;
 
-  public Specification<Endpoint> buildSpecification(List<String> assetGroupIds) {
-    Specification<Endpoint> dynamicFiltersSpec = getDynamicFilterSpecification(assetGroupIds);
-    Specification<Endpoint> transitiveMembershipSpec =
-        getTransitiveTargetingSpecification(assetGroupIds);
+  public Specification<T> buildSpecification(List<String> assetGroupIds, List<String> joinPath) {
+    Specification<T> dynamicFiltersSpec = getDynamicFilterSpecification(assetGroupIds, joinPath);
+    Specification<T> transitiveMembershipSpec =
+        getTransitiveTargetingSpecification(assetGroupIds, joinPath);
 
     return dynamicFiltersSpec == null
         ? transitiveMembershipSpec
         : dynamicFiltersSpec.or(transitiveMembershipSpec);
   }
 
-  private Specification<Endpoint> getDynamicFilterSpecification(List<String> assetGroupIds) {
-    return compileFilterGroupsWithOR(
-        assetGroupRepository.rawDynamicFiltersByAssetGroupIds(assetGroupIds).stream()
-            .map(df -> df.getAssetGroupDynamicFilter())
-            .filter(fg -> !fg.getFilters().isEmpty())
-            .toList());
-  }
+  private Specification<T> getDynamicFilterSpecification(
+      List<String> assetGroupIds, List<String> joinPath) {
+    Specification<Endpoint> positiveSpec =
+        compileFilterGroupsWithOR(
+            assetGroupRepository.rawDynamicFiltersByAssetGroupIds(assetGroupIds).stream()
+                .map(df -> df.getAssetGroupDynamicFilter())
+                .filter(fg -> !fg.getFilters().isEmpty())
+                .toList());
 
-  private Specification<Endpoint> compileFilterGroupsWithOR(
-      @NotNull List<Filters.FilterGroup> filterGroups) {
-    Specification<Endpoint> result = null;
-    for (Filters.FilterGroup filterGroup : filterGroups) {
-      Specification<Endpoint> converted = FilterUtilsJpa.computeFilterGroupJpa(filterGroup);
-      if (result == null) {
-        result = converted;
-        continue;
-      }
-      result = result.or(converted);
+    if (positiveSpec == null) {
+      return null;
     }
-    return result;
+
+    return ((root, query, criteriaBuilder) -> {
+      Subquery<Integer> subQuery = query.subquery(Integer.class);
+      Root<Endpoint> assetTable = subQuery.from(Endpoint.class);
+      From<?, ?> finalJoin =
+          createJoinedFrom(
+              assetTable, joinPath.stream().filter(path -> !"assets".equals(path)).toList());
+
+      subQuery
+          .select(criteriaBuilder.literal(1))
+          .where(
+              positiveSpec.toPredicate(assetTable, query, criteriaBuilder),
+              criteriaBuilder.equal(
+                  finalJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+      return criteriaBuilder.exists(subQuery);
+    });
   }
 
-  private Specification<Endpoint> getTransitiveTargetingSpecification(List<String> assetGroupIds) {
+  private Specification<T> getTransitiveTargetingSpecification(
+      List<String> assetGroupIds, List<String> joinPath) {
     return (root, query, criteriaBuilder) -> {
       Subquery<Integer> subQuery = query.subquery(Integer.class);
       Root<AssetGroup> assetGroupTable = subQuery.from(AssetGroup.class);
-      Join<AssetGroup, Asset> assetJoin = assetGroupTable.join("assets");
+      From<?, ?> finalJoin = createJoinedFrom(assetGroupTable, joinPath);
 
       subQuery
           .select(criteriaBuilder.literal(1))
           .where(
               criteriaBuilder.equal(
-                  assetJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")),
+                  finalJoin.get("id"), query.getRoots().stream().findFirst().get().get("id")),
               assetGroupTable.get("id").in(assetGroupIds));
       return criteriaBuilder.exists(subQuery);
     };
