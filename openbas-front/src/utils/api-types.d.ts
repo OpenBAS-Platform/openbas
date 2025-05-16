@@ -3765,14 +3765,11 @@ export interface PlayerOutput {
   user_firstname?: string;
   user_id: string;
   user_lastname?: string;
-  user_name?: string;
   user_organization?: string;
   user_pgp_key?: string;
   user_phone?: string;
   /** @uniqueItems true */
   user_tags?: string[];
-  /** @uniqueItems true */
-  user_teams?: string[];
 }
 
 export interface PlayerTarget {
@@ -4752,6 +4749,7 @@ export interface User {
   /** Secondary phone number of the user */
   user_phone2?: string;
   listened?: boolean;
+  team_exercises_users?: string[];
   /** True if the user is admin */
   user_admin?: boolean;
   /** City of the user */
