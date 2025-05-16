@@ -20,13 +20,12 @@ import io.openbas.utils.EndpointMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 public class CalderaExecutorService implements Runnable {
 
@@ -102,7 +101,7 @@ public class CalderaExecutorService implements Runnable {
         executorService.removeFromType(CALDERA_EXECUTOR_TYPE);
       }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating caldera executor: " + e);
+      log.error(String.format("Error creating caldera executor: %s", e.getMessage()), e);
     }
   }
 

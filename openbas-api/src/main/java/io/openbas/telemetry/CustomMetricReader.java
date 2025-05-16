@@ -13,10 +13,10 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-@Log
+@Slf4j
 public class CustomMetricReader implements MetricReader {
   private final OtlpHttpMetricExporter otlpExporter;
   private final ThreadPoolTaskScheduler taskScheduler;
@@ -90,10 +90,10 @@ public class CustomMetricReader implements MetricReader {
                   }
                 });
       } else {
-        log.severe("Telemetry - CollectionRegistration not initialized");
+        log.error("Telemetry - CollectionRegistration not initialized");
       }
     } catch (Exception e) {
-      log.severe("Telemetry - Error during metric collection: " + e);
+      log.error(String.format("Telemetry - Error during metric collection: %s", e.getMessage()), e);
     }
   }
 

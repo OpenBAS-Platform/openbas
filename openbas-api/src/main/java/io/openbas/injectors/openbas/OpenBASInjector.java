@@ -3,16 +3,14 @@ package io.openbas.injectors.openbas;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.integrations.InjectorService;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Log
+@Slf4j
 public class OpenBASInjector {
 
   public static final String OPENBAS_INJECTOR_NAME = "OpenBAS Implant";
@@ -159,13 +157,7 @@ public class OpenBASInjector {
           executorClearCommands,
           true);
     } catch (Exception e) {
-      log.log(
-          Level.SEVERE,
-          "Error creating OpenBAS implant injector ("
-              + e.getMessage()
-              + ")"
-              + "\n"
-              + Arrays.toString(e.getStackTrace()));
+      log.error(String.format("Error creating OpenBAS implant injector (%s)", e.getMessage()), e);
     }
   }
 }

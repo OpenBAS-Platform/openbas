@@ -7,12 +7,12 @@ import io.openbas.rest.finding.form.FindingOutput;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Log
+@Slf4j
 public class FindingMapper {
 
   private final EndpointMapper endpointMapper;
