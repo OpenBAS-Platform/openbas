@@ -55,6 +55,13 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
     Specification<Endpoint> overallSpec =
         searchSpecificationUtils.compileSpecificationForAssetGroupMembership(
             scopedInject, input, joinPath);
+
+    Specification<Endpoint> memberOfAnyTargetGroupSpec =
+        searchSpecificationUtils.compileSpecificationForAssetGroupMembership(
+            scopedInject,
+            SearchPaginationInput.builder().filterGroup(new Filters.FilterGroup()).build(),
+            joinPath);
+
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
 
     Page<Endpoint> eps =
@@ -63,7 +70,8 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
               if (Filters.FilterMode.and.equals(input.getFilterGroup().getMode())) {
                 return this.endpointRepository.findAll(overallSpec.and(specification), pageable);
               }
-              return this.endpointRepository.findAll(overallSpec.or(specification), pageable);
+              return this.endpointRepository.findAll(
+                  overallSpec.or(specification.and(memberOfAnyTargetGroupSpec)), pageable);
             },
             translatedInput,
             Endpoint.class);

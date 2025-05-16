@@ -46,6 +46,12 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
         specificationUtils.compileSpecificationForAssetGroupMembership(
             scopedInject, input, joinPath);
 
+    Specification<Agent> memberOfAnyTargetGroupSpec =
+        specificationUtils.compileSpecificationForAssetGroupMembership(
+            scopedInject,
+            SearchPaginationInput.builder().filterGroup(new Filters.FilterGroup()).build(),
+            joinPath);
+
     Specification<Agent> tagsSpec = specificationUtils.compileSpecificationForTags(input, joinPath);
 
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
@@ -60,7 +66,8 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
                 }
                 return this.agentRepository.findAll(finalSpec, pageable);
               }
-              Specification<Agent> finalSpec = memberOfAssetGroupSpec.or(specification);
+              Specification<Agent> finalSpec =
+                  memberOfAssetGroupSpec.or(specification.and(memberOfAnyTargetGroupSpec));
               if (tagsSpec != null) {
                 finalSpec = tagsSpec.or(finalSpec);
               }

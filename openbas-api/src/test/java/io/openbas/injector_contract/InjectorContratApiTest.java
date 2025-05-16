@@ -106,7 +106,7 @@ class InjectorContratApiTest extends IntegrationTest {
       void given_search_input_with_label_type_should_return_a_page_of_contrats_ignoring_case()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter(
+            PaginationFixture.simpleSearchWithAndOperator(
                 "injector_contract_labels", "multi-recipients", contains);
 
         mvc.perform(
@@ -121,7 +121,7 @@ class InjectorContratApiTest extends IntegrationTest {
       @Test
       void given_search_input_with_label_should_return_a_page_of_contrats() throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter(
+            PaginationFixture.simpleSearchWithAndOperator(
                 "injector_contract_labels", "Send multi-recipients mail", eq);
 
         mvc.perform(
@@ -137,7 +137,7 @@ class InjectorContratApiTest extends IntegrationTest {
       void given_search_input_with_label_should_return_a_page_of_contrats_ignoring_case()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter(
+            PaginationFixture.simpleSearchWithAndOperator(
                 "injector_contract_labels", "send multi-recipients mail", eq);
 
         mvc.perform(

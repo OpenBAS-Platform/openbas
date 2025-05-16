@@ -141,7 +141,7 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
       void given_filter_input_by_name_should_return_a_page_of_asset_groups_filter_by_name()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("asset_group_name", "Group", contains);
+            PaginationFixture.simpleSearchWithAndOperator("asset_group_name", "Group", contains);
 
         mvc.perform(
                 post(ASSET_GROUP_URI + "/search")
@@ -156,7 +156,7 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
       void given_filter_input_by_sttaus_should_return_a_page_of_asset_groups_filter_by_description()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter(
+            PaginationFixture.simpleSearchWithAndOperator(
                 "asset_group_description", valueOf("wrong"), not_contains);
 
         mvc.perform(
