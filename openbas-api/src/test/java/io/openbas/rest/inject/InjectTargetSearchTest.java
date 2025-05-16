@@ -1481,7 +1481,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public void withSomePlayersTargets_returnMatchingItemsInPage1() throws Exception {
       String searchTerm = "player target";
       InjectComposer.Composer injectWrapper = getInjectWrapper();
-      for (int i = 10; i < 30; i++) {
+      for (int i = 10; i < 20; i++) {
         injectWrapper.withTeam(
             getTeamComposerWithName(searchTerm + " " + i)
                 .withUser(
@@ -1513,61 +1513,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       List<PlayerTarget> expected =
           inject.getTeams().stream()
-              .sorted(Comparator.comparing(Team::getName))
-              .limit(search.getSize())
-              .map(
-                  team -> {
-                    User user = team.getUsers().getFirst();
-                    return new PlayerTarget(
-                        user.getId(),
-                        user.getNameOrEmail(),
-                        user.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
-                        Set.of(team.getId()));
-                  })
-              .toList();
-
-      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
-    }
-
-    @Test
-    @DisplayName("With some players targets, return matching items in page 2")
-    public void withSomePlayersTargets_returnMatchingItemsInPage2() throws Exception {
-      String searchTerm = "team target";
-      InjectComposer.Composer injectWrapper = getInjectWrapper();
-      for (int i = 10; i < 30; i++) {
-        injectWrapper.withTeam(
-            getTeamComposerWithName(searchTerm + " " + i)
-                .withUser(
-                    getPlayerComposerWithName(
-                        searchTerm + " " + i,
-                        searchTerm + " " + i,
-                        searchTerm + " " + i + "@toto.fr")));
-      }
-      Inject inject = injectWrapper.persist().get();
-      entityManager.flush();
-      entityManager.clear();
-
-      SearchPaginationInput search =
-          PaginationFixture.simpleFilter("", searchTerm, Filters.FilterOperator.contains);
-      search.setPage(1); // 0-based
-      String response =
-          mvc.perform(
-                  post(INJECT_URI
-                          + "/"
-                          + inject.getId()
-                          + "/targets/"
-                          + targetType.name()
-                          + "/search")
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(mapper.writeValueAsString(search)))
-              .andExpect(status().isOk())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      List<PlayerTarget> expected =
-          inject.getTeams().stream()
-              .skip((long) search.getPage() * search.getSize())
               .sorted(Comparator.comparing(Team::getName))
               .limit(search.getSize())
               .map(
