@@ -42,10 +42,6 @@ public class InjectMapper {
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                injectUtils.getPrimaryExpectations(inject)))
-        .targets(resultUtils.getInjectTargetWithResults(Set.of(inject.getId())))
         .build();
   }
 

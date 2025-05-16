@@ -1,17 +1,15 @@
-import { Divider, Grid, List, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Grid, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
+import { type SyntheticEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { type InjectTarget, type InjectTargetWithResult, type SearchPaginationInput } from '../../../../utils/api-types';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { type InjectTarget, type SearchPaginationInput } from '../../../../utils/api-types';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import PaginatedTargetTab from './PaginatedTargetTab';
-import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
 const useStyles = makeStyles()({
@@ -45,17 +43,10 @@ const AtomicTesting = () => {
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
-  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult & { mergedExpectations: boolean }>();
-  const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
-  const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
-  const filtering = useSearchAnFilter('', 'name', ['name']);
   const [activeTab, setActiveTab] = useState(0);
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
-
-  const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
-
   const [hasAssetsGroup, setHasAssetsGroup] = useState(false);
   const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
   const [hasEndpoints, setHasEndpoints] = useState(false);
@@ -63,6 +54,7 @@ const AtomicTesting = () => {
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
+  const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
 
   const tabConfig: {
     key: number;
@@ -97,14 +89,6 @@ const AtomicTesting = () => {
         entityPrefix: 'endpoint_target',
       });
     }
-
-    tabs.push({
-      key: index++,
-      label: t('All targets'),
-      type: 'ALL_TARGETS',
-      entityPrefix: '',
-    });
-
     return tabs;
   }, [hasAssetsGroup, hasTeams, hasEndpoints]);
 
@@ -157,59 +141,13 @@ const AtomicTesting = () => {
   }, [injectResultOverviewOutput]);
 
   // Handles
-
-  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTargetLegacy({
-      ...target,
-      mergedExpectations: false,
-    });
-    setCurrentParentTarget(currentParent);
-    setUpperParentTarget(upperParentTarget);
-  };
-
   const handleNewTargetClick = (target: InjectTarget) => {
-    setSelectedTargetLegacy({
-      id: target.target_id,
-      name: target.target_name,
-      targetType: target.target_type,
-      // @ts-expect-error target_subtype is always within the allowed values
-      platformType: target.target_subtype,
-      mergedExpectations: true,
-    });
-
-    setCurrentParentTarget(undefined);
-    setUpperParentTarget(undefined);
+    setSelectedTarget(target);
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     setReloadContentCount(reloadContentCount + 1);
-
-    if (tabConfig[newValue].type == 'ALL_TARGETS') {
-      handleTargetClick(sortedTargets[0]);
-    }
-  };
-
-  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
-    return (
-      <>
-        <TargetListItem
-          onClick={() => handleTargetClick(target, parent, upperParent)}
-          target={target}
-          selected={selectedTargetLegacy?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
-        />
-        {target?.children && target.children.length > 0 && (
-          <List disablePadding style={{ marginLeft: theme.spacing(2) }}>
-            {target.children.map(child => (
-              <Fragment key={child?.id}>
-                {renderTargetItem(child, target, parent)}
-              </Fragment>
-            ))}
-            <Divider className={classes.dividerL} />
-          </List>
-        )}
-      </>
-    );
   };
 
   const drawTabs = () => {
@@ -229,21 +167,6 @@ const AtomicTesting = () => {
             target_type={tab.type}
             reloadContentCount={reloadContentCount}
           />
-        )}
-        {isAllTargets && (
-          <>
-            {sortedTargets.length > 0 ? (
-              <List>
-                {sortedTargets.map(target => (
-                  <div key={target?.id}>
-                    {renderTargetItem(target, undefined, undefined)}
-                  </div>
-                ))}
-              </List>
-            ) : (
-              <Empty message={t('No target configured.')} />
-            )}
-          </>
         )}
       </>
     );
@@ -285,17 +208,15 @@ const AtomicTesting = () => {
           {t('Results by target')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
+          {selectedTarget && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
-              upperParentTargetId={upperParentTarget?.id}
-              parentTargetId={currentParentTarget?.id}
-              target={selectedTargetLegacy}
+              target={selectedTarget}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
               lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
             />
           )}
-          {!selectedTargetLegacy && (
+          {!selectedTarget && (
             <Empty message={t('No target data available.')} />
           )}
         </Paper>
