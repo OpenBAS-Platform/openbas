@@ -18,10 +18,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -48,9 +47,8 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class AppSecurityConfig {
-
-  private static final Logger LOGGER = Logger.getLogger(AppSecurityConfig.class.getName());
 
   private final Environment env;
   private final OpenBASConfig openBASConfig;
@@ -151,7 +149,7 @@ public class AppSecurityConfig {
                 })
             .toList();
       } catch (Exception e) {
-        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        log.error(e.getMessage(), e);
       }
     }
     return new ArrayList<>();

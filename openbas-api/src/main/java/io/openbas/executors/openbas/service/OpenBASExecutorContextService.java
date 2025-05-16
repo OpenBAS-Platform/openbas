@@ -10,10 +10,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service(OPENBAS_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class OpenBASExecutorContextService extends ExecutorContextService {
