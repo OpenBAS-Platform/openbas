@@ -8,6 +8,7 @@ import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
 import jakarta.persistence.criteria.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +62,10 @@ public class PlayerTargetSearchAdaptor extends SearchAdaptorBase {
   @Override
   public Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject) {
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
+
+    // mind the specific sorts "email" because no name for players
+    SortField defaultSort = new SortField("user_email", "ASC");
+    translatedInput.setSorts(List.of(defaultSort));
 
     Page<User> filteredPlayers =
         buildPaginationJPA(
