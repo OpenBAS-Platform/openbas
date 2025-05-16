@@ -255,8 +255,12 @@ public class InjectExpectation implements Base {
 
   @JsonProperty("target_id")
   public String getTargetId() {
-    if (team != null) {
+    if (user != null) {
+      return user.getId();
+    } else if (team != null) {
       return team.getId();
+    } else if (agent != null) {
+      return agent.getId();
     } else if (asset != null) {
       return asset.getId();
     } else if (assetGroup != null) {

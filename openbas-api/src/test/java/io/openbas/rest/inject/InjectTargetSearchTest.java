@@ -39,7 +39,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private InjectorContractComposer injectContractComposer;
   @Autowired private PayloadComposer payloadComposer;
   @Autowired private AssetGroupComposer assetGroupComposer;
-  @Autowired private ExpectationComposer expectationComposer;
+  @Autowired private InjectExpectationComposer injectExpectationComposer;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private TeamComposer teamComposer;
   @Autowired private MockMvc mvc;
@@ -52,7 +52,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     injectContractComposer.reset();
     payloadComposer.reset();
     assetGroupComposer.reset();
-    expectationComposer.reset();
+    injectExpectationComposer.reset();
     endpointComposer.reset();
   }
 
@@ -292,7 +292,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       injectWrapper
           .withAssetGroup(assetGroupWrapper)
           .withExpectation(
-              expectationComposer
+              injectExpectationComposer
                   .forExpectation(
                       InjectExpectationFixture.createExpectationWithTypeAndStatus(
                           InjectExpectation.EXPECTATION_TYPE.DETECTION,
@@ -300,7 +300,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                   .withAssetGroup(assetGroupWrapper)
                   .withEndpoint(ep1Wrapper))
           .withExpectation(
-              expectationComposer
+              injectExpectationComposer
                   .forExpectation(
                       InjectExpectationFixture.createExpectationWithTypeAndStatus(
                           InjectExpectation.EXPECTATION_TYPE.PREVENTION,
@@ -309,7 +309,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                   .withEndpoint(ep1Wrapper))
           .withAssetGroup(assetGroupWrapper2)
           .withExpectation(
-              expectationComposer
+              injectExpectationComposer
                   .forExpectation(
                       InjectExpectationFixture.createExpectationWithTypeAndStatus(
                           InjectExpectation.EXPECTATION_TYPE.DETECTION,
@@ -317,7 +317,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                   .withAssetGroup(assetGroupWrapper2)
                   .withEndpoint(ep2Wrapper))
           .withExpectation(
-              expectationComposer
+              injectExpectationComposer
                   .forExpectation(
                       InjectExpectationFixture.createExpectationWithTypeAndStatus(
                           InjectExpectation.EXPECTATION_TYPE.PREVENTION,
@@ -1054,9 +1054,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
     @Nested
     @DisplayName("With actual results")
     public class WithActualResults {
-      private ExpectationComposer.Composer getExpectationWrapperWithResult(
+      private InjectExpectationComposer.Composer getExpectationWrapperWithResult(
           InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
-        return expectationComposer.forExpectation(
+        return injectExpectationComposer.forExpectation(
             InjectExpectationFixture.createExpectationWithTypeAndStatus(type, status));
       }
 
@@ -1066,17 +1066,17 @@ public class InjectTargetSearchTest extends IntegrationTest {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupComposerWithName(searchTerm);
-        ExpectationComposer.Composer expectationDetectionWrapper =
+        InjectExpectationComposer.Composer expectationDetectionWrapper =
             getExpectationWrapperWithResult(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION,
                     InjectExpectation.EXPECTATION_STATUS.SUCCESS)
                 .withAssetGroup(assetGroupWrapper);
-        ExpectationComposer.Composer expectationPreventionWrapper =
+        InjectExpectationComposer.Composer expectationPreventionWrapper =
             getExpectationWrapperWithResult(
                     InjectExpectation.EXPECTATION_TYPE.PREVENTION,
                     InjectExpectation.EXPECTATION_STATUS.FAILED)
                 .withAssetGroup(assetGroupWrapper);
-        ExpectationComposer.Composer expectationHumanResponseWrapper =
+        InjectExpectationComposer.Composer expectationHumanResponseWrapper =
             getExpectationWrapperWithResult(
                     InjectExpectation.EXPECTATION_TYPE.CHALLENGE,
                     InjectExpectation.EXPECTATION_STATUS.PENDING)
@@ -1367,9 +1367,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
     @Nested
     @DisplayName("With actual results")
     public class WithActualResults {
-      private ExpectationComposer.Composer getExpectationWrapperWithResult(
+      private InjectExpectationComposer.Composer getExpectationWrapperWithResult(
           InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
-        return expectationComposer.forExpectation(
+        return injectExpectationComposer.forExpectation(
             InjectExpectationFixture.createExpectationWithTypeAndStatus(type, status));
       }
 
@@ -1379,7 +1379,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         String searchTerm = "team target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         TeamComposer.Composer teamWrapper = getTeamComposerWithName(searchTerm);
-        ExpectationComposer.Composer expectationHumanResponseWrapper =
+        InjectExpectationComposer.Composer expectationHumanResponseWrapper =
             getExpectationWrapperWithResult(
                     InjectExpectation.EXPECTATION_TYPE.CHALLENGE,
                     InjectExpectation.EXPECTATION_STATUS.PENDING)
