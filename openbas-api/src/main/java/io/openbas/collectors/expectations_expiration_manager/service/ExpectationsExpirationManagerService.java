@@ -11,13 +11,13 @@ import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class ExpectationsExpirationManagerService {
 
   public static final String COLLECTOR = "collector";

@@ -8,9 +8,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
@@ -33,9 +32,8 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 public class RabbitMQHelper {
-
-  private static final Logger LOGGER = Logger.getLogger(RabbitMQHelper.class.getName());
 
   private static String rabbitMQVersion;
 
@@ -63,7 +61,7 @@ public class RabbitMQHelper {
           | KeyManagementException
           | CertificateException
           | IOException e) {
-        LOGGER.severe(e.getMessage());
+        log.error(e.getMessage(), e);
         return null;
       }
 
@@ -78,7 +76,7 @@ public class RabbitMQHelper {
       try {
         result = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
       } catch (RestClientException e) {
-        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        log.error(e.getMessage(), e);
         return null;
       }
 

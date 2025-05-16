@@ -9,10 +9,10 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Log
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class RegexGroupUtils {

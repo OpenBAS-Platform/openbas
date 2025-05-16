@@ -56,13 +56,12 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.hibernate.Hibernate;
@@ -80,7 +79,7 @@ import org.springframework.validation.annotation.Validated;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 @Validated
 public class ScenarioService {
 
@@ -545,7 +544,7 @@ public class ScenarioService {
                   zipExport.write(data);
                   zipExport.closeEntry();
                 } catch (IOException e) {
-                  log.log(Level.SEVERE, e.getMessage(), e);
+                  log.error(e.getMessage(), e);
                 }
               }
             });

@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class ExecutionExecutorService {
 
   private final ApplicationContext context;
@@ -94,7 +94,9 @@ public class ExecutionExecutorService {
                 inject, crowdstrikeAgents, injectStatus);
         atLeastOneExecution.set(true);
       } catch (Exception e) {
-        log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
+        log.error(
+            String.format("Crowdstrike launchBatchExecutorSubprocess error: %s", e.getMessage()),
+            e);
         executionTraceRepository.saveAll(
             crowdstrikeAgents.stream()
                 .map(
@@ -117,7 +119,7 @@ public class ExecutionExecutorService {
             launchExecutorContextForAgent(inject, agent);
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
-            log.severe("launchExecutorContextForAgent error: " + e.getMessage());
+            log.error(String.format("launchExecutorContextForAgent error: %s", e.getMessage()), e);
             executionTraceRepository.save(
                 new ExecutionTrace(
                     injectStatus,
@@ -141,7 +143,7 @@ public class ExecutionExecutorService {
           context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
       executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
     } catch (Exception e) {
-      log.severe(e.getMessage());
+      log.error(e.getMessage(), e);
       throw new AgentException("Fatal error: " + e.getMessage(), agent);
     }
   }

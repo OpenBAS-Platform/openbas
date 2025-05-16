@@ -29,8 +29,7 @@ import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -42,9 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class LadeService {
-
-  private static final Logger LOGGER = Logger.getLogger(LadeService.class.getName());
 
   @Resource private io.openbas.injectors.lade.config.LadeConfig config;
 
@@ -197,7 +195,7 @@ public class LadeService {
                   // Add new built workzone
                   zones.put(ladeWorkzone.getId(), ladeWorkzone);
                 } catch (Exception e) {
-                  LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                  log.error(e.getMessage(), e);
                 }
               });
         });

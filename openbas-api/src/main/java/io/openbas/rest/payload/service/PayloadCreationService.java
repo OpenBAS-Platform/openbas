@@ -14,10 +14,10 @@ import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PayloadCreationService {

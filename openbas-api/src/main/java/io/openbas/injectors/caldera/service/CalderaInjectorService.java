@@ -16,15 +16,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CalderaInjectorService {
 
   private final CalderaInjectorClient client;
@@ -207,7 +206,7 @@ public class CalderaInjectorService {
     try {
       return this.client.agents().stream().toList();
     } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "Error getting the list of Caldera agents", e);
+      log.error("Error getting the list of Caldera agents", e);
       return new ArrayList<>();
     }
   }

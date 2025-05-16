@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service(CrowdStrikeExecutorContextService.SERVICE_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {

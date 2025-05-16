@@ -13,15 +13,14 @@ import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @ConditionalOnProperty(prefix = "executor.tanium", name = "enable")
-@Log
+@Slf4j
 @Service
 public class TaniumExecutorService implements Runnable {
 
@@ -82,7 +81,7 @@ public class TaniumExecutorService implements Runnable {
         executorService.remove(config.getId());
       }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating Tanium executor: " + e);
+      log.error(String.format("Error creating Tanium executor: %s", e), e);
     }
   }
 
