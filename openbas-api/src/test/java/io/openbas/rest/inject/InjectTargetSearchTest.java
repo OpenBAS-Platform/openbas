@@ -1513,6 +1513,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       List<PlayerTarget> expected =
           inject.getTeams().stream()
+              .sorted(Comparator.comparing(Team::getName))
               .limit(search.getSize())
               .map(
                   team -> {
@@ -1567,6 +1568,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
       List<PlayerTarget> expected =
           inject.getTeams().stream()
               .skip((long) search.getPage() * search.getSize())
+              .sorted(Comparator.comparing(Team::getName))
               .limit(search.getSize())
               .map(
                   team -> {
