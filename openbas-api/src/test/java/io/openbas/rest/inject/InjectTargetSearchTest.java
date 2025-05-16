@@ -1481,7 +1481,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public void withSomePlayersTargets_returnMatchingItemsInPage1() throws Exception {
       String searchTerm = "player target";
       InjectComposer.Composer injectWrapper = getInjectWrapper();
-      for (int i = 0; i < 20; i++) {
+      for (int i = 10; i < 30; i++) {
         injectWrapper.withTeam(
             getTeamComposerWithName(searchTerm + " " + i)
                 .withUser(
@@ -1533,7 +1533,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public void withSomePlayersTargets_returnMatchingItemsInPage2() throws Exception {
       String searchTerm = "team target";
       InjectComposer.Composer injectWrapper = getInjectWrapper();
-      for (int i = 0; i < 20; i++) {
+      for (int i = 10; i < 30; i++) {
         injectWrapper.withTeam(
             getTeamComposerWithName(searchTerm + " " + i)
                 .withUser(
