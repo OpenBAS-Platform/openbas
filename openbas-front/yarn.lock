@@ -4076,6 +4076,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn-loose@npm:^8.5.0":
+  version: 8.5.0
+  resolution: "acorn-loose@npm:8.5.0"
+  dependencies:
+    acorn: "npm:^8.14.0"
+  checksum: 10c0/221df4224ccad267d46775323d956636dd0e4ef263d18450258daff1a33d99e8e00e6214465bdc658fc961cc77fc60cef2f0f4710ec93543ce179f287da0ea80
+  languageName: node
+  linkType: hard
+
 "acorn-walk@npm:^8.3.4":
   version: 8.3.4
   resolution: "acorn-walk@npm:8.3.4"
@@ -9400,7 +9409,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:2.12.4, monocart-coverage-reports@npm:^2.12.4":
+"monocart-coverage-reports@npm:2.12.6":
+  version: 2.12.6
+  resolution: "monocart-coverage-reports@npm:2.12.6"
+  dependencies:
+    acorn: "npm:^8.14.1"
+    acorn-loose: "npm:^8.5.0"
+    acorn-walk: "npm:^8.3.4"
+    commander: "npm:^13.1.0"
+    console-grid: "npm:^2.2.3"
+    eight-colors: "npm:^1.3.1"
+    foreground-child: "npm:^3.3.1"
+    istanbul-lib-coverage: "npm:^3.2.2"
+    istanbul-lib-report: "npm:^3.0.1"
+    istanbul-reports: "npm:^3.1.7"
+    lz-utils: "npm:^2.1.0"
+    monocart-locator: "npm:^1.0.2"
+  bin:
+    mcr: lib/cli.js
+  checksum: 10c0/10e6670454874c2a10ee493b4e14aa108cc741c1784ca32e87b3f40e97e97800b93c59e3f39d89499462455a17129adfacbce2f02bd25bc8a8f12df6f386fc92
+  languageName: node
+  linkType: hard
+
+"monocart-coverage-reports@npm:^2.12.4":
   version: 2.12.4
   resolution: "monocart-coverage-reports@npm:2.12.4"
   dependencies:
@@ -9877,7 +9908,7 @@ __metadata:
     mdi-material-ui: "npm:7.9.4"
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.48"
-    monocart-coverage-reports: "npm:2.12.4"
+    monocart-coverage-reports: "npm:2.12.6"
     monocart-reporter: "npm:2.9.18"
     normalizr: "npm:3.6.2"
     pdfmake: "npm:0.2.19"
