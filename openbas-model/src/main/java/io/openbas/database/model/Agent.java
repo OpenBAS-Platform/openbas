@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -50,7 +51,7 @@ public class Agent implements Base {
   // ID is UUID by default and external reference for CrowdStrike agent
   private String id = UUID.randomUUID().toString();
 
-  @Queryable(sortable = true)
+  @Queryable(sortable = true, filterable = true, path = "asset.id")
   @ManyToOne
   @JoinColumn(name = "agent_asset")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -73,7 +74,7 @@ public class Agent implements Base {
   @NotNull
   private DEPLOYMENT_MODE deploymentMode;
 
-  @Queryable(sortable = true)
+  @Queryable(sortable = true, filterable = true)
   @Column(name = "agent_executed_by_user")
   @JsonProperty("agent_executed_by_user")
   @NotBlank
@@ -140,6 +141,12 @@ public class Agent implements Base {
   @Column(name = "agent_cleared_at")
   @JsonProperty("agent_cleared_at")
   private Instant clearedAt = now();
+
+  @JsonIgnore
+  @Transient
+  public String getTargetDisplayName() {
+    return getExecutedByUser() + " (" + getAsset().getName() + ")";
+  }
 
   @Override
   public int hashCode() {

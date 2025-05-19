@@ -166,7 +166,7 @@ public class ScenarioInjectApiSearchTest extends IntegrationTest {
       void given_filter_input_by_name_should_return_a_page_of_injects_filter_by_name()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("inject_title", "email", contains);
+            PaginationFixture.simpleSearchWithAndOperator("inject_title", "email", contains);
 
         mvc.perform(
                 post(SCENARIO_URI + "/" + SCENARIO_ID + "/injects/simple")
@@ -182,7 +182,7 @@ public class ScenarioInjectApiSearchTest extends IntegrationTest {
           given_filter_input_by_injector_contract_should_return_a_page_of_injects_filter_by_injector_contract()
               throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter(
+            PaginationFixture.simpleSearchWithAndOperator(
                 "inject_injector_contract", EMAIL_INJECTOR_CONTRACT_ID, contains);
 
         mvc.perform(

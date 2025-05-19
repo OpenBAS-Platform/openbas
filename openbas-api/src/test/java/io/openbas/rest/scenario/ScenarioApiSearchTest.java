@@ -144,7 +144,7 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       void given_filter_input_by_name_should_return_a_page_of_scenarios_filter_by_name()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("scenario_name", "Crisis", contains);
+            PaginationFixture.simpleSearchWithAndOperator("scenario_name", "Crisis", contains);
 
         mvc.perform(
                 post(SCENARIO_URI + "/search")
@@ -159,7 +159,8 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       void given_filter_input_by_category_should_return_a_page_of_scenarios_filter_by_category()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("scenario_category", "incident-response", contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "scenario_category", "incident-response", contains);
 
         mvc.perform(
                 post(SCENARIO_URI + "/search")
@@ -174,7 +175,8 @@ public class ScenarioApiSearchTest extends IntegrationTest {
       void given_filter_input_by_severity_should_return_a_page_of_scenarios_filter_by_severity()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("scenario_severity", valueOf(critical), contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "scenario_severity", valueOf(critical), contains);
 
         mvc.perform(
                 post(SCENARIO_URI + "/search")

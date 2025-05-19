@@ -60,6 +60,8 @@ const AtomicTesting = () => {
   const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
   const [hasEndpoints, setHasEndpoints] = useState(false);
   const [hasEndpointsChecked, setHasEndpointsChecked] = useState(false);
+  const [hasAgents, setHasAgents] = useState(false);
+  const [hasAgentsChecked, setHasAgentsChecked] = useState(false);
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
@@ -107,6 +109,14 @@ const AtomicTesting = () => {
         entityPrefix: 'player_target',
       });
     }
+    if (hasAgents) {
+      tabs.push({
+        key: index++,
+        label: t('Agents'),
+        type: 'AGENT',
+        entityPrefix: 'agent_target',
+      });
+    }
 
     tabs.push({
       key: index++,
@@ -116,7 +126,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasPlayers]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents, hasPlayers]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -170,6 +180,16 @@ const AtomicTesting = () => {
       })
       .finally(() => {
         setHasPlayersChecked(true);
+      });
+
+    searchTargets(injectId, 'AGENT', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasAgents(true);
+        } else { setHasAgents(false); }
+      })
+      .finally(() => {
+        setHasAgentsChecked(true);
       });
 
     setReloadContentCount(reloadContentCount + 1);
@@ -281,7 +301,7 @@ const AtomicTesting = () => {
         </Typography>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasPlayersChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && hasPlayersChecked && (
             <>
               <Tabs
                 value={activeTab}

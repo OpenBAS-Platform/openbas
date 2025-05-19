@@ -144,7 +144,7 @@ public class ExerciseApiSearchTest extends IntegrationTest {
       void given_filter_input_by_name_should_return_a_page_of_exercises_filter_by_name()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("exercise_name", "Crisis", contains);
+            PaginationFixture.simpleSearchWithAndOperator("exercise_name", "Crisis", contains);
 
         mvc.perform(
                 post(EXERCISE_URI + "/search")
@@ -159,7 +159,8 @@ public class ExerciseApiSearchTest extends IntegrationTest {
       void given_filter_input_by_sttaus_should_return_a_page_of_exercises_filter_by_status()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("exercise_status", valueOf(SCHEDULED), contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "exercise_status", valueOf(SCHEDULED), contains);
 
         mvc.perform(
                 post(EXERCISE_URI + "/search")

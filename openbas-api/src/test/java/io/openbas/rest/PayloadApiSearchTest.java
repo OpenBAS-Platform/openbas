@@ -151,7 +151,7 @@ public class PayloadApiSearchTest extends IntegrationTest {
       void given_filter_input_by_name_should_return_a_page_of_payloads_filter_by_name()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("payload_name", "command", contains);
+            PaginationFixture.simpleSearchWithAndOperator("payload_name", "command", contains);
 
         mvc.perform(
                 post(PAYLOAD_URI + "/search")
@@ -166,7 +166,8 @@ public class PayloadApiSearchTest extends IntegrationTest {
       void given_filter_input_by_platforms_should_return_a_page_of_payloads_filter_by_platforms()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("payload_platforms", valueOf(Linux), contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "payload_platforms", valueOf(Linux), contains);
 
         mvc.perform(
                 post(PAYLOAD_URI + "/search")
@@ -181,7 +182,8 @@ public class PayloadApiSearchTest extends IntegrationTest {
       void given_filter_input_by_source_should_return_a_page_of_payloads_filter_by_source()
           throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("payload_source", valueOf(MANUAL), contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "payload_source", valueOf(MANUAL), contains);
 
         mvc.perform(
                 post(PAYLOAD_URI + "/search")
@@ -197,7 +199,8 @@ public class PayloadApiSearchTest extends IntegrationTest {
           given_filter_input_by_arch_should_return_a_page_of_executable_payloads_filtered_by_architecture()
               throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("payload_execution_arch", valueOf(arm64), contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "payload_execution_arch", valueOf(arm64), contains);
 
         mvc.perform(
                 post(PAYLOAD_URI + "/search")
