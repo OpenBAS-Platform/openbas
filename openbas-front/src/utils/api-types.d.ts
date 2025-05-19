@@ -2193,6 +2193,8 @@ export interface InjectResultOverviewOutput {
   inject_content?: object;
   /** Description of inject */
   inject_description?: string;
+  /** Result of expectations */
+  inject_expectation_results: ExpectationResultsByType[];
   /** Expectations */
   inject_expectations?: InjectExpectationSimple[];
   /** Id of inject */

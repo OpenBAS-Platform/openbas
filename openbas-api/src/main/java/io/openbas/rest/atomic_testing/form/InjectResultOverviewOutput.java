@@ -2,9 +2,12 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.utils.AtomicTestingUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.Builder;
@@ -73,4 +76,13 @@ public class InjectResultOverviewOutput {
   @Schema(description = "Timestamp when the inject was last updated")
   @JsonProperty("inject_updated_at")
   private Instant updatedAt;
+
+  // -- COMPUTED ATTRIBUTES --
+
+  @Builder.Default
+  @Schema(description = "Result of expectations")
+  @JsonProperty("inject_expectation_results")
+  @NotNull
+  private List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
+      new ArrayList<>();
 }
