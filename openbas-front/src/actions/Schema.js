@@ -354,12 +354,12 @@ export const storeHelper = state => ({
   getTeamUsers: (id) => {
     const team = entity(id, 'teams', state);
     if (!team) return List([]);
-    return team.get('team_users').map(tu => entity(tu, 'users', state));
+    return team.get('team_users').map(tu => entity(tu, 'users', state)).filter(u => !!u);
   },
   getTeamExerciseInjects: (id) => {
     const team = entity(id, 'teams', state);
     if (!team) return List([]);
-    return team.get('team_exercise_injects').map(te => entity(te, 'injects', state));
+    return team.get('team_exercise_injects').map(te => entity(te, 'injects', state)).filter(i => !!i);
   },
   getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
@@ -454,7 +454,7 @@ export const storeHelper = state => ({
   getTeamScenarioInjects: (id) => {
     const team = entity(id, 'teams', state);
     if (!team) return List([]);
-    return team.get('team_scenario_injects').map(te => entity(te, 'injects', state));
+    return team.get('team_scenario_injects').map(te => entity(te, 'injects', state)).filter(i => !!i);
   },
   getScenarioObjectives: id => entities('objectives', state).filter(o => o.get('objective_scenario') === id),
   getScenarioLessonsCategories: id => entities('lessonscategorys', state).filter(
