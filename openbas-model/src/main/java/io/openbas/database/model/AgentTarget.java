@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import java.util.Optional;
 import java.util.Set;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
