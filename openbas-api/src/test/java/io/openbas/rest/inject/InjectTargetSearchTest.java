@@ -2964,7 +2964,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleSearchWithAndOperator("", "target player", Filters.FilterOperator.eq);
+          PaginationFixture.simpleSearchWithAndOperator(
+              "", "target player", Filters.FilterOperator.eq);
       String response =
           mvc.perform(
                   post(INJECT_URI
@@ -3002,7 +3003,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleSearchWithAndOperator("", searchTerm, Filters.FilterOperator.contains);
+          PaginationFixture.simpleSearchWithAndOperator(
+              "", searchTerm, Filters.FilterOperator.contains);
       String response =
           mvc.perform(
                   post(INJECT_URI
@@ -3055,7 +3057,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleSearchWithAndOperator("", searchTerm, Filters.FilterOperator.contains);
+          PaginationFixture.simpleSearchWithAndOperator(
+              "", searchTerm, Filters.FilterOperator.contains);
       search.setPage(1); // 0-based
       String response =
           mvc.perform(
@@ -3116,7 +3119,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleSearchWithAndOperator("", "player target", Filters.FilterOperator.contains);
+          PaginationFixture.simpleSearchWithAndOperator(
+              "", "player target", Filters.FilterOperator.contains);
       String response =
           mvc.perform(
                   post(INJECT_URI
@@ -3174,7 +3178,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       entityManager.clear();
 
       SearchPaginationInput search =
-          PaginationFixture.simpleSearchWithAndOperator("", "player target", Filters.FilterOperator.contains);
+          PaginationFixture.simpleSearchWithAndOperator(
+              "", "player target", Filters.FilterOperator.contains);
       String response =
           mvc.perform(
                   post(INJECT_URI
@@ -3237,7 +3242,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
         entityManager.clear();
 
         SearchPaginationInput search =
-            PaginationFixture.simpleSearchWithAndOperator("", searchTerm, Filters.FilterOperator.contains);
+            PaginationFixture.simpleSearchWithAndOperator(
+                "", searchTerm, Filters.FilterOperator.contains);
         String response =
             mvc.perform(
                     post(INJECT_URI
