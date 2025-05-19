@@ -1,6 +1,6 @@
-import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
+import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, fetchExerciseTeams, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
 import { removeExerciseTeams, replaceExerciseTeams, searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
-import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
+import { addTeam } from '../../../../../actions/teams/team-actions';
 import { type Page } from '../../../../../components/common/queryable/Page';
 import { type Exercise, type ExerciseTeamUser, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -13,11 +13,11 @@ const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTea
   return {
     async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(addExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
-      return dispatch(fetchTeams());
+      return dispatch(fetchExerciseTeams(exerciseId));
     },
     async onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
-      return dispatch(fetchTeams());
+      return dispatch(fetchExerciseTeams(exerciseId));
     },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({
