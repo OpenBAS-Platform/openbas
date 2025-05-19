@@ -73,6 +73,24 @@ public class InjectTargetSearchTest extends IntegrationTest {
     return assetGroupComposer.forAssetGroup(dynamicAssetGroup);
   }
 
+  private InjectComposer.Composer getInjectWithAllTeams() {
+    return injectComposer
+        .forInject(InjectFixture.getInjectWithAllTeams())
+        .withInjectorContract(
+            injectContractComposer
+                .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                .withPayload(payloadComposer.forPayload(PayloadFixture.createDefaultCommand())));
+  }
+
+  private ExerciseComposer.Composer getExerciseComposerWithName() {
+    return exerciseComposer.forExercise(ExerciseFixture.createDefaultExercise());
+  }
+
+  private UserComposer.Composer getPlayerComposerWithName(
+      String firstname, String lastname, String email) {
+    return userComposer.forUser(UserFixture.getUser(firstname, lastname, email));
+  }
+
   @Nested
   @WithMockAdminUser
   @DisplayName("When inject does not exist")
@@ -1174,6 +1192,103 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName(
+          "When teams are targets, options should return all possible targets for exercise all teams")
+      public void whenTeamsAreTargets_returnAllPossibleTargetsForExerciseAllTeams()
+          throws Exception {
+        String searchTerm1 = "team target 1";
+        String searchTerm2 = "team target 2";
+        TeamComposer.Composer teamWrapper1 = getTeamComposerWithName(searchTerm1);
+        UserComposer.Composer userWrapper1 =
+            getPlayerComposerWithName(searchTerm1, searchTerm1, searchTerm1 + "@toto.fr");
+        TeamComposer.Composer teamWrapper2 = getTeamComposerWithName(searchTerm2);
+        UserComposer.Composer userWrapper2 =
+            getPlayerComposerWithName(searchTerm2, searchTerm2, searchTerm2 + "@toto.fr");
+        InjectComposer.Composer injectWrapper = getInjectWithAllTeams();
+        ExerciseComposer.Composer exerciseWrapper =
+            getExerciseComposerWithName()
+                .withTeam(teamWrapper1.withUser(userWrapper1))
+                .withTeam(teamWrapper2.withUser(userWrapper2))
+                .withTeamUsers()
+                .withInject(injectWrapper);
+        Exercise exercise = exerciseWrapper.persist().get();
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI
+                            + "/"
+                            + exercise.getInjects().getFirst().getId()
+                            + "/targets/"
+                            + targetType
+                            + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(teamWrapper2.get().getId(), teamWrapper2.get().getName()),
+                new FilterUtilsJpa.Option(
+                    teamWrapper1.get().getId(), teamWrapper1.get().getName()));
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName(
+          "When teams are targets, options should return all possible targets for exercise with inject with 1 team")
+      public void whenTeamsAreTargets_returnAllPossibleTargetsForExerciseWithInjectWith1Team()
+          throws Exception {
+        String searchTerm1 = "player target 1";
+        String searchTerm2 = "player target 2";
+        TeamComposer.Composer teamWrapper1 = getTeamComposerWithName(searchTerm1);
+        UserComposer.Composer userWrapper1 =
+            getPlayerComposerWithName(searchTerm1, searchTerm1, searchTerm1 + "@toto.fr");
+        TeamComposer.Composer teamWrapper2 = getTeamComposerWithName(searchTerm2);
+        UserComposer.Composer userWrapper2 =
+            getPlayerComposerWithName(searchTerm2, searchTerm2, searchTerm2 + "@toto.fr");
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+        ExerciseComposer.Composer exerciseWrapper =
+            getExerciseComposerWithName()
+                .withTeam(teamWrapper1.withUser(userWrapper1))
+                .withTeam(teamWrapper2.withUser(userWrapper2))
+                .withTeamUsers()
+                .withInject(injectWrapper.withTeam(teamWrapper1));
+        Exercise exercise = exerciseWrapper.persist().get();
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            mvc.perform(
+                    get(INJECT_URI
+                            + "/"
+                            + exercise.getInjects().getFirst().getId()
+                            + "/targets/"
+                            + targetType
+                            + "/options")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FilterUtilsJpa.Option> expected =
+            List.of(
+                new FilterUtilsJpa.Option(
+                    teamWrapper1.get().getId(), teamWrapper1.get().getName()));
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName(
           "When teams are targets, options should return all possible targets matching search text")
       public void whenTeamsAreTargets_returnAllPossibleTargetsMatchingSearchText()
           throws Exception {
@@ -1363,6 +1478,62 @@ public class InjectTargetSearchTest extends IntegrationTest {
       assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
     }
 
+    @Test
+    @DisplayName(
+        "With some teams targets, return matching items for exercises with inject all teams")
+    public void withSomeTeamsTargets_returnMatchingItemsForExercisesWithInjectAllTeams()
+        throws Exception {
+      String searchTerm1 = "team target 1";
+      String searchTerm2 = "team target 2";
+      TeamComposer.Composer teamWrapper1 = getTeamComposerWithName(searchTerm1);
+      UserComposer.Composer userWrapper1 =
+          getPlayerComposerWithName(searchTerm1, searchTerm1, searchTerm1 + "@toto.fr");
+      TeamComposer.Composer teamWrapper2 = getTeamComposerWithName(searchTerm2);
+      UserComposer.Composer userWrapper2 =
+          getPlayerComposerWithName(searchTerm2, searchTerm2, searchTerm2 + "@toto.fr");
+      InjectComposer.Composer injectWrapper = getInjectWithAllTeams();
+      ExerciseComposer.Composer exerciseWrapper =
+          getExerciseComposerWithName()
+              .withTeam(teamWrapper1.withUser(userWrapper1))
+              .withTeam(teamWrapper2.withUser(userWrapper2))
+              .withTeamUsers()
+              .withInject(injectWrapper);
+      Exercise exercise = exerciseWrapper.persist().get();
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput search =
+          PaginationFixture.simpleFilter(
+              "target_name", "team target", Filters.FilterOperator.contains);
+      String response =
+          mvc.perform(
+                  post(INJECT_URI
+                          + "/"
+                          + exercise.getInjects().getFirst().getId()
+                          + "/targets/"
+                          + targetType.name()
+                          + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(search)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<TeamTarget> expected =
+          exercise.getTeams().stream()
+              .limit(search.getSize())
+              .map(
+                  team ->
+                      new TeamTarget(
+                          team.getId(),
+                          team.getName(),
+                          team.getTags().stream().map(Tag::getId).collect(Collectors.toSet())))
+              .toList();
+
+      assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+    }
+
     @Nested
     @DisplayName("With actual results")
     public class WithActualResults {
@@ -1427,26 +1598,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
     private final TargetType targetType = TargetType.PLAYERS;
 
-    private UserComposer.Composer getPlayerComposerWithName(
-        String firstname, String lastname, String email) {
-      return userComposer.forUser(UserFixture.getUser(firstname, lastname, email));
-    }
-
     private TeamComposer.Composer getTeamComposerWithName(String teamName) {
       return teamComposer.forTeam(TeamFixture.createTeamWithName(teamName));
-    }
-
-    private ExerciseComposer.Composer getExerciseComposerWithName() {
-      return exerciseComposer.forExercise(ExerciseFixture.createDefaultExercise());
-    }
-
-    private InjectComposer.Composer getInjectWithAllTeams() {
-      return injectComposer
-          .forInject(InjectFixture.getInjectWithAllTeams())
-          .withInjectorContract(
-              injectContractComposer
-                  .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
-                  .withPayload(payloadComposer.forPayload(PayloadFixture.createDefaultCommand())));
     }
 
     @Test
