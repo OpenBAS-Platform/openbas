@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -140,6 +141,12 @@ public class Agent implements Base {
   @Column(name = "agent_cleared_at")
   @JsonProperty("agent_cleared_at")
   private Instant clearedAt = now();
+
+  @JsonIgnore
+  @Transient
+  public String getTargetDisplayName() {
+    return getExecutedByUser() + " (" + getAsset().getName() + ")";
+  }
 
   @Override
   public int hashCode() {

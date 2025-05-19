@@ -102,7 +102,7 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
     InjectTarget target =
         new AgentTarget(
             agent.getId(),
-            agent.getExecutedByUser(),
+            agent.getTargetDisplayName(),
             Set.of(),
             agent.getAsset().getId(),
             agent.getExecutor().getType());
