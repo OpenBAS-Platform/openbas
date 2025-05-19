@@ -40,12 +40,11 @@ public class InjectMapper {
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
-        .isReady(inject.isReady())
-        .updatedAt(inject.getUpdatedAt())
         .expectationResultByTypes(
             AtomicTestingUtils.getExpectationResultByTypes(
                 injectUtils.getPrimaryExpectations(inject)))
-        .targets(resultUtils.getInjectTargetWithResults(Set.of(inject.getId())))
+        .isReady(inject.isReady())
+        .updatedAt(inject.getUpdatedAt())
         .build();
   }
 

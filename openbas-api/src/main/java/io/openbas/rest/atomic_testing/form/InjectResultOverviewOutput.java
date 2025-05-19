@@ -2,7 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.AtomicTestingUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -80,15 +79,10 @@ public class InjectResultOverviewOutput {
 
   // -- COMPUTED ATTRIBUTES --
 
-  @Default
+  @Builder.Default
   @Schema(description = "Result of expectations")
   @JsonProperty("inject_expectation_results")
   @NotNull
-  private List<ExpectationResultsByType> expectationResultByTypes = new ArrayList<>();
-
-  @Default
-  @Schema(description = "Results of expectations for each target")
-  @JsonProperty("inject_targets")
-  @NotNull
-  private List<InjectTargetWithResult> targets = new ArrayList<>();
+  private List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
+      new ArrayList<>();
 }

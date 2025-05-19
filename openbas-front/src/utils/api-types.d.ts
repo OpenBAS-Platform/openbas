@@ -2244,8 +2244,6 @@ export interface InjectResultOverviewOutput {
    * @uniqueItems true
    */
   inject_tags?: string[];
-  /** Results of expectations for each target */
-  inject_targets: InjectTargetWithResult[];
   /** Title of inject */
   inject_title: string;
   /** Type of inject */
@@ -2318,25 +2316,6 @@ export type InjectTarget = BaseInjectTarget &
     | BaseInjectTargetTargetTypeMapping<"PLAYERS", PlayerTarget>
     | BaseInjectTargetTargetTypeMapping<"AGENT", AgentTarget>
   );
-
-/** Results of expectations for each target */
-export interface InjectTargetWithResult {
-  children?: InjectTargetWithResult[];
-  executorType?: string;
-  expectationResultsByTypes?: ExpectationResultsByType[];
-  id: string;
-  name?: string;
-  platformType?:
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown";
-  targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYERS" | "TEAMS";
-}
 
 export interface InjectTeamsInput {
   inject_teams?: string[];
