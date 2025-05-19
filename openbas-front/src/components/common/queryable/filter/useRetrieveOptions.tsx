@@ -47,7 +47,13 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'target_assets':
+      case 'target_endpoint':
         searchTargetOptionsById('ASSETS', ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'target_teams':
+        searchTargetOptionsById('TEAMS', ids).then((response) => {
           setOptions(response.data);
         });
         break;

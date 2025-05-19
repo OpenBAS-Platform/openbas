@@ -1,8 +1,10 @@
 package io.openbas.service.targets;
 
 import io.openbas.database.model.*;
+import io.openbas.service.targets.search.AgentTargetSearchAdaptor;
 import io.openbas.service.targets.search.AssetGroupTargetSearchAdaptor;
 import io.openbas.service.targets.search.EndpointTargetSearchAdaptor;
+import io.openbas.service.targets.search.PlayerTargetSearchAdaptor;
 import io.openbas.service.targets.search.TeamTargetSearchAdaptor;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
@@ -18,6 +20,8 @@ public class TargetService {
   private final AssetGroupTargetSearchAdaptor assetGroupTargetSearchAdaptor;
   private final EndpointTargetSearchAdaptor endpointTargetSearchAdaptor;
   private final TeamTargetSearchAdaptor teamTargetSearchAdaptor;
+  private final AgentTargetSearchAdaptor agentTargetSearchAdaptor;
+  private final PlayerTargetSearchAdaptor playerTargetSearchAdaptor;
 
   public Page<InjectTarget> searchTargets(
       TargetType injectTargetType, Inject inject, SearchPaginationInput input) {
@@ -33,6 +37,8 @@ public class TargetService {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.search(input, inject);
       case ASSETS -> endpointTargetSearchAdaptor.search(input, inject);
       case TEAMS -> teamTargetSearchAdaptor.search(input, inject);
+      case PLAYERS -> playerTargetSearchAdaptor.search(input, inject);
+      case AGENT -> agentTargetSearchAdaptor.search(input, inject);
       default -> throw new IllegalArgumentException("Unsupported target type: " + injectTargetType);
     };
   }
@@ -43,6 +49,8 @@ public class TargetService {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
       case ASSETS -> endpointTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
       case TEAMS -> teamTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
+      case PLAYERS -> playerTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
+      case AGENT -> agentTargetSearchAdaptor.getOptionsForInject(inject, textSearch);
       default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
     };
   }
@@ -53,6 +61,8 @@ public class TargetService {
       case ASSETS_GROUPS -> assetGroupTargetSearchAdaptor.getOptionsByIds(ids);
       case ASSETS -> endpointTargetSearchAdaptor.getOptionsByIds(ids);
       case TEAMS -> teamTargetSearchAdaptor.getOptionsByIds(ids);
+      case AGENT -> agentTargetSearchAdaptor.getOptionsByIds(ids);
+      case PLAYERS -> playerTargetSearchAdaptor.getOptionsByIds(ids);
       default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
     };
   }

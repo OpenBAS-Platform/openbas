@@ -43,12 +43,18 @@ const useSearchOptions = () => {
         });
         break;
       case 'target_asset_groups':
-        searchTargetOptions(contextId, 'ASSETS_GROUPS').then((response) => {
+        searchTargetOptions(contextId, 'ASSETS_GROUPS', search).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'target_assets':
-        searchTargetOptions(contextId, 'ASSETS').then((response) => {
+      case 'target_endpoint':
+        searchTargetOptions(contextId, 'ASSETS', search).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'target_teams':
+        searchTargetOptions(contextId, 'TEAMS').then((response) => {
           setOptions(response.data);
         });
         break;

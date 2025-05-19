@@ -51,9 +51,13 @@ const AtomicTesting = () => {
   const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
   const [hasEndpoints, setHasEndpoints] = useState(false);
   const [hasEndpointsChecked, setHasEndpointsChecked] = useState(false);
+  const [hasAgents, setHasAgents] = useState(false);
+  const [hasAgentsChecked, setHasAgentsChecked] = useState(false);
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
+  const [hasPlayers, setHasPlayers] = useState(false);
+  const [hasPlayersChecked, setHasPlayersChecked] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
 
   const tabConfig: {
@@ -89,8 +93,25 @@ const AtomicTesting = () => {
         entityPrefix: 'endpoint_target',
       });
     }
+    if (hasPlayers) {
+      tabs.push({
+        key: index++,
+        label: t('Players'),
+        type: 'PLAYERS',
+        entityPrefix: 'player_target',
+      });
+    }
+    if (hasAgents) {
+      tabs.push({
+        key: index++,
+        label: t('Agents'),
+        type: 'AGENT',
+        entityPrefix: 'agent_target',
+      });
+    }
+
     return tabs;
-  }, [hasAssetsGroup, hasTeams, hasEndpoints]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents, hasPlayers]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -134,6 +155,26 @@ const AtomicTesting = () => {
       })
       .finally(() => {
         setHasTeamsChecked(true);
+      });
+
+    searchTargets(injectId, 'PLAYERS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasPlayers(true);
+        } else { setHasPlayers(false); }
+      })
+      .finally(() => {
+        setHasPlayersChecked(true);
+      });
+
+    searchTargets(injectId, 'AGENT', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasAgents(true);
+        } else { setHasAgents(false); }
+      })
+      .finally(() => {
+        setHasAgentsChecked(true);
       });
 
     setReloadContentCount(reloadContentCount + 1);
@@ -184,7 +225,7 @@ const AtomicTesting = () => {
         </Typography>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && hasPlayersChecked && (
             <>
               <Tabs
                 value={activeTab}

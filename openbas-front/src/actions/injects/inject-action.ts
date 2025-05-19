@@ -79,9 +79,10 @@ export const searchTargets = (injectId: string, targetType: string, searchPagina
   return simplePostCall(uri, data);
 };
 
-export const searchTargetOptions = (injectId: string, targetType: string) => {
+export const searchTargetOptions = (injectId: string, targetType: string, searchText = '') => {
+  const params = { searchText };
   const uri = `/api/injects/${injectId}/targets/${targetType}/options`;
-  return simpleCall(uri);
+  return simpleCall(uri, { params });
 };
 
 export const searchTargetOptionsById = (targetType: string, ids: string[]) => {

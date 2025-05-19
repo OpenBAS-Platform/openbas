@@ -1,19 +1,19 @@
 package io.openbas.service.targets.search;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.service.targets.search.specifications.ExcludeMembersOfAssetGroupsSpecification;
 import io.openbas.service.targets.search.specifications.IncludeDirectEndpointTargetsSpecification;
 import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGroupsSpecification;
+import io.openbas.service.targets.search.specifications.SearchSpecificationUtils;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,25 +25,25 @@ import org.springframework.stereotype.Component;
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   private final EndpointRepository endpointRepository;
   private final InjectExpectationService injectExpectationService;
-  private final IncludeMembersOfAssetGroupsSpecification includeMembersOfAssetGroupsSpecification;
-  private final ExcludeMembersOfAssetGroupsSpecification excludeMembersOfAssetGroupsSpecification;
-  private final IncludeDirectEndpointTargetsSpecification includeDirectEndpointTargetsSpecification;
+  private final SearchSpecificationUtils<Endpoint> searchSpecificationUtils;
+  private final IncludeMembersOfAssetGroupsSpecification<Endpoint>
+      includeMembersOfAssetGroupsSpecification;
+  private final IncludeDirectEndpointTargetsSpecification<Endpoint>
+      includeDirectEndpointTargetsSpecification;
 
-  private record AssetGroupSplit(
-      List<AssetGroup> includedAssetGroups,
-      List<AssetGroup> excludedAssetGroups,
-      Filters.FilterOperator filterOperator) {}
+  private final List<String> joinPath = List.of("assets");
 
   public EndpointTargetSearchAdaptor(
       EndpointRepository endpointRepository,
       InjectExpectationService injectExpectationService,
-      IncludeMembersOfAssetGroupsSpecification includeMembersOfAssetGroupsSpecification,
-      ExcludeMembersOfAssetGroupsSpecification excludeMembersOfAssetGroupsSpecification,
-      IncludeDirectEndpointTargetsSpecification includeDirectEndpointTargetsSpecification) {
+      SearchSpecificationUtils<Endpoint> searchSpecificationUtils,
+      IncludeMembersOfAssetGroupsSpecification<Endpoint> includeMembersOfAssetGroupsSpecification,
+      IncludeDirectEndpointTargetsSpecification<Endpoint>
+          includeDirectEndpointTargetsSpecification) {
     this.endpointRepository = endpointRepository;
     this.injectExpectationService = injectExpectationService;
+    this.searchSpecificationUtils = searchSpecificationUtils;
     this.includeMembersOfAssetGroupsSpecification = includeMembersOfAssetGroupsSpecification;
-    this.excludeMembersOfAssetGroupsSpecification = excludeMembersOfAssetGroupsSpecification;
     this.includeDirectEndpointTargetsSpecification = includeDirectEndpointTargetsSpecification;
     // field name translations
     this.fieldTranslations.put("target_name", "asset_name");
@@ -52,35 +52,15 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public Page<InjectTarget> search(SearchPaginationInput input, @NotNull Inject scopedInject) {
-    AssetGroupSplit split = determineAssetGroupSplit(scopedInject, input);
-
     Specification<Endpoint> overallSpec =
-        switch (split.filterOperator) {
-          case null ->
-              includeMembersOfAssetGroupsSpecification
-                  .buildSpecification(
-                      split.includedAssetGroups.stream().map(AssetGroup::getId).toList())
-                  .or(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
+        searchSpecificationUtils.compileSpecificationForAssetGroupMembership(
+            scopedInject, input, joinPath);
 
-          case contains, not_empty ->
-              includeMembersOfAssetGroupsSpecification.buildSpecification(
-                  split.includedAssetGroups.stream().map(AssetGroup::getId).toList());
-
-          case empty ->
-              excludeMembersOfAssetGroupsSpecification
-                  .buildSpecification(
-                      split.excludedAssetGroups.stream().map(AssetGroup::getId).toList())
-                  .and(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
-          case not_contains ->
-              includeMembersOfAssetGroupsSpecification
-                  .buildSpecification(
-                      split.includedAssetGroups.stream().map(AssetGroup::getId).toList())
-                  .and(
-                      excludeMembersOfAssetGroupsSpecification.buildSpecification(
-                          split.excludedAssetGroups.stream().map(AssetGroup::getId).toList()))
-                  .or(includeDirectEndpointTargetsSpecification.buildSpecification(scopedInject));
-          default -> throw new IllegalArgumentException();
-        };
+    Specification<Endpoint> memberOfAnyTargetGroupSpec =
+        searchSpecificationUtils.compileSpecificationForAssetGroupMembership(
+            scopedInject,
+            SearchPaginationInput.builder().filterGroup(new Filters.FilterGroup()).build(),
+            joinPath);
 
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
 
@@ -90,7 +70,8 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
               if (Filters.FilterMode.and.equals(input.getFilterGroup().getMode())) {
                 return this.endpointRepository.findAll(overallSpec.and(specification), pageable);
               }
-              return this.endpointRepository.findAll(overallSpec.or(specification), pageable);
+              return this.endpointRepository.findAll(
+                  overallSpec.or(specification.and(memberOfAnyTargetGroupSpec)), pageable);
             },
             translatedInput,
             Endpoint.class);
@@ -105,57 +86,28 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
-    throw new NotImplementedException("Implement when needed by the Agents paginated tab");
+    Specification<Endpoint> spec =
+        includeMembersOfAssetGroupsSpecification
+            .buildSpecification(
+                scopedInject.getAssetGroups().stream().map(AssetGroup::getId).toList(), joinPath)
+            .or(
+                includeDirectEndpointTargetsSpecification.buildSpecification(
+                    scopedInject, joinPath));
+
+    Specification<Endpoint> nameSpec =
+        (root, query, criteriaBuilder) ->
+            criteriaBuilder.like(root.get("name"), "%" + textSearch + "%");
+
+    return this.endpointRepository.findAll(spec.and(nameSpec)).stream()
+        .map(ep -> new FilterUtilsJpa.Option(ep.getId(), ep.getName()))
+        .toList();
   }
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
-    throw new NotImplementedException("Implement when needed by the Agents paginated tab");
-  }
-
-  private AssetGroupSplit determineAssetGroupSplit(
-      Inject scopedInject, SearchPaginationInput input) {
-    List<AssetGroup> allTargetAssetGroups = scopedInject.getAssetGroups();
-
-    Filters.Filter assetGroupFilter = getAssetGroupFilter(input);
-    if (assetGroupFilter == null) {
-      return new AssetGroupSplit(allTargetAssetGroups, List.of(), null);
-    }
-
-    return switch (assetGroupFilter.getOperator()) {
-      case contains ->
-          new AssetGroupSplit(
-              allTargetAssetGroups.stream()
-                  .filter(ag -> assetGroupFilter.getValues().contains(ag.getId()))
-                  .toList(),
-              List.of(),
-              assetGroupFilter.getOperator());
-      case not_empty ->
-          new AssetGroupSplit(allTargetAssetGroups, List.of(), assetGroupFilter.getOperator());
-      case empty ->
-          new AssetGroupSplit(List.of(), allTargetAssetGroups, assetGroupFilter.getOperator());
-      case not_contains ->
-          new AssetGroupSplit(
-              allTargetAssetGroups.stream()
-                  .filter(ag -> !assetGroupFilter.getValues().contains(ag.getId()))
-                  .toList(),
-              allTargetAssetGroups.stream()
-                  .filter(ag -> assetGroupFilter.getValues().contains(ag.getId()))
-                  .toList(),
-              assetGroupFilter.getOperator());
-      default ->
-          throw new IllegalArgumentException("Unknown operator: " + assetGroupFilter.getOperator());
-    };
-  }
-
-  private Filters.Filter getAssetGroupFilter(SearchPaginationInput input) {
-    Filters.FilterGroup filterGroup = input.getFilterGroup();
-    String key = "target_asset_groups";
-
-    return filterGroup.getFilters().stream()
-        .filter(filter -> key.equals(filter.getKey()))
-        .findFirst()
-        .orElse(null);
+    return fromIterable(this.endpointRepository.findAllById(ids)).stream()
+        .map(ep -> new FilterUtilsJpa.Option(ep.getId(), ep.getName()))
+        .toList();
   }
 
   private InjectTarget convertFromEndpoint(Endpoint endpoint, Inject inject) {

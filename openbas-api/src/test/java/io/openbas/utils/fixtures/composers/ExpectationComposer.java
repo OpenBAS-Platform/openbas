@@ -14,7 +14,9 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     private final InjectExpectation injectExpectation;
     private Optional<AssetGroupComposer.Composer> assetGroupComposer = Optional.empty();
     private Optional<TeamComposer.Composer> teamComposer = Optional.empty();
+    private Optional<UserComposer.Composer> userComposer = Optional.empty();
     private Optional<EndpointComposer.Composer> endpointComposer = Optional.empty();
+    private Optional<AgentComposer.Composer> agentComposer = Optional.empty();
 
     public Composer(InjectExpectation injectExpectation) {
       this.injectExpectation = injectExpectation;
@@ -23,6 +25,12 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     public Composer withTeam(TeamComposer.Composer teamComposer) {
       this.teamComposer = Optional.of(teamComposer);
       this.injectExpectation.setTeam(teamComposer.get());
+      return this;
+    }
+
+    public Composer withUser(UserComposer.Composer userComposer) {
+      this.userComposer = Optional.of(userComposer);
+      this.injectExpectation.setUser(userComposer.get());
       return this;
     }
 
@@ -38,11 +46,20 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
       return this;
     }
 
+    public Composer withAgent(AgentComposer.Composer agentComposer) {
+      this.agentComposer = Optional.of(agentComposer);
+      this.injectExpectation.setAgent(agentComposer.get());
+      this.injectExpectation.setAsset(agentComposer.get().getAsset());
+      return this;
+    }
+
     @Override
     public Composer persist() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::persist);
       endpointComposer.ifPresent(EndpointComposer.Composer::persist);
+      agentComposer.ifPresent(AgentComposer.Composer::persist);
       teamComposer.ifPresent(TeamComposer.Composer::persist);
+      userComposer.ifPresent(UserComposer.Composer::persist);
       injectExpectationRepository.save(injectExpectation);
       return this;
     }
@@ -51,7 +68,9 @@ public class ExpectationComposer extends ComposerBase<InjectExpectation> {
     public InnerComposerBase<InjectExpectation> delete() {
       assetGroupComposer.ifPresent(AssetGroupComposer.Composer::delete);
       endpointComposer.ifPresent(EndpointComposer.Composer::delete);
+      agentComposer.ifPresent(AgentComposer.Composer::delete);
       teamComposer.ifPresent(TeamComposer.Composer::delete);
+      userComposer.ifPresent(UserComposer.Composer::delete);
       injectExpectationRepository.delete(injectExpectation);
       return this;
     }

@@ -5,20 +5,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import java.util.Optional;
 import java.util.Set;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
 
-@Data
-public class EndpointTarget extends InjectTarget {
-  public EndpointTarget(String id, String name, Set<String> tags, String subType) {
+public class AgentTarget extends InjectTarget {
+
+  public AgentTarget(String id, String name, Set<String> tags, String endpoint, String subType) {
     this.setId(id);
     this.setName(name);
     this.setTags(tags);
-    this.setTargetType("ASSETS");
+    this.setEndpoint(endpoint);
+    this.setTargetType("AGENT");
     this.subType = subType;
   }
 
   @JsonProperty("target_name")
+  @Getter
+  @Setter
   @Queryable(filterable = true, searchable = true, sortable = true)
   private String name;
 
@@ -36,8 +40,14 @@ public class EndpointTarget extends InjectTarget {
         "NOT AVAILABLE; this property exists for exposing a filter only.");
   }
 
+  @JsonIgnore
+  @Setter
+  @JsonProperty("target_endpoint")
+  @Queryable(searchable = true, filterable = true, dynamicValues = true)
+  private String endpoint;
+
   @Override
   protected String getTargetSubtype() {
-    return Optional.ofNullable(this.subType).orElse(Endpoint.PLATFORM_TYPE.Unknown.name());
+    return Optional.ofNullable(this.subType).orElse("Unknown");
   }
 }
