@@ -1,6 +1,12 @@
-import { addScenarioTeamPlayers, disableScenarioTeamPlayers, enableScenarioTeamPlayers, removeScenarioTeamPlayers } from '../../../../../actions/scenarios/scenario-actions';
+import {
+  addScenarioTeamPlayers,
+  disableScenarioTeamPlayers,
+  enableScenarioTeamPlayers,
+  fetchScenarioTeams,
+  removeScenarioTeamPlayers,
+} from '../../../../../actions/scenarios/scenario-actions';
 import { removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
-import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
+import { addTeam } from '../../../../../actions/teams/team-actions';
 import { type Page } from '../../../../../components/common/queryable/Page';
 import { type Scenario, type ScenarioTeamUser, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -12,11 +18,11 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
   return {
     async onAddUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(addScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: userIds }));
-      return dispatch(fetchTeams());
+      return dispatch(fetchScenarioTeams(scenarioId));
     },
     async onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       await dispatch(removeScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: userIds }));
-      return dispatch(fetchTeams());
+      return dispatch(fetchScenarioTeams(scenarioId));
     },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({
