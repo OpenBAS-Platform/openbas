@@ -36,7 +36,7 @@ const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
       ASSETS_GROUPS: <SelectGroup />,
       ASSETS: <PlatformIcon platform={target?.target_subtype ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />,
       TEAMS: <Groups3Outlined />,
-      PLAYER: <PersonOutlined fontSize="small" />,
+      PLAYERS: <PersonOutlined fontSize="small" />,
       AGENT: (
         <img
           src={`/api/images/executors/icons/${target.target_subtype}`}

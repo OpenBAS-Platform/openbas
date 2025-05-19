@@ -46,7 +46,7 @@ const TargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
         />
       ),
       TEAMS: <Groups3Outlined />,
-      PLAYER: <PersonOutlined fontSize="small" />,
+      PLAYERS: <PersonOutlined fontSize="small" />,
     };
 
     return iconMap[target.targetType];

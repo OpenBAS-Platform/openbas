@@ -65,6 +65,8 @@ const AtomicTesting = () => {
   const [reloadContentCount, setReloadContentCount] = useState(0);
   const [hasTeams, setHasTeams] = useState(false);
   const [hasTeamsChecked, setHasTeamsChecked] = useState(false);
+  const [hasPlayers, setHasPlayers] = useState(false);
+  const [hasPlayersChecked, setHasPlayersChecked] = useState(false);
 
   const tabConfig: {
     key: number;
@@ -99,6 +101,14 @@ const AtomicTesting = () => {
         entityPrefix: 'endpoint_target',
       });
     }
+    if (hasPlayers) {
+      tabs.push({
+        key: index++,
+        label: t('Players'),
+        type: 'PLAYERS',
+        entityPrefix: 'player_target',
+      });
+    }
     if (hasAgents) {
       tabs.push({
         key: index++,
@@ -116,7 +126,7 @@ const AtomicTesting = () => {
     });
 
     return tabs;
-  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents]);
+  }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents, hasPlayers]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -160,6 +170,16 @@ const AtomicTesting = () => {
       })
       .finally(() => {
         setHasTeamsChecked(true);
+      });
+
+    searchTargets(injectId, 'PLAYERS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasPlayers(true);
+        } else { setHasPlayers(false); }
+      })
+      .finally(() => {
+        setHasPlayersChecked(true);
       });
 
     searchTargets(injectId, 'AGENT', searchPaginationInput1Result)
@@ -281,7 +301,7 @@ const AtomicTesting = () => {
         </Typography>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && (
+          {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && hasPlayersChecked && (
             <>
               <Tabs
                 value={activeTab}

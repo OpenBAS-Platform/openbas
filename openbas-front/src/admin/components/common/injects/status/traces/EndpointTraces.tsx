@@ -89,7 +89,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
         <Typography variant="body2">{t(endpoint.platformType)}</Typography>
       </div>
 
-      <div>
+      <div style={{ overflow: 'auto' }}>
         {groupedTraces.map(([agentId, traces]) => (
           <AgentTraces key={agentId} traces={traces} />
         ))}

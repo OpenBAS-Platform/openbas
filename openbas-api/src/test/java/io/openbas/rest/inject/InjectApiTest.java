@@ -1118,7 +1118,7 @@ class InjectApiTest extends IntegrationTest {
               INJECT_URI + "/execution-traces",
               inject.getId(),
               savedPlayer.getId(),
-              TargetType.PLAYER);
+              TargetType.PLAYERS);
 
       assertExecutionTracesMatch(response);
     }

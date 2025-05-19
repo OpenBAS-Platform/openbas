@@ -801,7 +801,8 @@ public class InjectExpectationService {
             case TEAMS, ASSETS_GROUPS ->
                 this.findMergedExpectationsByInjectAndTargetAndTargetType(
                     injectId, targetId, "not applicable", targetType);
-            case PLAYER -> injectExpectationRepository.findAllByInjectAndPlayer(injectId, targetId);
+            case PLAYERS ->
+                injectExpectationRepository.findAllByInjectAndPlayer(injectId, targetId);
             case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
             case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
           });
@@ -819,7 +820,7 @@ public class InjectExpectationService {
       TargetType targetTypeEnum = TargetType.valueOf(targetType);
       return switch (targetTypeEnum) {
         case TEAMS -> injectExpectationRepository.findAllByInjectAndTeam(injectId, targetId);
-        case PLAYER ->
+        case PLAYERS ->
             injectExpectationRepository.findAllByInjectAndTeamAndPlayer(
                 injectId, parentTargetId, targetId);
         case AGENT ->
@@ -857,10 +858,16 @@ public class InjectExpectationService {
                           electedExpectations.get(expectation.getType()).getResults().stream(),
                           Stream.of(expectationResult))
                       .toList());
+          electedExpectations
+              .get(expectation.getType())
+              .setScore(
+                  Collections.max(
+                      electedExpectations.get(expectation.getType()).getResults().stream()
+                          .map(InjectExpectationResult::getScore)
+                          .toList()));
         }
       }
     }
-
     return electedExpectations.values().stream().toList();
   }
 

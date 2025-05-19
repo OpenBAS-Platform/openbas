@@ -3,15 +3,16 @@ package io.openbas.service.targets.search;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.UserRepository;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.service.TeamService;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
 import jakarta.persistence.criteria.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,41 +20,37 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
-  private final TeamService teamService;
-  private final TeamRepository teamRepository;
+public class PlayerTargetSearchAdaptor extends SearchAdaptorBase {
+  private final UserRepository userRepository;
   private final InjectExpectationService injectExpectationService;
 
-  public TeamTargetSearchAdaptor(
-      TeamService teamService,
-      TeamRepository teamRepository,
-      InjectExpectationService injectExpectationService) {
-    this.teamService = teamService;
-    this.teamRepository = teamRepository;
+  public PlayerTargetSearchAdaptor(
+      UserRepository userRepository, InjectExpectationService injectExpectationService) {
+    this.userRepository = userRepository;
     this.injectExpectationService = injectExpectationService;
 
     // field name translations
-    this.fieldTranslations.put("target_name", "team_name");
-    this.fieldTranslations.put("target_tags", "team_tags");
+    this.fieldTranslations.put("target_tags", "user_tags");
+    this.fieldTranslations.put("target_teams", "user_teams");
   }
 
-  private static Specification<Team> teamsSpecificationFromInject(Inject scopedInject) {
+  private static Specification<User> playersSpecificationFromInject(Inject scopedInject) {
     return (root, query, builder) -> {
       if (scopedInject.isAtomicTesting()) {
-        Path<Object> injectPath = root.join("injects").get("id");
+        Path<Object> injectPath = root.join("teams").join("injects").get("id");
         return builder.equal(injectPath, scopedInject.getId());
       } else {
         if (scopedInject.isAllTeams()) {
           Path<Object> exerciseTeamUsersPath =
               root.get("exerciseTeamUsers").get("exercise").get("id");
-          Path<Object> injectPath = root.join("exercises").get("injects").get("id");
+          Path<Object> injectPath = root.join("teams").join("exercises").get("injects").get("id");
           return builder.and(
               builder.equal(injectPath, scopedInject.getId()),
               builder.equal(exerciseTeamUsersPath, scopedInject.getExercise().getId()));
         } else {
           Path<Object> exerciseTeamUsersPath =
               root.get("exerciseTeamUsers").get("exercise").get("id");
-          Path<Object> injectPath = root.join("injects").get("id");
+          Path<Object> injectPath = root.join("teams").join("injects").get("id");
           return builder.and(
               builder.equal(injectPath, scopedInject.getId()),
               builder.equal(exerciseTeamUsersPath, scopedInject.getExercise().getId()));
@@ -66,50 +63,43 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
   public Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject) {
     SearchPaginationInput translatedInput = this.translate(input, scopedInject);
 
-    Page<Team> filteredTeams =
+    // mind the specific sorts "email" because no name for players
+    SortField defaultSort = new SortField("user_email", "ASC");
+    translatedInput.setSorts(List.of(defaultSort));
+
+    Page<User> filteredPlayers =
         buildPaginationJPA(
-            (Specification<Team> specification, Pageable pageable) ->
-                this.teamRepository.findAll(
-                    teamsSpecificationFromInject(scopedInject).and(specification), pageable),
+            (Specification<User> specification, Pageable pageable) ->
+                this.userRepository.findAll(
+                    playersSpecificationFromInject(scopedInject).and(specification), pageable),
             translatedInput,
-            Team.class);
+            User.class);
 
     return new PageImpl<>(
-        filteredTeams.getContent().stream()
-            .map(team -> convertFromTeamOutput(team, scopedInject))
+        filteredPlayers.getContent().stream()
+            .map(player -> convertFromPlayerOutput(player, scopedInject))
             .toList(),
-        filteredTeams.getPageable(),
-        filteredTeams.getTotalElements());
+        filteredPlayers.getPageable(),
+        filteredPlayers.getTotalElements());
   }
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsForInject(Inject scopedInject, String textSearch) {
-    if (scopedInject.isAllTeams()) {
-      return scopedInject.getExercise().getTeams().stream()
-          .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
-          .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
-          .toList();
-    } else {
-      return scopedInject.getTeams().stream()
-          .filter(team -> team.getName().toLowerCase().contains(textSearch.toLowerCase()))
-          .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
-          .toList();
-    }
+    throw new NotImplementedException("Implement when needed");
   }
 
   @Override
   public List<FilterUtilsJpa.Option> getOptionsByIds(List<String> ids) {
-    return teamService.getTeams(ids).stream()
-        .map(team -> new FilterUtilsJpa.Option(team.getId(), team.getName()))
-        .toList();
+    throw new NotImplementedException("Implement when needed");
   }
 
-  private InjectTarget convertFromTeamOutput(Team team, Inject inject) {
-    TeamTarget target =
-        new TeamTarget(
-            team.getId(),
-            team.getName(),
-            team.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
+  private InjectTarget convertFromPlayerOutput(User player, Inject inject) {
+    PlayerTarget target =
+        new PlayerTarget(
+            player.getId(),
+            player.getNameOrEmail(),
+            player.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+            player.getTeams().stream().map(Team::getId).collect(Collectors.toSet()));
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         AtomicTestingUtils.getExpectationResultByTypes(

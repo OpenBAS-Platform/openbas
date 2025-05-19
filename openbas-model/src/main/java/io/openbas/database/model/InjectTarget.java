@@ -12,11 +12,12 @@ import lombok.Data;
 @Data
 @Schema(
     discriminatorProperty = "target_type",
-    oneOf = {AssetGroupTarget.class, TeamTarget.class, EndpointTarget.class, AgentTarget.class},
+    oneOf = {AssetGroupTarget.class, TeamTarget.class, EndpointTarget.class, AgentTarget.class, PlayerTarget.class},
     discriminatorMapping = {
       @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
       @DiscriminatorMapping(value = "ASSETS", schema = EndpointTarget.class),
       @DiscriminatorMapping(value = "TEAMS", schema = TeamTarget.class),
+      @DiscriminatorMapping(value = "PLAYERS", schema = PlayerTarget.class),
       @DiscriminatorMapping(value = "AGENT", schema = AgentTarget.class),
     })
 public abstract class InjectTarget {
@@ -24,10 +25,6 @@ public abstract class InjectTarget {
   @NotBlank
   @JsonProperty("target_id")
   private String id;
-
-  @JsonProperty("target_name")
-  @Queryable(filterable = true, searchable = true, sortable = true)
-  private String name;
 
   @JsonProperty("target_tags")
   @Queryable(filterable = true, searchable = true, sortable = true, dynamicValues = true)

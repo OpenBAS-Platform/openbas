@@ -53,6 +53,11 @@ const useSearchOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'target_teams':
+        searchTargetOptions(contextId, 'TEAMS').then((response) => {
+          setOptions(response.data);
+        });
+        break;
       case 'asset_tags':
       case 'asset_group_tags':
       case 'exercise_tags':

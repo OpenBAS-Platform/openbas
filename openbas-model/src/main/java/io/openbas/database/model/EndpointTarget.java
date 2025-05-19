@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import java.util.Optional;
 import java.util.Set;
+import lombok.Data;
 import org.apache.commons.lang3.NotImplementedException;
 
+@Data
 public class EndpointTarget extends InjectTarget {
   public EndpointTarget(String id, String name, Set<String> tags, String subType) {
     this.setId(id);
@@ -15,6 +17,10 @@ public class EndpointTarget extends InjectTarget {
     this.setTargetType("ASSETS");
     this.subType = subType;
   }
+
+  @JsonProperty("target_name")
+  @Queryable(filterable = true, searchable = true, sortable = true)
+  private String name;
 
   @JsonIgnore private final String subType;
 

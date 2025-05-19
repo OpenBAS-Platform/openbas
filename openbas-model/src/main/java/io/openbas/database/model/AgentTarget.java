@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import java.util.Optional;
 import java.util.Set;
+
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -18,6 +20,12 @@ public class AgentTarget extends InjectTarget {
     this.setTargetType("AGENT");
     this.subType = subType;
   }
+
+  @JsonProperty("target_name")
+  @Getter
+  @Setter
+  @Queryable(filterable = true, searchable = true, sortable = true)
+  private String name;
 
   @JsonIgnore private final String subType;
 
