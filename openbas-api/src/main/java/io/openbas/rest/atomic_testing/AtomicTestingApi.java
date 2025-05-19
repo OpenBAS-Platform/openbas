@@ -7,6 +7,9 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Comparator;
@@ -98,6 +101,24 @@ public class AtomicTestingApi extends RestBehavior {
         injectId, targetId, parentTargetId, targetType);
   }
 
+  /**
+   * Returns expectations for inject target with results merged across all expectations of the same
+   * type
+   *
+   * @param injectId ID of the inject owning the targets
+   * @param targetId ID of the specific target
+   * @param targetType Type of the specified target
+   */
+  @Operation(
+      summary =
+          "Fetch target expectations with merged results across all occurrences of each expectation type")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Expectation results fetched successfully"),
+        @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
+      })
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}/merged")
   @PreAuthorize("isInjectObserver(#injectId)")
   public List<InjectExpectation> findTargetResultMerged(
