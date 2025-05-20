@@ -45,8 +45,6 @@ import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -84,22 +82,18 @@ public class InjectApi extends RestBehavior {
   private final OpenBASConfig openBASConfig;
   private final ObjectMapper objectMapper;
 
-  @Autowired private Environment environment;
-
   private BatchQueueService<InjectExecutionCallback> injectTraceQueueService;
 
   @PostConstruct
   public void init() throws IOException, TimeoutException {
-    if (!Arrays.asList(environment.getActiveProfiles()).contains("test")) {
-      // Initializing the queue for batching the inject execution trace
-      injectTraceQueueService =
-          new BatchQueueService<>(
-              InjectExecutionCallback.class,
-              injectStatusService::handleInjectExecutionCallbackList,
-              rabbitmqConfig,
-              objectMapper,
-              openBASConfig.getQueueConfig().get("inject-trace"));
-    }
+    // Initializing the queue for batching the inject execution trace
+    injectTraceQueueService =
+        new BatchQueueService<>(
+            InjectExecutionCallback.class,
+            injectStatusService::handleInjectExecutionCallbackList,
+            rabbitmqConfig,
+            objectMapper,
+            openBASConfig.getQueueConfig().get("inject-trace"));
   }
 
   // -- INJECTS --
