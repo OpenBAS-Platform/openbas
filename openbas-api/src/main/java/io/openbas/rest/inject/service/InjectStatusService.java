@@ -3,7 +3,6 @@ package io.openbas.rest.inject.service;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
@@ -11,8 +10,6 @@ import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.finding.FindingService;
-import io.openbas.rest.finding.FindingUtils;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -23,9 +20,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -40,8 +34,6 @@ public class InjectStatusService {
   private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
-  private final FindingService findingService;
-  private final FindingUtils findingUtils;
 
   @Resource private ObjectMapper mapper;
 
@@ -115,7 +107,7 @@ public class InjectStatusService {
       ObjectNode structuredOutput) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
-    return new ExecutionTrace( // todo
+    return new ExecutionTrace(
         injectStatus,
         traceStatus,
         null,
@@ -140,24 +132,6 @@ public class InjectStatusService {
     }
   }
 
-  public void handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = null;
-
-    try {
-      inject = loadInjectOrThrow(injectId);
-
-      Agent agent = loadAgentIfPresent(agentId);
-
-      ObjectNode structuredOutput = computeStructuredOutput(input, inject);
-
-      processInjectExecution(input, agent, inject, structuredOutput);
-
-    } catch (ElementNotFoundException | JsonProcessingException e) {
-      handleInjectExecutionError(e, inject);
-    }
-  }
-
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -175,107 +149,6 @@ public class InjectStatusService {
 
       injectRepository.save(inject);
     }
-  }
-
-  private Agent loadAgentIfPresent(String agentId) {
-    return (agentId == null)
-        ? null
-        : agentRepository
-            .findById(agentId)
-            .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
-  }
-
-  private Inject loadInjectOrThrow(String injectId) {
-    return injectRepository
-        .findById(injectId)
-        .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
-  }
-
-  private void processInjectExecution(
-      InjectExecutionInput input, Agent agent, Inject inject, ObjectNode structuredOutput) {
-    // -- UPDATE STATUS --
-    updateInjectStatus(agent, inject, input, structuredOutput);
-
-    // -- FINDINGS --
-    if (structuredOutput != null) {
-      findingService.computeFindings(structuredOutput, inject, agent);
-    }
-  }
-
-  private void handleInjectExecutionError(Exception e, Inject inject) {
-    log.log(Level.SEVERE, e.getMessage());
-    if (inject != null) {
-      inject
-          .getStatus()
-          .ifPresent(
-              status -> {
-                ExecutionTrace trace =
-                    new ExecutionTrace(
-                        status,
-                        ExecutionTraceStatus.ERROR,
-                        null,
-                        e.getMessage(),
-                        null,
-                        ExecutionTraceAction.COMPLETE,
-                        null,
-                        Instant.now());
-                status.addTrace(trace);
-              });
-      injectRepository.save(inject);
-    }
-  }
-
-  private ObjectNode computeStructuredOutput(InjectExecutionInput input, Inject inject)
-      throws JsonProcessingException {
-    if (input.getOutputStructured() != null) {
-      return mapper.readValue(input.getOutputStructured(), ObjectNode.class);
-    }
-
-    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      return computeOutputFromParsers(inject, input.getMessage());
-    }
-
-    return null;
-  }
-
-  private ObjectNode computeOutputFromParsers(Inject inject, String rawOutput) {
-    ObjectNode result = mapper.createObjectNode();
-
-    Optional<Payload> optionalPayload = inject.getPayload();
-    if (optionalPayload.isEmpty()) {
-      log.info("No payload found for inject: " + inject.getId());
-      return null;
-    }
-
-    Set<OutputParser> outputParsers = optionalPayload.get().getOutputParsers();
-    if (outputParsers == null || outputParsers.isEmpty()) {
-      log.info("No output parsers available for payload used in inject: " + inject.getId());
-      return null;
-    }
-
-    for (OutputParser outputParser : outputParsers) {
-      String rawOutputByMode =
-          findingUtils.extractRawOutputByMode(rawOutput, outputParser.getMode());
-      if (rawOutputByMode == null) {
-        continue;
-      }
-
-      ObjectNode parsed;
-      switch (outputParser.getType()) {
-        case REGEX:
-        default:
-          parsed =
-              findingUtils.computeStructuredOutputUsingRegexRules(
-                  rawOutputByMode, outputParser.getContractOutputElements());
-          break;
-      }
-
-      if (parsed != null) {
-        result.setAll(parsed);
-      }
-    }
-
-    return result.size() > 0 ? result : null;
   }
 
   public ExecutionStatus computeStatus(List<ExecutionTrace> traces) {
