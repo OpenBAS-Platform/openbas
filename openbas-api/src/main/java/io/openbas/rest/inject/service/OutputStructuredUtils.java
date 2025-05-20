@@ -1,12 +1,13 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.IntNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.*;
 import io.openbas.database.model.*;
+import io.openbas.rest.inject.form.InjectExecutionInput;
 import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.logging.Level;
@@ -25,7 +26,67 @@ public class OutputStructuredUtils {
 
   @Resource private final ObjectMapper mapper;
 
-  public String extractRawOutputByMode(String rawOutput, ParserMode mode) {
+  Set<OutputParser> extractOutputParsers(Inject inject) {
+    Optional<Payload> optionalPayload = inject.getPayload();
+    if (optionalPayload.isEmpty()) {
+      log.info("No payload found for inject: " + inject.getId());
+      return Collections.emptySet();
+    }
+
+    Set<OutputParser> outputParsers = optionalPayload.get().getOutputParsers();
+    if (outputParsers == null || outputParsers.isEmpty()) {
+      log.info("No output parsers available for payload used in inject: " + inject.getId());
+      return Collections.emptySet();
+    }
+    return outputParsers;
+  }
+
+  public ObjectNode computeOutputStructured(
+      Set<OutputParser> outputParsers, InjectExecutionInput input) throws JsonProcessingException {
+    if (input.getOutputStructured() != null) {
+      return mapper.readValue(input.getOutputStructured(), ObjectNode.class);
+    }
+
+    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
+      return computeOutputStructuredFromOutputParsers(outputParsers, input.getMessage());
+    }
+
+    return null;
+  }
+
+  private ObjectNode computeOutputStructuredFromOutputParsers(
+      Set<OutputParser> outputParsers, String rawOutput) {
+    ObjectNode result = mapper.createObjectNode();
+
+    if (outputParsers == null) {
+      return null;
+    }
+
+    for (OutputParser outputParser : outputParsers) {
+      String rawOutputByMode = extractRawOutputByMode(rawOutput, outputParser.getMode());
+      if (rawOutputByMode == null) {
+        continue;
+      }
+
+      ObjectNode parsed;
+      switch (outputParser.getType()) {
+        case REGEX:
+        default:
+          parsed =
+              computeOutputStructuredUsingRegexRules(
+                  rawOutputByMode, outputParser.getContractOutputElements());
+          break;
+      }
+
+      if (parsed != null) {
+        result.setAll(parsed);
+      }
+    }
+
+    return result.isEmpty() ? null : result;
+  }
+
+  private static String extractRawOutputByMode(String rawOutput, ParserMode mode) {
     if (rawOutput == null || rawOutput.isEmpty()) {
       return "";
     }
@@ -46,7 +107,7 @@ public class OutputStructuredUtils {
     return "";
   }
 
-  public ObjectNode computeOutputStructuredUsingRegexRules(
+  private ObjectNode computeOutputStructuredUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
     ObjectNode resultRoot = mapper.createObjectNode();
@@ -69,7 +130,9 @@ public class OutputStructuredUtils {
                 }
               });
 
-      if (pattern == null) continue;
+      if (pattern == null) {
+        continue;
+      }
 
       Matcher matcher = pattern.matcher(rawOutputByMode);
       ArrayNode matchesArray = mapper.createArrayNode();
@@ -94,16 +157,11 @@ public class OutputStructuredUtils {
 
     // Case: primitive types like Text, Number, IPv4, IPv6
     if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
-      List<String> extracted = extractValues(element.getRegexGroups(), matcher);
+      String extracted = extractValues(element.getRegexGroups(), matcher);
       if (type.technicalType == ContractOutputTechnicalType.Number && !extracted.isEmpty()) {
-        try {
-          return new IntNode(Integer.parseInt(extracted.get(0)));
-        } catch (NumberFormatException e) {
-          log.warning("Invalid number format: " + extracted.get(0));
-          return NullNode.getInstance();
-        }
+        return toNumericValue(extracted);
       }
-      return mapper.valueToTree(extracted.isEmpty() ? "" : extracted.get(0));
+      return extracted.isEmpty() ? null : mapper.valueToTree(extracted);
     }
 
     // Case: complex types like portscan, credentials, CVE
@@ -115,11 +173,11 @@ public class OutputStructuredUtils {
               .filter(rg -> rg.getField().equals(field.getKey()))
               .collect(Collectors.toSet());
 
-      List<String> values = extractValues(matchingGroups, matcher);
+      String concatedValues = extractValues(matchingGroups, matcher);
       JsonNode valueNode =
           (field.getType() == ContractOutputTechnicalType.Number)
-              ? toNumericArray(values)
-              : mapper.valueToTree(values);
+              ? toNumericValue(concatedValues)
+              : mapper.valueToTree(concatedValues);
 
       objectNode.set(field.getKey(), valueNode);
     }
@@ -127,47 +185,49 @@ public class OutputStructuredUtils {
     return objectNode;
   }
 
-  private JsonNode toNumericArray(List<String> values) {
-    ArrayNode array = mapper.createArrayNode();
-    for (String v : values) {
-      try {
-        array.add(Integer.parseInt(v));
-      } catch (NumberFormatException e) {
-        log.warning("Invalid numeric value: " + v);
-      }
+  private static ValueNode toNumericValue(String extracted) {
+    try {
+      return new IntNode(Integer.parseInt(extracted));
+    } catch (NumberFormatException e) {
+      log.warning("Invalid number format: " + extracted);
+      return NullNode.getInstance();
     }
-    return array;
   }
 
-  private List<String> extractValues(Set<RegexGroup> regexGroups, Matcher matcher) {
-    List<String> extractedValues = new ArrayList<>();
-
+  private static String extractValues(Set<RegexGroup> regexGroups, Matcher matcher) {
     for (RegexGroup regexGroup : regexGroups) {
       String[] indexes =
           Arrays.stream(regexGroup.getIndexValues().split("\\$", -1))
               .filter(index -> !index.isEmpty())
               .toArray(String[]::new);
 
+      StringBuilder concatenated = new StringBuilder();
+
       for (String index : indexes) {
         try {
           int groupIndex = Integer.parseInt(index);
           if (groupIndex > matcher.groupCount()) {
-            log.log(Level.WARNING, "Skipping invalid group index: " + groupIndex);
+            log.warning("Skipping invalid group index: " + groupIndex);
             continue;
           }
+
           String extracted = matcher.group(groupIndex);
-          if (extracted == null || extracted.isEmpty()) {
-            log.log(Level.WARNING, "Skipping invalid extracted value");
-            continue;
+          if (extracted != null && !extracted.isEmpty()) {
+            concatenated.append(extracted.trim());
           }
-          if (extracted != null) {
-            extractedValues.add(extracted.trim());
-          }
+
         } catch (NumberFormatException | IllegalStateException e) {
           log.log(Level.SEVERE, "Invalid regex group index: " + index, e);
         }
       }
+
+      // If something was extracted and concatenated, return it
+      if (concatenated.length() > 0) {
+        return concatenated.toString();
+      }
     }
-    return extractedValues;
+
+    // If no group yielded any value
+    return null;
   }
 }

@@ -14,13 +14,15 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "execution_traces")
 public class ExecutionTrace implements Base {
@@ -101,48 +103,49 @@ public class ExecutionTrace implements Base {
   }
 
   public static ExecutionTrace getNewErrorTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTrace(
-        null, ExecutionTraceStatus.ERROR, null, message, null, action, null, null);
+    return new ExecutionTrace(null, ExecutionTraceStatus.ERROR, null, message, action, null, null);
   }
 
   public static ExecutionTrace getNewErrorTrace(
       String message, ExecutionTraceAction action, Agent agent) {
-    return new ExecutionTrace(
-        null, ExecutionTraceStatus.ERROR, null, message, null, action, agent, null);
+    return new ExecutionTrace(null, ExecutionTraceStatus.ERROR, null, message, action, agent, null);
   }
 
   public static ExecutionTrace getNewErrorTrace(
       String message, ExecutionTraceAction action, List<String> identifiers) {
     return new ExecutionTrace(
-        null, ExecutionTraceStatus.ERROR, identifiers, message, null, action, null, null);
+        null, ExecutionTraceStatus.ERROR, identifiers, message, action, null, null);
   }
 
   public static ExecutionTrace getNewSuccessTrace(String message, ExecutionTraceAction action) {
     return new ExecutionTrace(
-        null, ExecutionTraceStatus.SUCCESS, null, message, null, action, null, null);
+        null, ExecutionTraceStatus.SUCCESS, null, message, action, null, null);
   }
 
   public static ExecutionTrace getNewSuccessTrace(
       String message, ExecutionTraceAction category, List<String> identifiers) {
     return new ExecutionTrace(
-        null, ExecutionTraceStatus.SUCCESS, identifiers, message, null, category, null, null);
+        null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null, null);
   }
 
   public static ExecutionTrace getNewInfoTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTrace(
-        null, ExecutionTraceStatus.INFO, null, message, null, action, null, null);
+    return new ExecutionTrace(null, ExecutionTraceStatus.INFO, null, message, action, null, null);
   }
 
   public static ExecutionTrace getNewInfoTrace(
       String message, ExecutionTraceAction action, List<String> identifiers) {
     return new ExecutionTrace(
-        null, ExecutionTraceStatus.INFO, identifiers, message, null, action, null, null);
+        null, ExecutionTraceStatus.INFO, identifiers, message, action, null, null);
   }
 
   public static ExecutionTrace getNewInfoTrace(
       String message, ExecutionTraceAction action, Agent agent, List<String> identifiers) {
     return new ExecutionTrace(
-        null, ExecutionTraceStatus.INFO, identifiers, message, null, action, agent, null);
+        null, ExecutionTraceStatus.INFO, identifiers, message, action, agent, null);
+  }
+
+  public static ExecutionTrace from(ExecutionTrace executionTrace, ObjectNode structuredMessage) {
+    return new ExecutionTrace(executionTrace, structuredMessage);
   }
 
   public ExecutionTrace() {}
@@ -152,7 +155,6 @@ public class ExecutionTrace implements Base {
       ExecutionTraceStatus status,
       List<String> identifiers,
       String message,
-      ObjectNode structuredMessage,
       ExecutionTraceAction action,
       Agent agent,
       Instant time) {
@@ -160,9 +162,19 @@ public class ExecutionTrace implements Base {
     this.status = status;
     this.identifiers = identifiers == null ? new String[0] : identifiers.toArray(new String[0]);
     this.message = message;
-    this.structuredMessage = structuredMessage;
-    this.time = time == null ? Instant.now() : time;
+    this.time = time == null ? now() : time;
     this.action = action;
     this.agent = agent;
+  }
+
+  public ExecutionTrace(ExecutionTrace base, ObjectNode structuredMessage) {
+    this.injectStatus = base.injectStatus;
+    this.status = base.status;
+    this.identifiers = base.identifiers;
+    this.message = base.message;
+    this.time = base.time;
+    this.action = base.action;
+    this.agent = base.agent;
+    this.structuredMessage = structuredMessage;
   }
 }
