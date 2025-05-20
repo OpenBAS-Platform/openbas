@@ -34,6 +34,17 @@ public class BatchQueueService<T> {
 
   private final QueueConfig queueConfig;
 
+  /**
+   * Public constructor of the BatchQueueService
+   *
+   * @param clazz the class of element that will be processed
+   * @param queueExecution the method to handle a list of the class element
+   * @param rabbitmqConfig the rabbitmq config object
+   * @param mapper the mapper to use
+   * @param queueConfig the queue config to use
+   * @throws IOException In case of issue when communicating with rabbitMQ
+   * @throws TimeoutException In case of a non responding rabbitMQ
+   */
   public BatchQueueService(
       Class<T> clazz,
       QueueExecution<T> queueExecution,
@@ -46,17 +57,18 @@ public class BatchQueueService<T> {
     this.mapper = mapper;
     this.queueConfig = queueConfig;
 
+    // Init a Connection factory
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost(rabbitmqConfig.getHostname());
     factory.setPort(rabbitmqConfig.getPort());
     factory.setUsername(rabbitmqConfig.getUser());
     factory.setPassword(rabbitmqConfig.getPass());
     factory.setVirtualHost(rabbitmqConfig.getVhost());
-
     factory.setAutomaticRecoveryEnabled(true);
     factory.setNetworkRecoveryInterval(5000);
     factory.setRequestedHeartbeat(30);
 
+    // Creation of the channels, exchange and queue
     connection = factory.newConnection();
     publisherChannel = connection.createChannel();
     publisherChannel.basicQos(queueConfig.getPublisherQos()); // Per publisher limit
@@ -73,10 +85,13 @@ public class BatchQueueService<T> {
     publisherChannel.queueDeclare(queueName, true, false, false, null);
     publisherChannel.queueBind(queueName, exchangeName, routingKey);
 
+    // Create consumers that will handle the processing
     createConsumer();
 
+    // The queue that will contain the object we need to process
     queue = new LinkedBlockingQueue<>();
 
+    // A scheduler to handle batches that did not reached the critical mass
     ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
     scheduledExecutor.scheduleAtFixedRate(
         this::processBufferedBatch,
@@ -88,33 +103,36 @@ public class BatchQueueService<T> {
   /**
    * Creates a consumer for the queue
    *
-   * @throws IOException
+   * @throws IOException In case of issue when communicating with rabbitMQ
    */
   private void createConsumer() throws IOException {
     try {
       for (int i = 0; i < queueConfig.getConsumerNumber(); ++i) {
         Channel consumerChannel = connection.createChannel();
-        // Limiter le nombre de messages non acquittés
         consumerChannel.basicQos(queueConfig.getConsumerQos());
 
+        // What to do when a message is consumed
         DeliverCallback deliverCallback =
             (consumerTag, delivery) -> {
               try {
+                // We get the object to process
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                log.info(" [x] Received '" + message + "'");
+                log.trace("Received message from queue {} : '{}'", queueName, message);
 
-                // Acquitter le message immédiatement
+                // Ack the message
                 consumerChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
 
+                // Unmarshalling of our object and setting it in the queue for processing
                 T element = mapper.readValue(message, clazz);
                 queue.put(element);
 
+                // If we reach a critical mass, we take care of it immediately
                 if (queue.size() > this.queueConfig.getMaxSize()) {
                   processBufferedBatch();
                 }
               } catch (Exception e) {
                 log.error("Error processing message: {}", e.getMessage());
-                // Rejeter le message et le renvoyer à la file
+                // Nack the message and sending it back to the queue
                 consumerChannel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, true);
               }
             };
@@ -122,6 +140,7 @@ public class BatchQueueService<T> {
         CancelCallback cancelCallback =
             consumerTag -> log.warn("Consumer {} was cancelled", consumerTag);
 
+        // Setting up the consumer itself
         consumerChannel.basicConsume(
             queueName,
             false,
@@ -134,6 +153,7 @@ public class BatchQueueService<T> {
       }
     } catch (IOException e) {
       log.error("Error creating consumer: {}", e.getMessage(), e);
+      throw e;
     }
   }
 
@@ -143,14 +163,18 @@ public class BatchQueueService<T> {
    */
   private void processBufferedBatch() {
     try {
+      // Draining the queue into the list with a max size
       List<T> currentBatch = new ArrayList<>();
       queue.drainTo(currentBatch, queueConfig.getMaxSize());
 
+      // If the list is not empty, we process it
       if (!currentBatch.isEmpty()) {
         log.info("Processing batch of {}", currentBatch.size());
         queueExecution.perform(currentBatch);
       }
 
+      // If the queue still has more element than we can process in one batch, there is no need to wait :
+      // We process it right now
       if (queue.size() > this.queueConfig.getMaxSize()) {
         processBufferedBatch();
       }
