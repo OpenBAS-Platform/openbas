@@ -10,7 +10,6 @@ import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
-import io.openbas.rest.finding.FindingUtils;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import jakarta.annotation.Resource;
 import java.time.Instant;
@@ -30,8 +29,7 @@ public class InjectExecutionService {
   private final AgentRepository agentRepository;
   private final InjectStatusService injectStatusService;
   private final FindingService findingService;
-  private final FindingUtils findingUtils;
-  private final StructuredOutputUtils structuredOutputUtils;
+  private final OutputStructuredUtils outputStructuredUtils;
 
   @Resource private ObjectMapper mapper;
 
@@ -43,38 +41,40 @@ public class InjectExecutionService {
       inject = loadInjectOrThrow(injectId);
       Agent agent = loadAgentIfPresent(agentId);
 
-      ObjectNode structuredOutput = computeStructuredOutput(input, inject);
-      processInjectExecution(input, agent, inject, structuredOutput);
+      ObjectNode outputStructured = computeOutputStructured(input, inject);
+      processInjectExecution(input, agent, inject, outputStructured);
     } catch (ElementNotFoundException | JsonProcessingException e) {
       handleInjectExecutionError(e, inject);
     }
   }
 
   private void processInjectExecution(
-      InjectExecutionInput input, Agent agent, Inject inject, ObjectNode structuredOutput) {
-    // -- UPDATE STATUS --
-    injectStatusService.updateInjectStatus(agent, inject, input, structuredOutput);
+      InjectExecutionInput input, Agent agent, Inject inject, ObjectNode outputStructured) {
+    injectStatusService.updateInjectStatus(agent, inject, input, outputStructured);
 
-    // -- FINDINGS --
-    if (structuredOutput != null) {
-      findingService.computeFindings(structuredOutput, inject, agent);
+    if (agent != null && outputStructured != null) {
+      findingService.extractFindingsFromComputedOutputStructured(outputStructured, inject, agent);
+    }
+    // From injectors
+    if (input.getOutputStructured() != null) {
+      findingService.extractFindingsFromOutputStructured(outputStructured, inject);
     }
   }
 
-  private ObjectNode computeStructuredOutput(InjectExecutionInput input, Inject inject)
+  private ObjectNode computeOutputStructured(InjectExecutionInput input, Inject inject)
       throws JsonProcessingException {
     if (input.getOutputStructured() != null) {
       return mapper.readValue(input.getOutputStructured(), ObjectNode.class);
     }
 
     if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      return computeStructuredOutputFromOutputParsers(inject, input.getMessage());
+      return computeOutputStructuredFromOutputParsers(inject, input.getMessage());
     }
 
     return null;
   }
 
-  private ObjectNode computeStructuredOutputFromOutputParsers(Inject inject, String rawOutput) {
+  private ObjectNode computeOutputStructuredFromOutputParsers(Inject inject, String rawOutput) {
     ObjectNode result = mapper.createObjectNode();
 
     Optional<Payload> optionalPayload = inject.getPayload();
@@ -91,7 +91,7 @@ public class InjectExecutionService {
 
     for (OutputParser outputParser : outputParsers) {
       String rawOutputByMode =
-          structuredOutputUtils.extractRawOutputByMode(rawOutput, outputParser.getMode());
+          outputStructuredUtils.extractRawOutputByMode(rawOutput, outputParser.getMode());
       if (rawOutputByMode == null) {
         continue;
       }
@@ -101,7 +101,7 @@ public class InjectExecutionService {
         case REGEX:
         default:
           parsed =
-              structuredOutputUtils.computeStructuredOutputUsingRegexRules(
+              outputStructuredUtils.computeOutputStructuredUsingRegexRules(
                   rawOutputByMode, outputParser.getContractOutputElements());
           break;
       }

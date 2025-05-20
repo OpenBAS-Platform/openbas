@@ -104,7 +104,7 @@ public class InjectStatusService {
       InjectStatus injectStatus,
       InjectExecutionInput input,
       Agent agent,
-      ObjectNode structuredOutput) {
+      ObjectNode outputStructured) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
     return new ExecutionTrace(
@@ -112,7 +112,7 @@ public class InjectStatusService {
         traceStatus,
         null,
         input.getMessage(),
-        structuredOutput,
+        outputStructured,
         executionAction,
         agent,
         null);
@@ -133,11 +133,11 @@ public class InjectStatusService {
   }
 
   public void updateInjectStatus(
-      Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
+      Agent agent, Inject inject, InjectExecutionInput input, ObjectNode outputStructured) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace =
-        createExecutionTrace(injectStatus, input, agent, structuredOutput);
+        createExecutionTrace(injectStatus, input, agent, outputStructured);
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
