@@ -1038,6 +1038,30 @@ export interface Endpoint {
   listened?: boolean;
 }
 
+export interface EndpointInput {
+  asset_description?: string;
+  asset_name: string;
+  asset_tags?: string[];
+  endpoint_agent_version?: string;
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  endpoint_hostname?: string;
+  /**
+   * @maxItems 2147483647
+   * @minItems 1
+   */
+  endpoint_ips: string[];
+  endpoint_mac_addresses?: string[];
+  endpoint_platform:
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown";
+}
+
 export interface EndpointOutput {
   /**
    * List of agents
@@ -1123,8 +1147,6 @@ export interface EndpointRegisterInput {
   agent_is_service?: boolean;
   asset_description?: string;
   asset_external_reference: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
@@ -1193,6 +1215,11 @@ export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
   asset_tags?: string[];
+  /**
+   * @maxItems 2147483647
+   * @minItems 1
+   */
+  endpoint_ips: string[];
 }
 
 export interface EsSearch {

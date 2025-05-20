@@ -1,8 +1,7 @@
 package io.openbas.service;
 
 import static io.openbas.database.model.Filters.isEmptyFilterGroup;
-import static io.openbas.database.specification.EndpointSpecification.findEndpointsForAssetGroup;
-import static io.openbas.database.specification.EndpointSpecification.findEndpointsForInjection;
+import static io.openbas.database.specification.EndpointSpecification.*;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -17,6 +16,7 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.executors.model.AgentRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -26,6 +26,7 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +36,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
@@ -58,7 +60,8 @@ public class EndpointService {
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
-  @Resource private OpenBASConfig openBASConfig;
+  @Resource
+  private OpenBASConfig openBASConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -139,12 +142,19 @@ public class EndpointService {
   }
 
   public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
+    Specification<Endpoint> endpointSpecification = findAgentlessEndpoints().or(findEndpointsForInjection());
     return buildPaginationJPA(
         (Specification<Endpoint> specification, Pageable pageable) ->
             this.endpointRepository.findAll(
-                findEndpointsForInjection().and(specification), pageable),
+                endpointSpecification.and(specification), pageable),
         handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
+    /*return buildPaginationJPA(
+        (Specification<Endpoint> specification, Pageable pageable) ->
+            this.endpointRepository.findAll(
+                findAgentlessEndpoints().and(specification), pageable),
+        handleEndpointFilter(searchPaginationInput),
+        Endpoint.class);*/
   }
 
   public Page<Endpoint> searchManagedEndpoints(
@@ -197,6 +207,15 @@ public class EndpointService {
 
   public Endpoint updateEndpoint(
       @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
+    Endpoint toUpdate = this.endpoint(endpointId);
+    toUpdate.setUpdateAttributes(input);
+    toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    return updateEndpoint(toUpdate);
+  }
+
+  public Endpoint updateAgentlessEndpoint(
+      @NotBlank final String endpointId, @NotNull final EndpointInput input
+  ) {
     Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));

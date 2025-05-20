@@ -47,6 +47,7 @@ const EndpointHeader = () => {
               ...endpoint,
               type: 'static',
             }}
+            agentless={endpoint.asset_agents.length === 0}
             onUpdate={endpoint}
             onDelete={() => navigate('/admin/assets/endpoints')}
           />

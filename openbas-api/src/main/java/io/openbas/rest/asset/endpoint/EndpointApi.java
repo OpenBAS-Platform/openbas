@@ -4,6 +4,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Agent;
@@ -11,23 +12,25 @@ import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.rest.asset.endpoint.form.EndpointOutput;
-import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.rest.asset.endpoint.form.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.HttpReqRespUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.pyroscope.vendor.kotlin.collections.EmptyList;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -48,8 +51,22 @@ public class EndpointApi extends RestBehavior {
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
+  private final TagRepository tagRepository;
 
   private final EndpointMapper endpointMapper;
+
+  @PostMapping(ENDPOINT_URI + "/agentless")
+  @PreAuthorize("isPlanner()")
+  @Transactional(rollbackFor = Exception.class)
+  public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(input);
+    endpoint.setPlatform(input.getPlatform());
+    endpoint.setArch(input.getArch());
+    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.setAgents(Collections.emptyList());
+    return this.endpointService.createEndpoint(endpoint);
+  }
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
@@ -142,6 +159,16 @@ public class EndpointApi extends RestBehavior {
       @Valid @RequestBody final EndpointUpdateInput input) {
     return endpointMapper.toEndpointOverviewOutput(
         this.endpointService.updateEndpoint(endpointId, input));
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping(ENDPOINT_URI + "/agentless/{endpointId}")
+  @Transactional(rollbackFor = Exception.class)
+  public EndpointOverviewOutput updateAgentlessEndpoint(
+      @PathVariable @NotBlank final String endpointId,
+      @Valid @RequestBody final EndpointInput input) {
+    return endpointMapper.toEndpointOverviewOutput(
+        this.endpointService.updateAgentlessEndpoint(endpointId, input));
   }
 
   @Secured(ROLE_ADMIN)

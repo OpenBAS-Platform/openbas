@@ -31,6 +31,10 @@ const inlineStyles = {
     backgroundColor: 'rgba(244, 67, 54, 0.08)',
     color: '#f44336',
   },
+  orange: {
+    backgroundColor: 'rgba(246,177,27,0.08)',
+    color: '#f19710',
+  },
 };
 
 interface Props {
@@ -58,6 +62,14 @@ const AssetStatus: FunctionComponent<Props> = ({ variant, status }) => {
           className={style}
           style={inlineStyles.red}
           label={t('Inactive')}
+        />
+      );
+    case 'Agentless':
+      return (
+        <Chip
+          className={style}
+          style={inlineStyles.orange}
+          label={t('Agentless')}
         />
       );
     default:

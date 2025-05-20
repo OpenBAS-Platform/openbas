@@ -83,6 +83,7 @@ const InjectContentForm = ({
         renderActions={endpoint => (
           <EndpointPopover
             inline
+            agentless={endpoint.asset_agents.length === 0}
             endpoint={endpoint}
             onRemoveEndpointFromInject={removeAsset}
             onDelete={removeAsset}

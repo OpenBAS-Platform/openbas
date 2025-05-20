@@ -22,6 +22,7 @@ export interface EndpointPopoverProps {
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
   disabled?: boolean;
+  agentless?: boolean;
 }
 
 const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
@@ -35,6 +36,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   onUpdate,
   onDelete,
   disabled = false,
+  agentless,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -44,6 +46,11 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
     asset_name: endpoint.asset_name,
     asset_description: endpoint.asset_description ?? '',
     asset_tags: endpoint.asset_tags,
+    endpoint_hostname: endpoint.endpoint_hostname ?? '',
+    endpoint_ips: endpoint.endpoint_ips ?? [],
+    endpoint_mac_addresses: endpoint.endpoint_mac_addresses,
+    endpoint_platform: endpoint.endpoint_platform,
+    endpoint_arch: endpoint.endpoint_arch,
   };
 
   // Edition
@@ -137,6 +144,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
           <EndpointForm
             initialValues={initialValues}
             editing
+            agentless={agentless}
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
           />
@@ -150,6 +158,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
           <EndpointForm
             initialValues={initialValues}
             editing
+            agentless={agentless}
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
           />
