@@ -28,6 +28,8 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -143,6 +145,22 @@ public class InjectApi extends RestBehavior {
     outputStream.close();
   }
 
+  /**
+   * Returns a page of inject target results based on search parameters
+   *
+   * @param injectId ID of the inject owning the targets
+   * @param targetType Type of the searched targets
+   * @param input Search terms specification
+   */
+  @Operation(summary = "Search inject targets by inject and by target type")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "A page of inject target results is fetched successfully"),
+        @ApiResponse(responseCode = "404", description = "The inject ID was not found"),
+        @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
+      })
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
   @PreAuthorize("isInjectObserver(#injectId)")
@@ -163,6 +181,22 @@ public class InjectApi extends RestBehavior {
     return targetService.searchTargets(injectTargetTypeEnum, inject, input);
   }
 
+  /**
+   * Returns all possible filter value options for the given target type and inject
+   *
+   * @param injectId ID of the inject owning the potential options
+   * @param targetType Type of the desired targets as options
+   * @param searchText Additional filter on target label
+   */
+  @Operation(summary = "Get filter values options from possible targets by target type and inject")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Target as option values fetched successfully"),
+        @ApiResponse(responseCode = "404", description = "The inject ID was not found"),
+        @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
+      })
   @LogExecutionTime
   @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
   @PreAuthorize("isInjectObserver(#injectId)")
@@ -184,6 +218,20 @@ public class InjectApi extends RestBehavior {
         injectTargetTypeEnum, inject, StringUtils.trimToEmpty(searchText));
   }
 
+  /**
+   * Returns possible filter value options for the given target ids
+   *
+   * @param targetType Type of the desired targets as options
+   * @param ids IDs of the target options to fetch
+   */
+  @Operation(summary = "Get filter values options from possible targets by IDs")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Target as option values fetched successfully"),
+        @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
+      })
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/targets/{targetType}/options")
   public List<FilterUtilsJpa.Option> targetOptionsById(
