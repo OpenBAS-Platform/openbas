@@ -68,6 +68,8 @@ const InjectContentForm = ({
   useEffect(() => {
     if (fieldsMap.has('asset') && injectAssetIds.length > 0) {
       findEndpoints(injectAssetIds).then(result => setInjectAsset(result.data));
+    } else {
+      setInjectAsset([]);
     }
   }, [injectAssetIds]);
 

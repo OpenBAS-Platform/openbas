@@ -145,7 +145,7 @@ const UpdateInject: React.FC<Props> = ({
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <InjectForm
             handleClose={handleClose}
-            openDetail
+            openDetails
             disabled={!injectorContractContent}
             drawerRef={drawerRef}
             isAtomic={isAtomic}
