@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 public class QueueConfig {
-  @JsonProperty("consumer.number")
+  @JsonProperty("consumer-number")
   private int consumerNumber;
 
-  @JsonProperty("consumer.frequency")
+  @JsonProperty("consumer-frequency")
   private int consumerFrequency;
 
   @JsonProperty("queue-name")
