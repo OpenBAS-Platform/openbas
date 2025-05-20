@@ -1,7 +1,6 @@
 package io.openbas.rest.inject.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
@@ -9,7 +8,6 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionInput;
-import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.Set;
 import java.util.logging.Level;
@@ -27,8 +25,6 @@ public class InjectExecutionService {
   private final InjectStatusService injectStatusService;
   private final FindingService findingService;
   private final OutputStructuredUtils outputStructuredUtils;
-
-  @Resource private ObjectMapper mapper;
 
   public void handleInjectExecutionCallback(
       String injectId, String agentId, InjectExecutionInput input) {
