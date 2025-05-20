@@ -17,10 +17,7 @@ import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.ExecutableInjectService;
-import io.openbas.rest.inject.service.InjectExportService;
-import io.openbas.rest.inject.service.InjectService;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.ImportService;
 import io.openbas.service.targets.TargetService;
@@ -63,17 +60,17 @@ public class InjectApi extends RestBehavior {
 
   private static final int MAX_NEXT_INJECTS = 6;
 
+  private final AuthorisationService authorisationService;
+  private final ExecutableInjectService executableInjectService;
   private final ExerciseRepository exerciseRepository;
-  private final UserRepository userRepository;
+  private final ImportService importService;
   private final InjectRepository injectRepository;
   private final InjectService injectService;
-  private final InjectStatusService injectStatusService;
-  private final ExecutableInjectService executableInjectService;
-  private final ImportService importService;
+  private final InjectExecutionService injectExecutionService;
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
-  private final AuthorisationService authorisationService;
   private final TargetService targetService;
+  private final UserRepository userRepository;
 
   // -- INJECTS --
 
@@ -330,7 +327,7 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
   @Secured(ROLE_ADMIN)
