@@ -2,8 +2,7 @@ package io.openbas.rest.asset_group;
 
 import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.AssetGroupFixture.createAssetGroupWithTags;
-import static io.openbas.utils.fixtures.AssetGroupFixture.createDefaultAssetGroup;
+import static io.openbas.utils.fixtures.AssetGroupFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -49,10 +48,12 @@ class AssetGroupApiTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseService exerciseService;
 
-  @DisplayName("Given valid AssetGroupInput, should create assetGroup successfully")
+  @DisplayName(
+      "Given valid AssetGroupInput, should create and get assetGroup without dynamic filter successfully")
   @Test
   @WithMockAdminUser
-  void given_validAssetGroupInput_should_createAssetGroupSuccessfully() throws Exception {
+  void given_validAssetGroupInput_should_createAndGetAssetGroupWithoutDynamicFilterSuccessfully()
+      throws Exception {
     // -- PREPARE --
     Tag tag = tagRepository.save(TagFixture.getTag());
     AssetGroupInput assetGroupInput = createAssetGroupWithTags("Asset group", List.of(tag.getId()));
@@ -73,7 +74,81 @@ class AssetGroupApiTest extends IntegrationTest {
     assertEquals(assetGroupInput.getName(), JsonPath.read(response, "$.asset_group_name"));
     assertEquals(
         assetGroupInput.getDescription(), JsonPath.read(response, "$.asset_group_description"));
+    // Check default because null in the input
+    assertEquals(
+        "{mode=or, filters=[]}",
+        JsonPath.read(response, "$.asset_group_dynamic_filter").toString());
     assertEquals(tag.getId(), JsonPath.read(response, "$.asset_group_tags[0]"));
+
+    // --EXECUTE--
+    String response2 =
+        mvc.perform(
+                get(ASSET_GROUP_URI + "/" + JsonPath.read(response, "$.asset_group_id"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals(assetGroupInput.getName(), JsonPath.read(response2, "$.asset_group_name"));
+    assertEquals(
+        assetGroupInput.getDescription(), JsonPath.read(response2, "$.asset_group_description"));
+    // Check default because null in the input
+    assertEquals(
+        "{mode=or, filters=[]}",
+        JsonPath.read(response2, "$.asset_group_dynamic_filter").toString());
+    assertEquals(tag.getId(), JsonPath.read(response2, "$.asset_group_tags[0]"));
+  }
+
+  @DisplayName(
+      "Given valid AssetGroupInput, should create and get assetGroup with dynamic filter successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validAssetGroupInput_should_createAndGetAssetGroupWithDynamicFilterSuccessfully()
+      throws Exception {
+    // -- PREPARE --
+    AssetGroupInput assetGroupInput = createAssetGroupWithDynamicFilters("Asset group");
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(ASSET_GROUP_URI)
+                    .content(asJsonString(assetGroupInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals(assetGroupInput.getName(), JsonPath.read(response, "$.asset_group_name"));
+    assertEquals(
+        assetGroupInput.getDescription(), JsonPath.read(response, "$.asset_group_description"));
+    assertEquals(
+        "{mode=or, filters=[{\"key\":\"endpoint_platform\",\"mode\":\"or\",\"values\":[\"Windows\"],\"operator\":\"eq\"}]}",
+        JsonPath.read(response, "$.asset_group_dynamic_filter").toString());
+
+    // --EXECUTE--
+    String response2 =
+        mvc.perform(
+                get(ASSET_GROUP_URI + "/" + JsonPath.read(response, "$.asset_group_id"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals(assetGroupInput.getName(), JsonPath.read(response2, "$.asset_group_name"));
+    assertEquals(
+        assetGroupInput.getDescription(), JsonPath.read(response2, "$.asset_group_description"));
+    assertEquals(
+        "{mode=or, filters=[{\"key\":\"endpoint_platform\",\"mode\":\"or\",\"values\":[\"Windows\"],\"operator\":\"eq\"}]}",
+        JsonPath.read(response2, "$.asset_group_dynamic_filter").toString());
   }
 
   @DisplayName("Given valid AssetGroupInput, should update assetGroup successfully")

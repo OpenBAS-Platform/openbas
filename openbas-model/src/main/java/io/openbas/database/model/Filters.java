@@ -36,6 +36,13 @@ public class Filters {
     @NotNull private FilterMode mode; // Between filters
     private List<Filter> filters = new ArrayList<>();
 
+    public static FilterGroup defaultFilterGroup() {
+      FilterGroup filterGroup = new FilterGroup();
+      filterGroup.setMode(FilterMode.or);
+      filterGroup.setFilters(List.of());
+      return filterGroup;
+    }
+
     // -- UTILS --
 
     public Optional<Filter> findByKey(@NotBlank final String filterKey) {

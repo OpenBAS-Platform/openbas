@@ -62,7 +62,8 @@ public class AssetGroup implements Base {
   @Type(JsonType.class)
   @Column(name = "asset_group_dynamic_filter")
   @JsonProperty("asset_group_dynamic_filter")
-  private FilterGroup dynamicFilter;
+  @NotNull
+  private FilterGroup dynamicFilter = FilterGroup.defaultFilterGroup();
 
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
