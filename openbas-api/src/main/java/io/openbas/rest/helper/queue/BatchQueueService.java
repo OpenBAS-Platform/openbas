@@ -173,8 +173,8 @@ public class BatchQueueService<T> {
         queueExecution.perform(currentBatch);
       }
 
-      // If the queue still has more element than we can process in one batch, there is no need to wait :
-      // We process it right now
+      // If the queue still has more element than we can process in one batch,
+      // there is no need to wait : we process it right now
       if (queue.size() > this.queueConfig.getMaxSize()) {
         processBufferedBatch();
       }
