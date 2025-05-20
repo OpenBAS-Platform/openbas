@@ -177,15 +177,9 @@ services:
       POSTGRES_DB: openbas
   - name: rabbitmq
     image: rabbitmq:4.1-management
-    restart: unless-stopped
-    volumes:
-      - ./openbas-dev/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    ports:
-      - "5672:5672"
-      - "15672:15672"
   - name: minio-e2e
     image: minio/minio:RELEASE.2023-12-02T10-51-33Z-cpuv1
     environment:
