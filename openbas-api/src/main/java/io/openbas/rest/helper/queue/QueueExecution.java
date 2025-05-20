@@ -1,4 +1,4 @@
-package io.openbas.rest.inject.service.queue;
+package io.openbas.rest.helper.queue;
 
 import java.util.List;
 

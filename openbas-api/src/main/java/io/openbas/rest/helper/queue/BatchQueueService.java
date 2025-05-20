@@ -1,10 +1,9 @@
-package io.openbas.rest.inject.service;
+package io.openbas.rest.helper.queue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
 import io.openbas.config.QueueConfig;
 import io.openbas.config.RabbitmqConfig;
-import io.openbas.rest.inject.service.queue.QueueExecution;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InjectTraceQueueService<T> {
+public class BatchQueueService<T> {
 
   private final Class<T> clazz;
   private final QueueExecution<T> queueExecution;
@@ -35,7 +34,7 @@ public class InjectTraceQueueService<T> {
 
   private final QueueConfig queueConfig;
 
-  public InjectTraceQueueService(
+  public BatchQueueService(
       Class<T> clazz,
       QueueExecution<T> queueExecution,
       RabbitmqConfig rabbitmqConfig,
@@ -63,13 +62,13 @@ public class InjectTraceQueueService<T> {
     publisherChannel.basicQos(queueConfig.getPublisherQos()); // Per publisher limit
     exchangeName =
         rabbitmqConfig.getPrefix()
-            + String.format(InjectTraceQueueService.EXCHANGE_KEY, queueConfig.getQueueName());
+            + String.format(BatchQueueService.EXCHANGE_KEY, queueConfig.getQueueName());
     routingKey =
         rabbitmqConfig.getPrefix()
-            + String.format(InjectTraceQueueService.ROUTING_KEY, queueConfig.getQueueName());
+            + String.format(BatchQueueService.ROUTING_KEY, queueConfig.getQueueName());
     queueName =
         rabbitmqConfig.getPrefix()
-            + String.format(InjectTraceQueueService.QUEUE_NAME, queueConfig.getQueueName());
+            + String.format(BatchQueueService.QUEUE_NAME, queueConfig.getQueueName());
     publisherChannel.exchangeDeclare(exchangeName, "topic", true);
     publisherChannel.queueDeclare(queueName, true, false, false, null);
     publisherChannel.queueBind(queueName, exchangeName, routingKey);
@@ -86,57 +85,69 @@ public class InjectTraceQueueService<T> {
         TimeUnit.MILLISECONDS);
   }
 
+  /**
+   * Creates a consumer for the queue
+   *
+   * @throws IOException
+   */
   private void createConsumer() throws IOException {
-    for (int i = 0; i < queueConfig.getConsumerNumber(); ++i) {
-      Channel consumerChannel = connection.createChannel();
-      // Limiter le nombre de messages non acquittés
-      consumerChannel.basicQos(queueConfig.getConsumerQos());
+    try {
+      for (int i = 0; i < queueConfig.getConsumerNumber(); ++i) {
+        Channel consumerChannel = connection.createChannel();
+        // Limiter le nombre de messages non acquittés
+        consumerChannel.basicQos(queueConfig.getConsumerQos());
 
-      DeliverCallback deliverCallback =
-          (consumerTag, delivery) -> {
-            try {
-              String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-              log.info(" [x] Received '" + message + "'");
+        DeliverCallback deliverCallback =
+            (consumerTag, delivery) -> {
+              try {
+                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                log.info(" [x] Received '" + message + "'");
 
-              // Acquitter le message immédiatement
-              consumerChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
+                // Acquitter le message immédiatement
+                consumerChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
 
-              T element = mapper.readValue(message, clazz);
-              queue.put(element);
+                T element = mapper.readValue(message, clazz);
+                queue.put(element);
 
-              if (queue.size() > this.queueConfig.getMaxSize()) {
-                processBufferedBatch();
+                if (queue.size() > this.queueConfig.getMaxSize()) {
+                  processBufferedBatch();
+                }
+              } catch (Exception e) {
+                log.error("Error processing message: {}", e.getMessage());
+                // Rejeter le message et le renvoyer à la file
+                consumerChannel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, true);
               }
-            } catch (Exception e) {
-              log.error("Error processing message: {}", e.getMessage());
-              // Rejeter le message et le renvoyer à la file
-              consumerChannel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, true);
-            }
-          };
+            };
 
-      CancelCallback cancelCallback =
-          consumerTag -> log.warn("Consumer {} was cancelled", consumerTag);
+        CancelCallback cancelCallback =
+            consumerTag -> log.warn("Consumer {} was cancelled", consumerTag);
 
-      consumerChannel.basicConsume(
-          queueName,
-          false,
-          String.format("consumer-%s-%d", queueConfig.getQueueName(), i),
-          false,
-          false,
-          null,
-          deliverCallback,
-          cancelCallback);
+        consumerChannel.basicConsume(
+            queueName,
+            false,
+            String.format("consumer-%s-%d", queueConfig.getQueueName(), i),
+            false,
+            false,
+            null,
+            deliverCallback,
+            cancelCallback);
+      }
+    } catch (IOException e) {
+      log.error("Error creating consumer: {}", e.getMessage(), e);
     }
   }
 
-  /** Traite les messages en attente dans le tampon */
+  /**
+   * Process messages in the queue buffer. It will only process as many messages as what's
+   * configures in openbas.queue-config.<name of the queue>.max-size
+   */
   private void processBufferedBatch() {
     try {
       List<T> currentBatch = new ArrayList<>();
       queue.drainTo(currentBatch, queueConfig.getMaxSize());
 
       if (!currentBatch.isEmpty()) {
-        log.info("Processing batch of {} callbacks", currentBatch.size());
+        log.info("Processing batch of {}", currentBatch.size());
         queueExecution.perform(currentBatch);
       }
 
@@ -144,11 +155,22 @@ public class InjectTraceQueueService<T> {
         processBufferedBatch();
       }
     } catch (Exception e) {
-      log.error("Error processing batch: {}", e.getMessage());
+      log.error(String.format("Error processing batch: %s", e.getMessage()), e);
     }
   }
 
+  /**
+   * Publish a stringified object of type T into the queue
+   *
+   * @param publishedJson the stringified T object
+   * @throws IOException in case of error during the publish
+   */
   public void publish(String publishedJson) throws IOException {
-    publisherChannel.basicPublish(exchangeName, routingKey, null, publishedJson.getBytes());
+    try {
+      publisherChannel.basicPublish(exchangeName, routingKey, null, publishedJson.getBytes());
+    } catch (IOException e) {
+      log.error(String.format("Error publishing batch: %s", e.getMessage()), e);
+      throw e;
+    }
   }
 }

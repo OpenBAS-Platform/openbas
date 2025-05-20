@@ -19,6 +19,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.helper.queue.BatchQueueService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
@@ -78,16 +79,16 @@ public class InjectApi extends RestBehavior {
   private final InjectStatusService injectStatusService;
 
   private final RabbitmqConfig rabbitmqConfig;
+  private final OpenBASConfig openBASConfig;
   private final ObjectMapper objectMapper;
 
-  private final OpenBASConfig openBASConfig;
-
-  private InjectTraceQueueService<InjectExecutionCallback> injectTraceQueueService;
+  private BatchQueueService<InjectExecutionCallback> injectTraceQueueService;
 
   @PostConstruct
   public void init() throws IOException, TimeoutException {
+    // Initializing the queue for batching the inject execution trace
     injectTraceQueueService =
-        new InjectTraceQueueService<>(
+        new BatchQueueService<>(
             InjectExecutionCallback.class,
             injectStatusService::handleInjectExecutionCallbackList,
             rabbitmqConfig,
