@@ -5,6 +5,8 @@ import static io.openbas.database.model.ContractOutputType.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
@@ -29,53 +31,6 @@ public class FindingUtils {
 
   private final FindingRepository findingRepository;
 
-  public void computeFindingUsingRegexRules(
-      Inject inject,
-      Asset asset,
-      String rawOutputByMode,
-      Set<io.openbas.database.model.ContractOutputElement> contractOutputElements) {
-    Map<String, Pattern> patternCache = new HashMap<>();
-
-    contractOutputElements.stream()
-        .filter(io.openbas.database.model.ContractOutputElement::isFinding)
-        .forEach(
-            contractOutputElement -> {
-              String regex = contractOutputElement.getRule();
-
-              // Check regex
-              Pattern pattern =
-                  patternCache.computeIfAbsent(
-                      regex,
-                      r -> {
-                        try {
-                          return Pattern.compile(
-                              r,
-                              Pattern.MULTILINE
-                                  | Pattern.CASE_INSENSITIVE
-                                  | Pattern.UNICODE_CHARACTER_CLASS);
-                        } catch (PatternSyntaxException e) {
-                          log.log(Level.INFO, "Invalid regex pattern: " + r, e.getMessage());
-                          return null;
-                        }
-                      });
-
-              if (pattern == null) return;
-
-              Matcher matcher = pattern.matcher(rawOutputByMode);
-
-              while (matcher.find()) {
-                String finalValue = buildValue(contractOutputElement, matcher);
-                if (isValid(finalValue)) {
-                  buildFinding(inject, asset, contractOutputElement, finalValue);
-                }
-              }
-            });
-  }
-
-  private static boolean isValid(String finalValue) {
-    return finalValue != null && !finalValue.isEmpty();
-  }
-
   public String extractRawOutputByMode(String rawOutput, ParserMode mode) {
     if (rawOutput == null || rawOutput.isEmpty()) {
       return "";
@@ -97,27 +52,97 @@ public class FindingUtils {
     return "";
   }
 
-  public String buildValue(ContractOutputElement contractOutputElement, Matcher matcher) {
-    JsonNode resultNode;
-    if (contractOutputElement.getType().fields == null) {
-      List<String> extractedValues = extractValues(contractOutputElement.getRegexGroups(), matcher);
-      resultNode = mapper.valueToTree(extractedValues);
-    } else {
-      ObjectNode objectNode = mapper.createObjectNode();
-      for (ContractOutputField field : contractOutputElement.getType().fields) {
-        List<String> extractedValues =
-            extractValues(
-                contractOutputElement.getRegexGroups().stream()
-                    .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
-                    .collect(Collectors.toSet()),
-                matcher);
-        ArrayNode arrayNode = mapper.valueToTree(extractedValues);
-        objectNode.set(field.getKey(), arrayNode);
+  public ObjectNode computeStructuredOutputUsingRegexRules(
+      String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
+    Map<String, Pattern> patternCache = new HashMap<>();
+    ObjectNode resultRoot = mapper.createObjectNode();
+
+    for (ContractOutputElement contractOutputElement : contractOutputElements) {
+      String regex = contractOutputElement.getRule();
+      Pattern pattern =
+          patternCache.computeIfAbsent(
+              regex,
+              r -> {
+                try {
+                  return Pattern.compile(
+                      r,
+                      Pattern.MULTILINE
+                          | Pattern.CASE_INSENSITIVE
+                          | Pattern.UNICODE_CHARACTER_CLASS);
+                } catch (PatternSyntaxException e) {
+                  log.log(Level.INFO, "Invalid regex pattern: " + r, e.getMessage());
+                  return null;
+                }
+              });
+
+      if (pattern == null) continue;
+
+      Matcher matcher = pattern.matcher(rawOutputByMode);
+      ArrayNode matchesArray = mapper.createArrayNode();
+
+      while (matcher.find()) {
+        JsonNode structured = buildStructuredJsonNode(contractOutputElement, matcher);
+        if (structured != null && contractOutputElement.getType().validate.apply(structured)) {
+          matchesArray.add(structured);
+        }
       }
-      resultNode = objectNode;
+
+      if (!matchesArray.isEmpty()) {
+        resultRoot.set(contractOutputElement.getKey(), matchesArray);
+      }
     }
 
-    return contractOutputElement.getType().toFindingValue.apply(resultNode);
+    return resultRoot;
+  }
+
+  private JsonNode buildStructuredJsonNode(ContractOutputElement element, Matcher matcher) {
+    ContractOutputType type = element.getType();
+
+    // Case: primitive types like Text, Number, IPv4, IPv6
+    if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
+      List<String> extracted = extractValues(element.getRegexGroups(), matcher);
+      if (type.technicalType == ContractOutputTechnicalType.Number && !extracted.isEmpty()) {
+        try {
+          return new IntNode(Integer.parseInt(extracted.get(0)));
+        } catch (NumberFormatException e) {
+          log.warning("Invalid number format: " + extracted.get(0));
+          return NullNode.getInstance();
+        }
+      }
+      return mapper.valueToTree(extracted.isEmpty() ? "" : extracted.get(0));
+    }
+
+    // Case: complex types like portscan, credentials, CVE
+    ObjectNode objectNode = mapper.createObjectNode();
+
+    for (ContractOutputField field : type.fields) {
+      Set<RegexGroup> matchingGroups =
+          element.getRegexGroups().stream()
+              .filter(rg -> rg.getField().equals(field.getKey()))
+              .collect(Collectors.toSet());
+
+      List<String> values = extractValues(matchingGroups, matcher);
+      JsonNode valueNode =
+          (field.getType() == ContractOutputTechnicalType.Number)
+              ? toNumericArray(values)
+              : mapper.valueToTree(values);
+
+      objectNode.set(field.getKey(), valueNode);
+    }
+
+    return objectNode;
+  }
+
+  private JsonNode toNumericArray(List<String> values) {
+    ArrayNode array = mapper.createArrayNode();
+    for (String v : values) {
+      try {
+        array.add(Integer.parseInt(v));
+      } catch (NumberFormatException e) {
+        log.warning("Invalid numeric value: " + v);
+      }
+    }
+    return array;
   }
 
   private List<String> extractValues(Set<RegexGroup> regexGroups, Matcher matcher) {

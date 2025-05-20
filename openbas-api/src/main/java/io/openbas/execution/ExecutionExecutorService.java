@@ -60,6 +60,7 @@ public class ExecutionExecutorService {
                               + agent.getExecutedByUser()
                               + " is inactive for the asset "
                               + agent.getAsset().getName(),
+                          null,
                           ExecutionTraceAction.COMPLETE,
                           agent,
                           null))
@@ -79,6 +80,7 @@ public class ExecutionExecutorService {
                               + agent.getExecutedByUser()
                               + " from the asset "
                               + agent.getAsset().getName(),
+                          null,
                           ExecutionTraceAction.COMPLETE,
                           agent,
                           null))
@@ -104,6 +106,7 @@ public class ExecutionExecutorService {
                             ExecutionTraceStatus.ERROR,
                             List.of(),
                             e.getMessage(),
+                            null,
                             ExecutionTraceAction.COMPLETE,
                             agent,
                             null))
@@ -124,6 +127,7 @@ public class ExecutionExecutorService {
                     ExecutionTraceStatus.ERROR,
                     List.of(),
                     e.getMessage(),
+                    null,
                     ExecutionTraceAction.COMPLETE,
                     e.getAgent(),
                     null));
