@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Log
 @RequiredArgsConstructor
 @Component
-public class StructuredOutputUtils {
+public class OutputStructuredUtils {
 
   @Resource private final ObjectMapper mapper;
 
@@ -46,7 +46,7 @@ public class StructuredOutputUtils {
     return "";
   }
 
-  public ObjectNode computeStructuredOutputUsingRegexRules(
+  public ObjectNode computeOutputStructuredUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
     ObjectNode resultRoot = mapper.createObjectNode();

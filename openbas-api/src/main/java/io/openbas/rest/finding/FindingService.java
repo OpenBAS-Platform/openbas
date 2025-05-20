@@ -79,20 +79,9 @@ public class FindingService {
     this.findingRepository.deleteById(id);
   }
 
-  // -- EXTRACTION FINDINGS --
-
-  public void computeFindings(ObjectNode structuredOutput, Inject inject, Agent agent) {
-    // Used for inject with payload
-    if (agent != null) {
-      extractFindingsFromRawOutput(structuredOutput, inject, agent);
-    }
-    // Used for injectors
-    extractFindingsFromStructuredOutput(structuredOutput, inject);
-  }
-
   // -- STRUCTURED OUTPUT --
 
-  public void extractFindingsFromStructuredOutput(ObjectNode structuredOutput, Inject inject) {
+  public void extractFindingsFromOutputStructured(ObjectNode outputStructured, Inject inject) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     List<Finding> findings = new ArrayList<>();
     // Get the contract
@@ -104,7 +93,7 @@ public class FindingService {
           contractOutput -> {
             if (contractOutput.isFindingCompatible()) {
               if (contractOutput.isMultiple()) {
-                JsonNode jsonNodes = structuredOutput.get(contractOutput.getField());
+                JsonNode jsonNodes = outputStructured.get(contractOutput.getField());
                 if (jsonNodes != null && jsonNodes.isArray()) {
                   for (JsonNode jsonNode : jsonNodes) {
                     if (!contractOutput.getType().validate.apply(jsonNode)) {
@@ -117,7 +106,7 @@ public class FindingService {
                   }
                 }
               } else {
-                JsonNode jsonNode = structuredOutput.get(contractOutput.getField());
+                JsonNode jsonNode = outputStructured.get(contractOutput.getField());
                 if (!contractOutput.getType().validate.apply(jsonNode)) {
                   throw new IllegalArgumentException("Finding not correctly formatted");
                 }
@@ -164,7 +153,14 @@ public class FindingService {
 
   // -- RAW OUTPUT --
 
-  public void extractFindingsFromRawOutput(JsonNode structuredOutput, Inject inject, Agent agent) {
-    // extractFindings(inject, agent.getAsset(), structuredOutput);
+  public void extractFindingsFromComputedOutputStructured(
+      JsonNode outputStructured, Inject inject, Agent agent) {
+    // extractFindings(inject, agent.getAsset(), outputStructured);
+    // while (matcher.find()) {
+    //                String finalValue = buildValue(contractOutputElement, matcher);
+    //                if (isValid(finalValue)) {
+    //                  buildFinding(inject, asset, contractOutputElement, finalValue);
+    //                }
+    //              }
   }
 }
