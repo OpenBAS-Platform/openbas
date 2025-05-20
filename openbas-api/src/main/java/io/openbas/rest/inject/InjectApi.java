@@ -230,7 +230,6 @@ public class InjectApi extends RestBehavior {
         @ApiResponse(
             responseCode = "200",
             description = "Target as option values fetched successfully"),
-        @ApiResponse(responseCode = "404", description = "The inject ID was not found"),
         @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
       })
   @LogExecutionTime
