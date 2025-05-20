@@ -88,6 +88,7 @@ public class CalderaResultCollectorService implements Runnable {
                           + " ("
                           + resultStatus.getContent()
                           + ")",
+                      null, // As result is fail, We dont apply outputParsers
                       ExecutionTraceAction.COMPLETE,
                       entry.getValue(),
                       resultStatus.getFinish()));
@@ -105,6 +106,7 @@ public class CalderaResultCollectorService implements Runnable {
                           + " ("
                           + resultStatus.getContent()
                           + ")",
+                      null, // resultStatus.getContent(), // TODO computeOutPutParser?
                       ExecutionTraceAction.COMPLETE,
                       entry.getValue(),
                       resultStatus.getFinish()));
@@ -121,6 +123,7 @@ public class CalderaResultCollectorService implements Runnable {
                       ExecutionTraceStatus.MAYBE_PREVENTED,
                       List.of(),
                       "Timeout on linkID " + entry.getKey() + ", injection has failed",
+                      null,
                       ExecutionTraceAction.COMPLETE,
                       entry.getValue(),
                       resultStatus.getFinish()));
