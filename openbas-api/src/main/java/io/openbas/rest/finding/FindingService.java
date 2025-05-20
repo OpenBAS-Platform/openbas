@@ -2,9 +2,7 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
-import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,7 +13,6 @@ import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.injector_contract.outputs.ContractOutputUtils;
-import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
@@ -84,46 +81,32 @@ public class FindingService {
 
   // -- EXTRACTION FINDINGS --
 
-  public void computeFindings(InjectExecutionInput input, Inject inject, Agent agent) {
+  public void computeFindings(ObjectNode structuredOutput, Inject inject, Agent agent) {
     // Used for inject with payload
     if (agent != null) {
-      extractFindingsFromRawOutput(input, inject, agent);
+      extractFindingsFromRawOutput(structuredOutput, inject, agent);
     }
     // Used for injectors
-    extractFindingsFromStructuredOutput(input, inject);
+    extractFindingsFromStructuredOutput(structuredOutput, inject);
   }
 
   // -- STRUCTURED OUTPUT --
 
-  public void extractFindingsFromStructuredOutput(InjectExecutionInput input, Inject inject) {
+  public void extractFindingsFromStructuredOutput(ObjectNode structuredOutput, Inject inject) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
-    if (input.getOutputStructured() != null) {
-      try {
-        List<Finding> findings = new ArrayList<>();
-        // Get the contract
-        InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-        List<ContractOutputElement> contractOutputs =
-            getContractOutputs(injectorContract.getConvertedContent(), mapper);
-        ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
-        if (!contractOutputs.isEmpty()) {
-          contractOutputs.forEach(
-              contractOutput -> {
-                if (contractOutput.isFindingCompatible()) {
-                  if (contractOutput.isMultiple()) {
-                    JsonNode jsonNodes = values.get(contractOutput.getField());
-                    if (jsonNodes != null && jsonNodes.isArray()) {
-                      for (JsonNode jsonNode : jsonNodes) {
-                        if (!contractOutput.getType().validate.apply(jsonNode)) {
-                          throw new IllegalArgumentException("Finding not correctly formatted");
-                        }
-                        Finding finding = ContractOutputUtils.createFinding(contractOutput);
-                        finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                        Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
-                        findings.add(linkedFinding);
-                      }
-                    }
-                  } else {
-                    JsonNode jsonNode = values.get(contractOutput.getField());
+    List<Finding> findings = new ArrayList<>();
+    // Get the contract
+    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+    List<ContractOutputElement> contractOutputs =
+        getContractOutputs(injectorContract.getConvertedContent(), mapper);
+    if (!contractOutputs.isEmpty()) {
+      contractOutputs.forEach(
+          contractOutput -> {
+            if (contractOutput.isFindingCompatible()) {
+              if (contractOutput.isMultiple()) {
+                JsonNode jsonNodes = structuredOutput.get(contractOutput.getField());
+                if (jsonNodes != null && jsonNodes.isArray()) {
+                  for (JsonNode jsonNode : jsonNodes) {
                     if (!contractOutput.getType().validate.apply(jsonNode)) {
                       throw new IllegalArgumentException("Finding not correctly formatted");
                     }
@@ -133,13 +116,20 @@ public class FindingService {
                     findings.add(linkedFinding);
                   }
                 }
-              });
-        }
-        this.createFindings(findings, inject.getId());
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
+              } else {
+                JsonNode jsonNode = structuredOutput.get(contractOutput.getField());
+                if (!contractOutput.getType().validate.apply(jsonNode)) {
+                  throw new IllegalArgumentException("Finding not correctly formatted");
+                }
+                Finding finding = ContractOutputUtils.createFinding(contractOutput);
+                finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
+                findings.add(linkedFinding);
+              }
+            }
+          });
     }
+    this.createFindings(findings, inject.getId());
   }
 
   private Finding linkFindings(
@@ -174,45 +164,7 @@ public class FindingService {
 
   // -- RAW OUTPUT --
 
-  public void extractFindingsFromRawOutput(InjectExecutionInput input, Inject inject, Agent agent) {
-    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      inject
-          .getPayload()
-          .ifPresent(
-              payload -> {
-                if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
-                  extractFindings(inject, agent.getAsset(), input.getMessage());
-                } else {
-                  log.info(
-                      "No output parsers available for payload used in inject:" + inject.getId());
-                }
-              });
-    }
-  }
-
-  private void extractFindings(Inject inject, Asset asset, String trace) {
-    inject
-        .getPayload()
-        .map(Payload::getOutputParsers)
-        .ifPresent(
-            outputParsers ->
-                outputParsers.forEach(
-                    outputParser -> {
-                      String rawOutputByMode =
-                          findingUtils.extractRawOutputByMode(trace, outputParser.getMode());
-                      if (rawOutputByMode == null) {
-                        return;
-                      }
-                      switch (outputParser.getType()) {
-                        case REGEX:
-                        default:
-                          findingUtils.computeFindingUsingRegexRules(
-                              inject,
-                              asset,
-                              rawOutputByMode,
-                              outputParser.getContractOutputElements());
-                          break;
-                      }
-                    }));
+  public void extractFindingsFromRawOutput(JsonNode structuredOutput, Inject inject, Agent agent) {
+    // extractFindings(inject, agent.getAsset(), structuredOutput);
   }
 }

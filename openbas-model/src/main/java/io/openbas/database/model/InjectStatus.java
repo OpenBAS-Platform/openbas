@@ -55,37 +55,47 @@ public class InjectStatus extends BaseInjectStatus {
     this.getTraces().add(trace);
   }
 
+  // Used for global traces of inject
   public void addTrace(
       ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
     ExecutionTrace newTrace =
-        new ExecutionTrace(this, status, List.of(), message, action, agent, null);
+        new ExecutionTrace(this, status, List.of(), message, null, action, agent, null);
     this.getTraces().add(newTrace);
   }
 
   public void addMayBePreventedTrace(String message, ExecutionTraceAction action, Agent agent) {
     ExecutionTrace newTrace =
         new ExecutionTrace(
-            this, ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, action, agent, null);
+            this,
+            ExecutionTraceStatus.MAYBE_PREVENTED,
+            List.of(),
+            message,
+            null,
+            action,
+            agent,
+            null);
     this.getTraces().add(newTrace);
   }
 
   public void addErrorTrace(String message, ExecutionTraceAction action) {
     ExecutionTrace newTrace =
         new ExecutionTrace(
-            this, ExecutionTraceStatus.ERROR, List.of(), message, action, null, null);
+            this, ExecutionTraceStatus.ERROR, List.of(), message, null, action, null, null);
     this.getTraces().add(newTrace);
   }
 
+  // todo check why not use executiontraces methodes?
   public void addInfoTrace(String message, ExecutionTraceAction action) {
     ExecutionTrace newTrace =
-        new ExecutionTrace(this, ExecutionTraceStatus.INFO, List.of(), message, action, null, null);
+        new ExecutionTrace(
+            this, ExecutionTraceStatus.INFO, List.of(), message, null, action, null, null);
     this.getTraces().add(newTrace);
   }
 
   public void addWarningTrace(String message, ExecutionTraceAction action) {
     ExecutionTrace newTrace =
         new ExecutionTrace(
-            this, ExecutionTraceStatus.WARNING, List.of(), message, action, null, null);
+            this, ExecutionTraceStatus.WARNING, List.of(), message, null, action, null, null);
     this.getTraces().add(newTrace);
   }
 }
