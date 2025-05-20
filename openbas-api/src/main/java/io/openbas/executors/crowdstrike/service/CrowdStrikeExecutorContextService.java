@@ -128,7 +128,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
                               + " (arch:"
                               + ((Endpoint) agent.getAsset()).getArch()
                               + ")",
-                          null,
                           ExecutionTraceAction.COMPLETE,
                           agent,
                           null))

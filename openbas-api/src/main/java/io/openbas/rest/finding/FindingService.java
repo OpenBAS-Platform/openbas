@@ -17,7 +17,10 @@ import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +84,7 @@ public class FindingService {
 
   // -- STRUCTURED OUTPUT --
 
-  public void extractFindingsFromOutputStructured(ObjectNode outputStructured, Inject inject) {
+  public void extractFindingsFromOutputStructured(Inject inject, ObjectNode outputStructured) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     List<Finding> findings = new ArrayList<>();
     // Get the contract
@@ -151,16 +154,31 @@ public class FindingService {
     return finding;
   }
 
-  // -- RAW OUTPUT --
-
   public void extractFindingsFromComputedOutputStructured(
-      JsonNode outputStructured, Inject inject, Agent agent) {
-    // extractFindings(inject, agent.getAsset(), outputStructured);
-    // while (matcher.find()) {
-    //                String finalValue = buildValue(contractOutputElement, matcher);
-    //                if (isValid(finalValue)) {
-    //                  buildFinding(inject, asset, contractOutputElement, finalValue);
-    //                }
-    //              }
+      Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode outputStructured) {
+
+    outputParsers.forEach(
+        outputParser -> {
+          outputParser
+              .getContractOutputElements()
+              .forEach(
+                  contractOutputElement -> {
+                    if (contractOutputElement.isFinding()) {
+                      JsonNode jsonNodes = outputStructured.get(contractOutputElement.getKey());
+                      if (jsonNodes != null && jsonNodes.isArray()) {
+                        for (JsonNode jsonNode : jsonNodes) {
+                          if (!contractOutputElement.getType().validate.apply(jsonNode)) {
+                            throw new IllegalArgumentException("Finding not correctly formatted");
+                          }
+                          findingUtils.buildFinding(
+                              inject,
+                              agent.getAsset(),
+                              contractOutputElement,
+                              contractOutputElement.getType().toFindingValue.apply(jsonNode));
+                        }
+                      }
+                    }
+                  });
+        });
   }
 }
