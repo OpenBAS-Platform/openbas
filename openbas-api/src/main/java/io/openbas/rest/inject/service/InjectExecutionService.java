@@ -1,7 +1,5 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,7 +11,6 @@ import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import jakarta.annotation.Resource;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
@@ -41,77 +38,32 @@ public class InjectExecutionService {
       inject = loadInjectOrThrow(injectId);
       Agent agent = loadAgentIfPresent(agentId);
 
-      ObjectNode outputStructured = computeOutputStructured(input, inject);
-      processInjectExecution(input, agent, inject, outputStructured);
+      Set<OutputParser> outputParsers = outputStructuredUtils.extractOutputParsers(inject);
+      ObjectNode outputStructured =
+          outputStructuredUtils.computeOutputStructured(outputParsers, input);
+
+      processInjectExecution(inject, agent, input, outputParsers, outputStructured);
     } catch (ElementNotFoundException | JsonProcessingException e) {
-      handleInjectExecutionError(e, inject);
+      handleInjectExecutionError(inject, e);
     }
   }
 
   private void processInjectExecution(
-      InjectExecutionInput input, Agent agent, Inject inject, ObjectNode outputStructured) {
+      Inject inject,
+      Agent agent,
+      InjectExecutionInput input,
+      Set<OutputParser> outputParsers,
+      ObjectNode outputStructured) {
     injectStatusService.updateInjectStatus(agent, inject, input, outputStructured);
 
     if (agent != null && outputStructured != null) {
-      findingService.extractFindingsFromComputedOutputStructured(outputStructured, inject, agent);
+      findingService.extractFindingsFromComputedOutputStructured(
+          inject, agent, outputParsers, outputStructured);
     }
     // From injectors
     if (input.getOutputStructured() != null) {
-      findingService.extractFindingsFromOutputStructured(outputStructured, inject);
+      findingService.extractFindingsFromOutputStructured(inject, outputStructured);
     }
-  }
-
-  private ObjectNode computeOutputStructured(InjectExecutionInput input, Inject inject)
-      throws JsonProcessingException {
-    if (input.getOutputStructured() != null) {
-      return mapper.readValue(input.getOutputStructured(), ObjectNode.class);
-    }
-
-    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      return computeOutputStructuredFromOutputParsers(inject, input.getMessage());
-    }
-
-    return null;
-  }
-
-  private ObjectNode computeOutputStructuredFromOutputParsers(Inject inject, String rawOutput) {
-    ObjectNode result = mapper.createObjectNode();
-
-    Optional<Payload> optionalPayload = inject.getPayload();
-    if (optionalPayload.isEmpty()) {
-      log.info("No payload found for inject: " + inject.getId());
-      return null;
-    }
-
-    Set<OutputParser> outputParsers = optionalPayload.get().getOutputParsers();
-    if (outputParsers == null || outputParsers.isEmpty()) {
-      log.info("No output parsers available for payload used in inject: " + inject.getId());
-      return null;
-    }
-
-    for (OutputParser outputParser : outputParsers) {
-      String rawOutputByMode =
-          outputStructuredUtils.extractRawOutputByMode(rawOutput, outputParser.getMode());
-      if (rawOutputByMode == null) {
-        continue;
-      }
-
-      ObjectNode parsed;
-      switch (outputParser.getType()) {
-        case REGEX:
-        default:
-          parsed =
-              outputStructuredUtils.computeOutputStructuredUsingRegexRules(
-                  rawOutputByMode, outputParser.getContractOutputElements());
-          break;
-      }
-
-      if (parsed != null) {
-        result.setAll(parsed);
-      }
-    }
-
-    return result.isEmpty() ? null : result;
   }
 
   private Agent loadAgentIfPresent(String agentId) {
@@ -128,7 +80,7 @@ public class InjectExecutionService {
         .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
   }
 
-  private void handleInjectExecutionError(Exception e, Inject inject) {
+  private void handleInjectExecutionError(Inject inject, Exception e) {
     log.log(Level.SEVERE, e.getMessage());
     if (inject != null) {
       inject
@@ -141,7 +93,6 @@ public class InjectExecutionService {
                         ExecutionTraceStatus.ERROR,
                         null,
                         e.getMessage(),
-                        null,
                         ExecutionTraceAction.COMPLETE,
                         null,
                         Instant.now());

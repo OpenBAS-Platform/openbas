@@ -64,7 +64,6 @@ public class InjectStatusService {
             ExecutionTraceStatus.INFO,
             null,
             message,
-            null,
             ExecutionTraceAction.START,
             agent,
             null);
@@ -107,15 +106,10 @@ public class InjectStatusService {
       ObjectNode outputStructured) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
-    return new ExecutionTrace(
-        injectStatus,
-        traceStatus,
-        null,
-        input.getMessage(),
-        outputStructured,
-        executionAction,
-        agent,
-        null);
+    ExecutionTrace base =
+        new ExecutionTrace(
+            injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
+    return ExecutionTrace.from(base, outputStructured);
   }
 
   private void computeExecutionTraceStatusIfNeeded(
