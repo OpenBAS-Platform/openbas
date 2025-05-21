@@ -96,11 +96,11 @@ const GroupManageUsers: FunctionComponent<Props> = ({
           values={userValues}
           selectedValues={selectedUserValues}
           elements={elements}
-          prefix="user"
           onSelect={addUser}
           onDelete={removeUser}
           paginationComponent={paginationComponent}
-          getName={(user: UserOutput) => resolveUserName(user)}
+          getId={element => element.user_id}
+          getName={(element: UserOutput) => resolveUserName(element)}
         />
         <div style={{
           float: 'right',

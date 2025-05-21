@@ -74,7 +74,7 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
       injectContext.onImportInjectFromXls?.(importId, input).then((value: ImportTestSummary) => {
         const criticalMessages = value.import_message?.filter((importMessage: ImportMessage) => importMessage.message_level === 'CRITICAL');
         if (criticalMessages && criticalMessages?.length > 0) {
-          MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
+          MESSAGING$.notifyError(t(criticalMessages[0].message_code || 'An unknown error occurred. Please contact your administrator or the OpenBAS maintainers.'), true);
         }
         onImportedInjects();
         handleXlsImportClose();

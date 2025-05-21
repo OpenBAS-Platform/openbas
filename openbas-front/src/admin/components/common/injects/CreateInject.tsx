@@ -116,7 +116,7 @@ const CreateInject: FunctionComponent<Props> = ({
       isSortable: false,
       value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <Tooltip title={tPick(contract.injector_contract_labels)}>
-          {tPick(contract.injector_contract_labels)}
+          <span>{tPick(contract.injector_contract_labels)}</span>
         </Tooltip>
       ),
     },
@@ -342,7 +342,6 @@ const CreateInject: FunctionComponent<Props> = ({
             )}
             content={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
           />
-
           <InjectForm
             handleClose={handleClose}
             disabled={!selectedContract}
@@ -371,7 +370,6 @@ const CreateInject: FunctionComponent<Props> = ({
             uriVariable={uriVariable}
             variablesFromExerciseOrScenario={variablesFromExerciseOrScenario}
           />
-
         </div>
       </>
     </Drawer>

@@ -1,8 +1,6 @@
-import { pathOr } from 'ramda';
+export const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
-export const random = (min, max) => Math.random() * (max - min) + min;
-
-export const numberFormat = (number, digits = 2) => {
+export const numberFormat = (number: number, digits = 2) => {
   const si = [
     {
       value: 1,
@@ -47,7 +45,7 @@ export const numberFormat = (number, digits = 2) => {
   };
 };
 
-export const bytesFormat = (number, digits = 2) => {
+export const bytesFormat = (number: number, digits = 2) => {
   const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
   const sizes = [' Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (number === 0) {
@@ -57,32 +55,10 @@ export const bytesFormat = (number, digits = 2) => {
       original: number,
     };
   }
-  const i = parseInt(Math.floor(Math.log(number) / Math.log(1024)), 10);
+  const i = Math.floor(Math.log(number) / Math.log(1024));
   return {
     number: (number / 1024 ** i).toFixed(digits).replace(rx, '$1'),
     symbol: sizes[i],
     original: number,
   };
-};
-
-export const setNumberOfElements = (
-  prevProps,
-  props,
-  key,
-  callback,
-  propKey = 'data',
-) => {
-  const currentNumberOfElements = pathOr(
-    0,
-    [key, 'pageInfo', 'globalCount'],
-    props[propKey],
-  );
-  const prevNumberOfElements = pathOr(
-    0,
-    [key, 'pageInfo', 'globalCount'],
-    prevProps[propKey],
-  );
-  if (currentNumberOfElements !== prevNumberOfElements) {
-    callback(numberFormat(currentNumberOfElements));
-  }
 };

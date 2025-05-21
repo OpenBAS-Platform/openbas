@@ -1,10 +1,10 @@
 import moment from 'moment-timezone';
-import { Component } from 'react';
-import { injectIntl, useIntl } from 'react-intl';
+import { Component, type ComponentType, type ReactNode } from 'react';
+import { injectIntl, type IntlShape, useIntl, type WrappedComponentProps } from 'react-intl';
 
-import { bytesFormat, numberFormat } from '../utils/Number';
+import { bytesFormat, numberFormat } from '../utils/number';
 
-export const isNone = (date) => {
+export const isNone = (date: moment.MomentInput) => {
   if (!date) return true;
   const parsedDate = moment(date).format();
   return (
@@ -15,23 +15,23 @@ export const isNone = (date) => {
 };
 
 // @Deprecated
-const inject18n = (WrappedComponent) => {
-  class InjectIntl extends Component {
+const inject18n = <P extends object>(WrappedComponent: ComponentType<P>) => {
+  class InjectIntl extends Component<P & WrappedComponentProps & { children: ReactNode }> {
     render() {
       const { children } = this.props;
-      const translate = (message, values) => this.props.intl.formatMessage({ id: message }, values);
-      const formatNumber = (number) => {
+      const translate = (message: string, values?: Record<string, string>) => this.props.intl.formatMessage({ id: message }, values);
+      const formatNumber = (number: number | '') => {
         if (number === null || number === '') {
           return '-';
         }
-        return `${this.props.intl.formatNumber(numberFormat(number).number)}${
+        return `${numberFormat(number).number}${
           numberFormat(number).symbol
         }`;
       };
-      const formatBytes = number => `${this.props.intl.formatNumber(bytesFormat(number).number)}${
+      const formatBytes = (number: number) => `${bytesFormat(number).number}${
         bytesFormat(number).symbol
       }`;
-      const longDate = (date) => {
+      const longDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -41,7 +41,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const longDateTime = (date) => {
+      const longDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -54,7 +54,7 @@ const inject18n = (WrappedComponent) => {
           hour: 'numeric',
         });
       };
-      const shortDate = (date) => {
+      const shortDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -64,7 +64,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const shortNumericDate = (date) => {
+      const shortNumericDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -74,7 +74,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const shortNumericDateTime = (date) => {
+      const shortNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -87,7 +87,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const veryShortNumericDateTime = (date) => {
+      const veryShortNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -99,7 +99,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const fullNumericDateTime = (date) => {
+      const fullNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -112,7 +112,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const standardDate = (date) => {
+      const standardDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -122,7 +122,7 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const monthDate = (date) => {
+      const monthDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -131,13 +131,13 @@ const inject18n = (WrappedComponent) => {
           year: 'numeric',
         });
       };
-      const monthTextDate = (date) => {
+      const monthTextDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
         return this.props.intl.formatDate(date, { month: 'long' });
       };
-      const yearDate = (date) => {
+      const yearDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
         if (isNone(date)) {
           return translate('None');
         }
@@ -148,8 +148,8 @@ const inject18n = (WrappedComponent) => {
           {...this.props}
           {...{ t: translate }}
           {...{
-            tPick: label => label[this.props.intl.locale]
-              ?? label[this.props.intl.defaultLocale],
+            tPick: (labels: Record<string, string>) => labels[this.props.intl.locale]
+              ?? labels[this.props.intl.defaultLocale],
           }}
           {...{ n: formatNumber }}
           {...{ b: formatBytes }}
@@ -174,21 +174,27 @@ const inject18n = (WrappedComponent) => {
   return injectIntl(InjectIntl);
 };
 
+export type Translate = {
+  (message: string, values?: Record<string, string>): string;
+  (message: string, values?: Record<string, ReactNode>): ReactNode[];
+};
+
 export const useFormatter = () => {
   const intl = useIntl();
-  const translate = (message, values) => intl.formatMessage({ id: message }, values);
-  const formatNumber = (number) => {
+  const translate: Translate = ((message, values) => intl.formatMessage({ id: message }, values)) as Translate;
+  const formatNumber = (number: number | '') => {
     if (number === null || number === '') {
       return '-';
     }
-    return `${intl.formatNumber(numberFormat(number).number)}${
+    const t = numberFormat(number).number;
+    return `${t}${
       numberFormat(number).symbol
     }`;
   };
-  const formatBytes = number => `${intl.formatNumber(bytesFormat(number).number)}${
+  const formatBytes = (number: number) => `${bytesFormat(number).number}${
     bytesFormat(number).symbol
   }`;
-  const longDate = (date) => {
+  const longDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -198,7 +204,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const longDateTime = (date) => {
+  const longDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -211,7 +217,7 @@ export const useFormatter = () => {
       hour: 'numeric',
     });
   };
-  const shortDate = (date) => {
+  const shortDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -221,7 +227,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const shortNumericDate = (date) => {
+  const shortNumericDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -231,7 +237,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const shortNumericDateTime = (date) => {
+  const shortNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -244,7 +250,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const veryShortNumericDateTime = (date) => {
+  const veryShortNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -256,7 +262,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const fullNumericDateTime = (date) => {
+  const fullNumericDateTime = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -269,14 +275,14 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const time = (date) => {
+  const time = (date: Parameters<IntlShape['formatDate']>[0]) => {
     return intl.formatTime(date, {
       second: 'numeric',
       minute: 'numeric',
       hour: 'numeric',
     });
   };
-  const standardDate = (date) => {
+  const standardDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -286,7 +292,7 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const monthDate = (date) => {
+  const monthDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -295,13 +301,13 @@ export const useFormatter = () => {
       year: 'numeric',
     });
   };
-  const monthTextDate = (date) => {
+  const monthTextDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
     return intl.formatDate(date, { month: 'long' });
   };
-  const yearDate = (date) => {
+  const yearDate = (date: Parameters<IntlShape['formatDate']>[0]) => {
     if (isNone(date)) {
       return translate('None');
     }
@@ -310,7 +316,7 @@ export const useFormatter = () => {
   return {
     t: translate,
     locale: intl.locale ?? intl.defaultLocale,
-    tPick: label => (label ? label[intl.locale] ?? label[intl.defaultLocale] : ''),
+    tPick: (labels?: Record<string, string>) => (labels ? labels[intl.locale] ?? labels[intl.defaultLocale] : ''),
     n: formatNumber,
     b: formatBytes,
     fld: longDate,

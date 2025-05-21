@@ -40,7 +40,7 @@ const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
     <Drawer
       open={open}
       handleClose={handleClose}
-      title={t(expectationResult.sourceName)}
+      title={t(expectationResult.sourceName || '-')}
     >
       <>
         <Typography variant="body1">

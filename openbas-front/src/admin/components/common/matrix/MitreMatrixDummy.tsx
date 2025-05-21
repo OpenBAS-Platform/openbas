@@ -6,7 +6,7 @@ import { type AttackPatternHelper } from '../../../../actions/attack_patterns/at
 import { type KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { useHelper } from '../../../../store';
 import { type AttackPattern, type KillChainPhase } from '../../../../utils/api-types';
-import { random } from '../../../../utils/Number';
+import { random } from '../../../../utils/number';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 
 const useStyles = makeStyles()(() => ({

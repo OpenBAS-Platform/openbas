@@ -111,7 +111,6 @@ const UpdateTeams: FunctionComponent<Props> = ({ addedTeamIds }) => {
               values={teamValues}
               selectedValues={selectedTeamValues}
               elements={elements}
-              prefix="team"
               onSelect={addTeam}
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
@@ -121,6 +120,8 @@ const UpdateTeams: FunctionComponent<Props> = ({ addedTeamIds }) => {
                   onCreate={team => setSelectedTeamValues([...selectedTeamValues, team as TeamOutput])}
                 />
               )}
+              getId={element => element.team_id}
+              getName={element => element.team_name}
             />
           </Box>
         </DialogContent>
