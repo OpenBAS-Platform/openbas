@@ -176,7 +176,7 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-    user: 999
+    user: postgres
     commands: 
       - touch /var/lib/postgresql/data/postgresql.conf
       - postgres -c 'max_connections=250'
