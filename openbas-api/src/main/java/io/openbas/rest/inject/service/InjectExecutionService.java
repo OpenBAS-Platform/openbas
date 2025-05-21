@@ -60,6 +60,7 @@ public class InjectExecutionService {
         findingService.extractFindingsFromComputedOutputStructured(
             inject, agent, outputParsers, structured);
       } else {
+        // From Injectors
         findingService.extractFindingsFromOutputStructured(inject, structured);
       }
     }
