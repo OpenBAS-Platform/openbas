@@ -156,10 +156,6 @@ public class OutputStructuredUtils {
     if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
       String extracted = extractValues(element.getRegexGroups(), matcher);
 
-      if (extracted == null || extracted.trim().isEmpty()) {
-        return Optional.empty();
-      }
-
       return type.technicalType == ContractOutputTechnicalType.Number
           ? Optional.of(toNumericValue(extracted))
           : Optional.of(mapper.valueToTree(extracted));
@@ -175,10 +171,6 @@ public class OutputStructuredUtils {
               .collect(Collectors.toSet());
 
       String concatedValues = extractValues(matchingGroups, matcher);
-
-      if (concatedValues == null || concatedValues.trim().isEmpty()) {
-        continue;
-      }
 
       JsonNode valueNode =
           (field.getType() == ContractOutputTechnicalType.Number)
