@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -59,7 +60,7 @@ public class ExecutionTrace implements Base {
 
   @Column(name = "execution_structured_message")
   @Convert(converter = ContentConverter.class)
-  @JsonProperty("execution_structured_message")
+  @JsonIgnore
   private ObjectNode structuredMessage;
 
   @Column(name = "execution_action")
