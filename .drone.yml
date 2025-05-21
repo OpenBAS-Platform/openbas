@@ -176,7 +176,7 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-    command: [ -N, 2000 ]
+    command: [ -c, 'max_connections=2000' ]
   - name: rabbitmq
     image: rabbitmq:4.1-management
     environment:
