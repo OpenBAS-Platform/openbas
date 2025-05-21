@@ -147,6 +147,7 @@ class InjectApiTest extends IntegrationTest {
     this.teamRepository.delete(TEAM);
     this.injectorContractRepository.deleteAll(
         List.of(PAYLOAD_INJECTOR_CONTRACT, PAYLOAD_INJECTOR_CONTRACT_2));
+    this.injectRepository.deleteAll();
   }
 
   // -- SCENARIOS --
