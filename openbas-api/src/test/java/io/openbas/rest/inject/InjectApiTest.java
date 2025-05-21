@@ -28,6 +28,7 @@ import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.helper.queue.BatchQueueService;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.ScenarioService;
@@ -52,6 +53,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -62,6 +64,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.ResourceUtils;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -759,6 +762,11 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Inject Execution Callback Handling (simulating a request from an implant)")
   class handleInjectExecutionCallback {
 
+    @SpyBean private InjectApi injectApi;
+
+    @Mock
+    private BatchQueueService<InjectExecutionCallback> injectExecutionCallbackBatchQueueService;
+
     private Inject getPendingInjectWithAssets() {
       return injectComposer
           .forInject(InjectFixture.getDefaultInject())
@@ -775,6 +783,10 @@ class InjectApiTest extends IntegrationTest {
 
     private void performCallbackRequest(String agentId, String injectId, InjectExecutionInput input)
         throws Exception {
+
+      mvc = MockMvcBuilders.standaloneSetup(injectApi).build();
+      injectApi.setInjectTraceQueueService(injectExecutionCallbackBatchQueueService);
+
       mvc.perform(
               post(INJECT_URI + "/execution/" + agentId + "/callback/" + injectId)
                   .content(asJsonString(input))
@@ -790,9 +802,9 @@ class InjectApiTest extends IntegrationTest {
     @DisplayName("Action Handling:")
     class ActionHandlingTest {
 
-      @DisplayName("Should add trace when process is not finished")
+      @DisplayName("Should publish a message when calling the endpoint")
       @Test
-      void shouldAddTraceWhenProcessNotFinished() throws Exception {
+      void shouldPushToRabbitMQ() throws Exception {
         // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         String logMessage = "First log received";
@@ -804,6 +816,38 @@ class InjectApiTest extends IntegrationTest {
         // -- EXECUTE --
         String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
         performCallbackRequest(agentId, inject.getId(), input);
+        InjectExecutionCallback injectExecutionCallback =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input)
+                .agentId(agentId)
+                .injectId(inject.getId())
+                .build();
+
+        // -- ASSERT --
+        verify(injectExecutionCallbackBatchQueueService)
+            .publish(mapper.writeValueAsString(injectExecutionCallback));
+      }
+
+      @DisplayName("Should add trace when process is not finished")
+      @Test
+      void shouldAddTraceWhenProcessNotFinished() {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        String logMessage = "First log received";
+        input.setMessage(logMessage);
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("SUCCESS");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        InjectExecutionCallback injectExecutionCallback =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input)
+                .agentId(agentId)
+                .injectId(inject.getId())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(List.of(injectExecutionCallback));
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
@@ -830,14 +874,26 @@ class InjectApiTest extends IntegrationTest {
 
         // -- EXECUTE --
         String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
-        performCallbackRequest(agentId, inject.getId(), input);
+        InjectExecutionCallback injectExecutionCallback1 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input)
+                .agentId(agentId)
+                .injectId(inject.getId())
+                .build();
 
         InjectExecutionInput input2 = new InjectExecutionInput();
         String lastLogMessage = "Complete log received";
         input2.setMessage(lastLogMessage);
         input2.setAction(InjectExecutionAction.complete);
         input2.setStatus("INFO");
-        performCallbackRequest(agentId, inject.getId(), input2);
+        InjectExecutionCallback injectExecutionCallback2 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input2)
+                .agentId(agentId)
+                .injectId(inject.getId())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(
+            List.of(injectExecutionCallback1, injectExecutionCallback2));
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
@@ -861,10 +917,10 @@ class InjectApiTest extends IntegrationTest {
       void shouldAddTraceComputeAgentStatusAndUpdateInjectStatusWhenAllAgentsFinish()
           throws Exception {
         // -- PREPARE --
-        InjectExecutionInput input = new InjectExecutionInput();
-        input.setMessage("First log received");
-        input.setAction(InjectExecutionAction.command_execution);
-        input.setStatus("COMMAND_NOT_FOUND");
+        InjectExecutionInput input1 = new InjectExecutionInput();
+        input1.setMessage("First log received");
+        input1.setAction(InjectExecutionAction.command_execution);
+        input1.setStatus("COMMAND_NOT_FOUND");
         Inject inject = getPendingInjectWithAssets();
 
         // -- EXECUTE --
@@ -872,17 +928,45 @@ class InjectApiTest extends IntegrationTest {
             ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
         String secondAgentId =
             ((Endpoint) inject.getAssets().getFirst()).getAgents().getLast().getId();
-        performCallbackRequest(firstAgentId, inject.getId(), input);
-        input.setStatus("SUCCESS");
-        performCallbackRequest(secondAgentId, inject.getId(), input);
+        InjectExecutionCallback injectExecutionCallback1 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input1)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
 
         InjectExecutionInput input2 = new InjectExecutionInput();
+        input2.setMessage("First log received");
+        input2.setAction(InjectExecutionAction.command_execution);
+        input2.setStatus("SUCCESS");
+        InjectExecutionCallback injectExecutionCallback2 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input2)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(
+            List.of(injectExecutionCallback1, injectExecutionCallback2));
+
+        InjectExecutionInput input3 = new InjectExecutionInput();
         String lastLogMessage = "Complete log received";
-        input2.setMessage(lastLogMessage);
-        input2.setAction(InjectExecutionAction.complete);
-        input2.setStatus("INFO");
-        performCallbackRequest(firstAgentId, inject.getId(), input2);
-        performCallbackRequest(secondAgentId, inject.getId(), input2);
+        input3.setMessage(lastLogMessage);
+        input3.setAction(InjectExecutionAction.complete);
+        input3.setStatus("INFO");
+        InjectExecutionCallback injectExecutionCallback3 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input3)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
+        InjectExecutionCallback injectExecutionCallback4 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input3)
+                .agentId(secondAgentId)
+                .injectId(inject.getId())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(
+            List.of(injectExecutionCallback3, injectExecutionCallback4));
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
@@ -902,22 +986,46 @@ class InjectApiTest extends IntegrationTest {
           ExecutionTraceStatus expectedAgentStatus)
           throws Exception {
         // -- PREPARE --
-        InjectExecutionInput input = new InjectExecutionInput();
-        input.setMessage("First log received");
-        input.setAction(InjectExecutionAction.command_execution);
-        input.setStatus(inputTraceStatus1);
+        InjectExecutionInput input1 = new InjectExecutionInput();
+        input1.setMessage("First log received");
+        input1.setAction(InjectExecutionAction.command_execution);
+        input1.setStatus(inputTraceStatus1);
         Inject inject = getPendingInjectWithAssets();
 
         // -- EXECUTE --
         String firstAgentId =
             ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
-        performCallbackRequest(firstAgentId, inject.getId(), input);
-        input.setStatus(inputTraceStatus2);
-        performCallbackRequest(firstAgentId, inject.getId(), input);
+        performCallbackRequest(firstAgentId, inject.getId(), input1);
+        InjectExecutionInput input2 = new InjectExecutionInput();
+        input2.setMessage("First log received");
+        input2.setAction(InjectExecutionAction.command_execution);
+        input2.setStatus(inputTraceStatus2);
         // send complete trace
-        input.setAction(InjectExecutionAction.complete);
-        input.setStatus("INFO");
-        performCallbackRequest(firstAgentId, inject.getId(), input);
+        InjectExecutionInput input3 = new InjectExecutionInput();
+        input3.setMessage("First log received");
+        input3.setAction(InjectExecutionAction.complete);
+        input3.setStatus("INFO");
+
+        InjectExecutionCallback injectExecutionCallback1 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input1)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
+        InjectExecutionCallback injectExecutionCallback2 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input2)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
+        InjectExecutionCallback injectExecutionCallback3 =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input3)
+                .agentId(firstAgentId)
+                .injectId(inject.getId())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(
+            List.of(injectExecutionCallback1, injectExecutionCallback2, injectExecutionCallback3));
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();

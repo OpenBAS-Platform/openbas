@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -82,7 +83,8 @@ public class InjectApi extends RestBehavior {
   private final OpenBASConfig openBASConfig;
   private final ObjectMapper objectMapper;
 
-  private BatchQueueService<InjectExecutionCallback> injectTraceQueueService;
+  // For testing purpose, we add a setter
+  @Setter private BatchQueueService<InjectExecutionCallback> injectTraceQueueService;
 
   @PostConstruct
   public void init() throws IOException, TimeoutException {
@@ -341,7 +343,7 @@ public class InjectApi extends RestBehavior {
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
   public void injectExecutionCallback(
       @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input)
-      throws IOException, TimeoutException {
+      throws IOException {
     injectExecutionCallback(null, injectId, input);
   }
 
