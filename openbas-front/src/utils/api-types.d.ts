@@ -1304,7 +1304,6 @@ export interface ExecutionTrace {
     | "MAYBE_PARTIAL_PREVENTED"
     | "AGENT_INACTIVE"
     | "INFO";
-  execution_structured_message?: object;
   /** @format date-time */
   execution_time?: string;
   execution_trace_id: string;
