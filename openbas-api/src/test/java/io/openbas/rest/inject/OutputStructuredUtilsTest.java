@@ -1,6 +1,7 @@
-package io.openbas.rest.finding;
+package io.openbas.rest.inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,12 +41,12 @@ class OutputStructuredUtilsTest {
   }
 
   @Test
-  @DisplayName("Should return an empty string for a raw output empty")
-  void given_a_raw_output_empty_should_return_empty() {
+  @DisplayName("Should return null string for a raw output empty")
+  void given_a_raw_output_empty_should_return_null() {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Empty output");
     regexGroup.setIndexValues("$2");
-    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "Text", "^(\\S+)", "");
+    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "Text", "^(\\S+)", null);
   }
 
   @Test
@@ -64,8 +65,8 @@ class OutputStructuredUtilsTest {
   }
 
   @Test
-  @DisplayName("Should return empty for a non-numeric index")
-  void given_an_index_no_numerical_should_return_empty() {
+  @DisplayName("Should return null for a non-numeric index")
+  void given_an_index_no_numerical_should_return_null() {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Non-numeric Index");
     regexGroup.setIndexValues("$t");
@@ -75,7 +76,7 @@ class OutputStructuredUtilsTest {
         ContractOutputType.Text,
         "Text",
         "^(\\S+)",
-        "");
+        null);
   }
 
   @Test
@@ -299,6 +300,10 @@ class OutputStructuredUtilsTest {
         outputStructuredUtils.computeOutputStructuredFromOutputParsers(
             Set.of(outputParser), jsonInput);
 
-    assertEquals(expected, result.get(key).toString());
+    if (expected == null) {
+      assertNull(result);
+    } else {
+      assertEquals(expected, result.get(key).toString());
+    }
   }
 }
