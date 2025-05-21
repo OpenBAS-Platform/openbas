@@ -47,6 +47,8 @@ const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabl
     if (injectTeamIds.length > 0) {
       findTeams(injectTeamIds).then(result =>
         setTeams(result.data.sort((a: TeamOutput, b: TeamOutput) => a.team_name.localeCompare(b.team_name))));
+    } else {
+      setTeams([]);
     }
   }, [injectTeamIds]);
 

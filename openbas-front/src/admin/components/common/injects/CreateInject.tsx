@@ -242,7 +242,7 @@ const CreateInject: FunctionComponent<Props> = ({
       disableEnforceFocus
       containerStyle={{
         display: 'grid',
-        gridTemplateColumns: '60% 40%',
+        gridTemplateColumns: '60% auto',
         gap: theme.spacing(2),
       }}
     >

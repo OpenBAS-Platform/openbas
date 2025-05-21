@@ -74,7 +74,7 @@ type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
 
 interface Props {
   handleClose: () => void;
-  openDetail?: boolean;
+  openDetails?: boolean;
   disabled?: boolean;
   isAtomic: boolean;
   isCreation?: boolean;
@@ -89,7 +89,7 @@ interface Props {
 
 const InjectForm = ({
   handleClose,
-  openDetail = false,
+  openDetails = false,
   disabled = false,
   isAtomic,
   isCreation = false,
@@ -105,7 +105,7 @@ const InjectForm = ({
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
-  const [openDetails, setOpenDetails] = useState(openDetail);
+  const [openDetailContent, setOpenDetailContent] = useState(openDetails);
   const notDynamicFields = [
     'teams',
     'assets',
@@ -116,10 +116,10 @@ const InjectForm = ({
     'expectations',
   ];
   const toggleInjectContent = () => {
-    if (openDetails && drawerRef.current) {
+    if (openDetailContent && drawerRef.current) {
       drawerRef.current.scrollTop = 0;
     }
-    setOpenDetails(!openDetails);
+    setOpenDetailContent(!openDetailContent);
   };
 
   const getInitialValues = (): Record<string, FieldValue> => {
@@ -231,7 +231,7 @@ const InjectForm = ({
   useEffect(() => {
     const initialValues = getInitialValues();
     setDefaultValues(initialValues);
-    setOpenDetails(false);
+    setOpenDetailContent(openDetails);
     reset(initialValues);
   }, [injectorContractContent]);
 
@@ -260,7 +260,7 @@ const InjectForm = ({
           </div>
         )}
 
-        {injectorContractContent && openDetails && (
+        {injectorContractContent && openDetailContent && (
           <InjectContentForm
             injectorContractContent={injectorContractContent}
             readOnly={isSubmitting || disabled || permissions.readOnly}
@@ -276,7 +276,7 @@ const InjectForm = ({
             onClick={toggleInjectContent}
             className={classes.injectContentButton}
           >
-            {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+            {openDetailContent ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
             {t('Inject content')}
           </Button>
         )}

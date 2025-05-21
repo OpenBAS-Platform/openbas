@@ -54,6 +54,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
       });
     } else {
       setLoading(false);
+      setAssetGroupValues([]);
     }
   }, [assetGroupIds]);
 

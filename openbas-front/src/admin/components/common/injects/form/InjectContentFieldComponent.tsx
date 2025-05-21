@@ -113,8 +113,8 @@ const InjectContentFieldComponent = ({
         const makeChoiceItems = (entries: [string, string][]) =>
           entries.toSorted((a, b) => a[1].localeCompare(b[1]))
             .map(([k, v]) => ({
-              value: v,
-              label: t(k || 'Unknown'),
+              value: k,
+              label: t(v || 'Unknown'),
             }));
 
         if (fieldType === 'dependency-select') {
