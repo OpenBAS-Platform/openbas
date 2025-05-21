@@ -194,7 +194,7 @@ export interface AssetGroup {
   asset_group_description?: string;
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
-  asset_group_dynamic_filter?: FilterGroup;
+  asset_group_dynamic_filter: FilterGroup;
   asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_injects?: string[];

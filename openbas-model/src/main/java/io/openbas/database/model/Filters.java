@@ -36,6 +36,19 @@ public class Filters {
     @NotNull private FilterMode mode; // Between filters
     private List<Filter> filters = new ArrayList<>();
 
+    /**
+     * asset_group_dynamic_filter in AssetGroup is now not null so we added a default not null value
+     * for the java object AssetGroup and the SQL table asset_groups Tests to protect this are
+     * implemented in AssetGroupApiTest Don't forget to update the default value for each case
+     * described above if needed !
+     */
+    public static FilterGroup defaultFilterGroup() {
+      FilterGroup filterGroup = new FilterGroup();
+      filterGroup.setMode(FilterMode.and);
+      filterGroup.setFilters(new ArrayList<>());
+      return filterGroup;
+    }
+
     // -- UTILS --
 
     public Optional<Filter> findByKey(@NotBlank final String filterKey) {

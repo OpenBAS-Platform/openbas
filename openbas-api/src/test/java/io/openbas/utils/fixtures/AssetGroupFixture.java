@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.Filters;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,15 @@ public class AssetGroupFixture {
     assetGroupInput.setName(name);
     assetGroupInput.setDescription("An asset group");
     assetGroupInput.setTagIds(tagIds);
+    return assetGroupInput;
+  }
+
+  public static AssetGroupInput createAssetGroupWithDynamicFilters(
+      @NotNull final String name, @NotNull final Filters.FilterGroup dynamicFilter) {
+    AssetGroupInput assetGroupInput = new AssetGroupInput();
+    assetGroupInput.setName(name);
+    assetGroupInput.setDescription("An asset group");
+    assetGroupInput.setDynamicFilter(dynamicFilter);
     return assetGroupInput;
   }
 

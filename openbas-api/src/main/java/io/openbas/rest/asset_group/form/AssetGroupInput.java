@@ -25,5 +25,5 @@ public class AssetGroupInput {
   private List<String> tagIds = new ArrayList<>();
 
   @JsonProperty("asset_group_dynamic_filter")
-  private FilterGroup dynamicFilter;
+  private FilterGroup dynamicFilter = FilterGroup.defaultFilterGroup();
 }
