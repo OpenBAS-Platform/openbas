@@ -1,5 +1,6 @@
 package io.openbas.rest.inject_expectation;
 
+import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.PREVENTED;
 import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_ID;
 import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_NAME;
 import static java.util.Collections.emptyList;
@@ -10,16 +11,23 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.AgentComposer;
+import io.openbas.utils.fixtures.composers.EndpointComposer;
+import io.openbas.utils.fixtures.composers.InjectComposer;
+import io.openbas.utils.fixtures.composers.InjectExpectationComposer;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +38,12 @@ class InjectExpectationServiceTest extends IntegrationTest {
   static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
 
   // Saved entities for test setup
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectExpectationComposer injectExpectationComposer;
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private EntityManager entityManager;
+
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectorRepository injectorRepository;
@@ -37,6 +51,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
   @Autowired private AssetRepository assetRepository;
   @Autowired private AssetGroupRepository assetGroupRepository;
   @Autowired private AgentRepository agentRepository;
+
   @Autowired private InjectExpectationService injectExpectationService;
 
   private static Injector savedInjector;
@@ -327,5 +342,92 @@ class InjectExpectationServiceTest extends IntegrationTest {
             .findAllByInjectAndAssetGroupAndAgent(
                 savedInject.getId(), savedAssetGroup.getId(), savedAgent1.getId())
             .size());
+  }
+
+  @Transactional
+  @Nested
+  @DisplayName("Verify Result label for InjectExpectation at asset level")
+  class ResultLabelInjectExpectation {
+
+    @Test
+    @DisplayName("InjectExpectation Asset should be Prevented")
+    void
+        given_expectation_agent_prevented_when_compute_asset_expectation_then_asset_expectation_should_be_prevented() {
+      assertAssetExpectationResult(
+          InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+          InjectExpectation.EXPECTATION_STATUS.PENDING,
+          InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+          PREVENTED,
+          100D);
+    }
+
+    @Test
+    @DisplayName("InjectExpectation Asset should be Not Detected")
+    void
+        given_expectation_agent_not_detected_when_compute_asset_expectation_then_asset_expectation_should_be_not_detected() {
+      assertAssetExpectationResult(
+          InjectExpectation.EXPECTATION_TYPE.DETECTION,
+          InjectExpectation.EXPECTATION_STATUS.PENDING,
+          InjectExpectation.EXPECTATION_STATUS.FAILED,
+          ExpectationType.DETECTION.failureLabel,
+          0D);
+    }
+
+    private void assertAssetExpectationResult(
+        InjectExpectation.EXPECTATION_TYPE expectationType,
+        InjectExpectation.EXPECTATION_STATUS assetStatus,
+        InjectExpectation.EXPECTATION_STATUS agentStatus,
+        String expectedResult,
+        Double score) {
+      AgentComposer.Composer agent =
+          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+      EndpointComposer.Composer endpoint =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).withAgent(agent);
+
+      InjectExpectation assetExpectation =
+          InjectExpectationFixture.createExpectationWithTypeAndStatus(expectationType, assetStatus);
+
+      InjectExpectation agentExpectation =
+          InjectExpectationFixture.createExpectationWithTypeAndStatus(expectationType, agentStatus);
+
+      agentExpectation.setResults(
+          List.of(
+              InjectExpectationResult.builder()
+                  .sourceType("sourceType")
+                  .sourceName("sourceName")
+                  .sourceId("sourceId")
+                  .score(score)
+                  .result(expectedResult)
+                  .build()));
+
+      Inject inject =
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withEndpoint(endpoint)
+              .withExpectation(
+                  injectExpectationComposer
+                      .forExpectation(agentExpectation)
+                      .withAgent(agent)
+                      .withEndpoint(endpoint))
+              .withExpectation(
+                  injectExpectationComposer.forExpectation(assetExpectation).withEndpoint(endpoint))
+              .persist()
+              .get();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      injectExpectationService.computeExpectationAsset(
+          assetExpectation, List.of(agentExpectation), "sourceId", "sourceType", "sourceName");
+
+      List<InjectExpectation> savedExpectations =
+          injectExpectationRepository.findAllByInjectAndAsset(
+              inject.getId(), endpoint.get().getId());
+
+      assertEquals(
+          expectedResult,
+          savedExpectations.get(0).getResults().get(0).getResult(),
+          "Asset expectation result should match expected");
+    }
   }
 }
