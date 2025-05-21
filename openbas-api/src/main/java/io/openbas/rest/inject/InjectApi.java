@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -361,6 +362,7 @@ public class InjectApi extends RestBehavior {
                 .injectExecutionInput(input)
                 .agentId(agentId)
                 .injectId(injectId)
+                .emissionDate(Instant.now())
                 .build());
 
     injectTraceQueueService.publish(inputAsString);
