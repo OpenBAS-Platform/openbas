@@ -176,10 +176,7 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-    user: postgres
-    commands: 
-      - touch /var/lib/postgresql/data/postgresql.conf
-      - postgres -c 'max_connections=250'
+    command: ["postgres"]
   - name: rabbitmq
     image: rabbitmq:4.1-management
     environment:
