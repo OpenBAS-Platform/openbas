@@ -176,7 +176,8 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-    command: [psql]
+    command:
+      - sed -i "s/max_connections = .*/max_connections = 500/i" /var/lib/postgresql/data/pgdata/postgresql.conf
   - name: rabbitmq
     image: rabbitmq:4.1-management
     environment:
