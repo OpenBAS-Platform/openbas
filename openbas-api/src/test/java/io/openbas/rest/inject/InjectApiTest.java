@@ -816,16 +816,9 @@ class InjectApiTest extends IntegrationTest {
         // -- EXECUTE --
         String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
         performCallbackRequest(agentId, inject.getId(), input);
-        InjectExecutionCallback injectExecutionCallback =
-            InjectExecutionCallback.builder()
-                .injectExecutionInput(input)
-                .agentId(agentId)
-                .injectId(inject.getId())
-                .build();
 
         // -- ASSERT --
-        verify(injectExecutionCallbackBatchQueueService)
-            .publish(mapper.writeValueAsString(injectExecutionCallback));
+        verify(injectExecutionCallbackBatchQueueService).publish(anyString());
       }
 
       @DisplayName("Should add trace when process is not finished")
@@ -846,6 +839,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input)
                 .agentId(agentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         injectStatusService.handleInjectExecutionCallbackList(List.of(injectExecutionCallback));
 
@@ -879,6 +873,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input)
                 .agentId(agentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
 
         InjectExecutionInput input2 = new InjectExecutionInput();
@@ -891,6 +886,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input2)
                 .agentId(agentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         injectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback1, injectExecutionCallback2));
@@ -933,6 +929,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input1)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
 
         InjectExecutionInput input2 = new InjectExecutionInput();
@@ -942,8 +939,9 @@ class InjectApiTest extends IntegrationTest {
         InjectExecutionCallback injectExecutionCallback2 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input2)
-                .agentId(firstAgentId)
+                .agentId(secondAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         injectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback1, injectExecutionCallback2));
@@ -958,12 +956,14 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         InjectExecutionCallback injectExecutionCallback4 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input3)
                 .agentId(secondAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         injectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback3, injectExecutionCallback4));
@@ -1011,18 +1011,21 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input1)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         InjectExecutionCallback injectExecutionCallback2 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input2)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         InjectExecutionCallback injectExecutionCallback3 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
+                .emissionDate(Instant.now())
                 .build();
         injectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback1, injectExecutionCallback2, injectExecutionCallback3));

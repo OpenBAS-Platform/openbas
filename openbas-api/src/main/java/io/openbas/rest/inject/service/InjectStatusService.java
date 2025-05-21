@@ -139,10 +139,15 @@ public class InjectStatusService {
   public void handleInjectExecutionCallbackList(
       List<InjectExecutionCallback> injectExecutionCallbacks) {
 
+    List<InjectExecutionCallback> sortedInjectExecutionCallbacks =
+        injectExecutionCallbacks.stream()
+            .sorted(Comparator.comparing(InjectExecutionCallback::getEmissionDate))
+            .toList();
+
     Map<String, Inject> injects =
         injectRepository
             .findAllById(
-                injectExecutionCallbacks.stream()
+                sortedInjectExecutionCallbacks.stream()
                     .map(InjectExecutionCallback::getInjectId)
                     .filter(Objects::nonNull)
                     .toList())
@@ -153,7 +158,7 @@ public class InjectStatusService {
         StreamSupport.stream(
                 agentRepository
                     .findAllById(
-                        injectExecutionCallbacks.stream()
+                        sortedInjectExecutionCallbacks.stream()
                             .map(InjectExecutionCallback::getAgentId)
                             .filter(Objects::nonNull)
                             .toList())
@@ -163,7 +168,7 @@ public class InjectStatusService {
 
     List<Inject> injectsToSave = new ArrayList<>();
 
-    for (InjectExecutionCallback injectExecutionCallback : injectExecutionCallbacks) {
+    for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
       try {
         Inject inject = injects.get(injectExecutionCallback.getInjectId());
 
@@ -210,7 +215,7 @@ public class InjectStatusService {
 
     injectRepository.saveAll(injectsToSave.stream().distinct().toList());
 
-    for (InjectExecutionCallback injectExecutionCallback : injectExecutionCallbacks) {
+    for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
       Inject inject = injects.get(injectExecutionCallback.getInjectId());
 
       if (inject == null) {

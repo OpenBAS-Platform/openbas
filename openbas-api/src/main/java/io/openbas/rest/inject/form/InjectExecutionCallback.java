@@ -1,6 +1,7 @@
 package io.openbas.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,4 +16,7 @@ public class InjectExecutionCallback {
 
   @JsonProperty("inject_execution_input")
   private InjectExecutionInput injectExecutionInput;
+
+  @JsonProperty("execution_emission_date")
+  private Instant emissionDate;
 }
