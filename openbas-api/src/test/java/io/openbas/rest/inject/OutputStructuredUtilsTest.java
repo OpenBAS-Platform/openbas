@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.service.OutputStructuredUtils;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -296,14 +297,14 @@ class OutputStructuredUtilsTest {
     stdoutNode.put("stdout", input);
     String jsonInput = stdoutNode.toString();
 
-    ObjectNode result =
+    Optional<ObjectNode> result =
         outputStructuredUtils.computeOutputStructuredFromOutputParsers(
             Set.of(outputParser), jsonInput);
 
     if (expected == null) {
       assertNull(result);
     } else {
-      assertEquals(expected, result.get(key).toString());
+      assertEquals(expected, result.get().get(key).toString());
     }
   }
 }
