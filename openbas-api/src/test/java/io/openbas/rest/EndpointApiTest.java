@@ -294,7 +294,7 @@ class EndpointApiTest extends IntegrationTest {
     JSONArray jsonArray = new JSONArray(response);
 
     // --ASSERT--
-    // assertEquals(expectedNumberOfResults, jsonArray.length());
+    assertEquals(expectedNumberOfResults, jsonArray.length());
   }
 
   Stream<Arguments> optionsByIdTestParameters() {

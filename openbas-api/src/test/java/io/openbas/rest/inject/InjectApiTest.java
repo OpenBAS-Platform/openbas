@@ -784,10 +784,11 @@ class InjectApiTest extends IntegrationTest {
     private void performCallbackRequest(String agentId, String injectId, InjectExecutionInput input)
         throws Exception {
 
-      mvc = MockMvcBuilders.standaloneSetup(injectApi).build();
+      MockMvc currentMvc = MockMvcBuilders.standaloneSetup(injectApi).build();
       injectApi.setInjectTraceQueueService(injectExecutionCallbackBatchQueueService);
 
-      mvc.perform(
+      currentMvc
+          .perform(
               post(INJECT_URI + "/execution/" + agentId + "/callback/" + injectId)
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
