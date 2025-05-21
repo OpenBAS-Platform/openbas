@@ -155,11 +155,13 @@ public class OutputStructuredUtils {
     // Case: primitive types like Text, Number, IPv4, IPv6
     if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
       String extracted = extractValues(element.getRegexGroups(), matcher);
-      if (type.technicalType == ContractOutputTechnicalType.Number && !extracted.isEmpty()) {
-        return Optional.of(toNumericValue(extracted));
+
+      if (extracted == null || extracted.trim().isEmpty()) {
+        return Optional.empty();
       }
-      return null == extracted || extracted.isEmpty()
-          ? Optional.empty()
+
+      return type.technicalType == ContractOutputTechnicalType.Number
+          ? Optional.of(toNumericValue(extracted))
           : Optional.of(mapper.valueToTree(extracted));
     }
 
@@ -173,6 +175,11 @@ public class OutputStructuredUtils {
               .collect(Collectors.toSet());
 
       String concatedValues = extractValues(matchingGroups, matcher);
+
+      if (concatedValues == null || concatedValues.trim().isEmpty()) {
+        continue;
+      }
+
       JsonNode valueNode =
           (field.getType() == ContractOutputTechnicalType.Number)
               ? toNumericValue(concatedValues)
