@@ -156,6 +156,10 @@ public class OutputStructuredUtils {
     if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
       String extracted = extractValues(element.getRegexGroups(), matcher);
 
+      if (extracted == null) {
+        return Optional.empty();
+      }
+
       return type.technicalType == ContractOutputTechnicalType.Number
           ? Optional.of(toNumericValue(extracted))
           : Optional.of(mapper.valueToTree(extracted));
