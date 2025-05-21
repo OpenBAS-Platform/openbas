@@ -301,8 +301,8 @@ class OutputStructuredUtilsTest {
         outputStructuredUtils.computeOutputStructuredFromOutputParsers(
             Set.of(outputParser), jsonInput);
 
-    if (expected == null) {
-      assertNull(result.get());
+    if (result.isEmpty()) {
+      assertNull(expected);
     } else {
       assertEquals(expected, result.get().get(key).toString());
     }
