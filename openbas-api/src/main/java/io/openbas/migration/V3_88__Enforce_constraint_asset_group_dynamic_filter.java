@@ -13,8 +13,8 @@ public class V3_88__Enforce_constraint_asset_group_dynamic_filter extends BaseJa
     try (Statement statement = context.getConnection().createStatement()) {
       statement.execute(
           """
-          ALTER TABLE asset_groups ALTER COLUMN asset_group_dynamic_filter SET DEFAULT '{"mode":"or","filters":[]}';
-          UPDATE asset_groups SET asset_group_dynamic_filter = '{"mode":"or","filters":[]}' where asset_group_dynamic_filter IS NULL;
+          ALTER TABLE asset_groups ALTER COLUMN asset_group_dynamic_filter SET DEFAULT '{"mode":"and","filters":[]}';
+          UPDATE asset_groups SET asset_group_dynamic_filter = '{"mode":"and","filters":[]}' where asset_group_dynamic_filter IS NULL;
           ALTER TABLE asset_groups ALTER COLUMN asset_group_dynamic_filter SET NOT NULL;
           """);
     }

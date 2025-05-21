@@ -4,6 +4,7 @@ import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.AssetGroupFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -20,6 +21,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ class AssetGroupApiTest extends IntegrationTest {
   @Autowired private TagRepository tagRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseService exerciseService;
+  @Autowired private EntityManager entityManager;
 
   @DisplayName(
       "Given valid AssetGroupInput, should create and get assetGroup without dynamic filter successfully")
@@ -57,6 +60,7 @@ class AssetGroupApiTest extends IntegrationTest {
     // -- PREPARE --
     Tag tag = tagRepository.save(TagFixture.getTag());
     AssetGroupInput assetGroupInput = createAssetGroupWithTags("Asset group", List.of(tag.getId()));
+    Filters.FilterGroup filterGroupExpected = Filters.FilterGroup.defaultFilterGroup();
 
     // --EXECUTE--
     String response =
@@ -71,14 +75,13 @@ class AssetGroupApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(assetGroupInput.getName(), JsonPath.read(response, "$.asset_group_name"));
-    assertEquals(
-        assetGroupInput.getDescription(), JsonPath.read(response, "$.asset_group_description"));
+    assertThatJson(response).node("asset_group_name").isEqualTo(assetGroupInput.getName());
+    assertThatJson(response)
+        .node("asset_group_description")
+        .isEqualTo(assetGroupInput.getDescription());
     // Check default because null in the input
-    assertEquals(
-        "{mode=or, filters=[]}",
-        JsonPath.read(response, "$.asset_group_dynamic_filter").toString());
-    assertEquals(tag.getId(), JsonPath.read(response, "$.asset_group_tags[0]"));
+    assertThatJson(response).node("asset_group_dynamic_filter").isEqualTo(filterGroupExpected);
+    assertThatJson(response).node("asset_group_tags[0]").isEqualTo(tag.getId());
 
     // --EXECUTE--
     String response2 =
@@ -92,14 +95,13 @@ class AssetGroupApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(assetGroupInput.getName(), JsonPath.read(response2, "$.asset_group_name"));
-    assertEquals(
-        assetGroupInput.getDescription(), JsonPath.read(response2, "$.asset_group_description"));
+    assertThatJson(response2).node("asset_group_name").isEqualTo(assetGroupInput.getName());
+    assertThatJson(response2)
+        .node("asset_group_description")
+        .isEqualTo(assetGroupInput.getDescription());
     // Check default because null in the input
-    assertEquals(
-        "{mode=or, filters=[]}",
-        JsonPath.read(response2, "$.asset_group_dynamic_filter").toString());
-    assertEquals(tag.getId(), JsonPath.read(response2, "$.asset_group_tags[0]"));
+    assertThatJson(response2).node("asset_group_dynamic_filter").isEqualTo(filterGroupExpected);
+    assertThatJson(response2).node("asset_group_tags[0]").isEqualTo(tag.getId());
   }
 
   @DisplayName(
@@ -109,7 +111,16 @@ class AssetGroupApiTest extends IntegrationTest {
   void given_validAssetGroupInput_should_createAndGetAssetGroupWithDynamicFilterSuccessfully()
       throws Exception {
     // -- PREPARE --
-    AssetGroupInput assetGroupInput = createAssetGroupWithDynamicFilters("Asset group");
+    Filters.FilterGroup dynamicFilter = new Filters.FilterGroup();
+    dynamicFilter.setMode(Filters.FilterMode.or);
+    Filters.Filter filter = new Filters.Filter();
+    filter.setKey("endpoint_platform");
+    filter.setMode(Filters.FilterMode.or);
+    filter.setOperator(Filters.FilterOperator.eq);
+    filter.setValues(List.of("Windows"));
+    dynamicFilter.setFilters(List.of(filter));
+    AssetGroupInput assetGroupInput =
+        createAssetGroupWithDynamicFilters("Asset group", dynamicFilter);
 
     // --EXECUTE--
     String response =
@@ -124,12 +135,12 @@ class AssetGroupApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(assetGroupInput.getName(), JsonPath.read(response, "$.asset_group_name"));
-    assertEquals(
-        assetGroupInput.getDescription(), JsonPath.read(response, "$.asset_group_description"));
-    assertEquals(
-        "{mode=or, filters=[{\"key\":\"endpoint_platform\",\"mode\":\"or\",\"values\":[\"Windows\"],\"operator\":\"eq\"}]}",
-        JsonPath.read(response, "$.asset_group_dynamic_filter").toString());
+    assertThatJson(response).node("asset_group_name").isEqualTo(assetGroupInput.getName());
+    assertThatJson(response)
+        .node("asset_group_description")
+        .isEqualTo(assetGroupInput.getDescription());
+    // Check default because null in the input
+    assertThatJson(response).node("asset_group_dynamic_filter").isEqualTo(dynamicFilter);
 
     // --EXECUTE--
     String response2 =
@@ -143,12 +154,51 @@ class AssetGroupApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(assetGroupInput.getName(), JsonPath.read(response2, "$.asset_group_name"));
-    assertEquals(
-        assetGroupInput.getDescription(), JsonPath.read(response2, "$.asset_group_description"));
-    assertEquals(
-        "{mode=or, filters=[{\"key\":\"endpoint_platform\",\"mode\":\"or\",\"values\":[\"Windows\"],\"operator\":\"eq\"}]}",
-        JsonPath.read(response2, "$.asset_group_dynamic_filter").toString());
+    assertThatJson(response2).node("asset_group_name").isEqualTo(assetGroupInput.getName());
+    assertThatJson(response2)
+        .node("asset_group_description")
+        .isEqualTo(assetGroupInput.getDescription());
+    // Check default because null in the input
+    assertThatJson(response2).node("asset_group_dynamic_filter").isEqualTo(dynamicFilter);
+  }
+
+  @DisplayName(
+      "Create one asset group with Java and one with SQL, compare them to check the both asset_group_dynamic_filter are the same")
+  @Test
+  @WithMockAdminUser
+  void should_createOneAssetGroupWithJavaAndOneWithSQLAndCompareThem() throws Exception {
+    // -- PREPARE --
+    Tag tag = tagRepository.save(TagFixture.getTag());
+    AssetGroupInput assetGroupInput = createAssetGroupWithTags("Asset group", List.of(tag.getId()));
+    Filters.FilterGroup filterGroupExpected = Filters.FilterGroup.defaultFilterGroup();
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(ASSET_GROUP_URI)
+                    .content(asJsonString(assetGroupInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    entityManager
+        .createNativeQuery(
+            "INSERT INTO asset_groups (asset_group_id, asset_group_name) VALUES ('test_id', 'test_name')")
+        .executeUpdate();
+    Object resultSql =
+        entityManager
+            .createNativeQuery(
+                "SELECT asset_group_dynamic_filter FROM asset_groups WHERE asset_group_id = 'test_id'")
+            .getSingleResult();
+    entityManager.flush();
+    entityManager.clear();
+
+    // --ASSERT--
+    // Check default because null in the input
+    assertThatJson(response).node("asset_group_dynamic_filter").isEqualTo(resultSql);
   }
 
   @DisplayName("Given valid AssetGroupInput, should update assetGroup successfully")

@@ -25,18 +25,11 @@ public class AssetGroupFixture {
     return assetGroupInput;
   }
 
-  public static AssetGroupInput createAssetGroupWithDynamicFilters(@NotNull final String name) {
+  public static AssetGroupInput createAssetGroupWithDynamicFilters(
+      @NotNull final String name, @NotNull final Filters.FilterGroup dynamicFilter) {
     AssetGroupInput assetGroupInput = new AssetGroupInput();
     assetGroupInput.setName(name);
     assetGroupInput.setDescription("An asset group");
-    Filters.FilterGroup dynamicFilter = new Filters.FilterGroup();
-    dynamicFilter.setMode(Filters.FilterMode.or);
-    Filters.Filter filter = new Filters.Filter();
-    filter.setKey("endpoint_platform");
-    filter.setMode(Filters.FilterMode.or);
-    filter.setOperator(Filters.FilterOperator.eq);
-    filter.setValues(List.of("Windows"));
-    dynamicFilter.setFilters(List.of(filter));
     assetGroupInput.setDynamicFilter(dynamicFilter);
     return assetGroupInput;
   }
