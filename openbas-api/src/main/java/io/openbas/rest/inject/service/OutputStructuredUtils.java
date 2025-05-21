@@ -41,25 +41,25 @@ public class OutputStructuredUtils {
     return outputParsers;
   }
 
-  public ObjectNode computeOutputStructured(
+  public Optional<ObjectNode> computeOutputStructured(
       Set<OutputParser> outputParsers, InjectExecutionInput input) throws JsonProcessingException {
     if (input.getOutputStructured() != null) {
-      return mapper.readValue(input.getOutputStructured(), ObjectNode.class);
+      return Optional.ofNullable(mapper.readValue(input.getOutputStructured(), ObjectNode.class));
     }
 
     if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
       return computeOutputStructuredFromOutputParsers(outputParsers, input.getMessage());
     }
 
-    return null;
+    return Optional.empty();
   }
 
-  public ObjectNode computeOutputStructuredFromOutputParsers(
+  public Optional<ObjectNode> computeOutputStructuredFromOutputParsers(
       Set<OutputParser> outputParsers, String rawOutput) {
     ObjectNode result = mapper.createObjectNode();
 
     if (outputParsers == null) {
-      return null;
+      return Optional.empty();
     }
 
     for (OutputParser outputParser : outputParsers) {
@@ -68,7 +68,7 @@ public class OutputStructuredUtils {
         continue;
       }
 
-      ObjectNode parsed;
+      Optional<ObjectNode> parsed;
       switch (outputParser.getType()) {
         case REGEX:
         default:
@@ -78,12 +78,10 @@ public class OutputStructuredUtils {
           break;
       }
 
-      if (parsed != null) {
-        result.setAll(parsed);
-      }
+      parsed.ifPresent(result::setAll);
     }
 
-    return result.isEmpty() ? null : result;
+    return result.isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
   private static String extractRawOutputByMode(String rawOutput, ParserMode mode) {
@@ -107,7 +105,7 @@ public class OutputStructuredUtils {
     return "";
   }
 
-  public ObjectNode computeOutputStructuredUsingRegexRules(
+  public Optional<ObjectNode> computeOutputStructuredUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
     ObjectNode resultRoot = mapper.createObjectNode();
@@ -138,30 +136,31 @@ public class OutputStructuredUtils {
       ArrayNode matchesArray = mapper.createArrayNode();
 
       while (matcher.find()) {
-        JsonNode structured = buildStructuredJsonNode(contractOutputElement, matcher);
-        if (structured != null && contractOutputElement.getType().validate.apply(structured)) {
-          matchesArray.add(structured);
-        }
+        buildStructuredJsonNode(contractOutputElement, matcher)
+            .filter(structured -> contractOutputElement.getType().validate.apply(structured))
+            .ifPresent(matchesArray::add);
       }
-
       if (!matchesArray.isEmpty()) {
         resultRoot.set(contractOutputElement.getKey(), matchesArray);
       }
     }
 
-    return resultRoot;
+    return Optional.of(resultRoot);
   }
 
-  public JsonNode buildStructuredJsonNode(ContractOutputElement element, Matcher matcher) {
+  public Optional<JsonNode> buildStructuredJsonNode(
+      ContractOutputElement element, Matcher matcher) {
     ContractOutputType type = element.getType();
 
     // Case: primitive types like Text, Number, IPv4, IPv6
     if (type.fields == null || type.technicalType != ContractOutputTechnicalType.Object) {
       String extracted = extractValues(element.getRegexGroups(), matcher);
       if (type.technicalType == ContractOutputTechnicalType.Number && !extracted.isEmpty()) {
-        return toNumericValue(extracted);
+        return Optional.of(toNumericValue(extracted));
       }
-      return null == extracted || extracted.isEmpty() ? null : mapper.valueToTree(extracted);
+      return null == extracted || extracted.isEmpty()
+          ? Optional.empty()
+          : Optional.of(mapper.valueToTree(extracted));
     }
 
     // Case: complex types like portscan, credentials, CVE
@@ -182,7 +181,7 @@ public class OutputStructuredUtils {
       objectNode.set(field.getKey(), valueNode);
     }
 
-    return objectNode;
+    return Optional.of(objectNode);
   }
 
   private static ValueNode toNumericValue(String extracted) {

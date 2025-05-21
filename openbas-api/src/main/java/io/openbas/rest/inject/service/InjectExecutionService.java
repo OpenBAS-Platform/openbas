@@ -9,6 +9,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class InjectExecutionService {
       Agent agent = loadAgentIfPresent(agentId);
 
       Set<OutputParser> outputParsers = outputStructuredUtils.extractOutputParsers(inject);
-      ObjectNode outputStructured =
+      Optional<ObjectNode> outputStructured =
           outputStructuredUtils.computeOutputStructured(outputParsers, input);
 
       processInjectExecution(inject, agent, input, outputParsers, outputStructured);
@@ -49,16 +50,17 @@ public class InjectExecutionService {
       Agent agent,
       InjectExecutionInput input,
       Set<OutputParser> outputParsers,
-      ObjectNode outputStructured) {
-    injectStatusService.updateInjectStatus(agent, inject, input, outputStructured);
+      Optional<ObjectNode> outputStructured) {
 
-    if (agent != null && outputStructured != null) {
-      findingService.extractFindingsFromComputedOutputStructured(
-          inject, agent, outputParsers, outputStructured);
-    }
-    // From injectors
-    if (input.getOutputStructured() != null) {
-      findingService.extractFindingsFromOutputStructured(inject, outputStructured);
+    ObjectNode structured = outputStructured.orElse(null);
+    injectStatusService.updateInjectStatus(agent, inject, input, structured);
+
+    if (structured != null) {
+      if (agent != null) {
+        findingService.extractFindingsFromComputedOutputStructured(
+            inject, agent, outputParsers, structured);
+      }
+      findingService.extractFindingsFromOutputStructured(inject, structured);
     }
   }
 
