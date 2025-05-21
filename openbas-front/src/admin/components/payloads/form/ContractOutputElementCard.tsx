@@ -41,6 +41,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   const defaultFields = {
     credentials: ['username', 'password'],
     portscan: ['host', 'port', 'service'],
+    cve: ['id', 'host', 'severity'],
   };
 
   const selectedContractOutputElementType = watch(`${prefixName}.${index}.contract_output_element_type`) as keyof typeof defaultFields | undefined;
@@ -52,7 +53,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
 
   type ContractOutputElementType = ContractOutputElement['contract_output_element_type'];
   const contractOutputElementTypes: ContractOutputElementType[] = [
-    'text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials',
+    'text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials', 'cve',
   ];
 
   const outputParserTypeList = contractOutputElementTypes.map(type => ({
