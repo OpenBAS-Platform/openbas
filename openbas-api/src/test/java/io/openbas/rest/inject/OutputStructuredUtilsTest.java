@@ -5,14 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.OutputStructuredUtils;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +30,6 @@ class OutputStructuredUtilsTest {
           + "  TCP    176.125.125.10:445            0.0.0.0:0              LISTENING\n"
           + "  TCP    192.168.12.12:902            0.0.0.0:0              LISTENING\n";
 
-  @Mock private FindingRepository findingRepository;
   private final ObjectMapper mapper = new ObjectMapper();
 
   private OutputStructuredUtils outputStructuredUtils;
