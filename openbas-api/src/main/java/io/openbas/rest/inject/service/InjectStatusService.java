@@ -3,7 +3,6 @@ package io.openbas.rest.inject.service;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
@@ -14,7 +13,6 @@ import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -34,8 +32,6 @@ public class InjectStatusService {
   private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
-
-  @Resource private ObjectMapper mapper;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
