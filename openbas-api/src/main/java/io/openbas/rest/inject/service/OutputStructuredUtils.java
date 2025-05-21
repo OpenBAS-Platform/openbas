@@ -216,7 +216,7 @@ public class OutputStructuredUtils {
           }
 
         } catch (NumberFormatException | IllegalStateException e) {
-          log.log(Level.SEVERE, "Invalid regex group index: " + index, e);
+          log.log(Level.SEVERE, "Invalid regex group index: " + index, e.getMessage());
         }
       }
 
