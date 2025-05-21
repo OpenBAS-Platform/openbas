@@ -178,6 +178,7 @@ services:
       POSTGRES_DB: openbas
     user: 999
     commands: 
+      - touch /var/lib/postgresql/data/postgresql.conf
       - postgres -c 'max_connections=250'
   - name: rabbitmq
     image: rabbitmq:4.1-management
