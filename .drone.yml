@@ -49,6 +49,7 @@ steps:
       OPENBAS_ADMIN_PASSWORD: admin
       OPENBAS_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
       SPRING_PROFILES_ACTIVE: ci
+      OPENBAS_RABBITMQ_HOSTNAME: rabbitmq-e2e
     commands:
       - apt update && apt install -y gnupg
       - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
@@ -193,6 +194,11 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
+  - name: rabbitmq-e2e
+    image: rabbitmq:4.1-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
   - name: elastic
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
     environment:
