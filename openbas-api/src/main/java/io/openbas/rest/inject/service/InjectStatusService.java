@@ -105,7 +105,7 @@ public class InjectStatusService {
     ExecutionTrace base =
         new ExecutionTrace(
             injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
-    return ExecutionTrace.from(base, outputStructured);
+    return outputStructured != null ? ExecutionTrace.from(base, outputStructured) : base;
   }
 
   private void computeExecutionTraceStatusIfNeeded(
