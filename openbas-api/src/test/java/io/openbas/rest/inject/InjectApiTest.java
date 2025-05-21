@@ -813,6 +813,8 @@ class InjectApiTest extends IntegrationTest {
         input.setStatus("SUCCESS");
         Inject inject = getPendingInjectWithAssets();
 
+        doNothing().when(injectExecutionCallbackBatchQueueService).publish(any());
+
         // -- EXECUTE --
         String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
         performCallbackRequest(agentId, inject.getId(), input);
