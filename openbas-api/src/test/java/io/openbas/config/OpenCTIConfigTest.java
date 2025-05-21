@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @DisplayName("OpenCTIConfig tests")
 public class OpenCTIConfigTest {
   @Nested
-  @WithMockOpenCTIConfig(apiUrl = "", url = "public_url")
+  @WithMockOpenCTIConfig(url = "public_url")
   @DisplayName("When setting only the public URL")
   public class withOnlyUrlNotApiUrl {
     @Autowired private OpenCTIConfig openCTIConfig;
