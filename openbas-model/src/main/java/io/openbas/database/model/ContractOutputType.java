@@ -58,9 +58,9 @@ public enum ContractOutputType {
               new ContractOutputField("service", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          !(jsonNode.get("host").isNull()
-              || jsonNode.get("port").isNull()
-              || jsonNode.get("service").isNull()),
+          jsonNode.get("host") != null
+              && jsonNode.get("port") != null
+              && jsonNode.get("service") != null,
       (JsonNode jsonNode) -> {
         String host = buildString(jsonNode, "host");
         String port = buildString(jsonNode, "port");
@@ -108,8 +108,7 @@ public enum ContractOutputType {
               new ContractOutputField("username", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("password", ContractOutputTechnicalType.Text, true))),
       true,
-      (JsonNode jsonNode) ->
-          !(jsonNode.get("username").isNull() || jsonNode.get("password").isNull()),
+      (JsonNode jsonNode) -> jsonNode.get("username") != null && jsonNode.get("password") != null,
       (JsonNode jsonNode) -> {
         String username = buildString(jsonNode, "username");
         String password = buildString(jsonNode, "password");
@@ -130,9 +129,9 @@ public enum ContractOutputType {
               new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          !(jsonNode.get("id").isNull()
-              || jsonNode.get("host").isNull()
-              || jsonNode.get("severity").isNull()),
+          jsonNode.get("id") != null
+              && jsonNode.get("host") != null
+              && jsonNode.get("severity") != null,
       (JsonNode jsonNode) -> {
         String id = buildString(jsonNode, "id");
         String host = buildString(jsonNode, "host");
@@ -140,7 +139,7 @@ public enum ContractOutputType {
         return host + ":" + id + " (" + severity + ")";
       },
       (JsonNode jsonNode) -> {
-        if (!jsonNode.get("asset_id").isNull()) {
+        if (jsonNode.get("asset_id") != null) {
           return List.of(jsonNode.get("asset_id").asText());
         }
         return new ArrayList<>();
