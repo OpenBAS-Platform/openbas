@@ -54,7 +54,7 @@ public class OutputStructuredUtils {
     return null;
   }
 
-  private ObjectNode computeOutputStructuredFromOutputParsers(
+  public ObjectNode computeOutputStructuredFromOutputParsers(
       Set<OutputParser> outputParsers, String rawOutput) {
     ObjectNode result = mapper.createObjectNode();
 
@@ -107,7 +107,7 @@ public class OutputStructuredUtils {
     return "";
   }
 
-  private ObjectNode computeOutputStructuredUsingRegexRules(
+  public ObjectNode computeOutputStructuredUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
     ObjectNode resultRoot = mapper.createObjectNode();
@@ -152,7 +152,7 @@ public class OutputStructuredUtils {
     return resultRoot;
   }
 
-  private JsonNode buildStructuredJsonNode(ContractOutputElement element, Matcher matcher) {
+  public JsonNode buildStructuredJsonNode(ContractOutputElement element, Matcher matcher) {
     ContractOutputType type = element.getType();
 
     // Case: primitive types like Text, Number, IPv4, IPv6
@@ -161,7 +161,7 @@ public class OutputStructuredUtils {
       if (type.technicalType == ContractOutputTechnicalType.Number && !extracted.isEmpty()) {
         return toNumericValue(extracted);
       }
-      return extracted.isEmpty() ? null : mapper.valueToTree(extracted);
+      return null == extracted || extracted.isEmpty() ? null : mapper.valueToTree(extracted);
     }
 
     // Case: complex types like portscan, credentials, CVE
@@ -222,12 +222,11 @@ public class OutputStructuredUtils {
       }
 
       // If something was extracted and concatenated, return it
-      if (concatenated.length() > 0) {
+      if (!concatenated.isEmpty()) {
         return concatenated.toString();
       }
     }
 
-    // If no group yielded any value
     return null;
   }
 }

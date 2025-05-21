@@ -8,8 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.inject.service.OutputStructuredUtils;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,10 +47,13 @@ class FindingUtilsTest {
   private final ObjectMapper mapper = new ObjectMapper();
 
   private FindingUtils findingUtils;
+  private OutputStructuredUtils outputStructuredUtils;
 
   @BeforeEach
   void setup() {
-    findingUtils = new FindingUtils(mapper, findingRepository);
+
+    findingUtils = new FindingUtils(findingRepository);
+    outputStructuredUtils = new OutputStructuredUtils(mapper);
   }
 
   private Matcher getMatcher(String regex, String input) {
@@ -62,17 +67,22 @@ class FindingUtilsTest {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Empty output");
     regexGroup.setIndexValues("$2");
-    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "Text", "^(\\S+)", "");
   }
 
   @Test
-  @DisplayName("Should return an empty string for an index bigger than matcher count")
-  void given_a_group_bigger_than_matcher_count_should_return_empty() {
+  @DisplayName("Should return null for an index bigger than matcher count")
+  void given_a_group_bigger_than_matcher_count_should_return_null() {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Wrong Index");
     regexGroup.setIndexValues("$2");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT_TASKLIST, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_TASKLIST,
+        Set.of(regexGroup),
+        ContractOutputType.Text,
+        "Text",
+        "^(\\S+)",
+        null);
   }
 
   @Test
@@ -82,7 +92,12 @@ class FindingUtilsTest {
     regexGroup.setField("Non-numeric Index");
     regexGroup.setIndexValues("$t");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT_TASKLIST, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_TASKLIST,
+        Set.of(regexGroup),
+        ContractOutputType.Text,
+        "Text",
+        "^(\\S+)",
+        "");
   }
 
   @Test
@@ -95,11 +110,9 @@ class FindingUtilsTest {
         SIMPLE_RAW_OUTPUT_NETSTAT,
         Set.of(regexGroup),
         ContractOutputType.Number,
+        "Number",
         "(\\d+)",
-        "192\n168\n1\n10\n135\n0\n"
-            + "0\n0\n0\n0\n176\n125\n125\n"
-            + "10\n445\n0\n0\n0\n0\n0\n192\n"
-            + "168\n12\n12\n902\n0\n0\n0\n0\n0");
+        "[192,168,1,10,135,0,0,0,0,0,176,125,125,10,445,0,0,0,0,0,192,168,12,12,902,0,0,0,0,0]");
   }
 
   @Test
@@ -121,8 +134,9 @@ class FindingUtilsTest {
         rawOutput,
         Set.of(regexGroup),
         ContractOutputType.Text,
+        "Text",
         "^(\\S+)",
-        "Image\n=========================\nSystem\nSystem\nSecure\nRegistry");
+        "[\"Image\",\"=========================\",\"System\",\"System\",\"Secure\",\"Registry\"]");
   }
 
   @Test
@@ -163,8 +177,9 @@ class FindingUtilsTest {
         rawOutput,
         regexGroups,
         ContractOutputType.CVE,
+        "CVE",
         regex,
-        "192.168.56.23:cve-2023-35078 (critical)");
+        "[{\"asset_id\":null,\"id\":\"\\\"cve-2023-35078\\\"\",\"host\":\"192.168.56.23\",\"severity\":\"critical\"}]");
   }
 
   @Test
@@ -188,8 +203,9 @@ class FindingUtilsTest {
         SIMPLE_RAW_OUTPUT_NETSTAT,
         regexGroups,
         ContractOutputType.PortsScan,
+        "PortScan",
         "^\\s*(TCP|UDP)\\s+([\\d\\.]+|\\*)?:?(\\d+)\\s+\\S+\\s+(\\S+)",
-        "192.168.1.10:135 (LISTENING)\n176.125.125.10:445 (LISTENING)\n192.168.12.12:902 (LISTENING)");
+        "[{\"asset_id\":null,\"host\":\"192.168.1.10\",\"port\":135,\"service\":\"LISTENING\"},{\"asset_id\":null,\"host\":\"176.125.125.10\",\"port\":445,\"service\":\"LISTENING\"},{\"asset_id\":null,\"host\":\"192.168.12.12\",\"port\":902,\"service\":\"LISTENING\"}]");
   }
 
   @Test
@@ -203,8 +219,9 @@ class FindingUtilsTest {
         SIMPLE_RAW_OUTPUT_NETSTAT,
         Set.of(regexGroup),
         ContractOutputType.Port,
+        "Port",
         "(?:TCP|UDP)\\s+[\\d\\.]+:(\\d+)",
-        "135\n445\n902");
+        "[135,445,902]");
   }
 
   @Test
@@ -218,8 +235,9 @@ class FindingUtilsTest {
         SIMPLE_RAW_OUTPUT_NETSTAT,
         Set.of(regexGroup),
         ContractOutputType.IPv4,
+        "Ipv4",
         "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b",
-        "192.168.1.10\n0.0.0.0\n176.125.125.10\n0.0.0.0\n192.168.12.12\n0.0.0.0");
+        "[\"192.168.1.10\",\"0.0.0.0\",\"176.125.125.10\",\"0.0.0.0\",\"192.168.12.12\",\"0.0.0.0\"]");
   }
 
   @Test
@@ -246,8 +264,9 @@ class FindingUtilsTest {
         rawOutput,
         Set.of(regexGroup),
         ContractOutputType.IPv6,
+        "Ipv6",
         ipv6Regex,
-        "fe80::1b03:a1ff:ccdb:b464%66\nfe80::1b04:a1ff:ccdb:b464%66\nfe80::1b03:a1ff:ccdb:b464%66\nfe80::6168:894c:9ee9:d02a%27");
+        "[\"fe80::1b03:a1ff:ccdb:b464%66\",\"fe80::1b04:a1ff:ccdb:b464%66\",\"fe80::1b03:a1ff:ccdb:b464%66\",\"fe80::6168:894c:9ee9:d02a%27\"]");
   }
 
   @Test
@@ -270,29 +289,39 @@ class FindingUtilsTest {
         rawOutput,
         regexGroups,
         ContractOutputType.Credentials,
+        "Credentials",
         "(\\S+)\\\\(\\S+):(\\S+)",
-        "savacano:savacano");
+        "[{\"username\":\"savacano\",\"password\":\"savacano\"}]");
   }
 
   private void testRegexExtraction(
       String input,
       Set<RegexGroup> regexGroups,
       ContractOutputType type,
+      String key,
       String regex,
       String expected) {
     ContractOutputElement contractOutputElement = new ContractOutputElement();
     contractOutputElement.setType(type);
     contractOutputElement.setRule(regex);
+    contractOutputElement.setKey(key);
     contractOutputElement.setRegexGroups(regexGroups);
 
-    Matcher matcher = getMatcher(regex, input);
-    StringBuilder result = new StringBuilder();
+    OutputParser outputParser = new OutputParser();
+    outputParser.setType(ParserType.REGEX);
+    outputParser.setMode(ParserMode.STDOUT);
+    outputParser.setContractOutputElements(Set.of(contractOutputElement));
 
-    while (matcher.find()) {
-      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
-    }
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode stdoutNode = mapper.createObjectNode();
+    stdoutNode.put("stdout", input);
+    String jsonInput = stdoutNode.toString();
 
-    assertEquals(expected, result.toString().trim());
+    ObjectNode result =
+        outputStructuredUtils.computeOutputStructuredFromOutputParsers(
+            Set.of(outputParser), jsonInput);
+
+    assertEquals(expected, result.get(key).toString());
   }
 
   @Test
