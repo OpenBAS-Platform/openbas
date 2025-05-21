@@ -5,17 +5,14 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVE
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.expectation.ExpectationType;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 public class ExpectationUtils {
 
-  public static final String FAILED = "FAILED";
   public static final String PREVENTED = "Prevented";
-  public static final String DETECTED = "Detected";
-  public static final String NOT_DETECTED = "Not Detected";
-  public static final String NOT_PREVENTED = "Not Prevented";
 
   private ExpectationUtils() {}
 
@@ -27,13 +24,17 @@ public class ExpectationUtils {
 
   public static String computeSuccessMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
-        ? DETECTED
-        : PREVENTION.equals(expectationType) ? PREVENTED : FAILED;
+        ? ExpectationType.DETECTION.successLabel
+        : PREVENTION.equals(expectationType)
+            ? PREVENTED
+            : ExpectationType.HUMAN_RESPONSE.successLabel;
   }
 
   public static String computeFailedMessage(@NotNull final EXPECTATION_TYPE expectationType) {
     return DETECTION.equals(expectationType)
-        ? NOT_DETECTED
-        : PREVENTION.equals(expectationType) ? NOT_PREVENTED : FAILED;
+        ? ExpectationType.DETECTION.failureLabel
+        : PREVENTION.equals(expectationType)
+            ? ExpectationType.PREVENTION.failureLabel
+            : ExpectationType.HUMAN_RESPONSE.failureLabel;
   }
 }
