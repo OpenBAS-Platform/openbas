@@ -1,6 +1,6 @@
 package io.openbas.rest.inject_expectation;
 
-import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.*;
+import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.PREVENTED;
 import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_ID;
 import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_NAME;
 import static java.util.Collections.emptyList;
@@ -11,6 +11,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.service.InjectExpectationService;
@@ -368,7 +369,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
           InjectExpectation.EXPECTATION_TYPE.DETECTION,
           InjectExpectation.EXPECTATION_STATUS.PENDING,
           InjectExpectation.EXPECTATION_STATUS.FAILED,
-          NOT_DETECTED,
+          ExpectationType.DETECTION.failureLabel,
           0D);
     }
 
