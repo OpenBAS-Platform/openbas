@@ -302,7 +302,7 @@ class OutputStructuredUtilsTest {
             Set.of(outputParser), jsonInput);
 
     if (expected == null) {
-      assertNull(result);
+      assertNull(result.get());
     } else {
       assertEquals(expected, result.get().get(key).toString());
     }
