@@ -176,8 +176,7 @@ services:
       POSTGRES_USER: openbas
       POSTGRES_PASSWORD: openbas
       POSTGRES_DB: openbas
-    command:
-      - psql postgres://openbas:openbas@localhost/openbas
+    command: [ -N, 2000 ]
   - name: rabbitmq
     image: rabbitmq:4.1-management
     environment:
