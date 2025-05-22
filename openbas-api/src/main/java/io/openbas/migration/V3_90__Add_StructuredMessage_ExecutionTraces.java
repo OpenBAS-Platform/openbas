@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_89__Add_StructuredMessage_ExecutionTraces extends BaseJavaMigration {
+public class V3_90__Add_StructuredMessage_ExecutionTraces extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
