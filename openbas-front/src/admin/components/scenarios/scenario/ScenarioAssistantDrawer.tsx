@@ -208,7 +208,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
             style={{ marginLeft: 'auto' }}
             disabled={isSubmitting || !isDirty}
           >
-            {t('Create Inject')}
+            {t('Create Injects')}
           </Button>
         </form>
         {/* TODO next chunk */}
