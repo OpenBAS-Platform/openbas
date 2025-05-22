@@ -14,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,10 @@ public class InjectAssistantService {
         false);
   }
 
+  /**
+   * Searches InjectorContract from database based on the attack pattern and a list of
+   * platform-architecture pairs (e.g., Linux:x86_64, macOS:arm64), with a result limit.
+   */
   private List<InjectorContract> searchInjectorContracts(
       String attackPatternId, List<String> platformArchitecturePairs, Integer limit) {
     StringBuilder sql =
@@ -144,15 +149,6 @@ public class InjectAssistantService {
     return allPlatformArchitecturePairs;
   }
 
-  private List<Inject> findMatchingInjects(
-      Map<List<String>, List<Inject>> injectsCreatedByPlatformArch,
-      List<String> platformArchitecturePairs) {
-    return injectsCreatedByPlatformArch.entrySet().stream()
-        .filter(entry -> new HashSet<>(entry.getKey()).containsAll(platformArchitecturePairs))
-        .flatMap(entry -> entry.getValue().stream())
-        .toList();
-  }
-
   private Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
     return endpoints.stream()
@@ -160,119 +156,111 @@ public class InjectAssistantService {
             Collectors.groupingBy(endpoint -> endpoint.getPlatform() + ":" + endpoint.getArch()));
   }
 
-  /**
-   * This method checks if an inject for the given platform-architecture pairs already exists and
-   * returns it. If not, it tries to create one using a matching injector contract. If neither is
-   * possible, it returns an empty list.
-   */
-  private List<Inject> getOrCreateInjectsByTTPAndPlatformArchitecturePairs(
-      AttackPattern attackPattern,
-      List<String> plarformArchitecturePairs,
-      Map<List<String>, List<Inject>> injectsCreatedByPlatformArch,
-      Integer injectNumberByTTP) {
-    List<Inject> injectsMatched =
-        findMatchingInjects(injectsCreatedByPlatformArch, plarformArchitecturePairs);
-    if (!injectsMatched.isEmpty()) {
-      return injectsMatched;
-    }
+  private record ContractResultForEndpoints(
+      Map<InjectorContract, List<Endpoint>> contractEndpointsMap,
+      Map<String, List<Endpoint>> manualEndpoints) {}
 
-    List<InjectorContract> injectorContracts =
-        this.searchInjectorContracts(
-            attackPattern.getId(), plarformArchitecturePairs, injectNumberByTTP);
-    if (injectorContracts.isEmpty()) {
-      return new ArrayList<>();
-    }
+  private ContractResultForEndpoints getInjectorContractForAssetsAndTTP(
+      AttackPattern attackPattern, Integer injectNumberByTTP, List<Endpoint> endpoints) {
+    Map<InjectorContract, List<Endpoint>> contractEndpointsMap = new HashMap<>();
+    Map<String, List<Endpoint>> manualEndpoints = new HashMap<>();
 
-    List<Inject> injects =
-        injectorContracts.stream()
-            .map(i -> buildTechnicalInjectFromInjectorContract(i, attackPattern))
-            .toList();
-    injectsCreatedByPlatformArch.put(plarformArchitecturePairs, injects);
-    return injects;
-  }
-
-  /**
-   * This method calls getOrCreateInjectsByTTPAndPlatformArchitecturePairs; if it returns an empty
-   * list, it creates and returns a manual inject.
-   */
-  private List<Inject> getOrCreateInjectsByTTPAndPlatformArchitecturePairWithManualFallback(
-      Map<List<String>, List<Inject>> injectsCreatedByPlatformArch,
-      AttackPattern attackPattern,
-      String platformArchitecture,
-      Integer injectNumberByTTP) {
-
-    List<Inject> injects =
-        getOrCreateInjectsByTTPAndPlatformArchitecturePairs(
-            attackPattern,
-            List.of(platformArchitecture),
-            injectsCreatedByPlatformArch,
-            injectNumberByTTP);
-
-    if (injects.isEmpty()) {
-      String[] parts = platformArchitecture.split(":");
-      String platform = parts[0];
-      String architecture = parts[1];
-      Inject manualInject = buildManualInject(attackPattern, platform, architecture);
-      injectsCreatedByPlatformArch.put(List.of(platformArchitecture), List.of(manualInject));
-      injects.add(manualInject);
-    }
-
-    return injects;
-  }
-
-  /**
-   * Processes a set of endpoints by grouping them by platform-architecture pairs, then finds or
-   * creates corresponding injects.
-   */
-  private void processInjectsByAsset(
-      Map<List<String>, List<Inject>> injectsCreatedByPlatformArch,
-      AttackPattern attackPattern,
-      Integer injectNumberByTTP,
-      List<Endpoint> endpoints) {
-    if (endpoints.isEmpty()) {
-      return;
-    }
     // Group endpoints by platform:architecture
     Map<String, List<Endpoint>> groupedAssets =
         this.groupEndpointsByPlatformAndArchitecture(endpoints);
 
-    // Try to find or create a single inject covering all platform-architecture pairs
-    List<Inject> injects =
-        getOrCreateInjectsByTTPAndPlatformArchitecturePairs(
-            attackPattern,
-            groupedAssets.keySet().stream().toList(),
-            injectsCreatedByPlatformArch,
-            injectNumberByTTP);
+    // Try to find injectors contract covering all platform-architecture pairs at once
+    List<InjectorContract> injectorContracts =
+        this.searchInjectorContracts(
+            attackPattern.getId(), groupedAssets.keySet().stream().toList(), injectNumberByTTP);
 
-    if (injects.isEmpty()) {
-      // For each platform architecture pairs try to create an inject or else create manual inject
+    if (!injectorContracts.isEmpty()) {
+      injectorContracts.forEach(ic -> contractEndpointsMap.put(ic, endpoints));
+    } else {
+      // Or else
       groupedAssets.forEach(
           (platformArchitecture, endpointValue) -> {
-            List<Inject> injectsForGroup =
-                getOrCreateInjectsByTTPAndPlatformArchitecturePairWithManualFallback(
-                    injectsCreatedByPlatformArch,
-                    attackPattern,
-                    platformArchitecture,
-                    injectNumberByTTP);
-            injectsForGroup.forEach(
-                inject -> inject.setAssets(endpointValue.stream().map(Asset.class::cast).toList()));
-            injects.addAll(injectsForGroup);
+            // For each platform architecture pairs try to find injectorContracts
+            List<InjectorContract> injectorContractsForGroup =
+                this.searchInjectorContracts(
+                    attackPattern.getId(), List.of(platformArchitecture), injectNumberByTTP);
+
+            // Else take the manual injectorContract
+            if (injectorContractsForGroup.isEmpty()) {
+              manualEndpoints.put(platformArchitecture, endpointValue);
+            } else {
+              injectorContractsForGroup.forEach(ic -> contractEndpointsMap.put(ic, endpointValue));
+            }
           });
-    } else {
-      injects.forEach(
-          inject -> inject.setAssets(endpoints.stream().map(Asset.class::cast).toList()));
     }
+    return new ContractResultForEndpoints(contractEndpointsMap, manualEndpoints);
   }
 
-  /**
-   * Processes an asset group by grouping its assets according to platform-architecture pairs, then
-   * finds or creates the most appropriate inject(s) for these groups.
-   */
-  private void processInjectsByAssetGroup(
-      Map<List<String>, List<Inject>> injectsCreatedByPlatformArch,
+  private List<InjectorContract> findInjectorContracts(
+      List<InjectorContract> alreadyFoundInjectorContracts,
+      List<String> platformArchitecturePairs,
+      Integer injectNumberByTTP) {
+    if (alreadyFoundInjectorContracts == null
+        || platformArchitecturePairs == null
+        || platformArchitecturePairs.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Set<Endpoint.PLATFORM_TYPE> platforms = new HashSet<>();
+    Set<String> architectures = new HashSet<>();
+    for (String pair : platformArchitecturePairs) {
+      String[] parts = pair.split(":");
+      if (parts.length == 2) {
+        platforms.add(Endpoint.PLATFORM_TYPE.valueOf(parts[0]));
+        architectures.add(parts[1]);
+      }
+    }
+    String architecture =
+        architectures.size() > 1
+            ? Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES.name()
+            : architectures.iterator().next();
+
+    return alreadyFoundInjectorContracts.stream()
+        .filter(
+            ic -> {
+              Set<Endpoint.PLATFORM_TYPE> icPlatformsSet =
+                  Arrays.stream(ic.getPlatforms()).collect(Collectors.toSet());
+              boolean hasPlatforms = icPlatformsSet.containsAll(platforms);
+              boolean hasArchitecture =
+                  architecture.equals(ic.getPayload().getExecutionArch().name());
+              return hasPlatforms && hasArchitecture;
+            })
+        .limit(injectNumberByTTP)
+        .toList();
+  }
+
+  private List<InjectorContract> findOrSearchInjectorContract(
+      List<InjectorContract> knownInjectorContracts,
+      AttackPattern attackPattern,
+      List<String> platformArchitecturePairs,
+      Integer injectNumberByTTP) {
+    // Find in existing list of InjectorContracts
+    List<InjectorContract> existingInjectorContract =
+        findInjectorContracts(knownInjectorContracts, platformArchitecturePairs, injectNumberByTTP);
+    if (!existingInjectorContract.isEmpty()) {
+      return existingInjectorContract;
+    }
+
+    // Else find from DB
+    return this.searchInjectorContracts(
+        attackPattern.getId(), platformArchitecturePairs, injectNumberByTTP);
+  }
+
+  private record ContractResultForAssetGroup(
+      List<InjectorContract> injectorContracts, String unmatchedPlatformArchitecture) {}
+
+  private ContractResultForAssetGroup getInjectorContractsForAssetGroupAndTTP(
+      AssetGroup assetGroup,
       AttackPattern attackPattern,
       Integer injectNumberByTTP,
-      AssetGroup assetGroup) {
+      List<InjectorContract> alreadyFoundContracts) {
+    String unmatchedPlatformArchitecture = "";
+
     // Retrieve and group all endpoints in the asset group by platform:architecture
     List<Endpoint> assetsFromGroup =
         this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream()
@@ -281,42 +269,106 @@ public class InjectAssistantService {
     Map<String, List<Endpoint>> groupedAssets =
         this.groupEndpointsByPlatformAndArchitecture(assetsFromGroup);
 
-    // Try to find or create a single inject covering all platform-architecture pairs
-    List<Inject> injects =
-        getOrCreateInjectsByTTPAndPlatformArchitecturePairs(
+    // Try to find an existing injectorsContract that cover all platform:architecture pairs from
+    // this group at once
+    List<InjectorContract> injectorContracts =
+        findOrSearchInjectorContract(
+            alreadyFoundContracts,
             attackPattern,
             groupedAssets.keySet().stream().toList(),
-            injectsCreatedByPlatformArch,
             injectNumberByTTP);
-
-    if (injects.isEmpty()) {
-      // Otherwise, select the most common platform-architecture group
-      String mostCommonPlatformArch =
-          groupedAssets.entrySet().stream()
-              .max(Comparator.comparingInt(entry -> entry.getValue().size()))
-              .map(Map.Entry::getKey)
-              .orElse("");
-
-      // Try to create an inject for the most common group or else create manual inject
-      List<Inject> injectsForGroup =
-          getOrCreateInjectsByTTPAndPlatformArchitecturePairWithManualFallback(
-              injectsCreatedByPlatformArch,
-              attackPattern,
-              mostCommonPlatformArch,
-              injectNumberByTTP);
-      injects.addAll(injectsForGroup);
+    if (!injectorContracts.isEmpty()) {
+      return new ContractResultForAssetGroup(injectorContracts, unmatchedPlatformArchitecture);
     }
 
-    injects.forEach(
-        inject -> {
-          List<AssetGroup> existing = inject.getAssetGroups();
-          if (!existing.isEmpty()) {
-            existing.add(assetGroup);
-            inject.setAssetGroups(existing);
-          } else {
-            inject.setAssetGroups(new ArrayList<>(List.of(assetGroup)));
-          }
+    // Otherwise, select the most common platform-architecture group
+    String mostCommonPlatformArch =
+        groupedAssets.entrySet().stream()
+            .max(Comparator.comparingInt(entry -> entry.getValue().size()))
+            .map(Map.Entry::getKey)
+            .orElse("");
+
+    // Try to find injectors contract for the most common group
+    List<InjectorContract> injectorContractsForGroup =
+        findOrSearchInjectorContract(
+            alreadyFoundContracts,
+            attackPattern,
+            List.of(mostCommonPlatformArch),
+            injectNumberByTTP);
+    if (injectorContractsForGroup.isEmpty()) {
+      unmatchedPlatformArchitecture = mostCommonPlatformArch;
+    }
+    return new ContractResultForAssetGroup(injectorContracts, unmatchedPlatformArchitecture);
+  }
+
+  private void handleEndpoints(
+      List<Endpoint> endpoints,
+      AttackPattern attackPattern,
+      Integer injectNumberByTTP,
+      Map<InjectorContract, Inject> contractInjectMap,
+      Map<String, Inject> manualInjectMap,
+      List<InjectorContract> knownInjectorContracts) {
+    ContractResultForEndpoints endpointResults =
+        getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
+
+    // Add matched contracts
+    endpointResults.contractEndpointsMap.forEach(
+        (contract, value) -> {
+          Inject inject =
+              contractInjectMap.computeIfAbsent(
+                  contract, k -> buildTechnicalInjectFromInjectorContract(k, attackPattern));
+          inject.setAssets(value.stream().map(Asset.class::cast).toList());
         });
+
+    // Add manual injects
+    endpointResults.manualEndpoints.forEach(
+        (platformArchitecture, value) -> {
+          Inject inject =
+              manualInjectMap.computeIfAbsent(
+                  platformArchitecture,
+                  key -> {
+                    String[] parts = key.split(":");
+                    return buildManualInject(attackPattern, parts[0], parts[1]);
+                  });
+          inject.setAssets(value.stream().map(Asset.class::cast).toList());
+        });
+
+    knownInjectorContracts.addAll(endpointResults.contractEndpointsMap.keySet());
+  }
+
+  private void handleAssetGroups(
+      List<AssetGroup> assetGroups,
+      AttackPattern attackPattern,
+      Integer injectNumberByTTP,
+      Map<InjectorContract, Inject> contractInjectMap,
+      Map<String, Inject> manualInjectMap,
+      List<InjectorContract> knownInjectorContracts) {
+    for (AssetGroup group : assetGroups) {
+      ContractResultForAssetGroup result =
+          getInjectorContractsForAssetGroupAndTTP(
+              group, attackPattern, injectNumberByTTP, knownInjectorContracts);
+
+      result.injectorContracts.forEach(
+          contract -> {
+            Inject inject =
+                contractInjectMap.computeIfAbsent(
+                    contract, k -> buildTechnicalInjectFromInjectorContract(k, attackPattern));
+            inject.getAssetGroups().add(group);
+          });
+
+      if (!result.unmatchedPlatformArchitecture.isEmpty()) {
+        Inject inject =
+            manualInjectMap.computeIfAbsent(
+                result.unmatchedPlatformArchitecture,
+                k -> {
+                  String[] parts = k.split(":");
+                  return buildManualInject(attackPattern, parts[0], parts[1]);
+                });
+        inject.getAssetGroups().add(group);
+      }
+
+      knownInjectorContracts.addAll(result.injectorContracts);
+    }
   }
 
   private List<Inject> generateInjectsByTTP(
@@ -329,36 +381,47 @@ public class InjectAssistantService {
         this.attackPatternRepository
             .findById(attackPatternId)
             .orElseThrow(() -> new ElementNotFoundException("Attack pattern not found"));
-    Map<List<String>, List<Inject>> injectsCreatedByPlatformArch = new HashMap<>();
 
-    // Try to find or create a single inject covering all platform-architecture pairs
+    // Try to find injector contract covering all platform-architecture pairs at once
     List<String> allPlatformArchitecturePairs = getAllPlatform();
-    List<Inject> injects =
-        getOrCreateInjectsByTTPAndPlatformArchitecturePairs(
-            attackPattern,
-            allPlatformArchitecturePairs,
-            injectsCreatedByPlatformArch,
-            injectNumberByTTP);
+    List<InjectorContract> injectorContracts =
+        this.searchInjectorContracts(
+            attackPattern.getId(), allPlatformArchitecturePairs, injectNumberByTTP);
 
-    if (!injects.isEmpty()) {
-      return injects.stream()
+    if (!injectorContracts.isEmpty()) {
+      return injectorContracts.stream()
           .map(
-              inject -> {
-                inject.setAssets(endpoints.stream().map(Asset.class::cast).toList());
+              ic -> {
+                Inject inject = buildTechnicalInjectFromInjectorContract(ic, attackPattern);
                 inject.setAssetGroups(assetGroups);
+                inject.setAssets(endpoints.stream().map(Asset.class::cast).toList());
                 return inject;
               })
           .toList();
     }
 
-    // Otherwise, check for asset and for asset-group
-    processInjectsByAsset(
-        injectsCreatedByPlatformArch, attackPattern, injectNumberByTTP, endpoints);
-    assetGroups.forEach(
-        assetGroup ->
-            processInjectsByAssetGroup(
-                injectsCreatedByPlatformArch, attackPattern, injectNumberByTTP, assetGroup));
+    // Otherwise, process for all endpoints and all assetgroups to find injector contract that match
+    // with TTP and platforms/architectures
+    Map<InjectorContract, Inject> contractInjectMap = new HashMap<>();
+    Map<String, Inject> manualInjectMap = new HashMap<>();
+    List<InjectorContract> knownInjectorContracts = new ArrayList<>();
 
-    return injectsCreatedByPlatformArch.values().stream().flatMap(List::stream).toList();
+    handleEndpoints(
+        endpoints,
+        attackPattern,
+        injectNumberByTTP,
+        contractInjectMap,
+        manualInjectMap,
+        knownInjectorContracts);
+    handleAssetGroups(
+        assetGroups,
+        attackPattern,
+        injectNumberByTTP,
+        contractInjectMap,
+        manualInjectMap,
+        knownInjectorContracts);
+
+    return Stream.concat(contractInjectMap.values().stream(), manualInjectMap.values().stream())
+        .toList();
   }
 }

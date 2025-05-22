@@ -15,6 +15,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.inject.form.InjectAssistantInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.AssetGroupService;
@@ -29,6 +30,7 @@ import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.json.JSONArray;
 import org.junit.jupiter.api.*;
@@ -357,13 +359,122 @@ class ScenarioInjectApiTest extends IntegrationTest {
       assertEquals(WINDOWS_X86_64.getId(), assetInject.getId());
     }
 
-    //    @DisplayName(
-    //            "Given injectorContracts each matching Windows x86_64 and Windows arm64, should
-    // create two injects")
-    // with two assets + windows group => check the most common
+    @DisplayName(
+        "Given injectorContracts each matching Windows x86_64 and Windows arm64, should create two injects")
+    @Test
+    void given_TwoInjectorContractWindows_should_createTwoInjects() throws Exception {
+      buildInjectorContract(
+          ATTACKPATTERN,
+          new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Windows},
+          Payload.PAYLOAD_EXECUTION_ARCH.x86_64);
+      buildInjectorContract(
+          ATTACKPATTERN,
+          new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Windows},
+          Payload.PAYLOAD_EXECUTION_ARCH.arm64);
 
-    // When no matching for asset => create placeholder inject
-    // void given_NoInjectorContractMatching_should_createPlaceholderInject()
+      InjectAssistantInput input = new InjectAssistantInput();
+      input.setAssetIds(List.of(WINDOWS_X86_64.getId(), WINDOWS_ARM64.getId()));
+      input.setAttackPatternIds(List.of(ATTACKPATTERN.getId()));
+      input.setInjectByTTPNumber(1);
 
+      String response =
+          mvc.perform(
+                  post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/assistant")
+                      .content(asJsonString(input))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .accept(MediaType.APPLICATION_JSON))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<Inject> injects = injectRepository.findByScenarioId(SCENARIO.getId());
+
+      JSONArray jsonArray = new JSONArray(response);
+      assertEquals(2, jsonArray.length());
+      assertEquals(2, injects.size());
+    }
+
+    @DisplayName("Given injectorContracts that do not match Windows, should create manualInject")
+    @Test
+    void given_NoInjectorContractMatching_should_createManualInject() throws Exception {
+      buildInjectorContract(
+          ATTACKPATTERN,
+          new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS},
+          Payload.PAYLOAD_EXECUTION_ARCH.arm64);
+
+      InjectAssistantInput input = new InjectAssistantInput();
+      input.setAssetIds(List.of(LINUX_X86_64.getId()));
+      input.setAssetGroupIds(List.of(ALL_WINDOWS.getId()));
+      input.setAttackPatternIds(List.of(ATTACKPATTERN.getId()));
+      input.setInjectByTTPNumber(1);
+
+      String response =
+          mvc.perform(
+                  post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/assistant")
+                      .content(asJsonString(input))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .accept(MediaType.APPLICATION_JSON))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<Inject> injects = injectRepository.findByScenarioId(SCENARIO.getId());
+
+      JSONArray jsonArray = new JSONArray(response);
+      assertEquals(2, jsonArray.length());
+      assertEquals(2, injects.size());
+      injects.forEach(
+          i -> {
+            assertEquals(ManualContract.MANUAL_DEFAULT, i.getInjectorContract().get().getId());
+            boolean hasLinuxPlatform =
+                Arrays.stream(i.getInjectorContract().get().getPlatforms())
+                    .anyMatch(platform -> platform == Endpoint.PLATFORM_TYPE.Linux);
+            if (hasLinuxPlatform) {
+              assertEquals(
+                  "This placeholder is disabled because the TTP "
+                      + ATTACKPATTERN.getExternalId()
+                      + " with platform Linux and architecture x86_64 is currently not covered. Please create the payloads for the missing TTP",
+                  i.getDescription());
+            }
+          });
+    }
+
+    // Test inject number per TTP
+    @DisplayName("Given injectByTTPNumber to 2, should create 2 injects")
+    @Test
+    void given_TwoInjectByTTPNumber_should_createTwoInjects() throws Exception {
+      buildInjectorContract(
+          ATTACKPATTERN,
+          new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Windows},
+          Payload.PAYLOAD_EXECUTION_ARCH.x86_64);
+      buildInjectorContract(
+          ATTACKPATTERN,
+          new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Windows},
+          Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES);
+
+      InjectAssistantInput input = new InjectAssistantInput();
+      input.setAssetIds(List.of(WINDOWS_X86_64.getId()));
+      input.setAttackPatternIds(List.of(ATTACKPATTERN.getId()));
+      input.setInjectByTTPNumber(2);
+
+      String response =
+          mvc.perform(
+                  post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/assistant")
+                      .content(asJsonString(input))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .accept(MediaType.APPLICATION_JSON))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<Inject> injects = injectRepository.findByScenarioId(SCENARIO.getId());
+
+      JSONArray jsonArray = new JSONArray(response);
+      assertEquals(2, jsonArray.length());
+      assertEquals(2, injects.size());
+    }
   }
 }
