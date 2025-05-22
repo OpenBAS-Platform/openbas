@@ -24,10 +24,6 @@ public class PayloadFixture {
     payload.setAttackPatterns(Collections.emptyList());
   }
 
-  public static Payload createDefaultCommand() {
-    return createCommand("PowerShell", "cd ..", null, null);
-  }
-
   public static Command createCommand(
       String executor,
       String commandLine,
@@ -45,6 +41,18 @@ public class PayloadFixture {
     }
     initializeDefaultPayload(command, WINDOWS_PLATFORM);
     command.setAttackPatterns(Collections.emptyList());
+    return command;
+  }
+
+  public static Payload createDefaultCommand() {
+    return createCommand("PowerShell", "cd ..", null, null);
+  }
+
+  public static Payload createDefaultCommandWithPlatformsAndArchitecture(
+      Endpoint.PLATFORM_TYPE[] platforms, Payload.PAYLOAD_EXECUTION_ARCH architecture) {
+    Payload command = createDefaultCommand();
+    command.setPlatforms(platforms);
+    command.setExecutionArch(architecture);
     return command;
   }
 

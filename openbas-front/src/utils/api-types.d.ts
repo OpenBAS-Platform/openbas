@@ -1911,6 +1911,14 @@ export interface Inject {
   listened?: boolean;
 }
 
+export interface InjectAssistantInput {
+  asset_group_ids?: string[];
+  asset_ids?: string[];
+  attack_pattern_ids: string[];
+  /** @format int32 */
+  inject_by_ttp_number: number;
+}
+
 export interface InjectBulkProcessingInput {
   inject_ids_to_ignore?: string[];
   inject_ids_to_process?: string[];

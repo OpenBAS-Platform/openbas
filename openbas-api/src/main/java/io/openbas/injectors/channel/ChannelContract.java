@@ -82,10 +82,7 @@ public class ChannelContract extends Contractor {
         """;
     ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
     ContractExpectations expectationsField =
-        expectationsField(
-            "expectations",
-            "Expectations",
-            List.of(this.expectationBuilderService.buildArticleExpectation()));
+        expectationsField(List.of(this.expectationBuilderService.buildArticleExpectation()));
     List<ContractElement> publishInstance =
         contractBuilder()
             // built in

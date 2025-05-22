@@ -61,4 +61,17 @@ public class EndpointFixture {
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
     return endpoint;
   }
+
+  public static Endpoint createDefaultWindowsEndpointWithArch(Endpoint.PLATFORM_ARCH arch) {
+    Endpoint endpoint = createEndpoint();
+    endpoint.setArch(arch);
+    return endpoint;
+  }
+
+  public static Endpoint createDefaultLinuxEndpointWithArch(Endpoint.PLATFORM_ARCH arch) {
+    Endpoint endpoint = createEndpoint();
+    endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Linux);
+    endpoint.setArch(arch);
+    return endpoint;
+  }
 }

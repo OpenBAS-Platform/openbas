@@ -84,7 +84,8 @@ const InjectContentForm = ({
           <EndpointPopover
             inline
             endpoint={endpoint}
-            onRemoveEndpointFromInject={removeAsset}
+            onRemoveFromContext={removeAsset}
+            removeFromContextLabel="Remove from the inject"
             onDelete={removeAsset}
             disabled={fieldsMap.get('asset')?.readOnly || readOnly}
           />
@@ -300,7 +301,7 @@ const InjectContentForm = ({
             flexWrap: 'wrap',
           }}
         >
-          <Typography variant="h5" style={{ fontWeight: 500 }}>
+          <Typography variant="h5">
             {part.title}
           </Typography>
           {part.renderLeftButton}

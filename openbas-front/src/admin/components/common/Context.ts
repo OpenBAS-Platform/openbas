@@ -104,6 +104,8 @@ export type TeamContextType = {
 };
 
 export type InjectContextType = {
+  injects: InjectOutputType[];
+  setInjects: (input: InjectOutputType[]) => void;
   searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>;
   onAddInject: (inject: Inject) => Promise<{
     result: string;
@@ -240,6 +242,8 @@ export const TeamContext = createContext<TeamContextType>({
   },
 });
 export const InjectContext = createContext<InjectContextType>({
+  injects: [],
+  setInjects: () => {},
   searchInjects(_: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
     return new Promise<{ data: Page<InjectOutputType> }>(() => {
     });

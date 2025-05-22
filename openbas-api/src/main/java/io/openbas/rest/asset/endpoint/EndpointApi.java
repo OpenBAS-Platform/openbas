@@ -2,7 +2,6 @@ package io.openbas.rest.asset.endpoint;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
 import io.openbas.aop.LogExecutionTime;
@@ -131,7 +130,7 @@ public class EndpointApi extends RestBehavior {
   @PostMapping(ENDPOINT_URI + "/find")
   @Transactional(readOnly = true)
   public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
-    return this.endpointRepository.findAll(fromIds(endpointIds));
+    return this.endpointService.endpoints(endpointIds);
   }
 
   @Secured(ROLE_ADMIN)

@@ -57,7 +57,7 @@ public class OvhSmsContract extends Contractor {
   @Override
   public List<Contract> contracts() {
     ContractConfig contractConfig = getConfig();
-    ContractExpectations expectationsField = expectationsField("expectations", "Expectations");
+    ContractExpectations expectationsField = expectationsField();
     List<ContractElement> instance =
         contractBuilder()
             .mandatory(teamField("teams", "Teams", Multiple))
