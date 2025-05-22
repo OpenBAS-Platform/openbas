@@ -41,6 +41,7 @@ const EndpointForm: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
+  const regexMacAddress = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/;
 
   const methods = useForm<EndpointInput>({
     mode: 'onTouched',
@@ -53,8 +54,7 @@ const EndpointForm: FunctionComponent<Props> = ({
         endpoint_ips: z.string().ip({ message: t('Invalid IP addresses') }).array().min(1),
         endpoint_mac_addresses: z
           .string()
-          .regex(
-            /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/,
+          .regex(regexMacAddress,
             t('Invalid MAC addresses'),
           ).array().optional(),
         endpoint_platform: z.enum(['Linux', 'Windows', 'MacOS', 'Container', 'Service', 'Generic', 'Internal', 'Unknown']),
@@ -84,6 +84,10 @@ const EndpointForm: FunctionComponent<Props> = ({
     {
       value: 'arm64',
       label: t('arm64'),
+    },
+    {
+      value: 'Unknown',
+      label: t('Unknown'),
     },
   ];
 
@@ -166,17 +170,9 @@ const EndpointForm: FunctionComponent<Props> = ({
 
           )
         }
-
         <IpAddressesFieldController name="endpoint_ips" label={t('IP Addresses')} required />
-
-        {
-          agentless && (
-            <MacAddressesFieldComponent name="endpoint_mac_addresses" label={t('MAC Addresses')} />
-          )
-        }
-
+        <MacAddressesFieldComponent name="endpoint_mac_addresses" label={t('MAC Addresses')} />
         <TagFieldController name="asset_tags" label={t('Tags')} />
-
         <div style={{ alignSelf: 'flex-end' }}>
           <Button
             variant="contained"

@@ -3,7 +3,6 @@ import { type FunctionComponent, useState } from 'react';
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
-import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
@@ -135,35 +134,19 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   return entries.length > 0 && (
     <>
       <ButtonPopover disabled={disabled} entries={entries} variant={inline ? 'icon' : 'toggle'} />
-      {inline ? (
-        <Dialog
-          open={edition}
+      <Drawer
+        open={edition}
+        handleClose={() => setEdition(false)}
+        title={t('Update the endpoint')}
+      >
+        <EndpointForm
+          initialValues={initialValues}
+          editing
+          agentless={agentless}
+          onSubmit={submitEdit}
           handleClose={() => setEdition(false)}
-          title={t('Update the endpoint')}
-        >
-          <EndpointForm
-            initialValues={initialValues}
-            editing
-            agentless={agentless}
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Dialog>
-      ) : (
-        <Drawer
-          open={edition}
-          handleClose={() => setEdition(false)}
-          title={t('Update the endpoint')}
-        >
-          <EndpointForm
-            initialValues={initialValues}
-            editing
-            agentless={agentless}
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Drawer>
-      )}
+        />
+      </Drawer>
       <DialogDelete
         open={removalFromAssetGroup}
         handleClose={() => setRemovalFromAssetGroup(false)}

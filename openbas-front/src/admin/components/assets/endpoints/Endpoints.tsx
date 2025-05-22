@@ -364,6 +364,7 @@ const Endpoints = () => {
                             inline
                             endpoint={{ ...endpoint }}
                             agentless={endpoint.asset_agents?.length === 0}
+                            onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
                             onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                           />
                         ))
@@ -401,7 +402,7 @@ const Endpoints = () => {
               })
         }
       </List>
-      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result, ...endpoints])} editing={false} agentless={true} />}
+      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} editing={false} agentless={true} />}
     </>
   );
 };
