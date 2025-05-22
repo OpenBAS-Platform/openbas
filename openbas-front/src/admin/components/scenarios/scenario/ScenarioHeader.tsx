@@ -236,7 +236,11 @@ const ScenarioHeader = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <ScenarioAssistantDrawer open={openScenarioAssistant} onClose={() => setOpenScenarioAssistant(false)} onSubmit={(data: InjectAssistantInput) => onScenarioInjectAssistantSubmit(data)} />
+      <ScenarioAssistantDrawer
+        open={openScenarioAssistant}
+        onClose={() => setOpenScenarioAssistant(false)}
+        onSubmit={(data: InjectAssistantInput) => onScenarioInjectAssistantSubmit(data)}
+      />
       <div className="clearfix" />
     </>
   );
