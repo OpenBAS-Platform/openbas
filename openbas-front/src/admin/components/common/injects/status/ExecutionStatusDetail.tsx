@@ -32,19 +32,20 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
   const isAsset = target?.targetType === 'ASSETS';
   const isAgent = target?.targetType === 'AGENT';
 
+  const fetchTraces = async () => {
+    if (!target?.id || !target.targetType) return;
+    setLoading(true);
+    try {
+      const result = await getInjectTracesFromInjectAndTarget(injectId, target.id, target.targetType);
+      setTraces(result.data || []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTraces = async () => {
-      if (!target?.id || !target.targetType) return;
-      setLoading(true);
-      try {
-        const result = await getInjectTracesFromInjectAndTarget(injectId, target.id, target.targetType);
-        setTraces(result.data || []);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTraces();
-  }, [injectId, target]);
+  }, [injectId, target?.id, target?.targetType]);
 
   if (loading) {
     return <Loader />;
