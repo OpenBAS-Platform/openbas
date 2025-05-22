@@ -1911,11 +1911,18 @@ export interface Inject {
   listened?: boolean;
 }
 
+/** Input model for automatically generating injects, based on the provided attack pattern IDs and target asset or asset group IDs. */
 export interface InjectAssistantInput {
+  /** List of asset group IDs to target. Either asset_ids or asset_group_ids must be provided. */
   asset_group_ids?: string[];
+  /** List of asset IDs to target. Either asset_ids or asset_group_ids must be provided. */
   asset_ids?: string[];
+  /** List of attack pattern used to generate injects */
   attack_pattern_ids: string[];
-  /** @format int32 */
+  /**
+   * Number of injects to generate for each TTP
+   * @format int32
+   */
   inject_by_ttp_number: number;
 }
 
