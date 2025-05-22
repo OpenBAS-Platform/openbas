@@ -6,18 +6,14 @@ import io.openbas.database.model.Endpoint;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 public class EndpointSpecification {
 
-  private EndpointSpecification() {
-  }
+  private EndpointSpecification() {}
 
   public static Specification<Endpoint> findEndpointsForInjection() {
     return (root, query, criteriaBuilder) -> {
@@ -32,8 +28,7 @@ public class EndpointSpecification {
   public static Specification<Endpoint> findAgentlessEndpoints() {
     return (root, query, criteriaBuilder) -> {
       query.groupBy(root.get("id"));
-      return criteriaBuilder.and(
-          criteriaBuilder.isEmpty(root.get("agents")));
+      return criteriaBuilder.and(criteriaBuilder.isEmpty(root.get("agents")));
     };
   }
 

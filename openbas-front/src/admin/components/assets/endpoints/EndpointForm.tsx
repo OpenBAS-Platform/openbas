@@ -12,6 +12,7 @@ import TagFieldController from '../../../../components/fields/TagFieldController
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import { type EndpointInput } from '../../../../utils/api-types';
+import { formatMacAddress } from '../../../../utils/String';
 import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
@@ -41,7 +42,10 @@ const EndpointForm: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
-  const regexMacAddress = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/;
+  const regexMacAddress = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+  if (initialValues.endpoint_mac_addresses) {
+    initialValues.endpoint_mac_addresses = initialValues.endpoint_mac_addresses?.values().map((mac: string, _: number) => formatMacAddress(mac)).toArray();
+  }
 
   const methods = useForm<EndpointInput>({
     mode: 'onTouched',
@@ -157,8 +161,8 @@ const EndpointForm: FunctionComponent<Props> = ({
                 gap: theme.spacing(2),
               }}
               >
-                <SelectFieldController name="endpoint_platform" label={t('Platform')} items={platformItems} />
                 <SelectFieldController name="endpoint_arch" label={t('Architecture')} items={architecturesItems} />
+                <SelectFieldController name="endpoint_platform" label={t('Platform')} items={platformItems} />
               </div>
 
               <TextFieldController

@@ -25,7 +25,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
@@ -59,8 +57,7 @@ public class EndpointService {
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -133,11 +130,11 @@ public class EndpointService {
   }
 
   public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
-    Specification<Endpoint> endpointSpecification = findAgentlessEndpoints().or(findEndpointsForInjection());
+    Specification<Endpoint> endpointSpecification =
+        findAgentlessEndpoints().or(findEndpointsForInjection());
     return buildPaginationJPA(
         (Specification<Endpoint> specification, Pageable pageable) ->
-            this.endpointRepository.findAll(
-                endpointSpecification.and(specification), pageable),
+            this.endpointRepository.findAll(endpointSpecification.and(specification), pageable),
         handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
   }

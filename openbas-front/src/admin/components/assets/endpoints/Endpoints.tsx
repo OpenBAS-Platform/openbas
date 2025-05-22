@@ -402,7 +402,7 @@ const Endpoints = () => {
               })
         }
       </List>
-      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} editing={false} agentless={true} />}
+      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />}
     </>
   );
 };

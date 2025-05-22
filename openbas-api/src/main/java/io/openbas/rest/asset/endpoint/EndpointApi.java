@@ -22,15 +22,11 @@ import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.HttpReqRespUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import io.pyroscope.vendor.kotlin.collections.EmptyList;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;

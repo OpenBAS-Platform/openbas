@@ -9,13 +9,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 
 interface Props {
-  editing?: boolean;
   agentless?: boolean;
   onCreate?: (result: Endpoint) => void;
 }
 
 const EndpointCreation: FunctionComponent<Props> = ({
-  editing,
   agentless,
   onCreate,
 }) => {
@@ -45,30 +43,17 @@ const EndpointCreation: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
-      {editing ? (
-        <Drawer
-          open={open}
+      <Drawer
+        open={open}
+        handleClose={() => setOpen(false)}
+        title={t('Create a new endpoint')}
+      >
+        <EndpointForm
+          onSubmit={onSubmit}
+          agentless={agentless}
           handleClose={() => setOpen(false)}
-          title={t('Update an endpoint')}
-        >
-          <EndpointForm
-            onSubmit={onSubmit}
-            handleClose={() => setOpen(false)}
-          />
-        </Drawer>
-      ) : (
-        <Drawer
-          open={open}
-          handleClose={() => setOpen(false)}
-          title={t('Create a new endpoint')}
-        >
-          <EndpointForm
-            onSubmit={onSubmit}
-            agentless={agentless}
-            handleClose={() => setOpen(false)}
-          />
-        </Drawer>
-      )}
+        />
+      </Drawer>
     </>
   );
 };

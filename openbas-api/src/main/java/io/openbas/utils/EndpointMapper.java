@@ -50,11 +50,11 @@ public class EndpointMapper {
         .seenIp(endpoint.getSeenIp())
         .ips(
             endpoint.getIps() != null
-                ? new HashSet<>(Arrays.asList(endpoint.getIps()))
+                ? new HashSet<>(Arrays.asList(setIps(endpoint.getIps())))
                 : emptySet())
         .macAddresses(
             endpoint.getMacAddresses() != null
-                ? new HashSet<>(Arrays.asList(endpoint.getMacAddresses()))
+                ? new HashSet<>(Arrays.asList(setMacAddresses(endpoint.getMacAddresses())))
                 : emptySet())
         .agents(agentMapper.toAgentOutputs(getPrimaryAgents(endpoint)))
         .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
