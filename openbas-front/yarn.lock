@@ -9869,7 +9869,7 @@ __metadata:
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.2"
     swagger-typescript-api: "npm:13.1.3"
-    tss-react: "npm:4.9.16"
+    tss-react: "npm:4.9.18"
     typescript: "npm:5.8.3"
     typescript-eslint: "npm:8.32.0"
     usehooks-ts: "npm:3.1.1"
@@ -12247,9 +12247,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tss-react@npm:4.9.16":
-  version: 4.9.16
-  resolution: "tss-react@npm:4.9.16"
+"tss-react@npm:4.9.18":
+  version: 4.9.18
+  resolution: "tss-react@npm:4.9.18"
   dependencies:
     "@emotion/cache": "npm:*"
     "@emotion/serialize": "npm:*"
@@ -12265,7 +12265,7 @@ __metadata:
       optional: true
     "@mui/material":
       optional: true
-  checksum: 10c0/f8a9644483fa9a65c8828f5b1f36da3c4af18cedef7a163172e1be115c5405fdcefe9713b66f99e7583fd610165b5db76419e87f39ced6edf255211ee6567f61
+  checksum: 10c0/81bfdfee892c1eb1bf253b2b456b9d573911d8b2668c757e2f5c56d01def00139bd780efe85fe9115dd7bb15477840e816586d6e999317456ca1e6cf7c1dccd3
   languageName: node
   linkType: hard
 
