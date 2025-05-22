@@ -6,6 +6,7 @@ import static io.openbas.utils.fixtures.AgentFixture.createAgent;
 import static io.openbas.utils.fixtures.EndpointFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.*;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -160,6 +161,10 @@ class EndpointApiTest extends IntegrationTest {
     EndpointInput updateInput = new EndpointInput();
     String newName = "New hostname";
     updateInput.setName(newName);
+    updateInput.setHostname(newName);
+    updateInput.setIps(endpointInput.getIps());
+    updateInput.setPlatform(endpointInput.getPlatform());
+    updateInput.setArch(endpointInput.getArch());
 
     // --EXECUTE--
     String response =
@@ -173,8 +178,12 @@ class EndpointApiTest extends IntegrationTest {
             .getResponse()
             .getContentAsString();
 
-    // --ASSERT--
-    assertEquals(newName, JsonPath.read(response, "$.asset_name"));
+    // --ASSERT
+    assertThatJson(response).node("asset_name").isEqualTo(newName);
+    assertThatJson(response).node("endpoint_hostname").isEqualTo(newName.toLowerCase());
+    assertThatJson(response).node("endpoint_platform").isEqualTo(endpointCreated.getPlatform());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointCreated.getIps());
+    // TODO create endpoint
   }
 
   @DisplayName("Given valid input, should delete an endpoint successfully")
