@@ -1211,17 +1211,6 @@ export interface EndpointTarget {
   target_type?: string;
 }
 
-export interface EndpointUpdateInput {
-  asset_description?: string;
-  asset_name: string;
-  asset_tags?: string[];
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
-}
-
 export interface EsSearch {
   base_created_at?: string;
   base_entity?: string;

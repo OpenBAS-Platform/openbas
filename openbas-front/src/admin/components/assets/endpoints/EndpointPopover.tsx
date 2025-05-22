@@ -6,7 +6,7 @@ import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type EndpointOutput, type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
+import { type EndpointInput, type EndpointOutput, type EndpointOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 
@@ -58,7 +58,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   const handleEdit = () => {
     setEdition(true);
   };
-  const submitEdit = (data: EndpointUpdateInput) => {
+  const submitEdit = (data: EndpointInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
       (result: {
         result: string;

@@ -61,10 +61,7 @@ public class EndpointApi extends RestBehavior {
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
-    endpoint.setPlatform(input.getPlatform());
-    endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    endpoint.setAgents(Collections.emptyList());
     return this.endpointService.createEndpoint(endpoint);
   }
 
@@ -156,19 +153,9 @@ public class EndpointApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
-      @Valid @RequestBody final EndpointUpdateInput input) {
-    return endpointMapper.toEndpointOverviewOutput(
-        this.endpointService.updateEndpoint(endpointId, input));
-  }
-
-  @Secured(ROLE_ADMIN)
-  @PutMapping(ENDPOINT_URI + "/agentless/{endpointId}")
-  @Transactional(rollbackFor = Exception.class)
-  public EndpointOverviewOutput updateAgentlessEndpoint(
-      @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
     return endpointMapper.toEndpointOverviewOutput(
-        this.endpointService.updateAgentlessEndpoint(endpointId, input));
+        this.endpointService.updateEndpoint(endpointId, input));
   }
 
   @Secured(ROLE_ADMIN)

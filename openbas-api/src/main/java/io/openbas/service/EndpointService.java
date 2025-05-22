@@ -18,7 +18,6 @@ import io.openbas.database.repository.*;
 import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
@@ -94,14 +93,6 @@ public class EndpointService {
         .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
-  public List<Endpoint> findEndpointByHostname(
-      @NotBlank final String hostname,
-      @NotNull final Endpoint.PLATFORM_TYPE platform,
-      @NotNull final Endpoint.PLATFORM_ARCH arch) {
-    return this.endpointRepository.findByHostnameArchAndPlatform(
-        hostname.toLowerCase(), platform.name(), arch.name());
-  }
-
   public List<Endpoint> findEndpointByHostnameAndAtLeastOneIp(
       @NotBlank final String hostname,
       @NotNull final Endpoint.PLATFORM_TYPE platform,
@@ -149,12 +140,6 @@ public class EndpointService {
                 endpointSpecification.and(specification), pageable),
         handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
-    /*return buildPaginationJPA(
-        (Specification<Endpoint> specification, Pageable pageable) ->
-            this.endpointRepository.findAll(
-                findAgentlessEndpoints().and(specification), pageable),
-        handleEndpointFilter(searchPaginationInput),
-        Endpoint.class);*/
   }
 
   public Page<Endpoint> searchManagedEndpoints(
@@ -206,16 +191,7 @@ public class EndpointService {
   }
 
   public Endpoint updateEndpoint(
-      @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
-    Endpoint toUpdate = this.endpoint(endpointId);
-    toUpdate.setUpdateAttributes(input);
-    toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return updateEndpoint(toUpdate);
-  }
-
-  public Endpoint updateAgentlessEndpoint(
-      @NotBlank final String endpointId, @NotNull final EndpointInput input
-  ) {
+      @NotBlank final String endpointId, @NotNull final EndpointInput input) {
     Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));

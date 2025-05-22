@@ -18,7 +18,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
@@ -158,7 +157,7 @@ class EndpointApiTest extends IntegrationTest {
         });
     Endpoint endpointCreated = endpointRepository.save(endpoint);
 
-    EndpointUpdateInput updateInput = new EndpointUpdateInput();
+    EndpointInput updateInput = new EndpointInput();
     String newName = "New hostname";
     updateInput.setName(newName);
 

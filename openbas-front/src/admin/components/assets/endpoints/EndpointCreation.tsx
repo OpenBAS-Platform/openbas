@@ -1,6 +1,6 @@
 import { type FunctionComponent, useState } from 'react';
 
-import { addEndpoint } from '../../../../actions/assets/endpoint-actions';
+import { addEndpointAgentless } from '../../../../actions/assets/endpoint-actions';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
@@ -25,7 +25,7 @@ const EndpointCreation: FunctionComponent<Props> = ({
 
   const dispatch = useAppDispatch();
   const onSubmit = (data: EndpointInput) => {
-    dispatch(addEndpoint(data)).then(
+    dispatch(addEndpointAgentless(data)).then(
       (result: {
         result: string;
         entities: { endpoints: Record<string, Endpoint> };
