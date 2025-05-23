@@ -5,16 +5,13 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
-import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.document.form.DocumentCreateInput;
 import io.openbas.rest.document.form.DocumentTagUpdateInput;
 import io.openbas.rest.document.form.DocumentUpdateInput;
@@ -31,10 +28,10 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,80 +43,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequiredArgsConstructor
 public class DocumentApi extends RestBehavior {
 
-  private FileService fileService;
-  private TagRepository tagRepository;
-  private DocumentRepository documentRepository;
-  private ExerciseRepository exerciseRepository;
-  private ScenarioRepository scenarioRepository;
-  private InjectService injectService;
-  private InjectDocumentRepository injectDocumentRepository;
-  private ChallengeRepository challengeRepository;
-  private UserRepository userRepository;
-  private InjectorRepository injectorRepository;
-  private CollectorRepository collectorRepository;
-  private SecurityPlatformRepository securityPlatformRepository;
+  private final TagRepository tagRepository;
+  private final DocumentRepository documentRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final InjectDocumentRepository injectDocumentRepository;
+  private final UserRepository userRepository;
+  private final InjectorRepository injectorRepository;
+  private final CollectorRepository collectorRepository;
+  private final SecurityPlatformRepository securityPlatformRepository;
 
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
-    this.injectDocumentRepository = injectDocumentRepository;
-  }
-
-  @Autowired
-  public void setInjectService(InjectService injectService) {
-    this.injectService = injectService;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setScenarioRepository(ScenarioRepository scenarioRepository) {
-    this.scenarioRepository = scenarioRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
-
-  @Autowired
-  public void setChallengeRepository(ChallengeRepository challengeRepository) {
-    this.challengeRepository = challengeRepository;
-  }
-
-  @Autowired
-  public void setInjectorRepository(InjectorRepository injectorRepository) {
-    this.injectorRepository = injectorRepository;
-  }
-
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
-
-  @Autowired
-  public void setSecurityPlatformRepository(SecurityPlatformRepository securityPlatformRepository) {
-    this.securityPlatformRepository = securityPlatformRepository;
-  }
-
-  @Autowired
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
-  }
+  private final DocumentService documentService;
+  private final FileService fileService;
+  private final InjectService injectService;
 
   private Optional<Document> resolveDocument(String documentId) {
     OpenBASPrincipal user = currentUser();
@@ -536,47 +475,13 @@ public class DocumentApi extends RestBehavior {
   private List<Document> getExercisePlayerDocuments(Exercise exercise) {
     List<Article> articles = exercise.getArticles();
     List<Inject> injects = exercise.getInjects();
-    return getPlayerDocuments(articles, injects);
+    return documentService.getPlayerDocuments(articles, injects);
   }
 
   private List<Document> getScenarioPlayerDocuments(Scenario scenario) {
     List<Article> articles = scenario.getArticles();
     List<Inject> injects = scenario.getInjects();
-    return getPlayerDocuments(articles, injects);
-  }
-
-  private List<Document> getPlayerDocuments(List<Article> articles, List<Inject> injects) {
-    Stream<Document> channelsDocs =
-        articles.stream().map(Article::getChannel).flatMap(channel -> channel.getLogos().stream());
-    Stream<Document> articlesDocs =
-        articles.stream().flatMap(article -> article.getDocuments().stream());
-    List<String> challenges =
-        injects.stream()
-            .filter(
-                inject ->
-                    inject
-                        .getInjectorContract()
-                        .map(contract -> contract.getId().equals(CHALLENGE_PUBLISH))
-                        .orElse(false))
-            .filter(inject -> inject.getContent() != null)
-            .flatMap(
-                inject -> {
-                  try {
-                    ChallengeContent content =
-                        mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                    return content.getChallenges().stream();
-                  } catch (JsonProcessingException e) {
-                    return Stream.empty();
-                  }
-                })
-            .toList();
-    Stream<Document> challengesDocs =
-        fromIterable(challengeRepository.findAllById(challenges)).stream()
-            .flatMap(challenge -> challenge.getDocuments().stream());
-    return Stream.of(channelsDocs, articlesDocs, challengesDocs)
-        .flatMap(documentStream -> documentStream)
-        .distinct()
-        .toList();
+    return documentService.getPlayerDocuments(articles, injects);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -595,7 +500,6 @@ public class DocumentApi extends RestBehavior {
   }
 
   // -- EXERCISE & SENARIO--
-
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
   public List<Document> playerDocuments(
       @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId) {
