@@ -55,6 +55,7 @@ public class InjectStatus extends BaseInjectStatus {
     this.getTraces().add(trace);
   }
 
+  // Used for global traces of inject
   public void addTrace(
       ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
     ExecutionTrace newTrace =
