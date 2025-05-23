@@ -11,7 +11,6 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.inject.form.InjectUpdateActivationInput;
 import io.openbas.rest.inject.output.InjectOutput;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.*;
@@ -22,7 +21,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,16 +67,6 @@ public class ScenarioInjectApi extends RestBehavior {
         Inject.class,
         joinMap);
   }
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
-  public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
-      @PathVariable @NotBlank String scenarioId,
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectTestStatusService.findAllInjectTestsByScenarioId(
-        scenarioId, searchPaginationInput);
-  }
-
-  // -- SCENARIOS --
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
