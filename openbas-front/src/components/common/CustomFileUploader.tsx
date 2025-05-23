@@ -1,6 +1,6 @@
 import { Box, Button, InputLabel } from '@mui/material';
 import { type FormEvent, type FunctionComponent, useEffect, useState } from 'react';
-import { type FieldError, type FieldErrors, type FieldErrorsImpl, type Merge } from 'react-hook-form';
+import { type FieldErrors } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../../utils/String';
@@ -53,8 +53,7 @@ const CustomFileUploader: FunctionComponent<CustomFileUploadProps> = ({
   const { t } = useFormatter();
   const { classes, cx } = useStyles();
   const [fileNameForDisplay, setFileNameForDisplay] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [errorText, setErrorText] = useState<string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>>('');
+  const [errorText, setErrorText] = useState<string>('');
 
   useEffect(() => {
     if (errors[name]) {

@@ -1,0 +1,26 @@
+import type { ExecutorHelper } from '../../actions/executors/executor-helper';
+import { type EndpointOutput, type ExecutorOutput } from '../api-types';
+
+export const getActiveMsgTooltip = (endpoint: EndpointOutput, activeMessage: string, inactiveMessage: string) => {
+  const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
+  const inactiveCount = endpoint.asset_agents.length - activeCount;
+  const isActive = activeCount > 0;
+  return {
+    isActive: isActive,
+    activeMsgTooltip: activeMessage + ' : ' + activeCount + ' | ' + inactiveMessage + ' : ' + inactiveCount,
+  };
+};
+
+export const getExecutorsCount = (endpoint: EndpointOutput, executorsMap: ReturnType<ExecutorHelper['getExecutorsMap']>) => {
+  const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
+  return executors?.reduce((acc, executor) => {
+    const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;
+    if (type && executor) {
+      acc[type] = acc[type] || [];
+      acc[type].push(executor);
+    } else {
+      acc['Unknown'] = acc['Unknown'] || [];
+    }
+    return acc;
+  }, {} as Record<string, ExecutorOutput[]>);
+};

@@ -18,8 +18,8 @@ const GlobalExecutionTraces = ({ injectStatus }: Props) => {
       <Paper variant="outlined" style={{ padding: theme.spacing(0, 3, 3) }}>
         <ExecutionTime
           style={{ marginTop: theme.spacing(3) }}
-          startDate={injectStatus.tracking_sent_date ?? null}
-          endDate={injectStatus.tracking_end_date ?? null}
+          startDate={injectStatus.tracking_sent_date}
+          endDate={injectStatus.tracking_end_date}
         />
         <MainTraces traces={injectStatus.status_main_traces} />
       </Paper>
