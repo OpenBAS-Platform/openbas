@@ -39,7 +39,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -50,7 +50,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Log
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class InjectorApi extends RestBehavior {
@@ -293,8 +293,9 @@ public class InjectorApi extends RestBehavior {
         try {
           connection.close();
         } catch (IOException e) {
-          log.severe(
-              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
+          log.error(
+              "Unable to close RabbitMQ connection. You should worry as this could impact performance",
+              e);
         }
       }
     }

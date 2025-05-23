@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(InjectExpectationTraceApi.INJECT_EXPECTATION_TRACES_URI)
 @PreAuthorize("isAdmin()")
-@Log
+@Slf4j
 public class InjectExpectationTraceApi extends RestBehavior {
 
   public static final String INJECT_EXPECTATION_TRACES_URI = "/api/inject-expectations-traces";

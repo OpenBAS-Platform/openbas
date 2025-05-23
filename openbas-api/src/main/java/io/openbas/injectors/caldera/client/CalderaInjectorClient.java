@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class CalderaInjectorClient {
 
   private static final String KEY_HEADER = "KEY";
@@ -86,7 +86,7 @@ public class CalderaInjectorClient {
       String jsonResponse = this.get(this.config.getRestApiV2Url() + AGENT_URI);
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (IOException e) {
-      log.severe("Cannot retrieve agent list");
+      log.error("Cannot retrieve agent list", e);
       throw new RuntimeException(e);
     }
   }

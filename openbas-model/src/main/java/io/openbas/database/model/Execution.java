@@ -7,14 +7,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Execution {
-
-  private static final Logger LOGGER = Logger.getLogger(Execution.class.getName());
 
   @Getter
   @JsonProperty("execution_runtime")
@@ -58,9 +56,9 @@ public class Execution {
   public void addTrace(ExecutionTrace context) {
     ExecutionTraceStatus status = context.getStatus();
     if (ExecutionTraceStatus.SUCCESS.equals(status) || ExecutionTraceStatus.INFO.equals(status)) {
-      LOGGER.log(Level.INFO, context.getMessage());
+      log.info(context.getMessage());
     } else {
-      LOGGER.log(Level.SEVERE, context.getMessage());
+      log.error(context.getMessage());
     }
     this.traces.add(context);
   }

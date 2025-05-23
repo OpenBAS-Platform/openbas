@@ -10,13 +10,12 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Log
+@Slf4j
 @Service
 public class CalderaResultCollectorService implements Runnable {
   private final int EXPIRATION_TIME = 900;
@@ -44,23 +43,21 @@ public class CalderaResultCollectorService implements Runnable {
     // For each one ask for traces and status
     injectStatuses.forEach(
         (injectStatus -> {
-          log.log(Level.INFO, "Found inject status: " + injectStatus.getId());
+          log.info("Found inject status: {}", injectStatus.getId());
           Map<String, Agent> linksMap = injectStatus.getStatusMapIdentifierAgent();
 
-          log.log(Level.INFO, "Found links IDs: " + linksMap.keySet());
+          log.info("Found links IDs: {}", linksMap.keySet());
           ResultStatus resultStatus = new ResultStatus();
           for (Map.Entry<String, Agent> entry : linksMap.entrySet()) {
             try {
-              log.log(Level.INFO, "Trying to get result for " + entry.getKey());
+              log.info("Trying to get result for {}", entry.getKey());
               resultStatus = this.calderaService.results(entry.getKey());
             } catch (Exception e) {
               injectStatus.addMayBePreventedTrace(
                   "Cannot get result for linkID " + entry.getKey() + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
                   entry.getValue());
-              log.log(
-                  Level.INFO,
-                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed");
+              log.info("Cannot get result for linkID {}, injection has failed", entry.getKey());
             }
 
             if (resultStatus.getPaw() == null
@@ -71,9 +68,7 @@ public class CalderaResultCollectorService implements Runnable {
                   "Cannot get result for linkID " + entry.getKey() + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
                   entry.getValue());
-              log.log(
-                  Level.INFO,
-                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed");
+              log.info("Cannot get result for linkID {}, injection has failed", entry.getKey());
 
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
@@ -125,7 +120,7 @@ public class CalderaResultCollectorService implements Runnable {
                       entry.getValue(),
                       resultStatus.getFinish()));
 
-              log.log(Level.INFO, "Timeout on linkID " + entry.getKey() + ", injection has failed");
+              log.info("Timeout on linkID {}, injection has failed", entry.getKey());
             }
           }
 
