@@ -4,8 +4,11 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.authorisation.AuthorisationService;
+import io.openbas.config.OpenBASConfig;
+import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -16,11 +19,9 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.helper.queue.BatchQueueService;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.ExecutableInjectService;
-import io.openbas.rest.inject.service.InjectExportService;
-import io.openbas.rest.inject.service.InjectService;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.ImportService;
 import io.openbas.service.targets.TargetService;
@@ -30,16 +31,20 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -67,13 +72,32 @@ public class InjectApi extends RestBehavior {
   private final UserRepository userRepository;
   private final InjectRepository injectRepository;
   private final InjectService injectService;
-  private final InjectStatusService injectStatusService;
   private final ExecutableInjectService executableInjectService;
   private final ImportService importService;
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final AuthorisationService authorisationService;
   private final TargetService targetService;
+  private final InjectStatusService injectStatusService;
+
+  private final RabbitmqConfig rabbitmqConfig;
+  private final OpenBASConfig openBASConfig;
+  private final ObjectMapper objectMapper;
+
+  // For testing purpose, we add a setter
+  @Setter private BatchQueueService<InjectExecutionCallback> injectTraceQueueService;
+
+  @PostConstruct
+  public void init() throws IOException, TimeoutException {
+    // Initializing the queue for batching the inject execution trace
+    injectTraceQueueService =
+        new BatchQueueService<>(
+            InjectExecutionCallback.class,
+            injectStatusService::handleInjectExecutionCallbackList,
+            rabbitmqConfig,
+            objectMapper,
+            openBASConfig.getQueueConfig().get("inject-trace"));
+  }
 
   // -- INJECTS --
 
@@ -319,7 +343,8 @@ public class InjectApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
   public void injectExecutionCallback(
-      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input)
+      throws IOException {
     injectExecutionCallback(null, injectId, input);
   }
 
@@ -329,8 +354,19 @@ public class InjectApi extends RestBehavior {
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
-      @Valid @RequestBody InjectExecutionInput input) {
-    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+      @Valid @RequestBody InjectExecutionInput input)
+      throws IOException {
+    var injectExecutionCallbackAsString =
+        mapper.writeValueAsString(
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input)
+                .agentId(agentId)
+                .injectId(injectId)
+                .emissionDate(Instant.now().toEpochMilli())
+                .build());
+
+    // Publishing the parameters into a queue for later ingestion
+    injectTraceQueueService.publish(injectExecutionCallbackAsString);
   }
 
   @Secured(ROLE_ADMIN)

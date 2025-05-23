@@ -405,7 +405,7 @@ public class InjectorApi extends RestBehavior {
       input.setMessage("Execution done");
       input.setStatus(ExecutionTraceStatus.INFO.name());
       input.setAction(InjectExecutionAction.complete);
-      injectStatusService.updateInjectStatus(agent, inject, input);
+      injectRepository.save(injectStatusService.updateInjectStatus(agent, inject, input));
     }
     throw new IllegalArgumentException(message);
   }
