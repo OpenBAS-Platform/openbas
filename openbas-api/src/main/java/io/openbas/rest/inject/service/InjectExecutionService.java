@@ -25,7 +25,7 @@ public class InjectExecutionService {
   private final AgentRepository agentRepository;
   private final InjectStatusService injectStatusService;
   private final FindingService findingService;
-  private final OutputStructuredUtils outputStructuredUtils;
+  private final StructuredOutputUtils structuredOutputUtils;
 
   public void handleInjectExecutionCallback(
       String injectId, String agentId, InjectExecutionInput input) {
@@ -35,11 +35,11 @@ public class InjectExecutionService {
       inject = loadInjectOrThrow(injectId);
       Agent agent = loadAgentIfPresent(agentId);
 
-      Set<OutputParser> outputParsers = outputStructuredUtils.extractOutputParsers(inject);
-      Optional<ObjectNode> outputStructured =
-          outputStructuredUtils.computeOutputStructured(outputParsers, input);
+      Set<OutputParser> outputParsers = structuredOutputUtils.extractOutputParsers(inject);
+      Optional<ObjectNode> structuredOutput =
+          structuredOutputUtils.computeStructuredOutput(outputParsers, input);
 
-      processInjectExecution(inject, agent, input, outputParsers, outputStructured);
+      processInjectExecution(inject, agent, input, outputParsers, structuredOutput);
     } catch (ElementNotFoundException | JsonProcessingException e) {
       handleInjectExecutionError(inject, e);
     }
@@ -50,9 +50,9 @@ public class InjectExecutionService {
       Agent agent,
       InjectExecutionInput input,
       Set<OutputParser> outputParsers,
-      Optional<ObjectNode> outputStructured) {
+      Optional<ObjectNode> structuredOutput) {
 
-    ObjectNode structured = outputStructured.orElse(null);
+    ObjectNode structured = structuredOutput.orElse(null);
     injectStatusService.updateInjectStatus(agent, inject, input, structured);
 
     if (structured != null) {

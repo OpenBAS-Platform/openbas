@@ -84,7 +84,7 @@ public class FindingService {
 
   // -- STRUCTURED OUTPUT --
 
-  public void extractFindingsFromInjectorContract(Inject inject, ObjectNode outputStructured) {
+  public void extractFindingsFromInjectorContract(Inject inject, ObjectNode structuredOutput) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     List<Finding> findings = new ArrayList<>();
     // Get the contract
@@ -96,7 +96,7 @@ public class FindingService {
           contractOutput -> {
             if (contractOutput.isFindingCompatible()) {
               if (contractOutput.isMultiple()) {
-                JsonNode jsonNodes = outputStructured.get(contractOutput.getField());
+                JsonNode jsonNodes = structuredOutput.get(contractOutput.getField());
                 if (jsonNodes != null && jsonNodes.isArray()) {
                   for (JsonNode jsonNode : jsonNodes) {
                     if (!contractOutput.getType().validate.apply(jsonNode)) {
@@ -109,7 +109,7 @@ public class FindingService {
                   }
                 }
               } else {
-                JsonNode jsonNode = outputStructured.get(contractOutput.getField());
+                JsonNode jsonNode = structuredOutput.get(contractOutput.getField());
                 if (!contractOutput.getType().validate.apply(jsonNode)) {
                   throw new IllegalArgumentException("Finding not correctly formatted");
                 }
@@ -155,7 +155,7 @@ public class FindingService {
   }
 
   public void extractFindingsFromOutputParsers(
-      Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode outputStructured) {
+      Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
 
     outputParsers.forEach(
         outputParser -> {
@@ -164,7 +164,7 @@ public class FindingService {
               .forEach(
                   contractOutputElement -> {
                     if (contractOutputElement.isFinding()) {
-                      JsonNode jsonNodes = outputStructured.get(contractOutputElement.getKey());
+                      JsonNode jsonNodes = structuredOutput.get(contractOutputElement.getKey());
                       if (jsonNodes != null && jsonNodes.isArray()) {
                         for (JsonNode jsonNode : jsonNodes) {
                           if (!contractOutputElement.getType().validate.apply(jsonNode)) {
