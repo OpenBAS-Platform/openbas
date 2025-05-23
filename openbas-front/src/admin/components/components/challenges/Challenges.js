@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
-import { fetchDocuments } from '../../../../actions/Document.js';
+import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';

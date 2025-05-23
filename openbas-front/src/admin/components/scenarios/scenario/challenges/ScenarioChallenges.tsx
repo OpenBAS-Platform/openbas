@@ -18,7 +18,7 @@ const ScenarioChallenges = () => {
   useDataLoader(() => {
     dispatch(fetchScenarioChallenges(scenarioId));
   });
-  const context: ChallengeContextType = { previewChallengeUrl: () => `/admin/scenarios/${scenarioId}/challenges?preview=true` };
+  const context: ChallengeContextType = { previewChallengeUrl: () => `/admin/scenarios/${scenarioId}/challenges` };
   return (
     <ChallengeContext.Provider value={context}>
       <ContextualChallenges challenges={challenges} linkToInjects={`/admin/scenarios/${scenarioId}/injects`} />

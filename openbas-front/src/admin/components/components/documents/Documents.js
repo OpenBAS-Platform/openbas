@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchDocuments } from '../../../../actions/Document.js';
+import { searchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';

@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChannel } from '../../../actions/channels/channel-action';
-import { fetchSimulationPlayerDocuments } from '../../../actions/Document.js';
+import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';

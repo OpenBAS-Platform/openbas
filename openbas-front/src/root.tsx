@@ -82,6 +82,9 @@ const Root = () => {
                       : <Navigate to="admin" replace={true} />}
                   />
                   <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
+                  {/* Add challenge preview routes here to ensure they are rendered without the top & left bar */}
+                  <Route path="admin/simulations/:exerciseId/challenges" element={errorWrapper(SimulationChallengesPreview)()} />
+                  <Route path="admin/scenarios/:scenarioId/challenges" element={errorWrapper(ScenarioChallengesPreview)()} />
                   <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
                   {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
                   <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
@@ -90,8 +93,6 @@ const Root = () => {
                   <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                   <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                   <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />
-                  <Route path="admin/simulations/:exerciseId/challenges" element={errorWrapper(SimulationChallengesPreview)()} />
-                  <Route path="admin/scenarios/:scenarioId/challenges" element={errorWrapper(ScenarioChallengesPreview)()} />
 
                   {/* Not found */}
                   <Route path="*" element={<NotFound />} />
