@@ -33,7 +33,7 @@ public class ManualContract extends Contractor {
   public ManualContract() {
 
     ContractElement teams = teamField("teams", "Teams", Multiple);
-    ContractElement expectations = expectationsField("expectations", "Expectations");
+    ContractElement expectations = expectationsField();
 
     Map<SupportedLanguage, String> label = Map.of(en, "Manual", fr, "Manuel");
     config = new ContractConfig(TYPE, label, "#009688", "#009688", "/img/manual.png", isExpose());

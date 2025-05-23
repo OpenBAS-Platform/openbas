@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import {
@@ -28,8 +30,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 
 const injectContextForExercise = (exercise: Exercise) => {
   const dispatch = useAppDispatch();
+  const [injects, setInjects] = useState<InjectOutputType[]>([]);
 
   return {
+    injects,
+    setInjects,
     searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
       return searchExerciseInjectsSimple(exercise.exercise_id, input);
     },

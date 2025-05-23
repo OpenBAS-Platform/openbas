@@ -8,14 +8,17 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.form.InjectAssistantInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.inject.form.InjectUpdateActivationInput;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.*;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ScenarioInjectApi extends RestBehavior {
 
+  private final InjectAssistantService injectAssistantService;
   private final InjectSearchService injectSearchService;
   private final InjectTestStatusService injectTestStatusService;
   private final InjectRepository injectRepository;
@@ -87,6 +91,19 @@ public class ScenarioInjectApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId, @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     return this.injectService.createInject(null, scenario, input);
+  }
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/assistant")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @Transactional(rollbackFor = Exception.class)
+  @Operation(
+      summary = "Assistant to generate injects for scenario",
+      description = "Generates injects based on the provided attack pattern and targets.")
+  public List<Inject> generateInjectsForScenario(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody InjectAssistantInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return this.injectAssistantService.generateInjectsForScenario(scenario, input);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")

@@ -5,7 +5,6 @@ import static io.openbas.database.model.ExerciseStatus.RUNNING;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -35,7 +34,6 @@ import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
@@ -74,7 +72,6 @@ class InjectApiTest extends IntegrationTest {
   static Document DOCUMENT1;
   static Document DOCUMENT2;
   static Team TEAM;
-  static String SCENARIO_INJECT_ID;
   static InjectorContract PAYLOAD_INJECTOR_CONTRACT;
   static InjectorContract PAYLOAD_INJECTOR_CONTRACT_2;
   @Resource protected ObjectMapper mapper;
@@ -144,126 +141,6 @@ class InjectApiTest extends IntegrationTest {
     this.teamRepository.delete(TEAM);
     this.injectorContractRepository.deleteAll(
         List.of(PAYLOAD_INJECTOR_CONTRACT, PAYLOAD_INJECTOR_CONTRACT_2));
-  }
-
-  // -- SCENARIOS --
-
-  @DisplayName("Add an inject for scenario")
-  @Test
-  @Order(1)
-  @WithMockPlannerUser
-  void addInjectForScenarioTest() throws Exception {
-    // -- PREPARE --
-    InjectInput input = new InjectInput();
-    input.setTitle("Test inject");
-    input.setInjectorContract(EMAIL_DEFAULT);
-    input.setDependsDuration(0L);
-
-    // -- EXECUTE --
-    String response =
-        mvc.perform(
-                post(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    SCENARIO_INJECT_ID = JsonPath.read(response, "$.inject_id");
-    response =
-        mvc.perform(get(SCENARIO_URI + "/" + SCENARIO.getId()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(SCENARIO_INJECT_ID, JsonPath.read(response, "$.scenario_injects[0]"));
-  }
-
-  @DisplayName("Retrieve injects for scenario")
-  @Test
-  @Order(2)
-  @WithMockObserverUser
-  void retrieveInjectsForScenarioTest() throws Exception {
-    // -- EXECUTE --
-    String response =
-        mvc.perform(
-                get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(SCENARIO_INJECT_ID, JsonPath.read(response, "$[0].inject_id"));
-  }
-
-  @DisplayName("Retrieve inject for scenario")
-  @Test
-  @Order(3)
-  @WithMockObserverUser
-  void retrieveInjectForScenarioTest() throws Exception {
-    // -- EXECUTE --
-    String response =
-        mvc.perform(
-                get(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(SCENARIO_INJECT_ID, JsonPath.read(response, "$.inject_id"));
-  }
-
-  @DisplayName("Update inject for scenario")
-  @Test
-  @Order(4)
-  @WithMockPlannerUser
-  void updateInjectForScenarioTest() throws Exception {
-    // -- PREPARE --
-    Inject inject = injectRepository.findById(SCENARIO_INJECT_ID).orElseThrow();
-    InjectInput input = new InjectInput();
-    String injectTitle = "A new title";
-    input.setTitle(injectTitle);
-    input.setInjectorContract(
-        inject.getInjectorContract().map(InjectorContract::getId).orElse(null));
-    input.setDependsDuration(inject.getDependsDuration());
-
-    // -- EXECUTE --
-    String response =
-        mvc.perform(
-                put(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID)
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(injectTitle, JsonPath.read(response, "$.inject_title"));
-  }
-
-  @DisplayName("Delete inject for scenario")
-  @Test
-  @Order(5)
-  @WithMockPlannerUser
-  void deleteInjectForScenarioTest() throws Exception {
-    // -- EXECUTE 1 ASSERT --
-    mvc.perform(delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects/" + SCENARIO_INJECT_ID))
-        .andExpect(status().is2xxSuccessful());
-
-    assertFalse(injectRepository.existsById(SCENARIO_INJECT_ID));
   }
 
   // BULK DELETE

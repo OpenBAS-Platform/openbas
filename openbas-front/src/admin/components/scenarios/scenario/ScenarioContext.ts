@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   addInjectForScenario,
   bulkDeleteInjectsSimple,
@@ -30,8 +32,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 
 const injectContextForScenario = (scenario: Scenario) => {
   const dispatch = useAppDispatch();
+  const [injects, setInjects] = useState<InjectOutputType[]>([]);
 
   return {
+    injects,
+    setInjects,
     searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
       return searchScenarioInjectsSimple(scenario.scenario_id, input);
     },

@@ -1,4 +1,4 @@
-package io.openbas.rest;
+package io.openbas.rest.scenario;
 
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;

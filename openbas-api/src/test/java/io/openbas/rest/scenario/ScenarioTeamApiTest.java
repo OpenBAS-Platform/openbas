@@ -1,4 +1,4 @@
-package io.openbas.rest;
+package io.openbas.rest.scenario;
 
 import static io.openbas.database.specification.TeamSpecification.fromScenario;
 import static io.openbas.helper.StreamHelper.fromIterable;

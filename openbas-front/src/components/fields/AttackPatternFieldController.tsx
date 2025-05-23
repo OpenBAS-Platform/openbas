@@ -32,11 +32,13 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   name: string;
   label: string;
+  hideAddButton?: boolean;
+  required?: boolean;
 }
 
 type AttackPatternCreateInputForm = Omit<AttackPatternCreateInput, 'attack_pattern_kill_chain_phases'> & { attack_pattern_kill_chain_phases?: Option[] };
 
-const AttackPatternFieldController = ({ name, label }: Props) => {
+const AttackPatternFieldController = ({ name, label, hideAddButton = false, required = false }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -98,7 +100,7 @@ const AttackPatternFieldController = ({ name, label }: Props) => {
     <Controller
       name={name}
       control={control}
-      render={({ field: { onChange, value } }) => (
+      render={({ field: { onChange, value }, fieldState: { error } }) => (
         <>
           <Autocomplete
             size="small"
@@ -114,22 +116,27 @@ const AttackPatternFieldController = ({ name, label }: Props) => {
                   {...params}
                   label={label}
                   fullWidth
+                  required={required}
                   variant="standard"
                   size="small"
+                  error={!!error}
+                  helperText={error ? error.message : null}
                   slotProps={{
                     input: {
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          <IconButton
-                            style={{
-                              position: 'absolute',
-                              right: '35px',
-                            }}
-                            onClick={() => openCreate()}
-                          >
-                            <AddOutlined />
-                          </IconButton>
+                          {!hideAddButton && (
+                            <IconButton
+                              style={{
+                                position: 'absolute',
+                                right: '35px',
+                              }}
+                              onClick={() => openCreate()}
+                            >
+                              <AddOutlined />
+                            </IconButton>
+                          )}
                           {params.InputProps.endAdornment}
                         </>
                       ),

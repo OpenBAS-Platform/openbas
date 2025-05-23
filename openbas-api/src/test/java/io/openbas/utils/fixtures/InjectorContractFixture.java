@@ -6,6 +6,7 @@ import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInje
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
@@ -54,6 +55,13 @@ public class InjectorContractFixture {
     ObjectNode content = createDefaultContent(objectMapper);
     injectorContract.setContent(objectMapper.writeValueAsString(content));
     injectorContract.setConvertedContent(content);
+    return injectorContract;
+  }
+
+  public static InjectorContract createInjectorContractWithPlatforms(
+      Endpoint.PLATFORM_TYPE[] platforms) {
+    InjectorContract injectorContract = createDefaultInjectorContract();
+    injectorContract.setPlatforms(platforms);
     return injectorContract;
   }
 

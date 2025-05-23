@@ -5,6 +5,7 @@ import {
   postReferential,
   putReferential,
   simpleDelCall,
+  simplePostCall,
   simplePutCall,
 } from '../utils/Action';
 import * as schema from './Schema';
@@ -101,6 +102,11 @@ export const injectDone = (exerciseId, injectId) => (dispatch) => {
 export const addInjectForScenario = (scenarioId, data) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects`;
   return postReferential(schema.inject, uri, data)(dispatch);
+};
+
+export const playInjectsAssistantForScenario = (scenarioId, data) => {
+  const uri = `/api/scenarios/${scenarioId}/injects/assistant`;
+  return simplePostCall(uri, data);
 };
 
 export const duplicateInjectForScenario = (scenarioId, injectId) => (dispatch) => {
