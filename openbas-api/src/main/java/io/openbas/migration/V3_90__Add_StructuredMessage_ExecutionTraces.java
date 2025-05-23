@@ -13,6 +13,6 @@ public class V3_90__Add_StructuredMessage_ExecutionTraces extends BaseJavaMigrat
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE execution_traces ADD COLUMN execution_structured_message TEXT;");
+    select.execute("ALTER TABLE execution_traces ADD COLUMN execution_structured_output TEXT;");
   }
 }
