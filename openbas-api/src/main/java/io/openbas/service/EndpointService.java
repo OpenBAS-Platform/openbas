@@ -130,10 +130,10 @@ public class EndpointService {
   }
 
   public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
-    Specification<Endpoint> endpointSpecification = findEndpointsForInjectionOrAgentlessEndpoints();
     return buildPaginationJPA(
         (Specification<Endpoint> specification, Pageable pageable) ->
-            this.endpointRepository.findAll(endpointSpecification.and(specification), pageable),
+            this.endpointRepository.findAll(
+                findEndpointsForInjectionOrAgentlessEndpoints().and(specification), pageable),
         handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
   }
