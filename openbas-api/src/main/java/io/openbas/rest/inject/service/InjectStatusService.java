@@ -174,21 +174,23 @@ public class InjectStatusService {
 
         if (inject == null) {
           log.log(Level.SEVERE, "Inject not found: {}", injectExecutionCallback.getInjectId());
-          break;
+          throw new ElementNotFoundException(
+              String.format("Inject not found: %s", injectExecutionCallback.getInjectId()));
         }
 
         Agent agent = agents.get(injectExecutionCallback.getAgentId());
 
         if (agent == null) {
           log.log(Level.SEVERE, "Agent not found: {}", injectExecutionCallback.getAgentId());
-          break;
+          throw new ElementNotFoundException(
+              String.format("Agent not found: %s", injectExecutionCallback.getAgentId()));
         }
 
         // -- UPDATE STATUS --
         injectsToSave.add(
             updateInjectStatus(agent, inject, injectExecutionCallback.getInjectExecutionInput()));
 
-      } catch (Exception e) {
+      } catch (ElementNotFoundException e) {
         log.log(Level.SEVERE, e.getMessage());
         Inject inject = injects.get(injectExecutionCallback.getInjectId());
         if (inject != null) {
