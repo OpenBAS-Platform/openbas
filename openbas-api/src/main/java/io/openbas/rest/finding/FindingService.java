@@ -82,7 +82,10 @@ public class FindingService {
     this.findingRepository.deleteById(id);
   }
 
-  // -- STRUCTURED OUTPUT --
+  // -- Extract findings from strctured output : Here we compute the findings from structured output
+  // from ExecutionInjectInput sent by injectors
+  // This structrued output is generated based on injectorcontract where we can find the node
+  // Outputs and with that the injector generate this structure output--
 
   public void extractFindingsFromInjectorContract(Inject inject, ObjectNode structuredOutput) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
@@ -154,6 +157,7 @@ public class FindingService {
     return finding;
   }
 
+  /** Extracts findings from structured output that was generated using output parsers. */
   public void extractFindingsFromOutputParsers(
       Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
 
@@ -167,9 +171,11 @@ public class FindingService {
                       JsonNode jsonNodes = structuredOutput.get(contractOutputElement.getKey());
                       if (jsonNodes != null && jsonNodes.isArray()) {
                         for (JsonNode jsonNode : jsonNodes) {
+                          // Validate finding format
                           if (!contractOutputElement.getType().validate.apply(jsonNode)) {
                             throw new IllegalArgumentException("Finding not correctly formatted");
                           }
+                          // Build and save the finding
                           findingUtils.buildFinding(
                               inject,
                               agent.getAsset(),
