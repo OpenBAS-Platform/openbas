@@ -355,7 +355,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input)
       throws IOException {
-    var inputAsString =
+    var injectExecutionCallbackAsString =
         mapper.writeValueAsString(
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input)
@@ -364,7 +364,8 @@ public class InjectApi extends RestBehavior {
                 .emissionDate(Instant.now().toEpochMilli())
                 .build());
 
-    injectTraceQueueService.publish(inputAsString);
+    // Publishing the parameters into a queue for later ingestion
+    injectTraceQueueService.publish(injectExecutionCallbackAsString);
   }
 
   @Secured(ROLE_ADMIN)
