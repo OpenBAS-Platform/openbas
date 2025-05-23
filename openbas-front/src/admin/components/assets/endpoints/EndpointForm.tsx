@@ -181,7 +181,7 @@ const EndpointForm: FunctionComponent<Props> = ({
           <Button
             variant="contained"
             onClick={handleClose}
-            style={{ marginRight: 10 }}
+            style={{ marginRight: theme.spacing(2) }}
             disabled={isSubmitting}
           >
             {t('Cancel')}

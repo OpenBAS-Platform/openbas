@@ -13,7 +13,7 @@ interface Props {
 }
 
 const MacAddressesFieldComponent = ({ name, label, style = {}, disabled = false, required = false }: Props) => {
-  const { control, trigger, setValue } = useFormContext();
+  const { control } = useFormContext();
   const { t } = useFormatter();
 
   return (
@@ -24,8 +24,7 @@ const MacAddressesFieldComponent = ({ name, label, style = {}, disabled = false,
         const value2 = value?.reduce((accumulator: string, current: string) => (accumulator === '' ? current : `${accumulator}\n${current}`), '');
         const onChange2: FormEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
           if (event.currentTarget.value === '') {
-            setValue('endpoint_mac_addresses', []);
-            trigger('endpoint_mac_addresses');
+            onChange([]);
           } else {
             onChange(event.currentTarget.value.split('\n'));
           }
@@ -42,13 +41,9 @@ const MacAddressesFieldComponent = ({ name, label, style = {}, disabled = false,
               error={!!error}
               disabled={disabled}
               helperText={error ? error.message : null}
-              slotProps={{
-                htmlInput: {
-                  onChange: onChange2,
-                  onBlur,
-                  value: value2,
-                },
-              }}
+              onChange={onChange2}
+              onBlur={onBlur}
+              value={value2}
               required={required}
             />
             <FormHelperText>{t('Please provide one MAC address per line.')}</FormHelperText>
