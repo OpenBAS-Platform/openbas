@@ -7,7 +7,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../../actions/Document.js';
+import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';

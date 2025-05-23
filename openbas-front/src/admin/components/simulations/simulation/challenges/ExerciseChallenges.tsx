@@ -18,7 +18,7 @@ const ExerciseChallenges = () => {
   useDataLoader(() => {
     dispatch(fetchExerciseChallenges(exerciseId));
   });
-  const context: ChallengeContextType = { previewChallengeUrl: () => `/admin/simulations/${exerciseId}/challenges?preview=true` };
+  const context: ChallengeContextType = { previewChallengeUrl: () => `/admin/simulations/${exerciseId}/challenges` };
   return (
     <ChallengeContext.Provider value={context}>
       <ContextualChallenges challenges={challenges} linkToInjects={`/admin/simulations/${exerciseId}/injects`} />

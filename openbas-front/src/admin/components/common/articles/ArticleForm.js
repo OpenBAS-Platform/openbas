@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchDocuments } from '../../../../actions/Document.js';
+import { fetchDocuments } from '../../../../actions/Document';
 import Autocomplete from '../../../../components/Autocomplete';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
 import OldTextField from '../../../../components/fields/OldTextField';
@@ -18,7 +18,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import DocumentType from '../../components/documents/DocumentType';
-import ArticleAddDocuments from './ArticleAddDocuments';
+import ArticleAddDocuments from './ArticleAddDocuments.js';
 
 const useStyles = makeStyles()(() => ({
   icon: {

@@ -27,7 +27,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
-import { fetchSimulationPlayerDocuments } from '../../../actions/Document.js';
+import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
@@ -236,7 +236,7 @@ const ChallengesPlayer = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/admin/simulations/${exerciseId}/challenges?preview=true`}
+            to={`/admin/simulations/${exerciseId}/challenges`}
             style={{
               position: 'absolute',
               top: 20,
