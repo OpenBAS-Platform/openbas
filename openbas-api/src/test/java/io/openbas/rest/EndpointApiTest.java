@@ -48,11 +48,58 @@ class EndpointApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private TagRepository tagRepository;
   @Autowired private EndpointRepository endpointRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseService exerciseService;
 
   @SpyBean private EndpointService endpointService;
+
+  @DisplayName("Given valid input, should create an endpoint agentless successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validInput_should_createEndpointAgentlessSuccessfully() throws Exception {
+    // --PREPARE--
+    Endpoint endpointInput = createEndpoint();
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(ENDPOINT_URI + "/agentless")
+                    .content(asJsonString(endpointInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT
+    assertThatJson(response).node("asset_name").isEqualTo(endpointInput.getName());
+    assertThatJson(response).node("asset_description").isEqualTo(endpointInput.getDescription());
+    assertThatJson(response).node("endpoint_hostname").isEqualTo(endpointInput.getHostname());
+    assertThatJson(response).node("endpoint_platform").isEqualTo(endpointInput.getPlatform());
+    assertThatJson(response).node("endpoint_arch").isEqualTo(endpointInput.getArch());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointInput.getIps());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointInput.getIps());
+    assertThatJson(response).node("asset_tags").isEqualTo(endpointInput.getTags());
+    assertThatJson(response).node("asset_agents").isEqualTo(endpointInput.getAgents());
+  }
+
+  @DisplayName("Given wrong input, can't create an endpoint agentless successfully")
+  @Test
+  @WithMockAdminUser
+  void given_wrongInput_cant_createEndpointAgentlessSuccessfully() throws Exception {
+    // --PREPARE--
+    Endpoint endpointInput = new Endpoint();
+    endpointInput.setHostname("Missing attributes for this endpoint");
+
+    // --EXECUTE--
+    mvc.perform(
+            post(ENDPOINT_URI + "/agentless")
+                .content(asJsonString(endpointInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
+  }
 
   @DisplayName("Given valid endpoint input, should upsert an endpoint successfully")
   @Test
@@ -183,7 +230,6 @@ class EndpointApiTest extends IntegrationTest {
     assertThatJson(response).node("endpoint_hostname").isEqualTo(newName.toLowerCase());
     assertThatJson(response).node("endpoint_platform").isEqualTo(endpointCreated.getPlatform());
     assertThatJson(response).node("endpoint_ips").isEqualTo(endpointCreated.getIps());
-    // TODO create endpoint
   }
 
   @DisplayName("Given valid input, should delete an endpoint successfully")
