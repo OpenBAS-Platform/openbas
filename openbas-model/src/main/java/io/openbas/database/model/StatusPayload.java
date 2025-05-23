@@ -31,6 +31,9 @@ public class StatusPayload {
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
 
+  @JsonProperty("payload_values")
+  private List<String> values = new ArrayList<>(); //TODO POC Values has to be inject ref and value and key
+
   @JsonProperty("payload_prerequisites")
   private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
 
