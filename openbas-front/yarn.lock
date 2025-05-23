@@ -9885,7 +9885,7 @@ __metadata:
     vite: "npm:6.3.5"
     vitest: "npm:3.1.2"
     zod: "npm:3.25.7"
-    zustand: "npm:5.0.4"
+    zustand: "npm:5.0.5"
   languageName: unknown
   linkType: soft
 
@@ -13248,9 +13248,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:5.0.4":
-  version: 5.0.4
-  resolution: "zustand@npm:5.0.4"
+"zustand@npm:5.0.5":
+  version: 5.0.5
+  resolution: "zustand@npm:5.0.5"
   peerDependencies:
     "@types/react": ">=18.0.0"
     immer: ">=9.0.6"
@@ -13265,7 +13265,7 @@ __metadata:
       optional: true
     use-sync-external-store:
       optional: true
-  checksum: 10c0/5b6220f51b315cef3224a6517fcc00fa553df1af604009a9f02f8091727fe52e0499bc093be3efdd64b9fa4ad9238346aff21f34cdf79355207fcad097031596
+  checksum: 10c0/76228022ad589c8ef29227f184d8852277509f88c80afd537de0506a6ded2e7ecc01d21bb79f426867560e4d59553c526e88d01abc46bd32b133d97ff337e19b
   languageName: node
   linkType: hard
 
