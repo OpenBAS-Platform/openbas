@@ -825,6 +825,40 @@ class InjectApiTest extends IntegrationTest {
         verify(injectExecutionCallbackBatchQueueService).publish(anyString());
       }
 
+      @DisplayName("Should add error trace when agent is not found")
+      @Test
+      void shouldAddTraceError() {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        String logMessage = "First log received";
+        input.setMessage(logMessage);
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("SUCCESS");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        InjectExecutionCallback injectExecutionCallback =
+            InjectExecutionCallback.builder()
+                .injectExecutionInput(input)
+                .agentId("FakeAgentId")
+                .injectId(inject.getId())
+                .emissionDate(Instant.now().toEpochMilli())
+                .build();
+        injectStatusService.handleInjectExecutionCallbackList(List.of(injectExecutionCallback));
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
+        assertEquals(1, injectStatusSaved.getTraces().size());
+        assertEquals(
+            ExecutionTraceStatus.ERROR, injectStatusSaved.getTraces().getFirst().getStatus());
+        assertEquals(
+            ExecutionTraceAction.COMPLETE, injectStatusSaved.getTraces().getFirst().getAction());
+        assertEquals(
+            "Agent not found: FakeAgentId", injectStatusSaved.getTraces().getFirst().getMessage());
+      }
+
       @DisplayName("Should add trace when process is not finished")
       @Test
       void shouldAddTraceWhenProcessNotFinished() {
