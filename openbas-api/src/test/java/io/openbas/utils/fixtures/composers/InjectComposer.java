@@ -101,6 +101,16 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
+    public Composer withDependsOn(Inject injectParent) {
+      InjectDependency injectDependency = new InjectDependency();
+      InjectDependencyId injectDependencyId = new InjectDependencyId();
+      injectDependencyId.setInjectParent(injectParent);
+      injectDependencyId.setInjectChildren(this.inject);
+      injectDependency.setCompositeId(injectDependencyId);
+      this.inject.setDependsOn(List.of(injectDependency));
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.injectorContractComposer.ifPresent(

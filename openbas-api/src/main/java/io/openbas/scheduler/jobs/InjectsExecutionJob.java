@@ -177,7 +177,6 @@ public class InjectsExecutionJob implements Job {
    *
    * @param exerciseId the id of the exercise
    * @param inject the inject to check
-   * @return an optional of list of error message
    */
   private void checkErrorMessagesPreExecution(String exerciseId, Inject inject)
       throws ErrorMessagesPreExecutionException {
@@ -303,14 +302,41 @@ public class InjectsExecutionJob implements Job {
       handleAutoStartExercises();
       // Get all injects to execute grouped by exercise.
       List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+
+      // We're grouping the injects to run by exercises but also making sure no injects
+      // run in the same batch as it's parents
       Map<String, List<ExecutableInject>> byExercises =
           injects.stream()
+              .filter(
+                  executableInject ->
+                      // If we got dependencies, we check that the parents are not part of the
+                      // current batch of injects running. If so, we're filtering them out and
+                      // they'll be part of the next batch of launched injects. Do note that this is
+                      // an edge case as it's not allowed to add a dependency less than a minute
+                      // after a parent but can happen if the platform was restarted after some time
+                      // out. It'll then start the injects that were not started because the
+                      // platform was down.
+                      executableInject.getInjection().getInject().getDependsOn() == null
+                          || !intersect(
+                              injects.stream()
+                                  .map(execInject -> execInject.getInjection().getId())
+                                  .toList(),
+                              executableInject.getInjection().getInject().getDependsOn().stream()
+                                  .map(
+                                      injectDependency ->
+                                          injectDependency
+                                              .getCompositeId()
+                                              .getInjectParent()
+                                              .getInject()
+                                              .getId())
+                                  .toList()))
               .collect(
                   groupingBy(
                       ex ->
                           ex.getInjection().getExercise() == null
                               ? "atomic"
                               : ex.getInjection().getExercise().getId()));
+
       // Execute injects in parallel for each exercise.
       byExercises.entrySet().parallelStream()
           .forEach(
@@ -339,5 +365,20 @@ public class InjectsExecutionJob implements Job {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       throw new JobExecutionException(e);
     }
+  }
+
+  /**
+   * Return true if some elements are in the two lists
+   *
+   * @param firstList the first list to test
+   * @param secondList the second list to test
+   * @return true if some elements are present in both the lists
+   */
+  private boolean intersect(List<String> firstList, List<String> secondList) {
+    return !firstList.stream()
+        .distinct()
+        .filter(secondList::contains)
+        .collect(Collectors.toSet())
+        .isEmpty();
   }
 }
