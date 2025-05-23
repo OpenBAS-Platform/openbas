@@ -130,8 +130,7 @@ public class EndpointService {
   }
 
   public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
-    Specification<Endpoint> endpointSpecification =
-        findAgentlessEndpoints().or(findEndpointsForInjection());
+    Specification<Endpoint> endpointSpecification = findEndpointsForInjectionOrAgentlessEndpoints();
     return buildPaginationJPA(
         (Specification<Endpoint> specification, Pageable pageable) ->
             this.endpointRepository.findAll(endpointSpecification.and(specification), pageable),
@@ -147,13 +146,14 @@ public class EndpointService {
             .orElseThrow(() -> new IllegalArgumentException("Asset group not found"));
 
     Specification<Endpoint> specificationStatic =
-        findEndpointsForAssetGroup(assetGroupId).and(findEndpointsForInjection());
+        findEndpointsForAssetGroup(assetGroupId)
+            .and(findEndpointsForInjectionOrAgentlessEndpoints());
 
     if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
       Specification<Endpoint> specificationDynamic =
           computeFilterGroupJpa(assetGroup.getDynamicFilter());
       Specification<Endpoint> specificationDynamicWithInjection =
-          specificationDynamic.and(findEndpointsForInjection());
+          specificationDynamic.and(findEndpointsForInjectionOrAgentlessEndpoints());
 
       Page<Endpoint> dynamicResult =
           buildPaginationJPA(

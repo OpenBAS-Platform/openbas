@@ -115,7 +115,8 @@ public class EndpointApi extends RestBehavior {
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
-    return this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
+    return this.endpointService.endpoints(
+        EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints());
   }
 
   @LogExecutionTime
