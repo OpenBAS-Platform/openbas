@@ -23,9 +23,10 @@ public class BatchQueueService<T> {
 
   protected ObjectMapper mapper;
 
-  private final Connection connection;
-  private final Channel publisherChannel;
+  private final RabbitmqConfig rabbitmqConfig;
 
+  private Connection connection;
+  private Channel publisherChannel;
   private final String routingKey;
   private final String exchangeName;
   private final String queueName;
@@ -33,6 +34,10 @@ public class BatchQueueService<T> {
   private final BlockingQueue<T> queue;
 
   private final QueueConfig queueConfig;
+  private final ScheduledExecutorService reconnectionExecutor;
+  private final ShutdownListener shutdownListener;
+
+  private final List<Channel> consumerChannels = new ArrayList<>();
 
   /**
    * Public constructor of the BatchQueueService
@@ -56,7 +61,42 @@ public class BatchQueueService<T> {
     this.queueExecution = queueExecution;
     this.mapper = mapper;
     this.queueConfig = queueConfig;
+    this.rabbitmqConfig = rabbitmqConfig;
+    shutdownListener = this::handleConnectionShutdown;
+    exchangeName =
+        rabbitmqConfig.getPrefix()
+            + String.format(BatchQueueService.EXCHANGE_KEY, queueConfig.getQueueName());
+    routingKey =
+        rabbitmqConfig.getPrefix()
+            + String.format(BatchQueueService.ROUTING_KEY, queueConfig.getQueueName());
+    queueName =
+        rabbitmqConfig.getPrefix()
+            + String.format(BatchQueueService.QUEUE_NAME, queueConfig.getQueueName());
 
+    // The queue that will contain the object we need to process
+    queue = new LinkedBlockingQueue<>();
+
+    establishConnection();
+
+    // A scheduler to handle batches that did not reached the critical mass
+    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+    scheduledExecutor.scheduleAtFixedRate(
+        this::processBufferedBatch,
+        this.queueConfig.getConsumerFrequency(),
+        this.queueConfig.getConsumerFrequency(),
+        TimeUnit.MILLISECONDS);
+
+    // Reconnection executor that we will start if we ever lose connection
+    this.reconnectionExecutor = Executors.newScheduledThreadPool(1);
+  }
+
+  /**
+   * Method to establish connection with rabbitMQ
+   *
+   * @throws IOException in case of issue while connecting to the server
+   * @throws TimeoutException in case of issue while connecting to the server
+   */
+  private void establishConnection() throws IOException, TimeoutException {
     // Init a Connection factory
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost(rabbitmqConfig.getHostname());
@@ -67,37 +107,14 @@ public class BatchQueueService<T> {
     factory.setAutomaticRecoveryEnabled(true);
     factory.setNetworkRecoveryInterval(5000);
     factory.setRequestedHeartbeat(30);
-
-    // Creation of the channels, exchange and queue
+    factory.setConnectionTimeout(10000);
     connection = factory.newConnection();
-    publisherChannel = connection.createChannel();
-    publisherChannel.basicQos(queueConfig.getPublisherQos()); // Per publisher limit
-    exchangeName =
-        rabbitmqConfig.getPrefix()
-            + String.format(BatchQueueService.EXCHANGE_KEY, queueConfig.getQueueName());
-    routingKey =
-        rabbitmqConfig.getPrefix()
-            + String.format(BatchQueueService.ROUTING_KEY, queueConfig.getQueueName());
-    queueName =
-        rabbitmqConfig.getPrefix()
-            + String.format(BatchQueueService.QUEUE_NAME, queueConfig.getQueueName());
-    publisherChannel.exchangeDeclare(exchangeName, "topic", true);
-    publisherChannel.queueDeclare(queueName, true, false, false, null);
-    publisherChannel.queueBind(queueName, exchangeName, routingKey);
+
+    // Handle shutdown
+    connection.addShutdownListener(shutdownListener);
 
     // Create consumers that will handle the processing
-    createConsumer();
-
-    // The queue that will contain the object we need to process
-    queue = new LinkedBlockingQueue<>();
-
-    // A scheduler to handle batches that did not reached the critical mass
-    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-    scheduledExecutor.scheduleAtFixedRate(
-        this::processBufferedBatch,
-        this.queueConfig.getConsumerFrequency(),
-        this.queueConfig.getConsumerFrequency(),
-        TimeUnit.MILLISECONDS);
+    createChannels();
   }
 
   /**
@@ -105,10 +122,18 @@ public class BatchQueueService<T> {
    *
    * @throws IOException In case of issue when communicating with rabbitMQ
    */
-  private void createConsumer() throws IOException {
+  private void createChannels() throws IOException {
     try {
+      // Creation of the channels, exchange and queue
+      publisherChannel = connection.createChannel();
+      publisherChannel.basicQos(queueConfig.getPublisherQos()); // Per publisher limit
+      publisherChannel.exchangeDeclare(exchangeName, "topic", true);
+      publisherChannel.queueDeclare(queueName, true, false, false, null);
+      publisherChannel.queueBind(queueName, exchangeName, routingKey);
+
       for (int i = 0; i < queueConfig.getConsumerNumber(); ++i) {
         Channel consumerChannel = connection.createChannel();
+        consumerChannels.add(consumerChannel);
         consumerChannel.basicQos(queueConfig.getConsumerQos());
 
         // What to do when a message is consumed
@@ -154,6 +179,72 @@ public class BatchQueueService<T> {
     } catch (IOException e) {
       log.error("Error creating consumer: {}", e.getMessage(), e);
       throw e;
+    }
+  }
+
+  /**
+   * Handle the connection shutdown
+   *
+   * @param cause the cause of the shutdown
+   */
+  private void handleConnectionShutdown(ShutdownSignalException cause) {
+    // If we're just closing openbas, all is good
+    if (cause.isInitiatedByApplication()) {
+      log.info("Connection shut down by application");
+      return;
+    }
+
+    // Otherwise, we lost the connection to the server
+    log.error("Connection lost unexpectedly: {}", cause.getMessage());
+    connection.removeShutdownListener(shutdownListener);
+
+    // Start trying to reconnect
+    reconnectionExecutor.schedule(this::attemptReconnection, 10000, TimeUnit.MILLISECONDS);
+  }
+
+  /** Reconnection attempt */
+  private void attemptReconnection() {
+    log.info("Attempting RabbitMQ reconnection");
+
+    try {
+      // Close the resources
+      closeResources();
+
+      // Trying to reestablish connection
+      establishConnection();
+
+      log.info("Reconnection successful");
+
+    } catch (Exception e) {
+      log.error(String.format("Reconnection attempt failed: %s", e.getMessage()), e);
+
+      // We failed. We schedule a new try ...
+      reconnectionExecutor.schedule(this::attemptReconnection, 10, TimeUnit.SECONDS);
+    }
+  }
+
+  /** Close the resources */
+  private void closeResources() {
+    try {
+      // Close consumer channels
+      for (Channel channel : consumerChannels) {
+        if (channel != null && channel.isOpen()) {
+          channel.close();
+        }
+      }
+      consumerChannels.clear();
+
+      // Closing the publishing channel
+      if (publisherChannel != null && publisherChannel.isOpen()) {
+        publisherChannel.close();
+      }
+
+      // Close the connection if it's open
+      if (connection != null && connection.isOpen()) {
+        connection.close();
+      }
+    } catch (Exception e) {
+      log.warn("Error closing resources: {}", e.getMessage());
     }
   }
 

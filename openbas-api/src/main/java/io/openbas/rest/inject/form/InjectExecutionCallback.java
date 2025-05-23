@@ -1,12 +1,15 @@
 package io.openbas.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InjectExecutionCallback {
   @JsonProperty("agent_id")
   private String agentId;
@@ -18,5 +21,5 @@ public class InjectExecutionCallback {
   private InjectExecutionInput injectExecutionInput;
 
   @JsonProperty("execution_emission_date")
-  private Instant emissionDate;
+  private long emissionDate;
 }
