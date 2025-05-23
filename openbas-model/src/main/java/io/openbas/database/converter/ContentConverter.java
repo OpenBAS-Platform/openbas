@@ -16,6 +16,9 @@ public class ContentConverter implements AttributeConverter<ObjectNode, String> 
   @Override
   public String convertToDatabaseColumn(ObjectNode meta) {
     try {
+      if (meta == null || meta.isNull()) {
+        return null;
+      }
       return mapper.writeValueAsString(meta);
     } catch (JsonProcessingException ex) {
       return null;
