@@ -142,6 +142,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           ? (
               <EndpointPopover
                 inline
+                agentless={endpoint.asset_agents.length === 0}
                 endpoint={endpoint}
                 assetGroupId={assetGroup?.asset_group_id}
                 assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}

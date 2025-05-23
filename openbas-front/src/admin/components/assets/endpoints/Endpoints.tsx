@@ -28,6 +28,7 @@ import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
+import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -107,33 +108,54 @@ const Endpoints = () => {
   };
 
   const getActiveMsgTooltip = (endpoint: EndpointOutput) => {
-    const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
-    const inactiveCount = endpoint.asset_agents.length - activeCount;
-    const isActive = activeCount > 0;
-    return {
-      isActive: isActive,
-      activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
-    };
+    if (endpoint.asset_agents.length > 0) {
+      const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
+      const inactiveCount = endpoint.asset_agents.length - activeCount;
+      const isActive = activeCount > 0;
+      if (isActive) {
+        return {
+          status: 'Active',
+          activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
+        };
+      } else {
+        return {
+          status: 'Inactive',
+          activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
+        };
+      }
+    } else {
+      return {
+        status: 'Agentless',
+        activeMsgTooltip: t('AGENTLESS'),
+      };
+    }
   };
 
   const getPrivilegesCount = (endpoint: EndpointOutput) => {
-    const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
-    const privilegeCount = privileges?.reduce((count, privilege) => {
-      if (privilege === 'admin') {
-        count.admin += 1;
-      } else {
-        count.user += 1;
-      }
-      return count;
-    }, {
-      admin: 0,
-      user: 0,
-    });
+    if (endpoint.asset_agents.length > 0) {
+      const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
+      const privilegeCount = privileges?.reduce((count, privilege) => {
+        if (privilege === 'admin') {
+          count.admin += 1;
+        } else {
+          count.user += 1;
+        }
+        return count;
+      }, {
+        admin: 0,
+        user: 0,
+      });
 
-    return {
-      adminCount: privilegeCount?.admin,
-      userCount: privilegeCount?.user,
-    };
+      return {
+        adminCount: privilegeCount?.admin,
+        userCount: privilegeCount?.user,
+      };
+    } else {
+      return {
+        adminCount: 0,
+        userCount: 0,
+      };
+    }
   };
 
   const getExecutorsCount = (endpoint: EndpointOutput) => {
@@ -167,7 +189,7 @@ const Endpoints = () => {
         return (
           <Tooltip title={status.activeMsgTooltip}>
             <span>
-              <AssetStatus variant="list" status={status.isActive ? 'Active' : 'Inactive'} />
+              <AssetStatus variant="list" status={status.status} />
             </span>
           </Tooltip>
         );
@@ -191,6 +213,11 @@ const Endpoints = () => {
                 {privileges.userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
               </span>
             </Tooltip>
+            {
+              endpoint.asset_agents.length === 0 && (
+                <span>{t('N/A')}</span>
+              )
+            }
           </>
         );
       },
@@ -203,7 +230,7 @@ const Endpoints = () => {
         return (
           <>
             <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />
-            {endpoint.endpoint_platform}
+            {endpoint.endpoint_platform ?? t('Unknown')}
           </>
         );
       },
@@ -212,50 +239,54 @@ const Endpoints = () => {
       field: 'endpoint_arch',
       label: 'Architecture',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => endpoint.endpoint_arch,
+      value: (endpoint: EndpointOutput) => endpoint.endpoint_arch ?? t('Unknown'),
     },
     {
       field: 'endpoint_agents_executor',
       label: 'Executors',
       isSortable: false,
       value: (endpoint: EndpointOutput) => {
-        const groupedExecutors = getExecutorsCount(endpoint);
-        return (
-          <>
-            {
-              Object.keys(groupedExecutors).map((executorType) => {
-                const executorsOfType = groupedExecutors[executorType];
-                const count = executorsOfType.length;
-                const base = executorsOfType[0];
+        if (endpoint.asset_agents.length > 0) {
+          const groupedExecutors = getExecutorsCount(endpoint);
+          return (
+            <>
+              {
+                Object.keys(groupedExecutors).map((executorType) => {
+                  const executorsOfType = groupedExecutors[executorType];
+                  const count = executorsOfType.length;
+                  const base = executorsOfType[0];
 
-                if (count > 0) {
-                  return (
-                    <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
-                      <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                      }}
-                      >
-                        <img
-                          src={`/api/images/executors/icons/${executorType}`}
-                          alt={executorType}
-                          style={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: 4,
-                            marginRight: 10,
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-                  );
-                } else {
-                  return t('Unknown');
-                }
-              })
-            }
-          </>
-        );
+                  if (count > 0) {
+                    return (
+                      <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                        }}
+                        >
+                          <img
+                            src={`/api/images/executors/icons/${executorType}`}
+                            alt={executorType}
+                            style={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: 4,
+                              marginRight: 10,
+                            }}
+                          />
+                        </div>
+                      </Tooltip>
+                    );
+                  } else {
+                    return t('Unknown');
+                  }
+                })
+              }
+            </>
+          );
+        } else {
+          return <span>{t('N/A')}</span>;
+        }
       },
     },
     {
@@ -332,6 +363,8 @@ const Endpoints = () => {
                           <EndpointPopover
                             inline
                             endpoint={{ ...endpoint }}
+                            agentless={endpoint.asset_agents?.length === 0}
+                            onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
                             onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                           />
                         ))
@@ -369,6 +402,7 @@ const Endpoints = () => {
               })
         }
       </List>
+      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />}
     </>
   );
 };

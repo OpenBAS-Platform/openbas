@@ -1,15 +1,13 @@
 import { type FunctionComponent, useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import { deleteEndpoint } from '../../../../actions/assets/endpoint-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
-import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type EndpointOutput, type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
+import { type EndpointOutput, type EndpointOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import EndpointForm from './EndpointForm';
+import EndpointUpdate from './EndpointUpdate';
 
 export interface EndpointPopoverProps {
   inline?: boolean;
@@ -18,10 +16,10 @@ export interface EndpointPopoverProps {
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
   onRemoveEndpointFromAssetGroup?: (asset: EndpointOutput) => void;
-  openEditOnInit?: boolean;
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
   disabled?: boolean;
+  agentless?: boolean;
 }
 
 const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
@@ -31,44 +29,18 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   assetGroupEndpointIds,
   onRemoveEndpointFromInject,
   onRemoveEndpointFromAssetGroup,
-  openEditOnInit = false,
   onUpdate,
   onDelete,
   disabled = false,
+  agentless,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const initialValues = {
-    asset_name: endpoint.asset_name,
-    asset_description: endpoint.asset_description ?? '',
-    asset_tags: endpoint.asset_tags,
-  };
-
-  // Edition
-  const [edition, setEdition] = useState(openEditOnInit);
-
-  const handleEdit = () => {
-    setEdition(true);
-  };
-  const submitEdit = (data: EndpointUpdateInput) => {
-    dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: {
-        result: string;
-        entities: { endpoints: Record<string, EndpointOverviewOutput> };
-      }) => {
-        if (result.entities) {
-          if (onUpdate) {
-            const endpointUpdated = result.entities.endpoints[result.result];
-            onUpdate(endpointUpdated);
-          }
-        }
-        return result;
-      },
-    );
-    setEdition(false);
-  };
+  const [edition, setEdition] = useState(false);
+  const handleOpenEdit = () => setEdition(true);
+  const handleCloseEdit = () => setEdition(false);
 
   // Removal
   const [removalFromAssetGroup, setRemovalFromAssetGroup] = useState(false);
@@ -110,7 +82,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   const entries = [];
   if (onUpdate) entries.push({
     label: 'Update',
-    action: () => handleEdit(),
+    action: () => handleOpenEdit(),
   });
   if (onRemoveEndpointFromInject) entries.push({
     label: 'Remove from the inject',
@@ -128,32 +100,14 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   return entries.length > 0 && (
     <>
       <ButtonPopover disabled={disabled} entries={entries} variant={inline ? 'icon' : 'toggle'} />
-      {inline ? (
-        <Dialog
-          open={edition}
-          handleClose={() => setEdition(false)}
-          title={t('Update the endpoint')}
-        >
-          <EndpointForm
-            initialValues={initialValues}
-            editing
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Dialog>
-      ) : (
-        <Drawer
-          open={edition}
-          handleClose={() => setEdition(false)}
-          title={t('Update the endpoint')}
-        >
-          <EndpointForm
-            initialValues={initialValues}
-            editing
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Drawer>
+      {edition && onUpdate && (
+        <EndpointUpdate
+          open
+          handleClose={handleCloseEdit}
+          endpointId={endpoint.asset_id}
+          agentless={agentless}
+          onUpdate={result => onUpdate(result as EndpointOverviewOutput)}
+        />
       )}
       <DialogDelete
         open={removalFromAssetGroup}
