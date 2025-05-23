@@ -362,7 +362,7 @@ public class InjectApi extends RestBehavior {
                 .injectExecutionInput(input)
                 .agentId(agentId)
                 .injectId(injectId)
-                .emissionDate(Instant.now())
+                .emissionDate(Instant.now().toEpochMilli())
                 .build());
 
     injectTraceQueueService.publish(inputAsString);
