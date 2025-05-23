@@ -161,11 +161,11 @@ public class Inject implements Base, Injection {
   @Schema(type = "string")
   private User user;
 
-  // CascadeType.ALL is required here because inject status are embedded
-  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonProperty("inject_status")
-  @Queryable(filterable = true, sortable = true)
-  private InjectStatus status;
+  //TODO Status -> Executions
+  @OneToMany(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("inject_statuses")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<InjectStatus> statuses = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
@@ -276,7 +276,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public void clean() {
-    this.status = null;
+    this.statuses = new ArrayList<>(); //TODO POC
     this.communications.clear();
     this.expectations.clear();
     this.findings.clear();
@@ -354,8 +354,8 @@ public class Inject implements Base, Injection {
   }
 
   public Optional<InjectStatus> getStatus() {
-    return ofNullable(this.status);
-  }
+    return ofNullable(this.statuses.get(0));
+  } //TODO POC Compute Status for Inject
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
     return this.expectations.stream()
