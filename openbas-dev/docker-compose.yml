@@ -10,6 +10,8 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   openbas-test-pgsql:
     container_name: openbas-test-pgsql
     image: postgres:17-alpine
@@ -116,4 +118,6 @@ volumes:
   esdata:
     driver: local
   essnapshots:
+    driver: local
+  pgdata  :
     driver: local
