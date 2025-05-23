@@ -41,12 +41,22 @@ public class StructuredOutputUtils {
     return outputParsers;
   }
 
+  /**
+   * Computes the structured output from the injection execution input.
+   *
+   * <p>Initially, it verifies if the structured output is already available. If it is not, and the
+   * input pertains to an execution action, the method attempts to generate the structured output
+   * from the raw execution output using the output parsers defined in the payload used for the
+   * injection.
+   */
   public Optional<ObjectNode> computeStructuredOutput(
       Set<OutputParser> outputParsers, InjectExecutionInput input) throws JsonProcessingException {
+    // Return pre-computed structured output if available
     if (input.getOutputStructured() != null) {
       return Optional.ofNullable(mapper.readValue(input.getOutputStructured(), ObjectNode.class));
     }
 
+    // Only compute if the action is actual execution
     if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
       return computeStructuredOutputFromOutputParsers(outputParsers, input.getMessage());
     }
@@ -105,6 +115,12 @@ public class StructuredOutputUtils {
     return "";
   }
 
+  /**
+   * Builds structured output from raw output using regex rules defined in contract output elements.
+   *
+   * <p>Each rule is applied to the raw output, and matched data is validated and added to the
+   * resulting JSON structure.
+   */
   public Optional<ObjectNode> computeStructuredOutputUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
@@ -112,6 +128,7 @@ public class StructuredOutputUtils {
 
     for (ContractOutputElement contractOutputElement : contractOutputElements) {
       String regex = contractOutputElement.getRule();
+      // Compile and cache regex
       Pattern pattern =
           patternCache.computeIfAbsent(
               regex,
