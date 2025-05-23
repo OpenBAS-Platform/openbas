@@ -57,8 +57,7 @@ public class InjectExecutionService {
 
     if (structured != null) {
       if (agent != null) {
-        findingService.extractFindingsFromOutputParsers(
-            inject, agent, outputParsers, structured);
+        findingService.extractFindingsFromOutputParsers(inject, agent, outputParsers, structured);
       } else {
         // From Injectors
         findingService.extractFindingsFromInjectorContract(inject, structured);

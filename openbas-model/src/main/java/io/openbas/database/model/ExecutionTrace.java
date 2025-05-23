@@ -58,10 +58,10 @@ public class ExecutionTrace implements Base {
   @NotNull
   private String message;
 
-  @Column(name = "execution_structured_message")
+  @Column(name = "execution_structured_output")
   @Convert(converter = ContentConverter.class)
   @JsonIgnore
-  private ObjectNode structuredMessage;
+  private ObjectNode structuredOutput;
 
   @Column(name = "execution_action")
   @JsonProperty("execution_action")
@@ -145,8 +145,8 @@ public class ExecutionTrace implements Base {
         null, ExecutionTraceStatus.INFO, identifiers, message, action, agent, null);
   }
 
-  public static ExecutionTrace from(ExecutionTrace executionTrace, ObjectNode structuredMessage) {
-    return new ExecutionTrace(executionTrace, structuredMessage);
+  public static ExecutionTrace from(ExecutionTrace executionTrace, ObjectNode structuredOutput) {
+    return new ExecutionTrace(executionTrace, structuredOutput);
   }
 
   public ExecutionTrace() {}
@@ -168,7 +168,7 @@ public class ExecutionTrace implements Base {
     this.agent = agent;
   }
 
-  public ExecutionTrace(ExecutionTrace base, ObjectNode structuredMessage) {
+  public ExecutionTrace(ExecutionTrace base, ObjectNode structuredOutput) {
     this.injectStatus = base.injectStatus;
     this.status = base.status;
     this.identifiers = base.identifiers;
@@ -176,6 +176,6 @@ public class ExecutionTrace implements Base {
     this.time = base.time;
     this.action = base.action;
     this.agent = base.agent;
-    this.structuredMessage = structuredMessage;
+    this.structuredOutput = structuredOutput;
   }
 }
