@@ -84,7 +84,7 @@ public class FindingService {
 
   // -- STRUCTURED OUTPUT --
 
-  public void extractFindingsFromOutputStructured(Inject inject, ObjectNode outputStructured) {
+  public void extractFindingsFromInjectorContract(Inject inject, ObjectNode outputStructured) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     List<Finding> findings = new ArrayList<>();
     // Get the contract
@@ -154,7 +154,7 @@ public class FindingService {
     return finding;
   }
 
-  public void extractFindingsFromComputedOutputStructured(
+  public void extractFindingsFromOutputParsers(
       Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode outputStructured) {
 
     outputParsers.forEach(
