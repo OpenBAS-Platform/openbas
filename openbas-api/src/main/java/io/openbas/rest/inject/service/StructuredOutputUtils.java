@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @Log
 @RequiredArgsConstructor
 @Component
-public class OutputStructuredUtils {
+public class StructuredOutputUtils {
 
   @Resource private final ObjectMapper mapper;
 
@@ -41,20 +41,20 @@ public class OutputStructuredUtils {
     return outputParsers;
   }
 
-  public Optional<ObjectNode> computeOutputStructured(
+  public Optional<ObjectNode> computeStructuredOutput(
       Set<OutputParser> outputParsers, InjectExecutionInput input) throws JsonProcessingException {
     if (input.getOutputStructured() != null) {
       return Optional.ofNullable(mapper.readValue(input.getOutputStructured(), ObjectNode.class));
     }
 
     if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      return computeOutputStructuredFromOutputParsers(outputParsers, input.getMessage());
+      return computeStructuredOutputFromOutputParsers(outputParsers, input.getMessage());
     }
 
     return Optional.empty();
   }
 
-  public Optional<ObjectNode> computeOutputStructuredFromOutputParsers(
+  public Optional<ObjectNode> computeStructuredOutputFromOutputParsers(
       Set<OutputParser> outputParsers, String rawOutput) {
     ObjectNode result = mapper.createObjectNode();
 
@@ -73,7 +73,7 @@ public class OutputStructuredUtils {
         case REGEX:
         default:
           parsed =
-              computeOutputStructuredUsingRegexRules(
+              computeStructuredOutputUsingRegexRules(
                   rawOutputByMode, outputParser.getContractOutputElements());
           break;
       }
@@ -105,7 +105,7 @@ public class OutputStructuredUtils {
     return "";
   }
 
-  public Optional<ObjectNode> computeOutputStructuredUsingRegexRules(
+  public Optional<ObjectNode> computeStructuredOutputUsingRegexRules(
       String rawOutputByMode, Set<ContractOutputElement> contractOutputElements) {
     Map<String, Pattern> patternCache = new HashMap<>();
     ObjectNode resultRoot = mapper.createObjectNode();

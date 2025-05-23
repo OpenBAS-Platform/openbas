@@ -15,18 +15,17 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "execution_traces")
 public class ExecutionTrace implements Base {
+
   @Id
   @Column(name = "execution_trace_id")
   @JsonProperty("execution_trace_id")

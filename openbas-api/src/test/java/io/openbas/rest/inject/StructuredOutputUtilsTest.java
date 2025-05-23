@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.rest.inject.service.OutputStructuredUtils;
+import io.openbas.rest.inject.service.StructuredOutputUtils;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class OutputStructuredUtilsTest {
+class StructuredOutputUtilsTest {
 
   public static final String SIMPLE_RAW_OUTPUT_TASKLIST =
       "\r\nImage Name                 PID  Session Name        Session#    Mem Usage\r\n"
@@ -34,11 +34,11 @@ class OutputStructuredUtilsTest {
 
   private final ObjectMapper mapper = new ObjectMapper();
 
-  private OutputStructuredUtils outputStructuredUtils;
+  private StructuredOutputUtils structuredOutputUtils;
 
   @BeforeEach
   void setup() {
-    outputStructuredUtils = new OutputStructuredUtils(mapper);
+    structuredOutputUtils = new StructuredOutputUtils(mapper);
   }
 
   @Test
@@ -298,7 +298,7 @@ class OutputStructuredUtilsTest {
     String jsonInput = stdoutNode.toString();
 
     Optional<ObjectNode> result =
-        outputStructuredUtils.computeOutputStructuredFromOutputParsers(
+        structuredOutputUtils.computeStructuredOutputFromOutputParsers(
             Set.of(outputParser), jsonInput);
 
     if (result.isEmpty()) {
