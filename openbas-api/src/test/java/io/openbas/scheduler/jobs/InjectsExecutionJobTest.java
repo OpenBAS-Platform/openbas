@@ -13,6 +13,7 @@ import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectStatusComposer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
@@ -80,8 +81,8 @@ class InjectsExecutionJobTest {
             .get();
     injectParent.setExercise(exerciseSaved);
     injectChildren.setExercise(exerciseSaved);
-    injectParent.setStatus(null);
-    injectChildren.setStatus(null);
+    injectParent.setExecutions(new ArrayList<>()); // TODO POC
+    injectChildren.setExecutions(new ArrayList<>()); // TODO POC
     exerciseSaved.setInjects(List.of(injectParent, injectChildren));
     EXERCISE_ID = exerciseSaved.getId();
 
@@ -105,9 +106,9 @@ class InjectsExecutionJobTest {
     assertTrue(savedInjectParent.isPresent());
     assertTrue(savedInjectChildren.isPresent());
 
-    assertTrue(savedInjectParent.get().getStatus().isPresent());
-    assertTrue(savedInjectChildren.get().getStatus().isEmpty());
+    assertTrue(savedInjectParent.get().getExecution().isPresent());
+    assertTrue(savedInjectChildren.get().getExecution().isEmpty());
 
-    assertNotNull(savedInjectParent.get().getStatus().get().getName());
+    assertNotNull(savedInjectParent.get().getExecution().get().getName());
   }
 }

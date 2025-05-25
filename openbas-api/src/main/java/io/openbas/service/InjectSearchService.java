@@ -410,10 +410,12 @@ public class InjectSearchService {
     Join<Base, Base> collectorJoin = payloadJoin.join("collector", JoinType.LEFT);
     joinMap.put("collector", collectorJoin);
 
-    Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
-    joinMap.put("status", statusJoin);
+    //    Join<Base, Base> statusJoin = injectRoot.join("status", JoinType.LEFT);
+    //    joinMap.put("status", statusJoin);
 
     // Array aggregations
+    // Expression<String[]> statusIdsExpression = createJoinArrayAggOnId(cb, injectRoot,
+    // "statuses");
     Expression<String[]> teamIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "teams");
     Expression<String[]> assetIdsExpression = createJoinArrayAggOnId(cb, injectRoot, "assets");
     Expression<String[]> assetGroupIdsExpression =
@@ -424,6 +426,8 @@ public class InjectSearchService {
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("updatedAt").alias("inject_updated_at"),
+            injectRoot.get("status").alias("inject_status"),
+            injectRoot.get("firstExecutionDate").alias("inject_first_execution_date"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.get("id").alias("injector_contract_id"),
             injectorContractJoin.get("content").alias("injector_contract_content"),
@@ -433,9 +437,6 @@ public class InjectSearchService {
             payloadJoin.get("id").alias("payload_id"),
             payloadJoin.get("type").alias("payload_type"),
             collectorJoin.get("type").alias("payload_collector_type"),
-            statusJoin.get("id").alias("status_id"),
-            statusJoin.get("name").alias("status_name"),
-            statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
             teamIdsExpression.alias("inject_teams"),
             assetIdsExpression.alias("inject_assets"),
             assetGroupIdsExpression.alias("inject_asset_groups"))
@@ -448,8 +449,7 @@ public class InjectSearchService {
             injectorContractJoin.get("id"),
             injectorJoin.get("id"),
             payloadJoin.get("id"),
-            collectorJoin.get("id"),
-            statusJoin.get("id")));
+            collectorJoin.get("id")));
   }
 
   private List<InjectResultOutput> execInjects(TypedQuery<Tuple> query) {
@@ -457,13 +457,12 @@ public class InjectSearchService {
         .map(
             tuple -> {
               InjectStatusSimple injectStatus = null;
-              ExecutionStatus status = tuple.get("status_name", ExecutionStatus.class);
+              ExecutionStatus status = tuple.get("inject_status", ExecutionStatus.class);
               if (status != null) {
                 injectStatus =
                     InjectStatusSimple.builder()
-                        .id(tuple.get("status_id", String.class))
                         .name(status.name())
-                        .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
+                        .trackingSentDate(tuple.get("inject_first_execution_date", Instant.class))
                         .build();
               } else {
                 injectStatus = InjectStatusSimple.builder().build();

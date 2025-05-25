@@ -3,7 +3,6 @@ package io.openbas.database.specification;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
@@ -59,7 +58,7 @@ public class InjectSpecification {
       return cb.and(
           cb.equal(root.get("enabled"), true), // isEnable
           cb.isNotNull(exercisePath.get("start")), // fromScheduled
-          cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+          cb.isNull(root.get("status")) // notExecuted
           );
     };
   }
@@ -72,7 +71,7 @@ public class InjectSpecification {
           cb.equal(root.get("enabled"), true), // isEnable
           cb.isNotNull(exercisePath.get("start")), // fromScheduled
           cb.equal(exercisePath.get("status"), ExerciseStatus.RUNNING), // fromRunningExercise
-          cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+          cb.isNull(root.get("status")) // notExecuted
           );
     };
   }
@@ -82,16 +81,16 @@ public class InjectSpecification {
         cb.and(
             cb.isNull(root.get("exercise")), // No exercise
             cb.isNull(root.get("scenario")), // No scenario
-            cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
-            cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING));
+            cb.equal(root.get("status"), ExecutionStatus.QUEUING),
+            cb.notEqual(root.get("status"), ExecutionStatus.PENDING));
   }
 
   public static Specification<Inject> pendingInjectWithThresholdMinutes(int thresholdMinutes) {
     return (root, query, cb) -> {
       Instant thresholdInstant = Instant.now().minus(Duration.ofMinutes(thresholdMinutes));
       return cb.and(
-          cb.equal(root.get("status").get("name"), ExecutionStatus.PENDING),
-          cb.lessThan(root.get("status").get("trackingSentDate"), thresholdInstant));
+          cb.equal(root.get("status"), ExecutionStatus.PENDING),
+          cb.lessThan(root.get("firstExecutionDate"), thresholdInstant));
     };
   }
 

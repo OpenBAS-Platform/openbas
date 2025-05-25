@@ -32,6 +32,7 @@ public interface InjectRepository
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
 
+  // TODO POC Status name
   @Query(
       value =
           "SELECT f.inject_id, f.inject_title, f.inject_scenario, f.inject_exercise, f.inject_created_at, f.inject_updated_at, f.inject_injector_contract, "

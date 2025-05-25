@@ -23,8 +23,9 @@ public class InjectStatus extends BaseInjectStatus {
   @JsonProperty("status_payload_output")
   private StatusPayload payloadOutput;
 
-  @JsonProperty("payload_values")
-  private List<InjectInputValues> values = new ArrayList<>(); //TODO POC Values has to be inject ref and value and key
+  @OneToMany(mappedBy = "injectStatus", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private List<InjectBinding> inputBindings = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "injectStatus",

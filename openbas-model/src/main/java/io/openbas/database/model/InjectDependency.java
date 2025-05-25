@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +27,10 @@ public class InjectDependency {
   @JsonProperty("dependency_condition")
   @Type(JsonType.class)
   private InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition;
+
+  @OneToMany(mappedBy = "injectDependency", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("attribute_mappings")
+  private List<InjectMapping> attributeMappings = new ArrayList<>();
 
   @CreationTimestamp
   @Column(name = "dependency_created_at")

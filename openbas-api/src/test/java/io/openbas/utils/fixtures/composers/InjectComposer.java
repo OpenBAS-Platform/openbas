@@ -3,10 +3,7 @@ package io.openbas.utils.fixtures.composers;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,7 +69,7 @@ public class InjectComposer extends ComposerBase<Inject> {
     public Composer withInjectStatus(InjectStatusComposer.Composer injectStatus) {
       injectStatusComposers = Optional.of(injectStatus);
       injectStatus.get().setInject(this.inject);
-      this.inject.setStatus(injectStatus.get());
+      this.inject.setExecutions(new ArrayList<>(Arrays.asList(injectStatus.get()))); // TODO POC
       return this;
     }
 

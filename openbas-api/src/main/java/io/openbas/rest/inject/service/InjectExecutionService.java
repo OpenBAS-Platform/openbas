@@ -86,7 +86,7 @@ public class InjectExecutionService {
     log.log(Level.SEVERE, e.getMessage());
     if (inject != null) {
       inject
-          .getStatus()
+          .getExecution() //TODO POC
           .ifPresent(
               status -> {
                 ExecutionTrace trace =

@@ -44,7 +44,9 @@ public class ExecutionExecutorService {
     agents.removeAll(crowdstrikeAgents);
 
     InjectStatus injectStatus =
-        inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+        inject
+            .getExecution() //TODO POC
+            .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents
     if (!inactiveAgents.isEmpty()) {

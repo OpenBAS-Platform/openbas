@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -308,7 +309,9 @@ public class InjectApi extends RestBehavior {
   public Inject injectExecutionReception(
       @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
+    inject.setFirstExecutionDate(Instant.now()); // TODO POC
+    inject.setStatus(ExecutionStatus.PENDING); // TODO POC
+    InjectStatus injectStatus = inject.getExecution().orElseThrow(ElementNotFoundException::new); //TODO POC
     injectStatus.setName(ExecutionStatus.PENDING);
     return injectRepository.save(inject);
   }

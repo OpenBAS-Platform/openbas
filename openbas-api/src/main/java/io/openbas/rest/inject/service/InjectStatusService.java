@@ -16,6 +16,8 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class InjectStatusService {
     injectStatus.setInject(inject);
     injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
-    inject.setStatus(injectStatus);
+    inject.setExecutions(new ArrayList<>(Arrays.asList(injectStatus))); // TODO POC
     return injectRepository.save(inject);
   }
 
@@ -68,7 +70,11 @@ public class InjectStatusService {
   }
 
   private int getCompleteTrace(Inject inject) {
-    return inject.getStatus().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
+    return inject
+        .getExecution() //TODO POC
+        .map(InjectStatus::getTraces)
+        .orElse(Collections.emptyList())
+        .stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
         .map(trace -> trace.getAgent().getId())
@@ -124,7 +130,7 @@ public class InjectStatusService {
 
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus = inject.getExecution().orElseThrow(ElementNotFoundException::new); //TODO POC
 
     ExecutionTrace executionTrace =
         createExecutionTrace(injectStatus, input, agent, structuredOutput);
@@ -194,7 +200,7 @@ public class InjectStatusService {
 
   private InjectStatus getOrInitializeInjectStatus(Inject inject) {
     return inject
-        .getStatus()
+        .getExecution() //TODO POC
         .orElseGet(
             () -> {
               InjectStatus newStatus = new InjectStatus();
