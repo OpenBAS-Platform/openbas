@@ -318,8 +318,8 @@ class FindingApiTest extends IntegrationTest {
     @DisplayName("When searching for findings on inject")
     class WhenSearchingForFindingsOnInject {
       @Test
-      @DisplayName("Returns all findings for observed simulation")
-      public void ReturnsAllFindingsForObservedSimulation() throws Exception {
+      @DisplayName("Returns all findings for observed inject")
+      public void ReturnsAllFindingsForObservedInject() throws Exception {
         ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
         scenarioWrapper.persist();
 
@@ -353,7 +353,65 @@ class FindingApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("When searching for findings on Endpoint")
-    class WhenSearchingForFindingsOnEndpoint {}
+    class WhenSearchingForFindingsOnEndpoint {
+      @Test
+      @DisplayName("Returns all findings for latest simulations involving endpoint")
+      public void ReturnsAllFindingsForLatestSimulationsInvolvingEndpoint() throws Exception {
+        EndpointComposer.Composer endpointWrapper =
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+        ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
+
+        // hack findings to attach to endpoint
+        for (Exercise ex : scenarioWrapper.get().getExercises()) {
+          for (Inject inject : ex.getInjects()) {
+            for (Finding finding : inject.getFindings()) {
+              finding.setAssets(List.of(endpointWrapper.get()));
+            }
+          }
+        }
+
+        List<FindingComposer.Composer> latestFindingWrappers = new ArrayList<>();
+        // add latest simulation to scenario
+        Hashtable<String, InjectComposer.Composer> latestSimulationInjectWrappers =
+            attachSimulationToScenario(scenarioWrapper);
+        for (Map.Entry<String, InjectComposer.Composer> entry :
+            latestSimulationInjectWrappers.entrySet()) {
+          FindingComposer.Composer findingWrapper =
+              findingComposer.forFinding(FindingFixture.createDefaultTextFindingWithRandomValue());
+          latestFindingWrappers.add(findingWrapper);
+          entry.getValue().withFinding(findingWrapper).withEndpoint(endpointWrapper);
+        }
+
+        scenarioWrapper.persist();
+
+        SearchPaginationInput input = PaginationFixture.getDefault().build();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            performCallbackRequest(
+                    FINDING_URI + "/endpoints/" + endpointWrapper.get().getId() + "/search", input)
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FindingOutput> expectedFindings =
+            fromIterable(
+                    findingRepository.findAllById(
+                        latestFindingWrappers.stream()
+                            .map(wrapper -> wrapper.get().getId())
+                            .toList()))
+                .stream()
+                .map(findingMapper::toFindingOutput)
+                .limit(input.getSize())
+                .toList();
+
+        assertThatJson(response)
+            .node("content")
+            .isEqualTo(mapper.writeValueAsString(expectedFindings));
+      }
+    }
   }
 
   @Nested
