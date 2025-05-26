@@ -109,13 +109,14 @@ public class InjectAssistantService {
    * platform-architecture pairs (e.g., Linux:x86_64, macOS:arm64), with a result limit.
    */
   private List<InjectorContract> searchInjectorContracts(
-      String attackPatternId, List<String> platformArchitecturePairs, Integer limit) {
+      String attackPatternExternalId, List<String> platformArchitecturePairs, Integer limit) {
     StringBuilder sql =
         new StringBuilder(
             "SELECT ic.* FROM injectors_contracts ic "
                 + "JOIN payloads p ON ic.injector_contract_payload = p.payload_id "
-                + "JOIN injectors_contracts_attack_patterns a ON ic.injector_contract_id = a.injector_contract_id "
-                + "WHERE a.attack_pattern_id = :attackPatternId");
+                + "JOIN injectors_contracts_attack_patterns injectorAttack ON ic.injector_contract_id = injectorAttack.injector_contract_id "
+                + "JOIN attack_patterns a ON  injectorAttack.attack_pattern_id = a.attack_pattern_id "
+                + "WHERE a.attack_pattern_external_id LIKE :attackPatternExternalId");
 
     for (String pair : platformArchitecturePairs) {
       String[] parts = pair.split(":");
@@ -133,7 +134,7 @@ public class InjectAssistantService {
     sql.append(" ORDER BY RANDOM() LIMIT :limit");
 
     Query query = this.entityManager.createNativeQuery(sql.toString(), InjectorContract.class);
-    query.setParameter("attackPatternId", attackPatternId);
+    query.setParameter("attackPatternExternalId", attackPatternExternalId + "%");
     query.setParameter("limit", limit);
 
     List<InjectorContract> results = query.getResultList();
@@ -172,7 +173,7 @@ public class InjectAssistantService {
     // Try to find injectors contract covering all platform-architecture pairs at once
     List<InjectorContract> injectorContracts =
         this.searchInjectorContracts(
-            attackPattern.getId(), groupedAssets.keySet().stream().toList(), injectNumberByTTP);
+            attackPattern.getExternalId(), groupedAssets.keySet().stream().toList(), injectNumberByTTP);
 
     if (!injectorContracts.isEmpty()) {
       injectorContracts.forEach(ic -> contractEndpointsMap.put(ic, endpoints));
@@ -183,7 +184,7 @@ public class InjectAssistantService {
             // For each platform architecture pairs try to find injectorContracts
             List<InjectorContract> injectorContractsForGroup =
                 this.searchInjectorContracts(
-                    attackPattern.getId(), List.of(platformArchitecture), injectNumberByTTP);
+                    attackPattern.getExternalId(), List.of(platformArchitecture), injectNumberByTTP);
 
             // Else take the manual injectorContract
             if (injectorContractsForGroup.isEmpty()) {
@@ -248,7 +249,7 @@ public class InjectAssistantService {
 
     // Else find from DB
     return this.searchInjectorContracts(
-        attackPattern.getId(), platformArchitecturePairs, injectNumberByTTP);
+        attackPattern.getExternalId(), platformArchitecturePairs, injectNumberByTTP);
   }
 
   private record ContractResultForAssetGroup(
@@ -386,7 +387,7 @@ public class InjectAssistantService {
     List<String> allPlatformArchitecturePairs = getAllPlatform();
     List<InjectorContract> injectorContracts =
         this.searchInjectorContracts(
-            attackPattern.getId(), allPlatformArchitecturePairs, injectNumberByTTP);
+            attackPattern.getExternalId(), allPlatformArchitecturePairs, injectNumberByTTP);
 
     if (!injectorContracts.isEmpty()) {
       return injectorContracts.stream()
