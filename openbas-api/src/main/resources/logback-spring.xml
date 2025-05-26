@@ -14,7 +14,9 @@
     <springProfile name="!dev">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
         <appender name="jsonEncoder" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+            <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
+                <WithThrowable>true</WithThrowable>
+            </encoder>
         </appender>
 
         <root>
