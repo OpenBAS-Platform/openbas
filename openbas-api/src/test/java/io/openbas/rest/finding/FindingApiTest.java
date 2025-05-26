@@ -381,8 +381,19 @@ class FindingApiTest extends IntegrationTest {
           latestFindingWrappers.add(findingWrapper);
           entry.getValue().withFinding(findingWrapper).withEndpoint(endpointWrapper);
         }
-
         scenarioWrapper.persist();
+
+        // add injects (atomic testing) with findings too
+        for (int i = 0; i < 2; i++) {
+          FindingComposer.Composer findingWrapper =
+                  findingComposer.forFinding(FindingFixture.createDefaultTextFindingWithRandomValue());
+          latestFindingWrappers.add(findingWrapper);
+          injectComposer
+                  .forInject(InjectFixture.getDefaultInject())
+                  .withFinding(findingWrapper)
+                  .withEndpoint(endpointWrapper)
+                  .persist();
+        }
 
         SearchPaginationInput input = PaginationFixture.getDefault().build();
 
