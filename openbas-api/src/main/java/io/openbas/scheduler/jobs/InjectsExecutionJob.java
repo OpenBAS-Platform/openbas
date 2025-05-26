@@ -145,7 +145,7 @@ public class InjectsExecutionJob implements Job {
             .map(
                 inject -> {
                   InjectStatus status =
-                      inject.getExecution().orElseThrow(ElementNotFoundException::new); //TODO POC
+                      inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
@@ -252,8 +252,10 @@ public class InjectsExecutionJob implements Job {
           mapCondition.put(
               "Execution",
               parent.getExecution().isPresent()
-                  && !ExecutionStatus.ERROR.equals(parent.getExecution().get().getName()) //TODO POC
-                  && !executionStatusesNotReady.contains(parent.getExecution().get().getName())); //TODO POC
+                  && !ExecutionStatus.ERROR.equals(
+                      parent.getExecution().get().getName()) // TODO POC
+                  && !executionStatusesNotReady.contains(
+                      parent.getExecution().get().getName())); // TODO POC
 
           List<InjectExpectation> expectations =
               injectExpectationRepository.findAllForExerciseAndInject(exerciseId, parent.getId());

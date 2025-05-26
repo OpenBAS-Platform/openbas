@@ -219,13 +219,7 @@ public class ScenarioToExerciseService {
           exerciseInject.setExercise(exerciseSaved);
           exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
           exerciseInject.setUser(scenarioInject.getUser());
-          exerciseInject
-              .getExecutions()
-              .add(
-                  scenarioInject
-                      .getExecution()
-                      .orElse(null)); // TODO POC: When Scenario is executed, a simulation is
-          // created, ths default status injects should be just one value
+          exerciseInject.setStatus(scenarioInject.getStatus()); // TODO POC : we pass status and not status/execution
           exerciseInject.setTags(CopyObjectListUtils.copy(scenarioInject.getTags(), Tag.class));
           exerciseInject.setContent(scenarioInject.getContent());
 

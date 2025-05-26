@@ -164,7 +164,6 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_status")
   @JsonProperty("inject_status")
   @Enumerated(EnumType.STRING)
-  @NotNull
   private ExecutionStatus
       status; // TODO POC: Migrate inject_status_name to inject_status, set the status...
 
@@ -175,7 +174,11 @@ public class Inject implements Base, Injection {
 
   // TODO POC Status -> Executions , Fecth Eager
   @Getter
-  @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "inject",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("inject_executions")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<InjectStatus> executions = new ArrayList<>();
@@ -369,7 +372,7 @@ public class Inject implements Base, Injection {
   }
 
   public Optional<InjectStatus> getExecution() {
-    return this.executions.stream().findFirst(); // TODO POC
+    return ofNullable(this.executions).flatMap(list->list.stream().findFirst()); // TODO POC
   }
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {

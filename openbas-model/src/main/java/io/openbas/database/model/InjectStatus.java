@@ -23,9 +23,9 @@ public class InjectStatus extends BaseInjectStatus {
   @JsonProperty("status_payload_output")
   private StatusPayload payloadOutput;
 
-  @OneToMany(mappedBy = "injectStatus", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "execution", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
-  private List<InjectBinding> inputBindings = new ArrayList<>();
+  private List<ExecutionBinding> executionBindings = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "injectStatus",

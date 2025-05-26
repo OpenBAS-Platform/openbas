@@ -122,7 +122,7 @@ public class ChallengeService {
                   InjectStatus injectStatus =
                       injectExpectation
                           .getInject()
-                          .getExecution() //TODO POC
+                          .getExecution() // TODO POC
                           .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
                   ChallengeAttemptId challengeAttemptId =
                       buildChallengeAttemptID(
@@ -153,7 +153,7 @@ public class ChallengeService {
             InjectStatus injectStatus =
                 playerExpectation
                     .getInject()
-                    .getExecution() //TODO POC
+                    .getExecution() // TODO POC
                     .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
             ChallengeAttemptId challengeAttemptId =
                 buildChallengeAttemptID(challengeId, injectStatus.getId(), user.getId());
@@ -183,7 +183,7 @@ public class ChallengeService {
               .map(
                   e ->
                       e.getInject()
-                          .getExecution() //TODO POC
+                          .getExecution() // TODO POC
                           .orElseThrow(() -> new ElementNotFoundException("Status should exist"))
                           .getId())
               .toList();

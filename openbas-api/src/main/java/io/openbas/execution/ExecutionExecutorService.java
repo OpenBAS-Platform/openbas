@@ -45,7 +45,7 @@ public class ExecutionExecutorService {
 
     InjectStatus injectStatus =
         inject
-            .getExecution() //TODO POC
+            .getExecution() // TODO POC
             .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents

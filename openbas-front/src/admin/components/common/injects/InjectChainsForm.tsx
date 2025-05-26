@@ -1,19 +1,5 @@
 import { Add, DeleteOutlined, ExpandMore } from '@mui/icons-material';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  type SelectChangeEvent,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, type SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import { type FormApi } from 'final-form';
 import { type FunctionComponent, type ReactElement, type ReactNode, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -22,7 +8,7 @@ import { type ConditionElement, type ConditionType, type Content, type Converted
 import ClickableChip, { type Element } from '../../../../components/common/chips/ClickableChip';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import { useFormatter } from '../../../../components/i18n';
-import { type Inject, type InjectDependency, type InjectDependencyCondition, type InjectOutput } from '../../../../utils/api-types';
+import { type Inject, type InjectBinding, type InjectDependency, type InjectDependencyCondition, type InjectOutput } from '../../../../utils/api-types';
 import { capitalize } from '../../../../utils/String';
 
 const useStyles = makeStyles()(() => ({
@@ -47,6 +33,9 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
 
+  console.log('injects', injects);
+  console.log('values', values);
+
   // List of parents
   const [parents, setParents] = useState<Dependency[]>(
     () => {
@@ -61,7 +50,6 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
       }
       return [];
     },
-
   );
 
   // List of childrens
@@ -145,12 +133,43 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
     return conditions;
   };
 
+  const getBindingParent = (injectDependsOn: (InjectDependency | undefined)[]) => {
+    const bindings: Record<string, InjectBinding[]> = {};
+
+    if (injectDependsOn) {
+      injectDependsOn.forEach((dependency) => {
+        if (dependency && dependency.dependency_bindings) {
+          const parentId = dependency.dependency_relationship?.inject_parent_id;
+          const childId = dependency.dependency_relationship?.inject_children_id;
+          const key = `${parentId}-${childId}`;
+
+          if (!bindings[key]) bindings[key] = [];
+
+          dependency.dependency_bindings.forEach((binding) => {
+            bindings[key].push({
+              injectDependency: dependency,
+              inject_binding_id: binding.inject_binding_id,
+              sourceKey: binding.sourceKey,
+              targetKey: binding.targetKey,
+            });
+          });
+        }
+      });
+    }
+
+    return bindings;
+  };
+
   const [parentConditions, setParentConditions] = useState(getConditionContentParent(values.inject_depends_on ? values.inject_depends_on : []));
   const [childrenConditions, setChildrenConditions] = useState(getConditionContentChildren(values.inject_depends_to));
 
+  const [parentBindings, setParentBindings] = useState<Record<string, InjectBinding[]>>(
+    getBindingParent(values.inject_depends_on ? values.inject_depends_on : []),
+  );
+
   /**
    * Get the inject dependency object from dependency ones
-   * @param deps the inject depencies
+   * @param deps the inject dependencies
    */
   const injectDependencyFromDependency = (deps: Dependency[]) => {
     return deps.flatMap(dependency => (dependency.inject?.inject_depends_on !== null ? dependency.inject?.inject_depends_on : []));
@@ -825,6 +844,88 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
       });
   };
 
+  /**
+   * Bindings
+   */
+  const getAvailableSourceKeys = (inject?: InjectOutputType): string[] => {
+    if (!inject?.inject_injector_contract?.injector_contract_payload?.payload_output_parsers) return [];
+
+    return inject?.inject_injector_contract?.injector_contract_payload?.payload_output_parsers.flatMap(parser =>
+      parser.output_parser_contract_output_elements?.map(el => el.contract_output_element_key) ?? [],
+    );
+  };
+
+  const getAvailableTargetKeys = (inject?: InjectOutputType): string[] => {
+    if (!inject?.inject_injector_contract?.injector_contract_payload?.payload_arguments) return [];
+
+    return inject?.inject_injector_contract?.injector_contract_payload.payload_arguments.map(arg => arg.key);
+  };
+
+  const addBinding = (parent: Dependency) => {
+    const key = `${parent.inject?.inject_id}-${values.inject_id}`;
+    const existingBindings = parentBindings[key] || [];
+
+    const duplicate = existingBindings.find(binding =>
+      binding.sourceKey === '' && binding.targetKey === '',
+    );
+
+    if (duplicate) {
+      alert(t('Empty binding already exists.'));
+      return;
+    }
+
+    setParentBindings(prev => ({
+      ...prev,
+      [key]: [...existingBindings, {
+        sourceKey: '',
+        targetKey: '',
+      }],
+    }));
+  };
+
+  const updateBinding = (
+    parent: Dependency,
+    index: number,
+    field: 'sourceKey' | 'targetKey',
+    value: string,
+  ) => {
+    const key = `${parent.inject?.inject_id}-${values.inject_id}`;
+    const updated = [...(parentBindings[key] || [])];
+    updated[index][field] = value;
+
+    setParentBindings(prev => ({
+      ...prev,
+      [key]: updated,
+    }));
+
+    // Update the form value in `inject_depends_on`
+    const depIndex = form.getState().values.inject_depends_on?.findIndex(
+      d => d.dependency_relationship?.inject_parent_id === parent.inject?.inject_id,
+    );
+
+    if (depIndex !== undefined && depIndex >= 0) {
+      form.mutators.setValue(`inject_depends_on[${depIndex}].dependency_bindings`, updated);
+    }
+  };
+
+  const removeBinding = (parent: Dependency, index: number) => {
+    const key = `${parent.inject?.inject_id}-${values.inject_id}`;
+    const updated = [...(parentBindings[key] || [])];
+    updated.splice(index, 1);
+    setParentBindings(prev => ({
+      ...prev,
+      [key]: updated,
+    }));
+
+    const depIndex = form.getState().values.inject_depends_on?.findIndex(
+      d => d.dependency_relationship?.inject_parent_id === parent.inject?.inject_id,
+    );
+
+    if (depIndex !== undefined && depIndex >= 0) {
+      form.mutators.setValue(`inject_depends_on[${depIndex}].dependency_bindings`, updated);
+    }
+  };
+
   return (
     <>
       <div className={classes.importerStyle}>
@@ -842,7 +943,6 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
           <Add fontSize="small" />
         </IconButton>
       </div>
-
       {parents.map((parent, index) => {
         return (
           <Accordion
@@ -929,6 +1029,60 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                     <Add fontSize="small" />
                     <Typography>
                       {t('Add condition')}
+                    </Typography>
+                  </Button>
+                </div>
+              </FormControl>
+              <FormControl fullWidth sx={{ marginTop: 2 }}>
+                <label className={classes.labelExecutionCondition}>{t('Execution Bindings:')}</label>
+                {(parentBindings[`${parent.inject?.inject_id}-${values.inject_id}`] || []).map((binding, index) => (
+                  <Box
+                    key={`binding-${index}`}
+                    sx={{
+                      padding: '12px 4px',
+                      display: 'flex',
+                      gap: 2,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Select
+                      fullWidth
+                      value={binding.sourceKey}
+                      onChange={e => updateBinding(parent, index, 'sourceKey', e.target.value)}
+                    >
+                      {getAvailableSourceKeys(parent.inject).map(key => (
+                        <MenuItem key={key} value={key}>{key}</MenuItem>
+                      ))}
+                    </Select>
+                    →
+                    <Select
+                      fullWidth
+                      value={binding.targetKey}
+                      onChange={e => updateBinding(parent, index, 'targetKey', e.target.value)}
+                    >
+                      {getAvailableTargetKeys(parent.inject).map(key => (
+                        <MenuItem key={key} value={key}>{key}</MenuItem>
+                      ))}
+                    </Select>
+                  </Box>
+                ))}
+                <div style={{ justifyContent: 'left' }}>
+                  <Button
+                    color="secondary"
+                    aria-label="Add"
+                    size="large"
+                    onClick={() => {
+                      addBinding(parent);
+                    }}
+                    style={{ justifyContent: 'start' }}
+                    disabled={
+                      getAvailableSourceKeys(parent.inject).length === 0
+                      || getAvailableTargetKeys(parent.inject).length === 0
+                    }
+                  >
+                    <Add fontSize="small" />
+                    <Typography>
+                      {t('Add binding')}
                     </Typography>
                   </Button>
                 </div>

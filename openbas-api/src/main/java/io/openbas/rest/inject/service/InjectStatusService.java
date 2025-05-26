@@ -71,7 +71,7 @@ public class InjectStatusService {
 
   private int getCompleteTrace(Inject inject) {
     return inject
-        .getExecution() //TODO POC
+        .getExecution() // TODO POC
         .map(InjectStatus::getTraces)
         .orElse(Collections.emptyList())
         .stream()
@@ -130,7 +130,8 @@ public class InjectStatusService {
 
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
-    InjectStatus injectStatus = inject.getExecution().orElseThrow(ElementNotFoundException::new); //TODO POC
+    InjectStatus injectStatus =
+        inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
 
     ExecutionTrace executionTrace =
         createExecutionTrace(injectStatus, input, agent, structuredOutput);
@@ -200,7 +201,7 @@ public class InjectStatusService {
 
   private InjectStatus getOrInitializeInjectStatus(Inject inject) {
     return inject
-        .getExecution() //TODO POC
+        .getExecution() // TODO POC
         .orElseGet(
             () -> {
               InjectStatus newStatus = new InjectStatus();

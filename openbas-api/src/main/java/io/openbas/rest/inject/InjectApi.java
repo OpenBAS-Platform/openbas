@@ -311,7 +311,8 @@ public class InjectApi extends RestBehavior {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     inject.setFirstExecutionDate(Instant.now()); // TODO POC
     inject.setStatus(ExecutionStatus.PENDING); // TODO POC
-    InjectStatus injectStatus = inject.getExecution().orElseThrow(ElementNotFoundException::new); //TODO POC
+    InjectStatus injectStatus =
+        inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
     injectStatus.setName(ExecutionStatus.PENDING);
     return injectRepository.save(inject);
   }

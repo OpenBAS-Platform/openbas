@@ -29,8 +29,8 @@ public class InjectDependency {
   private InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition;
 
   @OneToMany(mappedBy = "injectDependency", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonProperty("attribute_mappings")
-  private List<InjectMapping> attributeMappings = new ArrayList<>();
+  @JsonProperty("dependency_bindings")
+  private List<InjectBinding> bindings = new ArrayList<>();
 
   @CreationTimestamp
   @Column(name = "dependency_created_at")
