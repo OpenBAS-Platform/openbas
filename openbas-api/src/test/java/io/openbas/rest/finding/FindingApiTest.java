@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -137,7 +138,7 @@ class FindingApiTest extends IntegrationTest {
                       .withInjector(injectorFixture.getWellKnownObasImplantInjector())));
 
       ExerciseComposer.Composer simulationWrapper =
-          simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
+          simulationComposer.forExercise(ExerciseFixture.createRunningAttackExercise());
       for (Map.Entry<String, InjectComposer.Composer> entry : injects.entrySet()) {
         simulationWrapper.withInject(entry.getValue());
       }
@@ -218,6 +219,7 @@ class FindingApiTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
             .isEqualTo(mapper.writeValueAsString(expectedFindings));
       }
@@ -270,6 +272,7 @@ class FindingApiTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
             .isEqualTo(mapper.writeValueAsString(expectedFindings));
       }
@@ -358,7 +361,7 @@ class FindingApiTest extends IntegrationTest {
       @DisplayName("Returns all findings for latest simulations involving endpoint")
       public void ReturnsAllFindingsForLatestSimulationsInvolvingEndpoint() throws Exception {
         EndpointComposer.Composer endpointWrapper =
-            endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+            endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
         ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
 
         // hack findings to attach to endpoint
@@ -377,22 +380,23 @@ class FindingApiTest extends IntegrationTest {
         for (Map.Entry<String, InjectComposer.Composer> entry :
             latestSimulationInjectWrappers.entrySet()) {
           FindingComposer.Composer findingWrapper =
-              findingComposer.forFinding(FindingFixture.createDefaultTextFindingWithRandomValue());
+              findingComposer
+                  .forFinding(FindingFixture.createDefaultTextFindingWithRandomValue())
+                  .withEndpoint(endpointWrapper);
+          entry.getValue().withFinding(findingWrapper);
           latestFindingWrappers.add(findingWrapper);
-          entry.getValue().withFinding(findingWrapper).withEndpoint(endpointWrapper);
         }
         scenarioWrapper.persist();
 
         // add injects (atomic testing) with findings too
         for (int i = 0; i < 2; i++) {
           FindingComposer.Composer findingWrapper =
-                  findingComposer.forFinding(FindingFixture.createDefaultTextFindingWithRandomValue());
+              findingComposer.forFinding(FindingFixture.createDefaultTextFindingWithRandomValue());
           latestFindingWrappers.add(findingWrapper);
           injectComposer
-                  .forInject(InjectFixture.getDefaultInject())
-                  .withFinding(findingWrapper)
-                  .withEndpoint(endpointWrapper)
-                  .persist();
+              .forInject(InjectFixture.getDefaultInject())
+              .withFinding(findingWrapper.withEndpoint(endpointWrapper))
+              .persist();
         }
 
         SearchPaginationInput input = PaginationFixture.getDefault().build();
@@ -419,6 +423,7 @@ class FindingApiTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
             .isEqualTo(mapper.writeValueAsString(expectedFindings));
       }

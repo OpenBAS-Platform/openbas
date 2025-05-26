@@ -1,6 +1,7 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.Finding;
+import jakarta.persistence.criteria.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -25,5 +26,22 @@ public class FindingSpecification {
 
   public static Specification<Finding> findFindingsForEndpoint(@NotNull final String endpointId) {
     return (root, query, cb) -> cb.equal(root.get("assets").get("id"), endpointId);
+  }
+
+  public static Specification<Finding> forLatestSimulations() {
+    return (root, query, cb) -> {
+      Join<?, ?> injectJoin = root.join("inject", JoinType.INNER);
+      Join<?, ?> exerciseJoin1 = injectJoin.join("exercise", JoinType.LEFT);
+      Join<?, ?> exerciseJoin2 =
+          exerciseJoin1.join("scenario", JoinType.LEFT).join("exercises", JoinType.LEFT);
+
+      exerciseJoin2.on(
+          cb.and(
+              cb.equal(
+                  exerciseJoin1.get("scenario").get("id"), exerciseJoin2.get("scenario").get("id")),
+              cb.lessThan(exerciseJoin1.get("createdAt"), exerciseJoin2.get("createdAt"))));
+
+      return cb.isNull(exerciseJoin2.get("id"));
+    };
   }
 }

@@ -52,8 +52,7 @@ public class ExcludeMembersOfAssetGroupsSpecification<T> {
           .select(criteriaBuilder.literal(1))
           .where(
               positiveSpec.toPredicate(assetTable, query, criteriaBuilder),
-              criteriaBuilder.equal(
-                  finalFrom.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+              criteriaBuilder.equal(finalFrom.get("id"), root.get("id")));
       return criteriaBuilder.exists(subQuery).not();
     });
   }
@@ -68,8 +67,7 @@ public class ExcludeMembersOfAssetGroupsSpecification<T> {
       subQuery
           .select(criteriaBuilder.literal(1))
           .where(
-              criteriaBuilder.equal(
-                  finalFrom.get("id"), query.getRoots().stream().findFirst().get().get("id")),
+              criteriaBuilder.equal(finalFrom.get("id"), root.get("id")),
               assetGroupTable.get("id").in(assetGroupIds.stream().toList()));
       return criteriaBuilder.exists(subQuery).not();
     };
