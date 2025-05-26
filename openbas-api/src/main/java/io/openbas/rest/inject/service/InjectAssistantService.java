@@ -99,7 +99,7 @@ public class InjectAssistantService {
         String.format(
             "[%s] Placeholder - %s %s", attackPattern.getExternalId(), platform, architecture),
         String.format(
-            "This placeholder is disabled because the TTP %s with platform %s and architecture %s is currently not covered. Please create the payloads for the missing TTP",
+            "This placeholder is disabled because the TTP %s with platform %s and architecture %s is currently not covered. Please create the payloads for the missing TTP.",
             attackPattern.getExternalId(), platform, architecture),
         false);
   }

@@ -200,7 +200,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
             label={t('Cover the following TTPs')}
             required
           />
-          <TextFieldController type="number" label={t('Number of inject by TTP')} name="inject_by_ttp_number" required />
+          <TextFieldController type="number" label={t('Number of injects by TTP')} name="inject_by_ttp_number" required />
           <Button
             variant="contained"
             color="secondary"
