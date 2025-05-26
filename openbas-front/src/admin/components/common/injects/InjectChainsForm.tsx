@@ -8,7 +8,7 @@ import { type ConditionElement, type ConditionType, type Content, type Converted
 import ClickableChip, { type Element } from '../../../../components/common/chips/ClickableChip';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import { useFormatter } from '../../../../components/i18n';
-import { type Inject, type InjectBinding, type InjectDependency, type InjectDependencyCondition, type InjectOutput } from '../../../../utils/api-types';
+import { type ContractOutputElement, type Inject, type InjectBinding, type InjectDependency, type InjectDependencyCondition, type InjectOutput } from '../../../../utils/api-types';
 import { capitalize } from '../../../../utils/String';
 
 const useStyles = makeStyles()(() => ({
@@ -33,8 +33,13 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
 
-  console.log('injects', injects);
-  console.log('values', values);
+  type ContractOutputElementType = ContractOutputElement['contract_output_element_type'];
+
+  const defaultFields: Partial<Record<ContractOutputElementType, string[]>> = {
+    credentials: ['username', 'password'],
+    portscan: ['host', 'port', 'service'],
+    cve: ['id', 'host', 'severity'],
+  };
 
   // List of parents
   const [parents, setParents] = useState<Dependency[]>(
@@ -847,18 +852,63 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
   /**
    * Bindings
    */
-  const getAvailableSourceKeys = (inject?: InjectOutputType): string[] => {
-    if (!inject?.inject_injector_contract?.injector_contract_payload?.payload_output_parsers) return [];
-
-    return inject?.inject_injector_contract?.injector_contract_payload?.payload_output_parsers.flatMap(parser =>
-      parser.output_parser_contract_output_elements?.map(el => el.contract_output_element_key) ?? [],
-    );
+  console.log(injects);
+  console.log(values);
+  type OutputElementInfo = {
+    key: string;
+    type?: ContractOutputElementType;
   };
 
-  const getAvailableTargetKeys = (inject?: InjectOutputType): string[] => {
-    if (!inject?.inject_injector_contract?.injector_contract_payload?.payload_arguments) return [];
+  const getAvailableSourceKeys = (inject?: InjectOutputType): OutputElementInfo[] => {
+    const parsers = inject?.inject_injector_contract?.injector_contract_payload?.payload_output_parsers;
 
-    return inject?.inject_injector_contract?.injector_contract_payload.payload_arguments.map(arg => arg.key);
+    if (Array.isArray(parsers)) {
+      return parsers.flatMap(parser =>
+        parser.output_parser_contract_output_elements?.map(el => ({
+          key: el.contract_output_element_key,
+          type: el.contract_output_element_type,
+        })) ?? [],
+      );
+    }
+
+    // Fallback to parsed content
+    const content = inject?.inject_injector_contract?.injector_contract_content;
+    if (typeof content === 'string') {
+      try {
+        const parsed = JSON.parse(content);
+        return Array.isArray(parsed.outputs)
+          ? parsed.outputs.map((o: any) => ({
+              key: o.field,
+              type: o.type,
+            }))
+          : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
+  };
+
+  const getAvailableTargetKeys = (inject?: any): string[] => {
+    const payloadArgs
+      = inject?.inject_injector_contract?.injector_contract_payload?.payload_arguments;
+
+    if (Array.isArray(payloadArgs)) {
+      return payloadArgs.map(arg => arg.key);
+    }
+
+    const content = inject?.inject_injector_contract?.injector_contract_content;
+    if (content && typeof content === 'string') {
+      try {
+        const parsed = JSON.parse(content);
+        return Array.isArray(parsed.fields) ? parsed.fields.map((f: any) => f.key) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
   };
 
   const addBinding = (parent: Dependency) => {
@@ -1050,9 +1100,23 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                       value={binding.sourceKey}
                       onChange={e => updateBinding(parent, index, 'sourceKey', e.target.value)}
                     >
-                      {getAvailableSourceKeys(parent.inject).map(key => (
-                        <MenuItem key={key} value={key}>{key}</MenuItem>
-                      ))}
+                      {getAvailableSourceKeys(parent.inject).flatMap(({ key, type }) => {
+                        const fields = type && defaultFields[type];
+                        if (fields?.length) {
+                          return fields.map(field => (
+                            <MenuItem key={`${key}.${field}`} value={`${key}.${field}`}>
+                              {`${key}.${field}`}
+                            </MenuItem>
+                          ));
+                        }
+
+                        // If no known subfields, just use the key
+                        return (
+                          <MenuItem key={key} value={key}>
+                            {key}
+                          </MenuItem>
+                        );
+                      })}
                     </Select>
                     →
                     <Select
@@ -1060,7 +1124,7 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                       value={binding.targetKey}
                       onChange={e => updateBinding(parent, index, 'targetKey', e.target.value)}
                     >
-                      {getAvailableTargetKeys(parent.inject).map(key => (
+                      {getAvailableTargetKeys(values).map(key => (
                         <MenuItem key={key} value={key}>{key}</MenuItem>
                       ))}
                     </Select>
@@ -1077,7 +1141,7 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                     style={{ justifyContent: 'start' }}
                     disabled={
                       getAvailableSourceKeys(parent.inject).length === 0
-                      || getAvailableTargetKeys(parent.inject).length === 0
+                      || getAvailableTargetKeys(values).length === 0
                     }
                   >
                     <Add fontSize="small" />
