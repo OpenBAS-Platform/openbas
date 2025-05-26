@@ -252,6 +252,7 @@ public class Inject implements Base, Injection {
   private List<InjectExpectation> expectations = new ArrayList<>();
 
   @JsonIgnore
+  @Getter
   @OneToMany(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Finding> findings = new ArrayList<>();
 

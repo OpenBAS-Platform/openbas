@@ -1,10 +1,9 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Statement;
 
 @Component
 public class V3_90__add_automatic_finding_hash_column extends BaseJavaMigration {
@@ -17,7 +16,7 @@ public class V3_90__add_automatic_finding_hash_column extends BaseJavaMigration 
           """
           -- necessary for hashing functions
           CREATE EXTENSION IF NOT EXISTS pgcrypto;
-          
+
           CREATE OR REPLACE FUNCTION compute_finding_identity(id TEXT)
           RETURNS TEXT
           AS
@@ -51,10 +50,10 @@ public class V3_90__add_automatic_finding_hash_column extends BaseJavaMigration 
               );
             END;
             $$ LANGUAGE plpgsql;
-          
+
           ALTER TABLE findings
           ADD COLUMN finding_identity_hash TEXT NULL;
-          
+
           CREATE OR REPLACE FUNCTION update_finding_identity_hash_trigger()
           RETURNS TRIGGER AS $$
           BEGIN
@@ -64,12 +63,12 @@ public class V3_90__add_automatic_finding_hash_column extends BaseJavaMigration 
               RETURN NEW;
           END;
           $$ LANGUAGE plpgsql;
-          
+
           CREATE OR REPLACE TRIGGER after_insert_finding
           AFTER INSERT ON findings
           FOR EACH ROW
           EXECUTE PROCEDURE update_finding_identity_hash_trigger();
-          
+
           CREATE OR REPLACE TRIGGER after_update_finding
           AFTER UPDATE OF finding_field,
                       finding_type,
@@ -79,7 +78,7 @@ public class V3_90__add_automatic_finding_hash_column extends BaseJavaMigration 
                       finding_inject_id ON findings
           FOR EACH ROW
           EXECUTE PROCEDURE update_finding_identity_hash_trigger();
-          
+
           -- migration of existing records
           UPDATE findings
           SET finding_identity_hash = compute_finding_identity(finding_id)

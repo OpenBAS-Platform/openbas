@@ -25,6 +25,7 @@ public class InjectComposer extends ComposerBase<Inject> {
     private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
     private final List<AssetGroupComposer.Composer> assetGroupComposers = new ArrayList<>();
     private final List<InjectExpectationComposer.Composer> expectationComposers = new ArrayList<>();
+    private final List<FindingComposer.Composer> findingComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -108,6 +109,15 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectDependencyId.setInjectChildren(this.inject);
       injectDependency.setCompositeId(injectDependencyId);
       this.inject.setDependsOn(List.of(injectDependency));
+      return this;
+    }
+
+    public Composer withFinding(FindingComposer.Composer findingComposer) {
+      findingComposers.add(findingComposer);
+      List<Finding> tmpFindings = this.inject.getFindings();
+      tmpFindings.add(findingComposer.get());
+      findingComposer.get().setInject(this.inject);
+      this.inject.setFindings(tmpFindings);
       return this;
     }
 

@@ -1,7 +1,8 @@
-package io.openbas.rest.finding;
+package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.Finding;
+import java.util.UUID;
 
 public class FindingFixture {
 
@@ -16,6 +17,12 @@ public class FindingFixture {
     finding.setField(TEXT_FIELD);
     finding.setValue("text_value");
     finding.setLabels(new String[] {"reconnaissance phase"});
+    return finding;
+  }
+
+  public static Finding createDefaultTextFindingWithRandomValue() {
+    Finding finding = createDefaultTextFinding();
+    finding.setValue(UUID.randomUUID().toString());
     return finding;
   }
 

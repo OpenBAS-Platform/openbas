@@ -1,6 +1,6 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.rest.finding.FindingFixture.*;
+import static io.openbas.utils.fixtures.FindingFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static org.junit.jupiter.api.Assertions.*;
 
