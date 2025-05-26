@@ -78,7 +78,7 @@ public class NotificationRuleApi {
           @NotBlank
           @Schema(description = "Resource id of the resource associated with the notification rule")
           final String resourceId) {
-    log.warn("Test d'erreur", new Exception("test"));
+    log.error("Test d'erreur", new Exception("test"));
     return notificationRuleService
         .findNotificationRuleByResourceAndUser(resourceId, userService.currentUser().getId())
         .stream()
