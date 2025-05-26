@@ -141,7 +141,8 @@ public class AssetGroupService {
       return assetGroup;
     }
     Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getDynamicFilter());
-    Specification<Endpoint> specification2 = EndpointSpecification.findEndpointsForInjection();
+    Specification<Endpoint> specification2 =
+        EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints();
     List<Asset> assets =
         this.endpointService.endpoints(specification.and(specification2)).stream()
             .map(Asset.class::cast)
@@ -168,7 +169,8 @@ public class AssetGroupService {
                             filter -> {
                               Specification<Endpoint> specification = computeFilterGroupJpa(filter);
                               Specification<Endpoint> specification2 =
-                                  EndpointSpecification.findEndpointsForInjection();
+                                  EndpointSpecification
+                                      .findEndpointsForInjectionOrAgentlessEndpoints();
                               return this.endpointService
                                   .endpoints(specification.and(specification2))
                                   .stream()

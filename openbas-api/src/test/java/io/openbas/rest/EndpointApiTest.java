@@ -6,6 +6,7 @@ import static io.openbas.utils.fixtures.AgentFixture.createAgent;
 import static io.openbas.utils.fixtures.EndpointFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.*;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -18,7 +19,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
@@ -48,11 +48,58 @@ class EndpointApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private TagRepository tagRepository;
   @Autowired private EndpointRepository endpointRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseService exerciseService;
 
   @SpyBean private EndpointService endpointService;
+
+  @DisplayName("Given valid input, should create an endpoint agentless successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validInput_should_createEndpointAgentlessSuccessfully() throws Exception {
+    // --PREPARE--
+    Endpoint endpointInput = createEndpoint();
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(ENDPOINT_URI + "/agentless")
+                    .content(asJsonString(endpointInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT
+    assertThatJson(response).node("asset_name").isEqualTo(endpointInput.getName());
+    assertThatJson(response).node("asset_description").isEqualTo(endpointInput.getDescription());
+    assertThatJson(response).node("endpoint_hostname").isEqualTo(endpointInput.getHostname());
+    assertThatJson(response).node("endpoint_platform").isEqualTo(endpointInput.getPlatform());
+    assertThatJson(response).node("endpoint_arch").isEqualTo(endpointInput.getArch());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointInput.getIps());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointInput.getIps());
+    assertThatJson(response).node("asset_tags").isEqualTo(endpointInput.getTags());
+    assertThatJson(response).node("asset_agents").isEqualTo(endpointInput.getAgents());
+  }
+
+  @DisplayName("Given wrong input, can't create an endpoint agentless successfully")
+  @Test
+  @WithMockAdminUser
+  void given_wrongInput_cant_createEndpointAgentlessSuccessfully() throws Exception {
+    // --PREPARE--
+    Endpoint endpointInput = new Endpoint();
+    endpointInput.setHostname("Missing attributes for this endpoint");
+
+    // --EXECUTE--
+    mvc.perform(
+            post(ENDPOINT_URI + "/agentless")
+                .content(asJsonString(endpointInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
+  }
 
   @DisplayName("Given valid endpoint input, should upsert an endpoint successfully")
   @Test
@@ -158,9 +205,13 @@ class EndpointApiTest extends IntegrationTest {
         });
     Endpoint endpointCreated = endpointRepository.save(endpoint);
 
-    EndpointUpdateInput updateInput = new EndpointUpdateInput();
+    EndpointInput updateInput = new EndpointInput();
     String newName = "New hostname";
     updateInput.setName(newName);
+    updateInput.setHostname(newName);
+    updateInput.setIps(endpointInput.getIps());
+    updateInput.setPlatform(endpointInput.getPlatform());
+    updateInput.setArch(endpointInput.getArch());
 
     // --EXECUTE--
     String response =
@@ -174,8 +225,11 @@ class EndpointApiTest extends IntegrationTest {
             .getResponse()
             .getContentAsString();
 
-    // --ASSERT--
-    assertEquals(newName, JsonPath.read(response, "$.asset_name"));
+    // --ASSERT
+    assertThatJson(response).node("asset_name").isEqualTo(newName);
+    assertThatJson(response).node("endpoint_hostname").isEqualTo(newName.toLowerCase());
+    assertThatJson(response).node("endpoint_platform").isEqualTo(endpointCreated.getPlatform());
+    assertThatJson(response).node("endpoint_ips").isEqualTo(endpointCreated.getIps());
   }
 
   @DisplayName("Given valid input, should delete an endpoint successfully")

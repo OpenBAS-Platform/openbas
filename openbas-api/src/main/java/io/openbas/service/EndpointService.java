@@ -1,8 +1,7 @@
 package io.openbas.service;
 
 import static io.openbas.database.model.Filters.isEmptyFilterGroup;
-import static io.openbas.database.specification.EndpointSpecification.findEndpointsForAssetGroup;
-import static io.openbas.database.specification.EndpointSpecification.findEndpointsForInjection;
+import static io.openbas.database.specification.EndpointSpecification.*;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -17,8 +16,8 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.executors.model.AgentRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
@@ -91,14 +90,6 @@ public class EndpointService {
         .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
-  public List<Endpoint> findEndpointByHostname(
-      @NotBlank final String hostname,
-      @NotNull final Endpoint.PLATFORM_TYPE platform,
-      @NotNull final Endpoint.PLATFORM_ARCH arch) {
-    return this.endpointRepository.findByHostnameArchAndPlatform(
-        hostname.toLowerCase(), platform.name(), arch.name());
-  }
-
   public List<Endpoint> findEndpointByHostnameAndAtLeastOneIp(
       @NotBlank final String hostname,
       @NotNull final Endpoint.PLATFORM_TYPE platform,
@@ -142,7 +133,7 @@ public class EndpointService {
     return buildPaginationJPA(
         (Specification<Endpoint> specification, Pageable pageable) ->
             this.endpointRepository.findAll(
-                findEndpointsForInjection().and(specification), pageable),
+                findEndpointsForInjectionOrAgentlessEndpoints().and(specification), pageable),
         handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
   }
@@ -155,13 +146,14 @@ public class EndpointService {
             .orElseThrow(() -> new IllegalArgumentException("Asset group not found"));
 
     Specification<Endpoint> specificationStatic =
-        findEndpointsForAssetGroup(assetGroupId).and(findEndpointsForInjection());
+        findEndpointsForAssetGroup(assetGroupId)
+            .and(findEndpointsForInjectionOrAgentlessEndpoints());
 
     if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
       Specification<Endpoint> specificationDynamic =
           computeFilterGroupJpa(assetGroup.getDynamicFilter());
       Specification<Endpoint> specificationDynamicWithInjection =
-          specificationDynamic.and(findEndpointsForInjection());
+          specificationDynamic.and(findEndpointsForInjectionOrAgentlessEndpoints());
 
       Page<Endpoint> dynamicResult =
           buildPaginationJPA(
@@ -196,7 +188,7 @@ public class EndpointService {
   }
 
   public Endpoint updateEndpoint(
-      @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
+      @NotBlank final String endpointId, @NotNull final EndpointInput input) {
     Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
