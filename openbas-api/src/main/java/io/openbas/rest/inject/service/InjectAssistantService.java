@@ -173,7 +173,9 @@ public class InjectAssistantService {
     // Try to find injectors contract covering all platform-architecture pairs at once
     List<InjectorContract> injectorContracts =
         this.searchInjectorContracts(
-            attackPattern.getExternalId(), groupedAssets.keySet().stream().toList(), injectNumberByTTP);
+            attackPattern.getExternalId(),
+            groupedAssets.keySet().stream().toList(),
+            injectNumberByTTP);
 
     if (!injectorContracts.isEmpty()) {
       injectorContracts.forEach(ic -> contractEndpointsMap.put(ic, endpoints));
@@ -184,7 +186,9 @@ public class InjectAssistantService {
             // For each platform architecture pairs try to find injectorContracts
             List<InjectorContract> injectorContractsForGroup =
                 this.searchInjectorContracts(
-                    attackPattern.getExternalId(), List.of(platformArchitecture), injectNumberByTTP);
+                    attackPattern.getExternalId(),
+                    List.of(platformArchitecture),
+                    injectNumberByTTP);
 
             // Else take the manual injectorContract
             if (injectorContractsForGroup.isEmpty()) {
