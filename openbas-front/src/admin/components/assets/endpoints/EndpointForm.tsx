@@ -5,8 +5,7 @@ import { type FunctionComponent, type SyntheticEvent } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import IpAddressesFieldController from '../../../../components/fields/IpAddressesFieldController';
-import MacAddressesFieldComponent from '../../../../components/fields/MacAddressesFieldComponent';
+import AddressesFieldComponent from '../../../../components/fields/AddressesFieldComponent';
 import SelectFieldController from '../../../../components/fields/SelectFieldController';
 import TagFieldController from '../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
@@ -174,8 +173,8 @@ const EndpointForm: FunctionComponent<Props> = ({
 
           )
         }
-        <IpAddressesFieldController name="endpoint_ips" label={t('IP Addresses')} required />
-        <MacAddressesFieldComponent name="endpoint_mac_addresses" label={t('MAC Addresses')} />
+        <AddressesFieldComponent name="endpoint_ips" helperText="Please provide one IP address per line." label={t('IP Addresses')} required />
+        <AddressesFieldComponent name="endpoint_mac_addresses" helperText="Please provide one MAC address per line." label={t('MAC Addresses')} />
         <TagFieldController name="asset_tags" label={t('Tags')} />
         <div style={{ alignSelf: 'flex-end' }}>
           <Button
