@@ -29,6 +29,7 @@
         <jacoco-plugin.version>0.8.13</jacoco-plugin.version>
         <pyroscope.version>2.1.2</pyroscope.version>
         <spring-security-crypto.version>6.4.5</spring-security-crypto.version>
+        <elasticsearch.version>9.0.1</elasticsearch.version>
     </properties>
 
     <distributionManagement>
