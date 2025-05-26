@@ -6,6 +6,7 @@ import { useFormatter } from '../../../../../../components/i18n';
 import PlatformIcon from '../../../../../../components/PlatformIcon';
 import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
 import AgentTraces from './AgentTraces';
+import MainTraces from './MainTraces';
 
 interface Props {
   endpoint: {
@@ -90,9 +91,13 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
       </div>
 
       <div style={{ overflow: 'auto' }}>
-        {groupedTraces.map(([agentId, traces]) => (
-          <AgentTraces key={agentId} traces={traces} />
-        ))}
+        {groupedTraces.map(([agentId, traces]) => {
+          if (agentId == 'unknown') {
+            return <MainTraces key="unknown" traces={traces} />;
+          } else {
+            return <AgentTraces key={agentId} traces={traces} />;
+          }
+        })}
       </div>
     </div>
   );

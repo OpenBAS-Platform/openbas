@@ -764,6 +764,40 @@ public class InjectService {
         });
   }
 
+  public record AgentsAndAssetsAgentless(
+      @NotNull List<Agent> agents, @NotNull Set<Asset> assetsAgentless) {}
+
+  public AgentsAndAssetsAgentless getAgentsAndAgentlessAssetsByInject(Inject inject) {
+    List<Agent> agents = new ArrayList<>();
+    Set<String> agentIds = new HashSet<>();
+
+    Set<Asset> assetsAgentless = new HashSet<>();
+
+    Consumer<Asset> extractAgents =
+        asset -> {
+          List<Agent> collectedAgents =
+              Optional.ofNullable(((Endpoint) Hibernate.unproxy(asset)).getAgents())
+                  .orElse(Collections.emptyList());
+          if (collectedAgents.isEmpty()) {
+            assetsAgentless.add(asset);
+          } else {
+            for (Agent agent : collectedAgents) {
+              if (isPrimaryAgent(agent) && !agentIds.contains(agent.getId())) {
+                agents.add(agent);
+                agentIds.add(agent.getId());
+              }
+            }
+          }
+        };
+
+    new ArrayList<>(inject.getAssets()).forEach(extractAgents);
+    inject.getAssetGroups().stream()
+        .flatMap(assetGroup -> assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
+        .forEach(extractAgents);
+
+    return new AgentsAndAssetsAgentless(agents, assetsAgentless);
+  }
+
   public List<Agent> getAgentsByInject(Inject inject) {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();

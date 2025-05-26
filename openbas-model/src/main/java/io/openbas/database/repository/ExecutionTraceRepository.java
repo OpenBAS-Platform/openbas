@@ -28,8 +28,8 @@ public interface ExecutionTraceRepository
           "SELECT t.* FROM execution_traces t "
               + "INNER JOIN injects_statuses ins ON t.execution_inject_status_id = ins.status_id "
               + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
-              + "INNER JOIN Agents a ON t.execution_agent_id = a.agent_id "
-              + "WHERE i.inject_id = :injectId AND a.agent_asset = :targetId",
+              + "LEFT JOIN Agents a ON t.execution_agent_id = a.agent_id "
+              + "WHERE i.inject_id = :injectId AND (a.agent_asset = :targetId OR :targetId = ANY(t.execution_context_identifiers))",
       nativeQuery = true)
   List<ExecutionTrace> findByInjectIdAndAssetId(
       @Param("injectId") String injectId, @Param("targetId") String targetId);
