@@ -14,7 +14,13 @@ public class InjectorContractRepositoryHelper {
 
   /**
    * Searches InjectorContract from database based on the attack pattern and a list of
-   * platform-architecture pairs (e.g., Linux:x86_64, macOS:arm64), with a result limit.
+   * platform-architecture pairs
+   *
+   * @param attackPatternExternalId the external ID of the attack pattern to search for
+   * @param platformArchitecturePairs a list of platform-architecture pairs to filter the contracts
+   *     (e.g., Linux:x86_64, macOS:arm64)
+   * @param limit the maximum number of results to return
+   * @return a list of InjectorContract objects that match the search criteria
    */
   public List<InjectorContract> searchInjectorContractsByAttackPatternAndEnvironment(
       String attackPatternExternalId, List<String> platformArchitecturePairs, Integer limit) {
