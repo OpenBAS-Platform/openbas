@@ -16,37 +16,32 @@ export interface SelectListElements<T> {
   headers: SelectListHeader<T>[];
 }
 
-interface Props<T> {
+interface Props<T, V> {
   values: T[];
-  selectedValues: T[];
+  selectedValues: (T | V)[];
   elements: SelectListElements<T>;
-  prefix: string;
   onSelect: (id: string, value: T) => void;
   onDelete: (id: string) => void;
   paginationComponent: ReactElement;
   buttonComponent?: ReactElement;
-  getName?: (element: T) => string;
+  getId: (element: T | V) => string;
+  getName: (element: T | V) => string;
 }
 
-const SelectList = <T extends object>({
+const SelectList = <T extends object, V extends object = T>({
   values,
   selectedValues,
   elements,
-  prefix,
   onSelect,
   onDelete,
   paginationComponent,
   buttonComponent,
+  getId,
   getName,
-}: Props<T>) => {
-  // @ts-expect-error: use a Record<string, unknown> is not working
-  const getIdFn = (v: T) => v[`${prefix}_id`];
-  // @ts-expect-error: use a Record<string, unknown> is not working
-  const getNameFn = getName ? getName : (v: T) => v[`${prefix}_name`];
-
+}: Props<T, V>) => {
   const selectedIds = useMemo(
-    () => selectedValues.map(v => getIdFn(v)),
-    [selectedValues, prefix],
+    () => selectedValues.map(v => getId(v)),
+    [selectedValues],
   );
 
   return (
@@ -56,7 +51,7 @@ const SelectList = <T extends object>({
         <GridLegacy item xs={8}>
           <List>
             {values.map((value) => {
-              const id = getIdFn(value);
+              const id = getId(value);
               const disabled = selectedIds.includes(id);
               return (
                 <ListItemButton
@@ -105,8 +100,8 @@ const SelectList = <T extends object>({
             }}
           >
             {selectedValues.map((selectedValue) => {
-              const id = getIdFn(selectedValue);
-              const name = getNameFn(selectedValue);
+              const id = getId(selectedValue);
+              const name = getName(selectedValue);
               return (
                 <Chip
                   key={id}

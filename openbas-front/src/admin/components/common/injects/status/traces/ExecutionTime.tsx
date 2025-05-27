@@ -4,8 +4,8 @@ import { type CSSProperties } from 'react';
 import { useFormatter } from '../../../../../../components/i18n';
 
 interface Props {
-  startDate: string | null;
-  endDate: string | null;
+  startDate?: string;
+  endDate?: string;
   style?: CSSProperties;
 }
 
