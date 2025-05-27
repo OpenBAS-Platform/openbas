@@ -1,4 +1,4 @@
-package io.openbas.rest.challenge;
+package io.openbas.rest.challenge.output;
 
 // Implement for PublicExercise(exercise package) and ScenarioExercise(scenario challenge)
 

@@ -199,8 +199,7 @@ const ChallengesPlayer = () => {
   const submit = (cid, data) => {
     return dispatch(validateChallenge(exerciseId, cid, userId, data)).then(
       (result) => {
-        const challengeEntries = result.entities?.challengesreaders[result.result]
-          .exercise_challenges || [];
+        const challengeEntries = result.entities?.simulationchallengesreaders[result.result].exercise_challenges || [];
         setCurrentChallengeEntry(
           R.head(
             challengeEntries.filter(
@@ -220,7 +219,8 @@ const ChallengesPlayer = () => {
 
   const noResult = () => resultList.length === 0 && !hasManualResult;
   const hasResult = () => resultList.length > 0 || hasManualResult;
-  const validResult = () => resultList.length > 0 && resultList.every(r => r.result !== FAILED);
+  const validResult = () =>
+    resultList.length > 0 && resultList.every(r => r.result !== FAILED);
   const invalidResult = () => (resultList.length === 0 && hasManualResult) || resultList.some(r => r.result === FAILED);
   const maxAttemptsExceeded = () => !!currentChallenge?.challenge_max_attempts && currentAttempt >= currentChallenge?.challenge_max_attempts;
 
@@ -276,13 +276,13 @@ const ChallengesPlayer = () => {
               fontSize: 40,
             }}
           >
-            {exercise.exercise_name}
+            {exercise.name}
           </Typography>
           <Typography
             variant="h2"
             style={{ textAlign: 'center' }}
           >
-            {exercise.exercise_subtitle}
+            {exercise.description}
           </Typography>
           {challenges.length === 0 && (
             <div style={{ marginTop: 150 }}>

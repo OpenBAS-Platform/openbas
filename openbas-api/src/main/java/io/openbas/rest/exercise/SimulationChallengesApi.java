@@ -12,8 +12,10 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.service.SimulationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
+
 import java.util.List;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,5 +63,15 @@ public class SimulationChallengesApi extends RestBehavior {
             .map(challenge -> new ChallengeInformation(challenge, null, 0))
             .toList());
     return simulationChallengesReader;
+  }
+
+  @GetMapping("/api/player/simulations/{simulationId}/challenges")
+  public SimulationChallengesReader playerChallenges(
+      @PathVariable String simulationId, @RequestParam Optional<String> userId) {
+    final User user = impersonateUser(userRepository, userId);
+    if (user.getId().equals(ANONYMOUS)) {
+      throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+    }
+    return challengeService.playerChallenges(simulationId, user);
   }
 }

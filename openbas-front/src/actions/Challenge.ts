@@ -48,7 +48,7 @@ export const deleteChallenge = (channelId: string) => (dispatch: Dispatch) => {
 };
 
 export const fetchSimulationPlayerChallenges = (simulationId: string, userId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/player/simulations/${simulationId}/documents?userId=${userId}`;
+  const uri = `/api/player/simulations/${simulationId}/challenges?userId=${userId}`;
   return getReferential(simulationChallengesReaders, uri)(dispatch);
 };
 

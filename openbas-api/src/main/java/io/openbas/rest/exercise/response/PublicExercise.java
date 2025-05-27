@@ -1,7 +1,7 @@
 package io.openbas.rest.exercise.response;
 
 import io.openbas.database.model.Exercise;
-import io.openbas.rest.challenge.PublicEntity;
+import io.openbas.rest.challenge.output.PublicEntity;
 import lombok.Getter;
 
 @Getter

@@ -27,7 +27,7 @@ const IndexAdmin = lazy(() => import('./admin/Index'));
 const Comcheck = lazy(() => import('./public/components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./public/components/channels/Channel'));
 const SimulationReport = lazy(() => import('./admin/components/simulations/simulation/reports/SimulationReportPage'));
-const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
+const Challenges = lazy(() => import('./public/components/challenges/ChallengesPlayer'));
 const ExerciseViewLessons = lazy(() => import('./public/components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./public/components/lessons/ScenarioViewLessons'));
 const SimulationChallengesPreview = lazy(() => import('./admin/components/simulations/simulation/challenges/SimulationChallengesPreview'));

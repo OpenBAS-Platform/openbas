@@ -30,7 +30,7 @@ const useStyles = makeStyles()(theme => ({
   },
   logo: {
     width: 100,
-    margin: '0px 0px 10px 0px',
+    marginBottom: theme.spacing(1),
   },
   container: {
     margin: '0 auto',
@@ -74,10 +74,13 @@ const ChallengesPreview: FunctionComponent<Props> = ({
   };
 
   if (value.scenarioOrExercise) {
-    const groupChallenges = R.groupBy(
-      R.path(['challenge_detail', 'challenge_category']),
-    );
-    const sortedChallenges = groupChallenges(challenges);
+    const sortedChallenges = challenges?.reduce<Record<string, ChallengeInformation[]>>((acc, challenge) => {
+      const category = challenge.challenge_detail?.challenge_category || '-';
+      acc[category] = acc[category] || [];
+      acc[category].push(challenge);
+      return acc;
+    }, {});
+
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canRead && !R.isEmpty(value.linkToPlayerMode) && (
@@ -87,7 +90,8 @@ const ChallengesPreview: FunctionComponent<Props> = ({
             component={Link}
             to={value.linkToPlayerMode}
             style={{
-              position: 'absolute',
+              position: 'relative',
+              float: 'right',
               top: theme.spacing(2),
               right: theme.spacing(2),
             }}
@@ -102,7 +106,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
             component={Link}
             to={value.linkToAdministrationMode}
             style={{
-              position: 'absolute',
+              position: 'relative',
               top: theme.spacing(2),
               left: theme.spacing(2),
             }}
@@ -138,10 +142,16 @@ const ChallengesPreview: FunctionComponent<Props> = ({
               <Empty message={t('No challenge in this simulation yet.')} />
             </div>
           )}
-          {Object.keys(sortedChallenges).map((category: string) => {
+          {sortedChallenges && Object.keys(sortedChallenges).map((category: string) => {
             return (
               <div key={category}>
-                <Typography variant="h1" style={{ margin: '40px 0 30px 0' }}>
+                <Typography
+                  variant="h1"
+                  style={{
+                    marginTop: theme.spacing(5),
+                    marginBottom: theme.spacing(3),
+                  }}
+                >
                   {category !== 'null' ? category : t('No category')}
                 </Typography>
                 <div style={{
@@ -150,16 +160,22 @@ const ChallengesPreview: FunctionComponent<Props> = ({
                   gap: theme.spacing(3),
                 }}
                 >
-                  {sortedChallenges[category].map(({ challenge_detail: challenge }: { challenge_detail: Challenge }) => (
-                    <ChallengeCard
-                      key={challenge.challenge_id}
-                      challenge={challenge}
-                      onClick={() => {
-                        setCurrentChallenge(challenge);
-                      }}
-                      clickable
-                    />
-                  ),
+                  {sortedChallenges[category].map(({ challenge_detail: challenge }: { challenge_detail?: ChallengeInformation['challenge_detail'] }) => {
+                    return (
+                      challenge
+                        ? (
+                            <ChallengeCard
+                              key={challenge.challenge_id}
+                              challenge={challenge as Challenge}
+                              onClick={() => {
+                                setCurrentChallenge(challenge as Challenge);
+                              }}
+                              clickable
+                            />
+                          )
+                        : null
+                    );
+                  },
                   )}
                 </div>
               </div>

@@ -10,7 +10,7 @@ import Reset from './components/login/Reset';
 const Login = lazy(() => import('./components/login/Login'));
 const Comcheck = lazy(() => import('./components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./components/channels/Channel'));
-const Challenges = lazy(() => import('./components/challenges/Challenges'));
+const Challenges = lazy(() => import('./components/challenges/ChallengesPlayer'));
 const ExerciseViewLessons = lazy(() => import('./components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./components/lessons/ScenarioViewLessons'));
 

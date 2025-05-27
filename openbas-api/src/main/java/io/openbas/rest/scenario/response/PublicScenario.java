@@ -1,7 +1,7 @@
 package io.openbas.rest.scenario.response;
 
 import io.openbas.database.model.Scenario;
-import io.openbas.rest.challenge.PublicEntity;
+import io.openbas.rest.challenge.output.PublicEntity;
 
 public class PublicScenario extends PublicEntity {
 
