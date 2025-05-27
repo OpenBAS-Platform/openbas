@@ -1318,6 +1318,7 @@ export interface ExecutionTrace {
     | "WARNING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED"
+    | "ASSET_AGENTLESS"
     | "AGENT_INACTIVE"
     | "INFO";
   /** @format date-time */
@@ -1360,6 +1361,7 @@ export interface ExecutionTraceOutput {
     | "WARNING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED"
+    | "ASSET_AGENTLESS"
     | "AGENT_INACTIVE"
     | "INFO";
   /** @format date-time */
