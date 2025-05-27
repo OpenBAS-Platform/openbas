@@ -23,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -91,6 +92,11 @@ public class Exercise implements Base {
   @JsonProperty("exercise_start_date")
   @Queryable(filterable = true, sortable = true)
   private Instant start;
+
+  @Column(name = "exercise_launch_order", insertable = false, updatable = false)
+  @JsonProperty("exercise_launch_order")
+  @Setter(AccessLevel.NONE)
+  private Long launchOrder;
 
   @Column(name = "exercise_end_date")
   @JsonProperty("exercise_end_date")

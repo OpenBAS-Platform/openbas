@@ -99,6 +99,10 @@ public class ExerciseFixture {
     return exercise;
   }
 
+  public static Exercise createFinishedAttackExercise() {
+    return createFinishedAttackExercise(Instant.now());
+  }
+
   public static Exercise createFinishedAttackExercise(Instant startTime) {
     Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
