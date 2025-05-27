@@ -57,7 +57,7 @@ public class EmailContract extends Contractor {
             VariableType.String,
             One);
     // Contracts
-    ContractExpectations expectationsField = expectationsField("expectations", "Expectations");
+    ContractExpectations expectationsField = expectationsField();
     ContractConfig contractConfig = getConfig();
     // Standard contract
     List<ContractElement> standardInstance =

@@ -1,5 +1,5 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { FormHelperText, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -12,6 +12,11 @@ const useStyles = makeStyles()(theme => ({
     color: theme.palette.primary.main,
     fontWeight: theme.typography.h2.fontWeight,
   },
+  textError: {
+    fontSize: theme.typography.h2.fontSize,
+    color: theme.palette.error.main,
+    fontWeight: theme.typography.h2.fontWeight,
+  },
 }));
 
 interface Props {
@@ -20,6 +25,7 @@ interface Props {
   onSubmit: (endpointIds: string[]) => void;
   platforms?: string[];
   payloadArch?: string;
+  errorLabel?: string | null;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
@@ -28,6 +34,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   onSubmit,
   platforms,
   payloadArch,
+  errorLabel = null,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -43,17 +50,21 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
       <ListItemButton
         divider={true}
         onClick={handleOpen}
-        color="primary"
         disabled={disabled}
       >
-        <ListItemIcon color="primary">
-          <ControlPointOutlined color="primary" />
+        <ListItemIcon>
+          <ControlPointOutlined color={errorLabel ? 'error' : 'primary'} />
         </ListItemIcon>
         <ListItemText
           primary={t('Modify target assets')}
-          classes={{ primary: classes.text }}
+          classes={{ primary: errorLabel ? classes.textError : classes.text }}
         />
       </ListItemButton>
+      {errorLabel && (
+        <FormHelperText error>
+          {errorLabel}
+        </FormHelperText>
+      )}
       <EndpointsDialogAdding
         initialState={endpointIds}
         open={openDialog}

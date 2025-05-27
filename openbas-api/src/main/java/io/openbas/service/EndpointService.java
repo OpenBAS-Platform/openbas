@@ -112,6 +112,10 @@ public class EndpointService {
     return fromIterable(this.endpointRepository.findAll());
   }
 
+  public List<Endpoint> endpoints(List<String> endpointIds) {
+    return fromIterable(this.endpointRepository.findAll(fromIds(endpointIds)));
+  }
+
   public List<Endpoint> endpoints(@NotNull final Specification<Endpoint> specification) {
     return fromIterable(this.endpointRepository.findAll(specification));
   }

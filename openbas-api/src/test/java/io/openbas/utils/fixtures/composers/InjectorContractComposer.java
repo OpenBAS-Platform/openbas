@@ -5,6 +5,7 @@ import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.InjectorContractRepository;
@@ -30,6 +31,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
         List.of(CHALLENGE_PUBLISH, CHANNEL_PUBLISH);
 
     private final InjectorContract injectorContract;
+    private final List<AttackPatternComposer.Composer> attackPatternComposer = new ArrayList<>();
     private Optional<PayloadComposer.Composer> payloadComposer = Optional.empty();
     private final List<ChallengeComposer.Composer> challengeComposers = new ArrayList<>();
     private final List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
@@ -44,6 +46,14 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       }
       this.payloadComposer = Optional.of(payloadComposer);
       this.injectorContract.setPayload(payloadComposer.get());
+      return this;
+    }
+
+    public Composer withAttackPattern(AttackPatternComposer.Composer attackPatternComposer) {
+      this.attackPatternComposer.add(attackPatternComposer);
+      List<AttackPattern> tempAttackPattern = this.injectorContract.getAttackPatterns();
+      tempAttackPattern.add(attackPatternComposer.get());
+      this.injectorContract.setAttackPatterns(tempAttackPattern);
       return this;
     }
 
@@ -117,6 +127,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       payloadComposer.ifPresent(PayloadComposer.Composer::persist);
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
       articleComposers.forEach(ArticleComposer.Composer::persist);
+      attackPatternComposer.forEach(AttackPatternComposer.Composer::persist);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
         entityManager.persist(injectorContract.getInjector());
         injectorRepository.save(injectorContract.getInjector());
@@ -132,6 +143,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       payloadComposer.ifPresent(PayloadComposer.Composer::delete);
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
       articleComposers.forEach(ArticleComposer.Composer::delete);
+      attackPatternComposer.forEach(AttackPatternComposer.Composer::delete);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
         injectorContractRepository.delete(injectorContract);
       }

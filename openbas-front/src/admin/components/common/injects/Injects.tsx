@@ -109,6 +109,7 @@ const Injects: FunctionComponent<Props> = ({
   const { t, tPick } = useFormatter();
   const theme = useTheme();
   const injectContext = useContext(InjectContext);
+  const { injects, setInjects } = injectContext;
   const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
 
@@ -243,7 +244,6 @@ const Injects: FunctionComponent<Props> = ({
 
   // Injects
   // scoped to page
-  const [injects, setInjects] = useState<InjectOutputType[]>([]);
   // Bulk loading indicator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);

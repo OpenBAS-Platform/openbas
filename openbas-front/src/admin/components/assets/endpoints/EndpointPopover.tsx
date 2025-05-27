@@ -14,7 +14,8 @@ export interface EndpointPopoverProps {
   endpoint: EndpointOutput & EndpointOverviewOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
-  onRemoveEndpointFromInject?: (assetId: string) => void;
+  removeFromContextLabel?: string | null;
+  onRemoveFromContext?: (assetId: string) => void;
   onRemoveEndpointFromAssetGroup?: (asset: EndpointOutput) => void;
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
@@ -27,7 +28,8 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   endpoint,
   assetGroupId,
   assetGroupEndpointIds,
-  onRemoveEndpointFromInject,
+  removeFromContextLabel = null,
+  onRemoveFromContext,
   onRemoveEndpointFromAssetGroup,
   onUpdate,
   onDelete,
@@ -84,9 +86,9 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
     label: 'Update',
     action: () => handleOpenEdit(),
   });
-  if (onRemoveEndpointFromInject) entries.push({
-    label: 'Remove from the inject',
-    action: () => onRemoveEndpointFromInject(endpoint.asset_id),
+  if (onRemoveFromContext && removeFromContextLabel) entries.push({
+    label: removeFromContextLabel,
+    action: () => onRemoveFromContext(endpoint.asset_id),
   });
   if ((assetGroupId && endpoint.is_static)) entries.push({
     label: 'Remove from the asset group',

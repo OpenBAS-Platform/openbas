@@ -165,8 +165,6 @@ public class PayloadService {
 
   private ContractExpectations expectations() {
     return expectationsField(
-        "expectations",
-        "Expectations",
         List.of(
             this.expectationBuilderService.buildPreventionExpectation(),
             this.expectationBuilderService.buildDetectionExpectation()));
