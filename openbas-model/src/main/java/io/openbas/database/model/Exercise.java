@@ -94,7 +94,7 @@ public class Exercise implements Base {
   private Instant start;
 
   @Column(name = "exercise_launch_order", insertable = false, updatable = false)
-  @JsonProperty("exercise_launch_order")
+  @JsonIgnore
   @Setter(AccessLevel.NONE)
   private Long launchOrder;
 
