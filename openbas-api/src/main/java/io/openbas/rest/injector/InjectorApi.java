@@ -398,14 +398,16 @@ public class InjectorApi extends RestBehavior {
               .findById(agentId)
               .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
       InjectStatus injectStatus =
-          inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+          inject
+              .getExecution() // TODO POC
+              .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
       injectStatus.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
       injectStatusRepository.save(injectStatus);
       InjectExecutionInput input = new InjectExecutionInput();
       input.setMessage("Execution done");
       input.setStatus(ExecutionTraceStatus.INFO.name());
       input.setAction(InjectExecutionAction.complete);
-      injectStatusService.updateInjectStatus(agent, inject, input);
+      injectStatusService.updateInjectStatus(agent, inject, input, null);
     }
     throw new IllegalArgumentException(message);
   }

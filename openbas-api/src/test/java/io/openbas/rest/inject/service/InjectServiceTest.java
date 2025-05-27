@@ -602,7 +602,7 @@ class InjectServiceTest {
     injectStatus.setId(injectStatusID);
     Inject inject = new Inject();
     inject.setId(injectId);
-    inject.setStatus(injectStatus);
+    inject.setStatus(injectStatus); // TODO POC
     injectStatus.setInject(inject);
     StatusPayload statusPayload = new StatusPayload();
 

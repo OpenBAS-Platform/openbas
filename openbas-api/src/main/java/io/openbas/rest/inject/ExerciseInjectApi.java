@@ -284,7 +284,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/status")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject setInjectStatus(
+  public Inject setInjectStatus( // TODO POC REname update Manual inject
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {

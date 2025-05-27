@@ -1875,6 +1875,7 @@ export interface ImportTestSummary {
 }
 
 export interface Inject {
+  execution?: InjectStatus;
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
@@ -1902,8 +1903,11 @@ export interface Inject {
   inject_description?: string;
   inject_documents?: string[];
   inject_enabled?: boolean;
+  inject_executions?: InjectStatus[];
   inject_exercise?: string;
   inject_expectations?: string[];
+  /** @format date-time */
+  inject_first_execution_date?: string;
   inject_id: string;
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
@@ -1911,7 +1915,16 @@ export interface Inject {
   inject_scenario?: string;
   /** @format date-time */
   inject_sent_at?: string;
-  inject_status?: InjectStatus;
+  inject_status?:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "DRAFT"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING";
   inject_tags?: string[];
   inject_teams?: string[];
   inject_testable?: boolean;
@@ -1925,6 +1938,13 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
+}
+
+export interface InjectBinding {
+  injectDependency?: InjectDependency;
+  inject_binding_id?: string;
+  sourceKey?: string;
+  targetKey?: string;
 }
 
 export interface InjectBulkProcessingInput {
@@ -1949,6 +1969,7 @@ export interface InjectBulkUpdateOperation {
 }
 
 export interface InjectDependency {
+  dependency_bindings?: InjectBinding[];
   dependency_condition?: InjectDependencyCondition;
   /** @format date-time */
   dependency_created_at?: string;

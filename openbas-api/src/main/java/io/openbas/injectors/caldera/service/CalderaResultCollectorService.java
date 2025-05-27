@@ -134,7 +134,7 @@ public class CalderaResultCollectorService implements Runnable {
             injectStatusService.updateFinalInjectStatus(injectStatus);
           }
 
-          injectRepository.save(relatedInject);
+          injectRepository.save(relatedInject); // TODO POC
         }));
   }
 }

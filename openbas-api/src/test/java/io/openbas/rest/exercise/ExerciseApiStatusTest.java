@@ -29,6 +29,7 @@ import jakarta.servlet.ServletException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -160,7 +161,7 @@ public class ExerciseApiStatusTest {
     LESSON_ANSWER = lessonsAnswerRepository.save(lessonsAnswer);
 
     injectStatus.setName(ExecutionStatus.ERROR);
-    inject5.setStatus(injectStatus);
+    inject5.setExecutions(new ArrayList<>(Arrays.asList(injectStatus))); // TODO POC
     FINISHED_EXERCISE.setInjects(List.of(inject5));
     FINISHED_EXERCISE.setPauses(List.of(pause));
     FINISHED_EXERCISE.setLessonsCategories(List.of(lessonsCategory));

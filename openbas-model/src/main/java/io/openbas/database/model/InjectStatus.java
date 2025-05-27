@@ -23,6 +23,10 @@ public class InjectStatus extends BaseInjectStatus {
   @JsonProperty("status_payload_output")
   private StatusPayload payloadOutput;
 
+  @OneToMany(mappedBy = "execution", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private List<ExecutionBinding> executionBindings = new ArrayList<>();
+
   @OneToMany(
       mappedBy = "injectStatus",
       cascade = CascadeType.ALL,
@@ -55,6 +59,7 @@ public class InjectStatus extends BaseInjectStatus {
     this.getTraces().add(trace);
   }
 
+  // Used for global traces of inject
   public void addTrace(
       ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
     ExecutionTrace newTrace =

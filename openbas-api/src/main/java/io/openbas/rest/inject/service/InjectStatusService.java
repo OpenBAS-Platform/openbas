@@ -3,12 +3,12 @@ package io.openbas.rest.inject.service;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -16,9 +16,10 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,6 @@ public class InjectStatusService {
   private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
-  private final FindingService findingService;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -47,7 +47,7 @@ public class InjectStatusService {
     injectStatus.setInject(inject);
     injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
-    inject.setStatus(injectStatus);
+    inject.setExecutions(new ArrayList<>(Arrays.asList(injectStatus))); // TODO POC
     return injectRepository.save(inject);
   }
 
@@ -70,7 +70,11 @@ public class InjectStatusService {
   }
 
   private int getCompleteTrace(Inject inject) {
-    return inject.getStatus().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
+    return inject
+        .getExecution() // TODO POC
+        .map(InjectStatus::getTraces)
+        .orElse(Collections.emptyList())
+        .stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
         .map(trace -> trace.getAgent().getId())
@@ -98,11 +102,16 @@ public class InjectStatusService {
   }
 
   public ExecutionTrace createExecutionTrace(
-      InjectStatus injectStatus, InjectExecutionInput input, Agent agent) {
+      InjectStatus injectStatus,
+      InjectExecutionInput input,
+      Agent agent,
+      ObjectNode structuredOutput) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
-    return new ExecutionTrace(
-        injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
+    ExecutionTrace base =
+        new ExecutionTrace(
+            injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
+    return ExecutionTrace.from(base, structuredOutput);
   }
 
   private void computeExecutionTraceStatusIfNeeded(
@@ -119,10 +128,13 @@ public class InjectStatusService {
     }
   }
 
-  public void updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
+  public void updateInjectStatus(
+      Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
+    InjectStatus injectStatus =
+        inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
 
-    ExecutionTrace executionTrace = createExecutionTrace(injectStatus, input, agent);
+    ExecutionTrace executionTrace =
+        createExecutionTrace(injectStatus, input, agent, structuredOutput);
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
@@ -133,52 +145,6 @@ public class InjectStatusService {
       }
 
       injectRepository.save(inject);
-    }
-  }
-
-  public void handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = null;
-
-    try {
-      inject =
-          injectRepository
-              .findById(injectId)
-              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
-
-      Agent agent =
-          (agentId == null)
-              ? null
-              : agentRepository
-                  .findById(agentId)
-                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
-
-      // -- UPDATE STATUS --
-      updateInjectStatus(agent, inject, input);
-
-      // -- FINDINGS --
-      findingService.computeFindings(input, inject, agent);
-
-    } catch (ElementNotFoundException e) {
-      log.log(Level.SEVERE, e.getMessage());
-      if (inject != null) {
-        inject
-            .getStatus()
-            .ifPresent(
-                status -> {
-                  ExecutionTrace trace =
-                      new ExecutionTrace(
-                          status,
-                          ExecutionTraceStatus.ERROR,
-                          null,
-                          e.getMessage(),
-                          ExecutionTraceAction.COMPLETE,
-                          null,
-                          Instant.now());
-                  status.addTrace(trace);
-                });
-        injectRepository.save(inject);
-      }
     }
   }
 
@@ -235,7 +201,7 @@ public class InjectStatusService {
 
   private InjectStatus getOrInitializeInjectStatus(Inject inject) {
     return inject
-        .getStatus()
+        .getExecution() // TODO POC
         .orElseGet(
             () -> {
               InjectStatus newStatus = new InjectStatus();

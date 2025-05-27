@@ -293,7 +293,9 @@ public class InjectService {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     this.throwIfInjectNotLaunchable(inject);
     inject.clean();
-    inject.setUpdatedAt(Instant.now());
+    inject.setStatus(ExecutionStatus.QUEUING); // TODO POC
+    inject.setFirstExecutionDate(now()); // TODO POC
+    inject.setUpdatedAt(now());
     Inject savedInject = saveInjectAndStatusAsQueuing(inject);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
@@ -302,6 +304,8 @@ public class InjectService {
   public InjectResultOverviewOutput relaunch(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
     this.throwIfInjectNotLaunchable(duplicatedInject);
+    duplicatedInject.setStatus(ExecutionStatus.QUEUING); // TODO POC
+    duplicatedInject.setFirstExecutionDate(now()); // TODO POC
     Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
     delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
@@ -376,7 +380,9 @@ public class InjectService {
   private Inject saveInjectAndStatusAsQueuing(Inject inject) {
     Inject savedInject = injectRepository.save(inject);
     InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
-    savedInject.setStatus(injectStatus);
+    savedInject
+        .getExecutions()
+        .add(injectStatus); // TODO POC Atomic testing -> Execution one time: OK
     return savedInject;
   }
 

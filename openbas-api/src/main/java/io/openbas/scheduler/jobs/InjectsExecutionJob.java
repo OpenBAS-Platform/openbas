@@ -46,10 +46,13 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
+
+  public static final String DEFAULT_EXECUTION_THRESHOLD_TIME_IN_MINUTS = "10";
+  private static final long delayForSimulationCompletedEvent = 3600L;
+
   private final Environment env;
   private int injectExecutionThreshold;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
-  private static final long delayForSimulationCompletedEvent = 3600L;
 
   private final InjectHelper injectHelper;
   private final ExerciseRepository exerciseRepository;
@@ -76,7 +79,7 @@ public class InjectsExecutionJob implements Job {
   private void init() {
     String threshold = env.getProperty("inject.execution.threshold.minutes");
     if (threshold == null || threshold.isBlank()) {
-      threshold = "10";
+      threshold = DEFAULT_EXECUTION_THRESHOLD_TIME_IN_MINUTS;
     }
     this.injectExecutionThreshold = Integer.parseInt(threshold);
   }
@@ -142,7 +145,7 @@ public class InjectsExecutionJob implements Job {
             .map(
                 inject -> {
                   InjectStatus status =
-                      inject.getStatus().orElseThrow(ElementNotFoundException::new);
+                      inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
@@ -248,9 +251,11 @@ public class InjectsExecutionJob implements Job {
         parent -> {
           mapCondition.put(
               "Execution",
-              parent.getStatus().isPresent()
-                  && !ExecutionStatus.ERROR.equals(parent.getStatus().get().getName())
-                  && !executionStatusesNotReady.contains(parent.getStatus().get().getName()));
+              parent.getExecution().isPresent()
+                  && !ExecutionStatus.ERROR.equals(
+                      parent.getExecution().get().getName()) // TODO POC
+                  && !executionStatusesNotReady.contains(
+                      parent.getExecution().get().getName())); // TODO POC
 
           List<InjectExpectation> expectations =
               injectExpectationRepository.findAllForExerciseAndInject(exerciseId, parent.getId());

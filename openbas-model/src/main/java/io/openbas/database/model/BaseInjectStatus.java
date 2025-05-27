@@ -38,7 +38,7 @@ public abstract class BaseInjectStatus implements Base {
   private Instant trackingEndDate; // Done task from injector
 
   @Queryable(searchable = true, path = "inject.title")
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "status_inject")
   @JsonIgnore
   protected Inject inject;

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
-import io.openbas.database.raw.*;
 import io.openbas.helper.*;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -161,11 +160,28 @@ public class Inject implements Base, Injection {
   @Schema(type = "string")
   private User user;
 
-  // CascadeType.ALL is required here because inject status are embedded
-  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Getter
+  @Column(name = "inject_status")
   @JsonProperty("inject_status")
-  @Queryable(filterable = true, sortable = true)
-  private InjectStatus status;
+  @Enumerated(EnumType.STRING)
+  private ExecutionStatus
+      status; // TODO POC: Migrate inject_status_name to inject_status, set the status...
+
+  @Getter
+  @Column(name = "inject_first_execution_date")
+  @JsonProperty("inject_first_execution_date")
+  private Instant firstExecutionDate; // TODO POC: Migrate inject_status_name to inject_status
+
+  // TODO POC Status -> Executions , Fecth Eager
+  @Getter
+  @OneToMany(
+      mappedBy = "inject",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @JsonProperty("inject_executions")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<InjectStatus> executions = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
@@ -276,7 +292,9 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public void clean() {
-    this.status = null;
+    this.status = null; // TODO POC
+    this.firstExecutionDate = null; // TODO POC
+    this.executions.clear(); // TODO POC
     this.communications.clear();
     this.expectations.clear();
     this.findings.clear();
@@ -334,7 +352,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public boolean isNotExecuted() {
-    return this.getStatus().isEmpty();
+    return this.getExecution().isEmpty();
   }
 
   @JsonIgnore
@@ -353,8 +371,8 @@ public class Inject implements Base, Injection {
     return Optional.ofNullable(this.injectorContract);
   }
 
-  public Optional<InjectStatus> getStatus() {
-    return ofNullable(this.status);
+  public Optional<InjectStatus> getExecution() {
+    return ofNullable(this.executions).flatMap(list->list.stream().findFirst()); // TODO POC
   }
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
@@ -384,7 +402,7 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_sent_at")
   public Instant getSentAt() {
-    return InjectModelHelper.getSentAt(this.getStatus());
+    return InjectModelHelper.getSentAt(this.getExecution());
   }
 
   @JsonProperty("inject_kill_chain_phases")
