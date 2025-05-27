@@ -1,10 +1,16 @@
 package io.openbas.scheduler.jobs;
 
 import static java.time.Instant.now;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectDependenciesRepository;
@@ -22,9 +28,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,6 +88,80 @@ public class InjectsExecutionJob implements Job {
     this.injectExecutionThreshold = Integer.parseInt(threshold);
   }
 
+  @Override
+  public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    try {
+      // Handle starting exercises if needed.
+      handleAutoStartExercises();
+      // Get all injects to execute grouped by exercise.
+      List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+
+      // We're grouping the injects to run by exercises but also making sure no injects
+      // run in the same batch as it's parents
+      Map<String, List<ExecutableInject>> byExercises =
+          injects.stream()
+              .filter(
+                  executableInject ->
+                      // If we got dependencies, we check that the parents are not part of the
+                      // current batch of injects running. If so, we're filtering them out and
+                      // they'll be part of the next batch of launched injects. Do note that this is
+                      // an edge case as it's not allowed to add a dependency less than a minute
+                      // after a parent but can happen if the platform was restarted after some time
+                      // out. It'll then start the injects that were not started because the
+                      // platform was down.
+                      executableInject.getInjection().getInject().getDependsOn() == null
+                          || !intersect(
+                              injects.stream()
+                                  .map(execInject -> execInject.getInjection().getId())
+                                  .toList(),
+                              executableInject.getInjection().getInject().getDependsOn().stream()
+                                  .map(
+                                      injectDependency ->
+                                          injectDependency
+                                              .getCompositeId()
+                                              .getInjectParent()
+                                              .getInject()
+                                              .getId())
+                                  .toList()))
+              .collect(
+                  groupingBy(
+                      ex ->
+                          ex.getInjection().getExercise() == null
+                              ? "atomic"
+                              : ex.getInjection().getExercise().getId()));
+
+      // Execute injects in parallel for each exercise.
+      byExercises.entrySet().parallelStream()
+          .forEach(
+              (entry) -> {
+                // Execute each inject for the exercise in order.
+                entry.getValue().parallelStream()
+                    .forEach(
+                        executableInject -> {
+                          try {
+                            this.executeInject(executableInject);
+                          } catch (Exception e) {
+                            Inject inject = executableInject.getInjection().getInject();
+                            LOGGER.log(Level.WARNING, e.getMessage(), e);
+                            injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+                          }
+                        });
+                // Update the exercise
+                if (!entry.getKey().equals("atomic")) {
+                  updateExercise(
+                      entry.getKey()); // TODO POC Check If we need fetchExercise, why not make an
+                  // update directly?
+                }
+              });
+      // Change status of finished exercises.
+      handleAutoClosingExercises();
+      handlePendingInject();
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, e.getMessage(), e);
+      throw new JobExecutionException(e);
+    }
+  }
+
   public void handleAutoStartExercises() {
     List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
     if (exercises.isEmpty()) {
@@ -132,7 +210,7 @@ public class InjectsExecutionJob implements Job {
                     delayForSimulationCompletedEvent));
   }
 
-  public void handlePendingInject() {
+  public void handlePendingInject() { // TODO POC Change Name Methode
     List<Inject> pendingInjects =
         injectHelper.getAllPendingInjectsWithThresholdMinutes(this.injectExecutionThreshold);
 
@@ -140,39 +218,116 @@ public class InjectsExecutionJob implements Job {
       return;
     }
 
-    List<InjectStatus> updatedStatuses =
+    List<InjectStatus> updatedExecutionStatus =
         pendingInjects.stream()
             .map(
                 inject -> {
-                  InjectStatus status =
+                  InjectStatus execution =
                       inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
-                  status.setName(ExecutionStatus.MAYBE_PREVENTED);
-                  status.addWarningTrace(
+                  execution.setName(ExecutionStatus.MAYBE_PREVENTED);
+                  execution.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
                           + this.injectExecutionThreshold
                           + " minutes threshold.",
                       ExecutionTraceAction.EXECUTION);
-                  return status;
+                  return execution;
                 })
             .collect(Collectors.toList());
 
-    injectStatusService.saveAll(updatedStatuses);
+    injectStatusService.saveAll(updatedExecutionStatus);
   }
 
   private void executeInject(ExecutableInject executableInject)
       throws IOException, TimeoutException, ErrorMessagesPreExecutionException {
     // Depending on injector type (internal or external) execution must be done differently
     Inject inject = executableInject.getInjection().getInject();
+    List<Inject> parents = new ArrayList<>();
     // We are now checking if we depend on another inject and if it did not failed
     if (ofNullable(executableInject.getExerciseId()).isPresent()) {
-      checkErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
+      parents = checkErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
     if (!inject.isReady()) {
       throw new UnsupportedOperationException(
           "The inject is not ready to be executed (missing mandatory fields)");
     }
+
+    Map<String, Map<String, JsonNode>> executionWithTargetKeyAndValue = new HashMap<>();
+
+    for (Inject parent : parents) {
+      // Find dependency between this parent and the child (inject)
+      Optional<InjectDependency> optionalDependency =
+          inject.getDependsOn().stream()
+              .filter(dep -> dep.getCompositeId().getInjectParent().equals(parent))
+              .findFirst();
+
+      if (optionalDependency.isEmpty()) continue;
+
+      InjectDependency dependency = optionalDependency.get();
+      List<InjectBinding> bindings = dependency.getBindings();
+      if (bindings == null || bindings.isEmpty()) continue;
+
+      // For each execution in this parent
+      for (InjectStatus exec : parent.getExecutions()) {
+        String executionId = exec.getId();
+        Map<String, JsonNode> targetKeyValueMap = new HashMap<>();
+
+        for (ExecutionTrace trace : exec.getTraces()) {
+          if (trace.getAction() != ExecutionTraceAction.EXECUTION
+              && trace.getAction() != ExecutionTraceAction.COMPLETE) continue;
+
+          ObjectNode structuredOutput = trace.getStructuredOutput();
+          if (structuredOutput == null) continue;
+
+          for (InjectBinding binding : bindings) {
+            String sourceKey = binding.getSourceKey();
+            String targetKey = binding.getTargetKey();
+
+            JsonNode value = extractByDotNotation(structuredOutput, sourceKey);
+            targetKeyValueMap.put(targetKey, value);
+          }
+        }
+
+        if (!targetKeyValueMap.isEmpty()) {
+          executionWithTargetKeyAndValue.put(executionId, targetKeyValueMap);
+        }
+      }
+    }
+
     LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
-    this.executor.execute(executableInject);
+    this.executor.execute(
+        executableInject, executionWithTargetKeyAndValue); // TODO POC Maybe pass here the output
+  }
+
+  private JsonNode extractByDotNotation(ObjectNode root, String dotPath) {
+    String[] pathParts = dotPath.split("\\.");
+    JsonNode current = root;
+
+    for (int i = 0; i < pathParts.length; i++) {
+      String part = pathParts[i];
+
+      if (current == null || current.isMissingNode()) {
+        return NullNode.getInstance();
+      }
+
+      if (current.isArray() && i == pathParts.length - 1) {
+        // Extract property from each object in the array
+        ArrayNode resultArray = JsonNodeFactory.instance.arrayNode();
+        Set<JsonNode> seen = new HashSet<>();
+
+        for (JsonNode element : current) {
+          JsonNode value = element.get(part);
+          if (value != null && !value.isMissingNode() && seen.add(value)) {
+            resultArray.add(value);
+          }
+        }
+
+        return resultArray;
+      }
+
+      current = current.get(part);
+    }
+
+    return current;
   }
 
   /**
@@ -181,7 +336,7 @@ public class InjectsExecutionJob implements Job {
    * @param exerciseId the id of the exercise
    * @param inject the inject to check
    */
-  private void checkErrorMessagesPreExecution(String exerciseId, Inject inject)
+  private List<Inject> checkErrorMessagesPreExecution(String exerciseId, Inject inject)
       throws ErrorMessagesPreExecutionException {
     List<InjectDependency> injectDependencies =
         injectDependenciesRepository.findParents(List.of(inject.getId()));
@@ -226,7 +381,9 @@ public class InjectsExecutionJob implements Job {
       if (!errorMessages.isEmpty()) {
         throw new ErrorMessagesPreExecutionException(errorMessages);
       }
+      return parents;
     }
+    return emptyList();
   }
 
   /**
@@ -298,78 +455,6 @@ public class InjectsExecutionJob implements Job {
     Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
     exercise.setUpdatedAt(now());
     exerciseRepository.save(exercise);
-  }
-
-  @Override
-  public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    try {
-      // Handle starting exercises if needed.
-      handleAutoStartExercises();
-      // Get all injects to execute grouped by exercise.
-      List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-
-      // We're grouping the injects to run by exercises but also making sure no injects
-      // run in the same batch as it's parents
-      Map<String, List<ExecutableInject>> byExercises =
-          injects.stream()
-              .filter(
-                  executableInject ->
-                      // If we got dependencies, we check that the parents are not part of the
-                      // current batch of injects running. If so, we're filtering them out and
-                      // they'll be part of the next batch of launched injects. Do note that this is
-                      // an edge case as it's not allowed to add a dependency less than a minute
-                      // after a parent but can happen if the platform was restarted after some time
-                      // out. It'll then start the injects that were not started because the
-                      // platform was down.
-                      executableInject.getInjection().getInject().getDependsOn() == null
-                          || !intersect(
-                              injects.stream()
-                                  .map(execInject -> execInject.getInjection().getId())
-                                  .toList(),
-                              executableInject.getInjection().getInject().getDependsOn().stream()
-                                  .map(
-                                      injectDependency ->
-                                          injectDependency
-                                              .getCompositeId()
-                                              .getInjectParent()
-                                              .getInject()
-                                              .getId())
-                                  .toList()))
-              .collect(
-                  groupingBy(
-                      ex ->
-                          ex.getInjection().getExercise() == null
-                              ? "atomic"
-                              : ex.getInjection().getExercise().getId()));
-
-      // Execute injects in parallel for each exercise.
-      byExercises.entrySet().parallelStream()
-          .forEach(
-              (entry) -> {
-                // Execute each inject for the exercise in order.
-                entry.getValue().parallelStream()
-                    .forEach(
-                        executableInject -> {
-                          try {
-                            this.executeInject(executableInject);
-                          } catch (Exception e) {
-                            Inject inject = executableInject.getInjection().getInject();
-                            LOGGER.log(Level.WARNING, e.getMessage(), e);
-                            injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
-                          }
-                        });
-                // Update the exercise
-                if (!entry.getKey().equals("atomic")) {
-                  updateExercise(entry.getKey());
-                }
-              });
-      // Change status of finished exercises.
-      handleAutoClosingExercises();
-      handlePendingInject();
-    } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, e.getMessage(), e);
-      throw new JobExecutionException(e);
-    }
   }
 
   /**

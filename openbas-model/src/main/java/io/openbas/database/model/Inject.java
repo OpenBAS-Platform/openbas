@@ -372,7 +372,7 @@ public class Inject implements Base, Injection {
   }
 
   public Optional<InjectStatus> getExecution() {
-    return ofNullable(this.executions).flatMap(list->list.stream().findFirst()); // TODO POC
+    return ofNullable(this.executions).flatMap(list -> list.stream().findFirst()); // TODO POC
   }
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {

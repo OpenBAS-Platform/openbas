@@ -209,7 +209,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectStatus executeInject(
+  public void executeInject( // TODO POC : USed Reply Inject/Emails/
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {
@@ -247,10 +247,10 @@ public class ExerciseInjectApi extends RestBehavior {
             userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
     try {
-      return executor.directExecute(injection);
+      executor.directExecute(injection);
     } catch (Exception e) {
       log.log(Level.WARNING, e.getMessage(), e);
-      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+      injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
     }
   }
 

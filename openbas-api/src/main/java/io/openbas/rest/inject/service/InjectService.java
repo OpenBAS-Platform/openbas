@@ -573,6 +573,7 @@ public class InjectService {
                                     .getId()
                                     .equals(entry.getRelationship().getInjectParentId()))
                         .findFirst();
+
                 if (existingDependency.isPresent()) {
                   existingDependency
                       .get()
@@ -582,6 +583,13 @@ public class InjectService {
                       .get()
                       .getInjectDependencyCondition()
                       .setMode(entry.getConditions().getMode());
+
+                  // Clear old bindings and add new ones
+                  existingDependency.get().getBindings().clear();
+                  for (InjectBinding binding : entry.getBindings()) {
+                    binding.setInjectDependency(existingDependency.get()); // important!
+                    existingDependency.get().getBindings().add(binding);
+                  }
                 } else {
                   InjectDependency injectDependency = new InjectDependency();
                   injectDependency.getCompositeId().setInjectChildren(inject);
@@ -599,6 +607,13 @@ public class InjectService {
                   injectDependency
                       .getInjectDependencyCondition()
                       .setMode(entry.getConditions().getMode());
+
+                  // Add bindings
+                  for (InjectBinding binding : entry.getBindings()) {
+                    binding.setInjectDependency(injectDependency);
+                    injectDependency.getBindings().add(binding);
+                  }
+
                   inject.getDependsOn().add(injectDependency);
                 }
               });

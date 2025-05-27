@@ -1,7 +1,9 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,8 +30,13 @@ public class InjectDependency {
   @Type(JsonType.class)
   private InjectDependencyConditions.InjectDependencyCondition injectDependencyCondition;
 
-  @OneToMany(mappedBy = "injectDependency", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "injectDependency",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("dependency_bindings")
+  @JsonSerialize(using = MultiModelDeserializer.class)
   private List<InjectBinding> bindings = new ArrayList<>();
 
   @CreationTimestamp

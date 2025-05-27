@@ -27,7 +27,7 @@ public abstract class BaseInjectStatus implements Base {
   @JsonProperty("status_name")
   @Enumerated(EnumType.STRING)
   @NotNull
-  private ExecutionStatus name;
+  private ExecutionStatus name; // TODO POC Change to ExecutionStatus
 
   @Column(name = "tracking_sent_date")
   @JsonProperty("tracking_sent_date")

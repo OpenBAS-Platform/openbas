@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,11 +40,14 @@ public class InjectBinding {
         name = "inject_binding_inject_children_id",
         referencedColumnName = "inject_children_id")
   })
+  @JsonIgnore
   private InjectDependency injectDependency;
 
   @Column(name = "inject_binding_source_key", nullable = false)
+  @JsonProperty("inject_binding_source_key")
   private String sourceKey;
 
   @Column(name = "inject_binding_target_key", nullable = false)
+  @JsonProperty("inject_binding_target_key")
   private String targetKey;
 }

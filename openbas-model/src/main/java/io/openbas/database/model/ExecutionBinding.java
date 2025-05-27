@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -30,15 +31,19 @@ public class ExecutionBinding {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "execution_binding_execution_id", nullable = false)
+  @JsonIgnore
   private InjectStatus execution;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "execution_binding_source_execution_id", nullable = false)
+  @JsonProperty("execution_binding_source_execution")
   private InjectStatus sourceExecution;
 
   @Column(name = "execution_binding_argument_key", nullable = false)
+  @JsonProperty("execution_binding_argument_key")
   private String argumentKey;
 
   @Column(name = "execution_binding_argument_value", nullable = false)
+  @JsonProperty("execution_binding_argument_value")
   private String argumentValue;
 }

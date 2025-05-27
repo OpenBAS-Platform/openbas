@@ -219,7 +219,8 @@ public class ScenarioToExerciseService {
           exerciseInject.setExercise(exerciseSaved);
           exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
           exerciseInject.setUser(scenarioInject.getUser());
-          exerciseInject.setStatus(scenarioInject.getStatus()); // TODO POC : we pass status and not status/execution
+          exerciseInject.setStatus(
+              scenarioInject.getStatus()); // TODO POC : we pass status and not status/execution
           exerciseInject.setTags(CopyObjectListUtils.copy(scenarioInject.getTags(), Tag.class));
           exerciseInject.setContent(scenarioInject.getContent());
 

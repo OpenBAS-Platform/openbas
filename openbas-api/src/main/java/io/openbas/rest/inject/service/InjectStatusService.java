@@ -199,7 +199,7 @@ public class InjectStatusService {
     return injectStatus;
   }
 
-  private InjectStatus getOrInitializeInjectStatus(Inject inject) {
+  public InjectStatus getOrInitializeInjectStatus(Inject inject) {
     return inject
         .getExecution() // TODO POC
         .orElseGet(

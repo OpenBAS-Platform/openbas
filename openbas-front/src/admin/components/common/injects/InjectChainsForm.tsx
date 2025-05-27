@@ -152,10 +152,9 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
 
           dependency.dependency_bindings.forEach((binding) => {
             bindings[key].push({
-              injectDependency: dependency,
               inject_binding_id: binding.inject_binding_id,
-              sourceKey: binding.sourceKey,
-              targetKey: binding.targetKey,
+              inject_binding_source_key: binding.inject_binding_source_key,
+              inject_binding_target_key: binding.inject_binding_target_key,
             });
           });
         }
@@ -916,7 +915,7 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
     const existingBindings = parentBindings[key] || [];
 
     const duplicate = existingBindings.find(binding =>
-      binding.sourceKey === '' && binding.targetKey === '',
+      binding.inject_binding_source_key === '' && binding.inject_binding_target_key === '',
     );
 
     if (duplicate) {
@@ -927,8 +926,8 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
     setParentBindings(prev => ({
       ...prev,
       [key]: [...existingBindings, {
-        sourceKey: '',
-        targetKey: '',
+        inject_binding_source_key: '',
+        inject_binding_target_key: '',
       }],
     }));
   };
@@ -936,7 +935,7 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
   const updateBinding = (
     parent: Dependency,
     index: number,
-    field: 'sourceKey' | 'targetKey',
+    field: 'inject_binding_source_key' | 'inject_binding_target_key',
     value: string,
   ) => {
     const key = `${parent.inject?.inject_id}-${values.inject_id}`;
@@ -1097,8 +1096,8 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                   >
                     <Select
                       fullWidth
-                      value={binding.sourceKey}
-                      onChange={e => updateBinding(parent, index, 'sourceKey', e.target.value)}
+                      value={binding.inject_binding_source_key}
+                      onChange={e => updateBinding(parent, index, 'inject_binding_source_key', e.target.value)}
                     >
                       {getAvailableSourceKeys(parent.inject).flatMap(({ key, type }) => {
                         const fields = type && defaultFields[type];
@@ -1121,8 +1120,8 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                     →
                     <Select
                       fullWidth
-                      value={binding.targetKey}
-                      onChange={e => updateBinding(parent, index, 'targetKey', e.target.value)}
+                      value={binding.inject_binding_target_key}
+                      onChange={e => updateBinding(parent, index, 'inject_binding_target_key', e.target.value)}
                     >
                       {getAvailableTargetKeys(values).map(key => (
                         <MenuItem key={key} value={key}>{key}</MenuItem>

@@ -1925,10 +1925,9 @@ export interface Inject {
 }
 
 export interface InjectBinding {
-  injectDependency?: InjectDependency;
   inject_binding_id?: string;
-  sourceKey?: string;
-  targetKey?: string;
+  inject_binding_source_key?: string;
+  inject_binding_target_key?: string;
 }
 
 export interface InjectBulkProcessingInput {
@@ -1978,6 +1977,7 @@ export interface InjectDependencyIdInput {
 }
 
 export interface InjectDependencyInput {
+  dependency_bindings?: InjectBinding[];
   dependency_condition?: InjectDependencyCondition;
   dependency_relationship?: InjectDependencyIdInput;
 }
