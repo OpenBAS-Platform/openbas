@@ -1,5 +1,5 @@
-import { Button, Typography } from '@mui/material';
-import { type FunctionComponent, useEffect } from 'react';
+import { ListItemButton, ListItemText } from '@mui/material';
+import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -29,77 +29,60 @@ const useStyles = makeStyles()(theme => ({
     width: '100%',
     textTransform: 'capitalize',
     borderRadius: 4,
-    color: theme.palette.chip.main,
+    border: `1px solid ${theme.palette.action.selected}`,
+    fontSize: theme.typography.subtitle2.fontSize,
   },
 }));
+
+export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
 
 interface KillChainPhaseComponentProps {
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
   injectorsContratLight: InjectorContractLight[];
-  helpers: FilterHelpers;
-  onClick: () => void;
+  selectedAttackPatternIds?: Set<string>;
+  onAttackPatternClick: (attackPattern: AttackPattern) => void;
 }
-
-const computeTechnique = (attackPatterns: AttackPattern[]) => {
-  return attackPatterns.filter(attackPattern => attackPattern.attack_pattern_external_id.indexOf('.') < 0);
-};
-
-export const MITRE_FILTER_KEY = 'injector_contract_attack_patterns';
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   killChainPhase,
   attackPatterns,
   injectorsContratLight,
-  helpers,
-  onClick,
+  selectedAttackPatternIds = new Set(),
+  onAttackPatternClick,
 }) => {
   // Standard hooks
-  const { classes } = useStyles();
   const { t } = useFormatter();
+  const { classes } = useStyles();
+  const [selectedIds, setSelectedIds] = useState(selectedAttackPatternIds);
 
-  // Attack Pattern
-  const sortAttackPattern = (attackPattern1: AttackPattern, attackPattern2: AttackPattern) => {
-    if (attackPattern1.attack_pattern_name < attackPattern2.attack_pattern_name) {
-      return -1;
-    }
-    if (attackPattern1.attack_pattern_name > attackPattern2.attack_pattern_name) {
-      return 1;
-    }
-    return 0;
-  };
+  // Computing sorted techniques with concise filtering
+  const sortedTechniques: AttackPattern[] = attackPatterns
+    .filter(({ attack_pattern_external_id }) => !attack_pattern_external_id.includes('.'))
+    .sort((attackPattern1: AttackPattern, attackPattern2: AttackPattern) =>
+      attackPattern1.attack_pattern_name.localeCompare(attackPattern2.attack_pattern_name),
+    );
 
-  // Techniques
-  const techniques = computeTechnique(attackPatterns);
-
-  const computeSubTechnique = (attackPattern: AttackPattern) => {
-    return attackPatterns.filter(value => value.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
-  };
-
-  const injectorsContratComponent = (attackPattern: AttackPattern) => {
-    const subTechnique = computeSubTechnique(attackPattern);
+  const getInjectorsContractsLengthByAttackPattern = (attackPattern: AttackPattern) => {
+    const subTechnique = attackPatterns.filter(value => value.attack_pattern_external_id.includes(attackPattern.attack_pattern_external_id));
     const externalIds = subTechnique.map(value => value.attack_pattern_external_id);
     externalIds.push(attackPattern.attack_pattern_external_id);
     const injectorsContratList = injectorsContratLight
       .filter(value => externalIds.some(value1 => value.injector_contract_attack_patterns_external_id?.includes(value1)));
-    if (injectorsContratList.length > 0) {
-      return (
-        <span>
-&nbsp;(
-          {injectorsContratList.length}
-          )
-        </span>
-      );
-    }
-    return (<></>);
+    return injectorsContratList.length || 0;
   };
 
-  const handleOnClick = (attackPattern: AttackPattern) => {
-    helpers.handleAddSingleValueFilter(
-      MITRE_FILTER_KEY,
-      attackPattern.attack_pattern_external_id,
-    );
-    onClick();
+  const onItemClick = (attackPattern: AttackPattern) => {
+    setSelectedIds((prevSelectedIds) => {
+      const newSelectedIds = new Set(prevSelectedIds);
+      if (newSelectedIds.has(attackPattern.attack_pattern_id)) {
+        newSelectedIds.delete(attackPattern.attack_pattern_id);
+      } else {
+        newSelectedIds.add(attackPattern.attack_pattern_id);
+      }
+      return newSelectedIds;
+    });
+    onAttackPatternClick(attackPattern);
   };
 
   return (
@@ -112,29 +95,29 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
         <div>{killChainPhase.phase_name}</div>
         <div style={{ textWrap: 'nowrap' }}>
           (
-          {techniques.length}
+          {sortedTechniques.length}
           {' '}
           {t('techniques')}
           )
         </div>
       </div>
       <div>
-        {techniques.sort(sortAttackPattern)
-          .map(attackPattern => (
-            <Button
-              key={attackPattern.attack_pattern_id}
-              variant="outlined"
-              className={classes.button}
-              onClick={() => handleOnClick(attackPattern)}
-              style={{ justifyContent: 'start' }}
-            >
-              <Typography variant="caption">
-                {`[${attackPattern.attack_pattern_external_id}] `}
-                {attackPattern.attack_pattern_name}
-                {injectorsContratComponent(attackPattern)}
-              </Typography>
-            </Button>
-          ))}
+        {sortedTechniques.map(attackPattern => (
+          <ListItemButton
+            key={attackPattern.attack_pattern_id}
+            selected={selectedIds.has(attackPattern.attack_pattern_id)}
+            className={classes.button}
+            component="div"
+            dense
+            onClick={() => onItemClick(attackPattern)}
+          >
+            <ListItemText
+              primary={
+                `[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name} (${getInjectorsContractsLengthByAttackPattern(attackPattern)})`
+              }
+            />
+          </ListItemButton>
+        ))}
       </div>
     </div>
   );
@@ -142,12 +125,14 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
 
 interface MitreFilterProps {
   helpers: FilterHelpers;
-  onClick: () => void;
+  onClick: (attackPatternId: string) => void;
+  defaultSelectedAttackPatternIds?: string[];
 }
 
 const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   helpers,
   onClick,
+  defaultSelectedAttackPatternIds = [],
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -169,26 +154,36 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   }, []);
 
   // Kill Chain Phase
-  const sortKillChainPhase = (k1: KillChainPhase, k2: KillChainPhase) => {
-    return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);
-  };
+  const sortedKillChainPhases = useMemo(() => {
+    return killChainPhases.sort((k1: KillChainPhase, k2: KillChainPhase) => {
+      return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);
+    });
+  }, []);
 
   // Attack Pattern
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
     return attackPatterns.filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
   };
 
+  const onAttackPatternClick = (attackPattern: AttackPattern) => {
+    helpers.handleAddSingleValueFilter(
+      MITRE_FILTER_KEY,
+      attackPattern.attack_pattern_external_id,
+    );
+    onClick(attackPattern.attack_pattern_id);
+  };
+
   return (
     <div className={classes.container}>
-      {killChainPhases.sort(sortKillChainPhase)
+      {sortedKillChainPhases
         .map((killChainPhase: KillChainPhase) => (
           <KillChainPhaseColumn
             key={killChainPhase.phase_id}
             killChainPhase={killChainPhase}
             attackPatterns={getAttackPatterns(killChainPhase)}
             injectorsContratLight={injectorsContracts}
-            helpers={helpers}
-            onClick={onClick}
+            onAttackPatternClick={id => onAttackPatternClick(id)}
+            selectedAttackPatternIds={new Set(defaultSelectedAttackPatternIds)}
           />
         ))}
     </div>

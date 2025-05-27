@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Typography } from '@mui/material';
-import { type FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
@@ -11,13 +11,14 @@ import AttackPatternFieldController from '../../../../components/fields/AttackPa
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import {
-  type EndpointOutput,
+  type EndpointOutput, type Filter,
   type InjectAssistantInput,
 } from '../../../../utils/api-types';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../assets/endpoints/EndpointPopover';
 import EndpointsList from '../../assets/endpoints/EndpointsList';
+import MitreFilter from '../../common/filters/MitreFilter';
 import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import InjectAddEndpoints from '../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
 
@@ -44,8 +45,7 @@ interface Props {
 const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
-  // TODO next chunk
-  // const [openMitreFilter, setOpenMitreFilter] = useState(false);
+  const [openMitreFilterDrawer, setOpenMitreFilterDrawer] = useState(false);
 
   const schema = z.object({
     asset_group_ids: z.string().array().optional(),
@@ -85,14 +85,15 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { errors, isDirty, isSubmitting },
   } = methods;
 
+  // -- Assets
   const assetIds = useWatch({
     control,
     name: 'asset_ids',
   }) as string[];
-
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
   useEffect(() => {
     if (assetIds.length > 0) {
@@ -104,6 +105,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const onAssetChange = (assetIds: string[]) => setValue('asset_ids', assetIds);
   const removeAsset = (assetId: string) => setValue('asset_ids', assetIds.filter(id => id !== assetId));
 
+  // -- Asset groups
   const assetGroupIds = useWatch({
     control,
     name: 'asset_group_ids',
@@ -111,17 +113,36 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const onAssetGroupChange = (assetGroupIds: string[]) => setValue('asset_group_ids', assetGroupIds);
   const removeAssetGroup = (assetGroupId: string) => setValue('asset_group_ids', assetGroupIds.filter(id => id !== assetGroupId));
 
+  // -- Attack patterns
+  let selectedAttackPatternIds: Set<string> = new Set();
+  let isMitreSelectionChanged = false;
+  const onAttackPatternChange = () => {
+    if (isMitreSelectionChanged) {
+      setValue('attack_pattern_ids', Array.from(selectedAttackPatternIds), { shouldDirty: true });
+      isMitreSelectionChanged = false;
+    }
+  };
+  const onClickAttackPattern = (attackPatternId: string) => {
+    // Initialize selectedAttackPatternIds
+    if (!isMitreSelectionChanged) {
+      selectedAttackPatternIds = new Set(getValues('attack_pattern_ids') || []);
+    }
+    // Toggle the attack pattern selection
+    if (selectedAttackPatternIds.has(attackPatternId)) {
+      selectedAttackPatternIds.delete(attackPatternId);
+    } else {
+      selectedAttackPatternIds.add(attackPatternId);
+    }
+    isMitreSelectionChanged = true;
+  };
+
+  const onCloseMitreDrawer = () => {
+    onAttackPatternChange();
+    setOpenMitreFilterDrawer(false);
+  };
   const onCloseDrawer = () => {
     reset();
     onClose();
-  };
-
-  const handleSubmitWithoutDefault = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const isValid = await methods.trigger();
-    if (isValid) {
-      handleSubmit(onSubmit)(e);
-    }
   };
 
   return (
@@ -133,7 +154,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
       <FormProvider {...methods}>
         <form
           noValidate // disabled tooltip
-          onSubmit={handleSubmitWithoutDefault}
+          onSubmit={handleSubmit(onSubmit)}
           className={classes.formContainer}
         >
           <Typography variant="h5">
@@ -183,16 +204,15 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
 
           <div className={classes.titleWithButtonContainer}>
             <Typography variant="h5">{t('Scenario coverage')}</Typography>
-            {/* TODO next chunk */}
-            {/* <Button */}
-            {/*  variant="outlined" */}
-            {/*  color="inherit" */}
-            {/*  size="small" */}
-            {/*  style={{ marginLeft: 'auto' }} */}
-            {/*  onClick={() => setOpenMitreFilter(true)} */}
-            {/* > */}
-            {/*  {t('Select TTPs')} */}
-            {/* </Button> */}
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="small"
+              style={{ marginLeft: 'auto' }}
+              onClick={() => setOpenMitreFilterDrawer(true)}
+            >
+              {t('Select TTPs')}
+            </Button>
           </div>
           <AttackPatternFieldController
             hideAddButton
@@ -211,26 +231,26 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
             {t('Create Injects')}
           </Button>
         </form>
-        {/* TODO next chunk */}
-        {/* <Drawer */}
-        {/*  open={openMitreFilter} */}
-        {/*  handleClose={() => setOpenMitreFilter(false)} */}
-        {/*  title={t('ATT&CK Matrix')} */}
-        {/*  variant="full" */}
-        {/* > */}
-        {/*  <MitreFilter */}
-        {/*    helpers={{ */}
-        {/*      handleSwitchMode: () => {}, */}
-        {/*      handleAddFilterWithEmptyValue: (filter: Filter) => {}, */}
-        {/*      handleAddSingleValueFilter: (key: string, value: string) => {}, */}
-        {/*      handleAddMultipleValueFilter: (key: string, values: string[]) => {}, */}
-        {/*      handleChangeOperatorFilters: (key: string, operator: Filter['operator']) => {}, */}
-        {/*      handleClearAllFilters: () => {}, */}
-        {/*      handleRemoveFilterByKey: (key: string) => {}, */}
-        {/*    }} */}
-        {/*    onClick={() => setOpenMitreFilter(false)} */}
-        {/*  /> */}
-        {/* </Drawer> */}
+        <Drawer
+          open={openMitreFilterDrawer}
+          handleClose={onCloseMitreDrawer}
+          title={t('ATT&CK Matrix')}
+          variant="full"
+        >
+          <MitreFilter
+            helpers={{
+              handleSwitchMode: () => {},
+              handleAddFilterWithEmptyValue: (_: Filter) => { },
+              handleAddSingleValueFilter: () => { },
+              handleAddMultipleValueFilter: () => { },
+              handleChangeOperatorFilters: () => { },
+              handleClearAllFilters: () => { },
+              handleRemoveFilterByKey: () => { },
+            }}
+            onClick={data => onClickAttackPattern(data)}
+            defaultSelectedAttackPatternIds={getValues('attack_pattern_ids') || []}
+          />
+        </Drawer>
       </FormProvider>
     </Drawer>
   );
