@@ -274,6 +274,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <layout>ZIP</layout>
+                    <skip>false</skip>
                 </configuration>
             </plugin>
             <plugin>
