@@ -12,10 +12,8 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.service.SimulationService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
-
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
