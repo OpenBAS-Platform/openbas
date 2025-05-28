@@ -53,7 +53,8 @@ const Executors = () => {
 
   const sortedExecutors = executors.sort((a: Executor, b: Executor) => order[a.executor_type as keyof typeof order] - order[b.executor_type as keyof typeof order]);
   const needInformationStepper = (selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA);
-  const showEEChip = (executor: Executor) => !settings.platform_license?.license_is_validated && (executor.executor_type === OPENBAS_TANIUM || executor.executor_type === OPENBAS_CROWDSTRIKE);
+  const showEEChip = (executor: Executor) => !settings.platform_license?.license_is_validated
+    && (executor.executor_type === OPENBAS_TANIUM || executor.executor_type === OPENBAS_CROWDSTRIKE);
 
   // -- Manage Dialogs
   const steps = [t('Choose your platform'), t('Installation Instructions')];
