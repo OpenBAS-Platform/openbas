@@ -13,6 +13,7 @@ import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -21,8 +22,10 @@ import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.ExerciseFixture;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,38 +37,64 @@ import org.springframework.transaction.annotation.Transactional;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExerciseServiceIntegrationTest {
 
-  @Mock Ee eeService;
-  @Mock GrantService grantService;
-  @Mock InjectDuplicateService injectDuplicateService;
-  @Mock VariableService variableService;
+  @Mock
+  Ee eeService;
+  @Mock
+  GrantService grantService;
+  @Mock
+  InjectDuplicateService injectDuplicateService;
+  @Mock
+  VariableService variableService;
 
-  @Autowired private TeamService teamService;
-  @Autowired private TagRuleService tagRuleService;
-  @Autowired private InjectService injectService;
+  @Autowired
+  private TeamService teamService;
+  @Autowired
+  private TagRuleService tagRuleService;
+  @Autowired
+  private DocumentService documentService;
+  @Autowired
+  private InjectService injectService;
 
-  @Autowired private ExerciseMapper exerciseMapper;
-  @Autowired private InjectMapper injectMapper;
-  @Autowired private ResultUtils resultUtils;
-  @Mock private ActionMetricCollector actionMetricCollector;
-  @Autowired private ArticleRepository articleRepository;
-  @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private TeamRepository teamRepository;
+  @Autowired
+  private ExerciseMapper exerciseMapper;
+  @Autowired
+  private InjectMapper injectMapper;
+  @Autowired
+  private ResultUtils resultUtils;
+  @Mock
+  private ActionMetricCollector actionMetricCollector;
+  @Autowired
+  private ArticleRepository articleRepository;
+  @Autowired
+  private ExerciseRepository exerciseRepository;
+  @Autowired
+  private TeamRepository teamRepository;
 
-  @Autowired private AssetRepository assetRepository;
-  @Autowired private AssetGroupRepository assetGroupRepository;
-  @Autowired private InjectExpectationRepository injectExpectationRepository;
-  @Autowired private UserRepository userRepository;
-  @Autowired private InjectRepository injectRepository;
-  @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
-  @Autowired private LicenseCacheManager licenseCacheManager;
+  @Autowired
+  private AssetRepository assetRepository;
+  @Autowired
+  private AssetGroupRepository assetGroupRepository;
+  @Autowired
+  private InjectExpectationRepository injectExpectationRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private InjectRepository injectRepository;
+  @Autowired
+  private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired
+  private LicenseCacheManager licenseCacheManager;
 
   private static String USER_ID;
   private static String TEAM_ID;
   private static String INJECT_ID;
 
-  @InjectMocks private ExerciseService exerciseService;
+  @InjectMocks
+  private ExerciseService exerciseService;
 
   @BeforeEach
   void setUp() {
@@ -77,6 +106,7 @@ class ExerciseServiceIntegrationTest {
             teamService,
             variableService,
             tagRuleService,
+            documentService,
             injectService,
             exerciseMapper,
             injectMapper,

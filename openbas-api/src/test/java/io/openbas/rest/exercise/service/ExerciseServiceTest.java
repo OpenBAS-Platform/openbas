@@ -9,6 +9,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -22,7 +23,9 @@ import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.*;
+
 import java.util.*;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,31 +37,55 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
-  @Mock private Ee eeService;
-  @Mock private GrantService grantService;
-  @Mock private InjectDuplicateService injectDuplicateService;
-  @Mock private TeamService teamService;
-  @Mock private VariableService variableService;
-  @Mock private TagRuleService tagRuleService;
-  @Mock private InjectService injectService;
+  @Mock
+  private Ee eeService;
+  @Mock
+  private GrantService grantService;
+  @Mock
+  private InjectDuplicateService injectDuplicateService;
+  @Mock
+  private TeamService teamService;
+  @Mock
+  private VariableService variableService;
+  @Mock
+  private TagRuleService tagRuleService;
+  @Mock
+  private DocumentService documentService;
+  @Mock
+  private InjectService injectService;
 
-  @Mock private ExerciseMapper exerciseMapper;
-  @Mock private InjectMapper injectMapper;
-  @Mock private ResultUtils resultUtils;
-  @Mock private ActionMetricCollector actionMetricCollector;
-  @Mock private LicenseCacheManager licenseCacheManager;
+  @Mock
+  private ExerciseMapper exerciseMapper;
+  @Mock
+  private InjectMapper injectMapper;
+  @Mock
+  private ResultUtils resultUtils;
+  @Mock
+  private ActionMetricCollector actionMetricCollector;
+  @Mock
+  private LicenseCacheManager licenseCacheManager;
 
-  @Mock private AssetRepository assetRepository;
-  @Mock private AssetGroupRepository assetGroupRepository;
-  @Mock private InjectExpectationRepository injectExpectationRepository;
-  @Mock private ArticleRepository articleRepository;
-  @Mock private ExerciseRepository exerciseRepository;
-  @Mock private TeamRepository teamRepository;
-  @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  @Mock private InjectRepository injectRepository;
-  @Mock private LessonsCategoryRepository lessonsCategoryRepository;
+  @Mock
+  private AssetRepository assetRepository;
+  @Mock
+  private AssetGroupRepository assetGroupRepository;
+  @Mock
+  private InjectExpectationRepository injectExpectationRepository;
+  @Mock
+  private ArticleRepository articleRepository;
+  @Mock
+  private ExerciseRepository exerciseRepository;
+  @Mock
+  private TeamRepository teamRepository;
+  @Mock
+  private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  @Mock
+  private InjectRepository injectRepository;
+  @Mock
+  private LessonsCategoryRepository lessonsCategoryRepository;
 
-  @InjectMocks private ExerciseService exerciseService;
+  @InjectMocks
+  private ExerciseService exerciseService;
 
   @BeforeEach
   void setUp() {
@@ -70,6 +97,7 @@ class ExerciseServiceTest {
             teamService,
             variableService,
             tagRuleService,
+            documentService,
             injectService,
             exerciseMapper,
             injectMapper,
@@ -209,15 +237,15 @@ class ExerciseServiceTest {
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> resultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.PREVENTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.PREVENTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
 
     assertFalse(exerciseService.isThereAScoreDegradation(resultsMap, resultsMap));
   }
@@ -230,27 +258,27 @@ class ExerciseServiceTest {
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.PREVENTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.PREVENTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> secondLastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.PREVENTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.PREVENTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
     assertTrue(exerciseService.isThereAScoreDegradation(lastResultsMap, secondLastResultsMap));
   }
 
@@ -261,27 +289,27 @@ class ExerciseServiceTest {
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.HUMAN_RESPONSE,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.HUMAN_RESPONSE,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.HUMAN_RESPONSE,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> secondLastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.HUMAN_RESPONSE,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.HUMAN_RESPONSE,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.HUMAN_RESPONSE,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
     assertFalse(exerciseService.isThereAScoreDegradation(lastResultsMap, secondLastResultsMap));
   }
 
@@ -292,27 +320,27 @@ class ExerciseServiceTest {
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.HUMAN_RESPONSE,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.PREVENTION,
-                    InjectExpectation.EXPECTATION_STATUS.PENDING,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.PENDING,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, lowerScores)));
     Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> secondLastResultsMap =
         Map.of(
             ExpectationType.DETECTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.DETECTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.DETECTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.DETECTION, scores)),
             ExpectationType.PREVENTION,
-                new AtomicTestingUtils.ExpectationResultsByType(
-                    ExpectationType.PREVENTION,
-                    InjectExpectation.EXPECTATION_STATUS.SUCCESS,
-                    AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
+            new AtomicTestingUtils.ExpectationResultsByType(
+                ExpectationType.PREVENTION,
+                InjectExpectation.EXPECTATION_STATUS.SUCCESS,
+                AtomicTestingUtils.getResultDetail(ExpectationType.PREVENTION, scores)));
   }
 
   private AssetGroup getAssetGroup(String name) {
