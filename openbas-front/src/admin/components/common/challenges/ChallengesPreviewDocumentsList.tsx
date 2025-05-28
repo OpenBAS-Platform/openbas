@@ -29,6 +29,12 @@ const useStyles = makeStyles()(theme => ({
     height: '100%',
     fontSize: 13,
   },
+  documentIcon: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    fontWeight: 700,
+    fontSize: 12,
+  },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -112,11 +118,7 @@ const ChallengesPreviewDocumentsList: FunctionComponent<Props> = ({ currentChall
       >
         <ListItemIcon>
           <span
-            style={{
-              padding: '0 8px 0 8px',
-              fontWeight: 700,
-              fontSize: 12,
-            }}
+            className={classes.documentIcon}
           >
                           &nbsp;
           </span>

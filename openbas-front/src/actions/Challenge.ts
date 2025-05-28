@@ -1,7 +1,7 @@
 import { schema } from 'normalizr';
 import { type Dispatch } from 'redux';
 
-import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 import { type ChallengeInput, type ChallengeTryInput } from '../utils/api-types';
 import { scenarioChallengesReaders, simulationChallengesReaders } from './Schema';
 
@@ -34,7 +34,9 @@ export const updateChallenge = (challengeId: string, data: ChallengeInput) => (d
 
 export const addChallenge = (data: ChallengeInput) => (dispatch: Dispatch) => postReferential(challenge, '/api/challenges', data)(dispatch);
 
-export const tryChallenge = (challengeId: string, data: ChallengeTryInput) => (dispatch: Dispatch) => postReferential(null, `/api/challenges/${challengeId}/try`, data)(dispatch);
+export const tryChallenge = (challengeId: string, data: ChallengeTryInput) => {
+  return simplePostCall(`/api/challenges/${challengeId}/try`, data);
+};
 
 export const validateChallenge = (exerciseId: string, challengeId: string, userId: string, data: ChallengeTryInput) => (dispatch: Dispatch) => postReferential(
   simulationChallengesReaders,

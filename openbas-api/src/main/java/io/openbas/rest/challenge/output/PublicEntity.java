@@ -3,11 +3,9 @@ package io.openbas.rest.challenge.output;
 // Implement for PublicExercise(exercise package) and ScenarioExercise(scenario challenge)
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PublicEntity {
 
   @JsonProperty("id")

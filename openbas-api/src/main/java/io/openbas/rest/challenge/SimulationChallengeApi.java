@@ -18,15 +18,13 @@ import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.SimulationChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
-import io.openbas.rest.exercise.service.SimulationService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +40,7 @@ public class SimulationChallengeApi extends RestBehavior {
   private final ExerciseRepository exerciseRepository;
 
   private final ChallengeService challengeService;
-  private final SimulationService simulationService;
+  private final ExerciseService exerciseService;
 
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping(EXERCISE_URI + "/{exerciseId}/challenges")
@@ -91,7 +89,7 @@ public class SimulationChallengeApi extends RestBehavior {
           && !exerciseOpt.get().getUsers().contains(user)) {
         throw new UnsupportedOperationException("The given player is not in this exercise");
       }
-      return simulationService.getExercisePlayerDocuments(exerciseOpt.get());
+      return exerciseService.getExercisePlayerDocuments(exerciseOpt.get());
     } else {
       throw new IllegalArgumentException("Simulation ID not found");
     }

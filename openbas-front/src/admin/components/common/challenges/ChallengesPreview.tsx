@@ -4,7 +4,6 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as R from 'ramda';
 import { type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -16,7 +15,6 @@ import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type Challenge, type ChallengeInformation, type ChallengeResult, type ChallengeTryInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
 import ChallengeTryForm from '../../components/challenges/ChallengeTryForm';
 import { PreviewChallengeContext } from '../Context';
 import ChallengeCard from './ChallengeCard';
@@ -53,7 +51,6 @@ const ChallengesPreview: FunctionComponent<Props> = ({
 }) => {
   const theme = useTheme();
   const { classes } = useStyles();
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [currentResult, setCurrentResult] = useState<ChallengeResult | null>(null);
@@ -66,9 +63,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
 
   const submit = (cid: string | undefined, data: ChallengeTryInput) => {
     if (cid) {
-      return dispatch(tryChallenge(cid, data)).then((result: ChallengeResult) => {
-        setCurrentResult(result);
-      });
+      return tryChallenge(cid, data).then(result => setCurrentResult(result.data));
     }
     return null;
   };
@@ -83,7 +78,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
 
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && !R.isEmpty(value.linkToPlayerMode) && (
+        {permissions.isLoggedIn && permissions.canRead && value.linkToPlayerMode.length > 0 && (
           <Button
             color="secondary"
             variant="outlined"
