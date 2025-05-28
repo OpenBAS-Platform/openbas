@@ -3558,7 +3558,7 @@ export type Payload = BasePayload &
 
 export interface PayloadArgument {
   default_value: string;
-  description?: string;
+  description?: string | null;
   key: string;
   type: string;
 }
@@ -3580,7 +3580,7 @@ export type PayloadCreateInput = BasePayloadCreateInput &
 
 export interface PayloadPrerequisite {
   check_command?: string;
-  description?: string;
+  description?: string | null;
   executor: string;
   get_command: string;
 }
