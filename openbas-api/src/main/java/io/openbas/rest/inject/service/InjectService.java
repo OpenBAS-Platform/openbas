@@ -26,6 +26,7 @@ import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.LicenseRestrictionException;
 import io.openbas.rest.inject.form.*;
+import io.openbas.rest.inject.output.AgentsAndAssetsAgentless;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
@@ -764,38 +765,37 @@ public class InjectService {
         });
   }
 
-  public record AgentsAndAssetsAgentless(
-      @NotNull List<Agent> agents, @NotNull Set<Asset> assetsAgentless) {}
-
   public AgentsAndAssetsAgentless getAgentsAndAgentlessAssetsByInject(Inject inject) {
-    List<Agent> agents = new ArrayList<>();
-    Set<String> agentIds = new HashSet<>();
-
+    Set<Agent> agents = new HashSet<>();
     Set<Asset> assetsAgentless = new HashSet<>();
 
-    Consumer<Asset> extractAgents =
-        asset -> {
-          List<Agent> collectedAgents =
-              Optional.ofNullable(((Endpoint) Hibernate.unproxy(asset)).getAgents())
-                  .orElse(Collections.emptyList());
-          if (collectedAgents.isEmpty()) {
-            assetsAgentless.add(asset);
-          } else {
-            for (Agent agent : collectedAgents) {
-              if (isPrimaryAgent(agent) && !agentIds.contains(agent.getId())) {
-                agents.add(agent);
-                agentIds.add(agent.getId());
-              }
-            }
-          }
-        };
+    for (Asset asset : inject.getAssets()) {
+      extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
+    }
 
-    new ArrayList<>(inject.getAssets()).forEach(extractAgents);
-    inject.getAssetGroups().stream()
-        .flatMap(assetGroup -> assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
-        .forEach(extractAgents);
+    for (AssetGroup assetGroup : inject.getAssetGroups()) {
+      for (Asset asset : assetGroupService.assetsFromAssetGroup(assetGroup.getId())) {
+        extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
+      }
+    }
 
     return new AgentsAndAssetsAgentless(agents, assetsAgentless);
+  }
+
+  private void extractAgentsAndAssetsAgentless(
+      Set<Agent> agents, Set<Asset> assetsAgentless, Asset asset) {
+    List<Agent> collectedAgents =
+        Optional.ofNullable(((Endpoint) Hibernate.unproxy(asset)).getAgents())
+            .orElse(Collections.emptyList());
+    if (collectedAgents.isEmpty()) {
+      assetsAgentless.add(asset);
+    } else {
+      for (Agent agent : collectedAgents) {
+        if (isPrimaryAgent(agent)) {
+          agents.add(agent);
+        }
+      }
+    }
   }
 
   public List<Agent> getAgentsByInject(Inject inject) {

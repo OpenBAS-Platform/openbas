@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.ExecutionTraceRepository;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.rest.exception.AgentException;
+import io.openbas.rest.inject.output.AgentsAndAssetsAgentless;
 import io.openbas.rest.inject.service.InjectService;
 import java.util.List;
 import java.util.Set;
@@ -32,24 +33,24 @@ public class ExecutionExecutorService {
     InjectStatus injectStatus =
         inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     // First, get the agents and the assets agentless of this inject
-    InjectService.AgentsAndAssetsAgentless agentsAndAssetsAgentless =
+    AgentsAndAssetsAgentless agentsAndAssetsAgentless =
         this.injectService.getAgentsAndAgentlessAssetsByInject(inject);
-    List<Agent> agents = agentsAndAssetsAgentless.agents();
+    Set<Agent> agents = agentsAndAssetsAgentless.agents();
     Set<Asset> assetsAgentless = agentsAndAssetsAgentless.assetsAgentless();
     // Manage agentless assets
     saveAgentlessAssetsTraces(assetsAgentless, injectStatus);
     // Filter each list to do something for each specific case and then remove the specific agents
     // from the main "agents" list to execute payloads at the end for the remaining "normal" agents
     List<Agent> inactiveAgents = agents.stream().filter(agent -> !agent.isActive()).toList();
-    agents.removeAll(inactiveAgents);
+    inactiveAgents.forEach(agents::remove);
     List<Agent> agentsWithoutExecutor =
         agents.stream().filter(agent -> agent.getExecutor() == null).toList();
-    agents.removeAll(agentsWithoutExecutor);
+    agentsWithoutExecutor.forEach(agents::remove);
     List<Agent> crowdstrikeAgents =
         agents.stream()
             .filter(agent -> CROWDSTRIKE_EXECUTOR_TYPE.equals(agent.getExecutor().getType()))
             .collect(Collectors.toList());
-    agents.removeAll(crowdstrikeAgents);
+    crowdstrikeAgents.forEach(agents::remove);
 
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents
