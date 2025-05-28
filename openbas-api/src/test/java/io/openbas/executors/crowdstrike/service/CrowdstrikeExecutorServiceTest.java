@@ -21,6 +21,7 @@ import io.openbas.utils.fixtures.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,7 +112,7 @@ public class CrowdstrikeExecutorServiceTest {
     // Run method to test
     crowdStrikeExecutorContextService.launchBatchExecutorSubprocess(
         inject,
-        List.of(AgentFixture.createAgent(EndpointFixture.createEndpoint(), "12345")),
+        Set.of(AgentFixture.createAgent(EndpointFixture.createEndpoint(), "12345")),
         InjectStatusFixture.createPendingInjectStatus());
     // Asserts
     ArgumentCaptor<List<String>> agentIds = ArgumentCaptor.forClass(List.class);

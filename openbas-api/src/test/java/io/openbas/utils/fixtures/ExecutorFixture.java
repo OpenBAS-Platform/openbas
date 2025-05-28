@@ -32,7 +32,7 @@ public class ExecutorFixture {
     return executorOptional.orElseGet(() -> executorRepository.save(createOBASExecutor()));
   }
 
-  private Executor createCrowdstrikeExecutor() {
+  public Executor createCrowdstrikeExecutor() {
     Executor executor = new Executor();
     executor.setType(CROWDSTRIKE_EXECUTOR_TYPE);
     executor.setName(CROWDSTRIKE_EXECUTOR_NAME);

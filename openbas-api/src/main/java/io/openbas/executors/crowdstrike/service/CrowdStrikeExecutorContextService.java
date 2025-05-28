@@ -14,10 +14,7 @@ import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeAction;
 import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -59,7 +56,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       @NotNull final Agent agent) {}
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
+      Inject inject, Set<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
 
     eeService.throwEEExecutorService(
         licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectStatus);

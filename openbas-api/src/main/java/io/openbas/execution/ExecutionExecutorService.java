@@ -3,6 +3,7 @@ package io.openbas.execution;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_NAME;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ExecutionTraceRepository;
 import io.openbas.executors.ExecutorContextService;
@@ -41,16 +42,17 @@ public class ExecutionExecutorService {
     saveAgentlessAssetsTraces(assetsAgentless, injectStatus);
     // Filter each list to do something for each specific case and then remove the specific agents
     // from the main "agents" list to execute payloads at the end for the remaining "normal" agents
-    List<Agent> inactiveAgents = agents.stream().filter(agent -> !agent.isActive()).toList();
-    inactiveAgents.forEach(agents::remove);
-    List<Agent> agentsWithoutExecutor =
-        agents.stream().filter(agent -> agent.getExecutor() == null).toList();
-    agentsWithoutExecutor.forEach(agents::remove);
-    List<Agent> crowdstrikeAgents =
+    Set<Agent> inactiveAgents =
+        agents.stream().filter(agent -> !agent.isActive()).collect(Collectors.toSet());
+    agents.removeAll(inactiveAgents);
+    Set<Agent> agentsWithoutExecutor =
+        agents.stream().filter(agent -> agent.getExecutor() == null).collect(Collectors.toSet());
+    agents.removeAll(agentsWithoutExecutor);
+    Set<Agent> crowdstrikeAgents =
         agents.stream()
             .filter(agent -> CROWDSTRIKE_EXECUTOR_TYPE.equals(agent.getExecutor().getType()))
-            .collect(Collectors.toList());
-    crowdstrikeAgents.forEach(agents::remove);
+            .collect(Collectors.toSet());
+    agents.removeAll(crowdstrikeAgents);
 
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents
@@ -62,9 +64,8 @@ public class ExecutionExecutorService {
       try {
         ExecutorContextService executorContextService =
             context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
-        crowdstrikeAgents =
-            executorContextService.launchBatchExecutorSubprocess(
-                inject, crowdstrikeAgents, injectStatus);
+        executorContextService.launchBatchExecutorSubprocess(
+            inject, crowdstrikeAgents, injectStatus);
         atLeastOneExecution.set(true);
       } catch (Exception e) {
         log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
@@ -87,7 +88,8 @@ public class ExecutionExecutorService {
     }
   }
 
-  private void saveAgentErrorTrace(AgentException e, InjectStatus injectStatus) {
+  @VisibleForTesting
+  public void saveAgentErrorTrace(AgentException e, InjectStatus injectStatus) {
     executionTraceRepository.save(
         new ExecutionTrace(
             injectStatus,
@@ -99,8 +101,9 @@ public class ExecutionExecutorService {
             null));
   }
 
-  private void saveCrowdstrikeAgentsErrorTraces(
-      Exception e, List<Agent> crowdstrikeAgents, InjectStatus injectStatus) {
+  @VisibleForTesting
+  public void saveCrowdstrikeAgentsErrorTraces(
+      Exception e, Set<Agent> crowdstrikeAgents, InjectStatus injectStatus) {
     executionTraceRepository.saveAll(
         crowdstrikeAgents.stream()
             .map(
@@ -116,8 +119,9 @@ public class ExecutionExecutorService {
             .toList());
   }
 
-  private void saveWithoutExecutorAgentsTraces(
-      List<Agent> agentsWithoutExecutor, InjectStatus injectStatus) {
+  @VisibleForTesting
+  public void saveWithoutExecutorAgentsTraces(
+      Set<Agent> agentsWithoutExecutor, InjectStatus injectStatus) {
     if (!agentsWithoutExecutor.isEmpty()) {
       executionTraceRepository.saveAll(
           agentsWithoutExecutor.stream()
@@ -138,7 +142,8 @@ public class ExecutionExecutorService {
     }
   }
 
-  private void saveInactiveAgentsTraces(List<Agent> inactiveAgents, InjectStatus injectStatus) {
+  @VisibleForTesting
+  public void saveInactiveAgentsTraces(Set<Agent> inactiveAgents, InjectStatus injectStatus) {
     if (!inactiveAgents.isEmpty()) {
       executionTraceRepository.saveAll(
           inactiveAgents.stream()
@@ -159,7 +164,8 @@ public class ExecutionExecutorService {
     }
   }
 
-  private void saveAgentlessAssetsTraces(Set<Asset> assetsAgentless, InjectStatus injectStatus) {
+  @VisibleForTesting
+  public void saveAgentlessAssetsTraces(Set<Asset> assetsAgentless, InjectStatus injectStatus) {
     if (!assetsAgentless.isEmpty()) {
       executionTraceRepository.saveAll(
           assetsAgentless.stream()
