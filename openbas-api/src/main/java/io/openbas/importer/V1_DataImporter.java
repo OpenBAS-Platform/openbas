@@ -41,13 +41,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Log
+@Slf4j
 @RequiredArgsConstructor
 public class V1_DataImporter implements Importer {
 
@@ -945,8 +945,7 @@ public class V1_DataImporter implements Importer {
 
           // Check If inject contract exists
           if (injectorContractIdFromNode == null) {
-            log.warning(
-                "Import Inject Failed: Missing injector contract ID on inject: " + injectId);
+            log.warn("Import Inject Failed: Missing injector contract ID on inject: {}", injectId);
             return;
           }
           Optional<InjectorContract> injectorContract =
@@ -981,8 +980,8 @@ public class V1_DataImporter implements Importer {
           }
 
           if (injectorContractId == null) {
-            log.warning(
-                "Import Inject Failed: Unresolved injector contract ID on inject: " + injectId);
+            log.warn(
+                "Import Inject Failed: Unresolved injector contract ID on inject: {}", injectId);
             return;
           }
 
@@ -1089,7 +1088,7 @@ public class V1_DataImporter implements Importer {
                   boolean docAttached = jsonNode.get("document_attached").booleanValue();
                   injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
                 } else {
-                  log.warning("Missing document in the exercise_documents property");
+                  log.warn("Missing document in the exercise_documents property");
                 }
               });
         });
@@ -1211,7 +1210,7 @@ public class V1_DataImporter implements Importer {
     if (injectorContractFromPayload.isPresent()) {
       return injectorContractFromPayload.get().getId();
     } else {
-      log.warning("An error has occurred when importing the payload: " + payload.getName());
+      log.warn("An error has occurred when importing the payload: {}", payload.getName());
       return null;
     }
   }

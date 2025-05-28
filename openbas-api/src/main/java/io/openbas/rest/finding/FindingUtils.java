@@ -1,7 +1,5 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.database.model.ContractOutputType.*;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -10,17 +8,16 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
 import jakarta.annotation.Resource;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-@Log
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class FindingUtils {
@@ -54,7 +51,7 @@ public class FindingUtils {
                                   | Pattern.CASE_INSENSITIVE
                                   | Pattern.UNICODE_CHARACTER_CLASS);
                         } catch (PatternSyntaxException e) {
-                          log.log(Level.INFO, "Invalid regex pattern: " + r, e.getMessage());
+                          log.info(String.format("Invalid regex pattern: %s", r), e.getMessage());
                           return null;
                         }
                       });
@@ -91,7 +88,7 @@ public class FindingUtils {
         return rootNode.get("stderr").asText();
       }
     } catch (Exception e) {
-      log.log(Level.WARNING, e.getMessage(), e);
+      log.warn(e.getMessage(), e);
     }
 
     return "";
@@ -133,19 +130,19 @@ public class FindingUtils {
         try {
           int groupIndex = Integer.parseInt(index);
           if (groupIndex > matcher.groupCount()) {
-            log.log(Level.WARNING, "Skipping invalid group index: " + groupIndex);
+            log.warn("Skipping invalid group index: {}", groupIndex);
             continue;
           }
           String extracted = matcher.group(groupIndex);
           if (extracted == null || extracted.isEmpty()) {
-            log.log(Level.WARNING, "Skipping invalid extracted value");
+            log.warn("Skipping invalid extracted value");
             continue;
           }
           if (extracted != null) {
             extractedValues.add(extracted.trim());
           }
         } catch (NumberFormatException | IllegalStateException e) {
-          log.log(Level.SEVERE, "Invalid regex group index: " + index, e);
+          log.error(String.format("Invalid regex group index: %s", index), e);
         }
       }
     }
@@ -190,7 +187,10 @@ public class FindingUtils {
       }
 
     } catch (DataIntegrityViolationException ex) {
-      log.log(Level.INFO, "Race condition: finding already exists. Retrying ...", ex.getMessage());
+      log.info(
+          String.format(
+              "Race condition: finding already exists. Retrying ... %s ", ex.getMessage()),
+          ex);
       // Re-fetch and try to add the asset
       handleRaceCondition(inject, asset, contractOutputElement, finalValue);
     }
@@ -214,7 +214,7 @@ public class FindingUtils {
         findingRepository.save(existingFinding);
       }
     } else {
-      log.warning("Retry failed: Finding still not found after race condition.");
+      log.warn("Retry failed: Finding still not found after race condition.");
     }
   }
 }

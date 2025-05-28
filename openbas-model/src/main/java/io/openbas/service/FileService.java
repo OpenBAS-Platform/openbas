@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 public class FileService {
-
-  private static final Logger LOGGER = Logger.getLogger(FileService.class.getName());
   public static final String INJECTORS_IMAGES_BASE_PATH = "/injectors/images/";
   public static final String COLLECTORS_IMAGES_BASE_PATH = "/collectors/images/";
   public static final String EXECUTORS_IMAGES_ICONS_BASE_PATH = "/executors/images/icons/";
@@ -91,7 +90,7 @@ public class FileService {
     for (Result<DeleteError> result : removedObjects) {
       try {
         DeleteError error = result.get();
-        LOGGER.severe("Error in deleting object " + error.objectName() + "; " + error.message());
+        log.error("Error in deleting object {}; {}", error.objectName(), error.message());
       } catch (Exception e) {
         // Nothing to do
       }

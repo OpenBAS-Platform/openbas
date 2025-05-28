@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
     name = "Notification rules management",
     description =
         "Endpoints to manage NotificationRules. NotificationRules are used to subscribe to notifications. As of today, only scenario degradation score is supported.")
+@Slf4j
 public class NotificationRuleApi {
 
   public static final String NOTIFICATION_RULE_URI = "/api/notification-rules";
