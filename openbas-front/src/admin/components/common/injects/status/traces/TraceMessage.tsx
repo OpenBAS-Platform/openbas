@@ -3,8 +3,10 @@ import { Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
+import type { LoggedHelper } from '../../../../../../actions/helper';
 import { useFormatter } from '../../../../../../components/i18n';
-import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
+import { useHelper } from '../../../../../../store';
+import { type ExecutionTraceOutput, type PlatformSettings } from '../../../../../../utils/api-types';
 import EEChip from '../../../entreprise_edition/EEChip';
 
 interface Props { traces: ExecutionTraceOutput[] }
@@ -14,6 +16,7 @@ const TraceMessage = ({ traces }: Props) => {
   const theme = useTheme();
 
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
   const sorted = [...traces].sort((a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime());
   const truncateLength = 1000;
 
@@ -50,7 +53,7 @@ const TraceMessage = ({ traces }: Props) => {
                 marginBottom: theme.spacing(1),
               }}
             >
-              {tr.execution_message.startsWith('LICENSE RESTRICTION') && <EEChip clickable featureDetectedInfo={tr.execution_message.replace('LICENSE RESTRICTION - ', '')} />}
+              {!settings.platform_license?.license_is_validated && tr.execution_message.startsWith('LICENSE RESTRICTION') && <EEChip clickable featureDetectedInfo={tr.execution_message.replace('LICENSE RESTRICTION - ', '')} />}
               <strong>{tr.execution_status}</strong>
               {' '}
               {displayMessage}

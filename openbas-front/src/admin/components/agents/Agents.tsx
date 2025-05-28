@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { fetchExecutors } from '../../../actions/Executor';
 import { type ExecutorHelper } from '../../../actions/executors/executor-helper';
-import { type MeTokensHelper } from '../../../actions/helper';
+import { type LoggedHelper, type MeTokensHelper } from '../../../actions/helper';
 import { meTokens } from '../../../actions/User';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
@@ -33,7 +33,8 @@ const Executors = () => {
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { executors, tokens } = useHelper((helper: ExecutorHelper & MeTokensHelper) => ({
+  const { settings, executors, tokens } = useHelper((helper: ExecutorHelper & MeTokensHelper & LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
     executors: helper.getExecutors(),
     tokens: helper.getMeTokens(),
   }));
@@ -52,6 +53,7 @@ const Executors = () => {
 
   const sortedExecutors = executors.sort((a: Executor, b: Executor) => order[a.executor_type as keyof typeof order] - order[b.executor_type as keyof typeof order]);
   const needInformationStepper = (selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA);
+  const showEEChip = (executor: Executor) => !settings.platform_license?.license_is_validated && (executor.executor_type === OPENBAS_TANIUM || executor.executor_type === OPENBAS_CROWDSTRIKE);
 
   // -- Manage Dialogs
   const steps = [t('Choose your platform'), t('Installation Instructions')];
@@ -82,7 +84,7 @@ const Executors = () => {
             <ExecutorSelector
               executor={executor}
               setSelectedExecutor={setSelectedExecutor}
-              isEEExecutor={executor.executor_type == OPENBAS_TANIUM || executor.executor_type == OPENBAS_CROWDSTRIKE}
+              showEEChip={showEEChip(executor)}
             />
           </Grid>
         ))}
@@ -117,7 +119,7 @@ const Executors = () => {
               </>
             )}
           {!needInformationStepper && selectedExecutor && (
-            <ExecutorDocumentationLink executor={selectedExecutor} />
+            <ExecutorDocumentationLink showEEChip={showEEChip(selectedExecutor)} executor={selectedExecutor} />
           )}
         </DialogContent>
       </Dialog>
