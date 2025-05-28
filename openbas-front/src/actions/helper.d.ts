@@ -1,4 +1,4 @@
-import { type Challenge, type Document, type Exercise, type Organization, type PlatformSettings, type Scenario, type Tag, type Token, type User } from '../utils/api-types';
+import { type Challenge, type Document, type Exercise, type Organization, type PlatformSettings, type Scenario, type ScenarioChallengesReader, type SimulationChallengesReader, type Tag, type Token, type User } from '../utils/api-types';
 
 export interface UserHelper {
   getMe: () => User;
@@ -40,3 +40,7 @@ export interface DocumentHelper {
 }
 
 export interface MeTokensHelper { getMeTokens: () => Token[] }
+
+export interface SimulationChallengesReaderHelper { getSimulationChallengesReader: (exerciseId: SimulationChallengesReader['exercise_id']) => SimulationChallengesReader }
+
+export interface ScenarioChallengesReaderHelper { getScenarioChallengesReader: (scenarioId: SimulationChallengesReader['scenario_id']) => ScenarioChallengesReader }

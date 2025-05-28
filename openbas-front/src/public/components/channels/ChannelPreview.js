@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchObserverChannel } from '../../../actions/channels/channel-action';
-import { fetchPlayerDocuments } from '../../../actions/Document';
+import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
@@ -37,7 +37,7 @@ const ChannelPreview = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchObserverChannel(exerciseId, channelId));
-    dispatch(fetchPlayerDocuments(exerciseId));
+    dispatch(fetchSimulationPlayerDocuments(exerciseId));
   }, []);
   if (channel) {
     return (

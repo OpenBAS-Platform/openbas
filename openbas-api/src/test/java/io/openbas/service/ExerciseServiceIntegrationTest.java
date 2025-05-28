@@ -13,6 +13,7 @@ import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -41,6 +42,7 @@ class ExerciseServiceIntegrationTest {
 
   @Autowired private TeamService teamService;
   @Autowired private TagRuleService tagRuleService;
+  @Autowired private DocumentService documentService;
   @Autowired private InjectService injectService;
 
   @Autowired private ExerciseMapper exerciseMapper;
@@ -77,6 +79,7 @@ class ExerciseServiceIntegrationTest {
             teamService,
             variableService,
             tagRuleService,
+            documentService,
             injectService,
             exerciseMapper,
             injectMapper,

@@ -1,6 +1,5 @@
 package io.openbas.rest.challenge;
 
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.ChallengeSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -12,9 +11,7 @@ import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openbas.database.repository.*;
 import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
-import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
-import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
@@ -24,7 +21,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,9 +34,7 @@ public class ChallengeApi extends RestBehavior {
   private final ChallengeFlagRepository challengeFlagRepository;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
-  private final ExerciseRepository exerciseRepository;
   private final ChallengeService challengeService;
-  private final UserRepository userRepository;
 
   @GetMapping("/api/challenges")
   public Iterable<Challenge> challenges() {
@@ -110,29 +104,6 @@ public class ChallengeApi extends RestBehavior {
     return challengeRepository.save(challenge);
   }
 
-  @GetMapping("/api/player/challenges/{exerciseId}")
-  public ChallengesReader playerChallenges(
-      @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
-    final User user = impersonateUser(userRepository, userId);
-    if (user.getId().equals(ANONYMOUS)) {
-      throw new UnsupportedOperationException("User must be logged or dynamic player is required");
-    }
-    return challengeService.playerChallenges(exerciseId, user);
-  }
-
-  @GetMapping("/api/observer/challenges/{exerciseId}")
-  public ChallengesReader observerChallenges(@PathVariable String exerciseId) {
-    Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    ChallengesReader challengesReader = new ChallengesReader(exercise);
-    Iterable<Challenge> challenges = challengeService.getExerciseChallenges(exerciseId);
-    challengesReader.setExerciseChallenges(
-        fromIterable(challenges).stream()
-            .map(challenge -> new ChallengeInformation(challenge, null, 0))
-            .toList());
-    return challengesReader;
-  }
-
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
   @Transactional(rollbackOn = Exception.class)
@@ -146,23 +117,5 @@ public class ChallengeApi extends RestBehavior {
       throws InputValidationException {
     validateUUID(challengeId);
     return challengeService.tryChallenge(challengeId, input);
-  }
-
-  @PostMapping("/api/player/challenges/{exerciseId}/{challengeId}/validate")
-  @Transactional(rollbackOn = Exception.class)
-  public ChallengesReader validateChallenge(
-      @PathVariable String exerciseId,
-      @PathVariable String challengeId,
-      @Valid @RequestBody ChallengeTryInput input,
-      @RequestParam Optional<String> userId)
-      throws InputValidationException {
-    validateUUID(exerciseId);
-    validateUUID(challengeId);
-
-    final User user = impersonateUser(userRepository, userId);
-    if (user.getId().equals(ANONYMOUS)) {
-      throw new UnsupportedOperationException("User must be logged or dynamic player is required");
-    }
-    return challengeService.validateChallenge(exerciseId, challengeId, input, user);
   }
 }

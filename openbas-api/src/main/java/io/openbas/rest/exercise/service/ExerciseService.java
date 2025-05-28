@@ -24,6 +24,7 @@ import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
@@ -74,6 +75,7 @@ public class ExerciseService {
   private final TeamService teamService;
   private final VariableService variableService;
   private final TagRuleService tagRuleService;
+  private final DocumentService documentService;
   private final InjectService injectService;
 
   private final ExerciseMapper exerciseMapper;
@@ -173,6 +175,12 @@ public class ExerciseService {
     exerciseDuplicate.setDocuments(new ArrayList<>(exerciseOrigin.getDocuments()));
     exerciseDuplicate.setLessonsAnonymized(exerciseOrigin.isLessonsAnonymized());
     return exerciseDuplicate;
+  }
+
+  public List<Document> getExercisePlayerDocuments(Exercise exercise) {
+    List<Article> articles = exercise.getArticles();
+    List<Inject> injects = exercise.getInjects();
+    return documentService.getPlayerDocuments(articles, injects);
   }
 
   private void getListOfExerciseTeams(

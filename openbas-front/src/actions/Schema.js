@@ -134,10 +134,15 @@ export const channelReader = new schema.Entity(
   {},
   { idAttribute: 'channel_id' },
 );
-export const challengesReader = new schema.Entity(
-  'challengesreaders',
+export const simulationChallengesReaders = new schema.Entity(
+  'simulationchallengesreaders',
   {},
   { idAttribute: 'exercise_id' },
+);
+export const scenarioChallengesReaders = new schema.Entity(
+  'scenariochallengesreaders',
+  {},
+  { idAttribute: 'scenario_id' },
 );
 export const injectexpectation = new schema.Entity(
   'injectexpectations',
@@ -316,7 +321,8 @@ export const storeHelper = state => ({
     i => i.get('comcheckstatus_comcheck') === id,
   ),
   getChannelReader: id => entity(id, 'channelreaders', state),
-  getChallengesReader: id => entity(id, 'challengesreaders', state),
+  getSimulationChallengesReader: id => entity(id, 'simulationchallengesreaders', state),
+  getScenarioChallengesReader: id => entity(id, 'scenariochallengesreaders', state),
   // users
   getUsers: () => entities('users', state),
   getGroups: () => entities('groups', state),
