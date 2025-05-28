@@ -166,7 +166,7 @@ public class InjectService {
 
     // if inject content is null we add the defaults from the injector contract
     // this is the case when creating an inject from OpenCti
-    if (inject.getContent() == null) {
+    if (inject.getContent() == null || inject.getContent().isEmpty()) {
       inject.setContent(
           injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract));
     }
