@@ -1,19 +1,27 @@
 package io.openbas.service;
 
+import static com.opencsv.ICSVWriter.*;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static java.util.stream.StreamSupport.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
+import io.openbas.rest.asset.endpoint.form.EndpointExport;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.service.utils.CustomColumnPositionStrategy;
 import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
+import io.openbas.utils.TargetType;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
@@ -33,6 +41,7 @@ public class MapperService {
   private final ImportMapperRepository importMapperRepository;
 
   private final InjectorContractRepository injectorContractRepository;
+  private final EndpointService endpointService;
 
   /**
    * Create and save an ImportMapper object from a MapperAddInput one
@@ -276,6 +285,48 @@ public class MapperService {
     objectMapper.addMixIn(RuleAttribute.class, MapperExportMixins.RuleAttribute.class);
 
     return objectMapper.writeValueAsString(mappersList);
+  }
+
+  public void exportMappersCsv(TargetType targetType, HttpServletResponse response) {
+    switch (targetType) {
+      case ENDPOINTS:
+        try {
+            // TODO get list of endpoints from Front screen and not from database
+            List<Endpoint> endpoints = endpointService.endpoints();
+          List<EndpointExport> exports = new ArrayList<>();
+          for (Endpoint endpoint : endpoints) {
+            EndpointExport endpointExport = new EndpointExport();
+            endpointExport.setName(endpoint.getName());
+            endpointExport.setDescription(endpoint.getDescription());
+            endpointExport.setHostname(endpoint.getHostname());
+            endpointExport.setIps(endpoint.getIps()); // TODO get list
+            endpointExport.setPlatform(endpoint.getPlatform());
+            endpointExport.setArch(endpoint.getArch());
+            endpointExport.setMacAddresses(endpoint.getMacAddresses()); // TODO get list
+            endpointExport.setTags(endpointExport.getTags()); // TODO get names
+            exports.add(endpointExport);
+          }
+          String filename = "Endpoints.csv";
+          response.setContentType("text/csv");
+          response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+          response.setStatus(HttpServletResponse.SC_OK);
+          CustomColumnPositionStrategy<EndpointExport> columns = new CustomColumnPositionStrategy();
+          columns.setType(EndpointExport.class);
+          StatefulBeanToCsv<EndpointExport> writer =
+              new StatefulBeanToCsvBuilder<EndpointExport>(response.getWriter())
+                  .withQuotechar(DEFAULT_QUOTE_CHARACTER)
+                  .withSeparator(DEFAULT_SEPARATOR)
+                  .withMappingStrategy(columns)
+                  .build();
+          writer.write(exports);
+        } catch (Exception e) {
+          throw new RuntimeException("Error during export csv ", e);
+        }
+        break;
+      default:
+        throw new BadRequestException(
+            "Target type " + targetType + " for CSV export is not supported");
+    }
   }
 
   public void importMappers(List<ImportMapperAddInput> mappers) {

@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
@@ -22,6 +23,7 @@ import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.Constants;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
@@ -111,6 +113,14 @@ public class MapperApi extends RestBehavior {
     } catch (IOException e) {
       throw new RuntimeException("Error during export", e);
     }
+  }
+
+  @Operation(description = "Export all datas from a specific target (endpoint,...)")
+  @Secured(ROLE_ADMIN)
+  @PostMapping(value = "/api/mappers/csv")
+  @LogExecutionTime
+  public void exportMappersCsv(@RequestParam TargetType targetType, HttpServletResponse response) {
+    mapperService.exportMappersCsv(targetType, response);
   }
 
   @Secured(ROLE_ADMIN)
