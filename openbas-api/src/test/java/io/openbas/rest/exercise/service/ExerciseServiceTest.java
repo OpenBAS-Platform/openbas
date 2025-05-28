@@ -23,9 +23,7 @@ import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.*;
-
 import java.util.*;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,55 +35,32 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
-  @Mock
-  private Ee eeService;
-  @Mock
-  private GrantService grantService;
-  @Mock
-  private InjectDuplicateService injectDuplicateService;
-  @Mock
-  private TeamService teamService;
-  @Mock
-  private VariableService variableService;
-  @Mock
-  private TagRuleService tagRuleService;
-  @Mock
-  private DocumentService documentService;
-  @Mock
-  private InjectService injectService;
+  @Mock private Ee eeService;
+  @Mock private GrantService grantService;
+  @Mock private InjectDuplicateService injectDuplicateService;
+  @Mock private TeamService teamService;
+  @Mock private VariableService variableService;
+  @Mock private TagRuleService tagRuleService;
+  @Mock private DocumentService documentService;
+  @Mock private InjectService injectService;
 
-  @Mock
-  private ExerciseMapper exerciseMapper;
-  @Mock
-  private InjectMapper injectMapper;
-  @Mock
-  private ResultUtils resultUtils;
-  @Mock
-  private ActionMetricCollector actionMetricCollector;
-  @Mock
-  private LicenseCacheManager licenseCacheManager;
+  @Mock private ExerciseMapper exerciseMapper;
+  @Mock private InjectMapper injectMapper;
+  @Mock private ResultUtils resultUtils;
+  @Mock private ActionMetricCollector actionMetricCollector;
+  @Mock private LicenseCacheManager licenseCacheManager;
 
-  @Mock
-  private AssetRepository assetRepository;
-  @Mock
-  private AssetGroupRepository assetGroupRepository;
-  @Mock
-  private InjectExpectationRepository injectExpectationRepository;
-  @Mock
-  private ArticleRepository articleRepository;
-  @Mock
-  private ExerciseRepository exerciseRepository;
-  @Mock
-  private TeamRepository teamRepository;
-  @Mock
-  private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  @Mock
-  private InjectRepository injectRepository;
-  @Mock
-  private LessonsCategoryRepository lessonsCategoryRepository;
+  @Mock private AssetRepository assetRepository;
+  @Mock private AssetGroupRepository assetGroupRepository;
+  @Mock private InjectExpectationRepository injectExpectationRepository;
+  @Mock private ArticleRepository articleRepository;
+  @Mock private ExerciseRepository exerciseRepository;
+  @Mock private TeamRepository teamRepository;
+  @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  @Mock private InjectRepository injectRepository;
+  @Mock private LessonsCategoryRepository lessonsCategoryRepository;
 
-  @InjectMocks
-  private ExerciseService exerciseService;
+  @InjectMocks private ExerciseService exerciseService;
 
   @BeforeEach
   void setUp() {
