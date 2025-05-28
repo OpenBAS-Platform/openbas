@@ -87,7 +87,7 @@ const ScenarioHeader = ({
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const [openScenarioAssistantQueryParam] = useQueryParameter(['openScenarioAssistant']);
   const { injects, setInjects } = useContext(InjectContext);
-  const [openScenarioAssistant, setOpenScenarioAssistant] = useState(openScenarioAssistantQueryParam);
+  const [openScenarioAssistant, setOpenScenarioAssistant] = useState(openScenarioAssistantQueryParam === 'true');
   const [openLoaderDialog, setOpenLoaderDialog] = useState(false);
   const [isInjectAssistantLoading, setIsInjectAssistantLoading] = useState(false);
   // Fetching data
