@@ -27,7 +27,7 @@ public class ExecutorHelper {
 
     return command
         .replace("\"#{location}\"", location)
-        .replace("#{inject}", executionId)
+        .replace("#{execution}", executionId)
         .replace("#{agent}", agentId);
   }
 }

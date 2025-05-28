@@ -35,5 +35,5 @@ public interface InjectStatusRepository
               + "  AND cardinality(t.execution_context_identifiers) = 0"
               + " WHERE i.inject_id = :injectId",
       nativeQuery = true)
-  Optional<InjectStatus> findInjectStatusWithGlobalExecutionTraces(String injectId);
+  List<InjectStatus> findInjectStatusWithGlobalExecutionTraces(String injectId);
 }

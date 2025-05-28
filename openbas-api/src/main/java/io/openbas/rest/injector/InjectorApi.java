@@ -360,7 +360,8 @@ public class InjectorApi extends RestBehavior {
     String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
 
     if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
-      filename = "openbas-implant-" + version + (platform.equals("windows") ? ".exe" : "");
+      // filename = "openbas-implant-" + version + (platform.equals("windows") ? ".exe" : "");
+      filename = "openbas-implant.exe";
       in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
     } else if (executorOpenbasBinariesOrigin.equals(
         "repository")) { // if we want a specific version from artifactory

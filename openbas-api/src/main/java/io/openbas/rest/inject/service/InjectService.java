@@ -852,6 +852,9 @@ public class InjectService {
 
   public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
     return injectStatusMapper.toInjectStatusOutput(
-        injectStatusRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
+        Optional.ofNullable(
+            injectStatusRepository
+                .findInjectStatusWithGlobalExecutionTraces(injectId)
+                .getLast())); // TODO POC
   }
 }

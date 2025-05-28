@@ -51,9 +51,11 @@ public class InjectStatusService {
   }
 
   public void addStartImplantExecutionTraceByInject(
-      String injectId, String agentId, String message) {
+      String executionId, String agentId, String message) {
     InjectStatus injectStatus =
-        injectStatusRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
+        injectStatusRepository
+            .findByInjectId(executionId)
+            .orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
     ExecutionTrace trace =
         new ExecutionTrace(
@@ -65,7 +67,7 @@ public class InjectStatusService {
             agent,
             null);
     injectStatus.addTrace(trace);
-    injectStatusRepository.save(injectStatus);
+    injectStatusRepository.save(injectStatus); // TODO POC
   }
 
   private int getCompleteTrace(InjectStatus execution) {

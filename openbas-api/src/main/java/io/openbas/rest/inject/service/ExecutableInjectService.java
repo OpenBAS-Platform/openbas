@@ -4,6 +4,7 @@ import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -11,6 +12,7 @@ import io.openbas.rest.payload.service.PayloadService;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class ExecutableInjectService {
   private final PayloadService payloadService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
+  private final InjectStatusRepository injectStatusRepository;
 
   private List<String> getArgumentsFromCommandLines(String command) {
     Matcher matcher = argumentsRegex.matcher(command);
@@ -38,18 +41,38 @@ public class ExecutableInjectService {
   }
 
   private String replaceArgumentsByValue(
-      String command, List<PayloadArgument> defaultArguments, ObjectNode injectContent) {
+      String command,
+      List<PayloadArgument> defaultArguments,
+      ObjectNode injectContent,
+      List<ExecutionBinding> executionBindings) {
 
     List<String> arguments = getArgumentsFromCommandLines(command);
 
     for (String argument : arguments) {
       String value = "";
 
-      // Try to get the value from injectContent
-      if (injectContent.has(argument) && !injectContent.get(argument).asText().isEmpty()) {
-        value = injectContent.get(argument).asText();
-      } else {
-        // Fallback to defaultContent
+      // 1. Try executionBindings first
+      if (executionBindings != null && !executionBindings.isEmpty()) {
+        Optional<ExecutionBinding> bindingOpt =
+            executionBindings.stream()
+                .filter(binding -> binding.getArgumentKey().equals(argument))
+                .findFirst();
+
+        if (bindingOpt.isPresent()) {
+          value = bindingOpt.get().getArgumentValue();
+        }
+      }
+
+      // 2. If not found, try injectContent
+      if (value.isEmpty() && injectContent != null && injectContent.has(argument)) {
+        String injectedValue = injectContent.get(argument).asText();
+        if (!injectedValue.isEmpty()) {
+          value = injectedValue;
+        }
+      }
+
+      // 3. If still not found, try defaultArguments
+      if (value.isEmpty()) {
         value =
             defaultArguments.stream()
                 .filter(a -> a.getKey().equals(argument))
@@ -58,13 +81,14 @@ public class ExecutableInjectService {
                 .orElse("");
       }
 
+      // Replace the placeholder
       command = command.replace("#{" + argument + "}", value);
     }
 
     return command;
   }
 
-  public static String replaceCmdVariables(String cmd) {
+  public static String replaceCmdVariables(String cmd) { // TODO POC TO CHECK
     Matcher matcher = cmdVariablesRegex.matcher(cmd);
 
     StringBuilder result = new StringBuilder();
@@ -108,9 +132,11 @@ public class ExecutableInjectService {
       String executor,
       List<PayloadArgument> defaultArguments,
       ObjectNode injectContent,
+      List<ExecutionBinding> executionBindings,
       String obfuscator) {
     OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
-    String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
+    String computedCommand =
+        replaceArgumentsByValue(command, defaultArguments, injectContent, executionBindings);
 
     if (executor.equals("cmd")) {
       computedCommand = replaceCmdVariables(computedCommand);
@@ -122,16 +148,17 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
+  public Payload getExecutablePayloadAndUpdateInjectStatus(String executionId, String agentId)
       throws Exception {
-    Payload payloadToExecute = getExecutablePayloadInject(injectId);
+    Payload payloadToExecute = getExecutablePayloadInject(executionId);
     this.injectStatusService.addStartImplantExecutionTraceByInject(
-        injectId, agentId, "Implant is up and starting execution");
+        executionId, agentId, "Implant is up and starting execution");
     return payloadToExecute;
   }
 
-  private Payload getExecutablePayloadInject(String injectId) throws Exception {
-    Inject inject = injectService.inject(injectId);
+  private Payload getExecutablePayloadInject(String executionId) throws Exception {
+    InjectStatus execution = injectStatusRepository.findById(executionId).orElseThrow();
+    Inject inject = execution.getInject(); // TODO POC
     InjectorContract contract =
         inject
             .getInjectorContract()
@@ -161,6 +188,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
+                        execution.getExecutionBindings(),
                         obfuscator));
               }
               if (hasText(prerequisite.getGetCommand())) {
@@ -170,6 +198,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
+                        execution.getExecutionBindings(),
                         obfuscator));
               }
               prerequisiteList.add(payload);
@@ -185,6 +214,7 @@ public class ExecutableInjectService {
               contract.getPayload().getCleanupExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
+              execution.getExecutionBindings(),
               obfuscator));
     }
 
@@ -198,6 +228,7 @@ public class ExecutableInjectService {
               payloadCommand.getExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
+              execution.getExecutionBindings(),
               obfuscator));
       return payloadCommand;
     }
