@@ -172,6 +172,7 @@ const ScenarioHeader = ({
               style={{
                 marginRight: theme.spacing(1),
                 lineHeight: 'initial',
+                borderColor: theme.palette.divider,
               }}
               variant="outlined"
               color="inherit"
