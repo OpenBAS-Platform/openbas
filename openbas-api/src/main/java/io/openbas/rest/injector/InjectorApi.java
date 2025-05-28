@@ -5,7 +5,6 @@ import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.service.EndpointService.JFROG_BASE;
 import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
 import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
@@ -32,10 +31,8 @@ import io.openbas.utils.FilterUtilsJpa;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -344,16 +341,16 @@ public class InjectorApi extends RestBehavior {
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
       @PathVariable String platform,
       @PathVariable String architecture,
-      @RequestParam(required = false) final String injectId,
+      @RequestParam(required = false) final String executionId,
       @RequestParam(required = false) final String agentId)
       throws IOException {
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
       setImplantErrorTrace(
-          injectId, agentId, "Unable to download the implant. Platform invalid: " + platform);
+          executionId, agentId, "Unable to download the implant. Platform invalid: " + platform);
     }
     if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
       setImplantErrorTrace(
-          injectId,
+          executionId,
           agentId,
           "Unable to download the implant. Architecture invalid: " + architecture);
     }
@@ -367,11 +364,12 @@ public class InjectorApi extends RestBehavior {
       in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
     } else if (executorOpenbasBinariesOrigin.equals(
         "repository")) { // if we want a specific version from artifactory
-      filename =
-          "openbas-implant-"
-              + executorOpenbasBinariesVersion
-              + (platform.equals("windows") ? ".exe" : "");
-      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
+      //      filename =
+      //          "openbas-implant-"
+      //              + executorOpenbasBinariesVersion
+      //              + (platform.equals("windows") ? ".exe" : "");
+      //      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath +
+      // filename).openStream());
     }
 
     if (in != null) {
@@ -385,22 +383,21 @@ public class InjectorApi extends RestBehavior {
     throw new UnsupportedOperationException("Implant " + platform + " executable not supported");
   }
 
-  private void setImplantErrorTrace(String injectId, String agentId, String message) {
-    if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
+  private void setImplantErrorTrace(String executionId, String agentId, String message) {
+    if (executionId != null && !executionId.isBlank() && agentId != null && !agentId.isBlank()) {
       // Create execution traces to inform that the architecture or platform are not compatible with
       // the OpenBAS implant
-      Inject inject =
-          injectRepository
-              .findById(injectId)
-              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
       Agent agent =
           agentRepository
               .findById(agentId)
               .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
+
       InjectStatus execution =
-          inject
-              .getExecution() // TODO POC
-              .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+          injectStatusRepository
+              .findById(executionId)
+              .orElseThrow(
+                  () -> new ElementNotFoundException("Execution not found: " + executionId));
+
       execution.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
       injectStatusRepository.save(execution);
       InjectExecutionInput input = new InjectExecutionInput();

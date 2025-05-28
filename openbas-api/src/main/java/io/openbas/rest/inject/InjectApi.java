@@ -310,7 +310,8 @@ public class InjectApi extends RestBehavior {
   public Inject injectExecutionReception(
       @PathVariable String executionId, @Valid @RequestBody InjectReceptionInput input) {
 
-    InjectStatus injectStatus = injectStatusRepository.findById(executionId).orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus =
+        injectStatusRepository.findById(executionId).orElseThrow(ElementNotFoundException::new);
     Inject inject = injectStatus.getInject();
     inject.setFirstExecutionDate(Instant.now()); // TODO POC INJECTORES
     inject.setStatus(ExecutionStatus.PENDING); // TODO POC
@@ -319,32 +320,33 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
+  @PostMapping(INJECT_URI + "/execution/callback/{executionId}")
   public void injectExecutionCallback(
-      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
-    injectExecutionCallback(null, injectId, input);
+      @PathVariable String executionId, @Valid @RequestBody InjectExecutionInput input) {
+    injectExecutionCallback(null, executionId, input);
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
+  @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{executionId}")
   public void injectExecutionCallback(
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.
-      @PathVariable String injectId,
+      @PathVariable String executionId,
       @Valid @RequestBody InjectExecutionInput input) {
-    injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
+    injectExecutionService.handleInjectExecutionCallback(executionId, agentId, input);
   }
 
   @Secured(ROLE_ADMIN)
-  @GetMapping(INJECT_URI + "/{injectId}/{agentId}/executable-payload")
+  @GetMapping(INJECT_URI + "/{executionId}/{agentId}/executable-payload")
   @Operation(
       summary = "Get the payload ready to be executed",
       description =
           "This endpoint is invoked by implants to retrieve a payload command that's pre-configured and ready for execution.")
   public Payload getExecutablePayloadInject(
-      @PathVariable @NotBlank final String injectId, @PathVariable @NotBlank final String agentId)
+      @PathVariable @NotBlank final String executionId,
+      @PathVariable @NotBlank final String agentId)
       throws Exception {
-    return executableInjectService.getExecutablePayloadAndUpdateInjectStatus(injectId, agentId);
+    return executableInjectService.getExecutablePayloadAndUpdateInjectStatus(executionId, agentId);
   }
 
   // -- EXERCISES --
