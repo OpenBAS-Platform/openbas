@@ -78,7 +78,7 @@ const PayloadForm = ({
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
     get_command: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().optional(),
+    description: z.string().optional().nullable(),
     check_command: z.string().optional(),
   });
 
@@ -86,7 +86,7 @@ const PayloadForm = ({
     default_value: z.string().nonempty(t('Should not be empty')),
     key: z.string().min(1, { message: t('Should not be empty') }),
     type: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().optional(),
+    description: z.string().optional().nullable(),
   });
 
   const baseSchema = {
