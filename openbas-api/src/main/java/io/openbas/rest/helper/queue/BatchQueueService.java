@@ -272,15 +272,16 @@ public class BatchQueueService<T> {
     }
 
     // Sending Ack for all the processed element in the batch
-    try {
-      for (T element : currentBatch) {
+    for (T element : currentBatch) {
+      try {
         consumerChannels
             .get(rand.nextInt(consumerChannels.size()))
             .basicAck(deliveryTable.remove(element), true);
+      } catch (IOException e) {
+        log.error(
+            String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()),
+            e);
       }
-    } catch (IOException e) {
-      log.error(
-          String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()), e);
     }
 
     // If the queue still has more element than we can process in one batch,
