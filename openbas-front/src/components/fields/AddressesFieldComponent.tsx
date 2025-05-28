@@ -8,7 +8,7 @@ interface Props {
   name: string;
   label: string;
   style?: CSSProperties;
-  helperText?: string;
+  helperText: string;
   disabled?: boolean;
   required?: boolean;
 }
