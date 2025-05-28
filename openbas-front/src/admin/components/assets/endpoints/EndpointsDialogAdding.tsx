@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 
 import { findEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import { fetchExecutors } from '../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -17,6 +18,8 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import { type Endpoint, type EndpointOutput, type FilterGroup } from '../../../../utils/api-types';
 import { getActiveMsgTooltip, getExecutorsCount } from '../../../../utils/endpoints/utils';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
 
 interface Props {
@@ -42,9 +45,14 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const [endpointValues, setEndpointValues] = useState<(Endpoint | EndpointOutput)[]>([]);
   const { executorsMap } = useHelper((helper: ExecutorHelper) => ({ executorsMap: helper.getExecutorsMap() }));
+
+  useDataLoader(() => {
+    dispatch(fetchExecutors());
+  });
 
   useEffect(() => {
     if (open) {
@@ -77,7 +85,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       {
         field: 'asset_name',
         value: (endpoint: EndpointOutput) => endpoint.asset_name,
-        width: 30,
+        width: 35,
       },
       {
         field: 'endpoint_active',
@@ -91,7 +99,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
             </Tooltip>
           );
         },
-        width: 20,
+        width: 25,
       },
       {
         field: 'endpoint_platform',
@@ -114,48 +122,49 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       {
         field: 'endpoint_agents_executor',
         value: (endpoint: EndpointOutput) => {
-          const groupedExecutors = getExecutorsCount(endpoint, executorsMap);
-          if (!groupedExecutors) {
-            return 'N/A';
-          }
-          return (
-            <>
-              {
-                Object.keys(groupedExecutors).map((executorType) => {
-                  const executorsOfType = groupedExecutors[executorType];
-                  const count = executorsOfType.length;
-                  const base = executorsOfType[0];
+          if (endpoint.asset_agents.length > 0) {
+            const groupedExecutors = getExecutorsCount(endpoint, executorsMap);
+            return (
+              <>
+                {
+                  Object.keys(groupedExecutors).map((executorType) => {
+                    const executorsOfType = groupedExecutors[executorType];
+                    const count = executorsOfType.length;
+                    const base = executorsOfType[0];
 
-                  if (count > 0) {
-                    return (
-                      <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
-                        <div style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                        }}
-                        >
-                          <img
-                            src={`/api/images/executors/icons/${executorType}`}
-                            alt={executorType}
-                            style={{
-                              width: 20,
-                              height: 20,
-                              borderRadius: 4,
-                              marginRight: 10,
-                            }}
-                          />
-                        </div>
-                      </Tooltip>
-                    );
-                  } else {
-                    return t('Unknown');
-                  }
-                })
-              }
-            </>
-          );
+                    if (count > 0) {
+                      return (
+                        <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
+                          <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                          >
+                            <img
+                              src={`/api/images/executors/icons/${executorType}`}
+                              alt={executorType}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                borderRadius: 4,
+                                marginRight: 10,
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                      );
+                    } else {
+                      return t('Unknown');
+                    }
+                  })
+                }
+              </>
+            );
+          } else {
+            return <span>{t('N/A')}</span>;
+          }
         },
-        width: 20,
+        width: 10,
       },
       {
         field: 'asset_tags',
