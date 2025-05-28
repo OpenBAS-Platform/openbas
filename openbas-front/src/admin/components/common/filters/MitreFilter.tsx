@@ -102,22 +102,25 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
         </div>
       </div>
       <div>
-        {sortedTechniques.map(attackPattern => (
-          <ListItemButton
-            key={attackPattern.attack_pattern_id}
-            selected={selectedIds.has(attackPattern.attack_pattern_id)}
-            className={classes.button}
-            component="div"
-            dense
-            onClick={() => onItemClick(attackPattern)}
-          >
-            <ListItemText
-              primary={
-                `[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name} (${getInjectorsContractsLengthByAttackPattern(attackPattern)})`
-              }
-            />
-          </ListItemButton>
-        ))}
+        {sortedTechniques.map((attackPattern) => {
+          const numberOfPayloads = getInjectorsContractsLengthByAttackPattern(attackPattern);
+          return (
+            <ListItemButton
+              key={attackPattern.attack_pattern_id}
+              selected={selectedIds.has(attackPattern.attack_pattern_id)}
+              className={classes.button}
+              component="div"
+              dense
+              onClick={() => onItemClick(attackPattern)}
+            >
+              <ListItemText
+                primary={
+                  `[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name} ${numberOfPayloads > 0 ? `(${numberOfPayloads})` : ''}`
+                }
+              />
+            </ListItemButton>
+          );
+        })}
       </div>
     </div>
   );
