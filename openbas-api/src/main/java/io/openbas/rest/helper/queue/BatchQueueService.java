@@ -230,7 +230,7 @@ public class BatchQueueService<T> {
   }
 
   /** Close the resources */
-  private void closeResources() {
+  private void closeResources() throws IOException, TimeoutException {
     try {
       // Close consumer channels
       for (Channel channel : consumerChannels) {
@@ -250,6 +250,7 @@ public class BatchQueueService<T> {
       }
     } catch (Exception e) {
       log.warn("Error closing resources: {}", e.getMessage());
+      throw e;
     } finally {
       consumerChannels.clear();
     }
