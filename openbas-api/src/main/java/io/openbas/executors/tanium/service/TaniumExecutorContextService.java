@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
   }
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+      Inject inject, Set<Agent> agents, InjectStatus injectStatus) {
     return new ArrayList<>();
   }
 }
