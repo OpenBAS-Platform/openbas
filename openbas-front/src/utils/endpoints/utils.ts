@@ -1,7 +1,10 @@
 import type { ExecutorHelper } from '../../actions/executors/executor-helper';
 import { type EndpointOutput, type ExecutorOutput } from '../api-types';
 
-export const getActiveMsgTooltip = (endpoint: EndpointOutput, activeMessage: string, inactiveMessage: string, agentlessMessage: string) => {
+export const getActiveMsgTooltip = (endpoint: EndpointOutput, activeMessage: string, inactiveMessage: string, agentlessMessage: string): {
+  status: 'Active' | 'Inactive' | 'Agentless';
+  activeMsgTooltip: string;
+} => {
   if (endpoint.asset_agents.length > 0) {
     const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
     const inactiveCount = endpoint.asset_agents.length - activeCount;

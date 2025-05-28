@@ -39,23 +39,15 @@ const inlineStyles = {
 
 interface Props {
   variant: string;
-  status: string;
+  status: 'Active' | 'Inactive' | 'Agentless';
 }
 
-const AssetStatus: FunctionComponent<Props> = ({ variant, status }) => {
+const AssetStatus: FunctionComponent<Props> = ({ variant, status = 'Active' }) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;
 
   switch (status) {
-    case 'Active':
-      return (
-        <Chip
-          className={style}
-          style={inlineStyles.green}
-          label={t('Active')}
-        />
-      );
     case 'Inactive':
       return (
         <Chip
