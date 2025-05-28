@@ -7,9 +7,12 @@ import { type Executor } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
 
-interface Props { executor: Executor }
+interface Props {
+  executor: Executor;
+  showEEChip?: boolean;
+}
 
-const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor }) => {
+const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor, showEEChip }) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
@@ -27,9 +30,16 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor }) => {
       gap: theme.spacing(2),
     }}
     >
-      <Alert style={{ cursor: 'pointer' }} icon={<EEChip style={{ marginTop: theme.spacing(1) }} />} severity="success" onClick={onAlertClick}>
-        {`${executor.executor_name} ${t('executor is an enterprise edition feature. You can start the set up but you will need a license key to execute your injects. We provide a 3 month trial to let you test the platform at full capacity.')} `}
-      </Alert>
+      {showEEChip && (
+        <Alert
+          style={{ cursor: 'pointer' }}
+          icon={<EEChip style={{ marginTop: theme.spacing(1) }} />}
+          severity="success"
+          onClick={onAlertClick}
+        >
+          {`${executor.executor_name} ${t('executor is an enterprise edition feature. You can start the set up but you will need a license key to execute your injects. We provide a 3 month trial to let you test the platform at full capacity.')} `}
+        </Alert>
+      )}
       {executor.executor_doc && (
         <Typography variant="body1">
           {t('To install the agent please follow the ')}

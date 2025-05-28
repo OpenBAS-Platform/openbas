@@ -28,10 +28,10 @@ const useStyles = makeStyles()(theme => ({
 interface ExecutorSelectorProps {
   executor: Executor;
   setSelectedExecutor: (executor: Executor) => void;
-  isEEExecutor?: boolean;
+  showEEChip?: boolean;
 }
 
-const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelectedExecutor, isEEExecutor = false }) => {
+const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelectedExecutor, showEEChip = false }) => {
   const theme = useTheme();
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -63,7 +63,7 @@ const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelect
             }}
           >
             {`${t('Install')} ${executor.executor_name}`}
-            {isEEExecutor && <EEChip style={{ marginLeft: theme.spacing(1) }} />}
+            {showEEChip && <EEChip style={{ marginLeft: theme.spacing(1) }} />}
           </Typography>
           <Box
             sx={{

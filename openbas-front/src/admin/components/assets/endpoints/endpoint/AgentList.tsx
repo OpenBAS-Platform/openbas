@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import { type ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import type { LoggedHelper } from '../../../../../actions/helper';
 import useBodyItemsStyles from '../../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
@@ -51,7 +52,10 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   // Fetching data
-  const { executorsMap } = useHelper((helper: ExecutorHelper) => ({ executorsMap: helper.getExecutorsMap() }));
+  const { settings, executorsMap } = useHelper((helper: ExecutorHelper & LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+    executorsMap: helper.getExecutorsMap(),
+  }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
   });
@@ -77,7 +81,7 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
         }
 
         const { executor_type, executor_name } = executor;
-        const showEEChip = executor_type === 'openbas_tanium' || executor_type === 'openbas_crowdstrike';
+        const showEEChip = !settings.platform_license?.license_is_validated && (executor_type === 'openbas_tanium' || executor_type === 'openbas_crowdstrike');
 
         return (
           <>
