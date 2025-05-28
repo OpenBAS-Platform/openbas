@@ -14,24 +14,22 @@ public class V3_91__Inject_chaining_with_structured_output extends BaseJavaMigra
 
       statement.execute("ALTER TABLE injects ADD COLUMN inject_status VARCHAR(255);");
 
-      statement.execute("ALTER TABLE asset_agent_jobs ADD COLUMN asset_agent_execution VARCHAR(255);");
+      statement.execute(
+          "ALTER TABLE asset_agent_jobs ADD COLUMN asset_agent_execution VARCHAR(255);");
       // Then add the foreign key constraint
       statement.execute(
           "ALTER TABLE asset_agent_jobs ADD CONSTRAINT fk_asset_agent_execution "
-          + "FOREIGN KEY (asset_agent_execution) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;"
-      );
+              + "FOREIGN KEY (asset_agent_execution) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;");
 
       statement.execute("ALTER TABLE findings ADD COLUMN finding_execution_id VARCHAR(255);");
       statement.execute(
           "ALTER TABLE findings ADD CONSTRAINT fk_finding_execution_id "
-          + "FOREIGN KEY (finding_execution_id) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;"
-      );
+              + "FOREIGN KEY (finding_execution_id) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;");
 
       statement.execute("ALTER TABLE injects_expectations ADD COLUMN execution_id VARCHAR(255);");
       statement.execute(
           "ALTER TABLE injects_expectations ADD CONSTRAINT fk_inject_expectation_execution_id "
-          + "FOREIGN KEY (execution_id) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;"
-      );
+              + "FOREIGN KEY (execution_id) REFERENCES injects_statuses(status_id) ON DELETE CASCADE;");
 
       statement.execute(
           "ALTER TABLE injects ADD COLUMN inject_first_execution_date TIMESTAMP WITH TIME ZONE;");

@@ -602,7 +602,9 @@ public class ExpectationUtils {
   // COMPUTE SIGNATURES
 
   private static List<InjectExpectationSignature> computeSignatures(
-      String prefixSignature, String executionId, String agentId) { //TODO POC CHANGE TO EXECUTION ID
+      String prefixSignature,
+      String executionId,
+      String agentId) { // TODO POC CHANGE TO EXECUTION ID
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(

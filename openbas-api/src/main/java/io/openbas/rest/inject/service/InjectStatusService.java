@@ -69,7 +69,8 @@ public class InjectStatusService {
   }
 
   private int getCompleteTrace(InjectStatus execution) {
-    return execution.getTraces() // TODO POC
+    return execution
+        .getTraces() // TODO POC
         .stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
@@ -95,8 +96,8 @@ public class InjectStatusService {
     execution.setTrackingEndDate(Instant.now());
     execution.setName(finalStatus);
     execution.getInject().setUpdatedAt(Instant.now());
-    execution.getInject().setStatus(finalStatus); //TODO POC FINAL STATUS INJECT GLOBAL
-    execution.getInject().setFirstExecutionDate(Instant.now()); //TODO POC
+    execution.getInject().setStatus(finalStatus); // TODO POC FINAL STATUS INJECT GLOBAL
+    execution.getInject().setFirstExecutionDate(Instant.now()); // TODO POC
   }
 
   public ExecutionTrace createExecutionTrace(
@@ -127,10 +128,12 @@ public class InjectStatusService {
   }
 
   public void updateExecutionStatus(
-      Agent agent, InjectStatus execution, InjectExecutionInput input, ObjectNode structuredOutput) {
+      Agent agent,
+      InjectStatus execution,
+      InjectExecutionInput input,
+      ObjectNode structuredOutput) {
 
-    ExecutionTrace executionTrace =
-        createExecutionTrace(execution, input, agent, structuredOutput);
+    ExecutionTrace executionTrace = createExecutionTrace(execution, input, agent, structuredOutput);
     computeExecutionTraceStatusIfNeeded(execution, executionTrace, agent);
     execution.addTrace(executionTrace);
 
@@ -140,7 +143,7 @@ public class InjectStatusService {
         updateFinalExecutionStatus(execution);
       }
 
-      //TODO Compute Status for Inject global
+      // TODO Compute Status for Inject global
       injectStatusRepository.save(execution);
     }
   }

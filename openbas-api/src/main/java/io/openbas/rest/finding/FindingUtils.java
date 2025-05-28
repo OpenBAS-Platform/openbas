@@ -64,7 +64,10 @@ public class FindingUtils {
   }
 
   private void handleRaceCondition(
-      InjectStatus execution, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
+      InjectStatus execution,
+      Asset asset,
+      ContractOutputElement contractOutputElement,
+      String finalValue) {
     Optional<Finding> retryFinding =
         findingRepository.findByExecutionIdAndValueAndTypeAndKey(
             execution.getId(),

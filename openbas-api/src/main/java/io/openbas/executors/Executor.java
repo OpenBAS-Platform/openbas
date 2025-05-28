@@ -56,14 +56,16 @@ public class Executor {
     return this.injectStatusRepository.save(injectStatus);
   }
 
-  private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector, InjectStatus executionStatus) {
+  private InjectStatus executeInternal(
+      ExecutableInject executableInject, Injector injector, InjectStatus executionStatus) {
     io.openbas.executors.Injector executor =
         this.context.getBean(injector.getType(), io.openbas.executors.Injector.class);
     Execution execution = executor.executeInjection(executableInject);
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
-    InjectStatus completeStatus = injectStatusService.fromExecution(execution, executionStatus); //TODO POC
+    InjectStatus completeStatus =
+        injectStatusService.fromExecution(execution, executionStatus); // TODO POC
     return injectStatusRepository.save(completeStatus);
   }
 
