@@ -5,5 +5,6 @@ public enum TargetType {
   ASSETS,
   ASSETS_GROUPS,
   PLAYERS,
-  TEAMS
+  TEAMS,
+  ENDPOINTS
 }

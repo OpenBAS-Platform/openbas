@@ -809,6 +809,11 @@ public class InjectExpectationService {
                 injectExpectationRepository.findAllByInjectAndPlayer(injectId, targetId);
             case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
             case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+            default ->
+                throw new RuntimeException(
+                    "Target type "
+                        + targetType
+                        + " not implemented for this method findMergedExpectationsByInjectAndTargetAndTargetType");
           });
     } catch (IllegalArgumentException e) {
       return Collections.emptyList();
@@ -835,6 +840,11 @@ public class InjectExpectationService {
                 injectId, parentTargetId, targetId);
         case ASSETS_GROUPS ->
             injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
+        default ->
+            throw new RuntimeException(
+                "Target type "
+                    + targetType
+                    + " not implemented for this method findMergedExpectationsByInjectAndTargetAndTargetType");
       };
     } catch (IllegalArgumentException e) {
       return Collections.emptyList();
