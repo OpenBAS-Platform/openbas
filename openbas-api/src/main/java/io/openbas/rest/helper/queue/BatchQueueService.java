@@ -6,8 +6,7 @@ import io.openbas.config.QueueConfig;
 import io.openbas.config.RabbitmqConfig;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,11 +32,14 @@ public class BatchQueueService<T> {
 
   private final BlockingQueue<T> queue;
 
+  private final Map<T, Long> deliveryTable = new HashMap<>();
+
   private final QueueConfig queueConfig;
   private final ScheduledExecutorService reconnectionExecutor;
   private final ShutdownListener shutdownListener;
 
   private final List<Channel> consumerChannels = new ArrayList<>();
+  private final Random rand = new Random();
 
   /**
    * Public constructor of the BatchQueueService
@@ -131,6 +133,8 @@ public class BatchQueueService<T> {
       publisherChannel.queueDeclare(queueName, true, false, false, null);
       publisherChannel.queueBind(queueName, exchangeName, routingKey);
 
+      consumerChannels.clear();
+
       for (int i = 0; i < queueConfig.getConsumerNumber(); ++i) {
         Channel consumerChannel = connection.createChannel();
         consumerChannels.add(consumerChannel);
@@ -139,26 +143,28 @@ public class BatchQueueService<T> {
         // What to do when a message is consumed
         DeliverCallback deliverCallback =
             (consumerTag, delivery) -> {
+              // We get the object to process
+              String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+              log.trace("Received message from queue {} : '{}'", queueName, message);
+
+              // Unmarshalling of our object and setting it in the queue for processing
+              T element = mapper.readValue(message, clazz);
               try {
-                // We get the object to process
-                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                log.trace("Received message from queue {} : '{}'", queueName, message);
-
-                // Ack the message
-                consumerChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
-
-                // Unmarshalling of our object and setting it in the queue for processing
-                T element = mapper.readValue(message, clazz);
                 queue.put(element);
-
-                // If we reach a critical mass, we take care of it immediately
-                if (queue.size() > this.queueConfig.getMaxSize()) {
-                  processBufferedBatch();
-                }
-              } catch (Exception e) {
-                log.error("Error processing message: {}", e.getMessage());
+              } catch (InterruptedException e) {
+                log.error(String.format("Error processing message: %s", e.getMessage()), e);
                 // Nack the message and sending it back to the queue
                 consumerChannel.basicNack(delivery.getEnvelope().getDeliveryTag(), false, true);
+                return;
+              }
+
+              // Add the message and delivery tag into a hashmap that will allow us to ack when
+              // we've inserted in base
+              deliveryTable.put(element, delivery.getEnvelope().getDeliveryTag());
+
+              // If we reach a critical mass, we take care of it immediately
+              if (queue.size() > this.queueConfig.getMaxSize()) {
+                processBufferedBatch();
               }
             };
 
@@ -232,7 +238,6 @@ public class BatchQueueService<T> {
           channel.close();
         }
       }
-      consumerChannels.clear();
 
       // Closing the publishing channel
       if (publisherChannel != null && publisherChannel.isOpen()) {
@@ -245,6 +250,8 @@ public class BatchQueueService<T> {
       }
     } catch (Exception e) {
       log.warn("Error closing resources: {}", e.getMessage());
+    } finally {
+      consumerChannels.clear();
     }
   }
 
@@ -253,24 +260,32 @@ public class BatchQueueService<T> {
    * configures in openbas.queue-config.<name of the queue>.max-size
    */
   private void processBufferedBatch() {
+    // Draining the queue into the list with a max size
+    List<T> currentBatch = new ArrayList<>();
+    queue.drainTo(currentBatch, queueConfig.getMaxSize());
+
+    // If the list is not empty, we process it
+    if (!currentBatch.isEmpty()) {
+      log.info("Processing batch of {}", currentBatch.size());
+      queueExecution.perform(currentBatch);
+    }
+
+    // Sending Ack for all the processed element in the batch
     try {
-      // Draining the queue into the list with a max size
-      List<T> currentBatch = new ArrayList<>();
-      queue.drainTo(currentBatch, queueConfig.getMaxSize());
-
-      // If the list is not empty, we process it
-      if (!currentBatch.isEmpty()) {
-        log.info("Processing batch of {}", currentBatch.size());
-        queueExecution.perform(currentBatch);
+      for (T element : currentBatch) {
+        consumerChannels
+            .get(rand.nextInt(consumerChannels.size()))
+            .basicAck(deliveryTable.remove(element), true);
       }
+    } catch (IOException e) {
+      log.error(
+          String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()), e);
+    }
 
-      // If the queue still has more element than we can process in one batch,
-      // there is no need to wait : we process it right now
-      if (queue.size() > this.queueConfig.getMaxSize()) {
-        processBufferedBatch();
-      }
-    } catch (Exception e) {
-      log.error(String.format("Error processing batch: %s", e.getMessage()), e);
+    // If the queue still has more element than we can process in one batch,
+    // there is no need to wait : we process it right now
+    if (queue.size() > this.queueConfig.getMaxSize()) {
+      processBufferedBatch();
     }
   }
 

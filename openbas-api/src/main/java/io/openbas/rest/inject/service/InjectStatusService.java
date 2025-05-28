@@ -170,7 +170,7 @@ public class InjectStatusService {
             .collect(Collectors.toMap(Agent::getId, Function.identity()));
 
     // Preparing a list of injects we need to save
-    List<Inject> injectsToSave = new ArrayList<>();
+    Set<Inject> injectsToSave = new HashSet<>();
 
     // For each of the trace
     for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
@@ -234,14 +234,14 @@ public class InjectStatusService {
       Inject inject = injects.get(injectExecutionCallback.getInjectId());
       if (inject == null) {
         log.log(Level.SEVERE, "Inject not found: {}", injectExecutionCallback.getInjectId());
-        break;
+        continue;
       }
 
       // Getting the agent or throwing an exception
       Agent agent = agents.get(injectExecutionCallback.getAgentId());
       if (agent == null) {
         log.log(Level.SEVERE, "Agent not found: {}", injectExecutionCallback.getAgentId());
-        break;
+        continue;
       }
 
       // -- FINDINGS --
