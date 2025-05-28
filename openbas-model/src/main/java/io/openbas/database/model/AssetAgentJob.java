@@ -36,6 +36,14 @@ public class AssetAgentJob implements Base {
 
   @Getter
   @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "asset_agent_execution")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("asset_agent_execution")
+  @Schema(type = "string")
+  private InjectStatus execution;
+
+  @Getter
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_agent_agent")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_agent_agent")

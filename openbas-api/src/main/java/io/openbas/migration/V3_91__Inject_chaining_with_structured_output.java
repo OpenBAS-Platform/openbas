@@ -15,7 +15,27 @@ public class V3_91__Inject_chaining_with_structured_output extends BaseJavaMigra
       statement.execute("ALTER TABLE injects ADD COLUMN inject_status VARCHAR(255);");
 
       statement.execute(
+          "ALTER TABLE asset_agent_jobs ADD COLUMN asset_agent_execution VARCHAR(255) "
+              + "FOREIGN KEY (asset_agent_job_execution_id) "
+              + "REFERENCES injects_statuses(status_id) "
+              + "ON DELETE CASCADE;");
+
+      statement.execute(
+          "ALTER TABLE findings ADD COLUMN finding_execution_id VARCHAR(255) "
+              + "FOREIGN KEY (finding_execution_id) "
+              + "REFERENCES injects_statuses(status_id) "
+              + "ON DELETE CASCADE;");
+
+      statement.execute(
+          "ALTER TABLE injects_expectations ADD COLUMN execution_id VARCHAR(255) "
+              + "FOREIGN KEY (inject_expectation_execution_id) "
+              + "REFERENCES injects_statuses(status_id) "
+              + "ON DELETE CASCADE;");
+
+      statement.execute(
           "ALTER TABLE injects ADD COLUMN inject_first_execution_date TIMESTAMP WITH TIME ZONE;");
+
+      statement.execute("ALTER TABLE injects_statuses DROP INDEX uniq_658a47a864e0dbd;");
 
       statement.execute(
           """

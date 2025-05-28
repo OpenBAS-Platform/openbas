@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ExecutableInject {
 
   private final Injection injection;
+  private String executionId;
   private final int teamSize;
   private final boolean direct;
   private final boolean runtime;
@@ -30,11 +31,13 @@ public class ExecutableInject {
       boolean runtime,
       boolean direct,
       Injection injection,
+      String executionId,
       List<Team> teams,
       List<Asset> assets,
       List<AssetGroup> assetGroups,
       List<ExecutionContext> users) {
     this.injection = injection;
+    this.executionId = executionId;
     this.exerciseId = ofNullable(injection.getExercise()).map(Exercise::getId).orElse(null);
     this.runtime = runtime;
     this.direct = direct;
@@ -50,11 +53,15 @@ public class ExecutableInject {
   }
 
   public ExecutableInject(
-      boolean runtime, boolean direct, Injection injection, List<ExecutionContext> users) {
-    this(runtime, direct, injection, List.of(), List.of(), List.of(), users);
+      boolean runtime, boolean direct, Injection injection, String executionId, List<ExecutionContext> users) {
+    this(runtime, direct, injection, executionId, List.of(), List.of(), List.of(), users);
   }
 
   public void addDirectAttachment(MultipartFile file) {
     this.directAttachments.add(file);
+  }
+
+  public void setExecutionId(String executionId) {
+    this.executionId = executionId;
   }
 }

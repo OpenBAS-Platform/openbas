@@ -32,12 +32,12 @@ public class TaniumExecutorContextService extends ExecutorContextService {
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
       @NotNull final Endpoint assetEndpoint,
-      @NotNull final Agent agent)
+      @NotNull final Agent agent,
+      @NotNull final InjectStatus execution)
       throws AgentException {
 
-    InjectStatus status = inject.getExecution().orElseThrow(); // TODO POC
     eeService.throwEEExecutorService(
-        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, status);
+        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, execution);
 
     if (!this.taniumExecutorConfig.isEnable()) {
       throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
@@ -65,7 +65,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
-    command = replaceArgs(platform, command, inject.getId(), agent.getId());
+    command = replaceArgs(platform, command, execution.getId(), agent.getId());
 
     this.taniumExecutorClient.executeAction(
         agent.getExternalReference(),

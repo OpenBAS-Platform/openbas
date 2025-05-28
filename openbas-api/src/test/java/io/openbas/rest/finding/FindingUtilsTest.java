@@ -58,11 +58,11 @@ class FindingUtilsTest {
     finding1.setType(contractOutputElement.getType());
     finding1.setAssets(new ArrayList<>(Arrays.asList(asset1)));
 
-    when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
+    when(findingRepository.findByExecutionIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
+    findingUtils.buildFinding(inject.getExecution().get(), asset2, contractOutputElement, value);
 
     ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
     verify(findingRepository).save(findingCaptor.capture());
@@ -91,11 +91,11 @@ class FindingUtilsTest {
     finding1.setType(contractOutputElement.getType());
     finding1.setAssets(new ArrayList<>(Arrays.asList(asset1)));
 
-    when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
+    when(findingRepository.findByExecutionIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
+    findingUtils.buildFinding(inject.getExecution().get(), asset1, contractOutputElement, value);
 
     verify(findingRepository, never()).save(any());
   }

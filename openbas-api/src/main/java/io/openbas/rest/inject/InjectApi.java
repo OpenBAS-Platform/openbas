@@ -72,6 +72,7 @@ public class InjectApi extends RestBehavior {
   private final ScenarioRepository scenarioRepository;
   private final TargetService targetService;
   private final UserRepository userRepository;
+  private final InjectStatusRepository injectStatusRepository;
 
   // -- INJECTS --
 
@@ -305,14 +306,14 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
+  @PostMapping(INJECT_URI + "/execution/reception/{executionId}")
   public Inject injectExecutionReception(
-      @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    inject.setFirstExecutionDate(Instant.now()); // TODO POC
+      @PathVariable String executionId, @Valid @RequestBody InjectReceptionInput input) {
+
+    InjectStatus injectStatus = injectStatusRepository.findById(executionId).orElseThrow(ElementNotFoundException::new);
+    Inject inject = injectStatus.getInject();
+    inject.setFirstExecutionDate(Instant.now()); // TODO POC INJECTORES
     inject.setStatus(ExecutionStatus.PENDING); // TODO POC
-    InjectStatus injectStatus =
-        inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
     injectStatus.setName(ExecutionStatus.PENDING);
     return injectRepository.save(inject);
   }

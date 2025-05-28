@@ -147,6 +147,14 @@ public class InjectExpectation implements Base {
 
   @Setter
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "execution_id")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_expectation_execution")
+  @Schema(type = "string")
+  private InjectStatus execution;
+
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_user")

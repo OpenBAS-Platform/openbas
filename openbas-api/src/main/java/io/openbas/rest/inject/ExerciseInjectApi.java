@@ -241,6 +241,7 @@ public class ExerciseInjectApi extends RestBehavior {
             true,
             true,
             savedInject,
+            null,
             List.of(),
             savedInject.getAssets(),
             savedInject.getAssetGroups(),

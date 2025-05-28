@@ -22,9 +22,9 @@ public interface FindingRepository
 
   @Query(
       value =
-          "SELECT f FROM Finding f WHERE f.inject.id = :injectId AND f.value = :value AND f.type = :type AND f.field = :key")
-  Optional<Finding> findByInjectIdAndValueAndTypeAndKey(
-      @NotBlank @Param("injectId") String injectId,
+          "SELECT f FROM Finding f WHERE f.execution.id = :executionId AND f.value = :value AND f.type = :type AND f.field = :key")
+  Optional<Finding> findByExecutionIdAndValueAndTypeAndKey(
+      @NotBlank @Param("executionId") String executionId,
       @NotBlank @Param("value") String value,
       @NotNull @Param("type") ContractOutputType type,
       @NotBlank @Param("key") String key);
@@ -40,5 +40,5 @@ public interface FindingRepository
               + "LEFT JOIN scenarios_exercises se ON i.inject_exercise = se.exercise_id "
               + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT 500;",
       nativeQuery = true)
-  List<RawFinding> findForIndexing(@Param("from") Instant from);
+  List<RawFinding> findForIndexing(@Param("from") Instant from); // TODO POC ES
 }

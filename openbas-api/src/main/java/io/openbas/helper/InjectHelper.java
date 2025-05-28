@@ -117,6 +117,7 @@ public class InjectHelper {
                       true,
                       false,
                       inject,
+                      null,
                       getInjectTeams(inject),
                       inject.getAssets(), // TODO There is also inefficient lazy loading inside this
                       // get function
@@ -138,6 +139,7 @@ public class InjectHelper {
                       true,
                       false,
                       inject,
+                      null,
                       getInjectTeams(inject),
                       inject.getAssets(),
                       inject.getAssetGroups(),

@@ -9,9 +9,10 @@ import java.util.List;
 
 public abstract class ExecutorContextService {
 
-  public abstract void launchExecutorSubprocess(Inject inject, Endpoint assetEndpoint, Agent agent)
+  public abstract void launchExecutorSubprocess(
+      Inject inject, Endpoint assetEndpoint, Agent agent, InjectStatus execution)
       throws AgentException;
 
   public abstract List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException;
+      Inject inject, List<Agent> agents, InjectStatus execution) throws InterruptedException;
 }

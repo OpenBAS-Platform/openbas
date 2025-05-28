@@ -602,13 +602,13 @@ public class ExpectationUtils {
   // COMPUTE SIGNATURES
 
   private static List<InjectExpectationSignature> computeSignatures(
-      String prefixSignature, String injectId, String agentId) {
+      String prefixSignature, String executionId, String agentId) { //TODO POC CHANGE TO EXECUTION ID
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(
         createSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-            prefixSignature + injectId + "-agent-" + agentId));
+            prefixSignature + executionId + "-agent-" + agentId));
 
     return signatures;
   }

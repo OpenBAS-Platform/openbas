@@ -19,14 +19,14 @@ public class FindingUtils {
   private final FindingRepository findingRepository;
 
   public void buildFinding(
-      Inject inject,
+      InjectStatus execution,
       Asset asset,
       io.openbas.database.model.ContractOutputElement contractOutputElement,
       String finalValue) {
     try {
       Optional<Finding> optionalFinding =
-          findingRepository.findByInjectIdAndValueAndTypeAndKey(
-              inject.getId(),
+          findingRepository.findByExecutionIdAndValueAndTypeAndKey(
+              execution.getId(),
               finalValue,
               contractOutputElement.getType(),
               contractOutputElement.getKey());
@@ -35,7 +35,8 @@ public class FindingUtils {
           optionalFinding.orElseGet(
               () -> {
                 Finding newFinding = new Finding();
-                newFinding.setInject(inject);
+                newFinding.setInject(execution.getInject());
+                newFinding.setExecution(execution);
                 newFinding.setField(contractOutputElement.getKey());
                 newFinding.setType(contractOutputElement.getType());
                 newFinding.setValue(finalValue);
@@ -58,15 +59,15 @@ public class FindingUtils {
     } catch (DataIntegrityViolationException ex) {
       log.log(Level.INFO, "Race condition: finding already exists. Retrying ...", ex.getMessage());
       // Re-fetch and try to add the asset
-      handleRaceCondition(inject, asset, contractOutputElement, finalValue);
+      handleRaceCondition(execution, asset, contractOutputElement, finalValue);
     }
   }
 
   private void handleRaceCondition(
-      Inject inject, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
+      InjectStatus execution, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
     Optional<Finding> retryFinding =
-        findingRepository.findByInjectIdAndValueAndTypeAndKey(
-            inject.getId(),
+        findingRepository.findByExecutionIdAndValueAndTypeAndKey(
+            execution.getId(),
             finalValue,
             contractOutputElement.getType(),
             contractOutputElement.getKey());

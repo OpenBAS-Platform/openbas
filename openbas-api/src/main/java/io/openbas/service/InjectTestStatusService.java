@@ -134,6 +134,7 @@ public class InjectTestStatusService {
             false,
             true,
             inject,
+            null, //POC
             List.of(),
             inject.getAssets(),
             inject.getAssetGroups(),

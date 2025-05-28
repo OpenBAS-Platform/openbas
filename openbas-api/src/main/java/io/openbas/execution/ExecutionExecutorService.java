@@ -27,7 +27,7 @@ public class ExecutionExecutorService {
   private final ExecutionTraceRepository executionTraceRepository;
   private final InjectService injectService;
 
-  public void launchExecutorContext(Inject inject) {
+  public void launchExecutorContext(Inject inject, InjectStatus execution) {
     // First, get the agents of this injects
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
     // Filter each list to do something for each specific case and then remove the specific agents
@@ -43,10 +43,6 @@ public class ExecutionExecutorService {
             .collect(Collectors.toList());
     agents.removeAll(crowdstrikeAgents);
 
-    InjectStatus injectStatus =
-        inject
-            .getExecution() // TODO POC
-            .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents
     if (!inactiveAgents.isEmpty()) {
@@ -55,7 +51,7 @@ public class ExecutionExecutorService {
               .map(
                   agent ->
                       new ExecutionTrace(
-                          injectStatus,
+                          execution,
                           ExecutionTraceStatus.AGENT_INACTIVE,
                           List.of(),
                           "Agent "
@@ -74,7 +70,7 @@ public class ExecutionExecutorService {
               .map(
                   agent ->
                       new ExecutionTrace(
-                          injectStatus,
+                          execution,
                           ExecutionTraceStatus.ERROR,
                           List.of(),
                           "Cannot find the executor for the agent "
@@ -93,7 +89,7 @@ public class ExecutionExecutorService {
             context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
         crowdstrikeAgents =
             executorContextService.launchBatchExecutorSubprocess(
-                inject, crowdstrikeAgents, injectStatus);
+                inject, crowdstrikeAgents, execution);
         atLeastOneExecution.set(true);
       } catch (Exception e) {
         log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
@@ -102,7 +98,7 @@ public class ExecutionExecutorService {
                 .map(
                     agent ->
                         new ExecutionTrace(
-                            injectStatus,
+                            execution,
                             ExecutionTraceStatus.ERROR,
                             List.of(),
                             e.getMessage(),
@@ -116,13 +112,13 @@ public class ExecutionExecutorService {
     agents.forEach(
         agent -> {
           try {
-            launchExecutorContextForAgent(inject, agent);
+            launchExecutorContextForAgent(inject, agent, execution);
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
             log.severe("launchExecutorContextForAgent error: " + e.getMessage());
             executionTraceRepository.save(
                 new ExecutionTrace(
-                    injectStatus,
+                    execution,
                     ExecutionTraceStatus.ERROR,
                     List.of(),
                     e.getMessage(),
@@ -136,12 +132,13 @@ public class ExecutionExecutorService {
     }
   }
 
-  private void launchExecutorContextForAgent(Inject inject, Agent agent) throws AgentException {
+  private void launchExecutorContextForAgent(Inject inject, Agent agent, InjectStatus execution)
+      throws AgentException {
     try {
       Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
       ExecutorContextService executorContextService =
           context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
-      executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
+      executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent, execution);
     } catch (Exception e) {
       log.severe(e.getMessage());
       throw new AgentException("Fatal error: " + e.getMessage(), agent);

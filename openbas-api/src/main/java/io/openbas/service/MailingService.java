@@ -96,7 +96,7 @@ public class MailingService {
                                   user, inject, "Direct execution"))
                       .toList();
               ExecutableInject injection =
-                  new ExecutableInject(false, true, inject, userInjectContexts);
+                  new ExecutableInject(false, true, inject, null, userInjectContexts); //TODO POC
               Injector executor =
                   this.context.getBean(injectorContract.getInjector().getType(), Injector.class);
               executor.executeInjection(injection);

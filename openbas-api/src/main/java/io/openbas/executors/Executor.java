@@ -56,17 +56,14 @@ public class Executor {
     return this.injectStatusRepository.save(injectStatus);
   }
 
-  private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector) {
-    Inject inject = executableInject.getInjection().getInject();
+  private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector, InjectStatus executionStatus) {
     io.openbas.executors.Injector executor =
         this.context.getBean(injector.getType(), io.openbas.executors.Injector.class);
     Execution execution = executor.executeInjection(executableInject);
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
-    InjectStatus injectStatus =
-        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
-    InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
+    InjectStatus completeStatus = injectStatusService.fromExecution(execution, executionStatus); //TODO POC
     return injectStatusRepository.save(completeStatus);
   }
 
@@ -144,29 +141,32 @@ public class Executor {
 
         // Execute
         if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-          executionExecutorService.launchExecutorContext(inject);
+          executionExecutorService.launchExecutorContext(inject, executionStatus);
         }
 
         if (injector.isExternal()) {
+          executableInject.setExecutionId(executionStatus.getId());
           executeExternal(executableInject, injector);
         } else {
-          executeInternal(executableInject, injector);
+          executeInternal(executableInject, injector, executionStatus);
         }
       }
     }
 
     if (executionWithTargetKeyAndValue.isEmpty()) {
       InjectStatus executionStatus =
-          injectStatusService.initializeInjectStatus(inject.getId(), EXECUTING);
+          injectStatusService.initializeInjectStatus(
+              inject.getId(), EXECUTING); // TODO POC Execution first time generate a new status
       // Set bindings in the status
       inject.getExecutions().add(executionStatus);
       if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-        this.executionExecutorService.launchExecutorContext(inject);
+        this.executionExecutorService.launchExecutorContext(inject, executionStatus);
       }
       if (injector.isExternal()) {
+        executableInject.setExecutionId(executionStatus.getId());
         executeExternal(executableInject, injector);
       } else {
-        executeInternal(executableInject, injector);
+        executeInternal(executableInject, injector, executionStatus);
       }
     }
   }

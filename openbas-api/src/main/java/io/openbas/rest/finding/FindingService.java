@@ -62,9 +62,12 @@ public class FindingService {
   }
 
   public Iterable<Finding> createFindings(
-      @NotNull final List<Finding> findings, @NotBlank final String injectId) {
-    Inject inject = this.injectService.inject(injectId);
-    findings.forEach((finding) -> finding.setInject(inject));
+      @NotNull final List<Finding> findings, @NotBlank final InjectStatus execution) {
+    Inject inject = this.injectService.inject(execution.getInject().getId());
+    findings.forEach((finding) -> {
+      finding.setInject(inject);
+      finding.setExecution(execution);
+    });
     return this.findingRepository.saveAll(findings);
   }
 
@@ -87,11 +90,11 @@ public class FindingService {
   // This structrued output is generated based on injectorcontract where we can find the node
   // Outputs and with that the injector generate this structure output--
 
-  public void extractFindingsFromInjectorContract(Inject inject, ObjectNode structuredOutput) {
+  public void extractFindingsFromInjectorContract(InjectStatus execution, ObjectNode structuredOutput) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     List<Finding> findings = new ArrayList<>();
     // Get the contract
-    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+    InjectorContract injectorContract = execution.getInject().getInjectorContract().orElseThrow();
     List<ContractOutputElement> contractOutputs =
         getContractOutputs(injectorContract.getConvertedContent(), mapper);
     if (!contractOutputs.isEmpty()) {
@@ -124,7 +127,7 @@ public class FindingService {
             }
           });
     }
-    this.createFindings(findings, inject.getId());
+    this.createFindings(findings, execution);
   }
 
   private Finding linkFindings(
@@ -159,7 +162,7 @@ public class FindingService {
 
   /** Extracts findings from structured output that was generated using output parsers. */
   public void extractFindingsFromOutputParsers(
-      Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
+      InjectStatus execution, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
 
     outputParsers.forEach(
         outputParser -> {
@@ -177,7 +180,7 @@ public class FindingService {
                           }
                           // Build and save the finding
                           findingUtils.buildFinding(
-                              inject,
+                              execution,
                               agent.getAsset(),
                               contractOutputElement,
                               contractOutputElement.getType().toFindingValue.apply(jsonNode));

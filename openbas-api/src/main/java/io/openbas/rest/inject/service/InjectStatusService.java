@@ -18,7 +18,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -69,11 +68,8 @@ public class InjectStatusService {
     injectStatusRepository.save(injectStatus);
   }
 
-  private int getCompleteTrace(Inject inject) {
-    return inject
-        .getExecution() // TODO POC
-        .map(InjectStatus::getTraces)
-        .orElse(Collections.emptyList())
+  private int getCompleteTrace(InjectStatus execution) {
+    return execution.getTraces() // TODO POC
         .stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
@@ -83,22 +79,24 @@ public class InjectStatusService {
         .size();
   }
 
-  public boolean isAllInjectAgentsExecuted(Inject inject) {
-    int totalCompleteTrace = getCompleteTrace(inject);
-    List<Agent> agents = this.injectService.getAgentsByInject(inject);
+  public boolean isAllAgentsExecuted(InjectStatus execution) {
+    int totalCompleteTrace = getCompleteTrace(execution);
+    List<Agent> agents = this.injectService.getAgentsByInject(execution.getInject());
     return agents.size() == totalCompleteTrace;
   }
 
-  public void updateFinalInjectStatus(InjectStatus injectStatus) {
+  public void updateFinalExecutionStatus(InjectStatus execution) {
     ExecutionStatus finalStatus =
         computeStatus(
-            injectStatus.getTraces().stream()
+            execution.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
 
-    injectStatus.setTrackingEndDate(Instant.now());
-    injectStatus.setName(finalStatus);
-    injectStatus.getInject().setUpdatedAt(Instant.now());
+    execution.setTrackingEndDate(Instant.now());
+    execution.setName(finalStatus);
+    execution.getInject().setUpdatedAt(Instant.now());
+    execution.getInject().setStatus(finalStatus); //TODO POC FINAL STATUS INJECT GLOBAL
+    execution.getInject().setFirstExecutionDate(Instant.now()); //TODO POC
   }
 
   public ExecutionTrace createExecutionTrace(
@@ -128,23 +126,22 @@ public class InjectStatusService {
     }
   }
 
-  public void updateInjectStatus(
-      Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
-    InjectStatus injectStatus =
-        inject.getExecution().orElseThrow(ElementNotFoundException::new); // TODO POC
+  public void updateExecutionStatus(
+      Agent agent, InjectStatus execution, InjectExecutionInput input, ObjectNode structuredOutput) {
 
     ExecutionTrace executionTrace =
-        createExecutionTrace(injectStatus, input, agent, structuredOutput);
-    computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
-    injectStatus.addTrace(executionTrace);
+        createExecutionTrace(execution, input, agent, structuredOutput);
+    computeExecutionTraceStatusIfNeeded(execution, executionTrace, agent);
+    execution.addTrace(executionTrace);
 
-    synchronized (inject.getId()) {
+    synchronized (execution.getId()) {
       if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-          && (agent == null || isAllInjectAgentsExecuted(inject))) {
-        updateFinalInjectStatus(injectStatus);
+          && (agent == null || isAllAgentsExecuted(execution))) {
+        updateFinalExecutionStatus(execution);
       }
 
-      injectRepository.save(inject);
+      //TODO Compute Status for Inject global
+      injectStatusRepository.save(execution);
     }
   }
 
@@ -193,7 +190,7 @@ public class InjectStatusService {
     if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      updateFinalInjectStatus(injectStatus);
+      updateFinalExecutionStatus(injectStatus);
     }
 
     return injectStatus;

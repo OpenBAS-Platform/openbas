@@ -22,6 +22,7 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
 
   private String computeCommand(
       @NotNull final Inject inject,
+      String executionId,
       String agentId,
       Endpoint.PLATFORM_TYPE platform,
       Endpoint.PLATFORM_ARCH arch) {
@@ -36,7 +37,7 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
       case Windows, Linux, MacOS -> {
         String executorCommandKey = platform.name() + "." + arch.name();
         String cmd = injector.getExecutorCommands().get(executorCommandKey);
-        yield replaceArgs(platform, cmd, inject.getId(), agentId);
+        yield replaceArgs(platform, cmd, executionId, agentId);
       }
       default -> throw new RuntimeException("Unsupported platform: " + platform);
     };
@@ -45,21 +46,24 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
       @NotNull final Endpoint assetEndpoint,
-      @NotNull final Agent agent) {
+      @NotNull final Agent agent,
+      @NotNull final InjectStatus execution) {
     Endpoint.PLATFORM_TYPE platform = assetEndpoint.getPlatform();
     Endpoint.PLATFORM_ARCH arch = assetEndpoint.getArch();
     if (platform == null) {
       throw new RuntimeException("Unsupported null platform");
     }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
-    assetAgentJob.setCommand(computeCommand(inject, agent.getId(), platform, arch));
+    assetAgentJob.setCommand(
+        computeCommand(inject, execution.getId(), agent.getId(), platform, arch));
     assetAgentJob.setAgent(agent);
     assetAgentJob.setInject(inject);
+    assetAgentJob.setExecution(execution);
     assetAgentJobRepository.save(assetAgentJob);
   }
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+      Inject inject, List<Agent> agents, InjectStatus execution) {
     return new ArrayList<>();
   }
 }

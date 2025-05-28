@@ -89,6 +89,13 @@ public class Finding implements Base {
   @Queryable(filterable = true, dynamicValues = true, sortable = true, path = "inject.id")
   private Inject inject;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "finding_execution_id")
+  @JsonProperty("finding_execution_id")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
+  private InjectStatus execution;
+
   // -- AUDIT --
 
   @Queryable(filterable = true, sortable = true, label = "created at")
