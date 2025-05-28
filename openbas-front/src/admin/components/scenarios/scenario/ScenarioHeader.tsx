@@ -8,6 +8,7 @@ import { makeStyles } from 'tss-react/mui';
 import { playInjectsAssistantForScenario } from '../../../../actions/Inject';
 import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import LoaderDialog from '../../../../components/common/loader/LoaderDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -17,7 +18,7 @@ import {
   type Scenario,
 } from '../../../../utils/api-types';
 import { parseCron, type ParsedCron } from '../../../../utils/Cron';
-import { MESSAGING$ } from '../../../../utils/Environment';
+import { MESSAGING$, useQueryParameter } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
 import { InjectContext } from '../../common/Context';
@@ -84,8 +85,11 @@ const ScenarioHeader = ({
   const { classes } = useStyles();
   const theme = useTheme();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
+  const [openScenarioAssistantQueryParam] = useQueryParameter(['openScenarioAssistant']);
   const { injects, setInjects } = useContext(InjectContext);
-  const [openScenarioAssistant, setOpenScenarioAssistant] = useState(false);
+  const [openScenarioAssistant, setOpenScenarioAssistant] = useState(openScenarioAssistantQueryParam === 'true');
+  const [openLoaderDialog, setOpenLoaderDialog] = useState(false);
+  const [isInjectAssistantLoading, setIsInjectAssistantLoading] = useState(false);
   // Fetching data
   const { scenario }: { scenario: Scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(scenarioId) }));
 
@@ -106,9 +110,14 @@ const ScenarioHeader = ({
   };
 
   const onScenarioInjectAssistantSubmit = (data: InjectAssistantInput) => {
+    setOpenScenarioAssistant(false);
+    setIsInjectAssistantLoading(true);
+    setOpenLoaderDialog(true);
     playInjectsAssistantForScenario(scenarioId, data).then((results) => {
-      setOpenScenarioAssistant(false);
       setInjects([...injects, ...results.data]);
+      setIsInjectAssistantLoading(false);
+    }).catch(() => {
+      setOpenLoaderDialog(false);
     });
   };
 
@@ -242,6 +251,15 @@ const ScenarioHeader = ({
         onSubmit={(data: InjectAssistantInput) => onScenarioInjectAssistantSubmit(data)}
       />
       <div className="clearfix" />
+      <LoaderDialog
+        open={openLoaderDialog}
+        isSubmitting={isInjectAssistantLoading}
+        loadMessage={t('Injects generation in progress...')}
+        successMessage={t('Injects successfully generated.')}
+        redirectButtonLabel={t('Access these injects')}
+        redirectLink={`/admin/scenarios/${scenarioId}/injects`}
+        onClose={() => setOpenLoaderDialog(false)}
+      />
     </>
   );
 };

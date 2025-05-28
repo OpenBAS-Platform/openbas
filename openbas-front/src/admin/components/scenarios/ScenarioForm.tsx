@@ -1,8 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Autocomplete, Box, Button, Chip, GridLegacy, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Checkbox,
+  Chip, FormControlLabel,
+  MenuItem,
+  Tab,
+  Tabs,
+  TextField as MuiTextField,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import SelectField from '../../../components/fields/SelectField';
@@ -14,11 +24,12 @@ import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
 
 interface Props {
-  onSubmit: SubmitHandler<ScenarioInput>;
+  onSubmit: (data: ScenarioInput, isScenarioAssistantChecked?: boolean) => void;
   handleClose: () => void;
   editing?: boolean;
   disabled?: boolean;
   initialValues: ScenarioInput;
+  isCreation?: boolean;
 }
 
 const ScenarioForm: FunctionComponent<Props> = ({
@@ -27,12 +38,14 @@ const ScenarioForm: FunctionComponent<Props> = ({
   editing,
   initialValues,
   disabled,
+  isCreation = false,
 }) => {
   // Standard hooks
   const theme = useTheme();
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
+  const [isScenarioAssistantChecked, setIsScenarioAssistantChecked] = useState(false);
   const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
@@ -63,6 +76,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
     ),
     defaultValues: initialValues,
   });
+
   return (
     <>
       <Box sx={{
@@ -75,14 +89,22 @@ const ScenarioForm: FunctionComponent<Props> = ({
           <Tab label={t('Emails and SMS')} />
         </Tabs>
       </Box>
-      <form id="scenarioForm" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(2),
+          marginTop: theme.spacing(2),
+        }}
+        id="scenarioForm"
+        onSubmit={handleSubmit((data: ScenarioInput) => onSubmit(data, isScenarioAssistantChecked))}
+      >
         {currentTab === 0 && (
           <>
             <TextField
               variant="standard"
               fullWidth
               label={t('Name')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_name}
               helperText={errors.scenario_name?.message}
               inputProps={register('scenario_name')}
@@ -91,63 +113,61 @@ const ScenarioForm: FunctionComponent<Props> = ({
               setValue={setValue}
               askAi={true}
             />
-            <GridLegacy container spacing={2}>
-              <GridLegacy item xs={6}>
-                <SelectField
-                  variant="standard"
-                  fullWidth={true}
-                  name="scenario_category"
-                  label={t('Category')}
-                  style={{ marginTop: 20 }}
-                  error={!!errors.scenario_category}
-                  control={control}
-                  defaultValue={initialValues.scenario_category}
-                >
-                  {Array.from(scenarioCategories).map(([key, value]) => (
-                    <MenuItem key={key} value={key}>
-                      {t(value)}
-                    </MenuItem>
-                  ))}
-                </SelectField>
-              </GridLegacy>
-              <GridLegacy item xs={6}>
-                <SelectField
-                  variant="standard"
-                  fullWidth={true}
-                  name="scenario_main_focus"
-                  label={t('Main focus')}
-                  style={{ marginTop: 20 }}
-                  error={!!errors.scenario_main_focus}
-                  control={control}
-                  defaultValue={initialValues.scenario_main_focus}
-                >
-                  <MenuItem key="endpoint-protection" value="endpoint-protection">
-                    {t('Endpoint Protection')}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 20,
+            }}
+            >
+              <SelectField
+                variant="standard"
+                fullWidth={true}
+                name="scenario_category"
+                label={t('Category')}
+                error={!!errors.scenario_category}
+                control={control}
+                defaultValue={initialValues.scenario_category}
+              >
+                {Array.from(scenarioCategories).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {t(value)}
                   </MenuItem>
-                  <MenuItem key="web-filtering" value="web-filtering">
-                    {t('Web Filtering')}
-                  </MenuItem>
-                  <MenuItem key="incident-response" value="incident-response">
-                    {t('Incident Response')}
-                  </MenuItem>
-                  <MenuItem key="standard-operating-procedure" value="standard-operating-procedure">
-                    {t('Standard Operating Procedures')}
-                  </MenuItem>
-                  <MenuItem key="crisis-communication" value="crisis-communication">
-                    {t('Crisis Communication')}
-                  </MenuItem>
-                  <MenuItem key="strategic-reaction" value="strategic-reaction">
-                    {t('Strategic Reaction')}
-                  </MenuItem>
-                </SelectField>
-              </GridLegacy>
-            </GridLegacy>
+                ))}
+              </SelectField>
+              <SelectField
+                variant="standard"
+                fullWidth={true}
+                name="scenario_main_focus"
+                label={t('Main focus')}
+                error={!!errors.scenario_main_focus}
+                control={control}
+                defaultValue={initialValues.scenario_main_focus}
+              >
+                <MenuItem key="endpoint-protection" value="endpoint-protection">
+                  {t('Endpoint Protection')}
+                </MenuItem>
+                <MenuItem key="web-filtering" value="web-filtering">
+                  {t('Web Filtering')}
+                </MenuItem>
+                <MenuItem key="incident-response" value="incident-response">
+                  {t('Incident Response')}
+                </MenuItem>
+                <MenuItem key="standard-operating-procedure" value="standard-operating-procedure">
+                  {t('Standard Operating Procedures')}
+                </MenuItem>
+                <MenuItem key="crisis-communication" value="crisis-communication">
+                  {t('Crisis Communication')}
+                </MenuItem>
+                <MenuItem key="strategic-reaction" value="strategic-reaction">
+                  {t('Strategic Reaction')}
+                </MenuItem>
+              </SelectField>
+            </div>
             <SelectField
               variant="standard"
               fullWidth={true}
               name="scenario_severity"
               label={t('Severity')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_severity}
               control={control}
               defaultValue={initialValues.scenario_severity}
@@ -171,7 +191,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
               multiline
               rows={5}
               label={t('Description')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_description}
               helperText={errors.scenario_description?.message}
               inputProps={register('scenario_description')}
@@ -188,10 +207,20 @@ const ScenarioForm: FunctionComponent<Props> = ({
                   fieldValue={value ?? []}
                   fieldOnChange={onChange}
                   error={error}
-                  style={{ marginTop: 20 }}
                 />
               )}
             />
+            {isCreation && (
+              <FormControlLabel
+                control={(
+                  <Checkbox
+                    value={isScenarioAssistantChecked}
+                    onChange={() => setIsScenarioAssistantChecked(!isScenarioAssistantChecked)}
+                  />
+                )}
+                label={t('Use the scenario assistant')}
+              />
+            )}
           </>
         )}
         {currentTab === 1 && (
@@ -200,7 +229,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
               variant="standard"
               fullWidth
               label={t('Sender email address')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_mail_from}
               helperText={
                 errors.scenario_mail_from
@@ -254,7 +282,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
                         {...params}
                         variant="standard"
                         label={t('Reply to')}
-                        style={{ marginTop: 20 }}
                         error={!!fieldState.error}
                         helperText={errors.scenario_mails_reply_to?.find ? errors.scenario_mails_reply_to?.find(value => value != null)?.message ?? '' : ''}
                       />
@@ -267,7 +294,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
               variant="standard"
               fullWidth
               label={t('Messages header')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_message_header}
               helperText={errors.scenario_message_header && errors.scenario_message_header?.message}
               inputProps={register('scenario_message_header')}
@@ -277,7 +303,6 @@ const ScenarioForm: FunctionComponent<Props> = ({
               variant="standard"
               fullWidth
               label={t('Messages footer')}
-              style={{ marginTop: 20 }}
               error={!!errors.scenario_message_footer}
               helperText={errors.scenario_message_footer && errors.scenario_message_footer?.message}
               inputProps={register('scenario_message_footer')}
@@ -286,14 +311,14 @@ const ScenarioForm: FunctionComponent<Props> = ({
           </>
         )}
         <div style={{
-          float: 'right',
-          marginTop: 20,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: theme.spacing(1),
         }}
         >
           <Button
             variant="contained"
             onClick={handleClose}
-            style={{ marginRight: 10 }}
             disabled={isSubmitting}
           >
             {t('Cancel')}

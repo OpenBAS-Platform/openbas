@@ -21,7 +21,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({ onCreate }) => {
 
   const dispatch = useAppDispatch();
 
-  const onSubmit = (data: ScenarioInput) => {
+  const onSubmit = (data: ScenarioInput, isScenarioAssistantChecked?: boolean) => {
     dispatch(addScenario(data)).then(
       (result: {
         result: string;
@@ -34,7 +34,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({ onCreate }) => {
           }
           setOpen(false);
         }
-        navigate(`/admin/scenarios/${result.result}`);
+        navigate(`/admin/scenarios/${result.result}?openScenarioAssistant=${isScenarioAssistantChecked}`);
       },
     );
   };
@@ -53,8 +53,8 @@ const ScenarioCreation: FunctionComponent<Props> = ({ onCreate }) => {
     scenario_tags: [],
     scenario_message_header: t('SIMULATION HEADER'),
     scenario_message_footer: t('SIMULATION FOOTER'),
-    scenario_mail_from: settings.default_mailer ? settings.default_mailer : '',
-    scenario_mails_reply_to: [settings.default_reply_to ? settings.default_reply_to : ''],
+    scenario_mail_from: settings.default_mailer ?? '',
+    scenario_mails_reply_to: [settings.default_reply_to ?? ''],
   };
 
   return (
@@ -69,6 +69,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({ onCreate }) => {
           onSubmit={onSubmit}
           initialValues={initialValues}
           handleClose={() => setOpen(false)}
+          isCreation
         />
       </Drawer>
     </>
