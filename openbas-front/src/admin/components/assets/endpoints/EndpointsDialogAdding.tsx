@@ -116,7 +116,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
         value: (endpoint: EndpointOutput) => {
           const groupedExecutors = getExecutorsCount(endpoint, executorsMap);
           if (!groupedExecutors) {
-            return '-';
+            return 'N/A';
           }
           return (
             <>

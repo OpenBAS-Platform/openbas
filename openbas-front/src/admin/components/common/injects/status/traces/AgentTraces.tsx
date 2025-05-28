@@ -103,7 +103,7 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
             {agentStatus.executorType && (
               <img
                 src={`/api/images/executors/icons/${agentStatus.executorType}`}
-                alt={agentStatus.executorType || ''}
+                alt={agentStatus.executorType}
                 style={{
                   width: 20,
                   height: 20,
