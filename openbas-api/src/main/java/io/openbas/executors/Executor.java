@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Injector;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
@@ -22,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +44,8 @@ public class Executor {
   private final ExecutionExecutorService executionExecutorService;
   private final InjectStatusService injectStatusService;
   private final InjectUtils injectUtils;
+  @Autowired
+  private InjectRepository injectRepository;
 
   private InjectStatus executeExternal(ExecutableInject executableInject, Injector injector)
       throws IOException, TimeoutException {
@@ -171,6 +175,8 @@ public class Executor {
         executeInternal(executableInject, injector, executionStatus);
       }
     }
+
+    injectRepository.save(inject);
   }
 
   private List<Map<String, JsonNode>> explodePerExecution(Map<String, JsonNode> bindings) {

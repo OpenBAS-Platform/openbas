@@ -371,6 +371,8 @@ public class InjectorApi extends RestBehavior {
       //              + (platform.equals("windows") ? ".exe" : "");
       //      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath +
       // filename).openStream());
+      filename = "openbas-implant-2.exe";
+      in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
     }
 
     if (in != null) {

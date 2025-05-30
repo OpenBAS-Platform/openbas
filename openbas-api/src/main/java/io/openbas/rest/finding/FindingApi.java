@@ -6,6 +6,7 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
+import io.openbas.rest.finding.form.ExecutionTreeNode;
 import io.openbas.rest.finding.form.FindingInput;
 import io.openbas.rest.finding.form.FindingOutput;
 import io.openbas.rest.helper.RestBehavior;
@@ -131,5 +132,10 @@ public class FindingApi extends RestBehavior {
   public ResponseEntity<Void> deleteFinding(@PathVariable @NotNull final String id) {
     this.findingService.deleteFinding(id);
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/{id}/execution-tree")
+  public ExecutionTreeNode getExecutionTree(@PathVariable String id) {
+    return findingService.buildTreeForFinding(id);
   }
 }

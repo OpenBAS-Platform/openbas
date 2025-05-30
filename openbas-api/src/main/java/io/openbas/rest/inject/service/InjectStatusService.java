@@ -54,7 +54,7 @@ public class InjectStatusService {
       String executionId, String agentId, String message) {
     InjectStatus injectStatus =
         injectStatusRepository
-            .findByInjectId(executionId)
+            .findById(executionId)
             .orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
     ExecutionTrace trace =
@@ -147,6 +147,7 @@ public class InjectStatusService {
 
       // TODO Compute Status for Inject global
       injectStatusRepository.save(execution);
+      injectRepository.save(execution.getInject());
     }
   }
 

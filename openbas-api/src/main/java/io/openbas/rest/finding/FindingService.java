@@ -1,31 +1,30 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.AssetRepository;
-import io.openbas.database.repository.FindingRepository;
-import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
+import io.openbas.database.repository.*;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.injector_contract.outputs.ContractOutputUtils;
+import io.openbas.rest.finding.form.ExecutionTreeNode;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
 
 @Log
 @Service
@@ -40,8 +39,10 @@ public class FindingService {
   private final AssetRepository assetRepository;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
+  private final ExecutionBindingRepository executionBindingRepository;
 
-  @Resource private ObjectMapper mapper;
+  @Resource
+  private ObjectMapper mapper;
 
   // -- CRUD --
 
@@ -162,7 +163,9 @@ public class FindingService {
     return finding;
   }
 
-  /** Extracts findings from structured output that was generated using output parsers. */
+  /**
+   * Extracts findings from structured output that was generated using output parsers.
+   */
   public void extractFindingsFromOutputParsers(
       InjectStatus execution,
       Agent agent,
@@ -194,5 +197,30 @@ public class FindingService {
                     }
                   });
         });
+  }
+
+  public ExecutionTreeNode buildTreeForFinding(String findingId) {
+    Finding finding = findingRepository.findById(findingId)
+        .orElseThrow(() -> new RuntimeException("Finding not found"));
+
+    return buildExecutionTree(finding.getExecution());
+  }
+
+  public ExecutionTreeNode buildExecutionTree(InjectStatus execution) {
+    List<ExecutionBinding> bindings = executionBindingRepository.findByExecution(execution);
+
+    ExecutionTreeNode node = new ExecutionTreeNode();
+    node.setExecutionId(execution.getId());
+    node.setInjectTitle(execution.getInject().getTitle());
+
+    for (ExecutionBinding binding : bindings) {
+      ExecutionTreeNode parent = buildExecutionTree(binding.getSourceExecution());
+      parent.setInjectTitle(binding.getSourceExecution().getInject().getTitle());
+      parent.setArgumentKey(binding.getArgumentKey());
+      parent.setArgumentValue(binding.getArgumentValue());
+      node.getParents().add(parent);
+    }
+
+    return node;
   }
 }

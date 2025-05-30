@@ -182,6 +182,7 @@ export interface AssetAgentJob {
   /** @deprecated */
   asset_agent_asset?: string;
   asset_agent_command: string;
+  asset_agent_execution?: string;
   asset_agent_id: string;
   asset_agent_inject?: string;
   listened?: boolean;
@@ -1350,6 +1351,14 @@ export interface ExecutionTraceOutput {
   execution_time: string;
 }
 
+export interface ExecutionTreeNode {
+  argumentKey?: string;
+  argumentValue?: string;
+  executionId?: string;
+  injectTitle?: string;
+  parents?: ExecutionTreeNode[];
+}
+
 export interface Executor {
   executor_background_color?: string;
   /** @format date-time */
@@ -1640,6 +1649,7 @@ export interface Finding {
   finding_assets?: string[];
   /** @format date-time */
   finding_created_at: string;
+  finding_execution_id?: string;
   finding_field: string;
   finding_id: string;
   finding_inject_id?: string;
@@ -2014,6 +2024,7 @@ export interface InjectExpectation {
   /** @format date-time */
   inject_expectation_created_at?: string;
   inject_expectation_description?: string;
+  inject_expectation_execution?: string;
   inject_expectation_exercise?: string;
   /** @format double */
   inject_expectation_expected_score: number;

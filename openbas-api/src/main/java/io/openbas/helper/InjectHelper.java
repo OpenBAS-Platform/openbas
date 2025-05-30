@@ -90,7 +90,8 @@ public class InjectHelper {
   private boolean isBeforeOrEqualsNow(Injection injection) {
     Instant now = Instant.now();
     Instant injectWhen = injection.getDate().orElseThrow();
-    return injectWhen.equals(now) || injectWhen.isBefore(now);
+    Instant injectExecution = injection.getInject().getFirstExecutionDate();
+    return injectExecution != null ? !injectExecution.isBefore(now) : (injectWhen.equals(now) || injectWhen.isBefore(now)) ; //TODO POC
   }
 
   public List<Inject> getAllPendingInjectsWithThresholdMinutes(int thresholdMinutes) {
@@ -106,6 +107,7 @@ public class InjectHelper {
     List<Inject> injects = this.injectRepository.findAll(InjectSpecification.executable());
     Stream<ExecutableInject> executableInjects =
         injects.stream()
+            .filter(inject->inject.getStatus()== null) //TODO POC
             .filter(this::isBeforeOrEqualsNow)
             .sorted(Inject.executionComparator)
             .map(

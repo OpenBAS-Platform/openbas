@@ -16,6 +16,7 @@ import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
+import FindingExecutionTree from './FindingExecutionTree';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -77,7 +78,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       field: 'finding_value',
       label: 'Value',
       isSortable: true,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_value}><span>{finding.finding_value}</span></Tooltip>,
+      value: (finding: FindingOutput) => <FindingExecutionTree findingId={finding.finding_id} findingValue={finding.finding_value}/>,
     },
     {
       field: 'finding_tags',
