@@ -91,12 +91,8 @@ const Endpoints = () => {
 
   // Export
   const exportProps = {
-    exportType: 'endpoint',
-    exportKeys: [
-      'asset_name',
-      'endpoint_platform',
-      'endpoint_arch',
-    ],
+    exportType: 'ENDPOINTS',
+    exportKeys: [],
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
   };

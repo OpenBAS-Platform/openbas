@@ -117,10 +117,13 @@ public class MapperApi extends RestBehavior {
 
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
   @Secured(ROLE_ADMIN)
-  @PostMapping(value = "/api/mappers/csv")
+  @PostMapping(value = "/api/mappers/export/csv")
   @LogExecutionTime
-  public void exportMappersCsv(@RequestParam TargetType targetType, HttpServletResponse response) {
-    mapperService.exportMappersCsv(targetType, response);
+  public void exportMappersCsv(
+      @RequestParam TargetType targetType,
+      @RequestBody String contentToExport,
+      HttpServletResponse response) {
+    mapperService.exportMappersCsv(targetType, contentToExport, response);
   }
 
   @Secured(ROLE_ADMIN)
