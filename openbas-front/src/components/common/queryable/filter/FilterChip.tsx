@@ -4,10 +4,10 @@ import * as R from 'ramda';
 import { type FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
+import { useFormatter } from '../../../i18n';
 import FilterChipPopover from './FilterChipPopover';
 import FilterChipValues from './FilterChipValues';
 import { type FilterHelpers } from './FilterHelpers';
-import { useFormatter } from '../../../i18n';
 
 interface Props {
   filter: Filter;
