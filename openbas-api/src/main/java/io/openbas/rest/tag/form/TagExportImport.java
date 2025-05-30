@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class TagExport {
+public class TagExportImport {
 
-  public TagExport(String name, String color) {
+  public TagExportImport() {}
+
+  public TagExportImport(String name, String color) {
     this.name = name;
     this.color = color;
   }

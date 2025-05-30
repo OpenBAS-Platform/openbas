@@ -7,7 +7,7 @@ import io.openbas.database.model.Endpoint;
 import lombok.Data;
 
 @Data
-public class EndpointExport {
+public class EndpointExportImport {
 
   @JsonProperty("asset_name")
   @CsvBindByName(column = "asset_name", required = true)

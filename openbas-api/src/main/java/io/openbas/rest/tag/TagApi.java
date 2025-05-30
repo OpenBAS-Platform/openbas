@@ -20,10 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,9 +55,9 @@ public class TagApi extends RestBehavior {
 
   @ApiResponses(
       value = {
-          @ApiResponse(
-              responseCode = "200",
-              description = "All the existing tags corresponding to the search criteria")
+        @ApiResponse(
+            responseCode = "200",
+            description = "All the existing tags corresponding to the search criteria")
       })
   @Operation(description = "Search tags corresponding to the criteria", summary = "Search tags")
   @PostMapping("/api/tags/search")
@@ -122,9 +119,10 @@ public class TagApi extends RestBehavior {
       description = "Get a list of tag IDs and labels corresponding to the text search",
       summary = "Search tags by text")
   public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) @Schema(description = "Search text") final String searchText) {
+      @RequestParam(required = false) @Schema(description = "Search text")
+          final String searchText) {
     return fromIterable(
-        this.tagRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+            this.tagRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();

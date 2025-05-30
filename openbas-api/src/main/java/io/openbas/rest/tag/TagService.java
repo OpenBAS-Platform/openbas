@@ -4,16 +4,12 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
-
+import io.openbas.rest.tag.form.TagCreateInput;
 import java.util.List;
 import java.util.Optional;
-
-import io.openbas.rest.tag.form.TagCreateInput;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RequiredArgsConstructor
 @Service

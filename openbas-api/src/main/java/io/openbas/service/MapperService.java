@@ -1,13 +1,23 @@
 package io.openbas.service;
 
 import static com.opencsv.ICSVWriter.*;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
+import static java.io.File.createTempFile;
+import static java.time.Instant.now;
 import static java.util.stream.StreamSupport.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -17,19 +27,24 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
-import io.openbas.rest.asset.endpoint.form.EndpointExport;
+import io.openbas.rest.asset.endpoint.form.EndpointExportImport;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
-import io.openbas.rest.tag.form.TagExport;
+import io.openbas.rest.tag.TagService;
+import io.openbas.rest.tag.form.TagCreateInput;
+import io.openbas.rest.tag.form.TagExportImport;
 import io.openbas.service.utils.CustomColumnPositionStrategy;
 import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -37,11 +52,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -50,6 +67,9 @@ public class MapperService {
   private final ImportMapperRepository importMapperRepository;
   private final InjectorContractRepository injectorContractRepository;
   private final EndpointRepository endpointRepository;
+  private final EndpointService endpointService;
+
+  private final TagService tagService;
   private final ObjectMapper objectMapper;
 
   /**
@@ -301,8 +321,8 @@ public class MapperService {
     switch (targetType) {
       case ENDPOINTS:
         try {
-          List<EndpointExport> endpointsToExport = getEndpointsToExport(input);
-          exportCsv(response, "Endpoints.csv", endpointsToExport, EndpointExport.class);
+          List<EndpointExportImport> endpointsToExport = getEndpointsToExport(input);
+          exportCsv(response, "Endpoints.csv", endpointsToExport, EndpointExportImport.class);
         } catch (Exception e) {
           throw new RuntimeException("Error during export csv ", e);
         }
@@ -313,15 +333,15 @@ public class MapperService {
     }
   }
 
-  private List<EndpointExport> getEndpointsToExport(SearchPaginationInput input)
+  private List<EndpointExportImport> getEndpointsToExport(SearchPaginationInput input)
       throws JsonProcessingException {
     Specification<Endpoint> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
     filterSpecifications = filterSpecifications.and(computeSearchJpa(input.getTextSearch()));
     List<Endpoint> endpointsToProcess = endpointRepository.findAll(filterSpecifications);
-    List<EndpointExport> exports = new ArrayList<>();
-    EndpointExport endpointExport;
+    List<EndpointExportImport> exports = new ArrayList<>();
+    EndpointExportImport endpointExport;
     for (Endpoint endpoint : endpointsToProcess) {
-      endpointExport = new EndpointExport();
+      endpointExport = new EndpointExportImport();
       endpointExport.setName(endpoint.getName());
       endpointExport.setDescription(endpoint.getDescription());
       endpointExport.setHostname(endpoint.getHostname());
@@ -332,7 +352,7 @@ public class MapperService {
       endpointExport.setTags(
           objectMapper.writeValueAsString(
               endpoint.getTags().stream()
-                  .map(tag -> new TagExport(tag.getName(), tag.getColor()))
+                  .map(tag -> new TagExportImport(tag.getName(), tag.getColor()))
                   .collect(Collectors.toSet())));
       exports.add(endpointExport);
     }
@@ -354,6 +374,86 @@ public class MapperService {
             .withMappingStrategy(columns)
             .build();
     writer.write(exports);
+  }
+
+  public void importMappersCsv(MultipartFile file, TargetType targetType) throws IOException {
+    File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".csv");
+    FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+
+    CSVParser csvParser =
+        new CSVParserBuilder().withSeparator(DEFAULT_SEPARATOR).withIgnoreQuotations(false).build();
+
+    CSVReader csvReader =
+        new CSVReaderBuilder(new FileReader(tempFile))
+            .withSkipLines(1)
+            .withCSVParser(csvParser)
+            .build();
+
+    switch (targetType) {
+      case ENDPOINTS:
+        try {
+          importEndpointsCsv(setColumMapping(), csvReader);
+        } catch (Exception e) {
+          throw new RuntimeException("Error during export csv ", e);
+        }
+        break;
+      default:
+        throw new BadRequestException(
+            "Target type " + targetType + " for CSV export is not supported");
+    }
+  }
+
+  public void importEndpointsCsv(
+      ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
+      throws JsonProcessingException {
+
+    CsvToBean csv = new CsvToBean();
+    csv.setCsvReader(csvReader);
+    csv.setMappingStrategy(columnPositionMappingStrategy);
+
+    List list = csv.parse();
+
+    for (Object object : list) {
+      EndpointExportImport endpointExportImport = (EndpointExportImport) object;
+
+      Endpoint endpoint = new Endpoint();
+      endpoint.setName(endpointExportImport.getName());
+      endpoint.setDescription(endpointExportImport.getDescription());
+      endpoint.setHostname(endpointExportImport.getHostname());
+      endpoint.setPlatform(endpointExportImport.getPlatform());
+      endpoint.setArch(endpointExportImport.getArch());
+      endpoint.setIps(
+          EndpointMapper.setIps(
+              objectMapper.readValue(endpointExportImport.getIps(), new TypeReference<>() {})));
+      endpoint.setMacAddresses(
+          EndpointMapper.setMacAddresses(
+              objectMapper.readValue(
+                  endpointExportImport.getMacAddresses(), new TypeReference<>() {})));
+
+      List<Tag> tagsForCreation = new ArrayList<>();
+      Set<TagExportImport> endpointExportImportTags =
+          objectMapper.readValue(endpointExportImport.getTags(), new TypeReference<>() {});
+      for (TagExportImport tag : endpointExportImportTags) {
+        TagCreateInput tagCreateInput = new TagCreateInput();
+        tagCreateInput.setName(tag.getName());
+        tagCreateInput.setColor(tag.getColor());
+        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput));
+      }
+      endpoint.setTags(iterableToSet(tagsForCreation));
+      endpointService.createEndpoint(endpoint);
+    }
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static ColumnPositionMappingStrategy setColumMapping() {
+    ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+    strategy.setType(EndpointExportImport.class);
+    String[] columns =
+        new String[] {
+          "name", "description", "hostname", "ips", "platform", "arch", "macAddresses", "tags"
+        };
+    strategy.setColumnMapping(columns);
+    return strategy;
   }
 
   public void importMappers(List<ImportMapperAddInput> mappers) {

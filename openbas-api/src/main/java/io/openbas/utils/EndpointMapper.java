@@ -10,13 +10,11 @@ import io.openbas.database.model.Tag;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointSimple;
-
+import jakarta.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
