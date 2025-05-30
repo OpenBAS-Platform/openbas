@@ -200,6 +200,7 @@
   "Cleanup command and executor must be defined together or none at all": "La commande et l'exécuteur de nettoyage doivent être définis ensemble ou pas du tout",
   "Cleanup executor": "Exécuteur de nettoyage",
   "CLEANUP_EXECUTION": "Commande de nettoyage",
+  "Clear all": "Tout effacer",
   "Clear filters": "Supprimer les filtres",
   "Clear out": "Vider",
   "Close": "Fermer",

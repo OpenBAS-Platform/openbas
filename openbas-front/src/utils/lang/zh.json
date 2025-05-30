@@ -200,6 +200,7 @@
   "Cleanup command and executor must be defined together or none at all": "清理命令和执行器必须一起定义，否则根本无法定义",
   "Cleanup executor": "清理执行器",
   "CLEANUP_EXECUTION": "清理命令",
+  "Clear all": "全部清除",
   "Clear filters": "清除过滤器",
   "Clear out": "空",
   "Close": "关闭",

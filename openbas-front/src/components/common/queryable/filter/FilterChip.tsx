@@ -7,6 +7,7 @@ import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types
 import FilterChipPopover from './FilterChipPopover';
 import FilterChipValues from './FilterChipValues';
 import { type FilterHelpers } from './FilterHelpers';
+import { useFormatter } from '../../../i18n';
 
 interface Props {
   filter: Filter;
@@ -23,6 +24,8 @@ const FilterChip: FunctionComponent<Props> = ({
   pristine,
   contextId,
 }) => {
+  const { t } = useFormatter();
+
   const chipRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(!pristine);
   const handleOpen = () => setOpen(true);
@@ -76,7 +79,7 @@ const FilterChip: FunctionComponent<Props> = ({
         )}
         onDelete={handleRemoveFilter}
         deleteIcon={(
-          <Tooltip title="Clear all">
+          <Tooltip title={t('Clear all')}>
             <Cancel />
           </Tooltip>
         )}
