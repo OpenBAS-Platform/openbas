@@ -13,10 +13,6 @@
     <name>OpenBAS model</name>
     <description>OpenBAS model</description>
 
-    <properties>
-        <elasticsearch.version>8.18.1</elasticsearch.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
