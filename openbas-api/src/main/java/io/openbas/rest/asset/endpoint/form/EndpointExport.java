@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvBindByPosition;
 import io.openbas.database.model.Endpoint;
-import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -28,7 +27,7 @@ public class EndpointExport {
   @JsonProperty("endpoint_ips")
   @CsvBindByName(column = "endpoint_ips", required = true)
   @CsvBindByPosition(position = 3)
-  private String[] ips;
+  private String ips;
 
   @JsonProperty("endpoint_platform")
   @CsvBindByName(column = "endpoint_platform", required = true)
@@ -43,10 +42,10 @@ public class EndpointExport {
   @JsonProperty("endpoint_mac_addresses")
   @CsvBindByName(column = "endpoint_mac_addresses", required = true)
   @CsvBindByPosition(position = 6)
-  private String[] macAddresses;
+  private String macAddresses;
 
   @JsonProperty("asset_tags")
   @CsvBindByName(column = "asset_tags", required = true)
   @CsvBindByPosition(position = 7)
-  private Set<String> tags;
+  private String tags;
 }
