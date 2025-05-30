@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
@@ -28,6 +30,7 @@ import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
@@ -298,42 +301,8 @@ public class MapperService {
     switch (targetType) {
       case ENDPOINTS:
         try {
-          Specification<Endpoint> filterSpecifications =
-              computeFilterGroupJpa(input.getFilterGroup());
-          filterSpecifications = filterSpecifications.and(computeSearchJpa(input.getTextSearch()));
-          List<Endpoint> endpointsToProcess = endpointRepository.findAll(filterSpecifications);
-          List<EndpointExport> exports = new ArrayList<>();
-          EndpointExport endpointExport;
-          for (Endpoint endpoint : endpointsToProcess) {
-            endpointExport = new EndpointExport();
-            endpointExport.setName(endpoint.getName());
-            endpointExport.setDescription(endpoint.getDescription());
-            endpointExport.setHostname(endpoint.getHostname());
-            endpointExport.setIps(objectMapper.writeValueAsString(endpoint.getIps()));
-            endpointExport.setMacAddresses(
-                objectMapper.writeValueAsString(endpoint.getMacAddresses()));
-            endpointExport.setPlatform(endpoint.getPlatform());
-            endpointExport.setArch(endpoint.getArch());
-            endpointExport.setTags(
-                objectMapper.writeValueAsString(
-                    endpoint.getTags().stream()
-                        .map(tag -> new TagExport(tag.getName(), tag.getColor()))
-                        .collect(Collectors.toSet())));
-            exports.add(endpointExport);
-          }
-          String filename = "Endpoints.csv";
-          response.setContentType("text/csv");
-          response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-          response.setStatus(HttpServletResponse.SC_OK);
-          CustomColumnPositionStrategy<EndpointExport> columns = new CustomColumnPositionStrategy();
-          columns.setType(EndpointExport.class);
-          StatefulBeanToCsv<EndpointExport> writer =
-              new StatefulBeanToCsvBuilder<EndpointExport>(response.getWriter())
-                  .withQuotechar(DEFAULT_QUOTE_CHARACTER)
-                  .withSeparator(DEFAULT_SEPARATOR)
-                  .withMappingStrategy(columns)
-                  .build();
-          writer.write(exports);
+          List<EndpointExport> endpointsToExport = getEndpointsToExport(input);
+          exportCsv(response, "Endpoints.csv", endpointsToExport, EndpointExport.class);
         } catch (Exception e) {
           throw new RuntimeException("Error during export csv ", e);
         }
@@ -342,6 +311,49 @@ public class MapperService {
         throw new BadRequestException(
             "Target type " + targetType + " for CSV export is not supported");
     }
+  }
+
+  private List<EndpointExport> getEndpointsToExport(SearchPaginationInput input)
+      throws JsonProcessingException {
+    Specification<Endpoint> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
+    filterSpecifications = filterSpecifications.and(computeSearchJpa(input.getTextSearch()));
+    List<Endpoint> endpointsToProcess = endpointRepository.findAll(filterSpecifications);
+    List<EndpointExport> exports = new ArrayList<>();
+    EndpointExport endpointExport;
+    for (Endpoint endpoint : endpointsToProcess) {
+      endpointExport = new EndpointExport();
+      endpointExport.setName(endpoint.getName());
+      endpointExport.setDescription(endpoint.getDescription());
+      endpointExport.setHostname(endpoint.getHostname());
+      endpointExport.setIps(objectMapper.writeValueAsString(endpoint.getIps()));
+      endpointExport.setMacAddresses(objectMapper.writeValueAsString(endpoint.getMacAddresses()));
+      endpointExport.setPlatform(endpoint.getPlatform());
+      endpointExport.setArch(endpoint.getArch());
+      endpointExport.setTags(
+          objectMapper.writeValueAsString(
+              endpoint.getTags().stream()
+                  .map(tag -> new TagExport(tag.getName(), tag.getColor()))
+                  .collect(Collectors.toSet())));
+      exports.add(endpointExport);
+    }
+    return exports;
+  }
+
+  private static <T> void exportCsv(
+      HttpServletResponse response, String filename, List<T> exports, Class<T> exportClass)
+      throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+    response.setContentType("text/csv");
+    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+    response.setStatus(HttpServletResponse.SC_OK);
+    CustomColumnPositionStrategy<T> columns = new CustomColumnPositionStrategy();
+    columns.setType(exportClass);
+    StatefulBeanToCsv<T> writer =
+        new StatefulBeanToCsvBuilder<T>(response.getWriter())
+            .withQuotechar(DEFAULT_QUOTE_CHARACTER)
+            .withSeparator(DEFAULT_SEPARATOR)
+            .withMappingStrategy(columns)
+            .build();
+    writer.write(exports);
   }
 
   public void importMappers(List<ImportMapperAddInput> mappers) {
