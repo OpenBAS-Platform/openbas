@@ -641,6 +641,7 @@
   "IMAP service is not responding, your injectors may be impacted.": "IMAP service is not responding, your injectors may be impacted.",
   "Import": "导入",
   "Import a simulation": "导入模拟",
+  "Import endpoints": "导入端点",
   "Import injects": "导入注入",
   "in the documentation": "参见文档",
   "Inactive": "未激活",
