@@ -62,7 +62,7 @@ export const exportMapper = (input: ExportMapperInput) => {
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const exportCsvMapper = (targetType: string, searchPaginationInput: SearchPaginationInput) => {
+export const exportCsvMapper = (targetType: string, searchPaginationInput: SearchPaginationInput | undefined) => {
   const uri = `${XLS_MAPPER_URI}/export/csv?targetType=` + targetType;
   return simplePostCall(uri, searchPaginationInput).then((response) => {
     return {
