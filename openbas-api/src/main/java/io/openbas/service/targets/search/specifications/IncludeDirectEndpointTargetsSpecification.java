@@ -30,8 +30,7 @@ public class IncludeDirectEndpointTargetsSpecification<T> {
           .select(criteriaBuilder.literal(1))
           .where(
               criteriaBuilder.equal(injectTable.get("id"), scopedInject.getId()),
-              criteriaBuilder.equal(
-                  finalFrom.get("id"), query.getRoots().stream().findFirst().get().get("id")));
+              criteriaBuilder.equal(finalFrom.get("id"), root.get("id")));
       return criteriaBuilder.exists(subQuery);
     };
   }
