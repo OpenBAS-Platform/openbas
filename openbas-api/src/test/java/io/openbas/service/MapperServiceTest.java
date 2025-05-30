@@ -7,8 +7,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.InjectImporter;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.mapper.form.*;
@@ -27,15 +29,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(MockitoExtension.class)
 public class MapperServiceTest {
   @Mock private ImportMapperRepository importMapperRepository;
-
   @Mock private InjectorContractRepository injectorContractRepository;
+  @Mock private EndpointRepository endpointRepository;
+  @Mock private ObjectMapper objectMapper;
 
   private MapperService mapperService;
 
   @BeforeEach
   void before() {
     // Injecting mocks into the controller
-    mapperService = new MapperService(importMapperRepository, injectorContractRepository);
+    mapperService =
+        new MapperService(
+            importMapperRepository, injectorContractRepository, endpointRepository, objectMapper);
   }
 
   // -- SCENARIOS --
