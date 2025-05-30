@@ -1,3 +1,4 @@
+import { Cancel } from '@mui/icons-material';
 import { Chip, Tooltip } from '@mui/material';
 import * as R from 'ramda';
 import { type FunctionComponent, useEffect, useRef, useState } from 'react';
@@ -51,42 +52,49 @@ const FilterChip: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Tooltip
-        title={(
-          <FilterChipValues
-            filter={filter}
-            propertySchema={propertySchema}
-            isTooltip
-            handleOpen={handleOpen}
-          />
+      <Chip
+        variant={chipVariant}
+        label={(
+          <Tooltip
+            title={(
+              <FilterChipValues
+                filter={filter}
+                propertySchema={propertySchema}
+                isTooltip
+                handleOpen={handleOpen}
+              />
+            )}
+          >
+            <span>
+              <FilterChipValues
+                filter={filter}
+                propertySchema={propertySchema}
+                handleOpen={handleOpen}
+              />
+            </span>
+          </Tooltip>
         )}
-      >
-        <Chip
-          variant={chipVariant}
-          label={(
-            <FilterChipValues
-              filter={filter}
-              propertySchema={propertySchema}
-              handleOpen={handleOpen}
-            />
-          )}
-          onDelete={handleRemoveFilter}
-          sx={{ borderRadius: 1 }}
-          ref={chipRef}
+        onDelete={handleRemoveFilter}
+        deleteIcon={(
+          <Tooltip title="Clear all">
+            <Cancel />
+          </Tooltip>
+        )}
+        sx={{ borderRadius: 1 }}
+        ref={chipRef}
+      />
+
+      {anchorEl && (
+        <FilterChipPopover
+          filter={filter}
+          helpers={helpers}
+          open={open}
+          onClose={handleClose}
+          anchorEl={chipRef.current!}
+          propertySchema={propertySchema}
+          contextId={contextId}
         />
-      </Tooltip>
-      {anchorEl
-        && (
-          <FilterChipPopover
-            filter={filter}
-            helpers={helpers}
-            open={open}
-            onClose={handleClose}
-            anchorEl={chipRef.current!}
-            propertySchema={propertySchema}
-            contextId={contextId}
-          />
-        )}
+      )}
     </>
   );
 };
