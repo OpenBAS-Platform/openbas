@@ -4486,7 +4486,13 @@ export interface TagUpdateInput {
 export interface TargetSimple {
   target_id: string;
   target_name?: string;
-  target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYERS" | "TEAMS";
+  target_type?:
+    | "AGENT"
+    | "ASSETS"
+    | "ASSETS_GROUPS"
+    | "PLAYERS"
+    | "TEAMS"
+    | "ENDPOINTS";
 }
 
 export interface Team {

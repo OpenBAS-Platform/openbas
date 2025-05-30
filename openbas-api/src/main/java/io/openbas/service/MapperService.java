@@ -5,6 +5,7 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static java.util.stream.StreamSupport.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -39,9 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MapperService {
 
   private final ImportMapperRepository importMapperRepository;
-
   private final InjectorContractRepository injectorContractRepository;
-  private final EndpointService endpointService;
+  private final ObjectMapper objectMapper;
 
   /**
    * Create and save an ImportMapper object from a MapperAddInput one
@@ -287,25 +287,12 @@ public class MapperService {
     return objectMapper.writeValueAsString(mappersList);
   }
 
-  public void exportMappersCsv(TargetType targetType, HttpServletResponse response) {
+  public void exportMappersCsv(
+      TargetType targetType, String contentToExport, HttpServletResponse response) {
     switch (targetType) {
       case ENDPOINTS:
         try {
-            // TODO get list of endpoints from Front screen and not from database
-            List<Endpoint> endpoints = endpointService.endpoints();
-          List<EndpointExport> exports = new ArrayList<>();
-          for (Endpoint endpoint : endpoints) {
-            EndpointExport endpointExport = new EndpointExport();
-            endpointExport.setName(endpoint.getName());
-            endpointExport.setDescription(endpoint.getDescription());
-            endpointExport.setHostname(endpoint.getHostname());
-            endpointExport.setIps(endpoint.getIps()); // TODO get list
-            endpointExport.setPlatform(endpoint.getPlatform());
-            endpointExport.setArch(endpoint.getArch());
-            endpointExport.setMacAddresses(endpoint.getMacAddresses()); // TODO get list
-            endpointExport.setTags(endpointExport.getTags()); // TODO get names
-            exports.add(endpointExport);
-          }
+          List<EndpointExport> exports = objectMapper.readValue(contentToExport, new TypeReference<>() {});
           String filename = "Endpoints.csv";
           response.setContentType("text/csv");
           response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");

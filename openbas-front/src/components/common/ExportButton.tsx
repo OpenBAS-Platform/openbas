@@ -3,8 +3,10 @@ import { ToggleButton, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 
 import { type TagHelper } from '../../actions/helper';
+import { exportCsvMapper } from '../../actions/mapper/mapper-actions';
 import { useHelper } from '../../store';
 import { exportData } from '../../utils/Environment';
+import { download } from '../../utils/utils';
 import { useFormatter } from '../i18n';
 
 export interface ExportProps<T> {
@@ -25,38 +27,62 @@ const ExportButton = <T extends object>({ totalElements, exportProps }: Props<T>
   // Fetching data
   const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
 
-  return (
-    <>
-      {totalElements > 0
-        ? (
-            <CSVLink
-              data={exportData(
-                exportProps.exportType,
-                exportProps.exportKeys,
-                exportProps.exportData,
-                tagsMap,
-              )}
-              filename={exportProps.exportFileName}
-            >
-              <ToggleButton value="export" aria-label="export" size="small">
-                <Tooltip title={t('Export this list')}>
-                  <FileDownloadOutlined
-                    color="primary"
-                    fontSize="small"
-                  />
-                </Tooltip>
-              </ToggleButton>
-            </CSVLink>
-          )
-        : (
-            <ToggleButton value="export" aria-label="export" size="small" disabled={true}>
-              <Tooltip title={t('Export this list')}>
-                <FileDownloadOutlined fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
+  const exportCsvMapperAction = () => {
+    exportCsvMapper(exportProps.exportType, exportProps.exportData).then(
+      (result: {
+        data: string;
+        filename: string;
+      }) => {
+        window.alert(result.filename);
+        download(JSON.stringify(result.data, null, 2), result.filename, 'text/csv');
+      },
+    );
+  };
+
+  if (totalElements > 0) {
+    // TODO update all Front exports by Back API exports
+    if ('ENDPOINTS' == exportProps.exportType) {
+      return (
+        <ToggleButton value="export" aria-label="export" size="small" onClick={exportCsvMapperAction}>
+          <Tooltip title={t('Export this list')}>
+            <FileDownloadOutlined
+              color="primary"
+              fontSize="small"
+            />
+          </Tooltip>
+        </ToggleButton>
+      );
+    } else {
+      return (
+        <CSVLink
+          data={exportData(
+            exportProps.exportType,
+            exportProps.exportKeys,
+            exportProps.exportData,
+            tagsMap,
           )}
-    </>
-  );
+          filename={exportProps.exportFileName}
+        >
+          <ToggleButton value="export" aria-label="export" size="small">
+            <Tooltip title={t('Export this list')}>
+              <FileDownloadOutlined
+                color="primary"
+                fontSize="small"
+              />
+            </Tooltip>
+          </ToggleButton>
+        </CSVLink>
+      );
+    }
+  } else {
+    return (
+      <ToggleButton value="export" aria-label="export" size="small" disabled={true}>
+        <Tooltip title={t('Export this list')}>
+          <FileDownloadOutlined fontSize="small" />
+        </Tooltip>
+      </ToggleButton>
+    );
+  }
 };
 
 export default ExportButton;
