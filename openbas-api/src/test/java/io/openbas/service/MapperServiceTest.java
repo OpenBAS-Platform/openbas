@@ -14,6 +14,7 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.rest.tag.TagService;
 import io.openbas.utils.mockMapper.MockMapperUtils;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +29,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class MapperServiceTest {
+
   @Mock private ImportMapperRepository importMapperRepository;
   @Mock private InjectorContractRepository injectorContractRepository;
   @Mock private EndpointRepository endpointRepository;
   @Mock private ObjectMapper objectMapper;
+  @Mock private EndpointService endpointService;
+  @Mock private TagService tagService;
 
   private MapperService mapperService;
 
@@ -40,7 +44,12 @@ public class MapperServiceTest {
     // Injecting mocks into the controller
     mapperService =
         new MapperService(
-            importMapperRepository, injectorContractRepository, endpointRepository, objectMapper);
+            importMapperRepository,
+            injectorContractRepository,
+            endpointRepository,
+            endpointService,
+            tagService,
+            objectMapper);
   }
 
   // -- SCENARIOS --

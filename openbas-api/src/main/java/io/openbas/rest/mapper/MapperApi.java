@@ -5,7 +5,6 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.Scenario;
@@ -21,8 +20,6 @@ import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
-import io.openbas.rest.tag.TagService;
-import io.openbas.service.EndpointService;
 import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.Constants;
@@ -34,7 +31,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -42,7 +38,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -63,12 +58,6 @@ public class MapperApi extends RestBehavior {
   private final MapperService mapperService;
   private final InjectImportService injectImportService;
 
-  private final EndpointService endpointService;
-
-  private final TagService tagService;
-
-  private final ObjectMapper objectMapper;
-
   // 25mb in byte
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
   private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
@@ -78,7 +67,7 @@ public class MapperApi extends RestBehavior {
   public Page<RawPaginationImportMapper> getImportMapper(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
+            this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
         .map(RawPaginationImportMapper::new);
   }
 
@@ -142,8 +131,7 @@ public class MapperApi extends RestBehavior {
       throws ImportException {
     try {
       mapperService.importMappers(
-          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
-          }));
+          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {}));
     } catch (Exception e) {
       log.severe(e.getMessage());
       throw new ImportException("Mapper import", "Error during import");
