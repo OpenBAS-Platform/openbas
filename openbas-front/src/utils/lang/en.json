@@ -200,6 +200,7 @@
   "Cleanup command and executor must be defined together or none at all": "Cleanup command and executor must be defined together or none at all",
   "Cleanup executor": "Cleanup executor",
   "CLEANUP_EXECUTION": "Cleanup command",
+  "Clear all": "Clear all",
   "Clear filters": "Clear filters",
   "Clear out": "Clear out",
   "Close": "Close",
