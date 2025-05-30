@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
@@ -22,6 +23,7 @@ import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.Constants;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,8 +37,7 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -113,6 +114,17 @@ public class MapperApi extends RestBehavior {
     }
   }
 
+  @Operation(description = "Export all datas from a specific target (endpoint,...)")
+  @Secured(ROLE_ADMIN)
+  @PostMapping(value = "/api/mappers/export/csv")
+  @LogExecutionTime
+  public void exportMappersCsv(
+      @RequestParam TargetType targetType,
+      @RequestBody @Valid final SearchPaginationInput input,
+      HttpServletResponse response) {
+    mapperService.exportMappersCsv(targetType, input, response);
+  }
+
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/import")
   public void importMappers(@RequestPart("file") @NotNull MultipartFile file)
@@ -177,6 +189,14 @@ public class MapperApi extends RestBehavior {
     scenario.setRecurrenceStart(Instant.now());
     return injectImportService.importInjectIntoScenarioFromXLS(
         scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
+  }
+
+  // -- IMPORT --
+  @PostMapping("/api/mappers/csv/import")
+  @Transactional(rollbackOn = Exception.class)
+  public void importEndpoints(@RequestPart("file") @NotNull MultipartFile file) throws IOException {
+
+    mapperService.importMappersCsv(file, TargetType.ENDPOINTS);
   }
 
   private void validateUploadedFile(MultipartFile file) {
