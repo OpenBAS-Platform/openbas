@@ -20,8 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class TagApi extends RestBehavior {
   public static final String TAG_URI = "/api/tags";
 
   private TagRepository tagRepository;
+  private TagService tagService;
 
   @Autowired
   public void setTagRepository(TagRepository tagRepository) {
@@ -55,9 +58,9 @@ public class TagApi extends RestBehavior {
 
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "All the existing tags corresponding to the search criteria")
+          @ApiResponse(
+              responseCode = "200",
+              description = "All the existing tags corresponding to the search criteria")
       })
   @Operation(description = "Search tags corresponding to the criteria", summary = "Search tags")
   @PostMapping("/api/tags/search")
@@ -99,14 +102,7 @@ public class TagApi extends RestBehavior {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The upserted tag")})
   @Operation(description = "Upsert a tag", summary = "Upsert tag")
   public Tag upsertTag(@Valid @RequestBody TagCreateInput input) {
-    Optional<Tag> tag = tagRepository.findByName(input.getName());
-    if (tag.isPresent()) {
-      return tag.get();
-    } else {
-      Tag newTag = new Tag();
-      newTag.setUpdateAttributes(input);
-      return tagRepository.save(newTag);
-    }
+    return tagService.upsertTag(input);
   }
 
   @Secured(ROLE_ADMIN)
@@ -126,10 +122,9 @@ public class TagApi extends RestBehavior {
       description = "Get a list of tag IDs and labels corresponding to the text search",
       summary = "Search tags by text")
   public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) @Schema(description = "Search text")
-          final String searchText) {
+      @RequestParam(required = false) @Schema(description = "Search text") final String searchText) {
     return fromIterable(
-            this.tagRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+        this.tagRepository.findAll(byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
@@ -145,5 +140,10 @@ public class TagApi extends RestBehavior {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  @Autowired
+  public void setTagService(TagService tagService) {
+    this.tagService = tagService;
   }
 }
