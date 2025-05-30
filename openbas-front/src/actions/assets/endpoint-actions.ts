@@ -64,3 +64,7 @@ export const searchEndpointLinkedToFindingsAsOption = (searchText: string = '', 
   };
   return simpleCall(`${ENDPOINT_URI}/findings/options`, { params });
 };
+
+export const importEndpoints = (file: FormData) => {
+  return simplePostCall('/api/mappers/csv/import', file);
+};

@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
-import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -31,6 +31,7 @@ import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
+import ImportUploaderEndpoints from './ImportUploaderEndpoints';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -291,9 +292,12 @@ const Endpoints = () => {
         entityPrefix="asset"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        topBarButtons={
-          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-        }
+        topBarButtons={(
+          <ToggleButtonGroup value="fake" exclusive>
+            <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+            <ImportUploaderEndpoints />
+          </ToggleButtonGroup>
+        )}
       />
       <List>
         <ListItem

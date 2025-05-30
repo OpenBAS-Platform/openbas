@@ -2,14 +2,28 @@ package io.openbas.rest.mapper;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.io.File.createTempFile;
+import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.asset.endpoint.form.EndpointImport;
+import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.FileTooBigException;
 import io.openbas.rest.exception.ImportException;
@@ -20,9 +34,13 @@ import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.rest.tag.TagService;
+import io.openbas.rest.tag.form.TagCreateInput;
+import io.openbas.service.EndpointService;
 import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.Constants;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,17 +49,23 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -59,16 +83,22 @@ public class MapperApi extends RestBehavior {
   private final MapperService mapperService;
   private final InjectImportService injectImportService;
 
+  private final EndpointService endpointService;
+
+  private final TagService tagService;
+
+
   // 25mb in byte
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
   private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
+
 
   @Secured(ROLE_USER)
   @PostMapping("/api/mappers/search")
   public Page<RawPaginationImportMapper> getImportMapper(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-            this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
+        this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
         .map(RawPaginationImportMapper::new);
   }
 
@@ -132,7 +162,8 @@ public class MapperApi extends RestBehavior {
       throws ImportException {
     try {
       mapperService.importMappers(
-          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {}));
+          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
+          }));
     } catch (Exception e) {
       log.severe(e.getMessage());
       throw new ImportException("Mapper import", "Error during import");
@@ -190,6 +221,68 @@ public class MapperApi extends RestBehavior {
     scenario.setRecurrenceStart(Instant.now());
     return injectImportService.importInjectIntoScenarioFromXLS(
         scenario, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
+  }
+
+  // -- IMPORT --
+  @PostMapping("/api/mappers/csv/import")
+  @Transactional(rollbackOn = Exception.class)
+  public void importEndpoints(@RequestPart("file") @NotNull MultipartFile file) throws IOException {
+
+    File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".csv");
+    FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+
+    CSVParser csvParser = new CSVParserBuilder()
+        .withSeparator(',')
+        .withIgnoreQuotations(true)
+        .build();
+
+    CSVReader csvReader = new CSVReaderBuilder(
+        new FileReader(tempFile))
+        .withSkipLines(1)
+        .withCSVParser(csvParser)
+        .build();
+
+    CsvToBean csv = new CsvToBean();
+    csv.setCsvReader(csvReader);
+    csv.setMappingStrategy(setColumMapping());
+
+    List list = csv.parse();
+
+    for (Object object : list) {
+      EndpointImport endpointImport = (EndpointImport) object;
+      /*EndpointInput endpointInput = new EndpointInput();
+      endpointInput.setName(endpointImport.getName());
+      endpointInput.setPlatform(EndpointMapper.toPlatform(endpointImport.getPlatform()));
+      endpointInput.setArch(EndpointMapper.toArch(endpointImport.getArch()));
+      endpointInput.setHostname(endpointImport.getHostname());
+      endpointInput.setIps(endpointImport.getIps());
+      endpointInput.setDescription(endpointImport.getDescription());
+      endpointInput.setMacAddresses(endpointImport.getMacAddresses());
+      Endpoint endpoint = new Endpoint();
+      endpoint.setUpdateAttributes(endpointInput);
+      List<Tag> tagsForCreation = new ArrayList<>();
+      Set<TagCreateInput> endpointImportTags = endpointImport.getTags();
+      for (TagCreateInput tag : endpointImportTags) {*/
+        /*TagCreateInput tagCreateInput = new TagCreateInput();
+        tagCreateInput.setName(tag.getName());
+        tagCreateInput.setColor(tag.getColor());*/
+        /*tagsForCreation.add(this.tagService.upsertTag(tag));
+      }
+      endpoint.setTags(iterableToSet(tagsForCreation));
+      endpointService.createEndpoint(endpoint);*/
+      System.out.println(endpointImport);
+    }
+
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static ColumnPositionMappingStrategy setColumMapping() {
+    ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+    strategy.setType(EndpointImport.class);
+    String[] columns = new String[]{"name", "description", "hostname", "ips", "platform", "arch", "macAddresses",
+        "tagIds"};
+    strategy.setColumnMapping(columns);
+    return strategy;
   }
 
   private void validateUploadedFile(MultipartFile file) {
