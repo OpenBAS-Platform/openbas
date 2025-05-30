@@ -172,7 +172,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
         width: 20,
       },
     ],
-  }), []);
+  }), [executorsMap]);
 
   // Pagination
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
