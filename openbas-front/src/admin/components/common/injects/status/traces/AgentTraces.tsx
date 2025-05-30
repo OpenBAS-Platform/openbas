@@ -32,12 +32,12 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
     const agent = sorted[0]?.execution_agent;
 
     return {
-      agentName: agent?.agent_executed_by_user ?? null,
-      executorName: agent?.agent_executor?.executor_name ?? null,
-      executorType: agent?.agent_executor?.executor_type ?? null,
+      agentName: agent?.agent_executed_by_user,
+      executorName: agent?.agent_executor?.executor_name,
+      executorType: agent?.agent_executor?.executor_type,
       statusName: finalTrace?.execution_status ?? 'PENDING',
-      trackingStart: startTrace?.execution_time ?? null,
-      trackingEnd: finalTrace?.execution_time ?? null,
+      trackingStart: startTrace?.execution_time,
+      trackingEnd: finalTrace?.execution_time,
       traces: sorted,
     };
   }, [traces]);
@@ -100,16 +100,18 @@ const AgentTraces = ({ traces, isInitialExpanded = false }: Props) => {
           }}
           >
             <Typography variant="h3">{t('Executor')}</Typography>
-            <img
-              src={`/api/images/executors/icons/${agentStatus.executorType}`}
-              alt={agentStatus.executorType || ''}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: 4,
-              }}
-            />
-            <Typography variant="body2">{t(agentStatus.executorName)}</Typography>
+            {agentStatus.executorType && (
+              <img
+                src={`/api/images/executors/icons/${agentStatus.executorType}`}
+                alt={agentStatus.executorType}
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 4,
+                }}
+              />
+            )}
+            <Typography variant="body2">{t(agentStatus.executorName || '-')}</Typography>
           </div>
           <Typography variant="h3" sx={{ marginTop: theme.spacing(2) }}>
             {t('Traces')}

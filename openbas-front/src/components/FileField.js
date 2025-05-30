@@ -3,7 +3,7 @@ import * as R from 'ramda';
 import { useCallback, useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 
-import { bytesFormat } from '../utils/Number';
+import { bytesFormat } from '../utils/number';
 import { useFormatter } from './i18n';
 
 const FileFieldInput = ({ input, filters, ...props }) => {

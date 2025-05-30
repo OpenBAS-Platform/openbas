@@ -131,7 +131,6 @@ const InjectAddTeams: FunctionComponent<Props> = ({
               values={teamValues}
               selectedValues={selectedTeamValues}
               elements={elements}
-              prefix="team"
               onSelect={addTeam}
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
@@ -144,6 +143,8 @@ const InjectAddTeams: FunctionComponent<Props> = ({
                   }}
                 />
               )}
+              getId={element => element.team_id}
+              getName={element => element.team_name}
             />
           </Box>
         </DialogContent>

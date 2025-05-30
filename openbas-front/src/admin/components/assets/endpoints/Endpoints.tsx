@@ -22,7 +22,8 @@ import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type EndpointOutput, type ExecutorOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import { getActiveMsgTooltip, getExecutorsCount } from '../../../../utils/endpoints/utils';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -107,30 +108,6 @@ const Endpoints = () => {
     return searchEndpoints(input).finally(() => setLoading(false));
   };
 
-  const getActiveMsgTooltip = (endpoint: EndpointOutput) => {
-    if (endpoint.asset_agents.length > 0) {
-      const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
-      const inactiveCount = endpoint.asset_agents.length - activeCount;
-      const isActive = activeCount > 0;
-      if (isActive) {
-        return {
-          status: 'Active',
-          activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
-        };
-      } else {
-        return {
-          status: 'Inactive',
-          activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
-        };
-      }
-    } else {
-      return {
-        status: 'Agentless',
-        activeMsgTooltip: t('AGENTLESS'),
-      };
-    }
-  };
-
   const getPrivilegesCount = (endpoint: EndpointOutput) => {
     if (endpoint.asset_agents.length > 0) {
       const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
@@ -158,20 +135,6 @@ const Endpoints = () => {
     }
   };
 
-  const getExecutorsCount = (endpoint: EndpointOutput) => {
-    const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
-    return executors?.reduce((acc, executor) => {
-      const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;
-      if (type && executor) {
-        acc[type] = acc[type] || [];
-        acc[type].push(executor);
-      } else {
-        acc['Unknown'] = acc['Unknown'] || [];
-      }
-      return acc;
-    }, {} as Record<string, ExecutorOutput[]>);
-  };
-
   // Headers
   const headers = [
     {
@@ -185,7 +148,7 @@ const Endpoints = () => {
       label: 'Status',
       isSortable: false,
       value: (endpoint: EndpointOutput) => {
-        const status = getActiveMsgTooltip(endpoint);
+        const status = getActiveMsgTooltip(endpoint, t('Active'), t('Inactive'), t('Agentless'));
         return (
           <Tooltip title={status.activeMsgTooltip}>
             <span>
@@ -247,7 +210,10 @@ const Endpoints = () => {
       isSortable: false,
       value: (endpoint: EndpointOutput) => {
         if (endpoint.asset_agents.length > 0) {
-          const groupedExecutors = getExecutorsCount(endpoint);
+          const groupedExecutors = getExecutorsCount(endpoint, executorsMap);
+          if (!groupedExecutors) {
+            return '-';
+          }
           return (
             <>
               {

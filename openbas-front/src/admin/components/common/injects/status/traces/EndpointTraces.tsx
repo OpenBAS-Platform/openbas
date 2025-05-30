@@ -87,7 +87,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
           tooltip
           width={16}
         />
-        <Typography variant="body2">{t(endpoint.platformType)}</Typography>
+        <Typography variant="body2">{t(endpoint.platformType || '-')}</Typography>
       </div>
 
       <div style={{ overflow: 'auto' }}>

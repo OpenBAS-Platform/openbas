@@ -99,7 +99,7 @@ const InjectTestList: FunctionComponent<Props> = ({
       label: 'Test status',
       isSortable: true,
       value: (test: InjectTestStatusOutput) => {
-        return (<ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} variant="inList" />);
+        return (<ItemStatus isInject={true} status={test.status_name} label={t(test.status_name || '-')} variant="inList" />);
       },
     },
   ];

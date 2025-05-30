@@ -3,7 +3,7 @@ import { Box, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, List
 import * as R from 'ramda';
 
 import Empty from '../../../components/Empty.js';
-import { useFormatter } from '../../../components/i18n.js';
+import { useFormatter } from '../../../components/i18n';
 import ObjectivePopover from './ObjectivePopover.js';
 
 const LessonsObjectives = ({

@@ -98,10 +98,11 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
             values={assetGroups}
             selectedValues={assetGroupValues}
             elements={elements}
-            prefix="asset_group"
             onSelect={addAssetGroup}
             onDelete={removeAssetGroup}
             paginationComponent={paginationComponent}
+            getId={element => element.asset_group_id}
+            getName={element => element.asset_group_name}
           />
         </Box>
       </DialogContent>
