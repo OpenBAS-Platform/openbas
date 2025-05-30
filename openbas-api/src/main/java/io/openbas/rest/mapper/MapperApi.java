@@ -121,9 +121,9 @@ public class MapperApi extends RestBehavior {
   @LogExecutionTime
   public void exportMappersCsv(
       @RequestParam TargetType targetType,
-      @RequestBody String contentToExport,
+      @RequestBody @Valid final SearchPaginationInput input,
       HttpServletResponse response) {
-    mapperService.exportMappersCsv(targetType, contentToExport, response);
+    mapperService.exportMappersCsv(targetType, input, response);
   }
 
   @Secured(ROLE_ADMIN)

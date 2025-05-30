@@ -5,6 +5,7 @@ import { CSVLink } from 'react-csv';
 import { type TagHelper } from '../../actions/helper';
 import { exportCsvMapper } from '../../actions/mapper/mapper-actions';
 import { useHelper } from '../../store';
+import { type SearchPaginationInput } from '../../utils/api-types';
 import { exportData } from '../../utils/Environment';
 import { download } from '../../utils/utils';
 import { useFormatter } from '../i18n';
@@ -14,6 +15,7 @@ export interface ExportProps<T> {
   exportKeys: string[];
   exportData: T[];
   exportFileName: string;
+  searchPaginationInput?: SearchPaginationInput;
 }
 
 interface Props<T> {
@@ -28,13 +30,12 @@ const ExportButton = <T extends object>({ totalElements, exportProps }: Props<T>
   const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
 
   const exportCsvMapperAction = () => {
-    exportCsvMapper(exportProps.exportType, exportProps.exportData).then(
+    exportCsvMapper(exportProps.exportType, exportProps.searchPaginationInput).then(
       (result: {
         data: string;
         filename: string;
       }) => {
-        window.alert(result.filename);
-        download(JSON.stringify(result.data, null, 2), result.filename, 'text/csv');
+        download(result.data, result.filename, 'text/csv');
       },
     );
   };

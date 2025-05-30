@@ -1,15 +1,17 @@
 package io.openbas.service;
 
 import static com.opencsv.ICSVWriter.*;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 import static java.util.stream.StreamSupport.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
@@ -18,10 +20,12 @@ import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.rest.tag.form.TagExport;
 import io.openbas.service.utils.CustomColumnPositionStrategy;
 import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
 import io.openbas.utils.TargetType;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -32,6 +36,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +46,7 @@ public class MapperService {
 
   private final ImportMapperRepository importMapperRepository;
   private final InjectorContractRepository injectorContractRepository;
+  private final EndpointRepository endpointRepository;
   private final ObjectMapper objectMapper;
 
   /**
@@ -288,14 +294,36 @@ public class MapperService {
   }
 
   public void exportMappersCsv(
-      TargetType targetType, String contentToExport, HttpServletResponse response) {
+      TargetType targetType, SearchPaginationInput input, HttpServletResponse response) {
     switch (targetType) {
       case ENDPOINTS:
         try {
-          List<EndpointExport> exports = objectMapper.readValue(contentToExport, new TypeReference<>() {});
+          Specification<Endpoint> filterSpecifications =
+              computeFilterGroupJpa(input.getFilterGroup());
+          filterSpecifications = filterSpecifications.and(computeSearchJpa(input.getTextSearch()));
+          List<Endpoint> endpointsToProcess = endpointRepository.findAll(filterSpecifications);
+          List<EndpointExport> exports = new ArrayList<>();
+          EndpointExport endpointExport;
+          for (Endpoint endpoint : endpointsToProcess) {
+            endpointExport = new EndpointExport();
+            endpointExport.setName(endpoint.getName());
+            endpointExport.setDescription(endpoint.getDescription());
+            endpointExport.setHostname(endpoint.getHostname());
+            endpointExport.setIps(objectMapper.writeValueAsString(endpoint.getIps()));
+            endpointExport.setMacAddresses(
+                objectMapper.writeValueAsString(endpoint.getMacAddresses()));
+            endpointExport.setPlatform(endpoint.getPlatform());
+            endpointExport.setArch(endpoint.getArch());
+            endpointExport.setTags(
+                objectMapper.writeValueAsString(
+                    endpoint.getTags().stream()
+                        .map(tag -> new TagExport(tag.getName(), tag.getColor()))
+                        .collect(Collectors.toSet())));
+            exports.add(endpointExport);
+          }
           String filename = "Endpoints.csv";
           response.setContentType("text/csv");
-          response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+          response.setHeader("Content-Disposition", "attachment; filename=" + filename);
           response.setStatus(HttpServletResponse.SC_OK);
           CustomColumnPositionStrategy<EndpointExport> columns = new CustomColumnPositionStrategy();
           columns.setType(EndpointExport.class);

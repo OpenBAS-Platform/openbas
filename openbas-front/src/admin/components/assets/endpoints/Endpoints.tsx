@@ -95,6 +95,7 @@ const Endpoints = () => {
     exportKeys: [],
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
+    searchPaginationInput: searchPaginationInput,
   };
 
   const [loading, setLoading] = useState<boolean>(true);
