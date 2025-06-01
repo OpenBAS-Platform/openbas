@@ -105,7 +105,7 @@ public class BatchQueueService<T> {
     factory.setUsername(rabbitmqConfig.getUser());
     factory.setPassword(rabbitmqConfig.getPass());
     factory.setVirtualHost(rabbitmqConfig.getVhost());
-    factory.setAutomaticRecoveryEnabled(true);
+    factory.setAutomaticRecoveryEnabled(false);
     factory.setNetworkRecoveryInterval(5000);
     factory.setRequestedHeartbeat(30);
     factory.setConnectionTimeout(10000);
@@ -205,7 +205,7 @@ public class BatchQueueService<T> {
     }
 
     // Otherwise, we lost the connection to the server
-    log.error("Connection lost unexpectedly: {}", cause.getMessage());
+    log.error("Connection lost unexpectedly: {}", cause.getMessage(), cause);
     connection.removeShutdownListener(shutdownListener);
 
     // Start trying to reconnect
@@ -272,7 +272,11 @@ public class BatchQueueService<T> {
     // If the list is not empty, we process it
     if (!currentBatch.isEmpty()) {
       log.info("Processing batch of {}", currentBatch.size());
-      queueExecution.perform(currentBatch);
+      try {
+        queueExecution.perform(currentBatch);
+      } catch (Exception e) {
+        log.error("Error processing batch - Error during ingestion", e);
+      }
     }
 
     // Sending Ack for all the processed element in the batch
