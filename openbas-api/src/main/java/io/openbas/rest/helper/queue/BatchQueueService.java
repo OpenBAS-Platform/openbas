@@ -39,7 +39,6 @@ public class BatchQueueService<T> {
   private final ShutdownListener shutdownListener;
 
   private final List<Channel> consumerChannels = new ArrayList<>();
-  private final Random rand = new Random();
 
   /**
    * Public constructor of the BatchQueueService
@@ -279,9 +278,8 @@ public class BatchQueueService<T> {
     // Sending Ack for all the processed element in the batch
     for (T element : currentBatch) {
       try {
-        consumerChannels
-            .get(rand.nextInt(consumerChannels.size()))
-            .basicAck(deliveryTable.remove(element).getTag(), true);
+        DeliveryContext elementToAck = deliveryTable.remove(element);
+        elementToAck.getDeliveryChannel().basicAck(elementToAck.getTag(), false);
       } catch (IOException e) {
         log.error(
             String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()),
