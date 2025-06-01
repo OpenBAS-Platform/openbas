@@ -32,7 +32,7 @@ public class BatchQueueService<T> {
 
   private final BlockingQueue<T> queue;
 
-  private final Map<T, Long> deliveryTable = new HashMap<>();
+  private final Map<T, DeliveryContext> deliveryTable = new HashMap<>();
 
   private final QueueConfig queueConfig;
   private final ScheduledExecutorService reconnectionExecutor;
@@ -160,7 +160,12 @@ public class BatchQueueService<T> {
 
               // Add the message and delivery tag into a hashmap that will allow us to ack when
               // we've inserted in base
-              deliveryTable.put(element, delivery.getEnvelope().getDeliveryTag());
+              deliveryTable.put(
+                  element,
+                  DeliveryContext.builder()
+                      .tag(delivery.getEnvelope().getDeliveryTag())
+                      .deliveryChannel(consumerChannel)
+                      .build());
 
               // If we reach a critical mass, we take care of it immediately
               if (queue.size() > this.queueConfig.getMaxSize()) {
@@ -276,7 +281,7 @@ public class BatchQueueService<T> {
       try {
         consumerChannels
             .get(rand.nextInt(consumerChannels.size()))
-            .basicAck(deliveryTable.remove(element), true);
+            .basicAck(deliveryTable.remove(element).getTag(), true);
       } catch (IOException e) {
         log.error(
             String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()),
