@@ -6,22 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.inject.form.InjectBulkProcessingInput;
-import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
-import io.openbas.rest.inject.form.InjectBulkUpdateSupportedFields;
-import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
+import io.openbas.rest.inject.form.*;
+import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
+import io.openbas.rest.tag.TagService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
+import io.openbas.service.UserService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.fixtures.AssetGroupFixture;
@@ -67,6 +66,12 @@ class InjectServiceTest {
   @Mock private InjectMapper injectMapper;
 
   @Mock private InjectUtils injectUtils;
+
+  @Mock private InjectorContractService injectorContractService;
+
+  @Mock private UserService userService;
+
+  @Mock private TagService tagService;
 
   ObjectMapper mapper;
 
@@ -618,5 +623,62 @@ class InjectServiceTest {
     assertEquals(inject, savedStatus.getInject());
     assertEquals(executionStatus, savedStatus.getName());
     assertEquals(statusPayload, savedStatus.getPayloadOutput());
+  }
+
+  @Test
+  void givent_given_inject_without_injectcontent_SHOULD_take_default()
+      throws JsonProcessingException {
+    InjectInput injectInput = new InjectInput();
+    Scenario scenario = new Scenario();
+    String injectorContractId = "injectorContractId";
+    String injectorContractString =
+        """
+  {
+    "fields": [
+      {
+      "type": "defaultValue1",
+      "name": "value1",
+      "defaultValue": "defaultValue1"
+      },
+      {
+      "type": "asset",
+      "name": "value2",
+      "defaultValue": "defaultValue2"
+      }
+    ]
+  }
+""";
+    String injectorContentString =
+        """
+  {
+    "fields": [
+      {
+      "value1": "defaultValue1",
+      "value2": "defaultValue2"
+      }
+    ]
+  }
+""";
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setId(injectorContractId);
+    injectorContract.setContent(injectorContractString);
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode injectorContractJson = (ObjectNode) mapper.readTree(injectorContractString);
+    ObjectNode injectorContentJson = (ObjectNode) mapper.readTree(injectorContentString);
+
+    injectorContract.setConvertedContent(injectorContractJson);
+
+    injectInput.setInjectorContract(injectorContractId);
+    when(injectorContractService.injectorContract(injectorContractId)).thenReturn(injectorContract);
+    when(injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract))
+        .thenReturn(injectorContentJson);
+
+    injectService.createInject(null, scenario, injectInput);
+
+    ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
+    verify(injectRepository).save(injectCaptor.capture());
+    Inject capturedInject = injectCaptor.getValue();
+
+    assertEquals(injectorContentJson, capturedInject.getContent());
   }
 }
