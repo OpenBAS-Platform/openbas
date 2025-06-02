@@ -34,6 +34,10 @@ const useStyles = makeStyles()(theme => ({
     flexWrap: 'wrap',
     marginTop: theme.spacing(1),
   },
+  selectTTPsButton: {
+    marginLeft: 'auto',
+    borderColor: theme.palette.divider,
+  },
 }));
 
 interface Props {
@@ -208,7 +212,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
               variant="outlined"
               color="inherit"
               size="small"
-              style={{ marginLeft: 'auto' }}
+              className={classes.selectTTPsButton}
               onClick={() => setOpenMitreFilterDrawer(true)}
             >
               {t('Select TTPs')}
