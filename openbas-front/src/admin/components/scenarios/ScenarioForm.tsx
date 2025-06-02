@@ -214,7 +214,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
               <FormControlLabel
                 control={(
                   <Checkbox
-                    value={isScenarioAssistantChecked}
+                    checked={isScenarioAssistantChecked}
                     onChange={() => setIsScenarioAssistantChecked(!isScenarioAssistantChecked)}
                   />
                 )}
