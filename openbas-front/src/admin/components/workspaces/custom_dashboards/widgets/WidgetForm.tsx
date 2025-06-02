@@ -12,7 +12,7 @@ import WidgetCreationParameters from './WidgetCreationParameters';
 import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
-import { getAvailableSteps, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -135,16 +135,21 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   const isLastStep = () => activeStep === steps.length - 1;
 
+  const onClose = () => {
+    setActiveStep(editing ? lastStepIndex : 0);
+    toggleDialog();
+  };
+
   const onCancel = () => {
     reset(initialValues);
     setActiveStep(0);
-    toggleDialog();
+    onClose();
   };
 
   const handleSubmitWithoutPropagation = () => {
     handleSubmit((values) => {
       onSubmit(values);
-      toggleDialog();
+      onClose();
     })();
   };
 
@@ -153,7 +158,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       <Dialog
         className="noDrag"
         open={open}
-        handleClose={toggleDialog}
+        handleClose={onClose}
         title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
         actions={(
           <ActionsComponent

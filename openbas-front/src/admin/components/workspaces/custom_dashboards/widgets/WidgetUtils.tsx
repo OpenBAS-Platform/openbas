@@ -7,6 +7,7 @@ import { type HistogramWidget, type Widget, type WidgetInput } from '../../../..
 export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;
 export type StepType = ('type' | 'series' | 'parameters');
 export const steps: StepType[] = ['type', 'series', 'parameters'];
+export const lastStepIndex = steps.length - 1;
 const defaultSteps: StepType[] = ['type', 'series', 'parameters'];
 const defaultModes: HistogramWidget['mode'][] = ['structural', 'temporal'];
 
