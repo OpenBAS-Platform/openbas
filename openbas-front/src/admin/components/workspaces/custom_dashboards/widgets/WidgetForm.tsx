@@ -12,7 +12,7 @@ import WidgetCreationParameters from './WidgetCreationParameters';
 import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
-import { getAvailableSteps, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -136,7 +136,7 @@ const WidgetForm: FunctionComponent<Props> = ({
   const isLastStep = () => activeStep === steps.length - 1;
 
   const onClose = () => {
-    setActiveStep(editing ? 2 : 0);
+    setActiveStep(editing ? lastStepIndex : 0);
     toggleDialog();
   };
 
