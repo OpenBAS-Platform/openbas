@@ -47,7 +47,6 @@ const useStyles = makeStyles()(theme => ({
     display: 'flex',
     justifyContent: 'flex-end',
     padding: theme.spacing(1),
-    // backgroundColor: theme.palette.background.paperInCard,
     height: '55px',
   },
 }));
