@@ -5,7 +5,6 @@ import static org.springframework.util.StringUtils.hasText;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import java.util.Map;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -80,8 +79,6 @@ public class OpenBASConfig {
 
   @JsonProperty("with_proxy")
   private boolean withProxy;
-
-  private Map<String, QueueConfig> queueConfig;
 
   public String getBaseUrlForAgent() {
     return hasText(agentUrl) ? url(agentUrl) : url(baseUrl);

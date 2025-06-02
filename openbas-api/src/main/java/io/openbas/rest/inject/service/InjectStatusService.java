@@ -9,7 +9,6 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
-import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -17,11 +16,9 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -122,131 +119,66 @@ public class InjectStatusService {
     }
   }
 
-  public Inject updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
+  public void updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace = createExecutionTrace(injectStatus, input, agent);
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
-    if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-        && (agent == null || isAllInjectAgentsExecuted(inject))) {
-      updateFinalInjectStatus(injectStatus);
+    synchronized (inject.getId()) {
+      if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
+          && (agent == null || isAllInjectAgentsExecuted(inject))) {
+        updateFinalInjectStatus(injectStatus);
+      }
+
+      injectRepository.save(inject);
     }
-    return inject;
   }
 
-  public void handleInjectExecutionCallbackList(
-      List<InjectExecutionCallback> injectExecutionCallbacks) {
+  public void handleInjectExecutionCallback(
+      String injectId, String agentId, InjectExecutionInput input) {
+    Inject inject = null;
 
-    // Sorting the objects we need to take care of by date
-    List<InjectExecutionCallback> sortedInjectExecutionCallbacks =
-        injectExecutionCallbacks.stream()
-            .sorted(Comparator.comparing(InjectExecutionCallback::getEmissionDate))
-            .toList();
+    try {
+      inject =
+          injectRepository
+              .findById(injectId)
+              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
 
-    // Getting all the injects we need
-    Map<String, Inject> injects =
-        injectRepository
-            .findAllById(
-                sortedInjectExecutionCallbacks.stream()
-                    .map(InjectExecutionCallback::getInjectId)
-                    .filter(Objects::nonNull)
-                    .toList())
-            .stream()
-            .collect(Collectors.toMap(Inject::getId, Function.identity()));
+      Agent agent =
+          (agentId == null)
+              ? null
+              : agentRepository
+                  .findById(agentId)
+                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
 
-    // Getting all the agents we need
-    Map<String, Agent> agents =
-        StreamSupport.stream(
-                agentRepository
-                    .findAllById(
-                        sortedInjectExecutionCallbacks.stream()
-                            .map(InjectExecutionCallback::getAgentId)
-                            .filter(Objects::nonNull)
-                            .toList())
-                    .spliterator(),
-                false)
-            .collect(Collectors.toMap(Agent::getId, Function.identity()));
-
-    // Preparing a list of injects we need to save
-    Set<Inject> injectsToSave = new HashSet<>();
-
-    // For each of the trace
-    for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
-      try {
-        // Getting the inject or throwing an exception
-        Inject inject = injects.get(injectExecutionCallback.getInjectId());
-        if (inject == null) {
-          log.log(Level.SEVERE, "Inject not found: {}", injectExecutionCallback.getInjectId());
-          throw new ElementNotFoundException(
-              String.format("Inject not found: %s", injectExecutionCallback.getInjectId()));
-        }
-
-        // Getting the agent or throwing an exception
-        Agent agent = agents.get(injectExecutionCallback.getAgentId());
-        if (agent == null) {
-          log.log(Level.SEVERE, "Agent not found: {}", injectExecutionCallback.getAgentId());
-          throw new ElementNotFoundException(
-              String.format("Agent not found: %s", injectExecutionCallback.getAgentId()));
-        }
-
-        // -- UPDATE STATUS --
-        injectsToSave.add(
-            updateInjectStatus(agent, inject, injectExecutionCallback.getInjectExecutionInput()));
-
-      } catch (ElementNotFoundException e) {
-        // If we have the inject, we add an error message in it
-        log.log(Level.SEVERE, e.getMessage());
-        Inject inject = injects.get(injectExecutionCallback.getInjectId());
-        if (inject != null) {
-          inject
-              .getStatus()
-              .ifPresent(
-                  status -> {
-                    ExecutionTrace trace =
-                        new ExecutionTrace(
-                            status,
-                            ExecutionTraceStatus.ERROR,
-                            null,
-                            e.getMessage(),
-                            ExecutionTraceAction.COMPLETE,
-                            null,
-                            Instant.now());
-                    status.addTrace(trace);
-                  });
-
-          injectsToSave.add(inject);
-        }
-      }
-    }
-
-    // Saving everything by batch
-    injectRepository.saveAll(injectsToSave.stream().distinct().toList());
-
-    // We're doing another pass to take care of the findings
-    // This might not be optimal but is a bit simpler to handle.
-    // If there are still performance issue, this might be useful to merge these two loops into
-    // one.
-    for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
-
-      // Getting the inject or throwing an exception
-      Inject inject = injects.get(injectExecutionCallback.getInjectId());
-      if (inject == null) {
-        log.log(Level.SEVERE, "Inject not found: {}", injectExecutionCallback.getInjectId());
-        continue;
-      }
-
-      // Getting the agent or throwing an exception
-      Agent agent = agents.get(injectExecutionCallback.getAgentId());
-      if (agent == null) {
-        log.log(Level.SEVERE, "Agent not found: {}", injectExecutionCallback.getAgentId());
-        continue;
-      }
+      // -- UPDATE STATUS --
+      updateInjectStatus(agent, inject, input);
 
       // -- FINDINGS --
-      findingService.computeFindings(
-          injectExecutionCallback.getInjectExecutionInput(), inject, agent);
+      findingService.computeFindings(input, inject, agent);
+
+    } catch (ElementNotFoundException e) {
+      log.log(Level.SEVERE, e.getMessage());
+      if (inject != null) {
+        inject
+            .getStatus()
+            .ifPresent(
+                status -> {
+                  ExecutionTrace trace =
+                      new ExecutionTrace(
+                          status,
+                          ExecutionTraceStatus.ERROR,
+                          null,
+                          e.getMessage(),
+                          ExecutionTraceAction.COMPLETE,
+                          null,
+                          Instant.now());
+                  status.addTrace(trace);
+                });
+        injectRepository.save(inject);
+      }
     }
   }
 
