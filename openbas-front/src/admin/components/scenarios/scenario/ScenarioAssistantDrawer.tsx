@@ -27,6 +27,7 @@ const useStyles = makeStyles()(theme => ({
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing(2),
+    padding: theme.spacing(2, 1),
   },
   titleWithButtonContainer: {
     display: 'flex',
