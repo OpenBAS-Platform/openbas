@@ -580,10 +580,12 @@ class ToolBar extends Component {
           variant="persistent"
           classes={{ paper: paperClass }}
           open={isOpen}
-          PaperProps={{
-            variant: 'elevation',
-            elevation: 1,
-            style: { paddingLeft: navOpen ? 185 : 60 },
+          slotProps={{
+            paper: {
+              variant: 'elevation',
+              elevation: 1,
+              style: { paddingLeft: navOpen ? 185 : 60 },
+            },
           }}
         >
           <Toolbar style={{ minHeight: 54 }} data-testid="opencti-toolbar">
