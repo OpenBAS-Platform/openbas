@@ -10,11 +10,12 @@ import io.openbas.database.model.Tag;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointSimple;
-import jakarta.validation.constraints.NotBlank;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -96,26 +97,5 @@ public class EndpointMapper {
     return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
         .distinct()
         .toArray(String[]::new);
-  }
-
-  public static Endpoint.PLATFORM_TYPE toPlatform(@NotBlank final String platform) {
-    return switch (platform) {
-      case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
-      case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
-      case "Mac" -> Endpoint.PLATFORM_TYPE.MacOS;
-      case "Container" -> Endpoint.PLATFORM_TYPE.Container;
-      case "Service" -> Endpoint.PLATFORM_TYPE.Service;
-      case "Generic" -> Endpoint.PLATFORM_TYPE.Generic;
-      case "Internal" -> Endpoint.PLATFORM_TYPE.Internal;
-      default -> Endpoint.PLATFORM_TYPE.Unknown;
-    };
-  }
-
-  public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
-    return switch (arch) {
-      case "x64", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
-      case "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
-      default -> Endpoint.PLATFORM_ARCH.Unknown;
-    };
   }
 }

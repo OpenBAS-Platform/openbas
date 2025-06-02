@@ -43,6 +43,7 @@ import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -51,6 +52,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -160,7 +162,7 @@ public class MapperService {
   /**
    * Update an ImportMapper object from a MapperUpdateInput one
    *
-   * @param mapperId the id of the mapper that needs to be updated
+   * @param mapperId                the id of the mapper that needs to be updated
    * @param importMapperUpdateInput The input from the call
    * @return The updated ImportMapper
    */
@@ -202,7 +204,7 @@ public class MapperService {
    * Updates rule attributes from a list of input
    *
    * @param ruleAttributesInput the list of rule attributes input
-   * @param ruleAttributes the list of rule attributes to update
+   * @param ruleAttributes      the list of rule attributes to update
    */
   private void updateRuleAttributes(
       List<RuleAttributeUpdateInput> ruleAttributesInput, List<RuleAttribute> ruleAttributes) {
@@ -244,7 +246,7 @@ public class MapperService {
    * Updates a list of inject importers from an input one
    *
    * @param injectImportersInput the input
-   * @param injectImporters the inject importers to update
+   * @param injectImporters      the inject importers to update
    * @param mapInjectorContracts a map of injector contracts by contract id
    */
   private void updateInjectImporter(
@@ -376,31 +378,36 @@ public class MapperService {
     writer.write(exports);
   }
 
-  public void importMappersCsv(MultipartFile file, TargetType targetType) throws IOException {
+  public void importMappersCsv(MultipartFile file, TargetType targetType) throws Exception {
     File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".csv");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
 
-    CSVParser csvParser =
-        new CSVParserBuilder().withSeparator(DEFAULT_SEPARATOR).withIgnoreQuotations(false).build();
+    try {
+      CSVParser csvParser =
+          new CSVParserBuilder().withSeparator(DEFAULT_SEPARATOR).withIgnoreQuotations(false).build();
 
-    CSVReader csvReader =
-        new CSVReaderBuilder(new FileReader(tempFile))
-            .withSkipLines(1)
-            .withCSVParser(csvParser)
-            .build();
+      CSVReader csvReader =
+          new CSVReaderBuilder(new FileReader(tempFile))
+              .withSkipLines(1)
+              .withCSVParser(csvParser)
+              .build();
 
-    switch (targetType) {
-      case ENDPOINTS:
-        try {
-          importEndpointsCsv(setColumMapping(), csvReader);
-        } catch (Exception e) {
-          throw new RuntimeException("Error during export csv ", e);
-        }
-        break;
-      default:
-        throw new BadRequestException(
-            "Target type " + targetType + " for CSV export is not supported");
+      switch (targetType) {
+        case ENDPOINTS:
+          try {
+            importEndpointsCsv(setEndpointsColumnMapping(), csvReader);
+          } catch (Exception e) {
+            throw new RuntimeException("Error during export csv ", e);
+          }
+          break;
+        default:
+          throw new BadRequestException(
+              "Target type " + targetType + " for CSV export is not supported");
+      }
+    } finally {
+      tempFile.delete();
     }
+
   }
 
   public void importEndpointsCsv(
@@ -424,15 +431,18 @@ public class MapperService {
       endpoint.setArch(endpointExportImport.getArch());
       endpoint.setIps(
           EndpointMapper.setIps(
-              objectMapper.readValue(endpointExportImport.getIps(), new TypeReference<>() {})));
+              objectMapper.readValue(endpointExportImport.getIps(), new TypeReference<>() {
+              })));
       endpoint.setMacAddresses(
           EndpointMapper.setMacAddresses(
               objectMapper.readValue(
-                  endpointExportImport.getMacAddresses(), new TypeReference<>() {})));
+                  endpointExportImport.getMacAddresses(), new TypeReference<>() {
+                  })));
 
       List<Tag> tagsForCreation = new ArrayList<>();
       Set<TagExportImport> endpointExportImportTags =
-          objectMapper.readValue(endpointExportImport.getTags(), new TypeReference<>() {});
+          objectMapper.readValue(endpointExportImport.getTags(), new TypeReference<>() {
+          });
       for (TagExportImport tag : endpointExportImportTags) {
         TagCreateInput tagCreateInput = new TagCreateInput();
         tagCreateInput.setName(tag.getName());
@@ -445,12 +455,12 @@ public class MapperService {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private static ColumnPositionMappingStrategy setColumMapping() {
+  private static ColumnPositionMappingStrategy setEndpointsColumnMapping() {
     ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
     strategy.setType(EndpointExportImport.class);
     String[] columns =
-        new String[] {
-          "name", "description", "hostname", "ips", "platform", "arch", "macAddresses", "tags"
+        new String[]{
+            "name", "description", "hostname", "ips", "platform", "arch", "macAddresses", "tags"
         };
     strategy.setColumnMapping(columns);
     return strategy;
@@ -462,7 +472,7 @@ public class MapperService {
             .map(this::createImportMapper)
             .peek(
                 (m) ->
-                    m.setName(m.getName() + " %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX)))
+                    m.setName(m.getName() + " %s" .formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX)))
             .toList());
   }
 }

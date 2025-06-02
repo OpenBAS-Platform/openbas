@@ -31,6 +31,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -38,6 +39,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -67,7 +69,7 @@ public class MapperApi extends RestBehavior {
   public Page<RawPaginationImportMapper> getImportMapper(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-            this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
+        this.importMapperRepository::findAll, searchPaginationInput, ImportMapper.class)
         .map(RawPaginationImportMapper::new);
   }
 
@@ -131,7 +133,8 @@ public class MapperApi extends RestBehavior {
       throws ImportException {
     try {
       mapperService.importMappers(
-          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {}));
+          mapper.readValue(file.getInputStream().readAllBytes(), new TypeReference<>() {
+          }));
     } catch (Exception e) {
       log.severe(e.getMessage());
       throw new ImportException("Mapper import", "Error during import");
@@ -192,11 +195,15 @@ public class MapperApi extends RestBehavior {
   }
 
   // -- IMPORT --
-  @PostMapping("/api/mappers/csv/import")
+  @Operation(description = "Import all datas from a specific target (endpoint,...) through a csv file")
+  @Secured(ROLE_ADMIN)
+  @PostMapping("/api/mappers/import/csv")
+  @LogExecutionTime
   @Transactional(rollbackOn = Exception.class)
-  public void importEndpoints(@RequestPart("file") @NotNull MultipartFile file) throws IOException {
+  public void importEndpoints(@RequestParam TargetType targetType, @RequestPart("file") @NotNull MultipartFile file)
+      throws Exception {
 
-    mapperService.importMappersCsv(file, TargetType.ENDPOINTS);
+    mapperService.importMappersCsv(file, targetType);
   }
 
   private void validateUploadedFile(MultipartFile file) {
