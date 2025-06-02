@@ -270,7 +270,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
               onClick={data => onClickAttackPattern(data)}
               defaultSelectedAttackPatternIds={getValues('attack_pattern_ids') || []}
             />
-            <Paper elevation={2} className={classes.TTPWidgetToolbar}>
+            <Paper elevation={1} className={classes.TTPWidgetToolbar}>
               <Button
                 variant="contained"
                 color="primary"
