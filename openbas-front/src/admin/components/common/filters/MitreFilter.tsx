@@ -130,12 +130,14 @@ interface MitreFilterProps {
   helpers: FilterHelpers;
   onClick: (attackPatternId: string) => void;
   defaultSelectedAttackPatternIds?: string[];
+  className?: string;
 }
 
 const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   helpers,
   onClick,
   defaultSelectedAttackPatternIds = [],
+  className = '',
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -177,7 +179,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   };
 
   return (
-    <div className={classes.container}>
+    <div className={`${classes.container} ${className}`}>
       {sortedKillChainPhases
         .map((killChainPhase: KillChainPhase) => (
           <KillChainPhaseColumn

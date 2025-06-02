@@ -35,6 +35,11 @@ const useStyles = makeStyles<{ topPagination?: boolean }>()((theme, props) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  TTPMitreContainer: {
+    padding: theme.spacing(2),
+    overflow: 'scroll',
+    height: 'calc(100vh - 65px)', // 65px equal to the header height
+  },
 }));
 
 interface Props<T> {
@@ -179,8 +184,16 @@ const PaginationComponentV2 = <T extends object>({
                 handleClose={() => setOpenMitreFilter(false)}
                 title={t('ATT&CK Matrix')}
                 variant="full"
+                containerStyle={{
+                  padding: 0,
+                  maxHeight: '100%',
+                }}
               >
-                <MitreFilter helpers={queryableHelpers.filterHelpers} onClick={() => setOpenMitreFilter(false)} />
+                <MitreFilter
+                  className={classes.TTPMitreContainer}
+                  helpers={queryableHelpers.filterHelpers}
+                  onClick={() => setOpenMitreFilter(false)}
+                />
               </Drawer>
             </>
           )}

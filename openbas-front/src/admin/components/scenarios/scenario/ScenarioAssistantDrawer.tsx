@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Typography } from '@mui/material';
+import { Button, Paper, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -37,6 +37,17 @@ const useStyles = makeStyles()(theme => ({
   selectTTPsButton: {
     marginLeft: 'auto',
     borderColor: theme.palette.divider,
+  },
+  TTPMitreContainer: {
+    padding: theme.spacing(2),
+    overflow: 'scroll',
+    height: 'calc(100vh - 120px)', // 120px equal to the header and footer height
+  },
+  TTPWidgetToolbar: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(1),
+    height: '55px',
   },
 }));
 
@@ -93,6 +104,14 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     formState: { errors, isDirty, isSubmitting },
   } = methods;
 
+  const onCloseMitreDrawer = () => {
+    setOpenMitreFilterDrawer(false);
+  };
+  const onCloseDrawer = () => {
+    reset();
+    onClose();
+  };
+
   // -- Assets
   const assetIds = useWatch({
     control,
@@ -120,12 +139,12 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   // -- Attack patterns
   let selectedAttackPatternIds: Set<string> = new Set();
   let isMitreSelectionChanged = false;
-  const onAttackPatternChange = () => {
-    if (isMitreSelectionChanged) {
-      setValue('attack_pattern_ids', Array.from(selectedAttackPatternIds), { shouldDirty: true });
-      isMitreSelectionChanged = false;
-    }
+
+  const onUpdateAttackPatternWidget = () => {
+    setValue('attack_pattern_ids', Array.from(selectedAttackPatternIds), { shouldDirty: true });
+    onCloseMitreDrawer();
   };
+
   const onClickAttackPattern = (attackPatternId: string) => {
     // Initialize selectedAttackPatternIds
     if (!isMitreSelectionChanged) {
@@ -138,15 +157,6 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
       selectedAttackPatternIds.add(attackPatternId);
     }
     isMitreSelectionChanged = true;
-  };
-
-  const onCloseMitreDrawer = () => {
-    onAttackPatternChange();
-    setOpenMitreFilterDrawer(false);
-  };
-  const onCloseDrawer = () => {
-    reset();
-    onClose();
   };
 
   return (
@@ -240,20 +250,36 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
           handleClose={onCloseMitreDrawer}
           title={t('ATT&CK Matrix')}
           variant="full"
+          containerStyle={{
+            padding: 0,
+            maxHeight: '100%',
+          }}
         >
-          <MitreFilter
-            helpers={{
-              handleSwitchMode: () => {},
-              handleAddFilterWithEmptyValue: (_: Filter) => { },
-              handleAddSingleValueFilter: () => { },
-              handleAddMultipleValueFilter: () => { },
-              handleChangeOperatorFilters: () => { },
-              handleClearAllFilters: () => { },
-              handleRemoveFilterByKey: () => { },
-            }}
-            onClick={data => onClickAttackPattern(data)}
-            defaultSelectedAttackPatternIds={getValues('attack_pattern_ids') || []}
-          />
+          <>
+            <MitreFilter
+              className={classes.TTPMitreContainer}
+              helpers={{
+                handleSwitchMode: () => {},
+                handleAddFilterWithEmptyValue: (_: Filter) => { },
+                handleAddSingleValueFilter: () => { },
+                handleAddMultipleValueFilter: () => { },
+                handleChangeOperatorFilters: () => { },
+                handleClearAllFilters: () => { },
+                handleRemoveFilterByKey: () => { },
+              }}
+              onClick={data => onClickAttackPattern(data)}
+              defaultSelectedAttackPatternIds={getValues('attack_pattern_ids') || []}
+            />
+            <Paper elevation={1} className={classes.TTPWidgetToolbar}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onUpdateAttackPatternWidget}
+              >
+                {t('Update')}
+              </Button>
+            </Paper>
+          </>
         </Drawer>
       </FormProvider>
     </Drawer>
