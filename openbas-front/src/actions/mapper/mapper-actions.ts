@@ -61,6 +61,16 @@ export const exportMapper = (input: ExportMapperInput) => {
   });
 };
 
+export const exportCsvMapper = (targetType: string, searchPaginationInput: SearchPaginationInput | undefined) => {
+  const uri = `${XLS_MAPPER_URI}/export/csv?targetType=` + targetType;
+  return simplePostCall(uri, searchPaginationInput).then((response) => {
+    return {
+      data: response.data,
+      filename: response.headers['content-disposition'].split('filename=')[1],
+    };
+  });
+};
+
 export const importMapper = (formData: FormData) => {
   const uri = `${XLS_MAPPER_URI}/import`;
   return simplePostCall(uri, formData);

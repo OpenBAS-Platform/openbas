@@ -1,38 +1,78 @@
 package io.openbas.service;
 
+import static com.opencsv.ICSVWriter.*;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
+import static java.io.File.createTempFile;
+import static java.time.Instant.now;
 import static java.util.stream.StreamSupport.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
+import io.openbas.rest.asset.endpoint.form.EndpointExportImport;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.rest.tag.TagService;
+import io.openbas.rest.tag.form.TagCreateInput;
+import io.openbas.rest.tag.form.TagExportImport;
+import io.openbas.service.utils.CustomColumnPositionStrategy;
 import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
+import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.TargetType;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
 public class MapperService {
 
   private final ImportMapperRepository importMapperRepository;
-
   private final InjectorContractRepository injectorContractRepository;
+  private final EndpointRepository endpointRepository;
+  private final EndpointService endpointService;
+
+  private final TagService tagService;
+  private final ObjectMapper objectMapper;
 
   /**
    * Create and save an ImportMapper object from a MapperAddInput one
@@ -276,6 +316,172 @@ public class MapperService {
     objectMapper.addMixIn(RuleAttribute.class, MapperExportMixins.RuleAttribute.class);
 
     return objectMapper.writeValueAsString(mappersList);
+  }
+
+  /**
+   * Export CSV with options and return the file
+   *
+   * @param targetType used to know which entity list we want to export
+   * @param input used to know which filter we want to apply to get the entity list to export
+   * @param response used to return the file
+   */
+  public void exportMappersCsv(
+      TargetType targetType, SearchPaginationInput input, HttpServletResponse response) {
+    switch (targetType) {
+      case ENDPOINTS:
+        try {
+          List<EndpointExportImport> endpointsToExport = getEndpointsToExport(input);
+          String dateNow = DateTimeFormatter.ofPattern("yyyyMMddHHmm").format(LocalDateTime.now());
+          exportCsv(
+              response,
+              "Endpoints" + dateNow + ".csv",
+              endpointsToExport,
+              EndpointExportImport.class);
+        } catch (Exception e) {
+          throw new RuntimeException("Error during export csv ", e);
+        }
+        break;
+      default:
+        throw new BadRequestException(
+            "Target type " + targetType + " for CSV export is not supported");
+    }
+  }
+
+  private List<EndpointExportImport> getEndpointsToExport(SearchPaginationInput input)
+      throws JsonProcessingException {
+    Specification<Endpoint> filterSpecifications = computeFilterGroupJpa(input.getFilterGroup());
+    filterSpecifications = filterSpecifications.and(computeSearchJpa(input.getTextSearch()));
+    List<Endpoint> endpointsToProcess = endpointRepository.findAll(filterSpecifications);
+    List<EndpointExportImport> exports = new ArrayList<>();
+    EndpointExportImport endpointExport;
+    for (Endpoint endpoint : endpointsToProcess) {
+      endpointExport = new EndpointExportImport();
+      endpointExport.setName(endpoint.getName());
+      endpointExport.setDescription(endpoint.getDescription());
+      endpointExport.setHostname(endpoint.getHostname());
+      endpointExport.setIps(objectMapper.writeValueAsString(endpoint.getIps()));
+      endpointExport.setMacAddresses(objectMapper.writeValueAsString(endpoint.getMacAddresses()));
+      endpointExport.setPlatform(endpoint.getPlatform());
+      endpointExport.setArch(endpoint.getArch());
+      endpointExport.setTags(
+          objectMapper.writeValueAsString(
+              endpoint.getTags().stream()
+                  .map(tag -> new TagExportImport(tag.getName(), tag.getColor()))
+                  .collect(Collectors.toSet())));
+      exports.add(endpointExport);
+    }
+    return exports;
+  }
+
+  private static <T> void exportCsv(
+      HttpServletResponse response, String filename, List<T> exports, Class<T> exportClass)
+      throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+    response.setContentType("text/csv");
+    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+    response.setStatus(HttpServletResponse.SC_OK);
+    CustomColumnPositionStrategy<T> columns = new CustomColumnPositionStrategy();
+    columns.setType(exportClass);
+    StatefulBeanToCsv<T> writer =
+        new StatefulBeanToCsvBuilder<T>(response.getWriter())
+            .withQuotechar(DEFAULT_QUOTE_CHARACTER)
+            .withSeparator(DEFAULT_SEPARATOR)
+            .withMappingStrategy(columns)
+            .build();
+    writer.write(exports);
+  }
+
+  /**
+   * Import CSV with options
+   *
+   * @param file file to import
+   * @param targetType entity to know which columns format we use for the import
+   * @throws Exception exception if problem during the import
+   */
+  public void importMappersCsv(MultipartFile file, TargetType targetType) throws Exception {
+    File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".csv");
+    FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+
+    try {
+      CSVParser csvParser =
+          new CSVParserBuilder()
+              .withSeparator(DEFAULT_SEPARATOR)
+              .withIgnoreQuotations(false)
+              .build();
+
+      CSVReader csvReader =
+          new CSVReaderBuilder(new FileReader(tempFile))
+              .withSkipLines(1)
+              .withCSVParser(csvParser)
+              .build();
+
+      switch (targetType) {
+        case ENDPOINTS:
+          try {
+            importEndpointsCsv(setEndpointsColumnMapping(), csvReader);
+          } catch (Exception e) {
+            throw new RuntimeException("Error during export csv ", e);
+          }
+          break;
+        default:
+          throw new BadRequestException(
+              "Target type " + targetType + " for CSV export is not supported");
+      }
+    } finally {
+      tempFile.delete();
+    }
+  }
+
+  private void importEndpointsCsv(
+      ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
+      throws JsonProcessingException {
+
+    CsvToBean csv = new CsvToBean();
+    csv.setCsvReader(csvReader);
+    csv.setMappingStrategy(columnPositionMappingStrategy);
+
+    List list = csv.parse();
+
+    for (Object object : list) {
+      EndpointExportImport endpointExportImport = (EndpointExportImport) object;
+
+      Endpoint endpoint = new Endpoint();
+      endpoint.setName(endpointExportImport.getName());
+      endpoint.setDescription(endpointExportImport.getDescription());
+      endpoint.setHostname(endpointExportImport.getHostname());
+      endpoint.setPlatform(endpointExportImport.getPlatform());
+      endpoint.setArch(endpointExportImport.getArch());
+      endpoint.setIps(
+          EndpointMapper.setIps(
+              objectMapper.readValue(endpointExportImport.getIps(), new TypeReference<>() {})));
+      endpoint.setMacAddresses(
+          EndpointMapper.setMacAddresses(
+              objectMapper.readValue(
+                  endpointExportImport.getMacAddresses(), new TypeReference<>() {})));
+
+      List<Tag> tagsForCreation = new ArrayList<>();
+      Set<TagExportImport> endpointExportImportTags =
+          objectMapper.readValue(endpointExportImport.getTags(), new TypeReference<>() {});
+      for (TagExportImport tag : endpointExportImportTags) {
+        TagCreateInput tagCreateInput = new TagCreateInput();
+        tagCreateInput.setName(tag.getName());
+        tagCreateInput.setColor(tag.getColor());
+        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput));
+      }
+      endpoint.setTags(iterableToSet(tagsForCreation));
+      endpointService.createEndpoint(endpoint);
+    }
+  }
+
+  private static ColumnPositionMappingStrategy<EndpointExportImport> setEndpointsColumnMapping() {
+    ColumnPositionMappingStrategy<EndpointExportImport> strategy =
+        new ColumnPositionMappingStrategy<>();
+    strategy.setType(EndpointExportImport.class);
+    String[] columns =
+        new String[] {
+          "name", "description", "hostname", "ips", "platform", "arch", "macAddresses", "tags"
+        };
+    strategy.setColumnMapping(columns);
+    return strategy;
   }
 
   public void importMappers(List<ImportMapperAddInput> mappers) {
