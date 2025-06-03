@@ -39,6 +39,7 @@ public class BatchQueueService<T> {
   private final ShutdownListener shutdownListener;
 
   private final List<Channel> consumerChannels = new ArrayList<>();
+  private final Random rand = new Random();
 
   /**
    * Public constructor of the BatchQueueService
