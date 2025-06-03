@@ -47,6 +47,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -316,13 +318,25 @@ public class MapperService {
     return objectMapper.writeValueAsString(mappersList);
   }
 
+  /**
+   * Export CSV with options and return the file
+   *
+   * @param targetType used to know which entity list we want to export
+   * @param input used to know which filter we want to apply to get the entity list to export
+   * @param response used to return the file
+   */
   public void exportMappersCsv(
       TargetType targetType, SearchPaginationInput input, HttpServletResponse response) {
     switch (targetType) {
       case ENDPOINTS:
         try {
           List<EndpointExportImport> endpointsToExport = getEndpointsToExport(input);
-          exportCsv(response, "Endpoints.csv", endpointsToExport, EndpointExportImport.class);
+          String dateNow = DateTimeFormatter.ofPattern("yyyyMMddHHmm").format(LocalDateTime.now());
+          exportCsv(
+              response,
+              "Endpoints" + dateNow + ".csv",
+              endpointsToExport,
+              EndpointExportImport.class);
         } catch (Exception e) {
           throw new RuntimeException("Error during export csv ", e);
         }
@@ -376,6 +390,13 @@ public class MapperService {
     writer.write(exports);
   }
 
+  /**
+   * Import CSV with options
+   *
+   * @param file file to import
+   * @param targetType entity to know which columns format we use for the import
+   * @throws Exception exception if problem during the import
+   */
   public void importMappersCsv(MultipartFile file, TargetType targetType) throws Exception {
     File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".csv");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
@@ -410,7 +431,7 @@ public class MapperService {
     }
   }
 
-  public void importEndpointsCsv(
+  private void importEndpointsCsv(
       ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
       throws JsonProcessingException {
 
@@ -451,9 +472,9 @@ public class MapperService {
     }
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  private static ColumnPositionMappingStrategy setEndpointsColumnMapping() {
-    ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+  private static ColumnPositionMappingStrategy<EndpointExportImport> setEndpointsColumnMapping() {
+    ColumnPositionMappingStrategy<EndpointExportImport> strategy =
+        new ColumnPositionMappingStrategy<>();
     strategy.setType(EndpointExportImport.class);
     String[] columns =
         new String[] {

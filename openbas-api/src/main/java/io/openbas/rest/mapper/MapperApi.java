@@ -115,7 +115,7 @@ public class MapperApi extends RestBehavior {
   }
 
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
-  @Secured(ROLE_ADMIN)
+  @Secured(ROLE_USER)
   @PostMapping(value = "/api/mappers/export/csv")
   @LogExecutionTime
   public void exportMappersCsv(
@@ -194,7 +194,7 @@ public class MapperApi extends RestBehavior {
   // -- IMPORT --
   @Operation(
       description = "Import all datas from a specific target (endpoint,...) through a csv file")
-  @Secured(ROLE_ADMIN)
+  @Secured(ROLE_USER)
   @PostMapping("/api/mappers/import/csv")
   @LogExecutionTime
   @Transactional(rollbackOn = Exception.class)
