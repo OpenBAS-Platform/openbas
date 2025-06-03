@@ -13,8 +13,9 @@ logger.error = (msg, options) => {
 const basePath = '';
 
 const backProxy = () => ({
-  target: 'http://localhost:8080',
+  target: 'https://root.obas.lan:8080',
   changeOrigin: true,
+  secure: false,
   ws: true,
 });
 
@@ -130,6 +131,7 @@ export default ({ mode }: { mode: string }) => {
         '/oauth2': backProxy(),
         '/saml2': backProxy(),
       },
+      https: { pfx: '/home/antoinemzs/.local/share/pki001/pki/private/root.obas.lan.p12' },
     },
   });
 };
