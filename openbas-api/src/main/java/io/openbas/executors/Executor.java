@@ -56,20 +56,20 @@ public class Executor {
 
   private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector) {
     Inject inject = executableInject.getInjection().getInject();
-    log.log(Level.SEVERE, "executeInternal 1: " + inject.getId());
+    log.log(Level.INFO, "executeInternal 1: " + inject.getId());
     io.openbas.executors.Injector executor =
         this.context.getBean(injector.getType(), io.openbas.executors.Injector.class);
-    log.log(Level.SEVERE, "executeInternal 2: " + inject.getId());
+    log.log(Level.INFO, "executeInternal 2: " + inject.getId());
     Execution execution = executor.executeInjection(executableInject);
-    log.log(Level.SEVERE, "executeInternal 3: " + inject.getId());
+    log.log(Level.INFO, "executeInternal 3: " + inject.getId());
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
     InjectStatus injectStatus =
         this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
-    log.log(Level.SEVERE, "executeInternal 4: " + inject.getId());
+    log.log(Level.INFO, "executeInternal 4: " + inject.getId());
     InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
-    log.log(Level.SEVERE, "executeInternal 5: " + inject.getId());
+    log.log(Level.INFO, "executeInternal 5: " + inject.getId());
     return injectStatusRepository.save(completeStatus);
   }
 
