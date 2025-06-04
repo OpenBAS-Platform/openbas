@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @deprecated since 1.18.0, forRemoval = true
- * @see
+ * @see ScenarioInjectTestApi, SimulationInjectTestApi
  */
 @RestController
 @PreAuthorize("isAdmin()")

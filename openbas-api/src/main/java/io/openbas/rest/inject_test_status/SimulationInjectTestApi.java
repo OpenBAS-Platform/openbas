@@ -55,8 +55,7 @@ public class SimulationInjectTestApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{simulationId}/injects/{injectId}/test")
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   public InjectTestStatusOutput testInject(
-      @PathVariable @NotBlank String simulationId,
-      @PathVariable @NotBlank String injectId) {
+      @PathVariable @NotBlank String simulationId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
@@ -70,7 +69,7 @@ public class SimulationInjectTestApi extends RestBehavior {
   @DeleteMapping(EXERCISE_URI + "/{simulationId}/injects/test/{testId}")
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   public void deleteInjectTest(
-      @PathVariable @NotBlank String simulationId,@PathVariable String testId) {
+      @PathVariable @NotBlank String simulationId, @PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
   }
 
