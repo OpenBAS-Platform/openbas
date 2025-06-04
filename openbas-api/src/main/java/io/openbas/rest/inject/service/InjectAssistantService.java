@@ -6,6 +6,7 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.inject.form.InjectAssistantInput;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.service.AssetGroupService;
@@ -54,10 +55,14 @@ public class InjectAssistantService {
         .getAttackPatternIds()
         .forEach(
             attackPatternId -> {
-              List<Inject> injectsToAdd =
-                  this.generateInjectsByTTP(
-                      attackPatternId, endpoints, assetGroups, input.getInjectByTTPNumber());
-              injects.addAll(injectsToAdd);
+              try {
+                List<Inject> injectsToAdd =
+                    this.generateInjectsByTTP(
+                        attackPatternId, endpoints, assetGroups, input.getInjectByTTPNumber());
+                injects.addAll(injectsToAdd);
+              } catch (UnprocessableContentException e) {
+                throw new UnsupportedOperationException(e);
+              }
             });
 
     for (Inject inject : injects) {
@@ -245,9 +250,9 @@ public class InjectAssistantService {
       }
     }
     String architecture =
-        architectures.size() > 1
-            ? Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES.name()
-            : architectures.iterator().next();
+        architectures.size() == 1
+            ? architectures.iterator().next()
+            : Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES.name();
 
     return knownInjectorContracts.stream()
         .filter(
@@ -317,6 +322,10 @@ public class InjectAssistantService {
         this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream()
             .map(Endpoint.class::cast)
             .toList();
+    if (assetsFromGroup.isEmpty()) {
+      // No endpoints in the asset group, return empty result
+      return new ContractResultForAssetGroup(Collections.emptyList(), "");
+    }
     Map<String, List<Endpoint>> groupedAssets =
         this.groupEndpointsByPlatformAndArchitecture(assetsFromGroup);
 
@@ -369,6 +378,9 @@ public class InjectAssistantService {
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
+    if (endpoints.isEmpty()) {
+      return;
+    }
     ContractResultForEndpoints endpointResults =
         getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
 
@@ -456,7 +468,8 @@ public class InjectAssistantService {
       String attackPatternId,
       List<Endpoint> endpoints,
       List<AssetGroup> assetGroups,
-      Integer injectNumberByTTP) {
+      Integer injectNumberByTTP)
+      throws UnprocessableContentException {
     // Check if attack pattern exist
     AttackPattern attackPattern =
         this.attackPatternRepository
@@ -502,7 +515,12 @@ public class InjectAssistantService {
         manualInjectMap,
         knownInjectorContracts);
 
-    return Stream.concat(contractInjectMap.values().stream(), manualInjectMap.values().stream())
-        .toList();
+    List<Inject> injects =
+        Stream.concat(contractInjectMap.values().stream(), manualInjectMap.values().stream())
+            .toList();
+    if (injects.isEmpty()) {
+      throw new UnprocessableContentException("No target found");
+    }
+    return injects;
   }
 }
