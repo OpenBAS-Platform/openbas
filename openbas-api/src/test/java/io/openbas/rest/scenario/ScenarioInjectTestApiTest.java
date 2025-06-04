@@ -1,5 +1,6 @@
 package io.openbas.rest.scenario;
 
+import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -79,7 +80,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       SearchPaginationInput searchPaginationInput = new SearchPaginationInput();
       String response =
           mvc.perform(
-                  post("/api/scenarios/{scenarioId}/injects/test/search", scenario.getId())
+                  post(SCENARIO_URI + "/{scenarioId}/injects/test/search", scenario.getId())
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(asJsonString(searchPaginationInput)))
               .andExpect(status().isOk())
@@ -96,7 +97,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     @Test
     @DisplayName("Should return test status using test id")
     void should_return_test_status_by_testId() throws Exception {
-      mvc.perform(get("/api/scenarios/injects/test/{testId}", scenario.getId(), inject1.getId()))
+      mvc.perform(get(SCENARIO_URI + "/injects/test/{testId}", scenario.getId(), inject1.getId()))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.inject_id").value(inject1.getId()));
     }
@@ -106,7 +107,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_test_status_when_testing_specific_inject() throws Exception {
       mvc.perform(
               get(
-                  "/api/scenarios/{scenarioId}/injects/{injectId}/test",
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
                   scenario.getId(),
                   inject1.getId()))
           .andExpect(status().isOk())
@@ -121,7 +122,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       input.setSimulationOrScenarioId(scenario.getId());
 
       mvc.perform(
-              post("/api/scenarios/{scenarioId}/injects/{injectId}/test", scenario.getId())
+              post(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test", scenario.getId())
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(input)))
           .andExpect(status().isOk())
@@ -133,7 +134,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_404_when_fetching_deleted_inject_test_status() throws Exception {
       mvc.perform(
               delete(
-                  "/api/scenarios/{scenarioId}/injects/test/{testId}",
+                  SCENARIO_URI + "/{scenarioId}/injects/test/{testId}",
                   scenario.getId(),
                   injectTestStatus2.getId()))
           .andExpect(status().isOk());
@@ -153,7 +154,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_200_when_search_paginated_results() throws Exception {
       SearchPaginationInput searchPaginationInput = new SearchPaginationInput();
       mvc.perform(
-              post("/api/scenarios/{scenarioId}/injects/test/search", scenario.getId())
+              post(SCENARIO_URI + "/{scenarioId}/injects/test/search", scenario.getId())
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(searchPaginationInput)))
           .andExpect(status().isOk());
@@ -162,7 +163,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     @Test
     @DisplayName("Should return 200 when search by id")
     void should_return_200_when_search_by_testId() throws Exception {
-      mvc.perform(get("/api/scenarios/injects/test/{testId}", scenario.getId(), inject1.getId()))
+      mvc.perform(get(SCENARIO_URI + "/injects/test/{testId}", scenario.getId(), inject1.getId()))
           .andExpect(status().isOk());
     }
 
@@ -171,7 +172,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_403_when_testing_specific_inject() throws Exception {
       mvc.perform(
               get(
-                  "/api/scenarios/{scenarioId}/injects/{injectId}/test",
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
                   scenario.getId(),
                   inject1.getId()))
           .andExpect(status().isForbidden());
@@ -185,7 +186,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       input.setSimulationOrScenarioId(scenario.getId());
 
       mvc.perform(
-              post("/api/scenarios/{scenarioId}/injects/{injectId}/test", scenario.getId())
+              post(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test", scenario.getId())
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(input)))
           .andExpect(status().isForbidden());
@@ -196,7 +197,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_403_when_fetching_deleted_inject_test_status() throws Exception {
       mvc.perform(
               delete(
-                  "/api/scenarios/{scenarioId}/injects/test/{testId}",
+                  SCENARIO_URI + "/{scenarioId}/injects/test/{testId}",
                   scenario.getId(),
                   injectTestStatus2.getId()))
           .andExpect(status().isForbidden());
