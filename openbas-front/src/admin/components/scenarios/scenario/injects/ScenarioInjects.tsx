@@ -15,7 +15,7 @@ import { useHelper } from '../../../../../store';
 import { type Scenario } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { ArticleContext, InjectTestContext, InjectTestContextType, TeamContext, ViewModeContext } from '../../../common/Context';
+import { ArticleContext, InjectTestContext, type InjectTestContextType, TeamContext, ViewModeContext } from '../../../common/Context';
 import Injects from '../../../common/injects/Injects';
 import articleContextForScenario from '../articles/articleContextForScenario';
 import teamContextForScenario from '../teams/teamContextForScenario';
@@ -56,20 +56,18 @@ const ScenarioInjects: FunctionComponent = () => {
     setViewMode(mode);
     localStorage.setItem('scenario_or_exercise_view_mode', mode);
   };
-  const injectTestContext: InjectTestContextType =
-    {
+  const injectTestContext: InjectTestContextType
+    = {
       contextId: scenarioId,
       url: `/admin/scenarios/${scenarioId}/tests/`,
       testInject: testInject,
     };
 
-
   return (
     <ViewModeContext.Provider value={viewMode}>
       <ArticleContext.Provider value={articleContext}>
         <TeamContext.Provider value={teamContext}>
-          <InjectTestContext.Provider value={injectTestContext}
-          >
+          <InjectTestContext.Provider value={injectTestContext}>
             <Injects
               teams={teams}
               articles={articles}

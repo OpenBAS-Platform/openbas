@@ -17,7 +17,7 @@ import { useHelper } from '../../../../../store';
 import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { ArticleContext, InjectTestContext, InjectTestContextType, TeamContext, ViewModeContext } from '../../../common/Context';
+import { ArticleContext, InjectTestContext, type InjectTestContextType, TeamContext, ViewModeContext } from '../../../common/Context';
 import InjectDistributionByTeam from '../../../common/injects/InjectDistributionByTeam';
 import InjectDistributionByType from '../../../common/injects/InjectDistributionByType';
 import Injects from '../../../common/injects/Injects';
@@ -79,8 +79,7 @@ const ExerciseInjects: FunctionComponent = () => {
     contextId: exerciseId,
     url:
       `/admin/simulations/${exerciseId}/tests/`,
-    testInject:
-    testInject,
+    testInject: testInject,
   };
 
   return (
@@ -88,8 +87,7 @@ const ExerciseInjects: FunctionComponent = () => {
       {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
-            <InjectTestContext.Provider value={injectTestContext}
-            >
+            <InjectTestContext.Provider value={injectTestContext}>
               <Injects
                 setViewMode={handleViewMode}
                 availableButtons={availableButtons}

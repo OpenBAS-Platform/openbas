@@ -35,26 +35,28 @@ public class SimulationInjectTestApi extends RestBehavior {
    * @deprecated since 1.16.0, forRemoval = true
    * @see #findExercisePageInjectTests
    */
-  @PostMapping("/api/exercise/{exerciseId}/injects/test")
+  @PostMapping("/api/exercise/{simulationId}/injects/test")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
-      @PathVariable @NotBlank String exerciseId,
+      @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByExerciseId(
-        exerciseId, searchPaginationInput);
+        simulationId, searchPaginationInput);
   }
 
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test/search")
+  @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test/search")
   public Page<InjectTestStatusOutput> findExercisePageInjectTests(
-      @PathVariable @NotBlank String exerciseId,
+      @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByExerciseId(
-        exerciseId, searchPaginationInput);
+        simulationId, searchPaginationInput);
   }
 
   @Transactional(rollbackFor = Exception.class)
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/test")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
+  @GetMapping(EXERCISE_URI + "/{simulationId}/injects/{injectId}/test")
+  @PreAuthorize("isSimulationPlanner(#simulationId)")
+  public InjectTestStatusOutput testInject(
+      @PathVariable @NotBlank String simulationId,
+      @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
@@ -65,9 +67,10 @@ public class SimulationInjectTestApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/test/{testId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public void deleteInjectTest(@PathVariable String testId) {
+  @DeleteMapping(EXERCISE_URI + "/{simulationId}/injects/test/{testId}")
+  @PreAuthorize("isSimulationPlanner(#simulationId)")
+  public void deleteInjectTest(
+      @PathVariable @NotBlank String simulationId,@PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
   }
 
@@ -75,10 +78,11 @@ public class SimulationInjectTestApi extends RestBehavior {
       description = "Bulk tests of injects",
       tags = {"Injects", "Tests"})
   @Transactional(rollbackFor = Exception.class)
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test")
+  @PreAuthorize("isSimulationPlanner(#simulationId)")
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
+      @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs

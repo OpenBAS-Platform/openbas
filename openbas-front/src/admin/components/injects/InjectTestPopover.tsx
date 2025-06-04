@@ -47,11 +47,10 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
     if (deleteInjectTest) {
-      deleteInjectTest(contextId, injectTest.status_id).then(() => {
-        if (onDelete) {
-          onDelete(injectTest.status_id!);
-        }
-      });
+      deleteInjectTest(contextId, injectTest.status_id);
+      if (onDelete) {
+        onDelete(injectTest.status_id!);
+      }
     }
     handleCloseDelete();
   };
