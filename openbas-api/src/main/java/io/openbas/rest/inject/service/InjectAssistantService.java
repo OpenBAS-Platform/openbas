@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -56,10 +55,14 @@ public class InjectAssistantService {
         .getAttackPatternIds()
         .forEach(
             attackPatternId -> {
-              List<Inject> injectsToAdd =
-                  this.generateInjectsByTTP(
-                      attackPatternId, endpoints, assetGroups, input.getInjectByTTPNumber());
-              injects.addAll(injectsToAdd);
+              try {
+                List<Inject> injectsToAdd =
+                    this.generateInjectsByTTP(
+                        attackPatternId, endpoints, assetGroups, input.getInjectByTTPNumber());
+                injects.addAll(injectsToAdd);
+              } catch (UnprocessableContentException e) {
+                throw new UnsupportedOperationException(e);
+              }
             });
 
     for (Inject inject : injects) {
@@ -461,12 +464,12 @@ public class InjectAssistantService {
    * @param injectNumberByTTP the maximum number of injects to create for each TTP
    * @return a list of generated injects
    */
-  @SneakyThrows
   private List<Inject> generateInjectsByTTP(
       String attackPatternId,
       List<Endpoint> endpoints,
       List<AssetGroup> assetGroups,
-      Integer injectNumberByTTP) {
+      Integer injectNumberByTTP)
+      throws UnprocessableContentException {
     // Check if attack pattern exist
     AttackPattern attackPattern =
         this.attackPatternRepository
