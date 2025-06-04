@@ -9874,7 +9874,7 @@ __metadata:
     react-intl: "npm:7.1.11"
     react-markdown: "npm:10.1.0"
     react-redux: "npm:9.2.0"
-    react-router: "npm:7.6.0"
+    react-router: "npm:7.6.2"
     react-syntax-highlighter: "npm:15.6.1"
     redux: "npm:5.0.1"
     redux-thunk: "npm:3.1.0"
@@ -10685,9 +10685,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:7.6.0":
-  version: 7.6.0
-  resolution: "react-router@npm:7.6.0"
+"react-router@npm:7.6.2":
+  version: 7.6.2
+  resolution: "react-router@npm:7.6.2"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -10697,7 +10697,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/abc4d37c01804a3137b1cfd12cf7e55bff092a67c835404ab9da1411ec9e170fe72773b9846d2db084cc0272179237e59d88dbf46cef9db031892feebcb48640
+  checksum: 10c0/c8ef65f2a378f38e3cba900d67fa2b80a41c1c3925102875ee07c12faa01ea40991cb3fbefaf3ff6914e724c755732e3d7dec2b1bdef09e0fddd00fccc85a06a
   languageName: node
   linkType: hard
 
