@@ -1,8 +1,9 @@
 import { type FunctionComponent } from 'react';
 import { useParams } from 'react-router';
 
-import { fetchInjectTestStatus, searchScenarioInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
+import { fetchInjectTestStatus, searchInjectTests } from '../../../../../actions/inject_test/scenario-inject-test-actions';
 import { type InjectTestStatusOutput, type Scenario } from '../../../../../utils/api-types';
+import { InjectTestContext } from '../../../common/Context';
 import InjectTestList from '../../../injects/InjectTestList';
 
 const ScenarioTests: FunctionComponent = () => {
@@ -12,7 +13,14 @@ const ScenarioTests: FunctionComponent = () => {
   };
 
   return (
-    <InjectTestList searchInjectTests={searchScenarioInjectTests} searchInjectTest={fetchInjectTestStatus} exerciseOrScenarioId={scenarioId} statusId={statusId} />
+    <InjectTestContext.Provider value={{
+      contextId: scenarioId,
+      fetchInjectTestStatus: fetchInjectTestStatus,
+      searchInjectTests: searchInjectTests,
+    }}
+    >
+      <InjectTestList statusId={statusId} />
+    </InjectTestContext.Provider>
   );
 };
 

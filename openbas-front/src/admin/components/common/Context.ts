@@ -3,38 +3,7 @@ import { createContext, type ReactElement } from 'react';
 import { type FullArticleStore } from '../../../actions/channels/Article';
 import { type InjectOutputType, type InjectStore } from '../../../actions/injects/Inject';
 import { type Page } from '../../../components/common/queryable/Page';
-import {
-  type Article,
-  type ArticleCreateInput,
-  type ArticleUpdateInput,
-  type Evaluation,
-  type EvaluationInput,
-  type ImportTestSummary,
-  type Inject,
-  type InjectBulkProcessingInput,
-  type InjectBulkUpdateInputs,
-  type InjectsImportInput, type InjectTestStatusOutput,
-  type LessonsAnswer,
-  type LessonsAnswerCreateInput,
-  type LessonsCategory,
-  type LessonsCategoryCreateInput,
-  type LessonsCategoryTeamsInput,
-  type LessonsCategoryUpdateInput,
-  type LessonsQuestion,
-  type LessonsQuestionCreateInput,
-  type LessonsQuestionUpdateInput,
-  type LessonsSendInput,
-  type Objective,
-  type ObjectiveInput, type PublicExercise, type PublicScenario,
-  type Report,
-  type ReportInput,
-  type SearchPaginationInput,
-  type Team,
-  type TeamCreateInput,
-  type TeamOutput,
-  type Variable,
-  type VariableInput,
-} from '../../../utils/api-types';
+import { type Article, type ArticleCreateInput, type ArticleUpdateInput, type Evaluation, type EvaluationInput, type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestStatusOutput, type LessonsAnswer, type LessonsAnswerCreateInput, type LessonsCategory, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestion, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type Objective, type ObjectiveInput, type PublicExercise, type PublicScenario, type Report, type ReportInput, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput, type Variable, type VariableInput } from '../../../utils/api-types';
 import { type UserStore } from '../teams/players/Player';
 
 export type PermissionsContextType = {
@@ -58,6 +27,16 @@ export type PreviewChallengeContextType = {
   linkToPlayerMode: string;
   linkToAdministrationMode: string;
   scenarioOrExercise: PublicScenario | PublicExercise | undefined;
+};
+
+export type InjectTestContextType = {
+  contextId: string;
+  url?: string;
+  searchInjectTests?: (scenarioId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
+  fetchInjectTestStatus?: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
+  testInject?: (scenarioId: string, injectId: string) => Promise<{ data: InjectTestStatusOutput }>;
+  bulkTestInjects?: (scenarioId: string, data: InjectBulkProcessingInput) => Promise<InjectTestStatusOutput[]>;
+  deleteInjectTest?: (scenarioId: string, testId: string) => void;
 };
 
 export type DocumentContextType = {
@@ -204,6 +183,16 @@ export const PreviewChallengeContext = createContext<PreviewChallengeContextType
     name: '',
   },
 });
+
+export const InjectTestContext = createContext<InjectTestContextType>({
+  contextId: '',
+  url: '',
+  searchInjectTests: undefined,
+  fetchInjectTestStatus: undefined,
+  testInject: undefined,
+  bulkTestInjects: undefined,
+  deleteInjectTest: undefined,
+});
 export const DocumentContext = createContext<DocumentContextType>({
   onInitDocument(): {
     document_tags: {
@@ -258,7 +247,8 @@ export const TeamContext = createContext<TeamContextType>({
 });
 export const InjectContext = createContext<InjectContextType>({
   injects: [],
-  setInjects: () => {},
+  setInjects: () => {
+  },
   searchInjects(_: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
     return new Promise<{ data: Page<InjectOutputType> }>(() => {
     });

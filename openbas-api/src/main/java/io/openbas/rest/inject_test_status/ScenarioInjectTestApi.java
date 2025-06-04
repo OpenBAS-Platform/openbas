@@ -31,7 +31,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
   private final InjectTestStatusService injectTestStatusService;
   private final InjectService injectService;
 
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test/search")
   public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
       @PathVariable @NotBlank String scenarioId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -40,17 +40,17 @@ public class ScenarioInjectTestApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
+  @GetMapping(SCENARIO_URI + "/injects/test/{testId}")
+  public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
+    return injectTestStatusService.findInjectTestStatusById(testId);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank final String scenarioId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @GetMapping(SCENARIO_URI + "/injects/test/{testId}")
-  public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
-    return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
   @Transactional(rollbackFor = Exception.class)

@@ -9,6 +9,7 @@ import { type ArticlesHelper } from '../../../../../actions/channels/article-hel
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
+import { testInject } from '../../../../../actions/inject_test/simulation-inject-test-actions';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { useFormatter } from '../../../../../components/i18n';
@@ -16,7 +17,7 @@ import { useHelper } from '../../../../../store';
 import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
+import { ArticleContext, InjectTestContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import InjectDistributionByTeam from '../../../common/injects/InjectDistributionByTeam';
 import InjectDistributionByType from '../../../common/injects/InjectDistributionByType';
 import Injects from '../../../common/injects/Injects';
@@ -79,15 +80,21 @@ const ExerciseInjects: FunctionComponent = () => {
       {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
-            <Injects
-              exerciseOrScenarioId={exerciseId}
-              setViewMode={handleViewMode}
-              availableButtons={availableButtons}
-              teams={teams}
-              articles={articles}
-              variables={variables}
-              uriVariable={`/admin/simulations/${exerciseId}/definition`}
-            />
+            <InjectTestContext.Provider value={{
+              contextId: exerciseId,
+              url: `/admin/simulations/${exerciseId}/tests/`,
+              testInject: testInject,
+            }}
+            >
+              <Injects
+                setViewMode={handleViewMode}
+                availableButtons={availableButtons}
+                teams={teams}
+                articles={articles}
+                variables={variables}
+                uriVariable={`/admin/simulations/${exerciseId}/definition`}
+              />
+            </InjectTestContext.Provider>
           </TeamContext.Provider>
         </ArticleContext.Provider>
       )}

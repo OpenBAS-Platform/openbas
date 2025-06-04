@@ -19,7 +19,7 @@ import {
   type XYPosition,
 } from '@xyflow/react';
 import moment from 'moment-timezone';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
+import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
@@ -29,6 +29,7 @@ import { type InjectOutputType, type InjectStore } from '../actions/injects/Inje
 import { type InjectHelper } from '../actions/injects/inject-helper';
 import { type ScenariosHelper } from '../actions/scenarios/scenario-helper';
 import { type TeamsHelper } from '../actions/teams/team-helper';
+import { InjectTestContext } from '../admin/components/common/Context';
 import { useHelper } from '../store';
 import { type Inject, type InjectDependency } from '../utils/api-types';
 import { parseCron } from '../utils/Cron';
@@ -56,7 +57,6 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
   injects: InjectOutputType[];
-  exerciseOrScenarioId: string;
   onSelectedInject(inject?: InjectOutputType): void;
   onTimelineClick(duration: number): void;
   onUpdateInject: (data: Inject[]) => void;
@@ -73,7 +73,6 @@ interface Props {
 
 const ChainedTimelineFlow: FunctionComponent<Props> = ({
   injects,
-  exerciseOrScenarioId,
   onSelectedInject,
   onTimelineClick,
   onUpdateInject,
@@ -101,14 +100,16 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const reactFlow = useReactFlow();
 
+  const { contextId } = useContext(InjectTestContext);
+
   const { injectsMap, teams, assets, assetGroups, scenario, exercise }
     = useHelper((helper: ExercisesHelper & InjectHelper & TeamsHelper & EndpointHelper & AssetGroupsHelper & ScenariosHelper) => ({
       injectsMap: helper.getInjectsMap(),
       teams: helper.getTeamsMap(),
       assets: helper.getEndpointsMap(),
       assetGroups: helper.getAssetGroupMaps(),
-      scenario: helper.getScenario(exerciseOrScenarioId),
-      exercise: helper.getExercise(exerciseOrScenarioId),
+      scenario: helper.getScenario(contextId),
+      exercise: helper.getExercise(contextId),
     }));
 
   const { t } = useFormatter();
@@ -336,7 +337,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             targets: inject.inject_assets!.map(asset => assets[asset]?.asset_name)
               .concat(inject.inject_asset_groups!.map(assetGroup => assetGroups[assetGroup]?.asset_group_name))
               .concat(inject.inject_teams!.map(team => teams[team]?.team_name)),
-            exerciseOrScenarioId,
+            contextId,
             onCreate,
             onUpdate,
             onDelete,

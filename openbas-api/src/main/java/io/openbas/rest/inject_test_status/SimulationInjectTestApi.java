@@ -43,7 +43,7 @@ public class SimulationInjectTestApi extends RestBehavior {
         exerciseId, searchPaginationInput);
   }
 
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test")
+  @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/test/search")
   public Page<InjectTestStatusOutput> findExercisePageInjectTests(
       @PathVariable @NotBlank String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {

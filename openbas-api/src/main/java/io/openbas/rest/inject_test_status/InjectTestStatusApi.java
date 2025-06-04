@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @deprecated since 1.18.0, forRemoval = true
+ * @see
+ */
 @RestController
 @PreAuthorize("isAdmin()")
 @RequiredArgsConstructor

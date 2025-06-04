@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
+import { testInject } from '../../../../../actions/inject_test/scenario-inject-test-actions';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
@@ -14,7 +15,7 @@ import { useHelper } from '../../../../../store';
 import { type Scenario } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
+import { ArticleContext, InjectTestContext, TeamContext, ViewModeContext } from '../../../common/Context';
 import Injects from '../../../common/injects/Injects';
 import articleContextForScenario from '../articles/articleContextForScenario';
 import teamContextForScenario from '../teams/teamContextForScenario';
@@ -60,15 +61,21 @@ const ScenarioInjects: FunctionComponent = () => {
     <ViewModeContext.Provider value={viewMode}>
       <ArticleContext.Provider value={articleContext}>
         <TeamContext.Provider value={teamContext}>
-          <Injects
-            exerciseOrScenarioId={scenarioId}
-            teams={teams}
-            articles={articles}
-            variables={variables}
-            uriVariable={`/admin/scenarios/${scenarioId}/definition`}
-            setViewMode={handleViewMode}
-            availableButtons={availableButtons}
-          />
+          <InjectTestContext.Provider value={{
+            contextId: scenarioId,
+            url: `/admin/scenarios/${scenarioId}/tests/`,
+            testInject: testInject,
+          }}
+          >
+            <Injects
+              teams={teams}
+              articles={articles}
+              variables={variables}
+              uriVariable={`/admin/scenarios/${scenarioId}/definition`}
+              setViewMode={handleViewMode}
+              availableButtons={availableButtons}
+            />
+          </InjectTestContext.Provider>
         </TeamContext.Provider>
       </ArticleContext.Provider>
     </ViewModeContext.Provider>

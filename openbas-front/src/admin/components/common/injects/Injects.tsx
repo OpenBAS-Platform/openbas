@@ -37,7 +37,7 @@ import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';
 import { download, isNotEmptyField } from '../../../../utils/utils';
-import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
+import { InjectContext, InjectTestContext, PermissionsContext, ViewModeContext } from '../Context';
 import ToolBar from '../ToolBar';
 import CreateInject from './CreateInject';
 import InjectIcon from './InjectIcon';
@@ -86,7 +86,6 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  exerciseOrScenarioId: string;
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
   teams: Team[];
@@ -96,7 +95,6 @@ interface Props {
 }
 
 const Injects: FunctionComponent<Props> = ({
-  exerciseOrScenarioId,
   setViewMode,
   availableButtons,
   teams,
@@ -112,6 +110,7 @@ const Injects: FunctionComponent<Props> = ({
   const { injects, setInjects } = injectContext;
   const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
+  const { contextId } = useContext(InjectTestContext);
 
   // Headers
   const headers = useMemo(() => [
@@ -230,7 +229,7 @@ const Injects: FunctionComponent<Props> = ({
     ],
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${contextId}-injects`, buildSearchPagination({
     sorts: initSorting('inject_depends_duration', 'ASC'),
     filterGroup: quickFilter,
     size: 20,
@@ -422,7 +421,7 @@ const Injects: FunctionComponent<Props> = ({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : injectIdsToProcess(selectAll),
       inject_ids_to_ignore: injectIdsToIgnore(selectAll),
-      simulation_or_scenario_id: exerciseOrScenarioId,
+      simulation_or_scenario_id: contextId,
       update_operations: operationsToPerform,
     })
       .then((result) => {
@@ -438,7 +437,7 @@ const Injects: FunctionComponent<Props> = ({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : deleteIds,
       inject_ids_to_ignore: ignoreIds,
-      simulation_or_scenario_id: exerciseOrScenarioId,
+      simulation_or_scenario_id: contextId,
     }).then((result) => {
       // We update the numbers of elements in the pagination
       const newNumbers = Math.max(0, (queryableHelpers.paginationHelpers.getTotalElements() - result.length));
@@ -459,7 +458,7 @@ const Injects: FunctionComponent<Props> = ({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : testIds,
       inject_ids_to_ignore: ignoreIds,
-      simulation_or_scenario_id: exerciseOrScenarioId,
+      simulation_or_scenario_id: contextId,
     }).then((result: {
       uri: string;
       data: InjectTestStatusOutput[];
@@ -482,7 +481,7 @@ const Injects: FunctionComponent<Props> = ({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : testIds,
       inject_ids_to_ignore: ignoreIds,
-      simulation_or_scenario_id: exerciseOrScenarioId,
+      simulation_or_scenario_id: contextId,
       options: {
         with_players: withPlayers,
         with_teams: withTeams,
@@ -519,14 +518,13 @@ const Injects: FunctionComponent<Props> = ({
             onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
           />
         )}
-        contextId={exerciseOrScenarioId}
+        contextId={contextId}
       />
       {viewModeContext === 'chain' && (
         <div style={{ marginBottom: 10 }}>
           <div>
             <ChainedTimeline
               injects={injects}
-              exerciseOrScenarioId={exerciseOrScenarioId}
               onUpdateInject={massUpdateInject}
               onTimelineClick={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
@@ -584,7 +582,6 @@ const Injects: FunctionComponent<Props> = ({
                     secondaryAction={(
                       <InjectPopover
                         inject={inject}
-                        exerciseOrScenarioId={exerciseOrScenarioId}
                         canBeTested
                         setSelectedInjectId={setSelectedInjectId}
                         isDisabled={!injectContract || !isContractExposed}
@@ -686,7 +683,7 @@ const Injects: FunctionComponent<Props> = ({
                 selectAll={selectAll}
                 handleClearSelectedElements={handleClearSelectedElements}
                 teamsFromExerciseOrScenario={teams}
-                id={exerciseOrScenarioId}
+                id={contextId}
                 handleUpdate={massUpdateInjects}
                 handleBulkDelete={bulkDeleteInjects}
                 handleBulkTest={massTestInjects}

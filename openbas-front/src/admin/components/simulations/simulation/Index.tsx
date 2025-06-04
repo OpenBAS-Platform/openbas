@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { testInject } from '../../../../actions/inject_test/simulation-inject-test-actions';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
@@ -16,7 +17,7 @@ import { type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
+import { DocumentContext, type DocumentContextType, InjectContext, InjectTestContext, type InjectTestContextType, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
@@ -60,6 +61,11 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
         : [],
     }),
   };
+  const injectTestContext: InjectTestContextType = {
+    contextId: exercise.exercise_id,
+    url: `/admin/simulations/${exercise.exercise_id}/tests/`,
+    testInject: testInject,
+  };
   let tabValue = location.pathname;
   if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/definition`)) {
     tabValue = `/admin/simulations/${exercise.exercise_id}/definition`;
@@ -73,97 +79,99 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
-        <div style={{ paddingRight: ['/results', '/animation'].some(el => location.pathname.includes(el)) ? 200 : 0 }}>
-          <Breadcrumbs
-            variant="object"
-            elements={[
-              {
-                label: t('Simulations'),
-                link: '/admin/simulations',
-              },
-              {
-                label: exercise.exercise_name,
-                current: true,
-              },
-            ]}
-          />
-          <ExerciseHeader />
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-              marginBottom: 2,
-            }}
-          >
-            <Tabs value={tabValue}>
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}`}
-                value={`/admin/simulations/${exercise.exercise_id}`}
-                label={t('Overview')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/definition`}
-                value={`/admin/simulations/${exercise.exercise_id}/definition`}
-                label={t('Definition')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/injects`}
-                value={`/admin/simulations/${exercise.exercise_id}/injects`}
-                label={t('Injects')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/tests`}
-                value={`/admin/simulations/${exercise.exercise_id}/tests`}
-                label={t('Tests')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/animation`}
-                value={`/admin/simulations/${exercise.exercise_id}/animation`}
-                label={t('Animation')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/lessons`}
-                value={`/admin/simulations/${exercise.exercise_id}/lessons`}
-                label={t('Lessons learned')}
-              />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/findings`}
-                value={`/admin/simulations/${exercise.exercise_id}/findings`}
-                label={t('Findings')}
-              />
-            </Tabs>
-            <div className={classes.scheduling}>
-              <ExerciseDatePopover exercise={exercise} />
-              {exercise.exercise_start_date ? fldt(exercise.exercise_start_date) : t('Manual')}
-            </div>
-          </Box>
-          <Suspense fallback={<Loader />}>
-            <Routes>
-              <Route path="" element={errorWrapper(Simulation)()} />
-              <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
-              <Route path="injects" element={errorWrapper(Injects)()} />
-              <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
-              <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
-              <Route path="animation/timeline" element={errorWrapper(TimelineOverview)()} />
-              <Route path="animation/mails" element={errorWrapper(Mails)()} />
-              <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
-              <Route path="animation/logs" element={errorWrapper(Logs)()} />
-              <Route path="animation/chat" element={errorWrapper(Chat)()} />
-              <Route path="animation/validations" element={errorWrapper(Validations)()} />
-              <Route path="lessons" element={errorWrapper(Lessons)()} />
-              <Route path="findings" element={errorWrapper(SimulationFindings)()} />
-              {/* Not found */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </div>
+        <InjectTestContext.Provider value={injectTestContext}>
+          <div style={{ paddingRight: ['/results', '/animation'].some(el => location.pathname.includes(el)) ? 200 : 0 }}>
+            <Breadcrumbs
+              variant="object"
+              elements={[
+                {
+                  label: t('Simulations'),
+                  link: '/admin/simulations',
+                },
+                {
+                  label: exercise.exercise_name,
+                  current: true,
+                },
+              ]}
+            />
+            <ExerciseHeader />
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                marginBottom: 2,
+              }}
+            >
+              <Tabs value={tabValue}>
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}`}
+                  value={`/admin/simulations/${exercise.exercise_id}`}
+                  label={t('Overview')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/definition`}
+                  value={`/admin/simulations/${exercise.exercise_id}/definition`}
+                  label={t('Definition')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/injects`}
+                  value={`/admin/simulations/${exercise.exercise_id}/injects`}
+                  label={t('Injects')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/tests`}
+                  value={`/admin/simulations/${exercise.exercise_id}/tests`}
+                  label={t('Tests')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/animation`}
+                  value={`/admin/simulations/${exercise.exercise_id}/animation`}
+                  label={t('Animation')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/lessons`}
+                  value={`/admin/simulations/${exercise.exercise_id}/lessons`}
+                  label={t('Lessons learned')}
+                />
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/findings`}
+                  value={`/admin/simulations/${exercise.exercise_id}/findings`}
+                  label={t('Findings')}
+                />
+              </Tabs>
+              <div className={classes.scheduling}>
+                <ExerciseDatePopover exercise={exercise} />
+                {exercise.exercise_start_date ? fldt(exercise.exercise_start_date) : t('Manual')}
+              </div>
+            </Box>
+            <Suspense fallback={<Loader />}>
+              <Routes>
+                <Route path="" element={errorWrapper(Simulation)()} />
+                <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
+                <Route path="injects" element={errorWrapper(Injects)()} />
+                <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
+                <Route path="animation" element={<Navigate to="timeline" replace={true} />} />
+                <Route path="animation/timeline" element={errorWrapper(TimelineOverview)()} />
+                <Route path="animation/mails" element={errorWrapper(Mails)()} />
+                <Route path="animation/mails/:injectId" element={errorWrapper(MailsInject)()} />
+                <Route path="animation/logs" element={errorWrapper(Logs)()} />
+                <Route path="animation/chat" element={errorWrapper(Chat)()} />
+                <Route path="animation/validations" element={errorWrapper(Validations)()} />
+                <Route path="lessons" element={errorWrapper(Lessons)()} />
+                <Route path="findings" element={errorWrapper(SimulationFindings)()} />
+                {/* Not found */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </div>
+        </InjectTestContext.Provider>
       </DocumentContext.Provider>
     </PermissionsContext.Provider>
   );

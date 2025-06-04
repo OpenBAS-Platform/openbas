@@ -4,8 +4,8 @@ import { MESSAGING$ } from '../../utils/Environment';
 
 const SCENARIO_URI = `/api/scenarios`;
 
-export const searchSimulationInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
-  const uri = `${SCENARIO_URI}/${scenarioId}/injects/test`;
+export const searchInjectTests = (scenarioId: string, searchPaginationInput: SearchPaginationInput) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/injects/test/search`;
   return simplePostCall(uri, searchPaginationInput);
 };
 
