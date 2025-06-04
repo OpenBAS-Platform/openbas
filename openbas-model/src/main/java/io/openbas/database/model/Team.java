@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -124,8 +125,8 @@ public class Team implements Base {
       name = "injects_teams",
       joinColumns = @JoinColumn(name = "team_id"),
       inverseJoinColumns = @JoinColumn(name = "inject_id"))
-  @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_injects")
+  @JsonIgnore
   @Queryable(filterable = true, dynamicValues = true, path = "injects.id")
   private List<Inject> injects = new ArrayList<>();
 

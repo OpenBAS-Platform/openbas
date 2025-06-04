@@ -197,7 +197,6 @@ export interface AssetGroup {
   asset_group_dynamic_filter: FilterGroup;
   asset_group_external_reference?: string;
   asset_group_id: string;
-  asset_group_injects?: string[];
   asset_group_name: string;
   asset_group_tags?: string[];
   /** @format date-time */
@@ -4533,7 +4532,6 @@ export interface Team {
   /** ID of the team */
   team_id: string;
   team_inject_expectations?: string[];
-  team_injects?: string[];
   /**
    * Number of expectations linked to this team
    * @format int64

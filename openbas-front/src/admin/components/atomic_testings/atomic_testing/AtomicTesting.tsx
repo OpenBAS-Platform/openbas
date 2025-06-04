@@ -38,12 +38,19 @@ const useStyles = makeStyles()({
   tabs: { marginLeft: 'auto' },
 });
 
+type TabConfig = {
+  key: number;
+  label: string;
+  type: string;
+  entityPrefix: string;
+};
+
 const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabConfig>();
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -60,14 +67,14 @@ const AtomicTesting = () => {
   const [hasPlayersChecked, setHasPlayersChecked] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
 
-  const tabConfig: {
-    key: number;
-    label: string;
-    type: string;
-    entityPrefix: string;
-  }[] = useMemo(() => {
-    let index = 0;
-    const tabs = [];
+  const navigateToTab = (tab: TabConfig | undefined) => {
+    setActiveTab(tab);
+    setReloadContentCount(reloadContentCount + 1);
+  };
+
+  const tabConfig: TabConfig[] = useMemo(() => {
+    let index: number = 0;
+    const tabs: TabConfig[] = [];
 
     if (hasAssetsGroup) {
       tabs.push({
@@ -110,8 +117,26 @@ const AtomicTesting = () => {
       });
     }
 
+    // tabs visibility may have changed so we reevaluate this structure;
+    // figure out which tab to display; if the previously displayed tab
+    // is still available, keep it up
+    // otherwise default to the first occurring tab
+    if (tabs.length === 0) {
+      navigateToTab(undefined);
+    }
+
+    if (activeTab && tabs.map(conf => conf.type).includes(activeTab.type)) {
+      navigateToTab(tabs.find(tc => activeTab.type === tc.type));
+    } else {
+      navigateToTab(tabs[0]);
+    }
+
     return tabs;
   }, [hasAssetsGroup, hasTeams, hasEndpoints, hasAgents, hasPlayers]);
+
+  const activeTabKey: number = useMemo(() => {
+    return activeTab?.key || 0;
+  }, [activeTab]);
 
   const injectId = injectResultOverviewOutput?.inject_id || '';
 
@@ -178,7 +203,6 @@ const AtomicTesting = () => {
       });
 
     setReloadContentCount(reloadContentCount + 1);
-    setActiveTab(0);
   }, [injectResultOverviewOutput]);
 
   // Handles
@@ -187,12 +211,12 @@ const AtomicTesting = () => {
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-    setReloadContentCount(reloadContentCount + 1);
+    const location = tabConfig.find(tc => newValue == tc.key);
+    navigateToTab(location);
   };
 
   const drawTabs = () => {
-    const tab = tabConfig.find(value => value.key == activeTab);
+    const tab = tabConfig.find(value => value.type == activeTab?.type);
     if (!tab) {
       return (<div />);
     }
@@ -201,7 +225,7 @@ const AtomicTesting = () => {
       <>
         {!isAllTargets && injectResultOverviewOutput && (
           <PaginatedTargetTab
-            key={activeTab}
+            key={activeTabKey}
             handleSelectTarget={handleNewTargetClick}
             entityPrefix={tab.entityPrefix}
             inject_id={injectResultOverviewOutput.inject_id}
@@ -228,7 +252,7 @@ const AtomicTesting = () => {
           {hasAssetsGroupChecked && hasTeamsChecked && hasEndpointsChecked && hasAgentsChecked && hasPlayersChecked && (
             <>
               <Tabs
-                value={activeTab}
+                value={activeTabKey}
                 onChange={handleTabChange}
                 indicatorColor="primary"
                 textColor="primary"
