@@ -1,7 +1,7 @@
 import { type FunctionComponent } from 'react';
 import { useParams } from 'react-router';
 
-import { deleteInjectTest, fetchInjectTestStatus, searchInjectTests, testInject } from '../../../../../actions/inject_test/scenario-inject-test-actions';
+import { bulkTestInjects, deleteInjectTest, fetchInjectTestStatus, searchInjectTests, testInject } from '../../../../../actions/inject_test/scenario-inject-test-actions';
 import { type InjectTestStatusOutput, type Scenario } from '../../../../../utils/api-types';
 import { InjectTestContext, type InjectTestContextType } from '../../../common/Context';
 import InjectTestList from '../../../injects/InjectTestList';
@@ -13,6 +13,7 @@ const ScenarioTests: FunctionComponent = () => {
   };
   const injectTestContext: InjectTestContextType = {
     contextId: scenarioId,
+    bulkTestInjects: bulkTestInjects,
     deleteInjectTest: deleteInjectTest,
     searchInjectTests: searchInjectTests,
     fetchInjectTestStatus: fetchInjectTestStatus,

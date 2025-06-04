@@ -1,7 +1,7 @@
 import { type FunctionComponent } from 'react';
 import { useParams } from 'react-router';
 
-import { deleteInjectTest, fetchInjectTestStatus, searchInjectTests, testInject } from '../../../../../actions/inject_test/simulation-inject-test-actions';
+import { bulkTestInjects, deleteInjectTest, fetchInjectTestStatus, searchInjectTests, testInject } from '../../../../../actions/inject_test/simulation-inject-test-actions';
 import { type Exercise, type InjectTestStatusOutput } from '../../../../../utils/api-types';
 import { InjectTestContext, type InjectTestContextType } from '../../../common/Context';
 import InjectTestList from '../../../injects/InjectTestList';
@@ -14,6 +14,7 @@ const ExerciseTests: FunctionComponent = () => {
 
   const injectTestContext: InjectTestContextType = {
     contextId: exerciseId,
+    bulkTestInjects: bulkTestInjects,
     deleteInjectTest: deleteInjectTest,
     searchInjectTests: searchInjectTests,
     fetchInjectTestStatus: fetchInjectTestStatus,
