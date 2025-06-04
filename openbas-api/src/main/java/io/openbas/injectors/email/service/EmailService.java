@@ -20,12 +20,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class EmailService {
 
@@ -238,6 +241,7 @@ public class EmailService {
         emailSender.send(mimeMessage);
         return;
       } catch (Exception e) {
+        log.error("Failed to send mail: " + e.getMessage(), e);
         execution.addTrace(
             getNewInfoTrace(
                 "Failed to send mail" + e.getMessage(), ExecutionTraceAction.EXECUTION));

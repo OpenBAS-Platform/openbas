@@ -1,5 +1,6 @@
 package io.openbas.rest.expectation;
 
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -88,16 +90,23 @@ public class ExpectationApi extends RestBehavior {
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId,
       @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
+    List<InjectExpectation> results;
     if (expirationTime == null) {
-      return Stream.concat(
+      results = Stream.concat(
               injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
               injectExpectationService.detectionExpectationsNotFill(sourceId).stream())
           .toList();
+    } else {
+      results = Stream.concat(
+                      injectExpectationService.preventionExpectationsNotExpired(expirationTime).stream(),
+                      injectExpectationService.detectionExpectationsNotExpired(expirationTime).stream())
+              .toList();
     }
-    return Stream.concat(
-            injectExpectationService.preventionExpectationsNotExpired(expirationTime).stream(),
-            injectExpectationService.detectionExpectationsNotExpired(expirationTime).stream())
-        .toList();
+
+    // filter out expectations that are on injects that are not finished yet
+    results = results.stream().filter(injectExpectation -> injectExpectation.getInject().getStatus().isPresent()).toList();
+
+    return results;
   }
 
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention")
