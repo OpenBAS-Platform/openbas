@@ -118,10 +118,12 @@ public class RestBehavior {
             description = "Unprocessable Content",
             content = @Content(schema = @Schema(implementation = ResponseEntity.class)))
       })
-  ResponseEntity<ErrorMessage> handleUnprocessableException() {
-    return new ResponseEntity<>(
-        new ErrorMessage(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase()),
-        HttpStatus.UNPROCESSABLE_ENTITY);
+  ResponseEntity<ErrorMessage> handleUnprocessableException(UnprocessableContentException ex) {
+    String errorMessage =
+        ex.getMessage() != null && !ex.getMessage().isEmpty()
+            ? ex.getMessage()
+            : HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase();
+    return new ResponseEntity<>(new ErrorMessage(errorMessage), HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
