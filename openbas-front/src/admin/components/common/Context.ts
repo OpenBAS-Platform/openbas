@@ -32,11 +32,11 @@ export type PreviewChallengeContextType = {
 export type InjectTestContextType = {
   contextId: string;
   url?: string;
-  searchInjectTests?: (scenarioId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
+  searchInjectTests?: (contextId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
   fetchInjectTestStatus?: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
-  testInject?: (scenarioId: string, injectId: string) => Promise<{ data: InjectTestStatusOutput }>;
-  bulkTestInjects?: (scenarioId: string, data: InjectBulkProcessingInput) => Promise<InjectTestStatusOutput[]>;
-  deleteInjectTest?: (scenarioId: string, testId: string) => void;
+  testInject?: (contextId: string, injectId: string) => Promise<{ data: InjectTestStatusOutput }>;
+  bulkTestInjects?: (contextId: string, data: InjectBulkProcessingInput) => Promise<{ data: InjectTestStatusOutput[] }>;
+  deleteInjectTest?: (contextId: string, testId: string) => Promise<void>;
 };
 
 export type DocumentContextType = {

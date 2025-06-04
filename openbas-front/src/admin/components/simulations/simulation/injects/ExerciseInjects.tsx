@@ -17,7 +17,7 @@ import { useHelper } from '../../../../../store';
 import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { ArticleContext, InjectTestContext, TeamContext, ViewModeContext } from '../../../common/Context';
+import { ArticleContext, InjectTestContext, InjectTestContextType, TeamContext, ViewModeContext } from '../../../common/Context';
 import InjectDistributionByTeam from '../../../common/injects/InjectDistributionByTeam';
 import InjectDistributionByType from '../../../common/injects/InjectDistributionByType';
 import Injects from '../../../common/injects/Injects';
@@ -75,16 +75,20 @@ const ExerciseInjects: FunctionComponent = () => {
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId, exercise.exercise_teams_users, exercise.exercise_all_users_number, exercise.exercise_users_number);
 
+  const injectTestContext: InjectTestContextType = {
+    contextId: exerciseId,
+    url:
+      `/admin/simulations/${exerciseId}/tests/`,
+    testInject:
+    testInject,
+  };
+
   return (
     <ViewModeContext.Provider value={viewMode}>
       {(viewMode === 'list' || viewMode === 'chain') && (
         <ArticleContext.Provider value={articleContext}>
           <TeamContext.Provider value={teamContext}>
-            <InjectTestContext.Provider value={{
-              contextId: exerciseId,
-              url: `/admin/simulations/${exerciseId}/tests/`,
-              testInject: testInject,
-            }}
+            <InjectTestContext.Provider value={injectTestContext}
             >
               <Injects
                 setViewMode={handleViewMode}

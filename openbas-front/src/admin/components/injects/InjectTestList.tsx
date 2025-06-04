@@ -129,7 +129,6 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       >
         <InjectTestReplayAll
           searchPaginationInput={searchPaginationInput}
-          exerciseOrScenarioId={contextId}
           injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!)}
           onTest={result => setTests(result)}
         />

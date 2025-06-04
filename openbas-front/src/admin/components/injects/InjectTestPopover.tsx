@@ -2,13 +2,12 @@ import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
-import { deleteInjectTest, testInject } from '../../../actions/inject_test/inject-test-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
-import { PermissionsContext } from '../common/Context';
+import { InjectTestContext, PermissionsContext } from '../common/Context';
 
 interface Props {
   injectTest: InjectTestStatusOutput;
@@ -29,6 +28,12 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openTest, setOpenTest] = useState(false);
 
+  const {
+    contextId,
+    deleteInjectTest,
+    testInject,
+  } = useContext(InjectTestContext);
+
   const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -41,11 +46,13 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    deleteInjectTest(injectTest.status_id).then(() => {
-      if (onDelete) {
-        onDelete(injectTest.status_id!);
-      }
-    });
+    if (deleteInjectTest) {
+      deleteInjectTest(contextId, injectTest.status_id).then(() => {
+        if (onDelete) {
+          onDelete(injectTest.status_id!);
+        }
+      });
+    }
     handleCloseDelete();
   };
 
@@ -59,11 +66,13 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   };
 
   const submitTest = () => {
-    testInject(injectTest.inject_id!).then((result: { data: InjectTestStatusOutput }) => {
-      onTest?.(result.data);
-      MESSAGING$.notifySuccess(t(`Test for inject ${injectTest.inject_title} has been sent`));
-      return result;
-    });
+    if (testInject) {
+      testInject(contextId, injectTest.inject_id!).then((result: { data: InjectTestStatusOutput }) => {
+        onTest?.(result.data);
+        MESSAGING$.notifySuccess(t(`Test for inject ${injectTest.inject_title} has been sent`));
+        return result;
+      });
+    }
     handleCloseTest();
   };
 
