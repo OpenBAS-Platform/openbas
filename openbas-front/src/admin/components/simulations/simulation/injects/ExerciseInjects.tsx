@@ -77,8 +77,7 @@ const ExerciseInjects: FunctionComponent = () => {
 
   const injectTestContext: InjectTestContextType = {
     contextId: exerciseId,
-    url:
-      `/admin/simulations/${exerciseId}/tests/`,
+    url: `/admin/simulations/${exerciseId}/tests/`,
     testInject: testInject,
   };
 
