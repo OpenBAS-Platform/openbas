@@ -2,9 +2,12 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -22,6 +25,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "execution_traces")
 public class ExecutionTrace implements Base {
+
   @Id
   @Column(name = "execution_trace_id")
   @JsonProperty("execution_trace_id")
@@ -52,6 +56,11 @@ public class ExecutionTrace implements Base {
   @JsonProperty("execution_message")
   @NotNull
   private String message;
+
+  @Column(name = "execution_structured_output")
+  @Convert(converter = ContentConverter.class)
+  @JsonIgnore
+  private ObjectNode structuredOutput;
 
   @Column(name = "execution_action")
   @JsonProperty("execution_action")
@@ -135,6 +144,10 @@ public class ExecutionTrace implements Base {
         null, ExecutionTraceStatus.INFO, identifiers, message, action, agent, null);
   }
 
+  public static ExecutionTrace from(ExecutionTrace executionTrace, ObjectNode structuredOutput) {
+    return new ExecutionTrace(executionTrace, structuredOutput);
+  }
+
   public ExecutionTrace() {}
 
   public ExecutionTrace(
@@ -149,8 +162,19 @@ public class ExecutionTrace implements Base {
     this.status = status;
     this.identifiers = identifiers == null ? new String[0] : identifiers.toArray(new String[0]);
     this.message = message;
-    this.time = time == null ? Instant.now() : time;
+    this.time = time == null ? now() : time;
     this.action = action;
     this.agent = agent;
+  }
+
+  public ExecutionTrace(ExecutionTrace base, ObjectNode structuredOutput) {
+    this.injectStatus = base.injectStatus;
+    this.status = base.status;
+    this.identifiers = base.identifiers;
+    this.message = base.message;
+    this.time = base.time;
+    this.action = base.action;
+    this.agent = base.agent;
+    this.structuredOutput = structuredOutput;
   }
 }
