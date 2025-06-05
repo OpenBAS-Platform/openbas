@@ -16,7 +16,10 @@ export const fetchInjectTestStatus = (testId: string) => {
 
 export const testInject = (scenarioId: string, injectId: string) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/injects/${injectId}/test`;
-  return simpleCall(uri);
+  return simpleCall(uri).catch((error) => {
+    MESSAGING$.notifyError('Can\'t be tested');
+    throw error;
+  });
 };
 
 export const bulkTestInjects = (scenarioId: string, data: InjectBulkProcessingInput) => {
