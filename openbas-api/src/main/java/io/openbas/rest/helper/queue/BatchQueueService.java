@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,7 +40,7 @@ public class BatchQueueService<T> {
   private final ShutdownListener shutdownListener;
 
   private final List<Channel> consumerChannels = new ArrayList<>();
-  private final Random rand = new Random();
+  private final AtomicBoolean insertInProgress = new AtomicBoolean(false);
 
   /**
    * Public constructor of the BatchQueueService
@@ -265,37 +266,37 @@ public class BatchQueueService<T> {
    * Process messages in the queue buffer. It will only process as many messages as what's
    * configures in openbas.queue-config.<name of the queue>.max-size
    */
-  private void processBufferedBatch() {
-    // Draining the queue into the list with a max size
-    List<T> currentBatch = new ArrayList<>();
-    queue.drainTo(currentBatch, queueConfig.getMaxSize());
+  protected void processBufferedBatch() {
+    if (insertInProgress.compareAndSet(false, true)) {
+      do {
+        // Draining the queue into the list with a max size
+        List<T> currentBatch = new ArrayList<>();
+        queue.drainTo(currentBatch);
 
-    // If the list is not empty, we process it
-    if (!currentBatch.isEmpty()) {
-      log.info("Processing batch of {}", currentBatch.size());
-      try {
-        queueExecution.perform(currentBatch);
-      } catch (Exception e) {
-        log.error("Error processing batch - Error during ingestion", e);
-      }
-    }
+        // If the list is not empty, we process it
+        if (!currentBatch.isEmpty()) {
+          log.info("Processing batch of {}", currentBatch.size());
+          try {
+            queueExecution.perform(currentBatch);
+          } catch (Exception e) {
+            log.error("Error processing batch - Error during ingestion", e);
+          }
+        }
 
-    // Sending Ack for all the processed element in the batch
-    for (T element : currentBatch) {
-      try {
-        DeliveryContext elementToAck = deliveryTable.remove(element);
-        elementToAck.getDeliveryChannel().basicAck(elementToAck.getTag(), false);
-      } catch (IOException e) {
-        log.error(
-            String.format("Error processing batch - Cannot Ack the message: %s", e.getMessage()),
-            e);
-      }
-    }
-
-    // If the queue still has more element than we can process in one batch,
-    // there is no need to wait : we process it right now
-    if (queue.size() > this.queueConfig.getMaxSize()) {
-      processBufferedBatch();
+        // Sending Ack for all the processed element in the batch
+        for (T element : currentBatch) {
+          try {
+            DeliveryContext elementToAck = deliveryTable.remove(element);
+            elementToAck.getDeliveryChannel().basicAck(elementToAck.getTag(), false);
+          } catch (IOException e) {
+            log.error(
+                String.format(
+                    "Error processing batch - Cannot Ack the message: %s", e.getMessage()),
+                e);
+          }
+        }
+      } while (!queue.isEmpty());
+      insertInProgress.set(false);
     }
   }
 

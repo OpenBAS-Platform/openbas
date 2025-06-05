@@ -55,6 +55,7 @@ public class Inject implements Base, Injection {
   @UuidGenerator
   @JsonProperty("inject_id")
   @NotBlank
+  @Access(AccessType.PROPERTY)
   private String id;
 
   @Getter

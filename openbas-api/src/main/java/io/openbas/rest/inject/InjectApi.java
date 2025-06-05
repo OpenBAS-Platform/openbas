@@ -78,6 +78,8 @@ public class InjectApi extends RestBehavior {
   private final ScenarioRepository scenarioRepository;
   private final TargetService targetService;
   private final InjectStatusService injectStatusService;
+  private final BatchingInjectStatusService batchingInjectStatusService;
+  private final UserRepository userRepository;
 
   private final RabbitmqConfig rabbitmqConfig;
   private final OpenBASConfig openBASConfig;
@@ -92,7 +94,7 @@ public class InjectApi extends RestBehavior {
     injectTraceQueueService =
         new BatchQueueService<>(
             InjectExecutionCallback.class,
-            injectStatusService::handleInjectExecutionCallbackList,
+            batchingInjectStatusService::handleInjectExecutionCallbackList,
             rabbitmqConfig,
             objectMapper,
             openBASConfig.getQueueConfig().get("inject-trace"));
