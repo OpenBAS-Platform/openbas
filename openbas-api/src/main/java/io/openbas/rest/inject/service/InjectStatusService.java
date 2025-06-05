@@ -142,52 +142,6 @@ public class InjectStatusService {
     }
   }
 
-  public void handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = null;
-
-    try {
-      inject =
-          injectRepository
-              .findById(injectId)
-              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
-
-      Agent agent =
-          (agentId == null)
-              ? null
-              : agentRepository
-                  .findById(agentId)
-                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
-
-      // -- UPDATE STATUS --
-      updateInjectStatus(agent, inject, input);
-
-      // -- FINDINGS --
-      findingService.computeFindings(input, inject, agent);
-
-    } catch (ElementNotFoundException e) {
-      log.error(e.getMessage());
-      if (inject != null) {
-        inject
-            .getStatus()
-            .ifPresent(
-                status -> {
-                  ExecutionTrace trace =
-                      new ExecutionTrace(
-                          status,
-                          ExecutionTraceStatus.ERROR,
-                          null,
-                          e.getMessage(),
-                          ExecutionTraceAction.COMPLETE,
-                          null,
-                          Instant.now());
-                  status.addTrace(trace);
-                });
-        injectRepository.save(inject);
-      }
-    }
-  }
-
   public ExecutionStatus computeStatus(List<ExecutionTrace> traces) {
     ExecutionStatus executionStatus;
     int successCount = 0, errorCount = 0, partialCount = 0, maybePreventedCount = 0;
