@@ -84,13 +84,13 @@ public class InjectStatusService {
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.log(Level.INFO, "updateFinalInjectStatus 1: " + injectStatus.getId());
+    log.log(Level.INFO, "[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.log(Level.INFO, "updateFinalInjectStatus 2: " + injectStatus.getId());
+    log.log(Level.INFO, "[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -178,21 +178,21 @@ public class InjectStatusService {
   }
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    log.log(Level.INFO, "fromExecution 1: " + injectStatus.getId());
+    log.log(Level.INFO, "[issue/2797] fromExecution 1: " + injectStatus.getId());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
       injectStatus.getTraces().addAll(traces);
     }
-    log.log(Level.INFO, "fromExecution 2:  " + injectStatus.getId());
+    log.log(Level.INFO, "[issue/2797] fromExecution 2:  " + injectStatus.getId());
     if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
-      log.log(Level.INFO, "fromExecution 3a: " + injectStatus.getId());
+      log.log(Level.INFO, "[issue/2797] fromExecution 3a: " + injectStatus.getId());
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      log.log(Level.INFO, "fromExecution 3b: " + injectStatus.getId());
+      log.log(Level.INFO, "[issue/2797] fromExecution 3b: " + injectStatus.getId());
       updateFinalInjectStatus(injectStatus);
     }
-    log.log(Level.INFO, "fromExecution 4: " + injectStatus.getId());
+    log.log(Level.INFO, "[issue/2797] fromExecution 4: " + injectStatus.getId());
     return injectStatus;
   }
 
