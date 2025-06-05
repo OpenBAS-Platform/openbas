@@ -18,10 +18,13 @@ import io.openbas.database.specification.InjectorContractSpecification;
 import io.openbas.rest.attack_pattern.form.AttackPatternCreateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpdateInput;
 import io.openbas.rest.attack_pattern.form.AttackPatternUpsertInput;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,39 +32,27 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class AttackPatternApi extends RestBehavior {
 
   public static final String ATTACK_PATTERN_URI = "/api/attack_patterns";
 
-  private AttackPatternRepository attackPatternRepository;
+  private final AttackPatternService attackPatternService;
 
-  private InjectorContractRepository injectorContractRepository;
-  private KillChainPhaseRepository killChainPhaseRepository;
-
-  @Autowired
-  public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-    this.attackPatternRepository = attackPatternRepository;
-  }
-
-  @Autowired
-  public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
-    this.killChainPhaseRepository = killChainPhaseRepository;
-  }
-
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
-  }
+  private final AttackPatternRepository attackPatternRepository;
+  private final InjectorContractRepository injectorContractRepository;
+  private final KillChainPhaseRepository killChainPhaseRepository;
 
   @GetMapping("/api/attack_patterns")
   public List<RawAttackPattern> attackPatterns() {
@@ -76,6 +67,17 @@ public class AttackPatternApi extends RestBehavior {
             this.attackPatternRepository.findAll(specification, pageable),
         searchPaginationInput,
         AttackPattern.class);
+  }
+
+  @PostMapping("/api/attack_patterns/search-with-ai")
+  @Operation(
+      summary = "Extract Attack Paterns from text or files using AI",
+      description = "Get attack patterns ids extracted from a text or files using AI")
+  public List<String> searchAttackPatternWithTTPAIWebservice(
+      @RequestPart("files") @Nullable List<MultipartFile> files,
+      @RequestPart("text") final String text) {
+    return attackPatternService.searchAttackPatternWithTTPAIWebservice(
+        files == null ? new ArrayList<>() : files, text);
   }
 
   @GetMapping("/api/attack_patterns/{attackPatternId}")
