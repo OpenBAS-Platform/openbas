@@ -17,15 +17,14 @@ import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class Executor {
 
   @Resource protected ObjectMapper mapper;
@@ -60,20 +59,20 @@ public class Executor {
     // test-feature-branch env so those
     // logs are for tests on prerelease env with the scenario "20250318 REP-YGN Fermeture temporaire
     // KUC - test Dam"
-    log.log(Level.INFO, "[issue/2797] executeInternal 1: " + inject.getId());
+    log.info("[issue/2797] executeInternal 1: " + inject.getId());
     io.openbas.executors.Injector executor =
         this.context.getBean(injector.getType(), io.openbas.executors.Injector.class);
-    log.log(Level.INFO, "[issue/2797] executeInternal 2: " + inject.getId());
+    log.info("[issue/2797] executeInternal 2: " + inject.getId());
     Execution execution = executor.executeInjection(executableInject);
-    log.log(Level.INFO, "[issue/2797] executeInternal 3: " + inject.getId());
+    log.info("[issue/2797] executeInternal 3: " + inject.getId());
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
     InjectStatus injectStatus =
         this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
-    log.log(Level.INFO, "[issue/2797] executeInternal 4: " + inject.getId());
+    log.info("[issue/2797] executeInternal 4: " + inject.getId());
     InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
-    log.log(Level.INFO, "[issue/2797] executeInternal 5: " + inject.getId());
+    log.info("[issue/2797] executeInternal 5: " + inject.getId());
     return injectStatusRepository.save(completeStatus);
   }
 

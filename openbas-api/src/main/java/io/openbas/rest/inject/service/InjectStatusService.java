@@ -19,12 +19,12 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectStatusService {
 
   private final InjectRepository injectRepository;
@@ -84,13 +84,13 @@ public class InjectStatusService {
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.log(Level.INFO, "[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
+    log.info("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.log(Level.INFO, "[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
+    log.info("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -142,6 +142,52 @@ public class InjectStatusService {
     }
   }
 
+  public void handleInjectExecutionCallback(
+      String injectId, String agentId, InjectExecutionInput input) {
+    Inject inject = null;
+
+    try {
+      inject =
+          injectRepository
+              .findById(injectId)
+              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
+
+      Agent agent =
+          (agentId == null)
+              ? null
+              : agentRepository
+                  .findById(agentId)
+                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
+
+      // -- UPDATE STATUS --
+      updateInjectStatus(agent, inject, input);
+
+      // -- FINDINGS --
+      findingService.computeFindings(input, inject, agent);
+
+    } catch (ElementNotFoundException e) {
+      log.error(e.getMessage());
+      if (inject != null) {
+        inject
+            .getStatus()
+            .ifPresent(
+                status -> {
+                  ExecutionTrace trace =
+                      new ExecutionTrace(
+                          status,
+                          ExecutionTraceStatus.ERROR,
+                          null,
+                          e.getMessage(),
+                          ExecutionTraceAction.COMPLETE,
+                          null,
+                          Instant.now());
+                  status.addTrace(trace);
+                });
+        injectRepository.save(inject);
+      }
+    }
+  }
+
   public ExecutionStatus computeStatus(List<ExecutionTrace> traces) {
     ExecutionStatus executionStatus;
     int successCount = 0, errorCount = 0, partialCount = 0, maybePreventedCount = 0;
@@ -178,21 +224,21 @@ public class InjectStatusService {
   }
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    log.log(Level.INFO, "[issue/2797] fromExecution 1: " + injectStatus.getId());
+    log.info("[issue/2797] fromExecution 1: " + injectStatus.getId());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
       injectStatus.getTraces().addAll(traces);
     }
-    log.log(Level.INFO, "[issue/2797] fromExecution 2:  " + injectStatus.getId());
+    log.info("[issue/2797] fromExecution 2:  " + injectStatus.getId());
     if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
-      log.log(Level.INFO, "[issue/2797] fromExecution 3a: " + injectStatus.getId());
+      log.info("[issue/2797] fromExecution 3a: " + injectStatus.getId());
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      log.log(Level.INFO, "[issue/2797] fromExecution 3b: " + injectStatus.getId());
+      log.info("[issue/2797] fromExecution 3b: " + injectStatus.getId());
       updateFinalInjectStatus(injectStatus);
     }
-    log.log(Level.INFO, "[issue/2797] fromExecution 4: " + injectStatus.getId());
+    log.info("[issue/2797] fromExecution 4: " + injectStatus.getId());
     return injectStatus;
   }
 
