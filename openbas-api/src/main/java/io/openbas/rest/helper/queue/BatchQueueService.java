@@ -273,15 +273,15 @@ public class BatchQueueService<T> {
         List<T> currentBatch = new ArrayList<>();
         queue.drainTo(currentBatch);
 
-        // If the list is not empty, we process it
-        if (!currentBatch.isEmpty()) {
-          log.info("Processing batch of {}", currentBatch.size());
-          try {
-            queueExecution.perform(currentBatch);
-          } catch (Exception e) {
-            log.error("Error processing batch - Error during ingestion", e);
-          }
-        }
+    // If the list is not empty, we process it
+    if (!currentBatch.isEmpty()) {
+      log.info("Processing batch of {}", currentBatch.size());
+      try {
+        queueExecution.perform(currentBatch);
+      } catch (Exception e) {
+        log.error("Error processing batch - Error during ingestion", e);
+      }
+    }
 
         // Sending Ack for all the processed element in the batch
         for (T element : currentBatch) {

@@ -77,7 +77,6 @@ public class InjectApi extends RestBehavior {
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final TargetService targetService;
-  private final InjectStatusService injectStatusService;
   private final BatchingInjectStatusService batchingInjectStatusService;
   private final UserRepository userRepository;
 
