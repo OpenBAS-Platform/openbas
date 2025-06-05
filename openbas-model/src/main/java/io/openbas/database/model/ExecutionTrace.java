@@ -11,13 +11,15 @@ import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
@@ -27,6 +29,7 @@ public class ExecutionTrace implements Base {
   @Id
   @Column(name = "execution_trace_id")
   @JsonProperty("execution_trace_id")
+  @GeneratedValue
   @UuidGenerator
   @NotNull
   private String id;
