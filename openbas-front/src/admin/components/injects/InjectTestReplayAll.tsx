@@ -1,16 +1,15 @@
 import { ForwardToInbox } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
-import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
+import { InjectTestContext } from '../common/Context';
 
 interface Props {
   searchPaginationInput: SearchPaginationInput;
-  exerciseOrScenarioId: string;
   injectIds: string[] | undefined;
   onTest?: (result: InjectTestStatusOutput[]) => void;
 }
@@ -18,13 +17,17 @@ interface Props {
 const InjectTestReplayAll: FunctionComponent<Props> = ({
   searchPaginationInput,
   injectIds,
-  exerciseOrScenarioId,
   onTest,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
 
   const [openAllTest, setOpenAllTest] = useState(false);
+
+  const {
+    contextId,
+    bulkTestInjects,
+  } = useContext(InjectTestContext);
 
   const handleOpenAllTest = () => {
     setOpenAllTest(true);
@@ -35,14 +38,16 @@ const InjectTestReplayAll: FunctionComponent<Props> = ({
   };
 
   const handleSubmitAllTest = () => {
-    bulkTestInjects({
-      search_pagination_input: searchPaginationInput,
-      simulation_or_scenario_id: exerciseOrScenarioId,
-    }!).then((result: { data: InjectTestStatusOutput[] }) => {
-      onTest?.(result.data);
-      MESSAGING$.notifySuccess(t('Test(s) sent'));
-      return result;
-    });
+    if (bulkTestInjects) {
+      bulkTestInjects(contextId, {
+        search_pagination_input: searchPaginationInput,
+        simulation_or_scenario_id: contextId,
+      }!).then((result: { data: InjectTestStatusOutput[] }) => {
+        onTest?.(result.data);
+        MESSAGING$.notifySuccess(t('Test(s) sent'));
+        return result;
+      });
+    }
     handleCloseAllTest();
   };
 

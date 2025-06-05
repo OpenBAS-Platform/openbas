@@ -21,6 +21,8 @@ public class InjectComposer extends ComposerBase<Inject> {
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private final List<EndpointComposer.Composer> endpointComposers = new ArrayList<>();
     private Optional<InjectStatusComposer.Composer> injectStatusComposers = Optional.empty();
+    private Optional<InjectTestStatusComposer.Composer> injectTestStatusComposers =
+        Optional.empty();
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
     private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
     private final List<AssetGroupComposer.Composer> assetGroupComposers = new ArrayList<>();
@@ -74,6 +76,12 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectStatusComposers = Optional.of(injectStatus);
       injectStatus.get().setInject(this.inject);
       this.inject.setStatus(injectStatus.get());
+      return this;
+    }
+
+    public Composer withInjectTestStatus(InjectTestStatusComposer.Composer injectTestStatus) {
+      injectTestStatusComposers = Optional.of(injectTestStatus);
+      injectTestStatus.get().setInject(this.inject);
       return this;
     }
 

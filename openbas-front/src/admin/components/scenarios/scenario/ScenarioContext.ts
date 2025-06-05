@@ -1,33 +1,12 @@
 import { useState } from 'react';
 
-import {
-  addInjectForScenario,
-  bulkDeleteInjectsSimple,
-  bulkUpdateInjectSimple,
-  deleteInjectScenario,
-  fetchScenarioInjects,
-  updateInjectActivationForScenario,
-  updateInjectForScenario,
-} from '../../../../actions/Inject';
+import { addInjectForScenario, bulkDeleteInjectsSimple, bulkUpdateInjectSimple, deleteInjectScenario, fetchScenarioInjects, updateInjectActivationForScenario, updateInjectForScenario } from '../../../../actions/Inject';
+import { bulkTestInjects } from '../../../../actions/inject_test/scenario-inject-test-actions';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import { bulkTestInjects, importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
-import {
-  dryImportXlsForScenario,
-  fetchScenario,
-  fetchScenarioTeams,
-  importXlsForScenario,
-} from '../../../../actions/scenarios/scenario-actions';
+import { importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
+import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
 import { type Page } from '../../../../components/common/queryable/Page';
-import {
-  type ImportTestSummary,
-  type Inject,
-  type InjectBulkProcessingInput,
-  type InjectBulkUpdateInputs,
-  type InjectsImportInput,
-  type InjectTestStatusOutput,
-  type Scenario,
-  type SearchPaginationInput,
-} from '../../../../utils/api-types';
+import { type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestStatusOutput, type Scenario, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 const injectContextForScenario = (scenario: Scenario) => {
@@ -95,7 +74,7 @@ const injectContextForScenario = (scenario: Scenario) => {
       uri: string;
       data: InjectTestStatusOutput[];
     }> {
-      return bulkTestInjects(param).then(result => ({
+      return bulkTestInjects(scenario.scenario_id, param).then(result => ({
         uri: `/admin/scenarios/${scenario.scenario_id}/tests`,
         data: result.data,
       }));

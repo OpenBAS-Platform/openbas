@@ -13,8 +13,9 @@ import {
   updateInjectForExercise,
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
+import { bulkTestInjects } from '../../../../actions/inject_test/simulation-inject-test-actions';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import { bulkTestInjects, importInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
+import { importInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 import { type Page } from '../../../../components/common/queryable/Page';
 import {
   type Exercise,
@@ -105,7 +106,7 @@ const injectContextForExercise = (exercise: Exercise) => {
       uri: string;
       data: InjectTestStatusOutput[];
     }> {
-      return bulkTestInjects(param).then(result => ({
+      return bulkTestInjects(exercise.exercise_id, param).then(result => ({
         uri: `/admin/simulations/${exercise.exercise_id}/tests`,
         data: result.data,
       }));

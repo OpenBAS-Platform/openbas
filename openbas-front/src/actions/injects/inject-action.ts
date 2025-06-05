@@ -1,24 +1,11 @@
 import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import { type Exercise, type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
+import { type Exercise, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
 
 const INJECT_URI = '/api/injects';
-
-export const testInject = (injectId: string) => {
-  const uri = `/api/injects/${injectId}/test`;
-  return simpleCall(uri);
-};
-
-export const bulkTestInjects = (data: InjectBulkProcessingInput) => {
-  const uri = '/api/injects/test';
-  return simplePostCall(uri, data, undefined, false).catch((error) => {
-    MESSAGING$.notifyError('Can\'t be tested');
-    throw error;
-  });
-};
 
 export const exportInjectSearch = (data: InjectExportFromSearchRequestInput) => {
   const uri = '/api/injects/search/export';

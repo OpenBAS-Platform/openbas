@@ -1,6 +1,6 @@
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
-import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
@@ -12,6 +12,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import { InjectTestContext } from '../common/Context';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
 import InjectTestPopover from './InjectTestPopover';
@@ -51,19 +52,9 @@ const inlineStyles: Record<string, CSSProperties> = {
   status_name: { width: '20%' },
 };
 
-interface Props {
-  searchInjectTests: (exerciseOrScenarioId: string, input: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
-  searchInjectTest: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
-  exerciseOrScenarioId: string;
-  statusId: string | undefined;
-}
+interface Props { statusId: string | undefined }
 
-const InjectTestList: FunctionComponent<Props> = ({
-  searchInjectTests,
-  searchInjectTest,
-  exerciseOrScenarioId,
-  statusId,
-}) => {
+const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, fldt } = useFormatter();
@@ -71,10 +62,16 @@ const InjectTestList: FunctionComponent<Props> = ({
 
   const [selectedInjectTestStatus, setSelectedInjectTestStatus] = useState<InjectTestStatusOutput | null>(null);
 
+  const {
+    contextId,
+    searchInjectTests,
+    fetchInjectTestStatus,
+  } = useContext(InjectTestContext);
+
   // Fetching test
   useEffect(() => {
-    if (statusId !== null && statusId !== undefined) {
-      searchInjectTest(statusId).then((result: { data: InjectTestStatusOutput }) => {
+    if (statusId !== null && statusId !== undefined && fetchInjectTestStatus) {
+      fetchInjectTestStatus(statusId).then((result: { data: InjectTestStatusOutput }) => {
         setSelectedInjectTestStatus(result.data);
       });
     }
@@ -111,7 +108,16 @@ const InjectTestList: FunctionComponent<Props> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const searchInjectTestsToLoad = (input: SearchPaginationInput) => {
     setLoading(true);
-    return searchInjectTests(exerciseOrScenarioId, input).finally(() => setLoading(false));
+    try {
+      if (searchInjectTests) {
+        return searchInjectTests(contextId, input);
+      } else {
+        return new Promise<{ data: Page<InjectTestStatusOutput> }>(() => {
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -123,7 +129,6 @@ const InjectTestList: FunctionComponent<Props> = ({
       >
         <InjectTestReplayAll
           searchPaginationInput={searchPaginationInput}
-          exerciseOrScenarioId={exerciseOrScenarioId}
           injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!)}
           onTest={result => setTests(result)}
         />

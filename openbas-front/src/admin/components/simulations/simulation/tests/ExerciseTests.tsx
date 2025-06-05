@@ -1,8 +1,9 @@
 import { type FunctionComponent } from 'react';
 import { useParams } from 'react-router';
 
-import { fetchInjectTestStatus, searchExerciseInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
+import { bulkTestInjects, deleteInjectTest, fetchInjectTestStatus, searchInjectTests, testInject } from '../../../../../actions/inject_test/simulation-inject-test-actions';
 import { type Exercise, type InjectTestStatusOutput } from '../../../../../utils/api-types';
+import { InjectTestContext, type InjectTestContextType } from '../../../common/Context';
 import InjectTestList from '../../../injects/InjectTestList';
 
 const ExerciseTests: FunctionComponent = () => {
@@ -11,8 +12,19 @@ const ExerciseTests: FunctionComponent = () => {
     statusId: InjectTestStatusOutput['status_id'];
   };
 
+  const injectTestContext: InjectTestContextType = {
+    contextId: exerciseId,
+    bulkTestInjects: bulkTestInjects,
+    deleteInjectTest: deleteInjectTest,
+    searchInjectTests: searchInjectTests,
+    fetchInjectTestStatus: fetchInjectTestStatus,
+    testInject: testInject,
+  };
+
   return (
-    <InjectTestList searchInjectTests={searchExerciseInjectTests} searchInjectTest={fetchInjectTestStatus} exerciseOrScenarioId={exerciseId} statusId={statusId} />
+    <InjectTestContext.Provider value={injectTestContext}>
+      <InjectTestList statusId={statusId} />
+    </InjectTestContext.Provider>
   );
 };
 

@@ -92,7 +92,6 @@ export type NodeInject = Node<{
     topLeft: XYPosition;
     bottomRight: XYPosition;
   };
-  exerciseOrScenarioId: string;
   onSelectedInject(inject?: InjectOutputType): void;
   onCreate: (result: {
     result: string;
@@ -224,7 +223,6 @@ const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
               setSelectedInjectId={selectedInject}
               canBeTested={data.inject?.inject_testable}
               isDisabled={isDisabled}
-              exerciseOrScenarioId={data.exerciseOrScenarioId}
               onDelete={data.onDelete}
               onUpdate={data.onUpdate}
               onCreate={data.onCreate}

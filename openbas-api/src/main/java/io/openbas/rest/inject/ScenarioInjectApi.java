@@ -12,7 +12,6 @@ import io.openbas.rest.inject.form.InjectAssistantInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.inject.form.InjectUpdateActivationInput;
 import io.openbas.rest.inject.output.InjectOutput;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -25,7 +24,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +36,6 @@ public class ScenarioInjectApi extends RestBehavior {
 
   private final InjectAssistantService injectAssistantService;
   private final InjectSearchService injectSearchService;
-  private final InjectTestStatusService injectTestStatusService;
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final ScenarioService scenarioService;
@@ -73,16 +70,6 @@ public class ScenarioInjectApi extends RestBehavior {
         Inject.class,
         joinMap);
   }
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
-  public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
-      @PathVariable @NotBlank String scenarioId,
-      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return injectTestStatusService.findAllInjectTestsByScenarioId(
-        scenarioId, searchPaginationInput);
-  }
-
-  // -- SCENARIOS --
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")

@@ -3,21 +3,19 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconBu
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 
-import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import { type InjectStore } from '../../../../actions/injects/Inject';
-import { exportInjects, testInject } from '../../../../actions/injects/inject-action';
+import { exportInjects } from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
 import type { Inject, InjectExportRequestInput, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { download } from '../../../../utils/utils';
-import { InjectContext, PermissionsContext } from '../Context';
+import { InjectContext, InjectTestContext, PermissionsContext } from '../Context';
 
 type InjectPopoverType = {
   inject_id: string;
@@ -38,7 +36,6 @@ interface Props {
   canBeTested?: boolean;
   canDone?: boolean;
   canTriggerNow?: boolean;
-  exerciseOrScenarioId?: string;
   onCreate?: (result: {
     result: string;
     entities: { injects: Record<string, InjectStore> };
@@ -57,7 +54,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   canBeTested = false,
   canDone = false,
   canTriggerNow = false,
-  exerciseOrScenarioId,
   onCreate,
   onUpdate,
   onDelete,
@@ -73,6 +69,12 @@ const InjectPopover: FunctionComponent<Props> = ({
     onDeleteInject,
   } = useContext(InjectContext);
 
+  const {
+    contextId,
+    testInject,
+    url,
+  } = useContext(InjectTestContext);
+
   const [openDelete, setOpenDelete] = useState(false);
   const [duplicate, setDuplicate] = useState(false);
   const [openTest, setOpenTest] = useState(false);
@@ -82,8 +84,6 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openTrigger, setOpenTrigger] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openExportDialog, setOpenExportDialog] = useState(false);
-
-  const { isExercise } = useHelper((helper: ExercisesHelper) => ({ isExercise: helper.isExercise(exerciseOrScenarioId!) }));
 
   const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -161,13 +161,11 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
 
   const submitTest = () => {
-    testInject(inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
-      if (isExercise) {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`/admin/simulations/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
-      } else {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
-      }
-    });
+    if (testInject) {
+      testInject(contextId, inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${url}${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
+      });
+    }
     handleCloseTest();
   };
 
