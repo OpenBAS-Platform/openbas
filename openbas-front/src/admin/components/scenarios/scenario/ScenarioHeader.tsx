@@ -22,7 +22,7 @@ import { MESSAGING$, useQueryParameter } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
 import { InjectContext } from '../../common/Context';
-import ScenarioAssistantDrawer from './ScenarioAssistantDrawer';
+import ScenarioAssistantDrawer from './scenario_assistant/ScenarioAssistantDrawer';
 import ScenarioPopover from './ScenarioPopover';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 
@@ -115,10 +115,7 @@ const ScenarioHeader = ({
     setOpenLoaderDialog(true);
     playInjectsAssistantForScenario(scenarioId, data).then((results) => {
       setInjects([...injects, ...results.data]);
-      setIsInjectAssistantLoading(false);
-    }).catch(() => {
-      setOpenLoaderDialog(false);
-    });
+    }).finally(() => setOpenLoaderDialog(false));
   };
 
   useEffect(() => {
