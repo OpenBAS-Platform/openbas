@@ -85,7 +85,7 @@
     "@types/qs": "6",
     "@types/react": "19.1.6",
     "@types/react-csv": "1.1.10",
-    "@types/react-dom": "19.1.5",
+    "@types/react-dom": "19.1.6",
     "@types/react-grid-layout": "^1",
     "@types/react-syntax-highlighter": "15",
     "@typescript-eslint/utils": "8.33.1",
