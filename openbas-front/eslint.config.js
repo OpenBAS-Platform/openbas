@@ -64,7 +64,7 @@ export default [
       ],
 
       // eslint-plugin-simple-import-sort rules
-      'simple-import-sort/imports': 'error',
+      'simple-import-sort/imports': 'warn',
       'simple-import-sort/exports': 'error',
 
       // local package eslint-plugin-custom-rules rules

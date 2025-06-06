@@ -3,11 +3,11 @@ import { faker } from '@faker-js/faker';
 import { act, render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+// MUST be imported *before* the component
 import mockStoreMethodWithReturn from '../../fixtures/mock';
 import ExportButton from '../../../components/common/ExportButton';
 import { createDefaultTags, createTagMap } from '../../fixtures/api-types.fixtures';
 import TestRootComponent from '../../fixtures/TestRootComponent';
-import {Tag} from "../../../utils/api-types";
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 type testobj = { [key: string]: any };
@@ -57,13 +57,13 @@ describe('When tag map is defined', () => {
       const link = getByRole('link');
       expect(link).toBeDefined();
       expect(link.getAttribute('href')).toEqual(
-          'data:text/csv;charset=utf-8,﻿'+ exportKeys.map(k => '"'+k+'"').join(',') +'\n' +
-          exportData.map(
-              d =>
-                  '"' + d[`${exportType}_name`] +
-                  '","' +
-                  d[`${exportType}_tags`].map((t: string) => tagMap[t].tag_name).join(',') +
-                  '"').join('\n'));
+        'data:text/csv;charset=utf-8,﻿' + exportKeys.map(k => '"' + k + '"').join(',') + '\n'
+        + exportData.map(
+          d =>
+            '"' + d[`${exportType}_name`]
+            + '","'
+            + d[`${exportType}_tags`].map((t: string) => tagMap[t].tag_name).join(',')
+            + '"').join('\n'));
     });
   });
 });
