@@ -1,20 +1,23 @@
-import {store} from "../../store";
-import React from 'react';
-import ConnectedIntlProvider from "../../components/AppIntlProvider";
-import ConnectedThemeProvider from "../../components/AppThemeProvider";
-import {CssBaseline} from "@mui/material";
+import { CssBaseline } from '@mui/material';
+import { type ReactNode } from 'react';
 import { Provider } from 'react-redux';
 
-// @ts-ignore
-const TestRootComponent = ({children}) => {
-    return (<Provider store={store}>
-        <ConnectedIntlProvider>
-            <ConnectedThemeProvider>
-                <CssBaseline />
-                {children}
-            </ConnectedThemeProvider>
-        </ConnectedIntlProvider>
-    </Provider>);
+import ConnectedIntlProvider from '../../components/AppIntlProvider';
+import ConnectedThemeProvider from '../../components/AppThemeProvider';
+import { store } from '../../store';
+
+interface Props { children: ReactNode }
+const TestRootComponent = ({ children }: Props) => {
+  return (
+    <Provider store={store}>
+      <ConnectedIntlProvider>
+        <ConnectedThemeProvider>
+          <CssBaseline />
+          {children}
+        </ConnectedThemeProvider>
+      </ConnectedIntlProvider>
+    </Provider>
+  );
 };
 
 export default TestRootComponent;

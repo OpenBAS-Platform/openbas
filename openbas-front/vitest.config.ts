@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react';
 // import jsdom to not let tools report them as unused
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import jsdom from 'jsdom';
+import { transformWithEsbuild } from 'vite';
 import { defineConfig } from 'vitest/config';
-import {transformWithEsbuild} from "vite";
 
 export default defineConfig({
   plugins: [
@@ -22,7 +22,7 @@ export default defineConfig({
         });
       },
     },
-    react()
+    react(),
   ],
   test: {
     environment: 'jsdom',
