@@ -17,7 +17,7 @@ function createObjWithDefaultKeys(objtype: string): testobj {
     return obj;
 }
 
-describe('Generic export button', async () => {
+describe('Generic export button', () => {
     const exportType: string = "testobj"
     const exportData: testobj[] = [
         createObjWithDefaultKeys(exportType),
@@ -35,7 +35,7 @@ describe('Generic export button', async () => {
         obj[`${exportType}_tags`] = tags.map(t => t.tag_id);
     }
 
-    await mockStoreMethodWithReturn("getTagsMap", tagMap);
+    mockStoreMethodWithReturn("getTagsMap", tagMap);
 
     it("does something", async () => {
         const { getByRole } = render(
