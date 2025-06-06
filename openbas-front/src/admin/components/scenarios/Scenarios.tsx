@@ -150,7 +150,7 @@ const Scenarios = () => {
     ],
   };
 
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('scenarios', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput, setSearchPaginationInput } = useQueryableWithLocalStorage('scenarios', buildSearchPagination({
     sorts: initSorting('scenario_updated_at', 'DESC'),
     filterGroup: quickFilter,
   }));
@@ -228,7 +228,13 @@ const Scenarios = () => {
                       <ScenarioPopover
                         scenario={scenario}
                         actions={['Duplicate', 'Export', 'Delete']}
-                        onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
+                        onDelete={(result) => {
+                          setScenarios(scenarios.filter(e => (e.scenario_id !== result)));
+                          setSearchPaginationInput(prev => ({
+                            ...prev,
+                            size: prev.size - 1,
+                          }));
+                        }}
                         inList
                       />
                     )}
