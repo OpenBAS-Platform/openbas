@@ -310,13 +310,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/js-api@npm:^0.7.1":
-  version: 0.7.1
-  resolution: "@biomejs/js-api@npm:0.7.1"
+"@biomejs/js-api@npm:^0.8.0-beta.3":
+  version: 0.8.0-beta.3
+  resolution: "@biomejs/js-api@npm:0.8.0-beta.3"
   peerDependencies:
-    "@biomejs/wasm-bundler": ^1.9.2
-    "@biomejs/wasm-nodejs": ^1.9.2
-    "@biomejs/wasm-web": ^1.9.2
+    "@biomejs/wasm-bundler": ^1.9.4
+    "@biomejs/wasm-nodejs": ^1.9.4
+    "@biomejs/wasm-web": ^1.9.4
   peerDependenciesMeta:
     "@biomejs/wasm-bundler":
       optional: true
@@ -324,14 +324,14 @@ __metadata:
       optional: true
     "@biomejs/wasm-web":
       optional: true
-  checksum: 10c0/eb2be90535d44c74f769a45a19f74f4e4d0cdbfe609c00e03003077ab1c66c7c7f7fd71af916294cf049167861e2b92343299279a18dd9746f5362038be32cac
+  checksum: 10c0/f037e2338368170f95c3af2464bd2addee52ee78336275ef1cc730bf56a22689ccafdbc6a6a2c66ad62c1481da05aab7c66053ffb8d9378f7284bfe20d93a823
   languageName: node
   linkType: hard
 
-"@biomejs/wasm-nodejs@npm:^1.9.4":
-  version: 1.9.4
-  resolution: "@biomejs/wasm-nodejs@npm:1.9.4"
-  checksum: 10c0/9cb7c1fefbb3c4445a241d060b909b4856203277cf5a8d1745eb84511170889bb95555813388015bbf98e25c1cf15a203068ec31de9d51c07442386af2e3c7a4
+"@biomejs/wasm-nodejs@npm:^2.0.0-beta.6":
+  version: 2.0.0-beta.6
+  resolution: "@biomejs/wasm-nodejs@npm:2.0.0-beta.6"
+  checksum: 10c0/cce971dc448c66f9db24a3f55dda7b369fab634eaad3414c55062c451ecb56a6a523b4e27eee6c7ce297032a625eba85077c6a1f138b8b3e949b32309edd014e
   languageName: node
   linkType: hard
 
@@ -4632,15 +4632,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"c12@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "c12@npm:3.0.3"
+"c12@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "c12@npm:3.0.4"
   dependencies:
     chokidar: "npm:^4.0.3"
     confbox: "npm:^0.2.2"
     defu: "npm:^6.1.4"
-    dotenv: "npm:^16.4.7"
-    exsolve: "npm:^1.0.4"
+    dotenv: "npm:^16.5.0"
+    exsolve: "npm:^1.0.5"
     giget: "npm:^2.0.0"
     jiti: "npm:^2.4.2"
     ohash: "npm:^2.0.11"
@@ -4653,7 +4653,7 @@ __metadata:
   peerDependenciesMeta:
     magicast:
       optional: true
-  checksum: 10c0/bacf4aa499db90e7198dc4927c7385e721320b71db1073390c291a2e45b8ca2e7beb8b7c2d725e212eeb19df8c52ac5fefba1300a94a29830d585cb002d85c4e
+  checksum: 10c0/564c3c835c3238541501f4cbac010aadaea3471c8fe8d696ed38d7f884f3d8642106e0206e204b0fe3e9cb64700462fde4211e9ff430fd624e19de059126f4a4
   languageName: node
   linkType: hard
 
@@ -5631,7 +5631,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.4.7":
+"dotenv@npm:^16.5.0":
   version: 16.5.0
   resolution: "dotenv@npm:16.5.0"
   checksum: 10c0/5bc94c919fbd955bf0ba44d33922a1e93d1078e64a1db5c30faeded1d996e7a83c55332cb8ea4fae5a9ca4d0be44cbceb95c5811e70f9f095298df09d1997dd9
@@ -6514,7 +6514,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exsolve@npm:^1.0.1, exsolve@npm:^1.0.4":
+"exsolve@npm:^1.0.1, exsolve@npm:^1.0.5":
   version: 1.0.5
   resolution: "exsolve@npm:1.0.5"
   checksum: 10c0/0e845843951e8e7f190d26648259b3d584990933ea68a3c8ec984e826d4fb3731681f7f2569252b4fe619db1d67b0859abe0ef694cb2edb454343bd44bcdce59
@@ -9966,7 +9966,7 @@ __metadata:
     remark-gfm: "npm:4.0.1"
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.2"
-    swagger-typescript-api: "npm:13.1.3"
+    swagger-typescript-api: "npm:13.2.0"
     tss-react: "npm:4.9.18"
     typescript: "npm:5.8.3"
     typescript-eslint: "npm:8.33.1"
@@ -12082,14 +12082,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-typescript-api@npm:13.1.3":
-  version: 13.1.3
-  resolution: "swagger-typescript-api@npm:13.1.3"
+"swagger-typescript-api@npm:13.2.0":
+  version: 13.2.0
+  resolution: "swagger-typescript-api@npm:13.2.0"
   dependencies:
-    "@biomejs/js-api": "npm:^0.7.1"
-    "@biomejs/wasm-nodejs": "npm:^1.9.4"
+    "@biomejs/js-api": "npm:^0.8.0-beta.3"
+    "@biomejs/wasm-nodejs": "npm:^2.0.0-beta.6"
     "@types/swagger-schema-official": "npm:^2.0.25"
-    c12: "npm:^3.0.3"
+    c12: "npm:^3.0.4"
     citty: "npm:^0.1.6"
     consola: "npm:^3.4.2"
     eta: "npm:^2.2.0"
@@ -12102,7 +12102,7 @@ __metadata:
   bin:
     sta: ./dist/cli.js
     swagger-typescript-api: ./dist/cli.js
-  checksum: 10c0/0c1d21a84028bbcee90ab2e54903f3ba9a7bab865a2baeee4271c66764a4489878d3b41b377aa4488b3fe9dcc8c8ea2a0bec4965f794ea17dfe99e4599e4284d
+  checksum: 10c0/126914d979ebc43b2fcfb0656a2122fef572a34fb6f26ef7c44f61472d3d0f61d3427b8080a6d3f1bdeef06434e89ee5a99816477cd7536c2315457ef6a7a63b
   languageName: node
   linkType: hard
 
