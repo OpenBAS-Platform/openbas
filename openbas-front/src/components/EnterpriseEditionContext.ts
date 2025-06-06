@@ -16,16 +16,16 @@ type EnterpriseEditionContextType = {
   open: boolean;
   openDialog: () => void;
   closeDialog: () => void;
-  featureDetectedInfo: string;
-  setFeatureDetectedInfo: (info: string) => void;
+  EEFeatureDetectedInfo: string;
+  setEEFeatureDetectedInfo: (info: string) => void;
 };
 
 const EnterpriseEditionContext = createContext<EnterpriseEditionContextType>({
   open: false,
   openDialog: () => {},
   closeDialog: () => {},
-  featureDetectedInfo: '',
-  setFeatureDetectedInfo: () => {},
+  EEFeatureDetectedInfo: '',
+  setEEFeatureDetectedInfo: () => {},
 });
 
 export default EnterpriseEditionContext;

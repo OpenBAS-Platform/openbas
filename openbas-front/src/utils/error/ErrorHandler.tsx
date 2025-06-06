@@ -6,7 +6,7 @@ import useEnterpriseEdition from '../hooks/useEnterpriseEdition';
 import { type Error, setNotifyErrorHandler } from './errorHandlerUtil';
 
 const ErrorHandler = () => {
-  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
+  const { openDialog, setEEFeatureDetectedInfo } = useEnterpriseEdition();
   const { t } = useFormatter();
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const ErrorHandler = () => {
 
       if (error.status === 403 && error.message === 'LICENSE_RESTRICTION') {
         const messages = error?.errors?.children?.message?.errors;
-        setFeatureDetectedInfo(Array.isArray(messages) ? messages.join(', ') : '');
+        setEEFeatureDetectedInfo(Array.isArray(messages) ? messages.join(', ') : '');
         openDialog();
       } else if (error.status === 409) {
         MESSAGING$.notifyError(t('The element already exists'));

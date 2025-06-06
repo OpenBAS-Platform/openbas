@@ -7,16 +7,15 @@ import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { findEndpoints } from '../../../../../actions/assets/endpoint-actions';
-import type { LoggedHelper } from '../../../../../actions/helper';
 import Drawer from '../../../../../components/common/Drawer';
 import AttackPatternFieldController from '../../../../../components/fields/AttackPatternFieldController';
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
 import {
   type EndpointOutput,
   type InjectAssistantInput,
 } from '../../../../../utils/api-types';
+import useEnterpriseEdition from '../../../../../utils/hooks/useEnterpriseEdition';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
@@ -24,7 +23,7 @@ import EndpointsList from '../../../assets/endpoints/EndpointsList';
 import EEChip from '../../../common/entreprise_edition/EEChip';
 import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import InjectAddEndpoints from '../../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
-import AttackPatternAIAssistantModal from './AttackPatternAIAssistantModal';
+import AttackPatternAIAssistantDialog from '././AttackPatternAIAssistantDialog';
 import SelectTTPsDrawer from './SelectTTPsDrawer';
 
 const useStyles = makeStyles()(theme => ({
@@ -40,10 +39,6 @@ const useStyles = makeStyles()(theme => ({
     marginTop: theme.spacing(1),
     gap: theme.spacing(1),
   },
-  useArianeButton: {
-    marginLeft: 'auto',
-    color: theme.palette.ai.main,
-  },
   selectTTPsButton: { borderColor: theme.palette.divider },
 }));
 
@@ -57,8 +52,12 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const [openMitreFilterDrawer, setOpenMitreFilterDrawer] = useState(false);
-  const [openArianeAIAssistantModal, setOpenArianeAIAssistantModal] = useState(false);
-  const { settings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
+  const [openArianeAIAssistantDialog, setOpenArianeAIAssistantDialog] = useState(false);
+  const {
+    isValidated: isEnterpriseEdition,
+    openDialog: openEnterpriseEditionDialog,
+    setEEFeatureDetectedInfo,
+  } = useEnterpriseEdition();
 
   const schema = z.object({
     asset_group_ids: z.string().array().optional(),
@@ -102,11 +101,21 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     formState: { errors, isDirty, isSubmitting },
   } = methods;
 
+  const onUseArianeClick = () => {
+    if (!isEnterpriseEdition) {
+      setEEFeatureDetectedInfo(t('Ariane AI'));
+      openEnterpriseEditionDialog();
+    } else {
+      setOpenArianeAIAssistantDialog(true);
+    }
+  };
+
   const onCloseMitreDrawer = () => {
     setOpenMitreFilterDrawer(false);
   };
-  const onCloseArianneAIAssistantModal = () => {
-    setOpenArianeAIAssistantModal(false);
+
+  const onCloseArianneAIAssistantDialog = () => {
+    setOpenArianeAIAssistantDialog(false);
   };
 
   const onCloseDrawer = () => {
@@ -146,9 +155,9 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     onUpdateAttackPattern(Array.from(selectedAttackPatternIds));
     onCloseMitreDrawer();
   };
-  const onUpdateAttackPatternAIModal = (attackPatternIds: string[]) => {
+  const onUpdateAttackPatternAIDialog = (attackPatternIds: string[]) => {
     onUpdateAttackPattern(attackPatternIds);
-    onCloseArianneAIAssistantModal();
+    onCloseArianneAIAssistantDialog();
   };
 
   return (
@@ -213,13 +222,15 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
               <Typography variant="h5">{t('Scenario coverage')}</Typography>
               <Button
                 variant="outlined"
-                color="inherit"
+                sx={{
+                  marginLeft: 'auto',
+                  color: isEnterpriseEdition ? 'ai.main' : 'action.disabled',
+                  borderColor: isEnterpriseEdition ? 'ai.main' : 'action.disabledBackground',
+                }}
                 size="small"
-                className={classes.useArianeButton}
-                onClick={() => setOpenArianeAIAssistantModal(true)}
+                onClick={onUseArianeClick}
                 startIcon={<AutoAwesomeOutlined fontSize="small" />}
-                endIcon={!settings.platform_license?.license_is_validated ? <span><EEChip /></span> : <></>}
-                disabled={!settings.platform_license?.license_is_validated}
+                endIcon={isEnterpriseEdition ? <></> : <span><EEChip /></span>}
               >
                 {t('Use Ariane')}
               </Button>
@@ -257,10 +268,10 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
           initialSelectedTTPIds={getValues('attack_pattern_ids')}
           onUpdateAttackPattern={onUpdateAttackPatternWidget}
         />
-        <AttackPatternAIAssistantModal
-          open={openArianeAIAssistantModal}
-          onClose={onCloseArianneAIAssistantModal}
-          onAttackPatternIdsFind={onUpdateAttackPatternAIModal}
+        <AttackPatternAIAssistantDialog
+          open={openArianeAIAssistantDialog}
+          onClose={onCloseArianneAIAssistantDialog}
+          onAttackPatternIdsFind={onUpdateAttackPatternAIDialog}
         />
       </>
     </Drawer>
