@@ -12,7 +12,6 @@ import importPlugin from 'eslint-plugin-import';
 import playwright from 'eslint-plugin-playwright';
 import react from 'eslint-plugin-react';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 
@@ -51,8 +50,6 @@ export default [
     plugins: {
     // eslint-plugin-react-refresh
       'react-refresh': reactRefresh,
-      // eslint-plugin-simple-import-sort
-      'simple-import-sort': simpleImportSort,
       // local package eslint-plugin-custom-rules
       'custom-rules': customRules,
     },
@@ -62,10 +59,6 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
-
-      // eslint-plugin-simple-import-sort rules
-      'simple-import-sort/imports': 'warn',
-      'simple-import-sort/exports': 'error',
 
       // local package eslint-plugin-custom-rules rules
       'custom-rules/classes-rule': 1,
