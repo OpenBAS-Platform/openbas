@@ -26,12 +26,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Transactional
 @TestInstance(PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AttackPatternApiTest extends IntegrationTest {
   @Autowired private Environment env;
 
@@ -110,16 +112,16 @@ public class AttackPatternApiTest extends IntegrationTest {
           .thenReturn(
               new ResponseEntity<>(
                   """
-                  {
-                  "mock-file.pdf": [
-                    {
-                      "text": "Another file's text chunk",
-                      "predictions": {
-                        "T1057": 0.92
-                      }
-                    }
-                  ]
-                }""",
+                          {
+                          "mock-file.pdf": [
+                            {
+                              "text": "Another file's text chunk",
+                              "predictions": {
+                                "T1057": 0.92
+                              }
+                            }
+                          ]
+                        }""",
                   HttpStatus.OK));
 
       MockPart jsonPart = new MockPart("text", "Test".getBytes());
