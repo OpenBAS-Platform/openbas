@@ -57,7 +57,7 @@ public class RabbitMQHelper {
 
       RestTemplate restTemplate;
       try {
-        restTemplate = restTemplate(rabbitmqConfig);
+        restTemplate = rabbitMQRestTemplate(rabbitmqConfig);
       } catch (KeyStoreException
           | NoSuchAlgorithmException
           | KeyManagementException
@@ -91,7 +91,7 @@ public class RabbitMQHelper {
     return rabbitMQVersion;
   }
 
-  private static RestTemplate restTemplate(RabbitmqConfig rabbitmqConfig)
+  private static RestTemplate rabbitMQRestTemplate(RabbitmqConfig rabbitmqConfig)
       throws KeyStoreException,
           NoSuchAlgorithmException,
           KeyManagementException,

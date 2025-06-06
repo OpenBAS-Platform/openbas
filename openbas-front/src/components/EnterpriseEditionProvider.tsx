@@ -16,7 +16,7 @@ import EnterpriseEditionContext from './EnterpriseEditionContext';
 
 const EnterpriseEditionProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
-  const [featureDetectedInfo, setFeatureDetectedInfo] = useState('');
+  const [EEFeatureDetectedInfo, setEEFeatureDetectedInfo] = useState('');
 
   const openDialog = useCallback(() => setOpen(true), []);
   const closeDialog = useCallback(() => setOpen(false), []);
@@ -27,8 +27,8 @@ const EnterpriseEditionProvider = ({ children }: { children: ReactNode }) => {
         open,
         openDialog,
         closeDialog,
-        featureDetectedInfo,
-        setFeatureDetectedInfo,
+        EEFeatureDetectedInfo,
+        setEEFeatureDetectedInfo,
       }}
     >
       {children}

@@ -1,23 +1,35 @@
 import { CloudUploadOutlined } from '@mui/icons-material';
-import { CircularProgress, type CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
+import { Button, CircularProgress, type CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
 import { type ChangeEvent, type FunctionComponent, useRef, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { type UserHelper } from '../../actions/helper';
 import { useHelper } from '../../store';
 import { useFormatter } from '../i18n';
 
+const useStyles = makeStyles()(theme => ({ buttonImport: { borderColor: theme.palette.divider } }));
+
 interface Props {
   title: string;
-  handleUpload: (formData: FormData) => void;
+  handleUpload: (formData: FormData, file: File) => void;
   color?: CircularProgressProps['color'];
+  isIconButton?: boolean;
+  fileAccepted?: string;
+  allowReUpload?: boolean;
+  disabled?: boolean;
 }
 
 const ImportUploader: FunctionComponent<Props> = ({
   title,
   handleUpload,
   color,
+  isIconButton = true,
+  fileAccepted = '',
+  allowReUpload = false,
+  disabled = false,
 }) => {
   // Standard hooks
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [upload, setUpload] = useState(false);
@@ -28,9 +40,26 @@ const ImportUploader: FunctionComponent<Props> = ({
     setUpload(true);
     const formData = new FormData();
     formData.append('file', file);
+    handleUpload(formData, file);
     setUpload(false);
-    handleUpload(formData);
   };
+
+  if (upload) {
+    return (
+      <Tooltip
+        title={`Uploading ${upload}`}
+        aria-label={`Uploading ${upload}`}
+      >
+        <IconButton disabled={true} style={{ marginRight: 10 }}>
+          <CircularProgress
+            size={24}
+            thickness={2}
+            color={color ?? 'primary'}
+          />
+        </IconButton>
+      </Tooltip>
+    );
+  }
 
   return (
     <>
@@ -38,34 +67,25 @@ const ImportUploader: FunctionComponent<Props> = ({
         ref={uploadRef}
         type="file"
         style={{ display: 'none' }}
-        onChange={(event: ChangeEvent) => {
+        accept={fileAccepted}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
           const target = event.target as HTMLInputElement;
           const file: File = (target.files as FileList)[0];
           if (target.validity.valid) {
             onUpload(file);
           }
+          if (allowReUpload) {
+            event.target.value = '';
+          }
         }}
       />
-      {upload ? (
-        <Tooltip
-          title={`Uploading ${upload}`}
-          aria-label={`Uploading ${upload}`}
-        >
-          <IconButton disabled={true} style={{ marginRight: 10 }}>
-            <CircularProgress
-              size={24}
-              thickness={2}
-              color={color || 'primary'}
-            />
-          </IconButton>
-        </Tooltip>
-      ) : (
+      {isIconButton ? (
         <ToggleButton
           value="import"
           aria-label="import"
           size="small"
           onClick={handleOpenUpload}
-          disabled={!userAdmin}
+          disabled={!userAdmin || disabled}
         >
           <Tooltip
             title={t(title)}
@@ -77,6 +97,22 @@ const ImportUploader: FunctionComponent<Props> = ({
             />
           </Tooltip>
         </ToggleButton>
+      ) : (
+        <Tooltip
+          title={t(title)}
+          aria-label={title}
+        >
+          <Button
+            onClick={handleOpenUpload}
+            disabled={!userAdmin || disabled}
+            size="small"
+            variant="outlined"
+            color="inherit"
+            className={classes.buttonImport}
+          >
+            {t('Import')}
+          </Button>
+        </Tooltip>
       )}
     </>
   );
