@@ -49,6 +49,7 @@ const WidgetCreationParameters: FunctionComponent<{
       const newOptions: GroupOption[] = response.data
         .filter(d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
         .reduce<GroupOption[]>((acc, d) => {
+          // TODO add for number widget dates like availableFilters in WidgetCreationSeries
           let group = 'Specific properties';
           if (d.schema_property_name.includes('_side')) {
             group = 'Relationship properties';
