@@ -1,5 +1,5 @@
 import { TableChart } from '@mui/icons-material';
-import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
+import { ChartBar, ChartDonut, ChartLine, Counter } from 'mdi-material-ui';
 
 import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import { type HistogramWidget, type Widget, type WidgetInput } from '../../../../../utils/api-types-custom';
@@ -38,6 +38,10 @@ export const widgetVisualizationTypes: {
     modes: ['structural'],
     seriesLimit: 1,
   },
+  {
+    category: 'number',
+    seriesLimit: 2,
+  },
 ];
 
 export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' | 'small' | 'medium') => {
@@ -50,6 +54,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
       return <ChartDonut fontSize={fontSize} color="primary" />;
     case 'security-coverage':
       return <TableChart fontSize={fontSize} color="primary" />;
+    case 'number':
+      return <Counter fontSize={fontSize} color="primary" />;
     default:
       return <div />;
   }
