@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AttackPatternService {
   private final Environment env;
   private final AttackPatternRepository attackPatternRepository;
+  private final RestTemplate restTemplate;
 
   /**
    * Call the TTP Extraction AI Webservice to analyze files and text input.
@@ -42,8 +44,6 @@ public class AttackPatternService {
     String url = Objects.requireNonNull(env.getProperty("ttp.extraction.ai.webservice.url"));
     String encodedCertificate =
         Objects.requireNonNull(env.getProperty("ttp.extraction.ai.webservice.encoded.certificate"));
-
-    RestTemplate restTemplate = new RestTemplate();
 
     // Set up the headers for the request
     HttpHeaders headers = new HttpHeaders();
