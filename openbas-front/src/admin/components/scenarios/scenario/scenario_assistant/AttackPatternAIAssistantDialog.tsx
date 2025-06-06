@@ -56,7 +56,7 @@ interface Props {
   onAttackPatternIdsFind: (ids: string[]) => void;
 }
 
-const AttackPatternAIAssistantModal = ({ open, onClose, onAttackPatternIdsFind }: Props) => {
+const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const maxFilesNumber = 5;
@@ -181,4 +181,4 @@ const AttackPatternAIAssistantModal = ({ open, onClose, onAttackPatternIdsFind }
   );
 };
 
-export default AttackPatternAIAssistantModal;
+export default AttackPatternAIAssistantDialog;
