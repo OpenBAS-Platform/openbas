@@ -69,15 +69,15 @@ public class AttackPatternApi extends RestBehavior {
         AttackPattern.class);
   }
 
-  @PostMapping("/api/attack_patterns/search-with-ai")
+  @PostMapping(ATTACK_PATTERN_URI + "/search-with-ai")
   @Operation(
       summary = "Extract Attack Paterns from text or files using AI",
       description = "Get attack patterns ids extracted from a text or files using AI")
   public List<String> searchAttackPatternWithTTPAIWebservice(
       @RequestPart("files") @Nullable List<MultipartFile> files,
-      @RequestPart("text") final String text) {
+      @RequestPart("text") @Nullable final String text) {
     return attackPatternService.searchAttackPatternWithTTPAIWebservice(
-        files == null ? new ArrayList<>() : files, text);
+        files == null ? new ArrayList<>() : files, text == null ? "" : text);
   }
 
   @GetMapping("/api/attack_patterns/{attackPatternId}")

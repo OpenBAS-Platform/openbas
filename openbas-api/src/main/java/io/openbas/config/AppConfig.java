@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 @EnableAsync
@@ -48,5 +49,10 @@ public class AppConfig {
             new ExternalDocumentation()
                 .description("OpenBAS documentation")
                 .url("https://docs.openbas.io/"));
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
   }
 }
