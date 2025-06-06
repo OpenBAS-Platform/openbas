@@ -7,8 +7,11 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.rest.attack_pattern.form.AnalysisResultFromTTPExtractionAIWebserviceOutput;
 import java.io.IOException;
 import java.util.*;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -22,7 +25,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-@Log
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttackPatternService {
@@ -70,7 +73,7 @@ public class AttackPatternService {
     ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
 
     if (response.getStatusCode().isError()) {
-      log.severe("Request to TTP Extraction AI Webservice failed: " + response.getBody());
+      log.error("Request to TTP Extraction AI Webservice failed: {}", response.getBody());
       throw new RestClientException(
           "Request to TTP Extraction AI Webservice failed: " + response.getBody());
     }
