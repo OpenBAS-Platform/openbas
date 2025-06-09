@@ -4,11 +4,8 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
 

@@ -3,11 +3,9 @@ package io.openbas.utils;
 import static java.util.Collections.emptyList;
 
 import io.openbas.database.model.AttackPattern;
-import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.service.AssetGroupService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
