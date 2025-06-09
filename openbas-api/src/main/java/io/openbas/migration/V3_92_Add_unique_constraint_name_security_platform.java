@@ -14,6 +14,6 @@ public class V3_92_Add_unique_constraint_name_security_platform extends BaseJava
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE execution_traces ADD COLUMN execution_structured_output TEXT;");
+    select.execute("CREATE UNIQUE INDEX unique_name_for_security_platform ON assets (asset_name) WHERE asset_type = 'SecurityPlatform';");
   }
 }
