@@ -1,14 +1,15 @@
+// MUST be imported *before* the component
+// eslint-disable-next-line simple-import-sort/imports
+import mockStoreMethodWithReturn from '../../fixtures/mock';
+
 import { faker } from '@faker-js/faker';
 // @testing-library/dom is needed as well as it is a peer dependency of @testing-library/react
 import { act, render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-// MUST be imported *before* the component
-import mockStoreMethodWithReturn from '../../fixtures/mock';
 import ExportButton from '../../../components/common/ExportButton';
 import { createDefaultTags, createTagMap } from '../../fixtures/api-types.fixtures';
 import TestRootComponent from '../../fixtures/TestRootComponent';
-
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 type testobj = { [key: string]: any };
 function createObjWithDefaultKeys(objtype: string): testobj {
