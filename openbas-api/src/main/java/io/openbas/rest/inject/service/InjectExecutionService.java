@@ -7,8 +7,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectExecutionRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionInput;
@@ -18,10 +18,7 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -52,14 +49,16 @@ public class InjectExecutionService {
     injectExecution.setInject(inject);
     injectExecution.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
-    inject.setExecutions(injectExecution);
+    inject.setExecutions(new ArrayList<>(Arrays.asList(injectExecution)));
     return injectRepository.save(inject);
   }
 
   public void addStartImplantExecutionTraceByInject(
       String injectId, String agentId, String message) {
     InjectExecution injectExecution =
-        injectExecutionRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
+        injectExecutionRepository
+            .findByInjectId(injectId)
+            .orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
     ExecutionTrace trace =
         new ExecutionTrace(
@@ -76,7 +75,7 @@ public class InjectExecutionService {
 
   private int getCompleteTrace(Inject inject) {
     return inject
-        .getExecutions()
+        .getExecution()
         .map(InjectExecution::getTraces)
         .orElse(Collections.emptyList())
         .stream()
@@ -135,7 +134,7 @@ public class InjectExecutionService {
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
     InjectExecution injectExecution =
-        inject.getExecutions().orElseThrow(ElementNotFoundException::new);
+        inject.getExecution().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace =
         createExecutionTrace(injectExecution, input, agent, structuredOutput);
@@ -203,7 +202,7 @@ public class InjectExecutionService {
 
   private InjectExecution getOrInitializeInjectStatus(Inject inject) {
     return inject
-        .getExecutions()
+        .getExecution()
         .orElseGet(
             () -> {
               InjectExecution newStatus = new InjectExecution();
@@ -299,7 +298,7 @@ public class InjectExecutionService {
     log.log(Level.SEVERE, e.getMessage());
     if (inject != null) {
       inject
-          .getExecutions()
+          .getExecution()
           .ifPresent(
               status -> {
                 ExecutionTrace trace =

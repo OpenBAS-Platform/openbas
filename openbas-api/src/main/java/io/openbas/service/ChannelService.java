@@ -58,12 +58,12 @@ public class ChannelService {
                         .getInjectorContract()
                         .map(contract -> contract.getId().equals(CHANNEL_PUBLISH))
                         .orElse(false))
-            .filter(inject -> inject.getExecutions().isPresent())
+            .filter(inject -> inject.getExecution().isPresent())
             .sorted(
-                Comparator.comparing(inject -> inject.getExecutions().get().getTrackingSentDate()))
+                Comparator.comparing(inject -> inject.getExecution().get().getTrackingSentDate()))
             .flatMap(
                 inject -> {
-                  Instant virtualInjectDate = inject.getExecutions().get().getTrackingSentDate();
+                  Instant virtualInjectDate = inject.getExecution().get().getTrackingSentDate();
                   try {
                     ChannelContent content =
                         mapper.treeToValue(inject.getContent(), ChannelContent.class);

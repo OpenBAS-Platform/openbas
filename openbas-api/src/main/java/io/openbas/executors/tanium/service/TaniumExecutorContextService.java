@@ -36,7 +36,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
       @NotNull final Agent agent)
       throws AgentException {
 
-    InjectExecution status = inject.getExecutions().orElseThrow();
+    InjectExecution status = inject.getExecution().orElseThrow();
     eeService.throwEEExecutorService(
         licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, status);
 

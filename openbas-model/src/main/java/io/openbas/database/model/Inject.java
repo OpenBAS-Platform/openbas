@@ -287,7 +287,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public void clean() {
-    this.executions = null;
+    this.executions.clear();
     this.communications.clear();
     this.expectations.clear();
     this.findings.clear();
@@ -345,7 +345,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public boolean isNotExecuted() {
-    return this.getExecutions().isEmpty();
+    return this.getExecution().isEmpty();
   }
 
   @JsonIgnore
@@ -364,8 +364,8 @@ public class Inject implements Base, Injection {
     return Optional.ofNullable(this.injectorContract);
   }
 
-  public Optional<InjectExecution> getExecutions() {
-    return ofNullable(this.executions);
+  public Optional<InjectExecution> getExecution() {
+    return ofNullable(this.executions.getFirst());
   }
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
@@ -395,7 +395,7 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_sent_at")
   public Instant getSentAt() {
-    return InjectModelHelper.getSentAt(this.getExecutions());
+    return InjectModelHelper.getSentAt(this.getExecution());
   }
 
   @JsonProperty("inject_kill_chain_phases")

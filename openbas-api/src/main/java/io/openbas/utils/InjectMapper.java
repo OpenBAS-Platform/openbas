@@ -36,7 +36,7 @@ public class InjectMapper {
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
         .injectorContract(toInjectorContractOutput(injectorContract))
-        .status(injectStatusMapper.toInjectStatusSimple(inject.getExecutions()))
+        .status(injectStatusMapper.toInjectStatusSimple(inject.getExecution()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))

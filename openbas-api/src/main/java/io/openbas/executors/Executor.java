@@ -16,6 +16,8 @@ import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +104,7 @@ public class Executor {
     // Status
     InjectExecution updatedStatus =
         this.injectExecutionService.initializeInjectStatus(inject.getId(), EXECUTING);
-    inject.setExecutions(updatedStatus);
+    inject.setExecutions(new ArrayList<>(Arrays.asList(updatedStatus)));
     if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
       this.executionExecutorService.launchExecutorContext(inject);
     }

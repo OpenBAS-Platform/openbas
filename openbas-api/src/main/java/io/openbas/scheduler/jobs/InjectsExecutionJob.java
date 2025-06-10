@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -145,7 +146,7 @@ public class InjectsExecutionJob implements Job {
             .map(
                 inject -> {
                   InjectExecution status =
-                      inject.getExecutions().orElseThrow(ElementNotFoundException::new);
+                      inject.getExecution().orElseThrow(ElementNotFoundException::new);
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
@@ -249,11 +250,12 @@ public class InjectsExecutionJob implements Job {
 
     parents.forEach(
         parent -> {
+          Optional<InjectExecution> execution = parent.getExecution();
           mapCondition.put(
               "Execution",
-              parent.getExecutions().isPresent()
-                  && !ExecutionStatus.ERROR.equals(parent.getExecutions().get().getName())
-                  && !executionStatusesNotReady.contains(parent.getExecutions().get().getName()));
+              execution.isPresent()
+                  && !ExecutionStatus.ERROR.equals(execution.get().getName())
+                  && !executionStatusesNotReady.contains(execution.get().getName()));
 
           List<InjectExpectation> expectations =
               injectExpectationRepository.findAllForExerciseAndInject(exerciseId, parent.getId());

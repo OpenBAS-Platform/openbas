@@ -399,7 +399,7 @@ public class InjectorApi extends RestBehavior {
               .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
       InjectExecution injectExecution =
           inject
-              .getExecutions()
+              .getExecution()
               .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
       injectExecution.addTrace(
           ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);

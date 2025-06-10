@@ -4,6 +4,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import io.openbas.injectors.caldera.service.CalderaResultCollectorService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

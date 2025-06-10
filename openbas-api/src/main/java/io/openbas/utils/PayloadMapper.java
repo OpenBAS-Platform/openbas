@@ -45,7 +45,7 @@ public class PayloadMapper {
       statusPayloadOutputBuilder.obfuscator(obfuscator);
     }
 
-    Optional<InjectExecution> injectStatusOpt = injectObj.getExecutions();
+    Optional<InjectExecution> injectStatusOpt = injectObj.getExecution();
     Payload payload = injectorContract.getPayload();
 
     // Handle the case when inject has not been executed yet or no payload output exists
