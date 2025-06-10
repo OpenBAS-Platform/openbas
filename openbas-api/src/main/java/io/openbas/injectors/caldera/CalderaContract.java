@@ -1,5 +1,7 @@
 package io.openbas.injectors.caldera;
 
+import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSETS;
+import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS;
 import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
