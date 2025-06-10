@@ -68,7 +68,7 @@ public class ExecutionExecutorService {
             inject, crowdstrikeAgents, injectStatus);
         atLeastOneExecution.set(true);
       } catch (Exception e) {
-          log.error("Crowdstrike launchBatchExecutorSubprocess error: {}", e.getMessage());
+        log.error("Crowdstrike launchBatchExecutorSubprocess error: {}", e.getMessage());
         saveCrowdstrikeAgentsErrorTraces(e, crowdstrikeAgents, injectStatus);
       }
     }
@@ -79,7 +79,7 @@ public class ExecutionExecutorService {
             launchExecutorContextForAgent(inject, agent);
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
-              log.error("launchExecutorContextForAgent error: {}", e.getMessage());
+            log.error("launchExecutorContextForAgent error: {}", e.getMessage());
             saveAgentErrorTrace(e, injectStatus);
           }
         });
