@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Injector;
-import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.InjectExecutionRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -31,26 +31,26 @@ public class Executor {
 
   private final ApplicationContext context;
 
-  private final InjectStatusRepository injectStatusRepository;
+  private final InjectExecutionRepository injectExecutionRepository;
   private final InjectorRepository injectorRepository;
 
   private final QueueService queueService;
   private final ActionMetricCollector actionMetricCollector;
 
   private final ExecutionExecutorService executionExecutorService;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
 
   private InjectExecution executeExternal(ExecutableInject executableInject, Injector injector)
       throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     String jsonInject = mapper.writeValueAsString(executableInject);
     InjectExecution injectExecution =
-        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
+        this.injectExecutionRepository.findByInjectId(inject.getId()).orElseThrow();
     queueService.publish(injector.getType(), jsonInject);
     injectExecution.addInfoTrace(
         "The inject has been published and is now waiting to be consumed.",
         ExecutionTraceAction.EXECUTION);
-    return this.injectStatusRepository.save(injectExecution);
+    return this.injectExecutionRepository.save(injectExecution);
   }
 
   private InjectExecution executeInternal(ExecutableInject executableInject, Injector injector) {
@@ -69,11 +69,12 @@ public class Executor {
     // Injection status is filled after complete execution
     // Report inject execution
     InjectExecution injectExecution =
-        this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
+        this.injectExecutionRepository.findByInjectId(inject.getId()).orElseThrow();
     log.info("[issue/2797] executeInternal 4: " + inject.getId());
-    InjectExecution completeStatus = injectStatusService.fromExecution(execution, injectExecution);
+    InjectExecution completeStatus =
+        injectExecutionService.fromExecution(execution, injectExecution);
     log.info("[issue/2797] executeInternal 5: " + inject.getId());
-    return injectStatusRepository.save(completeStatus);
+    return injectExecutionRepository.save(completeStatus);
   }
 
   public InjectExecution execute(ExecutableInject executableInject)
@@ -100,7 +101,7 @@ public class Executor {
 
     // Status
     InjectExecution updatedStatus =
-        this.injectStatusService.initializeInjectStatus(inject.getId(), EXECUTING);
+        this.injectExecutionService.initializeInjectStatus(inject.getId(), EXECUTING);
     inject.setExecutions(updatedStatus);
     if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
       this.executionExecutorService.launchExecutorContext(inject);

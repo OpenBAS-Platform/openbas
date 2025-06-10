@@ -2,7 +2,6 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectTestExecution;
-
 import java.time.Instant;
 
 public class InjectTestStatusFixture {

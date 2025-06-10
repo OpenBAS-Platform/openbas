@@ -39,7 +39,8 @@ public class InjectUtils {
       return null;
     }
 
-    if (inject.getExecutions().isPresent() && inject.getExecutions().get().getPayloadOutput() != null) {
+    if (inject.getExecutions().isPresent()
+        && inject.getExecutions().get().getPayloadOutput() != null) {
       // Commands lines saved because inject has been executed
       return inject.getExecutions().get().getPayloadOutput();
     } else if (inject.getInjectorContract().isPresent()) {

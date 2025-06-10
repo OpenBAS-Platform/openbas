@@ -21,7 +21,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
 import io.openbas.rest.injector.response.InjectorConnection;
@@ -74,8 +74,8 @@ public class InjectorApi extends RestBehavior {
   private final FileService fileService;
   private final InjectRepository injectRepository;
   private final AgentRepository agentRepository;
-  private final InjectStatusRepository injectStatusRepository;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionRepository injectExecutionRepository;
+  private final InjectExecutionService injectExecutionService;
 
   @GetMapping("/api/injectors")
   public Iterable<Injector> injectors() {
@@ -398,14 +398,17 @@ public class InjectorApi extends RestBehavior {
               .findById(agentId)
               .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
       InjectExecution injectExecution =
-          inject.getExecutions().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
-      injectExecution.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
-      injectStatusRepository.save(injectExecution);
+          inject
+              .getExecutions()
+              .orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+      injectExecution.addTrace(
+          ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
+      injectExecutionRepository.save(injectExecution);
       InjectExecutionInput input = new InjectExecutionInput();
       input.setMessage("Execution done");
       input.setStatus(ExecutionTraceStatus.INFO.name());
       input.setAction(InjectExecutionAction.complete);
-      injectStatusService.updateInjectStatus(agent, inject, input, null);
+      injectExecutionService.updateInjectStatus(agent, inject, input, null);
     }
     throw new IllegalArgumentException(message);
   }

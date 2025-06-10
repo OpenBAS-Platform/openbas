@@ -5,7 +5,7 @@ import io.openbas.database.model.InjectExecution;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.caldera.CalderaContract;
 import io.openbas.injectors.caldera.model.ResultStatus;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,16 +23,16 @@ public class CalderaResultCollectorService implements Runnable {
 
   private final InjectRepository injectRepository;
   private final CalderaInjectorService calderaService;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
 
   @Autowired
   public CalderaResultCollectorService(
       InjectRepository injectRepository,
       CalderaInjectorService calderaService,
-      InjectStatusService injectStatusService) {
+      InjectExecutionService injectExecutionService) {
     this.injectRepository = injectRepository;
     this.calderaService = calderaService;
-    this.injectStatusService = injectStatusService;
+    this.injectExecutionService = injectExecutionService;
   }
 
   @Override
@@ -40,7 +40,7 @@ public class CalderaResultCollectorService implements Runnable {
   public void run() {
     // Retrieve Caldera inject not done
     List<InjectExecution> injectExecutions =
-        this.injectStatusService.findPendingInjectStatusByType(CalderaContract.TYPE);
+        this.injectExecutionService.findPendingInjectStatusByType(CalderaContract.TYPE);
     // For each one ask for traces and status
     injectExecutions.forEach(
         (injectStatus -> {
@@ -130,8 +130,8 @@ public class CalderaResultCollectorService implements Runnable {
           }
 
           Inject relatedInject = injectStatus.getInject();
-          if (injectStatusService.isAllInjectAgentsExecuted(relatedInject)) {
-            injectStatusService.updateFinalInjectStatus(injectStatus);
+          if (injectExecutionService.isAllInjectAgentsExecuted(relatedInject)) {
+            injectExecutionService.updateFinalInjectStatus(injectStatus);
           }
 
           injectRepository.save(relatedInject);

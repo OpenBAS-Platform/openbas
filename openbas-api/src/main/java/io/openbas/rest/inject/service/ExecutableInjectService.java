@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class ExecutableInjectService {
 
   private final InjectService injectService;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
   private final PayloadService payloadService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
@@ -125,7 +125,7 @@ public class ExecutableInjectService {
   public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
       throws Exception {
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
-    this.injectStatusService.addStartImplantExecutionTraceByInject(
+    this.injectExecutionService.addStartImplantExecutionTraceByInject(
         injectId, agentId, "Implant is up and starting execution");
     return payloadToExecute;
   }

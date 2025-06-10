@@ -308,7 +308,8 @@ public class InjectApi extends RestBehavior {
   public Inject injectExecutionReception(
       @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    InjectExecution injectExecution = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
+    InjectExecution injectExecution =
+        inject.getExecutions().orElseThrow(ElementNotFoundException::new);
     injectExecution.setName(ExecutionStatus.PENDING);
     return injectRepository.save(inject);
   }

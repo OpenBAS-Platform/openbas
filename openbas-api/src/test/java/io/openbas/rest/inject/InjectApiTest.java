@@ -28,7 +28,7 @@ import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
@@ -78,7 +78,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
-  @SpyBean private InjectStatusService injectStatusService;
+  @SpyBean private InjectExecutionService injectExecutionService;
 
   @Autowired private AgentComposer agentComposer;
   @Autowired private EndpointComposer endpointComposer;
@@ -550,7 +550,7 @@ class InjectApiTest extends IntegrationTest {
 
       Inject injectSaved = injectRepository.save(inject);
       doNothing()
-          .when(injectStatusService)
+          .when(injectExecutionService)
           .addStartImplantExecutionTraceByInject(any(), any(), any());
 
       // -- EXECUTE --
@@ -604,7 +604,7 @@ class InjectApiTest extends IntegrationTest {
 
       Inject injectSaved = injectRepository.save(inject);
       doNothing()
-          .when(injectStatusService)
+          .when(injectExecutionService)
           .addStartImplantExecutionTraceByInject(any(), any(), any());
 
       // -- EXECUTE --
@@ -690,7 +690,8 @@ class InjectApiTest extends IntegrationTest {
         assertEquals(
             ExecutionTraceStatus.SUCCESS, injectExecutionSaved.getTraces().getFirst().getStatus());
         assertEquals(
-            ExecutionTraceAction.EXECUTION, injectExecutionSaved.getTraces().getFirst().getAction());
+            ExecutionTraceAction.EXECUTION,
+            injectExecutionSaved.getTraces().getFirst().getAction());
         assertEquals(logMessage, injectExecutionSaved.getTraces().getFirst().getMessage());
       }
 

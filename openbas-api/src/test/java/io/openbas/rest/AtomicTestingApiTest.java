@@ -13,7 +13,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.InjectExecutionRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -49,7 +49,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private InjectStatusRepository injectStatusRepository;
+  @Autowired private InjectExecutionRepository injectExecutionRepository;
   @Autowired private EntityManager entityManager;
   @Autowired private ObjectMapper mapper;
 
@@ -63,7 +63,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     INJECT_WITH_STATUS_AND_COMMAND_LINES = injectRepository.save(injectWithPayload);
     InjectExecution injectExecution = InjectStatusFixture.createPendingInjectStatus();
     injectExecution.setInject(injectWithPayload);
-    INJECT_STATUS = injectStatusRepository.save(injectExecution);
+    INJECT_STATUS = injectExecutionRepository.save(injectExecution);
   }
 
   private InjectComposer.Composer getAtomicTestingWrapper(

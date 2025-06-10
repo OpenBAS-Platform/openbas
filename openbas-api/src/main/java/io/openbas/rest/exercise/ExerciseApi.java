@@ -84,7 +84,7 @@ public class ExerciseApi extends RestBehavior {
   private final LessonsCategoryRepository lessonsCategoryRepository;
   private final LessonsQuestionRepository lessonsQuestionRepository;
   private final LessonsAnswerRepository lessonsAnswerRepository;
-  private final InjectStatusRepository injectStatusRepository;
+  private final InjectExecutionRepository injectExecutionRepository;
   private final InjectRepository injectRepository;
   private final ObjectiveRepository objectiveRepository;
   private final EvaluationRepository evaluationRepository;
@@ -579,7 +579,7 @@ public class ExerciseApi extends RestBehavior {
       exercise.setCurrentPause(null);
       pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
       // Reset injects outcome, communications and expectations
-      this.injectStatusRepository.deleteAllById(
+      this.injectExecutionRepository.deleteAllById(
           exercise.getInjects().stream()
               .map(Inject::getExecutions)
               .map(i -> i.map(InjectExecution::getId).orElse(""))

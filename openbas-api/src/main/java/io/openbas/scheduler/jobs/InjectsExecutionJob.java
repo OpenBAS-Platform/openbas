@@ -14,7 +14,7 @@ import io.openbas.helper.InjectHelper;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import io.openbas.service.NotificationEventService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
@@ -58,7 +58,7 @@ public class InjectsExecutionJob implements Job {
   private final ExerciseRepository exerciseRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
   private final io.openbas.executors.Executor executor;
   private final ActionMetricCollector actionMetricCollector;
   private final NotificationEventService notificationEventService;
@@ -156,7 +156,7 @@ public class InjectsExecutionJob implements Job {
                 })
             .collect(Collectors.toList());
 
-    injectStatusService.saveAll(updatedStatuses);
+    injectExecutionService.saveAll(updatedStatuses);
   }
 
   private void executeInject(ExecutableInject executableInject)
@@ -353,7 +353,7 @@ public class InjectsExecutionJob implements Job {
                           } catch (Exception e) {
                             Inject inject = executableInject.getInjection().getInject();
                             LOGGER.log(Level.WARNING, e.getMessage(), e);
-                            injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+                            injectExecutionService.failInjectStatus(inject.getId(), e.getMessage());
                           }
                         });
                 // Update the exercise

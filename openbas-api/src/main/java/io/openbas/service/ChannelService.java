@@ -59,7 +59,8 @@ public class ChannelService {
                         .map(contract -> contract.getId().equals(CHANNEL_PUBLISH))
                         .orElse(false))
             .filter(inject -> inject.getExecutions().isPresent())
-            .sorted(Comparator.comparing(inject -> inject.getExecutions().get().getTrackingSentDate()))
+            .sorted(
+                Comparator.comparing(inject -> inject.getExecutions().get().getTrackingSentDate()))
             .flatMap(
                 inject -> {
                   Instant virtualInjectDate = inject.getExecutions().get().getTrackingSentDate();

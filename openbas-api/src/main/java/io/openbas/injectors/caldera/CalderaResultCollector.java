@@ -4,7 +4,6 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import io.openbas.injectors.caldera.service.CalderaResultCollectorService;
-import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class CalderaResultCollector {
   private final ThreadPoolTaskScheduler taskScheduler;
   private final InjectRepository injectRepository;
   private final CalderaInjectorService calderaService;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
 
   @PostConstruct
   public void init() {
@@ -29,7 +28,7 @@ public class CalderaResultCollector {
     if (this.config.isEnable()) {
       CalderaResultCollectorService service =
           new CalderaResultCollectorService(
-              this.injectRepository, this.calderaService, this.injectStatusService);
+              this.injectRepository, this.calderaService, this.injectExecutionService);
       this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
     }
   }

@@ -71,7 +71,7 @@ public class InjectService {
   private final Ee eeService;
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
-  private final InjectStatusRepository injectStatusRepository;
+  private final InjectExecutionRepository injectExecutionRepository;
   private final InjectMapper injectMapper;
   private final MethodSecurityExpressionHandler methodSecurityExpressionHandler;
   private final UserService userService;
@@ -394,7 +394,7 @@ public class InjectService {
     injectExecution.setInject(inject);
     injectExecution.setTrackingSentDate(Instant.now());
     injectExecution.setName(ExecutionStatus.QUEUING);
-    this.injectStatusRepository.save(injectExecution);
+    this.injectExecutionRepository.save(injectExecution);
     return injectExecution;
   }
 
@@ -873,6 +873,6 @@ public class InjectService {
 
   public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
     return injectStatusMapper.toInjectStatusOutput(
-        injectStatusRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
+        injectExecutionRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
   }
 }

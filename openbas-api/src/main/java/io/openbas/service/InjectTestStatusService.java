@@ -145,7 +145,8 @@ public class InjectTestStatusService {
             .findByInject(inject)
             .map(
                 existingStatus -> {
-                  InjectTestExecution updatedStatus = InjectTestExecution.fromExecutionTest(execution);
+                  InjectTestExecution updatedStatus =
+                      InjectTestExecution.fromExecutionTest(execution);
                   updatedStatus.setId(existingStatus.getId());
                   updatedStatus.setTestCreationDate(existingStatus.getTestCreationDate());
                   updatedStatus.setInject(inject);

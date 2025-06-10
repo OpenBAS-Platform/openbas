@@ -14,5 +14,6 @@ public abstract class ExecutorContextService {
       throws AgentException;
 
   public abstract List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, Set<Agent> agents, InjectExecution injectExecution) throws InterruptedException;
+      Inject inject, Set<Agent> agents, InjectExecution injectExecution)
+      throws InterruptedException;
 }

@@ -62,7 +62,7 @@ public class ExerciseApiStatusTest {
 
   @Autowired private InjectorContractRepository injectorContractRepository;
 
-  @Autowired private InjectStatusRepository injectStatusRepository;
+  @Autowired private InjectExecutionRepository injectExecutionRepository;
 
   @Autowired private LessonsAnswerRepository lessonsAnswerRepository;
 
@@ -490,7 +490,7 @@ public class ExerciseApiStatusTest {
 
     assertNull(JsonPath.read(response, "$.exercise_start_date"));
     assertNull(JsonPath.read(response, "$.exercise_end_date"));
-    assertEquals(Optional.empty(), injectStatusRepository.findByInjectId(SAVED_INJECT5.getId()));
+    assertEquals(Optional.empty(), injectExecutionRepository.findByInjectId(SAVED_INJECT5.getId()));
     assertEquals(Optional.empty(), lessonsAnswerRepository.findById(LESSON_ANSWER.getId()));
     assertEquals(
         List.of(ExerciseStatus.RUNNING.name()),

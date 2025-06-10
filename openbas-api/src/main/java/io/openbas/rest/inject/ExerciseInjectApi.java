@@ -21,8 +21,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectExecutionService;
 import io.openbas.rest.inject.service.InjectService;
-import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -69,7 +69,7 @@ public class ExerciseInjectApi extends RestBehavior {
   private final ExecutionContextService executionContextService;
   private final InjectService injectService;
   private final InjectDuplicateService injectDuplicateService;
-  private final InjectStatusService injectStatusService;
+  private final InjectExecutionService injectExecutionService;
 
   @Operation(summary = "Retrieved injects for an exercise")
   @ApiResponses(
@@ -229,7 +229,7 @@ public class ExerciseInjectApi extends RestBehavior {
       return executor.directExecute(injection);
     } catch (Exception e) {
       log.log(Level.WARNING, e.getMessage(), e);
-      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+      return injectExecutionService.failInjectStatus(inject.getId(), e.getMessage());
     }
   }
 
@@ -267,7 +267,7 @@ public class ExerciseInjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    return injectStatusService.updateInjectStatus(injectId, input);
+    return injectExecutionService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")

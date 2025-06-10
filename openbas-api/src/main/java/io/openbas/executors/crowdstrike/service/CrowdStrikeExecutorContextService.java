@@ -56,7 +56,8 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       @NotNull final Agent agent) {}
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, Set<Agent> agents, InjectExecution injectExecution) throws InterruptedException {
+      Inject inject, Set<Agent> agents, InjectExecution injectExecution)
+      throws InterruptedException {
 
     eeService.throwEEExecutorService(
         licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectExecution);
@@ -101,7 +102,8 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
         .toList();
   }
 
-  private List<Agent> manageWithoutPlatformAgents(List<Agent> agents, InjectExecution injectExecution) {
+  private List<Agent> manageWithoutPlatformAgents(
+      List<Agent> agents, InjectExecution injectExecution) {
     List<Agent> csAgents = new ArrayList<>(agents);
     List<Agent> withoutPlatformAgents =
         csAgents.stream()

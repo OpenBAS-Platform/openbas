@@ -61,7 +61,7 @@ class InjectServiceTest {
 
   @Mock private InjectDocumentRepository injectDocumentRepository;
 
-  @Mock private InjectStatusRepository injectStatusRepository;
+  @Mock private InjectExecutionRepository injectExecutionRepository;
 
   @Mock private InjectMapper injectMapper;
 
@@ -76,7 +76,7 @@ class InjectServiceTest {
   ObjectMapper mapper;
 
   @InjectMocks private InjectService injectService;
-  @InjectMocks private InjectStatusService injectStatusService;
+  @InjectMocks private InjectExecutionService injectExecutionService;
 
   @BeforeEach
   void setUp() {
@@ -614,10 +614,10 @@ class InjectServiceTest {
     when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
     when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
 
-    injectStatusService.initializeInjectStatus(injectId, executionStatus);
+    injectExecutionService.initializeInjectStatus(injectId, executionStatus);
 
     ArgumentCaptor<InjectExecution> statusCaptor = ArgumentCaptor.forClass(InjectExecution.class);
-    verify(injectStatusRepository).save(statusCaptor.capture());
+    verify(injectExecutionRepository).save(statusCaptor.capture());
     InjectExecution savedStatus = statusCaptor.getValue();
     assertNotNull(savedStatus);
     assertEquals(inject, savedStatus.getInject());
