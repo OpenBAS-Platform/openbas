@@ -18,14 +18,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectStatusService {
 
   private final InjectRepository injectRepository;
@@ -160,7 +159,7 @@ public class InjectStatusService {
       findingService.computeFindings(input, inject, agent);
 
     } catch (ElementNotFoundException e) {
-      log.log(Level.SEVERE, e.getMessage());
+      log.error(e.getMessage(), e);
       if (inject != null) {
         inject
             .getStatus()

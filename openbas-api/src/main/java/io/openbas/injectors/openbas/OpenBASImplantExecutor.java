@@ -23,12 +23,12 @@ import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component(OpenBASImplantContract.TYPE)
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class OpenBASImplantExecutor extends Injector {
 
   private final AssetGroupService assetGroupService;

@@ -8,10 +8,10 @@ import io.openbas.config.RabbitmqConfig;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 public class QueueService {
 
@@ -42,8 +42,9 @@ public class QueueService {
         try {
           connection.close();
         } catch (IOException ex) {
-          log.severe(
-              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
+          log.error(
+              "Unable to close RabbitMQ connection. You should worry as this could impact performance",
+              ex);
         }
       }
     }

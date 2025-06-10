@@ -17,14 +17,14 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Service containing the logic related to service health checks */
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class HealthCheckService {
 
   @Autowired private HealthCheckRepository healthCheckRepository;
@@ -79,8 +79,9 @@ public class HealthCheckService {
         try {
           connection.close();
         } catch (IOException e) {
-          log.severe(
-              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
+          log.error(
+              "Unable to close RabbitMQ connection. You should worry as this could impact performance",
+              e);
         }
       }
     }

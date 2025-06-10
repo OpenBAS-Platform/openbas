@@ -8,11 +8,11 @@ import io.openbas.service.AgentService;
 import io.openbas.utils.Time;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 public class CalderaGarbageCollectorService implements Runnable {
   private final int KILL_TTL = 900000; // 15 min
@@ -64,7 +64,7 @@ public class CalderaGarbageCollectorService implements Runnable {
                 log.info("Deleting agent " + agentCaldera.getHost());
                 client.deleteAgent(agentCaldera);
               } catch (RuntimeException e) {
-                log.severe("Failed to delete agent");
+                log.error("Failed to delete agent", e);
               }
             }
           }

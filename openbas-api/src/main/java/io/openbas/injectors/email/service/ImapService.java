@@ -17,12 +17,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,10 +29,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-@Log
+@Slf4j
 public class ImapService {
 
-  private static final Logger LOGGER = Logger.getLogger(ImapService.class.getName());
   private static final Pattern INJECT_ID_PATTERN = Pattern.compile("\\[inject_id=(.*)\\]");
   private static final String PROVIDER = "imap";
 
@@ -74,7 +71,7 @@ public class ImapService {
       initStore(env);
       this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
     } catch (Exception e) {
-      log.severe(e.getMessage());
+      log.error(e.getMessage(), e);
       this.platformSettingsService.errorMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
     }
   }
@@ -114,7 +111,7 @@ public class ImapService {
     String sentFolder = env.getProperty("openbas.mail.imap.sent");
     boolean isEnabled = env.getProperty("openbas.mail.imap.enabled", Boolean.class, false);
     if (isEnabled) {
-      LOGGER.log(Level.INFO, "IMAP sync started");
+      log.info("IMAP sync started");
       imapStore.connect(host, port, username, password);
       try {
         Folder defaultFolder = imapStore.getDefaultFolder();
@@ -124,10 +121,10 @@ public class ImapService {
           sentBox.setSubscribed(true);
         }
       } catch (Exception e) {
-        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        log.error(e.getMessage(), e);
       }
     } else {
-      LOGGER.log(Level.INFO, "IMAP sync disabled");
+      log.info("IMAP sync disabled");
     }
   }
 
@@ -284,7 +281,7 @@ public class ImapService {
             comm.setAttachments(uploads.toArray(String[]::new));
             communicationRepository.save(comm);
           } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
           }
         }
       }
@@ -301,14 +298,8 @@ public class ImapService {
     int startMessageNumber = parseInt(currentState.getValue());
     int messageCount = inbox.getMessageCount();
     if (startMessageNumber < messageCount) {
-      LOGGER.log(
-          Level.INFO,
-          "synchronizeInbox "
-              + inbox.getName()
-              + " from "
-              + startMessageNumber
-              + " to "
-              + messageCount);
+      log.info(
+          "synchronizeInbox {} from {} to {}", inbox.getName(), startMessageNumber, messageCount);
       int start = startMessageNumber + 1;
       Message[] messages = inbox.getMessages(start, messageCount);
       if (messages.length > 0) {
@@ -335,7 +326,7 @@ public class ImapService {
         tryToSynchronizeFolderFromBox(listeningFolder, false);
       }
     } catch (MessagingException e) {
-      log.warning("Connection failure: " + e.getMessage());
+      log.warn(String.format("Connection failure: %s", e.getMessage()), e);
       // Retry logic or rethrow the exception
       retrySyncFolders();
     }
@@ -347,7 +338,7 @@ public class ImapService {
         syncFolders();
         break;
       } catch (MessagingException e) {
-        log.warning("Retrying connection..." + e.getMessage());
+        log.warn(String.format("Retrying connection..." + e.getMessage()), e);
         Thread.sleep(2000);
         if (i == 2 && imapStore != null && imapStore.isConnected()) {
           imapStore.close();
@@ -365,7 +356,7 @@ public class ImapService {
           imapStore.connect(host, port, username, password);
           this.platformSettingsService.cleanMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
         } catch (MessagingException e) {
-          log.severe(e.getMessage());
+          log.error(e.getMessage(), e);
           this.platformSettingsService.errorMessage(BannerMessage.BANNER_KEYS.IMAP_UNAVAILABLE);
         }
       }

@@ -17,9 +17,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -35,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class CrowdStrikeExecutorClient {
 
   private static final Integer AUTH_TIMEOUT = 300;
@@ -82,7 +81,7 @@ public class CrowdStrikeExecutorClient {
       }
       return hosts;
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
+      log.error(String.format("Unexpected error occurred. Error: %s", e.getMessage()), e);
       throw new RuntimeException(e);
     }
   }
@@ -100,7 +99,7 @@ public class CrowdStrikeExecutorClient {
           .append(error.getMessage())
           .append(".");
     }
-    log.log(Level.SEVERE, msg.toString());
+    log.error(msg.toString());
   }
 
   private ResourcesHosts getResourcesHosts(int offset, String hostGroup) {
@@ -125,10 +124,11 @@ public class CrowdStrikeExecutorClient {
                   + fqlFilter);
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (Exception e) {
-      log.log(
-          Level.SEVERE,
-          "Error occurred during Crowdstrike getResourcesHosts API request. Error: {}",
-          e.getMessage());
+      log.error(
+          String.format(
+              "Error occurred during Crowdstrike getResourcesHosts API request. Error: %s",
+              e.getMessage()),
+          e);
       throw new RuntimeException(e);
     }
   }
@@ -139,10 +139,10 @@ public class CrowdStrikeExecutorClient {
       jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroup);
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (Exception e) {
-      log.log(
-          Level.SEVERE,
-          "Error occurred during Crowdstrike hostGroup API request. Error: {}",
-          e.getMessage());
+      log.error(
+          String.format(
+              "Error occurred during Crowdstrike hostGroup API request. Error: %s", e.getMessage()),
+          e);
       throw new RuntimeException(e);
     }
   }
@@ -157,7 +157,7 @@ public class CrowdStrikeExecutorClient {
       ResourcesSession session =
           this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
       if (session == null) {
-        log.log(Level.SEVERE, "Cannot get the session on the selected device");
+        log.error("Cannot get the session on the selected device");
         throw new RuntimeException("Cannot get the session on the selected device");
       }
       // Execute the command

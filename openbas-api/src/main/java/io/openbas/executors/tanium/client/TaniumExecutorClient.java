@@ -13,9 +13,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class TaniumExecutorClient {
 
   private static final String KEY_HEADER = "session";
@@ -68,18 +67,19 @@ public class TaniumExecutorClient {
       body.put("query", query);
       String jsonResponse = this.post(body);
       if (jsonResponse == null || jsonResponse.isEmpty()) {
-        log.log(Level.SEVERE, "Received empty response from API for query: {}", query);
+        log.error("Received empty response from API for query: {}", query);
         throw new RuntimeException("API returned an empty response");
       }
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (JsonProcessingException e) {
-      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
+      log.error(String.format("Failed to parse JSON response. Error: %s", e.getMessage()), e);
       throw new RuntimeException(e);
     } catch (IOException e) {
-      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
+      log.error(
+          String.format("I/O error occurred during API request. Error: %s", e.getMessage()), e);
       throw new RuntimeException(e);
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
+      log.error(String.format("Unexpected error occurred. Error: %s", e.getMessage()), e);
       throw new RuntimeException(e);
     }
   }

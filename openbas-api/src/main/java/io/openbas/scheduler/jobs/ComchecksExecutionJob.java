@@ -25,8 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -37,9 +36,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @DisallowConcurrentExecution
+@Slf4j
 public class ComchecksExecutionJob implements Job {
-
-  private static final Logger LOGGER = Logger.getLogger(ComchecksExecutionJob.class.getName());
   @Resource private OpenBASConfig openBASConfig;
   private ApplicationContext context;
   private ComcheckRepository comcheckRepository;
@@ -165,7 +163,7 @@ public class ComchecksExecutionJob implements Job {
                 }
               });
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, e.getMessage(), e);
+      log.error(e.getMessage(), e);
       throw new JobExecutionException(e);
     }
   }

@@ -3,14 +3,13 @@ package io.openbas.executors.openbas;
 import io.openbas.database.model.Endpoint;
 import io.openbas.executors.ExecutorService;
 import jakarta.annotation.PostConstruct;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class OpenBASExecutor {
 
   private final ExecutorService executorService;
@@ -38,7 +37,7 @@ public class OpenBASExecutor {
             Endpoint.PLATFORM_TYPE.MacOS.name()
           });
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating OpenBAS executor: " + e);
+      log.error(String.format("Error creating OpenBAS executor: %s", e), e);
     }
   }
 }

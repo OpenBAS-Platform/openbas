@@ -17,16 +17,15 @@ import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @ConditionalOnProperty(prefix = "executor.crowdstrike", name = "enable")
-@Log
+@Slf4j
 @Service
 public class CrowdStrikeExecutorService implements Runnable {
 
@@ -95,7 +94,7 @@ public class CrowdStrikeExecutorService implements Runnable {
         executorService.remove(config.getId());
       }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating CrowdStrike executor: " + e);
+      log.error(String.format("Error creating CrowdStrike executor: %s", e.getMessage()), e);
     }
   }
 
@@ -156,7 +155,7 @@ public class CrowdStrikeExecutorService implements Runnable {
           .append(error.getMessage())
           .append(".");
     }
-    log.log(Level.SEVERE, msg.toString());
+    log.error(msg.toString());
   }
 
   private List<AgentRegisterInput> toAgentEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {

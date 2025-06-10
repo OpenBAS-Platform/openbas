@@ -9,14 +9,13 @@ import io.openbas.injectors.lade.LadeContract;
 import io.openbas.injectors.lade.model.LadeWorkflow;
 import java.time.Instant;
 import java.util.List;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-@Log
+@Slf4j
 @RequiredArgsConstructor
 public class LadeListener {
 
@@ -51,7 +50,7 @@ public class LadeListener {
             relatedInject.setUpdatedAt(Instant.now());
             this.injectRepository.save(relatedInject);
           } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
           }
         });
   }

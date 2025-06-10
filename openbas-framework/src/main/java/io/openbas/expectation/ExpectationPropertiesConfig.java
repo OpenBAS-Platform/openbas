@@ -3,13 +3,13 @@ package io.openbas.expectation;
 import static java.util.Optional.ofNullable;
 
 import lombok.Setter;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Setter
-@Log
+@Slf4j
 public class ExpectationPropertiesConfig {
 
   public static long DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME = 21600L; // 6 hours
@@ -76,7 +76,7 @@ public class ExpectationPropertiesConfig {
     if (defaultManualExpectationScore == null
         || defaultManualExpectationScore < 1
         || defaultManualExpectationScore > 100) {
-      log.warning(
+      log.warn(
           "The provided default score value is invalid. It should be within the acceptable range of 0 to 100. The score will be set to the default of 50.");
       return DEFAULT_MANUAL_EXPECTATION_SCORE;
     }
