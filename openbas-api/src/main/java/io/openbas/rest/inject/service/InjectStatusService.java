@@ -33,7 +33,7 @@ public class InjectStatusService {
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
 
-  public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
+  public List<InjectExecution> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
   }
 
@@ -41,34 +41,34 @@ public class InjectStatusService {
   public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow();
     // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
+    InjectExecution injectExecution = new InjectExecution();
+    injectExecution.setInject(inject);
+    injectExecution.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
-    inject.setExecutions(injectStatus);
+    inject.setExecutions(injectExecution);
     return injectRepository.save(inject);
   }
 
   public void addStartImplantExecutionTraceByInject(
       String injectId, String agentId, String message) {
-    InjectStatus injectStatus =
+    InjectExecution injectExecution =
         injectStatusRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
     ExecutionTrace trace =
         new ExecutionTrace(
-            injectStatus,
+            injectExecution,
             ExecutionTraceStatus.INFO,
             null,
             message,
             ExecutionTraceAction.START,
             agent,
             null);
-    injectStatus.addTrace(trace);
-    injectStatusRepository.save(injectStatus);
+    injectExecution.addTrace(trace);
+    injectStatusRepository.save(injectExecution);
   }
 
   private int getCompleteTrace(Inject inject) {
-    return inject.getExecutions().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
+    return inject.getExecutions().map(InjectExecution::getTraces).orElse(Collections.emptyList()).stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
         .map(trace -> trace.getAgent().getId())
@@ -83,21 +83,21 @@ public class InjectStatusService {
     return agents.size() == totalCompleteTrace;
   }
 
-  public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.info("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
+  public void updateFinalInjectStatus(InjectExecution injectExecution) {
+    log.info("[issue/2797] updateFinalInjectStatus 1: " + injectExecution.getId());
     ExecutionStatus finalStatus =
         computeStatus(
-            injectStatus.getTraces().stream()
+            injectExecution.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.info("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
-    injectStatus.setTrackingEndDate(Instant.now());
-    injectStatus.setName(finalStatus);
-    injectStatus.getInject().setUpdatedAt(Instant.now());
+    log.info("[issue/2797] updateFinalInjectStatus 2: " + injectExecution.getId());
+    injectExecution.setTrackingEndDate(Instant.now());
+    injectExecution.setName(finalStatus);
+    injectExecution.getInject().setUpdatedAt(Instant.now());
   }
 
   public ExecutionTrace createExecutionTrace(
-      InjectStatus injectStatus,
+      InjectExecution injectExecution,
       InjectExecutionInput input,
       Agent agent,
       ObjectNode structuredOutput) {
@@ -105,17 +105,17 @@ public class InjectStatusService {
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
     ExecutionTrace base =
         new ExecutionTrace(
-            injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
+            injectExecution, traceStatus, null, input.getMessage(), executionAction, agent, null);
     return ExecutionTrace.from(base, structuredOutput);
   }
 
   private void computeExecutionTraceStatusIfNeeded(
-      InjectStatus injectStatus, ExecutionTrace executionTrace, Agent agent) {
+      InjectExecution injectExecution, ExecutionTrace executionTrace, Agent agent) {
     if (agent != null && executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)) {
       ExecutionTraceStatus traceStatus =
           convertExecutionStatus(
               computeStatus(
-                  injectStatus.getTraces().stream()
+                  injectExecution.getTraces().stream()
                       .filter(t -> t.getAgent() != null)
                       .filter(t -> t.getAgent().getId().equals(agent.getId()))
                       .toList()));
@@ -125,17 +125,17 @@ public class InjectStatusService {
 
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
-    InjectStatus injectStatus = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
+    InjectExecution injectExecution = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace =
-        createExecutionTrace(injectStatus, input, agent, structuredOutput);
-    computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
-    injectStatus.addTrace(executionTrace);
+        createExecutionTrace(injectExecution, input, agent, structuredOutput);
+    computeExecutionTraceStatusIfNeeded(injectExecution, executionTrace, agent);
+    injectExecution.addTrace(executionTrace);
 
     synchronized (inject.getId()) {
       if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agent == null || isAllInjectAgentsExecuted(inject))) {
-        updateFinalInjectStatus(injectStatus);
+        updateFinalInjectStatus(injectExecution);
       }
 
       injectRepository.save(inject);
@@ -177,61 +177,61 @@ public class InjectStatusService {
     return executionStatus;
   }
 
-  public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    log.info("[issue/2797] fromExecution 1: " + injectStatus.getId());
+  public InjectExecution fromExecution(Execution execution, InjectExecution injectExecution) {
+    log.info("[issue/2797] fromExecution 1: " + injectExecution.getId());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
-          execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
-      injectStatus.getTraces().addAll(traces);
+          execution.getTraces().stream().peek(t -> t.setInjectExecution(injectExecution)).toList();
+      injectExecution.getTraces().addAll(traces);
     }
-    log.info("[issue/2797] fromExecution 2:  " + injectStatus.getId());
-    if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
-      log.info("[issue/2797] fromExecution 3a: " + injectStatus.getId());
-      injectStatus.setName(ExecutionStatus.PENDING);
+    log.info("[issue/2797] fromExecution 2:  " + injectExecution.getId());
+    if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectExecution.getName())) {
+      log.info("[issue/2797] fromExecution 3a: " + injectExecution.getId());
+      injectExecution.setName(ExecutionStatus.PENDING);
     } else {
-      log.info("[issue/2797] fromExecution 3b: " + injectStatus.getId());
-      updateFinalInjectStatus(injectStatus);
+      log.info("[issue/2797] fromExecution 3b: " + injectExecution.getId());
+      updateFinalInjectStatus(injectExecution);
     }
-    log.info("[issue/2797] fromExecution 4: " + injectStatus.getId());
-    return injectStatus;
+    log.info("[issue/2797] fromExecution 4: " + injectExecution.getId());
+    return injectExecution;
   }
 
-  private InjectStatus getOrInitializeInjectStatus(Inject inject) {
+  private InjectExecution getOrInitializeInjectStatus(Inject inject) {
     return inject
         .getExecutions()
         .orElseGet(
             () -> {
-              InjectStatus newStatus = new InjectStatus();
+              InjectExecution newStatus = new InjectExecution();
               newStatus.setInject(inject);
               newStatus.setTrackingSentDate(Instant.now());
               return newStatus;
             });
   }
 
-  public InjectStatus failInjectStatus(@NotNull String injectId, @Nullable String message) {
+  public InjectExecution failInjectStatus(@NotNull String injectId, @Nullable String message) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();
-    InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
+    InjectExecution injectExecution = getOrInitializeInjectStatus(inject);
     if (message != null) {
-      injectStatus.addErrorTrace(message, ExecutionTraceAction.COMPLETE);
+      injectExecution.addErrorTrace(message, ExecutionTraceAction.COMPLETE);
     }
-    injectStatus.setName(ExecutionStatus.ERROR);
-    injectStatus.setTrackingEndDate(Instant.now());
-    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
-    return injectStatusRepository.save(injectStatus);
+    injectExecution.setName(ExecutionStatus.ERROR);
+    injectExecution.setTrackingEndDate(Instant.now());
+    injectExecution.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
+    return injectStatusRepository.save(injectExecution);
   }
 
   @Transactional
-  public InjectStatus initializeInjectStatus(
+  public InjectExecution initializeInjectStatus(
       @NotNull String injectId, @NotNull ExecutionStatus status) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();
-    InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
-    injectStatus.setName(status);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
-    return injectStatusRepository.save(injectStatus);
+    InjectExecution injectExecution = getOrInitializeInjectStatus(inject);
+    injectExecution.setName(status);
+    injectExecution.setTrackingSentDate(Instant.now());
+    injectExecution.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
+    return injectStatusRepository.save(injectExecution);
   }
 
-  public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses) {
-    return this.injectStatusRepository.saveAll(injectStatuses);
+  public Iterable<InjectExecution> saveAll(@NotNull List<InjectExecution> injectExecutions) {
+    return this.injectStatusRepository.saveAll(injectExecutions);
   }
 }

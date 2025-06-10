@@ -177,7 +177,7 @@ public class Inject implements Base, Injection {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @JsonIgnore
-  private List<InjectStatus> executions;
+  private List<InjectExecution> executions;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
@@ -366,7 +366,7 @@ public class Inject implements Base, Injection {
     return Optional.ofNullable(this.injectorContract);
   }
 
-  public Optional<InjectStatus> getExecutions() {
+  public Optional<InjectExecution> getExecutions() {
     return ofNullable(this.executions);
   }
 

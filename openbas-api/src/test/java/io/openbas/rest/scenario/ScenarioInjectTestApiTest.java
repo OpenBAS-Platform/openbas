@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTestStatus;
+import io.openbas.database.model.InjectTestExecution;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.InjectorContractRepository;
@@ -42,7 +42,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
 
   private Scenario scenario;
   private Inject inject1, inject2;
-  private InjectTestStatus injectTestStatus1, injectTestStatus2;
+  private InjectTestExecution injectTestStatus1, injectTestStatus2;
 
   @BeforeAll
   void setupData() {

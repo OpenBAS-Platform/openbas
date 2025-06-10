@@ -45,7 +45,7 @@ public class PayloadMapper {
       statusPayloadOutputBuilder.obfuscator(obfuscator);
     }
 
-    Optional<InjectStatus> injectStatusOpt = injectObj.getExecutions();
+    Optional<InjectExecution> injectStatusOpt = injectObj.getExecutions();
     Payload payload = injectorContract.getPayload();
 
     // Handle the case when inject has not been executed yet or no payload output exists
@@ -63,7 +63,7 @@ public class PayloadMapper {
 
     // If inject has been executed, reuse the previous status
     return injectStatusOpt
-        .map(InjectStatus::getPayloadOutput)
+        .map(InjectExecution::getPayloadOutput)
         .map(
             statusPayload ->
                 populateExecutedPayload(

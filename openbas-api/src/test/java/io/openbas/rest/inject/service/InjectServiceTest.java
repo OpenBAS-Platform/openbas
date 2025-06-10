@@ -603,12 +603,12 @@ class InjectServiceTest {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "injectid";
     String injectStatusID = "injectStatusID";
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setId(injectStatusID);
+    InjectExecution injectExecution = new InjectExecution();
+    injectExecution.setId(injectStatusID);
     Inject inject = new Inject();
     inject.setId(injectId);
-    inject.setExecutions(injectStatus);
-    injectStatus.setInject(inject);
+    inject.setExecutions(injectExecution);
+    injectExecution.setInject(inject);
     StatusPayload statusPayload = new StatusPayload();
 
     when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
@@ -616,9 +616,9 @@ class InjectServiceTest {
 
     injectStatusService.initializeInjectStatus(injectId, executionStatus);
 
-    ArgumentCaptor<InjectStatus> statusCaptor = ArgumentCaptor.forClass(InjectStatus.class);
+    ArgumentCaptor<InjectExecution> statusCaptor = ArgumentCaptor.forClass(InjectExecution.class);
     verify(injectStatusRepository).save(statusCaptor.capture());
-    InjectStatus savedStatus = statusCaptor.getValue();
+    InjectExecution savedStatus = statusCaptor.getValue();
     assertNotNull(savedStatus);
     assertEquals(inject, savedStatus.getInject());
     assertEquals(executionStatus, savedStatus.getName());

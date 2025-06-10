@@ -32,7 +32,7 @@ public class AgentUtils {
   public static boolean hasOnlyValidTraces(Inject inject, Agent agent) {
     return inject
         .getExecutions()
-        .map(InjectStatus::getTraces)
+        .map(InjectExecution::getTraces)
         .map(
             traces ->
                 Boolean.valueOf(

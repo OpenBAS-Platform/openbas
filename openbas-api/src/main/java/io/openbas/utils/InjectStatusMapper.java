@@ -13,7 +13,7 @@ public class InjectStatusMapper {
 
   private final AgentMapper agentMapper;
 
-  public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
+  public InjectStatusOutput toInjectStatusOutput(Optional<InjectExecution> injectStatus) {
     return injectStatus
         .map(
             status ->
@@ -22,7 +22,7 @@ public class InjectStatusMapper {
         .orElseGet(() -> InjectStatusOutput.builder().build());
   }
 
-  public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestStatus injectTestStatus) {
+  public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestExecution injectTestStatus) {
     InjectTestStatusOutput output = InjectTestStatusOutput.builder().build();
     buildInjectStatusOutput(output, injectTestStatus, injectTestStatus.getTraces());
 
@@ -40,7 +40,7 @@ public class InjectStatusMapper {
   }
 
   private <T extends InjectStatusOutput> T buildInjectStatusOutput(
-      T output, BaseInjectStatus status, List<ExecutionTrace> executionTraces) {
+      T output, BaseInjectExecution status, List<ExecutionTrace> executionTraces) {
     output.setId(status.getId());
     output.setName(status.getName().name());
     output.setTraces(
@@ -53,7 +53,7 @@ public class InjectStatusMapper {
     return output;
   }
 
-  public InjectStatusSimple toInjectStatusSimple(Optional<InjectStatus> injectStatus) {
+  public InjectStatusSimple toInjectStatusSimple(Optional<InjectExecution> injectStatus) {
     return injectStatus
         .map(
             status ->

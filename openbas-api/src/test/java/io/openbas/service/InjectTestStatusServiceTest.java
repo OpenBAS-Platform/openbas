@@ -111,7 +111,7 @@
 //    SecurityContextHolder.getContext().setAuthentication(auth);
 //
 //    // -- EXECUTE --
-//    InjectTestStatus test = injectTestStatusService.testInject(INJECT1.getId());
+//    InjectTestExecution test = injectTestStatusService.testInject(INJECT1.getId());
 //    assertNotNull(test);
 //
 //    // -- CLEAN --
@@ -143,7 +143,7 @@
 //    // -- CLEAN --
 //    SearchPaginationInput searchPaginationInput =
 // PaginationFixture.getDefault().size(1110).build();
-//    Page<InjectTestStatus> tests =
+//    Page<InjectTestExecution> tests =
 //        injectTestStatusService.findAllInjectTestsByExerciseId(
 //            EXERCISE.getId(), searchPaginationInput);
 //    tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
@@ -160,7 +160,7 @@
 //    SecurityContextHolder.getContext().setAuthentication(auth);
 //
 //    // -- EXECUTE --
-//    List<InjectTestStatus> tests =
+//    List<InjectTestExecution> tests =
 //        injectTestStatusService.bulkTestInjects(List.of(INJECT1.getId(), INJECT2.getId()));
 //    assertEquals(2, tests.size());
 //
@@ -193,7 +193,7 @@
 //    // -- CLEAN --
 //    SearchPaginationInput searchPaginationInput =
 // PaginationFixture.getDefault().size(1110).build();
-//    Page<InjectTestStatus> tests =
+//    Page<InjectTestExecution> tests =
 //        injectTestStatusService.findAllInjectTestsByExerciseId(
 //            EXERCISE.getId(), searchPaginationInput);
 //    tests.stream().forEach(test -> this.injectTestStatusService.deleteInjectTest(test.getId()));
@@ -216,7 +216,7 @@
 // PaginationFixture.getDefault().size(1110).build();
 //
 //    // -- EXECUTE --
-//    Page<InjectTestStatus> tests =
+//    Page<InjectTestExecution> tests =
 //        injectTestStatusService.findAllInjectTestsByExerciseId(
 //            EXERCISE.getId(), searchPaginationInput);
 //    assertEquals(2, tests.stream().toList().size());
@@ -236,10 +236,10 @@
 //    SecurityContextHolder.getContext().setAuthentication(auth);
 //
 //    // -- PREPARE --
-//    InjectTestStatus test = injectTestStatusService.testInject(INJECT1.getId());
+//    InjectTestExecution test = injectTestStatusService.testInject(INJECT1.getId());
 //
 //    // -- EXECUTE --
-//    InjectTestStatus foundTest = injectTestStatusService.findInjectTestStatusById(test.getId());
+//    InjectTestExecution foundTest = injectTestStatusService.findInjectTestStatusById(test.getId());
 //    assertNotNull(foundTest);
 //
 //    // -- CLEAN --
@@ -257,14 +257,14 @@
 //    SecurityContextHolder.getContext().setAuthentication(auth);
 //
 //    // -- PREPARE --
-//    InjectTestStatus test = injectTestStatusService.testInject(INJECT1.getId());
+//    InjectTestExecution test = injectTestStatusService.testInject(INJECT1.getId());
 //
 //    // --EXECUTE --
 //    injectTestStatusService.deleteInjectTest(test.getId());
 //
 //    SearchPaginationInput searchPaginationInput =
 // PaginationFixture.getDefault().size(1110).build();
-//    Page<InjectTestStatus> tests =
+//    Page<InjectTestExecution> tests =
 //        injectTestStatusService.findAllInjectTestsByExerciseId(
 //            EXERCISE.getId(), searchPaginationInput);
 //    assertEquals(0, tests.stream().toList().size());

@@ -2,7 +2,7 @@ package io.openbas.injectors.lade.service;
 
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectExecution;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.injectors.lade.LadeContract;
@@ -27,10 +27,10 @@ public class LadeListener {
   @Scheduled(fixedDelay = 15000, initialDelay = 0)
   public void listenWorkflows() {
     // Get all lade inject with workflow_id that are not done yet
-    List<InjectStatus> injectStatuses =
+    List<InjectExecution> injectExecutions =
         this.injectStatusRepository.pendingForInjectType(LadeContract.TYPE);
     // For each workflow ask for traces and status
-    injectStatuses.forEach(
+    injectExecutions.forEach(
         injectStatus -> {
           // Add traces and close inject if needed.
           String asyncId =

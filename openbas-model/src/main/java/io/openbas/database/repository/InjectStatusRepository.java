@@ -1,6 +1,6 @@
 package io.openbas.database.repository;
 
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectExecution;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -12,17 +12,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InjectStatusRepository
-    extends CrudRepository<InjectStatus, String>, JpaSpecificationExecutor<InjectStatus> {
+    extends CrudRepository<InjectExecution, String>, JpaSpecificationExecutor<InjectExecution> {
 
   @NotNull
-  Optional<InjectStatus> findById(@NotNull String id);
+  Optional<InjectExecution> findById(@NotNull String id);
 
   @Query(
       value =
-          "select c from InjectStatus c where c.name = 'PENDING' and c.inject.injectorContract.injector.type = :injectType")
-  List<InjectStatus> pendingForInjectType(@Param("injectType") String injectType);
+          "select c from InjectExecution c where c.name = 'PENDING' and c.inject.injectorContract.injector.type = :injectType")
+  List<InjectExecution> pendingForInjectType(@Param("injectType") String injectType);
 
-  Optional<InjectStatus> findByInjectId(@NotNull String injectId);
+  Optional<InjectExecution> findByInjectId(@NotNull String injectId);
 
   @Query(
       value =
@@ -35,5 +35,5 @@ public interface InjectStatusRepository
               + "  AND cardinality(t.execution_context_identifiers) = 0"
               + " WHERE i.inject_id = :injectId",
       nativeQuery = true)
-  Optional<InjectStatus> findInjectStatusWithGlobalExecutionTraces(String injectId);
+  Optional<InjectExecution> findInjectStatusWithGlobalExecutionTraces(String injectId);
 }

@@ -140,11 +140,11 @@ public class InjectsExecutionJob implements Job {
       return;
     }
 
-    List<InjectStatus> updatedStatuses =
+    List<InjectExecution> updatedStatuses =
         pendingInjects.stream()
             .map(
                 inject -> {
-                  InjectStatus status =
+                  InjectExecution status =
                       inject.getExecutions().orElseThrow(ElementNotFoundException::new);
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(

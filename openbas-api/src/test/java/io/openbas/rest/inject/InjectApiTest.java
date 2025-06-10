@@ -684,14 +684,14 @@ class InjectApiTest extends IntegrationTest {
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
-        InjectStatus injectStatusSaved = injectSaved.getExecutions().orElseThrow();
-        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
-        assertEquals(1, injectStatusSaved.getTraces().size());
+        InjectExecution injectExecutionSaved = injectSaved.getExecutions().orElseThrow();
+        assertEquals(ExecutionStatus.PENDING, injectExecutionSaved.getName());
+        assertEquals(1, injectExecutionSaved.getTraces().size());
         assertEquals(
-            ExecutionTraceStatus.SUCCESS, injectStatusSaved.getTraces().getFirst().getStatus());
+            ExecutionTraceStatus.SUCCESS, injectExecutionSaved.getTraces().getFirst().getStatus());
         assertEquals(
-            ExecutionTraceAction.EXECUTION, injectStatusSaved.getTraces().getFirst().getAction());
-        assertEquals(logMessage, injectStatusSaved.getTraces().getFirst().getMessage());
+            ExecutionTraceAction.EXECUTION, injectExecutionSaved.getTraces().getFirst().getAction());
+        assertEquals(logMessage, injectExecutionSaved.getTraces().getFirst().getMessage());
       }
 
       @DisplayName(
@@ -718,13 +718,13 @@ class InjectApiTest extends IntegrationTest {
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
-        InjectStatus injectStatusSaved = injectSaved.getExecutions().orElseThrow();
+        InjectExecution injectExecutionSaved = injectSaved.getExecutions().orElseThrow();
         // Check inject status
-        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
-        assertEquals(2, injectStatusSaved.getTraces().size());
+        assertEquals(ExecutionStatus.PENDING, injectExecutionSaved.getName());
+        assertEquals(2, injectExecutionSaved.getTraces().size());
         // The status of the complete trace should be ERROR
         List<ExecutionTrace> completeTraces =
-            injectStatusSaved.getTraces().stream()
+            injectExecutionSaved.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList();
         assertEquals(1, completeTraces.size());
@@ -763,9 +763,9 @@ class InjectApiTest extends IntegrationTest {
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
-        InjectStatus injectStatusSaved = injectSaved.getExecutions().orElseThrow();
+        InjectExecution injectExecutionSaved = injectSaved.getExecutions().orElseThrow();
         // Check inject status
-        assertEquals(ExecutionStatus.PARTIAL, injectStatusSaved.getName());
+        assertEquals(ExecutionStatus.PARTIAL, injectExecutionSaved.getName());
       }
     }
 
@@ -798,9 +798,9 @@ class InjectApiTest extends IntegrationTest {
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
-        InjectStatus injectStatusSaved = injectSaved.getExecutions().orElseThrow();
+        InjectExecution injectExecutionSaved = injectSaved.getExecutions().orElseThrow();
         List<ExecutionTrace> completeTraces =
-            injectStatusSaved.getTraces().stream()
+            injectExecutionSaved.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList();
         assertEquals(1, completeTraces.size());

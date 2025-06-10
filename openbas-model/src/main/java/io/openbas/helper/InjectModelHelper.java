@@ -226,7 +226,7 @@ public class InjectModelHelper {
     return Optional.ofNullable(LocalDateTime.now().toInstant(ZoneOffset.UTC));
   }
 
-  public static Instant getSentAt(Optional<InjectStatus> status) {
+  public static Instant getSentAt(Optional<InjectExecution> status) {
     if (status.isPresent()) {
       return status.orElseThrow().getTrackingSentDate();
     }

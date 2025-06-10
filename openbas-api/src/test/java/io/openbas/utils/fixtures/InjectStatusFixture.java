@@ -3,7 +3,7 @@ package io.openbas.utils.fixtures;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectExecution;
 import io.openbas.database.model.PayloadCommandBlock;
 import io.openbas.database.model.StatusPayload;
 import java.time.Instant;
@@ -11,11 +11,11 @@ import java.util.List;
 
 public class InjectStatusFixture {
 
-  private static InjectStatus createInjectStatus(ExecutionStatus status) {
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(status);
-    injectStatus.setPayloadOutput(
+  private static InjectExecution createInjectStatus(ExecutionStatus status) {
+    InjectExecution injectExecution = new InjectExecution();
+    injectExecution.setTrackingSentDate(Instant.now());
+    injectExecution.setName(status);
+    injectExecution.setPayloadOutput(
         new StatusPayload(
             null,
             null,
@@ -33,18 +33,18 @@ public class InjectStatusFixture {
             null,
             List.of(new PayloadCommandBlock("cmd", "content", List.of("clean cmd"))),
             "cmd"));
-    return injectStatus;
+    return injectExecution;
   }
 
-  public static InjectStatus createPendingInjectStatus() {
+  public static InjectExecution createPendingInjectStatus() {
     return createInjectStatus(ExecutionStatus.PENDING);
   }
 
-  public static InjectStatus createDraftInjectStatus() {
+  public static InjectExecution createDraftInjectStatus() {
     return createInjectStatus(ExecutionStatus.DRAFT);
   }
 
-  public static InjectStatus createQueuingInjectStatus() {
+  public static InjectExecution createQueuingInjectStatus() {
     return createInjectStatus(ExecutionStatus.QUEUING);
   }
 }

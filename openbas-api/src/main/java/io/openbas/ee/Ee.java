@@ -187,11 +187,11 @@ public class Ee {
   }
 
   public void throwEEExecutorService(
-      License license, String serviceName, InjectStatus injectStatus) {
+      License license, String serviceName, InjectExecution injectExecution) {
     if (!this.isLicenseActive(license) && eeExecutorsNames.contains(serviceName)) {
       String licenseRestrictedMsg =
           "LICENSE RESTRICTION - Asset will be executed through the " + serviceName + " executor";
-      injectStatus.addInfoTrace(licenseRestrictedMsg, ExecutionTraceAction.EXECUTION);
+      injectExecution.addInfoTrace(licenseRestrictedMsg, ExecutionTraceAction.EXECUTION);
       throw new LicenseRestrictionException(licenseRestrictedMsg);
     }
   }

@@ -16,7 +16,7 @@ import org.hibernate.annotations.Type;
 @Getter
 @Entity
 @Table(name = "injects_statuses")
-public class InjectStatus extends BaseInjectStatus {
+public class InjectExecution extends BaseInjectExecution {
 
   @Type(JsonType.class)
   @Column(name = "status_payload_output", columnDefinition = "json")

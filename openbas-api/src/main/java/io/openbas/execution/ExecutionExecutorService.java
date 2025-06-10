@@ -31,7 +31,7 @@ public class ExecutionExecutorService {
   private final InjectService injectService;
 
   public void launchExecutorContext(Inject inject) {
-    InjectStatus injectStatus =
+    InjectExecution injectExecution =
         inject.getExecutions().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     // First, get the agents and the assets agentless of this inject
     AgentsAndAssetsAgentless agentsAndAssetsAgentless =
@@ -39,7 +39,7 @@ public class ExecutionExecutorService {
     Set<Agent> agents = agentsAndAssetsAgentless.agents();
     Set<Asset> assetsAgentless = agentsAndAssetsAgentless.assetsAgentless();
     // Manage agentless assets
-    saveAgentlessAssetsTraces(assetsAgentless, injectStatus);
+    saveAgentlessAssetsTraces(assetsAgentless, injectExecution);
     // Filter each list to do something for each specific case and then remove the specific agents
     // from the main "agents" list to execute payloads at the end for the remaining "normal" agents
     Set<Agent> inactiveAgents =
@@ -56,20 +56,20 @@ public class ExecutionExecutorService {
 
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     // Manage inactive agents
-    saveInactiveAgentsTraces(inactiveAgents, injectStatus);
+    saveInactiveAgentsTraces(inactiveAgents, injectExecution);
     // Manage without executor agents
-    saveWithoutExecutorAgentsTraces(agentsWithoutExecutor, injectStatus);
+    saveWithoutExecutorAgentsTraces(agentsWithoutExecutor, injectExecution);
     // Manage Crowdstrike agents for batch execution
     if (!crowdstrikeAgents.isEmpty()) {
       try {
         ExecutorContextService executorContextService =
             context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
         executorContextService.launchBatchExecutorSubprocess(
-            inject, crowdstrikeAgents, injectStatus);
+            inject, crowdstrikeAgents, injectExecution);
         atLeastOneExecution.set(true);
       } catch (Exception e) {
         log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
-        saveCrowdstrikeAgentsErrorTraces(e, crowdstrikeAgents, injectStatus);
+        saveCrowdstrikeAgentsErrorTraces(e, crowdstrikeAgents, injectExecution);
       }
     }
     // Manage remaining agents
@@ -80,7 +80,7 @@ public class ExecutionExecutorService {
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
             log.severe("launchExecutorContextForAgent error: " + e.getMessage());
-            saveAgentErrorTrace(e, injectStatus);
+            saveAgentErrorTrace(e, injectExecution);
           }
         });
     if (!atLeastOneExecution.get()) {
@@ -89,10 +89,10 @@ public class ExecutionExecutorService {
   }
 
   @VisibleForTesting
-  public void saveAgentErrorTrace(AgentException e, InjectStatus injectStatus) {
+  public void saveAgentErrorTrace(AgentException e, InjectExecution injectExecution) {
     executionTraceRepository.save(
         new ExecutionTrace(
-            injectStatus,
+            injectExecution,
             ExecutionTraceStatus.ERROR,
             List.of(),
             e.getMessage(),
@@ -103,13 +103,13 @@ public class ExecutionExecutorService {
 
   @VisibleForTesting
   public void saveCrowdstrikeAgentsErrorTraces(
-      Exception e, Set<Agent> crowdstrikeAgents, InjectStatus injectStatus) {
+      Exception e, Set<Agent> crowdstrikeAgents, InjectExecution injectExecution) {
     executionTraceRepository.saveAll(
         crowdstrikeAgents.stream()
             .map(
                 agent ->
                     new ExecutionTrace(
-                        injectStatus,
+                        injectExecution,
                         ExecutionTraceStatus.ERROR,
                         List.of(),
                         e.getMessage(),
@@ -121,14 +121,14 @@ public class ExecutionExecutorService {
 
   @VisibleForTesting
   public void saveWithoutExecutorAgentsTraces(
-      Set<Agent> agentsWithoutExecutor, InjectStatus injectStatus) {
+      Set<Agent> agentsWithoutExecutor, InjectExecution injectExecution) {
     if (!agentsWithoutExecutor.isEmpty()) {
       executionTraceRepository.saveAll(
           agentsWithoutExecutor.stream()
               .map(
                   agent ->
                       new ExecutionTrace(
-                          injectStatus,
+                          injectExecution,
                           ExecutionTraceStatus.ERROR,
                           List.of(),
                           "Cannot find the executor for the agent "
@@ -143,14 +143,14 @@ public class ExecutionExecutorService {
   }
 
   @VisibleForTesting
-  public void saveInactiveAgentsTraces(Set<Agent> inactiveAgents, InjectStatus injectStatus) {
+  public void saveInactiveAgentsTraces(Set<Agent> inactiveAgents, InjectExecution injectExecution) {
     if (!inactiveAgents.isEmpty()) {
       executionTraceRepository.saveAll(
           inactiveAgents.stream()
               .map(
                   agent ->
                       new ExecutionTrace(
-                          injectStatus,
+                          injectExecution,
                           ExecutionTraceStatus.AGENT_INACTIVE,
                           List.of(),
                           "Agent "
@@ -165,14 +165,14 @@ public class ExecutionExecutorService {
   }
 
   @VisibleForTesting
-  public void saveAgentlessAssetsTraces(Set<Asset> assetsAgentless, InjectStatus injectStatus) {
+  public void saveAgentlessAssetsTraces(Set<Asset> assetsAgentless, InjectExecution injectExecution) {
     if (!assetsAgentless.isEmpty()) {
       executionTraceRepository.saveAll(
           assetsAgentless.stream()
               .map(
                   asset ->
                       new ExecutionTrace(
-                          injectStatus,
+                          injectExecution,
                           ExecutionTraceStatus.ASSET_AGENTLESS,
                           List.of(asset.getId()),
                           "Asset " + asset.getName() + " has no agent, unable to launch the inject",

@@ -14,7 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Entity
 @Table(name = "injects_tests_statuses")
-public class InjectTestStatus extends BaseInjectStatus {
+public class InjectTestExecution extends BaseInjectExecution {
   @OneToMany(
       mappedBy = "injectTestStatus",
       cascade = CascadeType.ALL,
@@ -33,8 +33,8 @@ public class InjectTestStatus extends BaseInjectStatus {
   @JsonProperty("inject_test_status_updated_at")
   private Instant testUpdateDate;
 
-  public static InjectTestStatus fromExecutionTest(Execution execution) {
-    InjectTestStatus injectTestStatus = new InjectTestStatus();
+  public static InjectTestExecution fromExecutionTest(Execution execution) {
+    InjectTestExecution injectTestStatus = new InjectTestExecution();
     injectTestStatus.setTrackingSentDate(Instant.now());
     injectTestStatus.getTraces().addAll(execution.getTraces());
     if (!execution.getTraces().isEmpty()) {

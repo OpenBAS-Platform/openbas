@@ -56,10 +56,10 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       @NotNull final Agent agent) {}
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, Set<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
+      Inject inject, Set<Agent> agents, InjectExecution injectExecution) throws InterruptedException {
 
     eeService.throwEEExecutorService(
-        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectStatus);
+        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectExecution);
 
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
       throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
@@ -76,7 +76,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    csAgents = manageWithoutPlatformAgents(csAgents, injectStatus);
+    csAgents = manageWithoutPlatformAgents(csAgents, injectExecution);
     List<CrowdStrikeAction> actions = new ArrayList<>();
     // Set implant script for Windows CS agents
     actions.addAll(
@@ -101,7 +101,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
         .toList();
   }
 
-  private List<Agent> manageWithoutPlatformAgents(List<Agent> agents, InjectStatus injectStatus) {
+  private List<Agent> manageWithoutPlatformAgents(List<Agent> agents, InjectExecution injectExecution) {
     List<Agent> csAgents = new ArrayList<>(agents);
     List<Agent> withoutPlatformAgents =
         csAgents.stream()
@@ -120,7 +120,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
               .map(
                   agent ->
                       new ExecutionTrace(
-                          injectStatus,
+                          injectExecution,
                           ExecutionTraceStatus.ERROR,
                           List.of(),
                           "Unsupported platform: "

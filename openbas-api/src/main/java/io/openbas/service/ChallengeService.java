@@ -119,14 +119,14 @@ public class ChallengeService {
                 injectExpectation -> {
                   Challenge challenge = injectExpectation.getChallenge();
                   challenge.setVirtualPublication(injectExpectation.getCreatedAt());
-                  InjectStatus injectStatus =
+                  InjectExecution injectExecution =
                       injectExpectation
                           .getInject()
                           .getExecutions()
                           .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
                   ChallengeAttemptId challengeAttemptId =
                       buildChallengeAttemptID(
-                          challenge.getId(), injectStatus.getId(), user.getId());
+                          challenge.getId(), injectExecution.getId(), user.getId());
                   ChallengeAttempt challengeAttempt =
                       this.challengeAttemptService
                           .getChallengeAttempt(challengeAttemptId)
@@ -150,13 +150,13 @@ public class ChallengeService {
               user.getId(), exerciseId, challengeId);
       playerExpectations.forEach(
           playerExpectation -> {
-            InjectStatus injectStatus =
+            InjectExecution injectExecution =
                 playerExpectation
                     .getInject()
                     .getExecutions()
                     .orElseThrow(() -> new ElementNotFoundException("Status should exist"));
             ChallengeAttemptId challengeAttemptId =
-                buildChallengeAttemptID(challengeId, injectStatus.getId(), user.getId());
+                buildChallengeAttemptID(challengeId, injectExecution.getId(), user.getId());
             ChallengeAttempt challengeAttempt =
                 this.challengeAttemptService
                     .getChallengeAttempt(challengeAttemptId)

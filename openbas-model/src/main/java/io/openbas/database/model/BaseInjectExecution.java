@@ -14,7 +14,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Setter
 @Getter
 @MappedSuperclass
-public abstract class BaseInjectStatus implements Base {
+public abstract class BaseInjectExecution implements Base {
 
   @Id
   @Column(name = "status_id")

@@ -1,6 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
-import io.openbas.database.model.InjectTestStatus;
+import io.openbas.database.model.InjectTestExecution;
 import io.openbas.database.repository.InjectTestStatusRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,16 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InjectTestStatusComposer extends ComposerBase<InjectTestStatus> {
+public class InjectTestStatusComposer extends ComposerBase<InjectTestExecution> {
 
   @Autowired private InjectTestStatusRepository injectTestStatusRepository;
 
-  public class Composer extends InnerComposerBase<InjectTestStatus> {
+  public class Composer extends InnerComposerBase<InjectTestExecution> {
 
-    private final InjectTestStatus InjectTestStatus;
+    private final InjectTestExecution InjectTestStatus;
     private final List<ExecutionTraceComposer.Composer> executionTracesComposer = new ArrayList<>();
 
-    public Composer(InjectTestStatus InjectTestStatus) {
+    public Composer(InjectTestExecution InjectTestStatus) {
       this.InjectTestStatus = InjectTestStatus;
     }
 
@@ -48,12 +48,12 @@ public class InjectTestStatusComposer extends ComposerBase<InjectTestStatus> {
     }
 
     @Override
-    public InjectTestStatus get() {
+    public InjectTestExecution get() {
       return this.InjectTestStatus;
     }
   }
 
-  public InjectTestStatusComposer.Composer forInjectTestStatus(InjectTestStatus InjectTestStatus) {
+  public InjectTestStatusComposer.Composer forInjectTestStatus(InjectTestExecution InjectTestStatus) {
     generatedItems.add(InjectTestStatus);
     return new InjectTestStatusComposer.Composer(InjectTestStatus);
   }

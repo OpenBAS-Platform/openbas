@@ -308,8 +308,8 @@ public class InjectApi extends RestBehavior {
   public Inject injectExecutionReception(
       @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    InjectStatus injectStatus = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
-    injectStatus.setName(ExecutionStatus.PENDING);
+    InjectExecution injectExecution = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
+    injectExecution.setName(ExecutionStatus.PENDING);
     return injectRepository.save(inject);
   }
 
@@ -486,7 +486,7 @@ public class InjectApi extends RestBehavior {
     return this.injectService.getInjectTracesFromInjectAndTarget(injectId, targetId, targetType);
   }
 
-  @Operation(description = "Get InjectStatus with global execution traces")
+  @Operation(description = "Get InjectExecution with global execution traces")
   @GetMapping(INJECT_URI + "/status")
   @LogExecutionTime
   public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(

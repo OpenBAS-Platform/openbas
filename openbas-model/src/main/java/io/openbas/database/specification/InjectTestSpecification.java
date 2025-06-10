@@ -1,13 +1,13 @@
 package io.openbas.database.specification;
 
-import io.openbas.database.model.InjectTestStatus;
+import io.openbas.database.model.InjectTestExecution;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import org.springframework.data.jpa.domain.Specification;
 
 public class InjectTestSpecification {
 
-  public static Specification<InjectTestStatus> findInjectTestInExercise(String exerciseId) {
+  public static Specification<InjectTestExecution> findInjectTestInExercise(String exerciseId) {
 
     return (root, query, criteriaBuilder) -> {
       Path<Object> path =
@@ -16,7 +16,7 @@ public class InjectTestSpecification {
     };
   }
 
-  public static Specification<InjectTestStatus> findInjectTestInScenario(String scenarioId) {
+  public static Specification<InjectTestExecution> findInjectTestInScenario(String scenarioId) {
 
     return (root, query, criteriaBuilder) -> {
       Path<Object> path =

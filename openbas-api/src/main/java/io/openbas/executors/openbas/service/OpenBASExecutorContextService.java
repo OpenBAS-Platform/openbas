@@ -60,7 +60,7 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
   }
 
   public List<Agent> launchBatchExecutorSubprocess(
-      Inject inject, Set<Agent> agents, InjectStatus injectStatus) {
+      Inject inject, Set<Agent> agents, InjectExecution injectExecution) {
     return new ArrayList<>();
   }
 }

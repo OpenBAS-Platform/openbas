@@ -143,7 +143,7 @@ public class ExerciseApiStatusTest {
     injectRepository.save(inject4);
     SAVED_INJECT5 = injectRepository.save(inject5);
 
-    InjectStatus injectStatus = new InjectStatus();
+    InjectExecution injectExecution = new InjectExecution();
 
     Pause pause = new Pause();
     Instant lastMinute = now().truncatedTo(MINUTES).minus(1, MINUTES);
@@ -159,8 +159,8 @@ public class ExerciseApiStatusTest {
     lessonsAnswer.setQuestion(lessonsQuestion);
     LESSON_ANSWER = lessonsAnswerRepository.save(lessonsAnswer);
 
-    injectStatus.setName(ExecutionStatus.ERROR);
-    inject5.setExecutions(injectStatus);
+    injectExecution.setName(ExecutionStatus.ERROR);
+    inject5.setExecutions(injectExecution);
     FINISHED_EXERCISE.setInjects(List.of(inject5));
     FINISHED_EXERCISE.setPauses(List.of(pause));
     FINISHED_EXERCISE.setLessonsCategories(List.of(lessonsCategory));

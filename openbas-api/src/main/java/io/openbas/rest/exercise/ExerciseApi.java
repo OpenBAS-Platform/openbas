@@ -582,7 +582,7 @@ public class ExerciseApi extends RestBehavior {
       this.injectStatusRepository.deleteAllById(
           exercise.getInjects().stream()
               .map(Inject::getExecutions)
-              .map(i -> i.map(InjectStatus::getId).orElse(""))
+              .map(i -> i.map(InjectExecution::getId).orElse(""))
               .toList());
       exercise.getInjects().forEach(Inject::clean);
       // Reset lessons learned answers

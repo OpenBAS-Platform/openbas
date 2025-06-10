@@ -1,6 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectExecution;
 import io.openbas.database.repository.InjectStatusRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InjectStatusComposer extends ComposerBase<InjectStatus> {
+public class InjectStatusComposer extends ComposerBase<InjectExecution> {
   @Autowired private InjectStatusRepository injectStatusRepository;
 
-  public class Composer extends InnerComposerBase<InjectStatus> {
-    private final InjectStatus injectStatus;
+  public class Composer extends InnerComposerBase<InjectExecution> {
+    private final InjectExecution injectExecution;
     private final List<ExecutionTraceComposer.Composer> executionTracesComposer = new ArrayList<>();
 
-    public Composer(InjectStatus injectStatus) {
-      this.injectStatus = injectStatus;
+    public Composer(InjectExecution injectExecution) {
+      this.injectExecution = injectExecution;
     }
 
     public Composer withExecutionTraces(List<ExecutionTraceComposer.Composer> traces) {
@@ -26,14 +26,14 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
 
     public Composer withExecutionTrace(ExecutionTraceComposer.Composer executionTrace) {
       executionTracesComposer.add(executionTrace);
-      executionTrace.get().setInjectStatus(this.injectStatus);
-      this.injectStatus.getTraces().add(executionTrace.get());
+      executionTrace.get().setInjectExecution(this.injectExecution);
+      this.injectExecution.getTraces().add(executionTrace.get());
       return this;
     }
 
     @Override
     public InjectStatusComposer.Composer persist() {
-      injectStatusRepository.save(injectStatus);
+      injectStatusRepository.save(injectExecution);
       executionTracesComposer.forEach(ExecutionTraceComposer.Composer::persist);
       return this;
     }
@@ -41,18 +41,18 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
     @Override
     public InjectStatusComposer.Composer delete() {
       executionTracesComposer.forEach(ExecutionTraceComposer.Composer::delete);
-      injectStatusRepository.delete(injectStatus);
+      injectStatusRepository.delete(injectExecution);
       return this;
     }
 
     @Override
-    public InjectStatus get() {
-      return this.injectStatus;
+    public InjectExecution get() {
+      return this.injectExecution;
     }
   }
 
-  public InjectStatusComposer.Composer forInjectStatus(InjectStatus injectStatus) {
-    generatedItems.add(injectStatus);
-    return new InjectStatusComposer.Composer(injectStatus);
+  public InjectStatusComposer.Composer forInjectStatus(InjectExecution injectExecution) {
+    generatedItems.add(injectExecution);
+    return new InjectStatusComposer.Composer(injectExecution);
   }
 }

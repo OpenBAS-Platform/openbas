@@ -60,7 +60,7 @@ public class InjectTestStatusService {
             .findById(currentUser().getId())
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    InjectTestStatus injectStatus = testInject(inject, user);
+    InjectTestExecution injectStatus = testInject(inject, user);
     return injectStatusMapper.toInjectTestStatusOutput(injectStatus);
   }
 
@@ -81,7 +81,7 @@ public class InjectTestStatusService {
             .findById(currentUser().getId())
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    List<InjectTestStatus> results = new ArrayList<>();
+    List<InjectTestExecution> results = new ArrayList<>();
     searchResult.forEach(inject -> results.add(testInject(inject, user)));
     return results.stream().map(injectStatusMapper::toInjectTestStatusOutput).toList();
   }
@@ -89,24 +89,24 @@ public class InjectTestStatusService {
   public Page<InjectTestStatusOutput> findAllInjectTestsByExerciseId(
       String exerciseId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-            (Specification<InjectTestStatus> specification, Pageable pageable) ->
+            (Specification<InjectTestExecution> specification, Pageable pageable) ->
                 injectTestStatusRepository.findAll(
                     InjectTestSpecification.findInjectTestInExercise(exerciseId).and(specification),
                     pageable),
             searchPaginationInput,
-            InjectTestStatus.class)
+            InjectTestExecution.class)
         .map(injectStatusMapper::toInjectTestStatusOutput);
   }
 
   public Page<InjectTestStatusOutput> findAllInjectTestsByScenarioId(
       String scenarioId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-            (Specification<InjectTestStatus> specification, Pageable pageable) ->
+            (Specification<InjectTestExecution> specification, Pageable pageable) ->
                 injectTestStatusRepository.findAll(
                     InjectTestSpecification.findInjectTestInScenario(scenarioId).and(specification),
                     pageable),
             searchPaginationInput,
-            InjectTestStatus.class)
+            InjectTestExecution.class)
         .map(injectStatusMapper::toInjectTestStatusOutput);
   }
 
@@ -117,7 +117,7 @@ public class InjectTestStatusService {
 
   // -- PRIVATE --
 
-  private InjectTestStatus testInject(Inject inject, User user) {
+  private InjectTestExecution testInject(Inject inject, User user) {
     ExecutionContext userInjectContext =
         this.executionContextService.executionContext(user, inject, "Direct test");
 
@@ -140,12 +140,12 @@ public class InjectTestStatusService {
             List.of(userInjectContext));
     Execution execution = executor.executeInjection(injection);
 
-    InjectTestStatus injectTestStatus =
+    InjectTestExecution injectTestStatus =
         this.injectTestStatusRepository
             .findByInject(inject)
             .map(
                 existingStatus -> {
-                  InjectTestStatus updatedStatus = InjectTestStatus.fromExecutionTest(execution);
+                  InjectTestExecution updatedStatus = InjectTestExecution.fromExecutionTest(execution);
                   updatedStatus.setId(existingStatus.getId());
                   updatedStatus.setTestCreationDate(existingStatus.getTestCreationDate());
                   updatedStatus.setInject(inject);
@@ -153,7 +153,7 @@ public class InjectTestStatusService {
                 })
             .orElseGet(
                 () -> {
-                  InjectTestStatus newStatus = InjectTestStatus.fromExecutionTest(execution);
+                  InjectTestExecution newStatus = InjectTestExecution.fromExecutionTest(execution);
                   newStatus.setInject(inject);
                   return newStatus;
                 });

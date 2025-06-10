@@ -384,18 +384,18 @@ public class InjectService {
 
   private Inject saveInjectAndStatusAsQueuing(Inject inject) {
     Inject savedInject = injectRepository.save(inject);
-    InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
-    savedInject.setExecutions(injectStatus);
+    InjectExecution injectExecution = saveInjectStatusAsQueuing(savedInject);
+    savedInject.setExecutions(injectExecution);
     return savedInject;
   }
 
-  private InjectStatus saveInjectStatusAsQueuing(Inject inject) {
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.QUEUING);
-    this.injectStatusRepository.save(injectStatus);
-    return injectStatus;
+  private InjectExecution saveInjectStatusAsQueuing(Inject inject) {
+    InjectExecution injectExecution = new InjectExecution();
+    injectExecution.setInject(inject);
+    injectExecution.setTrackingSentDate(Instant.now());
+    injectExecution.setName(ExecutionStatus.QUEUING);
+    this.injectStatusRepository.save(injectExecution);
+    return injectExecution;
   }
 
   /**

@@ -40,20 +40,20 @@ public class Executor {
   private final ExecutionExecutorService executionExecutorService;
   private final InjectStatusService injectStatusService;
 
-  private InjectStatus executeExternal(ExecutableInject executableInject, Injector injector)
+  private InjectExecution executeExternal(ExecutableInject executableInject, Injector injector)
       throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     String jsonInject = mapper.writeValueAsString(executableInject);
-    InjectStatus injectStatus =
+    InjectExecution injectExecution =
         this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     queueService.publish(injector.getType(), jsonInject);
-    injectStatus.addInfoTrace(
+    injectExecution.addInfoTrace(
         "The inject has been published and is now waiting to be consumed.",
         ExecutionTraceAction.EXECUTION);
-    return this.injectStatusRepository.save(injectStatus);
+    return this.injectStatusRepository.save(injectExecution);
   }
 
-  private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector) {
+  private InjectExecution executeInternal(ExecutableInject executableInject, Injector injector) {
     Inject inject = executableInject.getInjection().getInject();
     // [issue/2797] logs -> we try to understand why we can't reproduce on dev and
     // test-feature-branch env so those
@@ -68,15 +68,15 @@ public class Executor {
     // After execution, expectations are already created
     // Injection status is filled after complete execution
     // Report inject execution
-    InjectStatus injectStatus =
+    InjectExecution injectExecution =
         this.injectStatusRepository.findByInjectId(inject.getId()).orElseThrow();
     log.info("[issue/2797] executeInternal 4: " + inject.getId());
-    InjectStatus completeStatus = injectStatusService.fromExecution(execution, injectStatus);
+    InjectExecution completeStatus = injectStatusService.fromExecution(execution, injectExecution);
     log.info("[issue/2797] executeInternal 5: " + inject.getId());
     return injectStatusRepository.save(completeStatus);
   }
 
-  public InjectStatus execute(ExecutableInject executableInject)
+  public InjectExecution execute(ExecutableInject executableInject)
       throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     InjectorContract injectorContract =
@@ -99,7 +99,7 @@ public class Executor {
                             + injectorContract.getInjector().getType()));
 
     // Status
-    InjectStatus updatedStatus =
+    InjectExecution updatedStatus =
         this.injectStatusService.initializeInjectStatus(inject.getId(), EXECUTING);
     inject.setExecutions(updatedStatus);
     if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
@@ -112,7 +112,7 @@ public class Executor {
     }
   }
 
-  public InjectStatus directExecute(ExecutableInject executableInject)
+  public InjectExecution directExecute(ExecutableInject executableInject)
       throws IOException, TimeoutException {
     boolean isScheduledInject = !executableInject.isDirect();
     // If empty content, inject must be rejected

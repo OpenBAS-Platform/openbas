@@ -1,7 +1,7 @@
 package io.openbas.injectors.caldera.service;
 
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.InjectExecution;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.caldera.CalderaContract;
 import io.openbas.injectors.caldera.model.ResultStatus;
@@ -39,10 +39,10 @@ public class CalderaResultCollectorService implements Runnable {
   @Transactional
   public void run() {
     // Retrieve Caldera inject not done
-    List<InjectStatus> injectStatuses =
+    List<InjectExecution> injectExecutions =
         this.injectStatusService.findPendingInjectStatusByType(CalderaContract.TYPE);
     // For each one ask for traces and status
-    injectStatuses.forEach(
+    injectExecutions.forEach(
         (injectStatus -> {
           log.log(Level.INFO, "Found inject status: " + injectStatus.getId());
           Map<String, Agent> linksMap = injectStatus.getStatusMapIdentifierAgent();

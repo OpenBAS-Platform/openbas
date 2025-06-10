@@ -188,7 +188,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public InjectStatus executeInject(
+  public InjectExecution executeInject(
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
       @RequestPart("file") Optional<MultipartFile> file) {

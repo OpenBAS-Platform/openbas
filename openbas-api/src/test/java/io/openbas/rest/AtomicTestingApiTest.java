@@ -36,7 +36,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
   static Inject INJECT_WITH_STATUS_AND_COMMAND_LINES;
   static Inject INJECT_WITHOUT_STATUS;
-  static InjectStatus INJECT_STATUS;
+  static InjectExecution INJECT_STATUS;
   static InjectorContract INJECTOR_CONTRACT;
 
   @Autowired private AgentComposer agentComposer;
@@ -61,15 +61,15 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
     Inject injectWithPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
     INJECT_WITH_STATUS_AND_COMMAND_LINES = injectRepository.save(injectWithPayload);
-    InjectStatus injectStatus = InjectStatusFixture.createPendingInjectStatus();
-    injectStatus.setInject(injectWithPayload);
-    INJECT_STATUS = injectStatusRepository.save(injectStatus);
+    InjectExecution injectExecution = InjectStatusFixture.createPendingInjectStatus();
+    injectExecution.setInject(injectWithPayload);
+    INJECT_STATUS = injectStatusRepository.save(injectExecution);
   }
 
   private InjectComposer.Composer getAtomicTestingWrapper(
-      @Nullable InjectStatus injectStatus, @Nullable Executor executor) {
-    InjectStatus injectStatusToSet =
-        (injectStatus == null) ? InjectStatusFixture.createDraftInjectStatus() : injectStatus;
+      @Nullable InjectExecution injectExecution, @Nullable Executor executor) {
+    InjectExecution injectExecutionToSet =
+        (injectExecution == null) ? InjectStatusFixture.createDraftInjectStatus() : injectExecution;
     Executor executorToRun = (executor == null) ? executorFixture.getDefaultExecutor() : executor;
     return injectComposer
         .forInject(InjectFixture.getDefaultInject())
@@ -78,7 +78,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
                 .forEndpoint(EndpointFixture.createEndpoint())
                 .withAgent(
                     agentComposer.forAgent(AgentFixture.createDefaultAgentSession(executorToRun))))
-        .withInjectStatus(injectStatusComposer.forInjectStatus(injectStatusToSet));
+        .withInjectStatus(injectStatusComposer.forInjectStatus(injectExecutionToSet));
   }
 
   @Test
