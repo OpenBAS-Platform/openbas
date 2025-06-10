@@ -75,7 +75,7 @@ public class InjectComposer extends ComposerBase<Inject> {
     public Composer withInjectStatus(InjectStatusComposer.Composer injectStatus) {
       injectStatusComposers = Optional.of(injectStatus);
       injectStatus.get().setInject(this.inject);
-      this.inject.setStatus(injectStatus.get());
+      this.inject.setExecutions(injectStatus.get());
       return this;
     }
 

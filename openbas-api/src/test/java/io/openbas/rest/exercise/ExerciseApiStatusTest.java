@@ -160,7 +160,7 @@ public class ExerciseApiStatusTest {
     LESSON_ANSWER = lessonsAnswerRepository.save(lessonsAnswer);
 
     injectStatus.setName(ExecutionStatus.ERROR);
-    inject5.setStatus(injectStatus);
+    inject5.setExecutions(injectStatus);
     FINISHED_EXERCISE.setInjects(List.of(inject5));
     FINISHED_EXERCISE.setPauses(List.of(pause));
     FINISHED_EXERCISE.setLessonsCategories(List.of(lessonsCategory));

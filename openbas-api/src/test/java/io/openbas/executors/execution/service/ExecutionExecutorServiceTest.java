@@ -48,7 +48,7 @@ public class ExecutionExecutorServiceTest {
             InjectorContractFixture.createPayloadInjectorContract(injector, payloadCommand),
             "Inject",
             endpoint);
-    inject.setStatus(InjectStatusFixture.createPendingInjectStatus());
+    inject.setExecutions(InjectStatusFixture.createPendingInjectStatus());
     when(injectService.getAgentsAndAgentlessAssetsByInject(inject))
         .thenReturn(
             new AgentsAndAssetsAgentless(new HashSet<>(), new HashSet<>(List.of(endpoint))));

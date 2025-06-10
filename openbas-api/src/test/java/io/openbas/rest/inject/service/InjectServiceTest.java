@@ -607,7 +607,7 @@ class InjectServiceTest {
     injectStatus.setId(injectStatusID);
     Inject inject = new Inject();
     inject.setId(injectId);
-    inject.setStatus(injectStatus);
+    inject.setExecutions(injectStatus);
     injectStatus.setInject(inject);
     StatusPayload statusPayload = new StatusPayload();
 

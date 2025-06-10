@@ -385,7 +385,7 @@ public class InjectService {
   private Inject saveInjectAndStatusAsQueuing(Inject inject) {
     Inject savedInject = injectRepository.save(inject);
     InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
-    savedInject.setStatus(injectStatus);
+    savedInject.setExecutions(injectStatus);
     return savedInject;
   }
 

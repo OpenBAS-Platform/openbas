@@ -80,8 +80,8 @@ class InjectsExecutionJobTest {
             .get();
     injectParent.setExercise(exerciseSaved);
     injectChildren.setExercise(exerciseSaved);
-    injectParent.setStatus(null);
-    injectChildren.setStatus(null);
+    injectParent.setExecutions(null);
+    injectChildren.setExecutions(null);
     exerciseSaved.setInjects(List.of(injectParent, injectChildren));
     EXERCISE_ID = exerciseSaved.getId();
 
@@ -105,9 +105,9 @@ class InjectsExecutionJobTest {
     assertTrue(savedInjectParent.isPresent());
     assertTrue(savedInjectChildren.isPresent());
 
-    assertTrue(savedInjectParent.get().getStatus().isPresent());
-    assertTrue(savedInjectChildren.get().getStatus().isEmpty());
+    assertTrue(savedInjectParent.get().getExecutions().isPresent());
+    assertTrue(savedInjectChildren.get().getExecutions().isEmpty());
 
-    assertNotNull(savedInjectParent.get().getStatus().get().getName());
+    assertNotNull(savedInjectParent.get().getExecutions().get().getName());
   }
 }

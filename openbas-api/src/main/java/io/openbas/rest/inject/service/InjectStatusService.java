@@ -45,7 +45,7 @@ public class InjectStatusService {
     injectStatus.setInject(inject);
     injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
-    inject.setStatus(injectStatus);
+    inject.setExecutions(injectStatus);
     return injectRepository.save(inject);
   }
 
@@ -68,7 +68,7 @@ public class InjectStatusService {
   }
 
   private int getCompleteTrace(Inject inject) {
-    return inject.getStatus().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
+    return inject.getExecutions().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
         .filter(trace -> trace.getAgent() != null)
         .map(trace -> trace.getAgent().getId())
@@ -125,7 +125,7 @@ public class InjectStatusService {
 
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus = inject.getExecutions().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTrace executionTrace =
         createExecutionTrace(injectStatus, input, agent, structuredOutput);
@@ -198,7 +198,7 @@ public class InjectStatusService {
 
   private InjectStatus getOrInitializeInjectStatus(Inject inject) {
     return inject
-        .getStatus()
+        .getExecutions()
         .orElseGet(
             () -> {
               InjectStatus newStatus = new InjectStatus();

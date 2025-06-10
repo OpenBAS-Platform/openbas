@@ -12,7 +12,7 @@ public class InjectStatisticsHelper {
     Map<String, Long> stats = new HashMap<>();
     long total = injects.size();
     stats.put("total_count", total);
-    long executed = injects.stream().filter(inject -> inject.getStatus().isPresent()).count();
+    long executed = injects.stream().filter(inject -> inject.getExecutions().isPresent()).count();
     stats.put("total_executed", executed);
     stats.put("total_remaining", injects.stream().filter(Inject::isNotExecuted).count());
     stats.put("total_past", injects.stream().filter(Inject::isPastInject).count());
