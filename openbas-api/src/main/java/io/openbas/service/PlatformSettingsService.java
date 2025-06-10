@@ -31,7 +31,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
-@Log
+@Slf4j
 public class PlatformSettingsService {
 
   public static final String THEME_TYPE_LIGHT = "light";
@@ -273,7 +273,7 @@ public class PlatformSettingsService {
                     try {
                       return PreviewFeature.fromStringIgnoreCase(featureStr.strip());
                     } catch (IllegalArgumentException e) {
-                      log.warning("Unrecognised feature flag: " + e.getMessage());
+                      log.warn(String.format("Unrecognised feature flag: %s", e.getMessage()), e);
                       return null;
                     }
                   })

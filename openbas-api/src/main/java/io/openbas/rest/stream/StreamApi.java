@@ -13,8 +13,7 @@ import io.openbas.rest.helper.RestBehavior;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,12 +28,12 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 @RestController
+@Slf4j
 public class StreamApi extends RestBehavior {
 
   public static final String EVENT_TYPE_MESSAGE = "message";
   public static final String EVENT_TYPE_PING = "ping";
   public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
-  private static final Logger LOGGER = Logger.getLogger(StreamApi.class.getName());
   private final Map<String, Tuple2<OpenBASPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
 
   private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
@@ -75,7 +74,7 @@ public class StreamApi extends RestBehavior {
                   sendStreamEvent(fluxSink, userEvent);
                 } catch (Exception e) {
                   String simpleName = event.getInstance().getClass().getSimpleName();
-                  LOGGER.log(Level.WARNING, "Class " + simpleName + " cant be streamed", e);
+                  log.warn(String.format("Class %s cant be streamed", simpleName), e);
                 }
               } else {
                 sendStreamEvent(fluxSink, event);

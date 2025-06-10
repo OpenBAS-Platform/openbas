@@ -35,17 +35,16 @@ import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component(CalderaContract.TYPE)
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CalderaExecutor extends Injector {
 
   private static final String CALDERA_FAILED_TO_EXECUTE_THE_ABILITY_ON_AGENT =
@@ -241,7 +240,7 @@ public class CalderaExecutor extends Injector {
                                               + ")",
                                           ExecutionTraceAction.COMPLETE,
                                           agent));
-                                  log.severe(Arrays.toString(e.getStackTrace()));
+                                  log.error(e.getMessage(), e);
                                 }
                               });
 
@@ -315,16 +314,15 @@ public class CalderaExecutor extends Injector {
       throws InterruptedException {
     io.openbas.database.model.Agent agentForExecution = null;
     if (!assetEndpoint.getType().equals("Endpoint")) {
-      log.log(
-          Level.SEVERE,
-          "Caldera failed to execute ability on the asset because type is not supported: "
-              + assetEndpoint.getType());
+      log.error(
+          "Caldera failed to execute ability on the asset because type is not supported: {}",
+          assetEndpoint.getType());
       return null;
     }
-    log.log(Level.INFO, "Trying to find an available executor for " + assetEndpoint.getName());
+    log.info("Trying to find an available executor for {}", assetEndpoint.getName());
     for (int i = 0; i < RETRY_NUMBER; i++) {
       // Find an executor agent matching the assetEndpoint
-      log.log(Level.INFO, "Listing agentsCaldera...");
+      log.info("Listing agentsCaldera...");
       List<Agent> agentsCaldera =
           this.calderaService.agents().stream()
               .filter(
@@ -345,7 +343,7 @@ public class CalderaExecutor extends Injector {
                                           .toList()
                                           .contains(s)))
               .toList();
-      log.log(Level.INFO, "List return with " + agentsCaldera.size() + " agents");
+      log.info("List return with {} agents", agentsCaldera.size());
 
       if (!agentsCaldera.isEmpty()) {
         for (Agent agentCaldera : agentsCaldera) {
@@ -354,7 +352,7 @@ public class CalderaExecutor extends Injector {
               this.agentService.findByExternalReference(agentCaldera.getPaw());
 
           if (resolvedExistingAgent.isEmpty()) {
-            log.log(Level.INFO, "Agent found and not present in the database, creating it...");
+            log.info("Agent found and not present in the database, creating it...");
             io.openbas.database.model.Agent newAgent = new io.openbas.database.model.Agent();
             newAgent.setInject(inject);
             newAgent.setParent(agent);

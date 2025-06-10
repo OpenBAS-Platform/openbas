@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
 @RestControllerAdvice
-@Log
+@Slf4j
 public class RestBehavior {
 
   @Resource protected ObjectMapper mapper;
@@ -198,7 +198,7 @@ public class RestBehavior {
       })
   public ResponseEntity<ErrorMessage> handleElementNotFoundException(ElementNotFoundException ex) {
     ErrorMessage message = new ErrorMessage("Element not found: " + ex.getMessage());
-    log.warning("ElementNotFoundException: " + ex.getMessage());
+    log.warn(String.format("ElementNotFoundException: %s", ex.getMessage()), ex);
     return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
   }
 
@@ -206,21 +206,21 @@ public class RestBehavior {
   public ResponseEntity<ErrorMessage> handleUnsupportedMediaTypeException(
       UnsupportedMediaTypeException ex) {
     ErrorMessage message = new ErrorMessage(ex.getMessage());
-    log.warning("UnsupportedMediaTypeException: " + ex.getMessage());
+    log.warn(String.format("UnsupportedMediaTypeException: " + ex.getMessage()), ex);
     return new ResponseEntity<>(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
   }
 
   @ExceptionHandler(FileTooBigException.class)
   public ResponseEntity<ErrorMessage> handleFileTooBigException(FileTooBigException ex) {
     ErrorMessage message = new ErrorMessage(ex.getMessage());
-    log.warning("FileTooBigException: " + ex.getMessage());
+    log.warn(String.format("FileTooBigException: %s", ex.getMessage()), ex);
     return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(AlreadyExistingException.class)
   public ResponseEntity<ErrorMessage> handleAlreadyExistingException(AlreadyExistingException ex) {
     ErrorMessage message = new ErrorMessage(ex.getMessage());
-    log.warning("AlreadyExistingException: " + ex.getMessage());
+    log.warn(String.format("AlreadyExistingException: %s", ex.getMessage()), ex);
     return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
   }
 

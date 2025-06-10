@@ -11,9 +11,8 @@ import io.openbas.security.SsoRefererAuthenticationSuccessHandler;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +32,7 @@ import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilt
 import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 
 @Configuration
-@Log
+@Slf4j
 @RequiredArgsConstructor
 public class OpenSamlConfig {
 
@@ -49,7 +48,7 @@ public class OpenSamlConfig {
 
   public void addOpenSamlConfig(@NotNull final HttpSecurity http) throws Exception {
     if (this.relyingPartyRegistrationRepository == null) {
-      log.warning("No RelyingPartyRegistrationRepository found, skipping SAML2 configuration.");
+      log.warn("No RelyingPartyRegistrationRepository found, skipping SAML2 configuration.");
       return;
     }
 
@@ -123,7 +122,7 @@ public class OpenSamlConfig {
         return userLogin;
       }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Failed to manage SAML2 user", e);
+      log.error("Failed to manage SAML2 user", e);
     }
 
     Saml2Error authError = new Saml2Error("invalid_token", "User conversion fail");

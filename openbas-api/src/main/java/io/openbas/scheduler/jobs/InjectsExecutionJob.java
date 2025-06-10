@@ -26,10 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.quartz.DisallowConcurrentExecution;
@@ -45,6 +44,7 @@ import org.springframework.stereotype.Component;
 @Component
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
+@Slf4j
 public class InjectsExecutionJob implements Job {
 
   public static final String DEFAULT_EXECUTION_THRESHOLD_TIME_IN_MINUTS = "10";
@@ -52,7 +52,6 @@ public class InjectsExecutionJob implements Job {
 
   private final Environment env;
   private int injectExecutionThreshold;
-  private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
   private final ExerciseRepository exerciseRepository;
@@ -171,7 +170,7 @@ public class InjectsExecutionJob implements Job {
       throw new UnsupportedOperationException(
           "The inject is not ready to be executed (missing mandatory fields)");
     }
-    LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
+    log.info("Executing inject {}", inject.getInject().getTitle());
     this.executor.execute(executableInject);
   }
 
@@ -352,7 +351,7 @@ public class InjectsExecutionJob implements Job {
                             this.executeInject(executableInject);
                           } catch (Exception e) {
                             Inject inject = executableInject.getInjection().getInject();
-                            LOGGER.log(Level.WARNING, e.getMessage(), e);
+                            log.warn(e.getMessage(), e);
                             injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
                           }
                         });
@@ -365,7 +364,7 @@ public class InjectsExecutionJob implements Job {
       handleAutoClosingExercises();
       handlePendingInject();
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, e.getMessage(), e);
+      log.error(e.getMessage(), e);
       throw new JobExecutionException(e);
     }
   }

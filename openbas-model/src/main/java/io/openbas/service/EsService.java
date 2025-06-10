@@ -36,17 +36,16 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EsService {
-
-  private static final Logger LOGGER = Logger.getLogger(EsService.class.getName());
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
   private final EsEngine esEngine;
@@ -226,7 +225,7 @@ public class EsService {
           .map(Hit::source)
           .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
     } catch (Exception e) {
-      LOGGER.severe("resolveIdsRepresentative exception: " + e);
+      log.error(String.format("resolveIdsRepresentative exception: %s", e.getMessage()), e);
     }
     return Map.of();
   }
@@ -236,7 +235,7 @@ public class EsService {
   // region indexing
   public <T extends EsBase> void bulkParallelProcessing() {
     List<EsModel<T>> models = this.esEngine.getModels();
-    LOGGER.info("Executing bulk parallel processing for " + models.size() + " models");
+    log.info("Executing bulk parallel processing for {} models", models.size());
     models.stream()
         .parallel()
         .forEach(
@@ -259,15 +258,14 @@ public class EsService {
                 }
                 // Execute the bulk
                 try {
-                  LOGGER.info(
-                      "Indexing (" + results.size() + ") in progress for " + model.getName());
+                  log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
                   BulkRequest bulkRequest = br.build();
                   BulkResponse result = elasticClient.bulk(bulkRequest);
                   // Log errors, if any
                   if (result.errors()) {
                     for (BulkResponseItem item : result.items()) {
                       if (item.error() != null) {
-                        LOGGER.severe(item.error().reason());
+                        log.error(item.error().reason());
                       }
                     }
                   } else {
@@ -284,10 +282,11 @@ public class EsService {
                     }
                   }
                 } catch (IOException e) {
-                  LOGGER.severe("bulkParallelProcessing exception: " + e);
+                  log.error(
+                      String.format("bulkParallelProcessing exception: %s", e.getMessage()), e);
                 }
               } else {
-                LOGGER.info("Indexing <up to date> for " + model.getName());
+                log.info("Indexing <up to date> for {}", model.getName());
               }
             });
   }
@@ -313,7 +312,7 @@ public class EsService {
               .query(query)
               .build());
     } catch (IOException e) {
-      LOGGER.severe("bulkDelete exception: " + e);
+      log.error(String.format("bulkDelete exception: %s", e.getMessage()), e);
     }
   }
 
@@ -328,7 +327,7 @@ public class EsService {
           .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
           .count();
     } catch (IOException e) {
-      LOGGER.severe("count exception: " + e);
+      log.error(String.format("count exception: %s", e.getMessage()), e);
     }
     return 0;
   }
@@ -366,7 +365,7 @@ public class EsService {
         return termHistogramSTerms(user, config, aggregate, field);
       }
     } catch (Exception e) {
-      LOGGER.severe("termHistogram exception: " + e);
+      log.error(String.format("termHistogram exception: %s", e.getMessage()), e);
     }
     return new EsSeries(config.getName());
   }
@@ -487,7 +486,7 @@ public class EsService {
               .toList();
       return new EsSeries(config.getName(), data);
     } catch (IOException e) {
-      LOGGER.severe("dateHistogram exception: " + e);
+      log.error(String.format("dateHistogram exception: %s", e.getMessage()), e);
     }
     return new EsSeries(config.getName());
   }
@@ -525,7 +524,7 @@ public class EsService {
               })
           .toList();
     } catch (IOException e) {
-      LOGGER.severe("query exception: " + e);
+      log.error(String.format("query exception: %s", e.getMessage()), e);
     }
     return List.of();
   }

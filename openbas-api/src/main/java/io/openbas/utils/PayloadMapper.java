@@ -15,14 +15,14 @@ import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Log
+@Slf4j
 public class PayloadMapper {
 
   private final ApplicationContext context;

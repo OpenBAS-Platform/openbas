@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +61,7 @@ import org.springframework.util.CollectionUtils;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectService {
 
   private final TeamRepository teamRepository;
@@ -755,7 +755,7 @@ public class InjectService {
         id -> {
           T entity = entitiesFromDB.get(id);
           if (entity == null) {
-            log.warning("Inject update entity with ID " + id + " not found in the DB");
+            log.warn("Inject update entity with ID {} not found in the DB", id);
             return;
           }
 

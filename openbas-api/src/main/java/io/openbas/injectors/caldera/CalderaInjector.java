@@ -4,16 +4,14 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.integrations.InjectorService;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Log
+@Slf4j
 public class CalderaInjector {
 
   private static final String CALDERA_INJECTOR_NAME = "Caldera";
@@ -77,13 +75,7 @@ public class CalderaInjector {
           executorClearCommands,
           false);
     } catch (Exception e) {
-      log.log(
-          Level.SEVERE,
-          "Error creating Caldera injector ("
-              + e.getMessage()
-              + ")"
-              + "\n"
-              + Arrays.toString(e.getStackTrace()));
+      log.error(String.format("Error creating Caldera injector (%s)", e.getMessage()), e);
     }
   }
 }

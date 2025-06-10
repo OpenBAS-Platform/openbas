@@ -16,10 +16,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service(TaniumExecutorContextService.SERVICE_NAME)
 @RequiredArgsConstructor
 public class TaniumExecutorContextService extends ExecutorContextService {

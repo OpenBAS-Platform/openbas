@@ -1,17 +1,14 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.database.model.ContractOutputType.*;
-
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
 import java.util.*;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-@Log
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class FindingUtils {
@@ -56,7 +53,10 @@ public class FindingUtils {
       }
 
     } catch (DataIntegrityViolationException ex) {
-      log.log(Level.INFO, "Race condition: finding already exists. Retrying ...", ex.getMessage());
+      log.info(
+          String.format(
+              "Race condition: finding already exists. Retrying ... %s ", ex.getMessage()),
+          ex);
       // Re-fetch and try to add the asset
       handleRaceCondition(inject, asset, contractOutputElement, finalValue);
     }
@@ -80,7 +80,7 @@ public class FindingUtils {
         findingRepository.save(existingFinding);
       }
     } else {
-      log.warning("Retry failed: Finding still not found after race condition.");
+      log.warn("Retry failed: Finding still not found after race condition.");
     }
   }
 }

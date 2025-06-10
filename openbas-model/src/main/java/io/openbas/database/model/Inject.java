@@ -23,14 +23,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Entity
 @Table(name = "injects")
 @EntityListeners(ModelBaseListener.class)
-@Log
+@Slf4j
 public class Inject implements Base, Injection {
 
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.

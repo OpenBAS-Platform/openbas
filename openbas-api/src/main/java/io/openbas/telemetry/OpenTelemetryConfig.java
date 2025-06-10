@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +39,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
-@Log
+@Slf4j
 @Service
 @Profile("!test")
 @RequiredArgsConstructor
@@ -118,19 +118,18 @@ public class OpenTelemetryConfig {
       int responseCode = req.getResponseCode();
 
       if (responseCode != 200) {
-        log.severe(
-            "Telemetry - Failed to reach OTLP endpoint: "
-                + url
-                + " with response code: "
-                + responseCode);
+        log.error(
+            "Telemetry - Failed to reach OTLP endpoint: {} with response code: {}",
+            url,
+            responseCode);
         return false;
       } else {
-        log.info("Telemetry - Successfully reached OTLP endpoint: " + url);
+        log.info("Telemetry - Successfully reached OTLP endpoint: {}", url);
         return true;
       }
 
     } catch (IOException e) {
-      log.severe("Telemetry - Failed to reach OTLP endpoint: " + url);
+      log.error(String.format("Telemetry - Failed to reach OTLP endpoint: %s", url), e);
       return false;
     }
   }
@@ -157,7 +156,7 @@ public class OpenTelemetryConfig {
       String hostAddress = InetAddress.getLocalHost().getHostAddress();
       resourceBuilder.putAll(Attributes.of(ServerAttributes.SERVER_ADDRESS, hostAddress));
     } catch (UnknownHostException e) {
-      log.severe("Telemetry - Failed to get host address: " + e.getMessage());
+      log.error(String.format("Telemetry - Failed to get host address: %s", e.getMessage()), e);
     }
 
     return resourceBuilder.build();

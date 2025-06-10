@@ -27,7 +27,7 @@ import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +35,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
-@Log
+@Slf4j
 @RequiredArgsConstructor
 public class AtomicTestingService {
 
@@ -187,7 +187,7 @@ public class AtomicTestingService {
           }
         }
       } catch (JsonProcessingException e) {
-        log.severe("Cannot open injector contract");
+        log.error("Cannot open injector contract", e);
       }
     }
     return finalContent;
