@@ -112,7 +112,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
-  @Mock private InjectStatusRepositoryHelper injectStatusRepositoryHelper;
+  @MockBean private InjectStatusRepositoryHelper injectStatusRepositoryHelper;
 
   @BeforeAll
   void beforeAll() {
@@ -838,6 +838,7 @@ class InjectApiTest extends IntegrationTest {
             "injectStatusRepositoryHelper",
             injectStatusRepositoryHelper);
         doNothing().when(injectStatusRepositoryHelper).updateInjectStatusWithTraces(any(), any());
+        doNothing().when(injectStatusRepositoryHelper).saveFindings(any());
 
         // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
