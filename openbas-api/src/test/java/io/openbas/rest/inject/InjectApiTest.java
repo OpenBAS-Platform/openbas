@@ -64,6 +64,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -832,7 +833,11 @@ class InjectApiTest extends IntegrationTest {
       @DisplayName("Should add error trace when agent is not found")
       @Test
       void shouldAddTraceError() {
-        doNothing().when(injectStatusRepositoryHelper).saveFindings(any());
+        ReflectionTestUtils.setField(
+            batchingInjectStatusService,
+            "injectStatusRepositoryHelper",
+            injectStatusRepositoryHelper);
+        doNothing().when(injectStatusRepositoryHelper).updateInjectStatusWithTraces(any(), any());
 
         // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
