@@ -12,14 +12,12 @@ import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
-import io.openbas.injector_contract.outputs.ContractOutputUtils;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,11 +85,11 @@ public class FindingService {
   // This structrued output is generated based on injectorcontract where we can find the node
   // Outputs and with that the injector generate this structure output--
 
-  public void extractFindingsFromInjectorContract(Inject inject, ObjectNode structuredOutput) {
+  public List<SimpleFinding> extractFindingsFromInjectorContract(
+      String injectId, InjectorContract injectorContract, ObjectNode structuredOutput) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
-    List<Finding> findings = new ArrayList<>();
+    List<SimpleFinding> findings = new ArrayList<>();
     // Get the contract
-    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
     List<ContractOutputElement> contractOutputs =
         getContractOutputs(injectorContract.getConvertedContent(), mapper);
     if (!contractOutputs.isEmpty()) {
@@ -105,10 +103,13 @@ public class FindingService {
                     if (!contractOutput.getType().validate.apply(jsonNode)) {
                       throw new IllegalArgumentException("Finding not correctly formatted");
                     }
-                    Finding finding = ContractOutputUtils.createFinding(contractOutput);
+                    SimpleFinding finding = new SimpleFinding();
+                    finding.setType(contractOutput.getType().toString());
+                    finding.setField(contractOutput.getField());
+                    finding.setLabels(contractOutput.getLabels());
                     finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                    Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
-                    findings.add(linkedFinding);
+                    linkFindings(contractOutput, jsonNode, finding);
+                    findings.add(finding);
                   }
                 }
               } else {
@@ -116,50 +117,45 @@ public class FindingService {
                 if (!contractOutput.getType().validate.apply(jsonNode)) {
                   throw new IllegalArgumentException("Finding not correctly formatted");
                 }
-                Finding finding = ContractOutputUtils.createFinding(contractOutput);
+                SimpleFinding finding = new SimpleFinding();
+                finding.setType(contractOutput.getType().toString());
+                finding.setField(contractOutput.getField());
+                finding.setLabels(contractOutput.getLabels());
                 finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
-                findings.add(linkedFinding);
+                linkFindings(contractOutput, jsonNode, finding);
+                findings.add(finding);
               }
             }
           });
     }
-    this.createFindings(findings, inject.getId());
+    findings.forEach((finding) -> finding.setInjectId(injectId));
+    return findings;
   }
 
-  private Finding linkFindings(
-      ContractOutputElement contractOutput, JsonNode jsonNode, Finding finding) {
+  private void linkFindings(
+      ContractOutputElement contractOutput, JsonNode jsonNode, SimpleFinding finding) {
     // Create links with assets
     if (contractOutput.getType().toFindingAssets != null) {
       List<String> assetsIds = contractOutput.getType().toFindingAssets.apply(jsonNode);
-      List<Optional<Asset>> assets =
-          assetsIds.stream().map(this.assetRepository::findById).toList();
-      if (!assets.isEmpty()) {
-        finding.setAssets(assets.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
+      finding.setAssets(assetsIds);
     }
     // Create links with teams
     if (contractOutput.getType().toFindingTeams != null) {
       List<String> teamsIds = contractOutput.getType().toFindingTeams.apply(jsonNode);
-      List<Optional<Team>> teams = teamsIds.stream().map(this.teamRepository::findById).toList();
-      if (!teams.isEmpty()) {
-        finding.setTeams(teams.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
+      finding.setTeams(teamsIds);
     }
     // Create links with users
     if (contractOutput.getType().toFindingUsers != null) {
       List<String> usersIds = contractOutput.getType().toFindingUsers.apply(jsonNode);
-      List<Optional<User>> users = usersIds.stream().map(this.userRepository::findById).toList();
-      if (!users.isEmpty()) {
-        finding.setUsers(users.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
+      finding.setUsers(usersIds);
     }
-    return finding;
   }
 
   /** Extracts findings from structured output that was generated using output parsers. */
-  public void extractFindingsFromOutputParsers(
-      Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
+  public List<SimpleFinding> extractFindingsFromOutputParsers(
+      String injectId, String assetId, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
+
+    List<SimpleFinding> results = new ArrayList<>();
 
     outputParsers.forEach(
         outputParser -> {
@@ -176,15 +172,17 @@ public class FindingService {
                             throw new IllegalArgumentException("Finding not correctly formatted");
                           }
                           // Build and save the finding
-                          findingUtils.buildFinding(
-                              inject,
-                              agent.getAsset(),
-                              contractOutputElement,
-                              contractOutputElement.getType().toFindingValue.apply(jsonNode));
+                          results.add(
+                              findingUtils.buildSimplerFinding(
+                                  injectId,
+                                  assetId,
+                                  contractOutputElement,
+                                  contractOutputElement.getType().toFindingValue.apply(jsonNode)));
                         }
                       }
                     }
                   });
         });
+    return results;
   }
 }

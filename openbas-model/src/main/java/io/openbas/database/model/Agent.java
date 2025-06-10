@@ -48,6 +48,7 @@ public class Agent implements Base {
   @Column(name = "agent_id")
   @JsonProperty("agent_id")
   @NotBlank
+  @Access(AccessType.PROPERTY)
   // ID is UUID by default and external reference for CrowdStrike agent
   private String id = UUID.randomUUID().toString();
 
@@ -111,8 +112,9 @@ public class Agent implements Base {
 
   @JsonProperty("agent_active")
   public boolean isActive() {
-    return this.getLastSeen() != null
-        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+    return false;
+    // return this.getLastSeen() != null
+    //    && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
   }
 
   /** Used for Caldera only */
