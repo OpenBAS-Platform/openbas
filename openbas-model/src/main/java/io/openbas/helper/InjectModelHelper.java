@@ -67,31 +67,33 @@ public class InjectModelHelper {
       if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)) {
         ArrayNode mandatoryGroups =
             (ArrayNode) jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS);
-        boolean atLeastOneSet = false;
-        for (JsonNode mandatoryFieldKey : mandatoryGroups) {
-          Optional<JsonNode> groupField =
-              contractFields.stream()
-                  .filter(
-                      jsonNode ->
-                          mandatoryFieldKey
-                              .asText()
+        if (!mandatoryGroups.isEmpty()) {
+          boolean atLeastOneSet = false;
+          for (JsonNode mandatoryFieldKey : mandatoryGroups) {
+            Optional<JsonNode> groupField =
+                contractFields.stream()
+                    .filter(
+                        jsonNode ->
+                            mandatoryFieldKey
+                                .asText()
                               .equals(jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
-                  .findFirst();
-          if (groupField.isPresent()
-              && isFieldSet(
-                  allTeams,
-                  teams,
-                  assets,
-                  assetGroups,
-                  groupField.get(),
-                  content,
-                  injectContractFields)) {
-            atLeastOneSet = true;
-            break;
+                    .findFirst();
+            if (groupField.isPresent()
+                && isFieldSet(
+                allTeams,
+                teams,
+                assets,
+                assetGroups,
+                groupField.get(),
+                content,
+                injectContractFields)) {
+              atLeastOneSet = true;
+              break;
+            }
           }
-        }
-        if (!atLeastOneSet) {
-          isReady = false;
+          if (!atLeastOneSet) {
+            isReady = false;
+          }
         }
       }
 
