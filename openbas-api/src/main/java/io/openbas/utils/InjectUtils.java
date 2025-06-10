@@ -34,7 +34,7 @@ public class InjectUtils {
 
   private final ApplicationContext context;
 
-  public StatusPayload getStatusPayloadFromInject(final Inject inject) {
+  public ExecutionPayload getStatusPayloadFromInject(final Inject inject) {
     if (inject == null) {
       return null;
     }
@@ -56,7 +56,7 @@ public class InjectUtils {
         if (payloadCommand.getCleanupCommand() != null) {
           payloadCommandBlock.setCleanupCommand(List.of(payloadCommand.getCleanupCommand()));
         }
-        return new StatusPayload(
+        return new ExecutionPayload(
             payloadCommand.getName(),
             payloadCommand.getDescription(),
             COMMAND_TYPE,
@@ -79,7 +79,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        return new StatusPayload(
+        return new ExecutionPayload(
             payloadExecutable.getName(),
             payloadExecutable.getDescription(),
             EXECUTABLE_TYPE,
@@ -101,7 +101,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-        return new StatusPayload(
+        return new ExecutionPayload(
             payloadFileDrop.getName(),
             payloadFileDrop.getDescription(),
             FILE_DROP_TYPE,
@@ -123,7 +123,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-        return new StatusPayload(
+        return new ExecutionPayload(
             payloadDnsResolution.getName(),
             payloadDnsResolution.getDescription(),
             DNS_RESOLUTION_TYPE,
@@ -145,7 +145,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
-        return new StatusPayload(
+        return new ExecutionPayload(
             payloadNetworkTraffic.getName(),
             payloadNetworkTraffic.getDescription(),
             NETWORK_TRAFFIC_TYPE,

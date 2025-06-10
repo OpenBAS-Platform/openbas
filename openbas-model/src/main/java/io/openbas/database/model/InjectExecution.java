@@ -15,20 +15,20 @@ import org.hibernate.annotations.Type;
 @Setter
 @Getter
 @Entity
-@Table(name = "injects_statuses")
+@Table(name = "injects_executions")
 public class InjectExecution extends BaseInjectExecution {
 
   @Type(JsonType.class)
-  @Column(name = "status_payload_output", columnDefinition = "json")
-  @JsonProperty("status_payload_output")
-  private StatusPayload payloadOutput;
+  @Column(name = "execution_payload_output", columnDefinition = "json")
+  @JsonProperty("execution_payload_output")
+  private ExecutionPayload payloadOutput;
 
   @OneToMany(
       mappedBy = "injectExecution",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.EAGER)
-  @JsonProperty("status_traces")
+  @JsonProperty("execution_traces")
   private List<ExecutionTrace> traces = new ArrayList<>();
 
   // region transient

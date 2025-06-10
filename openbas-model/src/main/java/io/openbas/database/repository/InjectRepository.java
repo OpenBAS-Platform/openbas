@@ -39,7 +39,7 @@ public interface InjectRepository
               + "array_agg(ap.phase_id) FILTER ( WHERE ap.phase_id IS NOT NULL ) as inject_kill_chain_phases, "
               + "coalesce(array_agg(ins.status_name) FILTER ( WHERE ins.status_name IS NOT NULL ), '{}') as inject_status_name "
               + "FROM injects f "
-              + "LEFT JOIN injects_statuses ins ON ins.status_inject = f.inject_id "
+              + "LEFT JOIN injects_executions ins ON ins.status_inject = f.inject_id "
               + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
               + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
               + "LEFT JOIN attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
@@ -164,7 +164,7 @@ public interface InjectRepository
           "select icap.attack_pattern_id, count(distinct i) as countInjects from injects i "
               + "join injectors_contracts_attack_patterns icap ON icap.injector_contract_id = i.inject_injector_contract "
               + "join exercises e ON e.exercise_id = i.inject_exercise "
-              + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+              + "join injects_executions injectStatus ON injectStatus.status_inject = i.inject_id "
               + "where i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
               + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5",
       nativeQuery = true)
@@ -179,7 +179,7 @@ public interface InjectRepository
               + "inner join grants ON grants.grant_exercise = e.exercise_id "
               + "inner join groups ON grants.grant_group = groups.group_id "
               + "inner join users_groups ON groups.group_id = users_groups.group_id "
-              + "join injects_statuses injectStatus ON injectStatus.status_inject = i.inject_id "
+              + "join injects_executions injectStatus ON injectStatus.status_inject = i.inject_id "
               + "where users_groups.user_id = :userId and i.inject_created_at > :creationDate and i.inject_exercise is not null and e.exercise_start_date is not null and icap.injector_contract_id is not null and injectStatus.status_name = 'SUCCESS'"
               + "group by icap.attack_pattern_id order by countInjects DESC LIMIT 5",
       nativeQuery = true)
@@ -207,7 +207,7 @@ public interface InjectRepository
               + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = injects.inject_injector_contract "
               + "LEFT JOIN injectors_contracts injcon ON injcon.injector_contract_id = injects.inject_injector_contract "
               + "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = icap.attack_pattern_id "
-              + "LEFT JOIN injects_statuses ins ON ins.status_inject = injects.inject_id "
+              + "LEFT JOIN injects_executions ins ON ins.status_inject = injects.inject_id "
               + "WHERE injects.inject_id IN :ids "
               + "GROUP BY injects.inject_id, ins.status_name;",
       nativeQuery = true)

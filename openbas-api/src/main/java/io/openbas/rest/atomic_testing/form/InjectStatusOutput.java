@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class InjectStatusOutput {
 
-  @JsonProperty("status_id")
+  @JsonProperty("execution_id")
   @NotNull
   private String id;
 

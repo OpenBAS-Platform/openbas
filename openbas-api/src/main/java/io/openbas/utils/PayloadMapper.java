@@ -184,22 +184,22 @@ public class PayloadMapper {
 
   private StatusPayloadOutput populateExecutedPayload(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder,
-      StatusPayload statusPayload,
+      ExecutionPayload executionPayload,
       InjectorContract injectorContract) {
     builder
-        .cleanupExecutor(statusPayload.getCleanupExecutor())
-        .payloadCommandBlocks(statusPayload.getPayloadCommandBlocks())
-        .arguments(statusPayload.getArguments())
-        .prerequisites(statusPayload.getPrerequisites())
-        .externalId(statusPayload.getExternalId())
-        .executableFile(statusPayload.getExecutableFile())
-        .fileDropFile(statusPayload.getFileDropFile())
-        .hostname(statusPayload.getHostname())
+        .cleanupExecutor(executionPayload.getCleanupExecutor())
+        .payloadCommandBlocks(executionPayload.getPayloadCommandBlocks())
+        .arguments(executionPayload.getArguments())
+        .prerequisites(executionPayload.getPrerequisites())
+        .externalId(executionPayload.getExternalId())
+        .executableFile(executionPayload.getExecutableFile())
+        .fileDropFile(executionPayload.getFileDropFile())
+        .hostname(executionPayload.getHostname())
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch())
-        .name(statusPayload.getName())
-        .type(statusPayload.getType())
-        .description(statusPayload.getDescription())
+        .name(executionPayload.getName())
+        .type(executionPayload.getType())
+        .description(executionPayload.getDescription())
         .platforms(injectorContract.getPlatforms());
 
     Payload payload = injectorContract.getPayload();

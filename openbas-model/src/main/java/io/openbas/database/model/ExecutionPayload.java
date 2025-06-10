@@ -10,7 +10,7 @@ import lombok.Singular;
 
 @Getter
 @Setter
-public class StatusPayload {
+public class ExecutionPayload {
 
   @JsonProperty("payload_name")
   private String name;
@@ -66,9 +66,9 @@ public class StatusPayload {
   @NotNull
   private String protocol;
 
-  public StatusPayload() {}
+  public ExecutionPayload() {}
 
-  public StatusPayload(
+  public ExecutionPayload(
       String name,
       String description,
       String type,

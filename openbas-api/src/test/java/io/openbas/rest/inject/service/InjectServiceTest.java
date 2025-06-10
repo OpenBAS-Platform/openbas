@@ -609,9 +609,9 @@ class InjectServiceTest {
     inject.setId(injectId);
     inject.setExecutions(injectExecution);
     injectExecution.setInject(inject);
-    StatusPayload statusPayload = new StatusPayload();
+    ExecutionPayload executionPayload = new ExecutionPayload();
 
-    when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
+    when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(executionPayload);
     when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
 
     injectExecutionService.initializeInjectStatus(injectId, executionStatus);
@@ -622,7 +622,7 @@ class InjectServiceTest {
     assertNotNull(savedStatus);
     assertEquals(inject, savedStatus.getInject());
     assertEquals(executionStatus, savedStatus.getName());
-    assertEquals(statusPayload, savedStatus.getPayloadOutput());
+    assertEquals(executionPayload, savedStatus.getPayloadOutput());
   }
 
   @Test

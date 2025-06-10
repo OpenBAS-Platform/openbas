@@ -40,7 +40,7 @@ public abstract class Injector {
   public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception;
 
-  public StatusPayload getPayloadOutput(String externalId) {
+  public ExecutionPayload getPayloadOutput(String externalId) {
     return null;
   }
 

@@ -5,7 +5,7 @@ import static io.openbas.database.model.Command.COMMAND_TYPE;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectExecution;
 import io.openbas.database.model.PayloadCommandBlock;
-import io.openbas.database.model.StatusPayload;
+import io.openbas.database.model.ExecutionPayload;
 import java.time.Instant;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class InjectStatusFixture {
     injectExecution.setTrackingSentDate(Instant.now());
     injectExecution.setName(status);
     injectExecution.setPayloadOutput(
-        new StatusPayload(
+        new ExecutionPayload(
             null,
             null,
             COMMAND_TYPE,

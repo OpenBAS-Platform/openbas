@@ -275,8 +275,8 @@ public class CalderaExecutor extends Injector {
   }
 
   @Override
-  public StatusPayload getPayloadOutput(String externalId) {
-    StatusPayload statusPayload = new StatusPayload();
+  public ExecutionPayload getPayloadOutput(String externalId) {
+    ExecutionPayload executionPayload = new ExecutionPayload();
     Ability ability = calderaService.findAbilityById(externalId);
     if (ability != null) {
       ability
@@ -294,16 +294,16 @@ public class CalderaExecutor extends Injector {
                     && !executor.getCommandExecutor().isBlank()) {
                   payloadCommandBlock.setExecutor(executor.getCommandExecutor());
                 }
-                statusPayload.setPayloadCommandBlocks(
+                executionPayload.setPayloadCommandBlocks(
                     Collections.singletonList(payloadCommandBlock));
               });
-      statusPayload.setName(ability.getName());
-      statusPayload.setType(COMMAND_TYPE);
-      statusPayload.setDescription(ability.getDescription());
-      statusPayload.setExternalId(externalId);
+      executionPayload.setName(ability.getName());
+      executionPayload.setType(COMMAND_TYPE);
+      executionPayload.setDescription(ability.getDescription());
+      executionPayload.setExternalId(externalId);
     }
 
-    return statusPayload;
+    return executionPayload;
   }
 
   // -- PRIVATE --

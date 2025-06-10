@@ -20,7 +20,7 @@ public class InjectTestExecution extends BaseInjectExecution {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.EAGER)
-  @JsonProperty("status_traces")
+  @JsonProperty("execution_traces")
   private List<ExecutionTrace> traces = new ArrayList<>();
 
   @CreationTimestamp
