@@ -59,7 +59,7 @@ public class InjectSpecification {
       return cb.and(
           cb.equal(root.get("enabled"), true), // isEnable
           cb.isNotNull(exercisePath.get("start")), // fromScheduled
-          cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+          cb.isNull(root.join("executions", JoinType.LEFT).get("name")) // notExecuted
           );
     };
   }
@@ -72,7 +72,7 @@ public class InjectSpecification {
           cb.equal(root.get("enabled"), true), // isEnable
           cb.isNotNull(exercisePath.get("start")), // fromScheduled
           cb.equal(exercisePath.get("status"), ExerciseStatus.RUNNING), // fromRunningExercise
-          cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+          cb.isNull(root.join("executions", JoinType.LEFT).get("name")) // notExecuted
           );
     };
   }
@@ -82,16 +82,15 @@ public class InjectSpecification {
         cb.and(
             cb.isNull(root.get("exercise")), // No exercise
             cb.isNull(root.get("scenario")), // No scenario
-            cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
-            cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING));
+            cb.equal(root.get("executions").get("name"), ExecutionStatus.QUEUING));
   }
 
   public static Specification<Inject> pendingInjectWithThresholdMinutes(int thresholdMinutes) {
     return (root, query, cb) -> {
       Instant thresholdInstant = Instant.now().minus(Duration.ofMinutes(thresholdMinutes));
       return cb.and(
-          cb.equal(root.get("status").get("name"), ExecutionStatus.PENDING),
-          cb.lessThan(root.get("status").get("trackingSentDate"), thresholdInstant));
+          cb.equal(root.get("executions").get("name"), ExecutionStatus.PENDING),
+          cb.lessThan(root.get("executions").get("trackingSentDate"), thresholdInstant));
     };
   }
 

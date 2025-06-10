@@ -24,7 +24,7 @@ public class InjectExecution extends BaseInjectExecution {
   private StatusPayload payloadOutput;
 
   @OneToMany(
-      mappedBy = "injectStatus",
+      mappedBy = "injectExecution",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.EAGER)

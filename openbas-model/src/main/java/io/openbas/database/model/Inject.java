@@ -160,18 +160,6 @@ public class Inject implements Base, Injection {
   @Schema(type = "string")
   private User user;
 
-  //
-  //  @Getter
-  //  @Column(name = "inject_status")
-  //  @JsonProperty("inject_status")
-  //  @Enumerated(EnumType.STRING)
-  //  private ExecutionStatus status;
-  //
-  //  @Getter
-  //  @Column(name = "inject_execution_date")
-  //  @JsonProperty("inject_execution_date")
-  //  private Instant executionDate;
-
   @Getter
   @OneToMany(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
