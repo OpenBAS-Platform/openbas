@@ -68,7 +68,7 @@ public class ContractDef {
       throw new IllegalArgumentException("Fields cannot be null");
     }
 
-    element.setMandatoryConditionField(conditionalElement.getKey());
+    element.setMandatoryConditionFields(List.of(conditionalElement));
     element.setMandatory(false);
     this.fields.add(element);
     return this;
@@ -87,8 +87,8 @@ public class ContractDef {
       throw new IllegalArgumentException("Fields cannot be null");
     }
 
-    element.setMandatoryConditionField(conditionalElement.getKey());
-    element.setMandatoryConditionValue(value);
+    element.setMandatoryConditionFields(List.of(conditionalElement));
+    element.setMandatoryConditionValues(List.of(value));
     element.setMandatory(false);
     this.fields.add(element);
     return this;
