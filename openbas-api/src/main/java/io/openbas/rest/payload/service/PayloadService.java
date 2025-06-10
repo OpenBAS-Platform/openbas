@@ -1,5 +1,7 @@
 package io.openbas.rest.payload.service;
 
+import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSETS;
+import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
@@ -130,8 +132,9 @@ public class PayloadService {
             "#000000",
             "/img/icon-" + injector.getType() + ".png",
             true);
-    ContractAsset assetField = assetField("assets", "Assets", Multiple);
-    ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
+    ContractAsset assetField = assetField(CONTACT_ELEMENT_CONTENT_KEY_ASSETS, "Assets", Multiple);
+    ContractAssetGroup assetGroupField =
+        assetGroupField(CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS, "Asset groups", Multiple);
     ContractExpectations expectationsField = expectations();
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
