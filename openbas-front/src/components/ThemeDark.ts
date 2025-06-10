@@ -1,4 +1,4 @@
-import { type ThemeOptions } from '@mui/material';
+import {lighten, type ThemeOptions} from '@mui/material';
 
 import LogoCollapsed from '../static/images/logo_dark.png';
 import LogoText from '../static/images/logo_text_dark.png';
@@ -13,6 +13,8 @@ const THEME_DARK_DEFAULT_SECONDARY = '#00f1bd';
 const THEME_DARK_DEFAULT_ACCENT = '#0f1e38';
 const THEME_DARK_DEFAULT_PAPER = '#09101e';
 const THEME_DARK_DEFAULT_NAV = '#070d19';
+const THEME_DARK_DEFAULT_SCROLL_BACKGROUND = '#00020c';
+const THEME_DARK_DEFAULT_SCROLL_COLOR = '#7a7c85b3';
 
 const ThemeDark = (
   logo: string | null = null,
@@ -129,11 +131,11 @@ const ThemeDark = (
     MuiCssBaseline: {
       styleOverrides: {
         html: {
-          scrollbarColor: `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
+          scrollbarColor: `${accent || THEME_DARK_DEFAULT_SCROLL_COLOR} ${background || THEME_DARK_DEFAULT_SCROLL_BACKGROUND}`,
           scrollbarWidth: 'thin',
         },
         body: {
-          'scrollbarColor': `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
+          'scrollbarColor': `${accent || THEME_DARK_DEFAULT_SCROLL_COLOR} ${background || THEME_DARK_DEFAULT_SCROLL_BACKGROUND}`,
           'scrollbarWidth': 'thin',
           'html': { WebkitFontSmoothing: 'auto' },
           'a': { color: primary || THEME_DARK_DEFAULT_PRIMARY },
