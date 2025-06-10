@@ -80,13 +80,13 @@ public class InjectModelHelper {
                     .findFirst();
             if (groupField.isPresent()
                 && isFieldSet(
-                allTeams,
-                teams,
-                assets,
-                assetGroups,
-                groupField.get(),
-                content,
-                injectContractFields)) {
+                    allTeams,
+                    teams,
+                    assets,
+                    assetGroups,
+                    groupField.get(),
+                    content,
+                    injectContractFields)) {
               atLeastOneSet = true;
               break;
             }
