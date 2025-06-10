@@ -20,9 +20,9 @@ public abstract class ContractElement {
 
   private List<String> mandatoryGroups;
 
-  private String mandatoryConditionField;
+  private List<ContractElement> mandatoryConditionFields;
 
-  private String mandatoryConditionValue;
+  private List<String> mandatoryConditionValues;
 
   private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 

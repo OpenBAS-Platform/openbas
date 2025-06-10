@@ -97,13 +97,20 @@ public class InjectModelHelper {
 
       // If field is mandatory conditional, if the conditional field is set, check if the current
       // field is set
-      if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)) {
-        String conditionKey = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
+      if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS)) {
+        JsonNode fields = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS);
+        List<String> values = new ArrayList<>();
+        if (fields.isArray()) {
+          for (JsonNode node : fields) {
+            if (!node.isNull()) {
+              values.add(node.get(CONTACT_ELEMENT_CONTENT_KEY).asText());
+            }
+          }
+        }
         Optional<JsonNode> conditionalFieldOpt =
             contractFields.stream()
                 .filter(
-                    jsonNode ->
-                        conditionKey.equals(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
+                    jsonNode -> values.contains(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
                 .findFirst();
 
         // If field not exists -> skip
@@ -129,13 +136,28 @@ public class InjectModelHelper {
         }
 
         // If a specific value is required on conditional field
-        if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE)) {
-          String expectedValue =
-              jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE).asText();
+        if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES)) {
+          JsonNode jsonFields = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES);
+          List<String> expectedValues = new ArrayList<>();
+          if (jsonFields.isArray()) {
+            for (JsonNode node : jsonFields) {
+              if (!node.isNull()) {
+                expectedValues.add(node.asText());
+              }
+            }
+          }
           List<String> actualValues =
               getFieldValue(teams, assets, assetGroups, conditionalField, content);
 
-          if (!actualValues.contains(expectedValue)) {
+          boolean conditionMet = false;
+          for (String expectedValue : expectedValues) {
+            if (actualValues.contains(expectedValue)) {
+              conditionMet = true;
+              break;
+            }
+          }
+
+          if (!conditionMet) {
             continue; // condition not met → skip
           }
         }

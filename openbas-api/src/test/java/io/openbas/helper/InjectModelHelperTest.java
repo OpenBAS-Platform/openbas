@@ -1,16 +1,5 @@
 package io.openbas.helper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.Command;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static io.openbas.helper.InjectModelHelper.isReady;
 import static io.openbas.helper.ObjectMapperHelper.openBASJsonMapper;
 import static io.openbas.utils.fixtures.InjectorContractFixture.*;
@@ -18,6 +7,16 @@ import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInje
 import static io.openbas.utils.fixtures.PayloadFixture.createCommand;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Command;
+import io.openbas.database.model.Injector;
+import io.openbas.database.model.InjectorContract;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 class InjectModelHelperTest {
 
@@ -266,8 +265,8 @@ class InjectModelHelperTest {
 
       @Test
       void
-      given_an_injector_contract_with_mandatory_on_condition_and_condition_element_should_not_be_ready()
-          throws JsonProcessingException {
+          given_an_injector_contract_with_mandatory_on_condition_and_condition_element_should_not_be_ready()
+              throws JsonProcessingException {
         // -- PREPARE --
         InjectorContract injectorContract = prepareInjectorContract();
         addField(injectorContract, mapper, buildMandatoryOnCondition());
@@ -347,8 +346,8 @@ class InjectModelHelperTest {
 
     @Test
     void
-    given_mandatory_on_condition_with_specific_value_when_condition_not_matches_should_not_be_ready()
-        throws JsonProcessingException {
+        given_mandatory_on_condition_with_specific_value_when_condition_not_matches_should_not_be_ready()
+            throws JsonProcessingException {
       // -- PREPARE --
       InjectorContract injectorContract = prepareInjectorContract();
       addField(injectorContract, mapper, buildMandatoryOnConditionValue("assetGroupId"));
@@ -373,8 +372,8 @@ class InjectModelHelperTest {
 
     @Test
     void
-    given_mandatory_on_condition_with_not_specific_value_when_condition_not_matches_should_be_ready()
-        throws JsonProcessingException {
+        given_mandatory_on_condition_with_not_specific_value_when_condition_not_matches_should_be_ready()
+            throws JsonProcessingException {
       // -- PREPARE --
       InjectorContract injectorContract = prepareInjectorContract();
       addField(injectorContract, mapper, buildMandatoryOnConditionValue("assetGroupId"));
