@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.database.helper.InjectStatusRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -110,6 +111,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
+  @Mock private InjectStatusRepositoryHelper injectStatusRepositoryHelper;
 
   @BeforeAll
   void beforeAll() {
@@ -830,6 +832,8 @@ class InjectApiTest extends IntegrationTest {
       @DisplayName("Should add error trace when agent is not found")
       @Test
       void shouldAddTraceError() {
+        doNothing().when(injectStatusRepositoryHelper).saveFindings(any());
+
         // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         String logMessage = "First log received";

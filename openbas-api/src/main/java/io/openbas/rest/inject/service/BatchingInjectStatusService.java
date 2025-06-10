@@ -11,7 +11,6 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
-import io.openbas.utils.InjectUtils;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -27,16 +26,12 @@ import org.springframework.stereotype.Service;
 @Log
 public class BatchingInjectStatusService {
 
-  private final InjectRepository injectRepository;
   private final AgentRepository agentRepository;
-  private final InjectService injectService;
-  private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
   private final FindingService findingService;
   private final InjectStatusRepositoryHelper injectStatusRepositoryHelper;
   private final StructuredOutputUtils structuredOutputUtils;
   private final OutputParserRepository outputParserRepository;
-  private final AssetRepository assetRepository;
 
   /**
    * Update the final status of the inject
