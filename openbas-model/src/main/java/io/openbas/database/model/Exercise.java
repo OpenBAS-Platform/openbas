@@ -306,7 +306,7 @@ public class Exercise implements Base {
   @JsonProperty("exercise_next_inject_date")
   public Optional<Instant> getNextInjectExecution() {
     return getInjects().stream()
-        .filter(inject -> inject.getStatus().isEmpty())
+        .filter(inject -> inject.getExecutions().isEmpty())
         .filter(inject -> inject.getDate().isPresent())
         .filter(inject -> inject.getDate().get().isAfter(now()))
         .findFirst()

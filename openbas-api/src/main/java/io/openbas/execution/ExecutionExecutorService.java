@@ -32,7 +32,7 @@ public class ExecutionExecutorService {
 
   public void launchExecutorContext(Inject inject) {
     InjectStatus injectStatus =
-        inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+        inject.getExecutions().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     // First, get the agents and the assets agentless of this inject
     AgentsAndAssetsAgentless agentsAndAssetsAgentless =
         this.injectService.getAgentsAndAgentlessAssetsByInject(inject);

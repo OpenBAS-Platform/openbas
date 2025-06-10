@@ -219,7 +219,7 @@ public class ScenarioToExerciseService {
           exerciseInject.setExercise(exerciseSaved);
           exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
           exerciseInject.setUser(scenarioInject.getUser());
-          exerciseInject.setStatus(scenarioInject.getStatus().orElse(null));
+          exerciseInject.setExecutions(scenarioInject.getExecutions().orElse(null));
           exerciseInject.setTags(CopyObjectListUtils.copy(scenarioInject.getTags(), Tag.class));
           exerciseInject.setContent(scenarioInject.getContent());
 

@@ -159,12 +159,25 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_user")
   @Schema(type = "string")
   private User user;
+//
+//  @Getter
+//  @Column(name = "inject_status")
+//  @JsonProperty("inject_status")
+//  @Enumerated(EnumType.STRING)
+//  private ExecutionStatus status;
+//
+//  @Getter
+//  @Column(name = "inject_execution_date")
+//  @JsonProperty("inject_execution_date")
+//  private Instant executionDate;
 
-  // CascadeType.ALL is required here because inject status are embedded
-  @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonProperty("inject_status")
-  @Queryable(filterable = true, sortable = true)
-  private InjectStatus status;
+  @Getter
+  @OneToMany(
+      mappedBy = "inject",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @JsonIgnore
+  private List<InjectStatus> executions;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
@@ -276,7 +289,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public void clean() {
-    this.status = null;
+    this.executions = null;
     this.communications.clear();
     this.expectations.clear();
     this.findings.clear();
@@ -334,7 +347,7 @@ public class Inject implements Base, Injection {
 
   @JsonIgnore
   public boolean isNotExecuted() {
-    return this.getStatus().isEmpty();
+    return this.getExecutions().isEmpty();
   }
 
   @JsonIgnore
@@ -353,8 +366,8 @@ public class Inject implements Base, Injection {
     return Optional.ofNullable(this.injectorContract);
   }
 
-  public Optional<InjectStatus> getStatus() {
-    return ofNullable(this.status);
+  public Optional<InjectStatus> getExecutions() {
+    return ofNullable(this.executions);
   }
 
   public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
@@ -384,7 +397,7 @@ public class Inject implements Base, Injection {
 
   @JsonProperty("inject_sent_at")
   public Instant getSentAt() {
-    return InjectModelHelper.getSentAt(this.getStatus());
+    return InjectModelHelper.getSentAt(this.getExecutions());
   }
 
   @JsonProperty("inject_kill_chain_phases")
