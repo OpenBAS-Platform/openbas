@@ -39,7 +39,7 @@ public abstract class BaseInjectExecution implements Base {
 
   @Queryable(searchable = true, path = "inject.title")
   @ManyToOne
-  @JoinColumn(name = "status_inject")
+  @JoinColumn(name = "execution_inject")
   @JsonIgnore
   protected Inject inject;
 

@@ -34,7 +34,7 @@ public class LadeListener {
         injectStatus -> {
           // Add traces and close inject if needed.
           String asyncId =
-              injectStatus.statusIdentifiers().stream()
+              injectStatus.executionIdentifiers().stream()
                   .findFirst()
                   .orElse(null); // Lade handle only one asyncID for now
           try {

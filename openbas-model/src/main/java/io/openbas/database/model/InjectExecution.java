@@ -32,7 +32,7 @@ public class InjectExecution extends BaseInjectExecution {
   private List<ExecutionTrace> traces = new ArrayList<>();
 
   // region transient
-  public List<String> statusIdentifiers() {
+  public List<String> executionIdentifiers() {
     return this.getTraces().stream().flatMap(ex -> ex.getIdentifiers().stream()).toList();
   }
 

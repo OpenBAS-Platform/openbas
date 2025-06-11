@@ -28,7 +28,7 @@ public interface InjectExecutionRepository
       value =
           "SELECT ins.*, t.*"
               + " FROM injects_executions ins"
-              + " INNER JOIN injects i ON ins.status_inject = i.inject_id"
+              + " INNER JOIN injects i ON ins.execution_inject = i.inject_id"
               + " LEFT JOIN execution_traces t"
               + "  ON t.execution_inject_status_id = ins.status_id"
               + "  AND t.execution_agent_id IS NULL"

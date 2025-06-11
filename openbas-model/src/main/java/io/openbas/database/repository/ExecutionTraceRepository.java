@@ -16,7 +16,7 @@ public interface ExecutionTraceRepository
       value =
           "SELECT t.* FROM execution_traces t "
               + "INNER JOIN injects_executions ins ON t.execution_inject_status_id = ins.status_id "
-              + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
+              + "INNER JOIN injects i ON ins.execution_inject = i.inject_id "
               + "INNER JOIN Agents a ON t.execution_agent_id = a.agent_id "
               + "WHERE i.inject_id = :injectId AND t.execution_agent_id = :targetId",
       nativeQuery = true)
@@ -27,7 +27,7 @@ public interface ExecutionTraceRepository
       value =
           "SELECT t.* FROM execution_traces t "
               + "INNER JOIN injects_executions ins ON t.execution_inject_status_id = ins.status_id "
-              + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
+              + "INNER JOIN injects i ON ins.execution_inject = i.inject_id "
               + "LEFT JOIN Agents a ON t.execution_agent_id = a.agent_id "
               + "WHERE i.inject_id = :injectId AND (a.agent_asset = :targetId OR :targetId = ANY(t.execution_context_identifiers))",
       nativeQuery = true)
@@ -38,7 +38,7 @@ public interface ExecutionTraceRepository
       value =
           "SELECT t.* FROM execution_traces t "
               + "INNER JOIN injects_executions ins ON t.execution_inject_status_id = ins.status_id "
-              + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
+              + "INNER JOIN injects i ON ins.execution_inject = i.inject_id "
               + "INNER JOIN users_teams ut ON ut.user_id = ANY(t.execution_context_identifiers) "
               + "WHERE i.inject_id = :injectId AND ut.team_id = :targetId",
       nativeQuery = true)
@@ -49,7 +49,7 @@ public interface ExecutionTraceRepository
       value =
           "SELECT t.* FROM execution_traces t "
               + "INNER JOIN injects_executions ins ON t.execution_inject_status_id = ins.status_id "
-              + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
+              + "INNER JOIN injects i ON ins.execution_inject = i.inject_id "
               + "WHERE i.inject_id = :injectId AND :targetId = ANY(t.execution_context_identifiers)",
       nativeQuery = true)
   List<ExecutionTrace> findByInjectIdAndPlayerId(
