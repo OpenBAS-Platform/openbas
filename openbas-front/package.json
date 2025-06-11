@@ -75,7 +75,7 @@
   "devDependencies": {
     "@eslint/js": "9.28.0",
     "@faker-js/faker": "9.8.0",
-    "@playwright/test": "1.52.0",
+    "@playwright/test": "1.53.0",
     "@stylistic/eslint-plugin": "4.4.1",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.3.0",
