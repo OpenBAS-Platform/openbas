@@ -321,7 +321,7 @@ public class User implements Base {
   @JsonProperty("user_capabilities")
   @Enumerated(EnumType.STRING)
   public Set<Capability> getCapabilities() {
-    return groups.stream()
+    return getGroups().stream()
         .flatMap(group -> group.getRoles().stream())
         .flatMap(role -> role.getCapabilities().stream())
         .collect(Collectors.toSet());
