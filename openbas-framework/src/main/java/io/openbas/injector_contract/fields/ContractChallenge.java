@@ -1,16 +1,17 @@
 package io.openbas.injector_contract.fields;
 
+import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_CHALLENGES;
+
 import io.openbas.injector_contract.ContractCardinality;
 
 public class ContractChallenge extends ContractCardinalityElement {
 
-  public ContractChallenge(String key, String label, ContractCardinality cardinality) {
-    super(key, label, cardinality);
+  public ContractChallenge(ContractCardinality cardinality) {
+    super(CONTACT_ELEMENT_CONTENT_KEY_CHALLENGES, "Challenges", cardinality);
   }
 
-  public static ContractChallenge challengeField(
-      String key, String label, ContractCardinality cardinality) {
-    return new ContractChallenge(key, label, cardinality);
+  public static ContractChallenge challengeField(ContractCardinality cardinality) {
+    return new ContractChallenge(cardinality);
   }
 
   @Override

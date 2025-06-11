@@ -86,9 +86,9 @@ public class ChannelContract extends Contractor {
     List<ContractElement> publishInstance =
         contractBuilder()
             // built in
-            .optional(teamField("teams", "Teams", Multiple))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
-            .mandatory(articleField("articles", "Articles", Multiple))
+            .optional(teamField(Multiple))
+            .optional(attachmentField(Multiple))
+            .mandatory(articleField(Multiple))
             // Contract specific
             .optional(expectationsField)
             // Emailing zone

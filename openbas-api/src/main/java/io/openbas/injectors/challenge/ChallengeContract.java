@@ -79,15 +79,15 @@ public class ChallengeContract extends Contractor {
         expectationsField(List.of(this.expectationBuilderService.buildChallengeExpectation()));
     List<ContractElement> publishInstance =
         contractBuilder()
-            .mandatory(challengeField("challenges", "Challenges", Multiple))
+            .mandatory(challengeField(Multiple))
             // Contract specific
             .optional(expectationsField)
             .mandatory(
                 textField("subject", "Subject", "New challenges published for ${user.email}"))
             .mandatory(richTextareaField("body", "Body", messageBody))
             .optional(checkboxField("encrypted", "Encrypted", false))
-            .mandatory(teamField("teams", "Teams", Multiple))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .mandatory(teamField(Multiple))
+            .optional(attachmentField(Multiple))
             .build();
     Contract publishChallenge =
         executableContract(

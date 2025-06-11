@@ -59,7 +59,7 @@ public class MastodonContract extends Contractor {
         contractBuilder()
             .mandatory(textField("token", "Token"))
             .mandatory(textareaField("status", "Status"))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(attachmentField(Multiple))
             .build();
     return List.of(
         executableContract(
