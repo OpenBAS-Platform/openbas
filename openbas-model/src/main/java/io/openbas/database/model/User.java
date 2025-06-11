@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -315,6 +316,15 @@ public class User implements Base {
   @Schema(description = "True if the user is only a player")
   public boolean isOnlyPlayer() {
     return !isAdmin() && !isManager();
+  }
+
+  @JsonProperty("user_capabilities")
+  @Enumerated(EnumType.STRING)
+  public Set<Capability> getCapabilities() {
+    return groups.stream()
+        .flatMap(group -> group.getRoles().stream())
+        .flatMap(role -> role.getCapabilities().stream())
+        .collect(Collectors.toSet());
   }
 
   @Override

@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -91,6 +89,16 @@ public class Group implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("group_organizations")
   private List<Organization> organizations = new ArrayList<>();
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "groups_roles",
+      joinColumns = @JoinColumn(name = "group_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("group_roles")
+  private List<Role> roles = new ArrayList<>();
 
   // region transient
   @JsonProperty("group_default_exercise_planner")
