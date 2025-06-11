@@ -114,7 +114,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     setOpenMitreFilterDrawer(false);
   };
 
-  const onCloseArianneAIAssistantDialog = () => {
+  const onCloseArianeAIAssistantDialog = () => {
     setOpenArianeAIAssistantDialog(false);
   };
 
@@ -157,7 +157,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   };
   const onUpdateAttackPatternAIDialog = (attackPatternIds: string[]) => {
     onUpdateAttackPattern(attackPatternIds);
-    onCloseArianneAIAssistantDialog();
+    onCloseArianeAIAssistantDialog();
   };
 
   return (
@@ -270,7 +270,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
         />
         <AttackPatternAIAssistantDialog
           open={openArianeAIAssistantDialog}
-          onClose={onCloseArianneAIAssistantDialog}
+          onClose={onCloseArianeAIAssistantDialog}
           onAttackPatternIdsFind={onUpdateAttackPatternAIDialog}
         />
       </>

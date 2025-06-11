@@ -91,7 +91,7 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
     <Dialog
       open={open}
       handleClose={onResetAndClose}
-      title={t('ARIANNE - AI Assistant')}
+      title={t('ARIANE - AI Assistant')}
       maxWidth="md"
     >
       <div className={classes.modalContainer}>
