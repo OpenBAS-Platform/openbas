@@ -20,7 +20,7 @@ import io.openbas.ee.Ee;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
-import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
+import io.openbas.rest.atomic_testing.form.InjectExecutionOutput;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -79,7 +79,7 @@ public class InjectService {
   private final TagRuleService tagRuleService;
   private final TagService tagService;
   private final DocumentService documentService;
-  private final InjectStatusMapper injectStatusMapper;
+  private final InjectExecutionMapper injectExecutionMapper;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
 
@@ -303,7 +303,7 @@ public class InjectService {
     this.throwIfInjectNotLaunchable(inject);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
-    Inject savedInject = saveInjectAndStatusAsQueuing(inject);
+    Inject savedInject = saveInjectAndExecutionAsQueuing(inject);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
@@ -311,7 +311,7 @@ public class InjectService {
   public InjectResultOverviewOutput relaunch(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
     this.throwIfInjectNotLaunchable(duplicatedInject);
-    Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
+    Inject savedInject = saveInjectAndExecutionAsQueuing(duplicatedInject);
     delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
@@ -382,14 +382,14 @@ public class InjectService {
     return InjectUtils.duplicateInject(injectOrigin);
   }
 
-  private Inject saveInjectAndStatusAsQueuing(Inject inject) {
+  private Inject saveInjectAndExecutionAsQueuing(Inject inject) {
     Inject savedInject = injectRepository.save(inject);
-    InjectExecution injectExecution = saveInjectStatusAsQueuing(savedInject);
+    InjectExecution injectExecution = saveInjectExecutionAsQueuing(savedInject);
     savedInject.setExecutions(new ArrayList<>(Arrays.asList(injectExecution)));
     return savedInject;
   }
 
-  private InjectExecution saveInjectStatusAsQueuing(Inject inject) {
+  private InjectExecution saveInjectExecutionAsQueuing(Inject inject) {
     InjectExecution injectExecution = new InjectExecution();
     injectExecution.setInject(inject);
     injectExecution.setTrackingSentDate(Instant.now());
@@ -855,24 +855,24 @@ public class InjectService {
       final String injectId, final String targetId, final TargetType targetType) {
     switch (targetType) {
       case AGENT:
-        return injectStatusMapper.toExecutionTracesOutput(
+        return injectExecutionMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndAgentId(injectId, targetId));
       case ASSETS:
-        return injectStatusMapper.toExecutionTracesOutput(
+        return injectExecutionMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndAssetId(injectId, targetId));
       case TEAMS:
-        return injectStatusMapper.toExecutionTracesOutput(
+        return injectExecutionMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndTeamId(injectId, targetId));
       case PLAYERS:
-        return injectStatusMapper.toExecutionTracesOutput(
+        return injectExecutionMapper.toExecutionTracesOutput(
             this.executionTraceRepository.findByInjectIdAndPlayerId(injectId, targetId));
       default:
         throw new BadRequestException("Target type " + targetType + " is not supported");
     }
   }
 
-  public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
-    return injectStatusMapper.toInjectStatusOutput(
-        injectExecutionRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
+  public InjectExecutionOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
+    return injectExecutionMapper.toInjectExecutionOutput(
+        injectExecutionRepository.findInjectExecutionWithGlobalExecutionTraces(injectId));
   }
 }

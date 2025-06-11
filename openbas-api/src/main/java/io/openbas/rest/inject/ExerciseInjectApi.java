@@ -229,7 +229,7 @@ public class ExerciseInjectApi extends RestBehavior {
       return executor.directExecute(injection);
     } catch (Exception e) {
       log.log(Level.WARNING, e.getMessage(), e);
-      return injectExecutionService.failInjectStatus(inject.getId(), e.getMessage());
+      return injectExecutionService.failInjectExecution(inject.getId(), e.getMessage());
     }
   }
 
@@ -267,7 +267,7 @@ public class ExerciseInjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    return injectExecutionService.updateInjectStatus(injectId, input);
+    return injectExecutionService.updateInjectExecution(injectId, input);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")

@@ -78,7 +78,7 @@ public class AtomicTestingService {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  public StatusPayloadOutput findPayloadOutputByInjectId(String injectId) {
+  public ExecutionPayloadOutput findPayloadOutputByInjectId(String injectId) {
     Optional<Inject> inject = injectRepository.findById(injectId);
     return payloadMapper.getStatusPayloadOutputFromInject(inject);
   }

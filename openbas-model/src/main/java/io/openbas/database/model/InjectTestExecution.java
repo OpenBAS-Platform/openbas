@@ -13,10 +13,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @Getter
 @Entity
-@Table(name = "injects_tests_statuses")
+@Table(name = "injects_tests_executions")
 public class InjectTestExecution extends BaseInjectExecution {
   @OneToMany(
-      mappedBy = "injectTestStatus",
+      mappedBy = "injectTestExecution",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.EAGER)

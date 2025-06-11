@@ -12,7 +12,7 @@ import lombok.*;
 
 @Data
 @Builder
-public class StatusPayloadOutput {
+public class ExecutionPayloadOutput {
 
   @JsonProperty("payload_type")
   private String type;

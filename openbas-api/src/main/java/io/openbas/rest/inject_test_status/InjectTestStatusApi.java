@@ -7,7 +7,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.inject.output.InjectTestExecutionOutput;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,13 +35,13 @@ public class InjectTestStatusApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/{injectId}/test")
-  public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
+  public InjectTestExecutionOutput testInject(@PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/test/{testId}")
-  public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
+  public InjectTestExecutionOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
@@ -57,7 +57,7 @@ public class InjectTestStatusApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping("/api/injects/test")
   @LogExecutionTime
-  public List<InjectTestStatusOutput> bulkTestInject(
+  public List<InjectTestExecutionOutput> bulkTestInject(
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs

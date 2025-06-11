@@ -355,7 +355,7 @@ public class InjectsExecutionJob implements Job {
                           } catch (Exception e) {
                             Inject inject = executableInject.getInjection().getInject();
                             LOGGER.log(Level.WARNING, e.getMessage(), e);
-                            injectExecutionService.failInjectStatus(inject.getId(), e.getMessage());
+                            injectExecutionService.failInjectExecution(inject.getId(), e.getMessage());
                           }
                         });
                 // Update the exercise

@@ -41,7 +41,7 @@ public class InjectResultOutput {
 
   @Schema(description = "Status")
   @JsonProperty("inject_status")
-  private InjectStatusSimple status;
+  private InjectExecutionSimple status;
 
   @JsonIgnore private String[] teamIds;
   @JsonIgnore private String[] assetIds;

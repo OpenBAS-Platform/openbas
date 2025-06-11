@@ -30,10 +30,10 @@ public interface InjectExecutionRepository
               + " FROM injects_executions ins"
               + " INNER JOIN injects i ON ins.execution_inject = i.inject_id"
               + " LEFT JOIN execution_traces t"
-              + "  ON t.execution_inject_status_id = ins.status_id"
+              + "  ON t.execution_inject_execution_id = ins.execution_id"
               + "  AND t.execution_agent_id IS NULL"
               + "  AND cardinality(t.execution_context_identifiers) = 0"
               + " WHERE i.inject_id = :injectId",
       nativeQuery = true)
-  Optional<InjectExecution> findInjectStatusWithGlobalExecutionTraces(String injectId);
+  Optional<InjectExecution> findInjectExecutionWithGlobalExecutionTraces(String injectId);
 }

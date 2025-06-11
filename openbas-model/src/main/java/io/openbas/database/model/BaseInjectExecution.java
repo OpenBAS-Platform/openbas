@@ -17,10 +17,10 @@ import org.hibernate.annotations.UuidGenerator;
 public abstract class BaseInjectExecution implements Base {
 
   @Id
-  @Column(name = "status_id")
+  @Column(name = "execution_id")
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
-  @JsonProperty("status_id")
+  @JsonProperty("execution_id")
   private String id;
 
   @Column(name = "status_name")

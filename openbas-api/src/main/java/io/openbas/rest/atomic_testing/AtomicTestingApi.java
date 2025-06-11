@@ -48,7 +48,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}/payload")
-  public StatusPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
+  public ExecutionPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
     return atomicTestingService.findPayloadOutputByInjectId(injectId);
   }
 

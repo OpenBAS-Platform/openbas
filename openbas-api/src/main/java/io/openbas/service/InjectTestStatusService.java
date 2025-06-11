@@ -13,8 +13,8 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Injector;
 import io.openbas.rest.exception.BadRequestException;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
-import io.openbas.utils.InjectStatusMapper;
+import io.openbas.rest.inject.output.InjectTestExecutionOutput;
+import io.openbas.utils.InjectExecutionMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ public class InjectTestStatusService {
   private final InjectRepository injectRepository;
   private final ExecutionContextService executionContextService;
   private final InjectTestStatusRepository injectTestStatusRepository;
-  private final InjectStatusMapper injectStatusMapper;
+  private final InjectExecutionMapper injectExecutionMapper;
 
   @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
 
-  public InjectTestStatusOutput testInject(String injectId) {
+  public InjectTestExecutionOutput testInject(String injectId) {
     Inject inject =
         this.injectRepository
             .findById(injectId)
@@ -61,7 +61,7 @@ public class InjectTestStatusService {
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
     InjectTestExecution injectStatus = testInject(inject, user);
-    return injectStatusMapper.toInjectTestStatusOutput(injectStatus);
+    return injectExecutionMapper.toInjectTestExecutionOutput(injectStatus);
   }
 
   /**
@@ -70,7 +70,7 @@ public class InjectTestStatusService {
    * @param searchSpecifications the criteria to search injects to test
    * @return the list of inject test status
    */
-  public List<InjectTestStatusOutput> bulkTestInjects(
+  public List<InjectTestExecutionOutput> bulkTestInjects(
       final Specification<Inject> searchSpecifications) {
     List<Inject> searchResult = this.injectRepository.findAll(searchSpecifications);
     if (searchResult.isEmpty()) {
@@ -83,10 +83,10 @@ public class InjectTestStatusService {
 
     List<InjectTestExecution> results = new ArrayList<>();
     searchResult.forEach(inject -> results.add(testInject(inject, user)));
-    return results.stream().map(injectStatusMapper::toInjectTestStatusOutput).toList();
+    return results.stream().map(injectExecutionMapper::toInjectTestExecutionOutput).toList();
   }
 
-  public Page<InjectTestStatusOutput> findAllInjectTestsByExerciseId(
+  public Page<InjectTestExecutionOutput> findAllInjectTestsByExerciseId(
       String exerciseId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
             (Specification<InjectTestExecution> specification, Pageable pageable) ->
@@ -95,10 +95,10 @@ public class InjectTestStatusService {
                     pageable),
             searchPaginationInput,
             InjectTestExecution.class)
-        .map(injectStatusMapper::toInjectTestStatusOutput);
+        .map(injectExecutionMapper::toInjectTestExecutionOutput);
   }
 
-  public Page<InjectTestStatusOutput> findAllInjectTestsByScenarioId(
+  public Page<InjectTestExecutionOutput> findAllInjectTestsByScenarioId(
       String scenarioId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
             (Specification<InjectTestExecution> specification, Pageable pageable) ->
@@ -107,11 +107,11 @@ public class InjectTestStatusService {
                     pageable),
             searchPaginationInput,
             InjectTestExecution.class)
-        .map(injectStatusMapper::toInjectTestStatusOutput);
+        .map(injectExecutionMapper::toInjectTestExecutionOutput);
   }
 
-  public InjectTestStatusOutput findInjectTestStatusById(String testId) {
-    return injectStatusMapper.toInjectTestStatusOutput(
+  public InjectTestExecutionOutput findInjectTestStatusById(String testId) {
+    return injectExecutionMapper.toInjectTestExecutionOutput(
         injectTestStatusRepository.findById(testId).orElseThrow());
   }
 

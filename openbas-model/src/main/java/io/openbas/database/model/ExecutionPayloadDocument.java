@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StatusPayloadDocument {
+public class ExecutionPayloadDocument {
 
   @JsonProperty("document_id")
   @NotBlank
@@ -20,13 +20,13 @@ public class StatusPayloadDocument {
 
   // Usefully to avoid migration
   @JsonCreator
-  public StatusPayloadDocument(
+  public ExecutionPayloadDocument(
       @JsonProperty("document_id") String id, @JsonProperty("document_name") String name) {
     this.id = id;
     this.name = name;
   }
 
-  public StatusPayloadDocument(Document document) {
+  public ExecutionPayloadDocument(Document document) {
     this.id = document.getId();
     this.name = document.getName();
   }

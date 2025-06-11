@@ -163,7 +163,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const submitTest = () => {
     if (testInject) {
       testInject(contextId, inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${url}${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${url}${result.data.execution_id}`}>{t('its dedicated page')}</Link> }));
       });
     }
     handleCloseTest();

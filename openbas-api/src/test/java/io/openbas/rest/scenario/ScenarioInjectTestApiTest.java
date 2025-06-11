@@ -101,7 +101,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
               .getContentAsString();
 
       assertThatJson(response)
-          .inPath("$.content[*].status_id")
+          .inPath("$.content[*].execution_id")
           .isArray()
           .contains(injectTestStatus1.getId());
     }

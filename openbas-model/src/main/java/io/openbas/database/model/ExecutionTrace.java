@@ -35,13 +35,13 @@ public class ExecutionTrace implements Base {
   private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "execution_inject_status_id")
+  @JoinColumn(name = "execution_inject_execution_id")
   @Schema(type = "string")
   @JsonSerialize(using = MonoIdDeserializer.class)
   private InjectExecution injectExecution;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "execution_inject_test_status_id")
+  @JoinColumn(name = "execution_inject_test_execution_id")
   @Schema(type = "string")
   @JsonSerialize(using = MonoIdDeserializer.class)
   private InjectTestExecution injectTestStatus;

@@ -58,7 +58,7 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
     if (!injectResultOverviewOutput.inject_injector_contract) return null;
 
     if (injectResultOverviewOutput.inject_ready) {
-      const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.status_id ? 'Launch now' : 'Relaunch now';
+      const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.execution_id ? 'Launch now' : 'Relaunch now';
       return (
         <Button
           style={{
@@ -99,11 +99,11 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
       <Dialog open={openDialog} onClose={handleCloseDialog} slotProps={{ paper: { elevation: 1 } }}>
         <DialogContent>
           <DialogContentText>
-            {injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
+            {injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.execution_id
               ? t('Do you want to launch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })
               : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })}
           </DialogContentText>
-          {injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id && (
+          {injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.execution_id && (
             <Alert severity="warning" style={{ marginTop: theme.spacing(2) }}>
               {t('This atomic testing and its previous results will be deleted')}
             </Alert>
@@ -114,7 +114,7 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
           <Button
             color="secondary"
             onClick={
-              injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
+              injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.execution_id
                 ? submitLaunch
                 : submitRelaunch
             }

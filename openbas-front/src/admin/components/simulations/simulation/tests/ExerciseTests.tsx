@@ -9,7 +9,7 @@ import InjectTestList from '../../../injects/InjectTestList';
 const ExerciseTests: FunctionComponent = () => {
   const { exerciseId, statusId } = useParams() as {
     exerciseId: Exercise['exercise_id'];
-    statusId: InjectTestStatusOutput['status_id'];
+    statusId: InjectTestStatusOutput['execution_id'];
   };
 
   const injectTestContext: InjectTestContextType = {

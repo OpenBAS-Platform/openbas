@@ -433,7 +433,7 @@ public class InjectSearchService {
             payloadJoin.get("id").alias("payload_id"),
             payloadJoin.get("type").alias("payload_type"),
             collectorJoin.get("type").alias("payload_collector_type"),
-            statusJoin.get("id").alias("status_id"),
+            statusJoin.get("id").alias("execution_id"),
             statusJoin.get("name").alias("status_name"),
             statusJoin.get("trackingSentDate").alias("status_tracking_sent_date"),
             teamIdsExpression.alias("inject_teams"),
@@ -456,17 +456,17 @@ public class InjectSearchService {
     return query.getResultList().stream()
         .map(
             tuple -> {
-              InjectStatusSimple injectStatus = null;
+              InjectExecutionSimple injectStatus = null;
               ExecutionStatus status = tuple.get("status_name", ExecutionStatus.class);
               if (status != null) {
                 injectStatus =
-                    InjectStatusSimple.builder()
-                        .id(tuple.get("status_id", String.class))
+                    InjectExecutionSimple.builder()
+                        .id(tuple.get("execution_id", String.class))
                         .name(status.name())
                         .trackingSentDate(tuple.get("status_tracking_sent_date", Instant.class))
                         .build();
               } else {
-                injectStatus = InjectStatusSimple.builder().build();
+                injectStatus = InjectExecutionSimple.builder().build();
               }
 
               PayloadSimple payloadSimple = null;

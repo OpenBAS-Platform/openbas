@@ -611,7 +611,7 @@ class InjectServiceTest {
     injectExecution.setInject(inject);
     ExecutionPayload executionPayload = new ExecutionPayload();
 
-    when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(executionPayload);
+    when(injectUtils.getExecutionPayloadFromInject(inject)).thenReturn(executionPayload);
     when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
 
     injectExecutionService.initializeInjectStatus(injectId, executionStatus);

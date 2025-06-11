@@ -55,7 +55,7 @@ public class InjectResultOverviewOutput {
 
   @Schema(description = "status")
   @JsonProperty("inject_status")
-  private InjectStatusSimple status;
+  private InjectExecutionSimple status;
 
   @Schema(description = "Expectations")
   @JsonProperty("inject_expectations")

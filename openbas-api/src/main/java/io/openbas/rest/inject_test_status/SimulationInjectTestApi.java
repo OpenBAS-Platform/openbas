@@ -8,7 +8,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.inject.output.InjectTestExecutionOutput;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -36,7 +36,7 @@ public class SimulationInjectTestApi extends RestBehavior {
    * @see #findExercisePageInjectTests
    */
   @PostMapping("/api/exercise/{simulationId}/injects/test")
-  public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
+  public Page<InjectTestExecutionOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByExerciseId(
@@ -44,7 +44,7 @@ public class SimulationInjectTestApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test/search")
-  public Page<InjectTestStatusOutput> findExercisePageInjectTests(
+  public Page<InjectTestExecutionOutput> findExercisePageInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByExerciseId(
@@ -54,14 +54,14 @@ public class SimulationInjectTestApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/{simulationId}/injects/{injectId}/test")
   @PreAuthorize("isSimulationPlanner(#simulationId)")
-  public InjectTestStatusOutput testInject(
+  public InjectTestExecutionOutput testInject(
       @PathVariable @NotBlank String simulationId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/injects/test/{testId}")
-  public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
+  public InjectTestExecutionOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
@@ -80,7 +80,7 @@ public class SimulationInjectTestApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test")
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   @LogExecutionTime
-  public List<InjectTestStatusOutput> bulkTestInject(
+  public List<InjectTestExecutionOutput> bulkTestInject(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 

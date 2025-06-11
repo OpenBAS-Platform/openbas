@@ -158,14 +158,14 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
           : tests?.map((test) => {
               return (
                 <ListItem
-                  key={test.status_id}
+                  key={test.execution_id}
                   divider
                   secondaryAction={(
                     <InjectTestPopover
                       injectTest={test}
                       onTest={result =>
-                        setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
-                      onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
+                        setTests(tests?.map(existing => existing.execution_id !== result.execution_id ? existing : result))}
+                      onDelete={injectStatusId => setTests(tests.filter(existing => (existing.execution_id !== injectStatusId)))}
                     />
                   )}
                   disablePadding
@@ -173,7 +173,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
                   <ListItemButton
                     classes={{ root: classes.item }}
                     onClick={() => setSelectedInjectTestStatus(test)}
-                    selected={test.status_id === selectedInjectTestStatus?.status_id}
+                    selected={test.execution_id === selectedInjectTestStatus?.execution_id}
                   >
                     <ListItemIcon>
                       <InjectIcon

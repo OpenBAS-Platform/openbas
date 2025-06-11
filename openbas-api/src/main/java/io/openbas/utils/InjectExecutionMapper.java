@@ -2,44 +2,44 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
-import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.inject.output.InjectTestExecutionOutput;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class InjectStatusMapper {
+public class InjectExecutionMapper {
 
   private final AgentMapper agentMapper;
 
-  public InjectStatusOutput toInjectStatusOutput(Optional<InjectExecution> injectStatus) {
-    return injectStatus
+  public InjectExecutionOutput toInjectExecutionOutput(Optional<InjectExecution> injectExecution) {
+    return injectExecution
         .map(
             status ->
-                this.<InjectStatusOutput>buildInjectStatusOutput(
-                    InjectStatusOutput.builder().build(), status, status.getTraces()))
-        .orElseGet(() -> InjectStatusOutput.builder().build());
+                this.<InjectExecutionOutput>buildInjectExecutionOutput(
+                    InjectExecutionOutput.builder().build(), status, status.getTraces()))
+        .orElseGet(() -> InjectExecutionOutput.builder().build());
   }
 
-  public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestExecution injectTestStatus) {
-    InjectTestStatusOutput output = InjectTestStatusOutput.builder().build();
-    buildInjectStatusOutput(output, injectTestStatus, injectTestStatus.getTraces());
+  public InjectTestExecutionOutput toInjectTestExecutionOutput(InjectTestExecution injectTestExecution) {
+    InjectTestExecutionOutput output = InjectTestExecutionOutput.builder().build();
+    buildInjectExecutionOutput(output, injectTestExecution, injectTestExecution.getTraces());
 
-    output.setInjectId(injectTestStatus.getInject().getId());
+    output.setInjectId(injectTestExecution.getInject().getId());
     output.setInjectType(
-        injectTestStatus
+        injectTestExecution
             .getInject()
             .getInjectorContract()
             .map(InjectorContract::getInjector)
             .map(Injector::getType)
             .orElse(null));
-    output.setInjectTitle(injectTestStatus.getInject().getTitle());
+    output.setInjectTitle(injectTestExecution.getInject().getTitle());
 
     return output;
   }
 
-  private <T extends InjectStatusOutput> T buildInjectStatusOutput(
+  private <T extends InjectExecutionOutput> T buildInjectExecutionOutput(
       T output, BaseInjectExecution status, List<ExecutionTrace> executionTraces) {
     output.setId(status.getId());
     output.setName(status.getName().name());
@@ -53,17 +53,17 @@ public class InjectStatusMapper {
     return output;
   }
 
-  public InjectStatusSimple toInjectStatusSimple(Optional<InjectExecution> injectStatus) {
-    return injectStatus
+  public InjectExecutionSimple toInjectExecutionSimple(Optional<InjectExecution> injectExecution) {
+    return injectExecution
         .map(
             status ->
-                InjectStatusSimple.builder()
+                InjectExecutionSimple.builder()
                     .id(status.getId())
                     .name(status.getName().name())
                     .trackingSentDate(status.getTrackingSentDate())
                     .trackingEndDate(status.getTrackingEndDate())
                     .build())
-        .orElseGet(() -> InjectStatusSimple.builder().build());
+        .orElseGet(() -> InjectExecutionSimple.builder().build());
   }
 
   public List<ExecutionTraceOutput> toExecutionTracesOutput(List<ExecutionTrace> traces) {

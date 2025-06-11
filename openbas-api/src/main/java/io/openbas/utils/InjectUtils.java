@@ -34,7 +34,7 @@ public class InjectUtils {
 
   private final ApplicationContext context;
 
-  public ExecutionPayload getStatusPayloadFromInject(final Inject inject) {
+  public ExecutionPayload getExecutionPayloadFromInject(final Inject inject) {
     if (inject == null) {
       return null;
     }

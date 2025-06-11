@@ -10,7 +10,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
-import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
+import io.openbas.rest.atomic_testing.form.InjectExecutionOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
@@ -490,7 +490,7 @@ public class InjectApi extends RestBehavior {
   @Operation(description = "Get InjectExecution with global execution traces")
   @GetMapping(INJECT_URI + "/status")
   @LogExecutionTime
-  public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(
+  public InjectExecutionOutput getInjectStatusWithGlobalExecutionTraces(
       @RequestParam String injectId) {
     return this.injectService.getInjectStatusWithGlobalExecutionTraces(injectId);
   }

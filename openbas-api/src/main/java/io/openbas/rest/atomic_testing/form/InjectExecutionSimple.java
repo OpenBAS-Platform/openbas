@@ -13,9 +13,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class InjectStatusSimple {
+public class InjectExecutionSimple {
 
-  @JsonProperty("status_id")
+  @JsonProperty("execution_id")
   @NotNull
   private String id;
 

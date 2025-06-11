@@ -24,7 +24,7 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
-import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
+import io.openbas.rest.atomic_testing.form.InjectExecutionOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.*;
@@ -1028,15 +1028,15 @@ class InjectApiTest extends IntegrationTest {
                   .status(ExecutionTraceStatus.ERROR)
                   .build());
 
-      InjectStatusOutput expected = InjectStatusOutput.builder().traces(expectedTraces).build();
+      InjectExecutionOutput expected = InjectExecutionOutput.builder().traces(expectedTraces).build();
 
       assertThatJson(response)
           .whenIgnoringPaths(
-              "status_id",
+              "execution_id",
               "status_name",
               "tracking_sent_date",
               "tracking_end_date",
-              "status_main_traces[*].execution_time")
+              "execution_main_traces[*].execution_time")
           .isEqualTo(mapper.writeValueAsString(expected));
     }
 

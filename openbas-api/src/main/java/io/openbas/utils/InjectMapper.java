@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InjectMapper {
 
-  private final InjectStatusMapper injectStatusMapper;
+  private final InjectExecutionMapper injectExecutionMapper;
   private final InjectUtils injectUtils;
   private final ResultUtils resultUtils;
 
@@ -36,7 +36,7 @@ public class InjectMapper {
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
         .injectorContract(toInjectorContractOutput(injectorContract))
-        .status(injectStatusMapper.toInjectStatusSimple(inject.getExecution()))
+        .status(injectExecutionMapper.toInjectExecutionSimple(inject.getExecution()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))

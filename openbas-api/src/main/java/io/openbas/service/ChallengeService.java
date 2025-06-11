@@ -178,20 +178,20 @@ public class ChallengeService {
       List<InjectExpectation> playerExpectations =
           injectExpectationRepository.findByUserAndExerciseAndChallenge(
               user.getId(), exerciseId, challengeId);
-      List<String> injectStatusIds =
+      List<String> injectExecutionIds =
           playerExpectations.stream()
               .map(
                   e ->
                       e.getInject()
                           .getExecution()
-                          .orElseThrow(() -> new ElementNotFoundException("Status should exist"))
+                          .orElseThrow(() -> new ElementNotFoundException("Execution should exist"))
                           .getId())
               .toList();
       Map<ChallengeAttemptId, InjectExpectation> expectationMap = new HashMap<>();
       List<ChallengeAttemptId> challengeAttemptIds = new ArrayList<>();
       for (int i = 0; i < playerExpectations.size(); i++) {
         InjectExpectation expectation = playerExpectations.get(i);
-        String injectStatusId = injectStatusIds.get(i);
+        String injectStatusId = injectExecutionIds.get(i);
         ChallengeAttemptId challengeAttemptId =
             buildChallengeAttemptID(challengeId, injectStatusId, user.getId());
         expectationMap.put(challengeAttemptId, expectation);

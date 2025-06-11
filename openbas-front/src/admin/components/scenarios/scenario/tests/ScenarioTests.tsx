@@ -9,7 +9,7 @@ import InjectTestList from '../../../injects/InjectTestList';
 const ScenarioTests: FunctionComponent = () => {
   const { scenarioId, statusId } = useParams() as {
     scenarioId: Scenario['scenario_id'];
-    statusId: InjectTestStatusOutput['status_id'];
+    statusId: InjectTestStatusOutput['execution_id'];
   };
   const injectTestContext: InjectTestContextType = {
     contextId: scenarioId,

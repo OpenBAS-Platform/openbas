@@ -8,7 +8,7 @@ import static java.util.Optional.ofNullable;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
-import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.atomic_testing.form.ExecutionPayloadOutput;
 import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
 import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
 import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
@@ -27,7 +27,7 @@ public class PayloadMapper {
 
   private final ApplicationContext context;
 
-  public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
+  public ExecutionPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
 
     if (inject.isEmpty()) return null;
 
@@ -37,8 +37,8 @@ public class PayloadMapper {
       return null;
 
     InjectorContract injectorContract = injectorContractOpt.get();
-    StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
-        StatusPayloadOutput.builder();
+    ExecutionPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
+        ExecutionPayloadOutput.builder();
 
     if (ofNullable(inject.get().getContent()).map(c -> c.has("obfuscator")).orElse(Boolean.FALSE)) {
       String obfuscator = inject.get().getContent().findValue("obfuscator").asText();
@@ -115,7 +115,7 @@ public class PayloadMapper {
   }
 
   private void populatePayloadDetails(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder,
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder,
       Payload payload,
       InjectorContract injectorContract) {
     builder
@@ -135,7 +135,7 @@ public class PayloadMapper {
   }
 
   private void processPayloadType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, Payload payload) {
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Payload payload) {
     switch (payload.getType()) {
       case COMMAND_TYPE:
         handleCommandType(builder, (Command) Hibernate.unproxy(payload));
@@ -155,7 +155,7 @@ public class PayloadMapper {
   }
 
   private void handleCommandType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, Command payloadCommand) {
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Command payloadCommand) {
     List<String> cleanupCommands = new ArrayList<>();
     if (payloadCommand.getCleanupCommand() != null) {
       cleanupCommands.add(payloadCommand.getCleanupCommand());
@@ -168,22 +168,22 @@ public class PayloadMapper {
   }
 
   private void handleExecutableType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, Executable payloadExecutable) {
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Executable payloadExecutable) {
     builder.executableFile(new StatusPayloadDocument(payloadExecutable.getExecutableFile()));
   }
 
   private void handleFileDropType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
     builder.fileDropFile(new StatusPayloadDocument(payloadFileDrop.getFileDropFile()));
   }
 
   private void handleDnsResolutionType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, DnsResolution payloadDnsResolution) {
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, DnsResolution payloadDnsResolution) {
     builder.hostname(payloadDnsResolution.getHostname());
   }
 
-  private StatusPayloadOutput populateExecutedPayload(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder,
+  private ExecutionPayloadOutput populateExecutedPayload(
+      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder,
       ExecutionPayload executionPayload,
       InjectorContract injectorContract) {
     builder

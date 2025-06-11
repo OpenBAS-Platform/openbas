@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @JsonInclude(NON_NULL)
 @SuperBuilder
-public class InjectStatusOutput {
+public class InjectExecutionOutput {
 
   @JsonProperty("execution_id")
   @NotNull
@@ -30,7 +30,7 @@ public class InjectStatusOutput {
     return name != null ? name : ExecutionStatus.DRAFT.name();
   }
 
-  @JsonProperty("status_main_traces")
+  @JsonProperty("execution_main_traces")
   private List<ExecutionTraceOutput> traces;
 
   @JsonProperty("tracking_sent_date")

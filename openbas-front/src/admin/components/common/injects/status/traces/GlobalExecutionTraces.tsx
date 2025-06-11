@@ -21,7 +21,7 @@ const GlobalExecutionTraces = ({ injectStatus }: Props) => {
           startDate={injectStatus.tracking_sent_date}
           endDate={injectStatus.tracking_end_date}
         />
-        <MainTraces traces={injectStatus.status_main_traces} />
+        <MainTraces traces={injectStatus.execution_main_traces} />
       </Paper>
     </>
   );
