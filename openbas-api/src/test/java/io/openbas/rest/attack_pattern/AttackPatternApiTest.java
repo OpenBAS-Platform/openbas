@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.ee.Ee;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.servlet.ServletException;
@@ -38,6 +39,7 @@ public class AttackPatternApiTest extends IntegrationTest {
   @Autowired private Environment env;
 
   @MockBean private RestTemplate mockRestTemplate;
+  @MockBean private Ee mockEe;
 
   @Autowired private MockMvc mvc;
   @Autowired private AttackPatternRepository attackPatternRepository;
@@ -123,7 +125,7 @@ public class AttackPatternApiTest extends IntegrationTest {
                           ]
                         }""",
                   HttpStatus.OK));
-
+      Mockito.when(mockEe.getEnterpriseEditionLicensePem()).thenReturn("mock-certificate");
       MockPart jsonPart = new MockPart("text", "Test".getBytes());
       byte[] content = new byte[] {1, 2, 3, 4, 5}; // Example binary content
       MockMultipartFile mockFile =
