@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.attack_pattern.form.AnalysisResultFromTTPExtractionAIWebserviceOutput;
+import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +29,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class AttackPatternService {
+
+  @Resource protected ObjectMapper mapper;
+
   private final Environment env;
   private final AttackPatternRepository attackPatternRepository;
+  private final Ee ee;
   private final RestTemplate restTemplate;
 
   /**
@@ -41,8 +48,12 @@ public class AttackPatternService {
   private String callTTPExtractionAIWebservice(List<MultipartFile> files, String text)
       throws IOException {
     String url = Objects.requireNonNull(env.getProperty("ttp.extraction.ai.webservice.url"));
+    String certificate = ee.getEnterpriseEditionLicensePem();
+    if (certificate == null || certificate.isBlank()) {
+      throw new IllegalStateException("Enterprise Edition is not available");
+    }
     String encodedCertificate =
-        Objects.requireNonNull(env.getProperty("ttp.extraction.ai.webservice.encoded.certificate"));
+        Base64.getEncoder().encodeToString(certificate.getBytes(StandardCharsets.UTF_8));
 
     // Set up the headers for the request
     HttpHeaders headers = new HttpHeaders();
@@ -87,16 +98,14 @@ public class AttackPatternService {
    */
   private Set<String> extractExternalAttackPatternIdsFromResponse(String responseBody)
       throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode fileOrTextJsonArray = objectMapper.readTree(responseBody);
+    JsonNode fileOrTextJsonArray = mapper.readTree(responseBody);
     Set<String> externalAttackPatternIds = new HashSet<>();
 
     // For each (file or text_input) key-value pair in the JSON root
     for (JsonNode fileOrText : fileOrTextJsonArray) {
       for (JsonNode chunk : fileOrText) {
         AnalysisResultFromTTPExtractionAIWebserviceOutput result =
-            objectMapper.convertValue(
-                chunk, AnalysisResultFromTTPExtractionAIWebserviceOutput.class);
+            mapper.convertValue(chunk, AnalysisResultFromTTPExtractionAIWebserviceOutput.class);
 
         externalAttackPatternIds.addAll(result.getPredictions().keySet());
       }

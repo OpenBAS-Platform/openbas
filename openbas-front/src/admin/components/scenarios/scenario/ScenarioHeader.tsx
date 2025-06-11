@@ -115,7 +115,8 @@ const ScenarioHeader = ({
     setOpenLoaderDialog(true);
     playInjectsAssistantForScenario(scenarioId, data).then((results) => {
       setInjects([...injects, ...results.data]);
-    }).finally(() => setOpenLoaderDialog(false));
+      setIsInjectAssistantLoading(false);
+    }).catch(() => setOpenLoaderDialog(false));
   };
 
   useEffect(() => {

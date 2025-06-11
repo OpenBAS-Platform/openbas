@@ -65,13 +65,19 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
   const [files, setFiles] = useState<File[]>([]);
   const [text, setText] = useState<string>('');
 
+  const onResetAndClose = () => {
+    setFiles([]);
+    setText('');
+    onClose();
+  };
+
   const onSubmit = () => {
     setIsLoading(true);
     searchAttackPatternsWithAIWebservice(files ?? [], text)
       .then(response => onAttackPatternIdsFind(response.data))
       .finally(() => {
         setIsLoading(false);
-        onClose();
+        onResetAndClose();
       });
   };
 
@@ -84,7 +90,7 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
   return (
     <Dialog
       open={open}
-      handleClose={() => onClose()}
+      handleClose={onResetAndClose}
       title={t('ARIANNE - AI Assistant')}
       maxWidth="md"
     >
@@ -162,7 +168,7 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
           <Button
             variant="contained"
             style={{ marginLeft: 'auto' }}
-            onClick={onClose}
+            onClick={onResetAndClose}
             disabled={isLoading}
           >
             {t('Cancel')}

@@ -182,6 +182,13 @@ public class Ee {
     }
   }
 
+  public String getEnterpriseEditionLicensePem() {
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
+    return ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_LICENSE.key()))
+        .map(Setting::getValue)
+        .orElse(PLATFORM_ENTERPRISE_LICENSE.defaultValue());
+  }
+
   public License verifyCertificate(String pemToVerify) throws Exception {
     return getEnterpriseEditionInfoFromPem(pemToVerify);
   }
