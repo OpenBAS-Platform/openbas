@@ -1,6 +1,6 @@
 package io.openbas.injector_contract.fields;
 
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 
 import io.openbas.model.inject.form.Expectation;
@@ -15,7 +15,7 @@ public class ContractExpectations extends ContractCardinalityElement {
   List<Expectation> predefinedExpectations;
 
   private ContractExpectations(@NotNull final List<Expectation> expectations) {
-    super(CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS, "Expectations", Multiple);
+    super(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS, "Expectations", Multiple);
     this.predefinedExpectations = expectations;
   }
 

@@ -172,35 +172,35 @@ public class InjectorContract implements Base {
 
   // -- INJECTOR CONTRACT CONTENT --
 
-  public static final String CONTACT_CONTENT_FIELDS = "fields";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE = "type";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
+  public static final String CONTRACT_CONTENT_FIELDS = "fields";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY = "key";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE = "type";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
       "mandatoryConditionField";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE =
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE =
       "mandatoryConditionValue";
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS = "assetgroups";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_ARTICLES = "articles";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_CHALLENGES = "challenges";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_ATTACHMENTS = "attachments";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS = "expectations";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS = "assetgroups";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES = "articles";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_CHALLENGES = "challenges";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ATTACHMENTS = "attachments";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS = "expectations";
 
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
 
-  public static final List<String> CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC =
+  public static final List<String> CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC =
       List.of(
-          CONTACT_ELEMENT_CONTENT_KEY_TEAMS,
-          CONTACT_ELEMENT_CONTENT_KEY_ASSETS,
-          CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS,
-          CONTACT_ELEMENT_CONTENT_KEY_ARTICLES,
-          CONTACT_ELEMENT_CONTENT_KEY_CHALLENGES,
-          CONTACT_ELEMENT_CONTENT_KEY_ATTACHMENTS,
-          CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
+          CONTRACT_ELEMENT_CONTENT_KEY_TEAMS,
+          CONTRACT_ELEMENT_CONTENT_KEY_ASSETS,
+          CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS,
+          CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES,
+          CONTRACT_ELEMENT_CONTENT_KEY_CHALLENGES,
+          CONTRACT_ELEMENT_CONTENT_KEY_ATTACHMENTS,
+          CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
 }

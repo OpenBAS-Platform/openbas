@@ -1,13 +1,13 @@
 package io.openbas.injector_contract.fields;
 
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_TEAMS;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TEAMS;
 
 import io.openbas.injector_contract.ContractCardinality;
 
 public class ContractTeam extends ContractCardinalityElement {
 
   public ContractTeam(ContractCardinality cardinality) {
-    super(CONTACT_ELEMENT_CONTENT_KEY_TEAMS, "Teams", cardinality);
+    super(CONTRACT_ELEMENT_CONTENT_KEY_TEAMS, "Teams", cardinality);
   }
 
   public static ContractTeam teamField(ContractCardinality cardinality) {

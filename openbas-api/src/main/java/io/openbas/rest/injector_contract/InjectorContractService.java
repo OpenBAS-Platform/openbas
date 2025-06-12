@@ -209,8 +209,8 @@ public class InjectorContractService {
       ObjectNode injectContent = new ObjectMapper().createObjectNode();
 
       for (JsonNode field : fieldsNode) {
-        String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-        if (!CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
+        String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
+        if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
           injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
         }
