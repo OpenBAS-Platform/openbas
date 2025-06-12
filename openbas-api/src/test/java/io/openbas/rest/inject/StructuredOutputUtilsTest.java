@@ -120,7 +120,7 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get username:password from raw output command")
+  @DisplayName("Should get cve from raw output command")
   void given_raw_output_tasklist_should_return_credentials() {
     // username:RID:LM_Hash:NTLM_Hash:::
     String rawOutput =
@@ -163,7 +163,7 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:port (service) from raw output of netstat command")
+  @DisplayName("Should get hosts, ports, service from raw output of netstat command")
   void given_raw_output_netstat_should_return_portscans() {
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("host");
