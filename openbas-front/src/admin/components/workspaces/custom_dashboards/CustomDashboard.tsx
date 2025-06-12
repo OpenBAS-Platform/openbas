@@ -80,7 +80,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
     );
     setCustomDashboardValue(prev => prev && {
       ...prev,
-      custom_dashboard_widgets: prev.custom_dashboard_widgets?.map(widget => {
+      custom_dashboard_widgets: prev.custom_dashboard_widgets?.map((widget) => {
         const existingLayout = layouts.find(x => x.i === widget.widget_id)!;
         return {
           ...widget,
