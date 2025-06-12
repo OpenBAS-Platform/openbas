@@ -1,16 +1,15 @@
 package io.openbas.engine.model.endpoint;
 
+import static io.openbas.engine.EsUtils.buildRestrictions;
+
 import io.openbas.database.raw.RawEndpoint;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.engine.Handler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.engine.EsUtils.buildRestrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EndpointHandler implements Handler<EsEndpoint> {
@@ -28,7 +27,7 @@ public class EndpointHandler implements Handler<EsEndpoint> {
     List<RawEndpoint> forIndexing = endpointRepository.findForIndexing(queryFrom);
     return forIndexing.stream()
         .map(
-                endpoint -> {
+            endpoint -> {
               EsEndpoint esEndpoint = new EsEndpoint();
               // Base
               esEndpoint.setBase_id(endpoint.getAsset_id());
@@ -45,7 +44,8 @@ public class EndpointHandler implements Handler<EsEndpoint> {
               esEndpoint.setEndpoint_mac_addresses(endpoint.getEndpoint_mac_addresses());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
-              if (!(endpoint.getEndpoint_findings() == null) && !endpoint.getEndpoint_findings().isEmpty()) {
+              if (!(endpoint.getEndpoint_findings() == null)
+                  && !endpoint.getEndpoint_findings().isEmpty()) {
                 dependencies.addAll(endpoint.getEndpoint_findings());
                 esEndpoint.setBase_findings_side(endpoint.getEndpoint_findings());
               }

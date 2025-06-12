@@ -2,7 +2,6 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawEndpoint;
-import io.openbas.database.raw.RawFinding;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -102,13 +101,13 @@ public interface EndpointRepository
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
 
   @Query(
-          value =
-                  "SELECT a.asset_id, a.asset_type, a.asset_name, "
-                    + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, "
-                    + "a.endpoint_mac_addresses, a.asset_created_at, a.asset_updated_at, fa.finding_id "
-                    + "FROM assets a "
-                    + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
-                    + "WHERE a.asset_updated_at > :from ORDER BY a.asset_updated_at LIMIT 500;",
-          nativeQuery = true)
+      value =
+          "SELECT a.asset_id, a.asset_type, a.asset_name, "
+              + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, "
+              + "a.endpoint_mac_addresses, a.asset_created_at, a.asset_updated_at, fa.finding_id "
+              + "FROM assets a "
+              + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
+              + "WHERE a.asset_updated_at > :from ORDER BY a.asset_updated_at LIMIT 500;",
+      nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
 }
