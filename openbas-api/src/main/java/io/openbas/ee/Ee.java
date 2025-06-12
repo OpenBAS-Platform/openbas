@@ -161,8 +161,13 @@ public class Ee {
         this.settingRepository.findByKey(PLATFORM_ENTERPRISE_LICENSE.key()).orElse(new Setting());
     String pem = pemSetting.getValue();
     String pemFromConfig = openBASConfig.getApplicationLicense();
-    boolean isLicenseByConfig = pemFromConfig != null && !pemFromConfig.trim().isEmpty();
-    return isLicenseByConfig ? pemFromConfig.trim() : pem.trim();
+    if (pemFromConfig != null && !pemFromConfig.trim().isEmpty()) {
+      return pemFromConfig.trim();
+    }
+    if (pem != null && !pem.trim().isEmpty()) {
+      return pem.trim();
+    }
+    return "";
   }
 
   /**
