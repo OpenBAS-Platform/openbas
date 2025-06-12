@@ -91,6 +91,18 @@ const referential = (state: any = Map({}), action: any = {}) => {
       }
       return state;
     }
+    case Constants.DATA_FETCH_ERROR: {
+      if (action.payload.status === 401) {
+        // If unauthorized, reset all entities except platform parameters.
+        return entitiesInitializer.setIn(['entities', 'platformParameters'], state.getIn(['entities', 'platformParameters']));
+      }
+      return state;
+    }
+
+    case Constants.IDENTITY_LOGOUT_SUCCESS: {
+      // Upon logout, reset all entities except for platform parameters.
+      return entitiesInitializer.setIn(['entities', 'platformParameters'], state.getIn(['entities', 'platformParameters']));
+    }
     default: {
       return state;
     }
