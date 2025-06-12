@@ -13,12 +13,14 @@ logger.error = (msg, options) => {
 const basePath = '';
 
 const backProxy = () => ({
-  target: 'http://localhost:8080',
+  target: 'https://root.obas.lan:8080',
   changeOrigin: true,
   ws: true,
 });
 
 export default ({ mode }: { mode: string }) => {
+
+  console.log(mode);
   process.env = {
     ...process.env,
     ...loadEnv(mode, process.cwd()),
@@ -123,6 +125,10 @@ export default ({ mode }: { mode: string }) => {
 
     server: {
       port: 3001,
+      host: true,
+      https: {
+        pfx: "/home/antoinemzs/.local/share/pki001/pki/private/root.obas.lan.p12"
+      },
       proxy: {
         '/api': backProxy(),
         '/login': backProxy(),

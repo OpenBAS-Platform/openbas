@@ -3,6 +3,8 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAsset;
 
+import java.time.Instant;
+
 public class RawAssetFixture {
 
   public static RawAsset createDefaultRawAsset(
@@ -26,6 +28,16 @@ public class RawAssetFixture {
       @Override
       public String getEndpoint_platform() {
         return platformType.name();
+      }
+
+      @Override
+      public Instant getAsset_created_at() {
+        return Instant.now();
+      }
+
+      @Override
+      public Instant getAsset_updated_at() {
+        return Instant.now();
       }
     };
   }

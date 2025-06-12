@@ -1,5 +1,7 @@
 package io.openbas.database.raw;
 
+import java.time.Instant;
+
 public interface RawAsset {
 
   String getAsset_id();
@@ -9,4 +11,8 @@ public interface RawAsset {
   String getAsset_name();
 
   String getEndpoint_platform();
+
+  Instant getAsset_created_at();
+
+  Instant getAsset_updated_at();
 }
