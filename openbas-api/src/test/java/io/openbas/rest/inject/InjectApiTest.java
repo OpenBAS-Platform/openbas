@@ -999,14 +999,14 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli()+1)
+                .emissionDate(Instant.now().toEpochMilli() + 1)
                 .build();
         InjectExecutionCallback injectExecutionCallback4 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input3)
                 .agentId(secondAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli()+2)
+                .emissionDate(Instant.now().toEpochMilli() + 2)
                 .build();
         batchingInjectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback3, injectExecutionCallback4));
