@@ -2,7 +2,6 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAsset;
-
 import java.time.Instant;
 
 public class RawAssetFixture {

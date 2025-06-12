@@ -4,10 +4,9 @@ import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import io.openbas.engine.model.EsBase;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Set;
 
 @Getter
 @Setter
