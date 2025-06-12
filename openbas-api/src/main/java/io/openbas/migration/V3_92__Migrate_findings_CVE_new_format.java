@@ -15,7 +15,7 @@ public class V3_92__Migrate_findings_CVE_new_format extends BaseJavaMigration {
     Statement statement = connection.createStatement();
     statement.executeUpdate(
         "UPDATE findings "
-            + "SET finding_value = substring(finding_value FROM '^[^:]+:([^()]+)') "
+            + "SET finding_value = trim(substring(finding_value FROM '^[^:]+:([^()]+)'))"
             + "WHERE finding_type = 'CVE';");
   }
 }
