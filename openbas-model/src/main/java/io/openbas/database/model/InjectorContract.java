@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -75,9 +76,7 @@ public class InjectorContract implements Base {
   @JsonProperty("injector_contract_arch")
   @Enumerated(EnumType.STRING)
   public Payload.PAYLOAD_EXECUTION_ARCH getArch() {
-    return Optional.ofNullable(getPayload())
-        .map(payload -> payload.getExecutionArch())
-        .orElse(null);
+    return ofNullable(getPayload()).map(payload -> payload.getExecutionArch()).orElse(null);
   }
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -177,10 +176,10 @@ public class InjectorContract implements Base {
   public static final String CONTACT_ELEMENT_CONTENT_TYPE = "type";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
-      "mandatoryConditionField";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE =
-      "mandatoryConditionValue";
+  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS =
+      "mandatoryConditionFields";
+  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES =
+      "mandatoryConditionValues";
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 
   public static final String CONTACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
@@ -192,6 +191,7 @@ public class InjectorContract implements Base {
   public static final String CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS = "expectations";
 
   public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
+  public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP = "asset-group";
   public static final String CONTACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
 
   public static final List<String> CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC =
