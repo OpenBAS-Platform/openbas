@@ -15,15 +15,14 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class BatchingInjectStatusService {
 
   private final AgentRepository agentRepository;
@@ -103,7 +102,6 @@ public class BatchingInjectStatusService {
       InjectExecutionInput input) {
     SimpleExecutionTrace executionTrace =
         createExecutionTrace(injectStatus.getId(), input, agentId);
-
     // If we do have an agent and that our execution trace means we finished execution
     if (agentId != null && executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)) {
       computeExecutionTraceStatusIfNeeded(traces, executionTrace, agentId);
@@ -132,6 +130,7 @@ public class BatchingInjectStatusService {
             sortedInjectExecutionCallbacks.stream()
                 .map(InjectExecutionCallback::getInjectId)
                 .filter(Objects::nonNull)
+                .distinct()
                 .toList());
 
     Map<String, List<SimpleExecutionTrace>> mapSimpleExecutionTraceByInjectStatusId =
@@ -165,28 +164,42 @@ public class BatchingInjectStatusService {
     // For each of the trace
     for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
       try {
+        if (mapAssetIdByAgentId.get(injectExecutionCallback.getAgentId()) == null) {
+          throw new ElementNotFoundException(
+              "Agent not found: " + injectExecutionCallback.getAgentId());
+        }
         // Getting the inject or throwing an exception
         SimpleInjectStatus injectStatus =
             simpleInjectStatus.get(injectExecutionCallback.getInjectId());
         if (injectStatus == null) {
-          log.log(Level.SEVERE, "Inject not found: {}", injectExecutionCallback.getInjectId());
+          log.error("Inject not found: {}", injectExecutionCallback.getInjectId());
           throw new ElementNotFoundException(
               String.format("Inject not found: %s", injectExecutionCallback.getInjectId()));
         }
 
         // -- UPDATE STATUS --
-        executionTraceToSave.add(
+        List<SimpleExecutionTrace> traces =
+            mapSimpleExecutionTraceByInjectStatusId.getOrDefault(
+                injectStatus.getId(), Collections.emptyList());
+        SimpleExecutionTrace trace =
             updateInjectStatus(
                 injectExecutionCallback.getAgentId(),
                 injectStatus,
-                mapSimpleExecutionTraceByInjectStatusId.get(injectStatus.getId()),
-                injectExecutionCallback.getInjectExecutionInput()));
+                traces,
+                injectExecutionCallback.getInjectExecutionInput());
+        mapSimpleExecutionTraceByInjectStatusId.computeIfAbsent(
+            trace.getInjectStatusId(), k -> new ArrayList<>());
+        mapSimpleExecutionTraceByInjectStatusId.get(trace.getInjectStatusId()).add(trace);
+
+        executionTraceToSave.add(trace);
         injectsStatusToSave.add(injectStatus);
 
         Set<OutputParser> outputParsers =
             new HashSet<>(
                 outputParserByInjectId.get(injectExecutionCallback.getInjectId()).stream()
                     .map(OutputParserByInject::getOutputParser)
+                    .filter(Objects::nonNull)
+                    .distinct()
                     .toList());
         Optional<ObjectNode> structuredOutput =
             structuredOutputUtils.computeStructuredOutput(
@@ -218,9 +231,9 @@ public class BatchingInjectStatusService {
           }
         }
 
-      } catch (Exception e) {
+      } catch (ElementNotFoundException e) {
         // If we have the inject, we add an error message in it
-        log.log(Level.SEVERE, e.getMessage());
+        log.error(e.getMessage(), e);
         SimpleInjectStatus injectStatus =
             simpleInjectStatus.get(injectExecutionCallback.getInjectId());
         if (injectStatus != null) {
@@ -236,6 +249,8 @@ public class BatchingInjectStatusService {
           executionTraceToSave.add(trace);
           injectsStatusToSave.add(injectStatus);
         }
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
       }
     }
 

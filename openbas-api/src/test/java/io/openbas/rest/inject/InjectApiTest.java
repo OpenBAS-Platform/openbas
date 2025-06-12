@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.database.helper.InjectStatusRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -64,7 +63,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -87,7 +85,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
-  @SpyBean private BatchingInjectStatusService batchingInjectStatusService;
+  @Autowired private BatchingInjectStatusService batchingInjectStatusService;
   @SpyBean private InjectStatusService injectStatusService;
 
   @Autowired private AgentComposer agentComposer;
@@ -112,7 +110,6 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
-  @MockBean private InjectStatusRepositoryHelper injectStatusRepositoryHelper;
 
   @BeforeAll
   void beforeAll() {
@@ -833,12 +830,6 @@ class InjectApiTest extends IntegrationTest {
       @DisplayName("Should add error trace when agent is not found")
       @Test
       void shouldAddTraceError() {
-        ReflectionTestUtils.setField(
-            batchingInjectStatusService,
-            "injectStatusRepositoryHelper",
-            injectStatusRepositoryHelper);
-        doNothing().when(injectStatusRepositoryHelper).updateInjectStatusWithTraces(any(), any());
-        doNothing().when(injectStatusRepositoryHelper).saveFindings(any());
 
         // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
@@ -938,7 +929,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input2)
                 .agentId(agentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli())
+                .emissionDate(Instant.now().toEpochMilli() + 1)
                 .build();
         batchingInjectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback1, injectExecutionCallback2));
@@ -1008,14 +999,14 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli())
+                .emissionDate(Instant.now().toEpochMilli()+1)
                 .build();
         InjectExecutionCallback injectExecutionCallback4 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input3)
                 .agentId(secondAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli())
+                .emissionDate(Instant.now().toEpochMilli()+2)
                 .build();
         batchingInjectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback3, injectExecutionCallback4));
@@ -1077,7 +1068,7 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli())
+                .emissionDate(Instant.now().toEpochMilli() + 1)
                 .build();
         batchingInjectStatusService.handleInjectExecutionCallbackList(
             List.of(injectExecutionCallback1, injectExecutionCallback2, injectExecutionCallback3));

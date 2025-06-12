@@ -6,15 +6,16 @@ import java.sql.Types;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@RequiredArgsConstructor
 public class InjectStatusRepositoryHelper {
 
-  @Autowired NamedParameterJdbcTemplate jt;
+  private final NamedParameterJdbcTemplate jt;
 
   public void updateInjectStatusWithTraces(
       List<SimpleInjectStatus> injectStatusList, List<SimpleExecutionTrace> executionTraceList) {
@@ -133,7 +134,8 @@ public class InjectStatusRepositoryHelper {
 
       return jt.queryForStream(
               query, paramValues, new SimpleExecutionTrace.SimpleExecutionTraceRowMapper())
-          .collect(Collectors.groupingBy(SimpleExecutionTrace::getInjectStatusId));
+          .collect(
+              Collectors.groupingBy(SimpleExecutionTrace::getInjectStatusId, Collectors.toList()));
     }
     return new HashMap<>();
   }
