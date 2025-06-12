@@ -1,16 +1,17 @@
 package io.openbas.injector_contract.fields;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES;
+
 import io.openbas.injector_contract.ContractCardinality;
 
 public class ContractArticle extends ContractCardinalityElement {
 
-  public ContractArticle(String key, String label, ContractCardinality cardinality) {
-    super(key, label, cardinality);
+  public ContractArticle(ContractCardinality cardinality) {
+    super(CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES, "Articles", cardinality);
   }
 
-  public static ContractArticle articleField(
-      String key, String label, ContractCardinality cardinality) {
-    return new ContractArticle(key, label, cardinality);
+  public static ContractArticle articleField(ContractCardinality cardinality) {
+    return new ContractArticle(cardinality);
   }
 
   @Override

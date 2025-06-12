@@ -62,12 +62,12 @@ public class EmailContract extends Contractor {
     // Standard contract
     List<ContractElement> standardInstance =
         contractBuilder()
-            .mandatory(teamField("teams", "Teams", Multiple))
+            .mandatory(teamField(Multiple))
             .mandatory(textField("subject", "Subject"))
             .mandatory(richTextareaField("body", "Body"))
             // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
             .optional(checkboxField("encrypted", "Encrypted", false))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(attachmentField(Multiple))
             .optional(expectationsField)
             .build();
     Contract standardEmail =
@@ -82,11 +82,11 @@ public class EmailContract extends Contractor {
     // Global contract
     List<ContractElement> globalInstance =
         contractBuilder()
-            .mandatory(teamField("teams", "Teams", Multiple))
+            .mandatory(teamField(Multiple))
             .mandatory(textField("subject", "Subject"))
             .mandatory(richTextareaField("body", "Body"))
             // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(attachmentField(Multiple))
             .optional(expectationsField)
             .build();
     Contract globalEmail =

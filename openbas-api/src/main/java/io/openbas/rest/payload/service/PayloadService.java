@@ -128,8 +128,8 @@ public class PayloadService {
             "#000000",
             "/img/icon-" + injector.getType() + ".png",
             true);
-    ContractAsset assetField = assetField("assets", "Assets", Multiple);
-    ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
+    ContractAsset assetField = assetField(Multiple);
+    ContractAssetGroup assetGroupField = assetGroupField(Multiple);
     ContractExpectations expectationsField = expectations();
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);

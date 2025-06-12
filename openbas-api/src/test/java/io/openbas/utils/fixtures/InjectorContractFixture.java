@@ -1,6 +1,6 @@
 package io.openbas.utils.fixtures;
 
-import static io.openbas.database.model.InjectorContract.CONTACT_CONTENT_FIELDS;
+import static io.openbas.database.model.InjectorContract.CONTRACT_CONTENT_FIELDS;
 import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInjector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,7 +23,7 @@ public class InjectorContractFixture {
 
   private static ObjectNode createDefaultContent(ObjectMapper objectMapper) {
     ObjectNode node = objectMapper.createObjectNode();
-    node.set(CONTACT_CONTENT_FIELDS, objectMapper.valueToTree(new ArrayList<>()));
+    node.set(CONTRACT_CONTENT_FIELDS, objectMapper.valueToTree(new ArrayList<>()));
     return node;
   }
 
@@ -37,7 +37,7 @@ public class InjectorContractFixture {
 
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode content = createDefaultContent(objectMapper);
-    content.set(CONTACT_CONTENT_FIELDS, objectMapper.valueToTree(customContent));
+    content.set(CONTRACT_CONTENT_FIELDS, objectMapper.valueToTree(customContent));
 
     injectorContract.setContent(objectMapper.writeValueAsString(content));
     injectorContract.setConvertedContent(content);
