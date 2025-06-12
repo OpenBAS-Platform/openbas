@@ -2,7 +2,7 @@ import { Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { useFormatter } from '../../../../../../components/i18n';
-import { type InjectStatusOutput } from '../../../../../../utils/api-types';
+import { type InjectExecutionOutput } from '../../../../../../utils/api-types';
 import ExecutionTime from './ExecutionTime';
 import MainTraces from './MainTraces';
 

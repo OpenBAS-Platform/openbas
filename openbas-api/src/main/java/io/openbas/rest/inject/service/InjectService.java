@@ -871,7 +871,7 @@ public class InjectService {
     }
   }
 
-  public InjectExecutionOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
+  public InjectExecutionOutput getInjectExecutionWithGlobalExecutionTraces(String injectId) {
     return injectExecutionMapper.toInjectExecutionOutput(
         injectExecutionRepository.findInjectExecutionWithGlobalExecutionTraces(injectId));
   }

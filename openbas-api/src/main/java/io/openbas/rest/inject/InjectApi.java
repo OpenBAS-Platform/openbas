@@ -488,10 +488,10 @@ public class InjectApi extends RestBehavior {
   }
 
   @Operation(description = "Get InjectExecution with global execution traces")
-  @GetMapping(INJECT_URI + "/status")
+  @GetMapping(INJECT_URI + "/execution")
   @LogExecutionTime
-  public InjectExecutionOutput getInjectStatusWithGlobalExecutionTraces(
+  public InjectExecutionOutput getInjectExecutionWithGlobalExecutionTraces(
       @RequestParam String injectId) {
-    return this.injectService.getInjectStatusWithGlobalExecutionTraces(injectId);
+    return this.injectService.getInjectExecutionWithGlobalExecutionTraces(injectId);
   }
 }

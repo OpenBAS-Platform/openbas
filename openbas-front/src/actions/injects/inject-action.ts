@@ -102,7 +102,7 @@ export const getInjectTracesFromInjectAndTarget = (injectId: string = '', target
   };
   return simpleCall(`${INJECT_URI}/execution-traces`, { params });
 };
-export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') => {
+export const getInjectExecutionWithGlobalExecutionTraces = (injectId: string = '') => {
   const params = { injectId };
-  return simpleCall(`${INJECT_URI}/status`, { params });
+  return simpleCall(`${INJECT_URI}/execution`, { params });
 };
