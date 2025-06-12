@@ -938,7 +938,7 @@ class InjectApiTest extends IntegrationTest {
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
         // Check inject status
-        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
+        assertEquals(ExecutionStatus.ERROR, injectStatusSaved.getName());
         assertEquals(2, injectStatusSaved.getTraces().size());
         // The status of the complete trace should be ERROR
         List<ExecutionTrace> completeTraces =
@@ -984,10 +984,8 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input2)
                 .agentId(secondAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli())
+                .emissionDate(Instant.now().toEpochMilli() + 1)
                 .build();
-        batchingInjectStatusService.handleInjectExecutionCallbackList(
-            List.of(injectExecutionCallback1, injectExecutionCallback2));
 
         InjectExecutionInput input3 = new InjectExecutionInput();
         String lastLogMessage = "Complete log received";
@@ -999,17 +997,21 @@ class InjectApiTest extends IntegrationTest {
                 .injectExecutionInput(input3)
                 .agentId(firstAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli() + 1)
+                .emissionDate(Instant.now().toEpochMilli() + 2)
                 .build();
         InjectExecutionCallback injectExecutionCallback4 =
             InjectExecutionCallback.builder()
                 .injectExecutionInput(input3)
                 .agentId(secondAgentId)
                 .injectId(inject.getId())
-                .emissionDate(Instant.now().toEpochMilli() + 2)
+                .emissionDate(Instant.now().toEpochMilli() + 3)
                 .build();
         batchingInjectStatusService.handleInjectExecutionCallbackList(
-            List.of(injectExecutionCallback3, injectExecutionCallback4));
+            List.of(
+                injectExecutionCallback1,
+                injectExecutionCallback2,
+                injectExecutionCallback3,
+                injectExecutionCallback4));
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
