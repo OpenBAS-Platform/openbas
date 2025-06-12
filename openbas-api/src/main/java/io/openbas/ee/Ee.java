@@ -156,20 +156,27 @@ public class Ee {
         && (Instant.now().isBefore(license.getExpirationDate()) || license.isExtraExpiration());
   }
 
+  public String getEnterpriseEditionLicensePem() {
+    Setting pemSetting =
+        this.settingRepository.findByKey(PLATFORM_ENTERPRISE_LICENSE.key()).orElse(new Setting());
+    String pem = pemSetting.getValue();
+    String pemFromConfig = openBASConfig.getApplicationLicense();
+    if (pemFromConfig != null && !pemFromConfig.trim().isEmpty()) {
+      return pemFromConfig.trim();
+    }
+    if (pem != null && !pem.trim().isEmpty()) {
+      return pem.trim();
+    }
+    return "";
+  }
+
   /**
    * This should not be called directly. Prefer to use the license Cache Manager:
    *
    * @see(LicenseCacheManager#getEnterpriseEditionInfo)
    */
   public License getEnterpriseEditionInfo() {
-    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
-    String pem =
-        ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_LICENSE.key()))
-            .map(Setting::getValue)
-            .orElse(PLATFORM_ENTERPRISE_LICENSE.defaultValue());
-    String pemFromConfig = openBASConfig.getApplicationLicense();
-    boolean isLicenseByConfig = pemFromConfig != null && !pemFromConfig.trim().isEmpty();
-    String certificatePem = isLicenseByConfig ? pemFromConfig.trim() : pem.trim();
+    String certificatePem = getEnterpriseEditionLicensePem();
     try {
       if (certificatePem.isEmpty()) {
         throw new IllegalArgumentException("Certificate Pem is null or empty");
@@ -177,7 +184,7 @@ public class Ee {
       return getEnterpriseEditionInfoFromPem(certificatePem);
     } catch (Exception e) {
       License license = new License();
-      license.setLicenseByConfiguration(isLicenseByConfig);
+      license.setLicenseByConfiguration(false);
       return license;
     }
   }

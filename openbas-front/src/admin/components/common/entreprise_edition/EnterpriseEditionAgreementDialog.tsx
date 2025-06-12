@@ -32,14 +32,14 @@ const useStyles = makeStyles()(theme => ({
 
 const EnterpriseEditionAgreementDialog = () => {
   const { t } = useFormatter();
-  const { open, closeDialog, featureDetectedInfo, setFeatureDetectedInfo } = useEnterpriseEdition();
+  const { open, closeDialog, EEFeatureDetectedInfo, setEEFeatureDetectedInfo } = useEnterpriseEdition();
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const [enterpriseLicense, setEnterpriseLicense] = useState('');
 
   const onCloseEnterpriseEditionDialog = () => {
     closeDialog();
-    setFeatureDetectedInfo('');
+    setEEFeatureDetectedInfo('');
   };
 
   const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => {
@@ -68,10 +68,10 @@ const EnterpriseEditionAgreementDialog = () => {
       )}
     >
       <div className={classes.eeDialogContainer}>
-        {!isEmptyField(featureDetectedInfo) && (
+        {!isEmptyField(EEFeatureDetectedInfo) && (
           <Alert style={{ alignItems: 'center' }} icon={<EEChip />} severity="success">
             {`${t('Enterprise Edition feature detected :')} `}
-            {featureDetectedInfo}
+            {EEFeatureDetectedInfo}
           </Alert>
         )}
         <div>
