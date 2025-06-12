@@ -11,7 +11,7 @@ import DialogTest from '../../../../components/common/DialogTest';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject, InjectExportRequestInput, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
+import type { Inject, InjectExportRequestInput, InjectStatus, InjectTestExecutionOutput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { download } from '../../../../utils/utils';
@@ -162,7 +162,7 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const submitTest = () => {
     if (testInject) {
-      testInject(contextId, inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
+      testInject(contextId, inject.inject_id).then((result: { data: InjectTestExecutionOutput }) => {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${url}${result.data.execution_id}`}>{t('its dedicated page')}</Link> }));
       });
     }

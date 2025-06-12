@@ -7,7 +7,7 @@ import type {
   PayloadArgument,
   PayloadCommandBlock,
   PayloadPrerequisite,
-  StatusPayloadOutput,
+  ExecutionPayloadOutput,
 } from '../../../../../utils/api-types';
 import { emptyFilled } from '../../../../../utils/String';
 
@@ -16,7 +16,7 @@ const useStyles = makeStyles()(theme => ({
   tableContainer: { backgroundColor: theme.palette.background.paperInCard },
 }));
 
-interface Props { payloadOutput?: StatusPayloadOutput }
+interface Props { payloadOutput?: ExecutionPayloadOutput }
 
 const CommandsInfoCard = ({ payloadOutput }: Props) => {
   const { t } = useFormatter();

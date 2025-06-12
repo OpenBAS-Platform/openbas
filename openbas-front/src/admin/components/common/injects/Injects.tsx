@@ -28,7 +28,7 @@ import {
   type Inject,
   type InjectBulkUpdateOperation, type InjectExportFromSearchRequestInput,
   type InjectInput,
-  type InjectTestStatusOutput, type SearchPaginationInput,
+  type InjectTestExecutionOutput, type SearchPaginationInput,
   type Team,
   type Variable,
 } from '../../../../utils/api-types';
@@ -461,7 +461,7 @@ const Injects: FunctionComponent<Props> = ({
       simulation_or_scenario_id: contextId,
     }).then((result: {
       uri: string;
-      data: InjectTestStatusOutput[];
+      data: InjectTestExecutionOutput[];
     }) => {
       if (numberOfSelectedElements === 1) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].execution_id}`}>{t('its dedicated page')}</Link> }));

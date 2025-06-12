@@ -103,7 +103,7 @@ public class Executor {
 
     // Status
     InjectExecution updatedStatus =
-        this.injectExecutionService.initializeInjectStatus(inject.getId(), EXECUTING);
+        this.injectExecutionService.initializeInjectExecution(inject.getId(), EXECUTING);
     inject.setExecutions(new ArrayList<>(Arrays.asList(updatedStatus)));
     if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
       this.executionExecutorService.launchExecutorContext(inject);

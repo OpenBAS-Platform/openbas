@@ -55,7 +55,7 @@ public class ExecutionPayloadOutput {
   private Set<String> tags;
 
   @JsonProperty("executable_file")
-  private StatusPayloadDocument executableFile;
+  private ExecutionPayloadDocument executableFile;
 
   @JsonProperty("executable_arch")
   @Enumerated(EnumType.STRING)
@@ -63,7 +63,7 @@ public class ExecutionPayloadOutput {
       Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 
   @JsonProperty("file_drop_file")
-  private StatusPayloadDocument fileDropFile;
+  private ExecutionPayloadDocument fileDropFile;
 
   @JsonProperty("dns_resolution_hostname")
   private String hostname;

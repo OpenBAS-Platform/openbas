@@ -122,7 +122,7 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
+  public Payload getExecutablePayloadAndUpdateInjectExecution(String injectId, String agentId)
       throws Exception {
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
     this.injectExecutionService.addStartImplantExecutionTraceByInject(

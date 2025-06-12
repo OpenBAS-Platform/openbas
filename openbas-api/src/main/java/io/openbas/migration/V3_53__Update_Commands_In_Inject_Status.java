@@ -2,8 +2,8 @@ package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.ExecutionPayload;
 import io.openbas.database.model.PayloadCommandBlock;
-import io.openbas.database.model.StatusPayload;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -54,8 +54,8 @@ public class V3_53__Update_Commands_In_Inject_Status extends BaseJavaMigration {
           }
         }
         String externalId = jsonNode.get("external_id").asText();
-        StatusPayload statusPayload =
-            new StatusPayload(
+        ExecutionPayload executionPayload =
+            new ExecutionPayload(
                 null,
                 null,
                 null,
@@ -72,7 +72,7 @@ public class V3_53__Update_Commands_In_Inject_Status extends BaseJavaMigration {
                 null,
                 List.of(new PayloadCommandBlock(null, contentString, cleanupCommandList)),
                 null);
-        String value = mapper.writeValueAsString(statusPayload);
+        String value = mapper.writeValueAsString(executionPayload);
         statement.setString(1, value);
         statement.setString(2, statusId);
         statement.addBatch();

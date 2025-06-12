@@ -38,10 +38,10 @@ public class ExecutionPayload {
   private String externalId;
 
   @JsonProperty("executable_file")
-  private StatusPayloadDocument executableFile;
+  private ExecutionPayloadDocument executableFile;
 
   @JsonProperty("file_drop_file")
-  private StatusPayloadDocument fileDropFile;
+  private ExecutionPayloadDocument fileDropFile;
 
   @JsonProperty("dns_resolution_hostname")
   private String hostname;
@@ -95,10 +95,10 @@ public class ExecutionPayload {
     this.ipSrc = ipSrc;
     this.hostname = hostname;
     if (fileDropFile != null) {
-      this.fileDropFile = new StatusPayloadDocument(fileDropFile);
+      this.fileDropFile = new ExecutionPayloadDocument(fileDropFile);
     }
     if (executableFile != null) {
-      this.executableFile = new StatusPayloadDocument(executableFile);
+      this.executableFile = new ExecutionPayloadDocument(executableFile);
     }
     this.externalId = externalId;
     this.prerequisites = prerequisites;

@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchAtomicTestingPayload } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../../components/i18n';
-import { type StatusPayloadOutput } from '../../../../../utils/api-types';
+import { type ExecutionPayloadOutput } from '../../../../../utils/api-types';
 import CommandsInfoCard from './CommandsInfoCard';
 import OutputParserInfoCard from './OutputParserInfoCard';
 import PayloadInfoPaper from './PayloadInfoPaper';
@@ -16,12 +16,12 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const { injectId } = useParams();
-  const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
+  const [payloadOutput, setPayloadOutput] = useState<ExecutionPayloadOutput>();
 
   // Fetching data
   useEffect(() => {
     if (injectId) {
-      fetchAtomicTestingPayload(injectId).then((result: { data: StatusPayloadOutput }) => {
+      fetchAtomicTestingPayload(injectId).then((result: { data: ExecutionPayloadOutput }) => {
         setPayloadOutput(result.data);
       });
     }

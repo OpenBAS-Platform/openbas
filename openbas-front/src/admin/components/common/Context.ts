@@ -3,7 +3,7 @@ import { createContext, type ReactElement } from 'react';
 import { type FullArticleStore } from '../../../actions/channels/Article';
 import { type InjectOutputType, type InjectStore } from '../../../actions/injects/Inject';
 import { type Page } from '../../../components/common/queryable/Page';
-import { type Article, type ArticleCreateInput, type ArticleUpdateInput, type Evaluation, type EvaluationInput, type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestStatusOutput, type LessonsAnswer, type LessonsAnswerCreateInput, type LessonsCategory, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestion, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type Objective, type ObjectiveInput, type PublicExercise, type PublicScenario, type Report, type ReportInput, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput, type Variable, type VariableInput } from '../../../utils/api-types';
+import { type Article, type ArticleCreateInput, type ArticleUpdateInput, type Evaluation, type EvaluationInput, type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestExecutionOutput, type LessonsAnswer, type LessonsAnswerCreateInput, type LessonsCategory, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestion, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type Objective, type ObjectiveInput, type PublicExercise, type PublicScenario, type Report, type ReportInput, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput, type Variable, type VariableInput } from '../../../utils/api-types';
 import { type UserStore } from '../teams/players/Player';
 
 export type PermissionsContextType = {
@@ -32,10 +32,10 @@ export type PreviewChallengeContextType = {
 export type InjectTestContextType = {
   contextId: string;
   url?: string;
-  searchInjectTests?: (contextId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
-  fetchInjectTestStatus?: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
-  testInject?: (contextId: string, injectId: string) => Promise<{ data: InjectTestStatusOutput }>;
-  bulkTestInjects?: (contextId: string, data: InjectBulkProcessingInput) => Promise<{ data: InjectTestStatusOutput[] }>;
+  searchInjectTests?: (contextId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestExecutionOutput> }>;
+  fetchInjectTestStatus?: (testId: string) => Promise<{ data: InjectTestExecutionOutput }>;
+  testInject?: (contextId: string, injectId: string) => Promise<{ data: InjectTestExecutionOutput }>;
+  bulkTestInjects?: (contextId: string, data: InjectBulkProcessingInput) => Promise<{ data: InjectTestExecutionOutput[] }>;
   deleteInjectTest?: (contextId: string, testId: string) => void;
 };
 
@@ -120,7 +120,7 @@ export type InjectContextType = {
   onBulkDeleteInjects: (param: InjectBulkProcessingInput) => Promise<Inject[]>;
   bulkTestInjects: (param: InjectBulkProcessingInput) => Promise<{
     uri: string;
-    data: InjectTestStatusOutput[];
+    data: InjectTestExecutionOutput[];
   }>;
 };
 export type LessonContextType = {
@@ -318,11 +318,11 @@ export const InjectContext = createContext<InjectContextType>({
   },
   bulkTestInjects(_param: InjectBulkProcessingInput): Promise<{
     uri: string;
-    data: InjectTestStatusOutput[];
+    data: InjectTestExecutionOutput[];
   }> {
     return new Promise<{
       uri: string;
-      data: InjectTestStatusOutput[];
+      data: InjectTestExecutionOutput[];
     }>(() => {
     });
   },

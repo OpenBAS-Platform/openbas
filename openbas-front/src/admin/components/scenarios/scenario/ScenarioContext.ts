@@ -6,7 +6,7 @@ import { type InjectOutputType, type InjectStore } from '../../../../actions/inj
 import { importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
 import { type Page } from '../../../../components/common/queryable/Page';
-import { type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestStatusOutput, type Scenario, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestExecutionOutput, type Scenario, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 const injectContextForScenario = (scenario: Scenario) => {
@@ -72,7 +72,7 @@ const injectContextForScenario = (scenario: Scenario) => {
     },
     bulkTestInjects(param: InjectBulkProcessingInput): Promise<{
       uri: string;
-      data: InjectTestStatusOutput[];
+      data: InjectTestExecutionOutput[];
     }> {
       return bulkTestInjects(scenario.scenario_id, param).then(result => ({
         uri: `/admin/scenarios/${scenario.scenario_id}/tests`,

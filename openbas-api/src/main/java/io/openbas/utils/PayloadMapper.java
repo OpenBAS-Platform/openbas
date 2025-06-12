@@ -27,7 +27,7 @@ public class PayloadMapper {
 
   private final ApplicationContext context;
 
-  public ExecutionPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
+  public ExecutionPayloadOutput getExecutionPayloadOutputFromInject(Optional<Inject> inject) {
 
     if (inject.isEmpty()) return null;
 
@@ -37,12 +37,12 @@ public class PayloadMapper {
       return null;
 
     InjectorContract injectorContract = injectorContractOpt.get();
-    ExecutionPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
+    ExecutionPayloadOutput.ExecutionPayloadOutputBuilder executionPayloadOutputBuilder =
         ExecutionPayloadOutput.builder();
 
     if (ofNullable(inject.get().getContent()).map(c -> c.has("obfuscator")).orElse(Boolean.FALSE)) {
       String obfuscator = inject.get().getContent().findValue("obfuscator").asText();
-      statusPayloadOutputBuilder.obfuscator(obfuscator);
+      executionPayloadOutputBuilder.obfuscator(obfuscator);
     }
 
     Optional<InjectExecution> injectStatusOpt = injectObj.getExecution();
@@ -51,11 +51,11 @@ public class PayloadMapper {
     // Handle the case when inject has not been executed yet or no payload output exists
     if (injectStatusOpt.isEmpty() || injectStatusOpt.get().getPayloadOutput() == null) {
       if (payload != null) {
-        populatePayloadDetails(statusPayloadOutputBuilder, payload, injectorContract);
+        populatePayloadDetails(executionPayloadOutputBuilder, payload, injectorContract);
 
         // Handle different payload types
-        processPayloadType(statusPayloadOutputBuilder, payload);
-        return statusPayloadOutputBuilder.build();
+        processPayloadType(executionPayloadOutputBuilder, payload);
+        return executionPayloadOutputBuilder.build();
       } else {
         return null;
       }
@@ -67,7 +67,7 @@ public class PayloadMapper {
         .map(
             statusPayload ->
                 populateExecutedPayload(
-                    statusPayloadOutputBuilder, statusPayload, injectorContract))
+                    executionPayloadOutputBuilder, statusPayload, injectorContract))
         .orElse(null);
   }
 
@@ -115,7 +115,7 @@ public class PayloadMapper {
   }
 
   private void populatePayloadDetails(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder,
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder,
       Payload payload,
       InjectorContract injectorContract) {
     builder
@@ -135,7 +135,7 @@ public class PayloadMapper {
   }
 
   private void processPayloadType(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Payload payload) {
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder, Payload payload) {
     switch (payload.getType()) {
       case COMMAND_TYPE:
         handleCommandType(builder, (Command) Hibernate.unproxy(payload));
@@ -155,7 +155,7 @@ public class PayloadMapper {
   }
 
   private void handleCommandType(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Command payloadCommand) {
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder, Command payloadCommand) {
     List<String> cleanupCommands = new ArrayList<>();
     if (payloadCommand.getCleanupCommand() != null) {
       cleanupCommands.add(payloadCommand.getCleanupCommand());
@@ -168,22 +168,23 @@ public class PayloadMapper {
   }
 
   private void handleExecutableType(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, Executable payloadExecutable) {
-    builder.executableFile(new StatusPayloadDocument(payloadExecutable.getExecutableFile()));
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder, Executable payloadExecutable) {
+    builder.executableFile(new ExecutionPayloadDocument(payloadExecutable.getExecutableFile()));
   }
 
   private void handleFileDropType(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
-    builder.fileDropFile(new StatusPayloadDocument(payloadFileDrop.getFileDropFile()));
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
+    builder.fileDropFile(new ExecutionPayloadDocument(payloadFileDrop.getFileDropFile()));
   }
 
   private void handleDnsResolutionType(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder, DnsResolution payloadDnsResolution) {
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder,
+      DnsResolution payloadDnsResolution) {
     builder.hostname(payloadDnsResolution.getHostname());
   }
 
   private ExecutionPayloadOutput populateExecutedPayload(
-      ExecutionPayloadOutput.StatusPayloadOutputBuilder builder,
+      ExecutionPayloadOutput.ExecutionPayloadOutputBuilder builder,
       ExecutionPayload executionPayload,
       InjectorContract injectorContract) {
     builder

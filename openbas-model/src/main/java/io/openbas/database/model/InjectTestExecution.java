@@ -34,15 +34,15 @@ public class InjectTestExecution extends BaseInjectExecution {
   private Instant testUpdateDate;
 
   public static InjectTestExecution fromExecutionTest(Execution execution) {
-    InjectTestExecution injectTestStatus = new InjectTestExecution();
-    injectTestStatus.setTrackingSentDate(Instant.now());
-    injectTestStatus.getTraces().addAll(execution.getTraces());
+    InjectTestExecution injectTestExecution = new InjectTestExecution();
+    injectTestExecution.setTrackingSentDate(Instant.now());
+    injectTestExecution.getTraces().addAll(execution.getTraces());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
           execution.getTraces().stream()
-              .peek(t -> t.setInjectTestStatus(injectTestStatus))
+              .peek(t -> t.setInjectTestExecution(injectTestExecution))
               .toList();
-      injectTestStatus.getTraces().addAll(traces);
+      injectTestExecution.getTraces().addAll(traces);
     }
 
     int numberOfError =
@@ -59,8 +59,8 @@ public class InjectTestExecution extends BaseInjectExecution {
         numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
     ExecutionStatus finalStatus =
         numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
-    injectTestStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
-    injectTestStatus.setTrackingEndDate(Instant.now());
-    return injectTestStatus;
+    injectTestExecution.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
+    injectTestExecution.setTrackingEndDate(Instant.now());
+    return injectTestExecution;
   }
 }

@@ -5,10 +5,10 @@ import { makeStyles } from 'tss-react/mui';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import PlatformIcon from '../../../../../components/PlatformIcon';
-import type { AttackPatternSimple, StatusPayloadOutput } from '../../../../../utils/api-types';
+import type { AttackPatternSimple, ExecutionPayloadOutput } from '../../../../../utils/api-types';
 import { emptyFilled } from '../../../../../utils/String';
 
-interface Props { payloadOutput?: StatusPayloadOutput }
+interface Props { payloadOutput?: ExecutionPayloadOutput }
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {

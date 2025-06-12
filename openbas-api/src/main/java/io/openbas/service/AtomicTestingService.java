@@ -80,7 +80,7 @@ public class AtomicTestingService {
 
   public ExecutionPayloadOutput findPayloadOutputByInjectId(String injectId) {
     Optional<Inject> inject = injectRepository.findById(injectId);
-    return payloadMapper.getStatusPayloadOutputFromInject(inject);
+    return payloadMapper.getExecutionPayloadOutputFromInject(inject);
   }
 
   @Transactional

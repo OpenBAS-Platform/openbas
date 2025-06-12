@@ -225,7 +225,7 @@ public class InjectExecutionService {
   }
 
   @Transactional
-  public InjectExecution initializeInjectStatus(
+  public InjectExecution initializeInjectExecution(
       @NotNull String injectId, @NotNull ExecutionStatus status) {
     Inject inject = this.injectRepository.findById(injectId).orElseThrow();
     InjectExecution injectExecution = getOrInitializeInjectExecution(inject);

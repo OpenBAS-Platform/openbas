@@ -614,7 +614,7 @@ class InjectServiceTest {
     when(injectUtils.getExecutionPayloadFromInject(inject)).thenReturn(executionPayload);
     when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
 
-    injectExecutionService.initializeInjectStatus(injectId, executionStatus);
+    injectExecutionService.initializeInjectExecution(injectId, executionStatus);
 
     ArgumentCaptor<InjectExecution> statusCaptor = ArgumentCaptor.forClass(InjectExecution.class);
     verify(injectExecutionRepository).save(statusCaptor.capture());

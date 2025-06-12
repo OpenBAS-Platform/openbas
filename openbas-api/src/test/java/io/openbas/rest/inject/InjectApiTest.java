@@ -1028,7 +1028,8 @@ class InjectApiTest extends IntegrationTest {
                   .status(ExecutionTraceStatus.ERROR)
                   .build());
 
-      InjectExecutionOutput expected = InjectExecutionOutput.builder().traces(expectedTraces).build();
+      InjectExecutionOutput expected =
+          InjectExecutionOutput.builder().traces(expectedTraces).build();
 
       assertThatJson(response)
           .whenIgnoringPaths(

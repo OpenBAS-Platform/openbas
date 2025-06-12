@@ -14,7 +14,7 @@ public class V3_65__Update_Inject_Status_status_payload extends BaseJavaMigratio
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
 
-    String addParamsToStatusPayload =
+    String addParamsToExecutionPayload =
         "UPDATE injects_statuses "
             + "SET status_payload_output = jsonb_set("
             + "    jsonb_set("
@@ -31,7 +31,7 @@ public class V3_65__Update_Inject_Status_status_payload extends BaseJavaMigratio
             + "    '[]'::jsonb)"
             + "WHERE status_payload_output->'payload_command_blocks' IS NULL;";
 
-    statement.executeUpdate(addParamsToStatusPayload);
+    statement.executeUpdate(addParamsToExecutionPayload);
     statement.executeUpdate(updatePayloadCommandBlocks);
   }
 }

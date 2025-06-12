@@ -11,7 +11,7 @@ import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import { type InjectTestExecutionOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { InjectTestContext } from '../common/Context';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
@@ -60,7 +60,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   const { t, fldt } = useFormatter();
   const theme = useTheme();
 
-  const [selectedInjectTestStatus, setSelectedInjectTestStatus] = useState<InjectTestStatusOutput | null>(null);
+  const [selectedInjectTestStatus, setSelectedInjectTestStatus] = useState<InjectTestExecutionOutput | null>(null);
 
   const {
     contextId,
@@ -71,7 +71,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   // Fetching test
   useEffect(() => {
     if (statusId !== null && statusId !== undefined && fetchInjectTestStatus) {
-      fetchInjectTestStatus(statusId).then((result: { data: InjectTestStatusOutput }) => {
+      fetchInjectTestStatus(statusId).then((result: { data: InjectTestExecutionOutput }) => {
         setSelectedInjectTestStatus(result.data);
       });
     }
@@ -83,26 +83,26 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       field: 'inject_title',
       label: 'Inject title',
       isSortable: true,
-      value: (test: InjectTestStatusOutput) => test.inject_title,
+      value: (test: InjectTestExecutionOutput) => test.inject_title,
     },
     {
       field: 'tracking_sent_date',
       label: 'Test execution time',
       isSortable: true,
-      value: (test: InjectTestStatusOutput) => fldt(test.tracking_sent_date),
+      value: (test: InjectTestExecutionOutput) => fldt(test.tracking_sent_date),
     },
     {
       field: 'status_name',
       label: 'Test status',
       isSortable: true,
-      value: (test: InjectTestStatusOutput) => {
+      value: (test: InjectTestExecutionOutput) => {
         return (<ItemStatus isInject={true} status={test.status_name} label={t(test.status_name || '-')} variant="inList" />);
       },
     },
   ];
 
   // Filter and sort hook
-  const [tests, setTests] = useState<InjectTestStatusOutput[] | null>([]);
+  const [tests, setTests] = useState<InjectTestExecutionOutput[] | null>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({}));
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -112,7 +112,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       if (searchInjectTests) {
         return searchInjectTests(contextId, input);
       } else {
-        return new Promise<{ data: Page<InjectTestStatusOutput> }>(() => {
+        return new Promise<{ data: Page<InjectTestExecutionOutput> }>(() => {
         });
       }
     } finally {
@@ -129,7 +129,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       >
         <InjectTestReplayAll
           searchPaginationInput={searchPaginationInput}
-          injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!)}
+          injectIds={tests?.map((test: InjectTestExecutionOutput) => test.inject_id!)}
           onTest={result => setTests(result)}
         />
       </PaginationComponent>

@@ -14,11 +14,11 @@ public class InjectTestStatusComposer extends ComposerBase<InjectTestExecution> 
 
   public class Composer extends InnerComposerBase<InjectTestExecution> {
 
-    private final InjectTestExecution InjectTestStatus;
+    private final InjectTestExecution injectTestExecution;
     private final List<ExecutionTraceComposer.Composer> executionTracesComposer = new ArrayList<>();
 
-    public Composer(InjectTestExecution InjectTestStatus) {
-      this.InjectTestStatus = InjectTestStatus;
+    public Composer(InjectTestExecution injectTestExecution) {
+      this.injectTestExecution = injectTestExecution;
     }
 
     public Composer withExecutionTraces(List<ExecutionTraceComposer.Composer> traces) {
@@ -28,14 +28,14 @@ public class InjectTestStatusComposer extends ComposerBase<InjectTestExecution> 
 
     public Composer withExecutionTrace(ExecutionTraceComposer.Composer executionTrace) {
       executionTracesComposer.add(executionTrace);
-      executionTrace.get().setInjectTestStatus(this.InjectTestStatus);
-      this.InjectTestStatus.getTraces().add(executionTrace.get());
+      executionTrace.get().setInjectTestExecution(this.injectTestExecution);
+      this.injectTestExecution.getTraces().add(executionTrace.get());
       return this;
     }
 
     @Override
     public InjectTestStatusComposer.Composer persist() {
-      injectTestStatusRepository.save(InjectTestStatus);
+      injectTestStatusRepository.save(injectTestExecution);
       executionTracesComposer.forEach(ExecutionTraceComposer.Composer::persist);
       return this;
     }
@@ -43,13 +43,13 @@ public class InjectTestStatusComposer extends ComposerBase<InjectTestExecution> 
     @Override
     public InjectTestStatusComposer.Composer delete() {
       executionTracesComposer.forEach(ExecutionTraceComposer.Composer::delete);
-      injectTestStatusRepository.delete(InjectTestStatus);
+      injectTestStatusRepository.delete(injectTestExecution);
       return this;
     }
 
     @Override
     public InjectTestExecution get() {
-      return this.InjectTestStatus;
+      return this.injectTestExecution;
     }
   }
 

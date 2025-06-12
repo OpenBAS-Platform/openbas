@@ -2,10 +2,10 @@ package io.openbas.utils.fixtures;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 
+import io.openbas.database.model.ExecutionPayload;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectExecution;
 import io.openbas.database.model.PayloadCommandBlock;
-import io.openbas.database.model.ExecutionPayload;
 import java.time.Instant;
 import java.util.List;
 

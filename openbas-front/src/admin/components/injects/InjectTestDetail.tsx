@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
-import { type InjectTestStatusOutput } from '../../../utils/api-types';
+import { type InjectTestExecutionOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import InjectIcon from '../common/injects/InjectIcon';
 import GlobalExecutionTraces from '../common/injects/status/traces/GlobalExecutionTraces';
@@ -11,7 +11,7 @@ import GlobalExecutionTraces from '../common/injects/status/traces/GlobalExecuti
 interface Props {
   open: boolean;
   handleClose: () => void;
-  injectTestStatus: InjectTestStatusOutput | undefined;
+  injectTestStatus: InjectTestExecutionOutput | undefined;
 }
 
 const InjectTestDetail = ({

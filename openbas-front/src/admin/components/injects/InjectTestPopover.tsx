@@ -5,13 +5,13 @@ import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext,
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
-import { type InjectTestStatusOutput } from '../../../utils/api-types';
+import { type InjectTestExecutionOutput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { InjectTestContext, PermissionsContext } from '../common/Context';
 
 interface Props {
-  injectTest: InjectTestStatusOutput;
-  onTest?: (result: InjectTestStatusOutput) => void;
+  injectTest: InjectTestExecutionOutput;
+  onTest?: (result: InjectTestExecutionOutput) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -66,7 +66,7 @@ const InjectTestPopover: FunctionComponent<Props> = ({
 
   const submitTest = () => {
     if (testInject) {
-      testInject(contextId, injectTest.inject_id!).then((result: { data: InjectTestStatusOutput }) => {
+      testInject(contextId, injectTest.inject_id!).then((result: { data: InjectTestExecutionOutput }) => {
         onTest?.(result.data);
         MESSAGING$.notifySuccess(t(`Test for inject ${injectTest.inject_title} has been sent`));
         return result;

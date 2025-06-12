@@ -340,7 +340,7 @@ public class InjectApi extends RestBehavior {
   public Payload getExecutablePayloadInject(
       @PathVariable @NotBlank final String injectId, @PathVariable @NotBlank final String agentId)
       throws Exception {
-    return executableInjectService.getExecutablePayloadAndUpdateInjectStatus(injectId, agentId);
+    return executableInjectService.getExecutablePayloadAndUpdateInjectExecution(injectId, agentId);
   }
 
   // -- EXERCISES --

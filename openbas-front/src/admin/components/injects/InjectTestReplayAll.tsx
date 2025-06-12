@@ -4,14 +4,14 @@ import { type FunctionComponent, useContext, useState } from 'react';
 
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
-import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import { type InjectTestExecutionOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { InjectTestContext } from '../common/Context';
 
 interface Props {
   searchPaginationInput: SearchPaginationInput;
   injectIds: string[] | undefined;
-  onTest?: (result: InjectTestStatusOutput[]) => void;
+  onTest?: (result: InjectTestExecutionOutput[]) => void;
 }
 
 const InjectTestReplayAll: FunctionComponent<Props> = ({
@@ -42,7 +42,7 @@ const InjectTestReplayAll: FunctionComponent<Props> = ({
       bulkTestInjects(contextId, {
         search_pagination_input: searchPaginationInput,
         simulation_or_scenario_id: contextId,
-      }!).then((result: { data: InjectTestStatusOutput[] }) => {
+      }!).then((result: { data: InjectTestExecutionOutput[] }) => {
         onTest?.(result.data);
         MESSAGING$.notifySuccess(t('Test(s) sent'));
         return result;

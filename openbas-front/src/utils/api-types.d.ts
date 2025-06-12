@@ -1289,6 +1289,64 @@ export interface Executable {
     | "NETWORK_TRAFFIC";
 }
 
+export interface ExecutionPayload {
+  dns_resolution_hostname?: string;
+  executable_file?: ExecutionPayloadDocument;
+  file_drop_file?: ExecutionPayloadDocument;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  payload_arguments?: PayloadArgument[];
+  payload_cleanup_executor?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_description?: string;
+  payload_external_id?: string;
+  payload_name?: string;
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_type?: string;
+}
+
+export interface ExecutionPayloadDocument {
+  document_id: string;
+  document_name: string;
+}
+
+export interface ExecutionPayloadOutput {
+  dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  executable_file?: ExecutionPayloadDocument;
+  file_drop_file?: ExecutionPayloadDocument;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPatternSimple[];
+  payload_cleanup_executor?: string;
+  payload_collector_type?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_description?: string;
+  payload_external_id?: string;
+  payload_name?: string;
+  payload_obfuscator?: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParserSimple[];
+  payload_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  /** @uniqueItems true */
+  payload_tags?: string[];
+  payload_type?: string;
+}
+
 export interface ExecutionTrace {
   agent?: string;
   execution_action?:
@@ -1319,8 +1377,8 @@ export interface ExecutionTrace {
   execution_trace_id: string;
   /** @format date-time */
   execution_updated_at: string;
-  injectStatus?: string;
-  injectTestStatus?: string;
+  injectExecution?: string;
+  injectTestExecution?: string;
   listened?: boolean;
 }
 
@@ -1870,6 +1928,7 @@ export interface ImportTestSummary {
 }
 
 export interface Inject {
+  execution?: InjectExecution;
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
@@ -1906,7 +1965,6 @@ export interface Inject {
   inject_scenario?: string;
   /** @format date-time */
   inject_sent_at?: string;
-  inject_status?: InjectStatus;
   inject_tags?: string[];
   inject_teams?: string[];
   inject_testable?: boolean;
@@ -1992,6 +2050,27 @@ export interface InjectDocumentInput {
   document_id?: string;
 }
 
+export interface InjectExecution {
+  execution_id?: string;
+  execution_payload_output?: ExecutionPayload;
+  execution_traces?: ExecutionTrace[];
+  listened?: boolean;
+  status_name:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "DRAFT"
+    | "QUEUING"
+    | "EXECUTING"
+    | "PENDING";
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+}
+
 export interface InjectExecutionInput {
   execution_action?:
     | "prerequisite_check"
@@ -2008,6 +2087,26 @@ export interface InjectExecutionInput {
   execution_output_raw?: string;
   execution_output_structured?: string;
   execution_status: string;
+}
+
+export interface InjectExecutionOutput {
+  execution_id: string;
+  execution_main_traces?: ExecutionTraceOutput[];
+  status_name?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+}
+
+/** status */
+export interface InjectExecutionSimple {
+  execution_id: string;
+  status_name?: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
 }
 
 export interface InjectExpectation {
@@ -2234,7 +2333,7 @@ export interface InjectResultOutput {
   /** Injector contract */
   inject_injector_contract?: InjectorContractSimple;
   /** status */
-  inject_status?: InjectStatusSimple;
+  inject_status?: InjectExecutionSimple;
   inject_targets?: TargetSimple[];
   /** Title of inject */
   inject_title: string;
@@ -2264,7 +2363,7 @@ export interface InjectResultOverviewOutput {
   /** Indicates whether the inject is ready for use */
   inject_ready?: boolean;
   /** status */
-  inject_status?: InjectStatusSimple;
+  inject_status?: InjectExecutionSimple;
   /**
    * Tags
    * @uniqueItems true
@@ -2293,47 +2392,6 @@ export interface InjectSimple {
   inject_title: string;
 }
 
-export interface InjectStatus {
-  listened?: boolean;
-  status_id?: string;
-  status_name:
-    | "SUCCESS"
-    | "ERROR"
-    | "MAYBE_PREVENTED"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "DRAFT"
-    | "QUEUING"
-    | "EXECUTING"
-    | "PENDING";
-  status_payload_output?: StatusPayload;
-  status_traces?: ExecutionTrace[];
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
-
-export interface InjectStatusOutput {
-  status_id: string;
-  status_main_traces?: ExecutionTraceOutput[];
-  status_name?: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
-
-/** status */
-export interface InjectStatusSimple {
-  status_id: string;
-  status_name?: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-}
-
 export type InjectTarget = BaseInjectTarget &
   (
     | BaseInjectTargetTargetTypeMapping<"ASSETS_GROUPS", AssetGroupTarget>
@@ -2347,12 +2405,12 @@ export interface InjectTeamsInput {
   inject_teams?: string[];
 }
 
-export interface InjectTestStatusOutput {
+export interface InjectTestExecutionOutput {
+  execution_id: string;
+  execution_main_traces?: ExecutionTraceOutput[];
   inject_id: string;
   inject_title: string;
   inject_type?: string;
-  status_id: string;
-  status_main_traces?: ExecutionTraceOutput[];
   status_name?: string;
   /** @format date-time */
   tracking_end_date?: string;
@@ -3226,8 +3284,8 @@ export interface PageInjectTarget {
   totalPages?: number;
 }
 
-export interface PageInjectTestStatusOutput {
-  content?: InjectTestStatusOutput[];
+export interface PageInjectTestExecutionOutput {
+  content?: InjectTestExecutionOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -4383,64 +4441,6 @@ export interface StatisticElement {
   global_count?: number;
   /** @format int64 */
   progression_count?: number;
-}
-
-export interface StatusPayload {
-  dns_resolution_hostname?: string;
-  executable_file?: StatusPayloadDocument;
-  file_drop_file?: StatusPayloadDocument;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
-  payload_arguments?: PayloadArgument[];
-  payload_cleanup_executor?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
-  payload_description?: string;
-  payload_external_id?: string;
-  payload_name?: string;
-  payload_prerequisites?: PayloadPrerequisite[];
-  payload_type?: string;
-}
-
-export interface StatusPayloadDocument {
-  document_id: string;
-  document_name: string;
-}
-
-export interface StatusPayloadOutput {
-  dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  executable_file?: StatusPayloadDocument;
-  file_drop_file?: StatusPayloadDocument;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: AttackPatternSimple[];
-  payload_cleanup_executor?: string;
-  payload_collector_type?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
-  payload_description?: string;
-  payload_external_id?: string;
-  payload_name?: string;
-  payload_obfuscator?: string;
-  /** @uniqueItems true */
-  payload_output_parsers?: OutputParserSimple[];
-  payload_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  /** @uniqueItems true */
-  payload_tags?: string[];
-  payload_type?: string;
 }
 
 export interface StructuralHistogramSeries {

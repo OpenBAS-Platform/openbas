@@ -22,7 +22,8 @@ public class InjectExecutionMapper {
         .orElseGet(() -> InjectExecutionOutput.builder().build());
   }
 
-  public InjectTestExecutionOutput toInjectTestExecutionOutput(InjectTestExecution injectTestExecution) {
+  public InjectTestExecutionOutput toInjectTestExecutionOutput(
+      InjectTestExecution injectTestExecution) {
     InjectTestExecutionOutput output = InjectTestExecutionOutput.builder().build();
     buildInjectExecutionOutput(output, injectTestExecution, injectTestExecution.getTraces());
 
