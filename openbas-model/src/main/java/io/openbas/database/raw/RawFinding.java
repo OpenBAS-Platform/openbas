@@ -19,4 +19,6 @@ public interface RawFinding {
   String getFinding_inject_id();
 
   String getScenario_id();
+
+  String getAsset_id();
 }

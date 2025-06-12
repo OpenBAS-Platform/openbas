@@ -50,6 +50,10 @@ public class FindingHandler implements Handler<EsFinding> {
                 dependencies.add(finding.getScenario_id());
                 esFinding.setBase_scenario_side(finding.getScenario_id());
               }
+              if (hasText(finding.getAsset_id())) {
+                dependencies.add(finding.getAsset_id());
+                esFinding.setBase_endpoint_side(finding.getAsset_id());
+              }
               esFinding.setBase_dependencies(dependencies);
               return esFinding;
             })
