@@ -124,9 +124,14 @@ public enum ContractOutputType {
       new ArrayList<>(
           List.of(
               new ContractOutputField("asset_id", ContractOutputTechnicalType.Text, false),
-              new ContractOutputField("id", ContractOutputTechnicalType.Text, true))),
+              new ContractOutputField("id", ContractOutputTechnicalType.Text, true),
+              new ContractOutputField("host", ContractOutputTechnicalType.Text, true),
+              new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
       true,
-      (JsonNode jsonNode) -> jsonNode.get("id") != null,
+      (JsonNode jsonNode) ->
+          jsonNode.get("id") != null
+              && jsonNode.get("host") != null
+              && jsonNode.get("severity") != null,
       (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
         if (jsonNode.get("asset_id") != null) {
