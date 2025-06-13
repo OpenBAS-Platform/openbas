@@ -62,6 +62,24 @@ public class FindingUtils {
     }
   }
 
+  public SimpleFinding buildSimplerFinding(
+      String injectId,
+      String assetId,
+      io.openbas.database.model.ContractOutputElement contractOutputElement,
+      String finalValue) {
+
+    SimpleFinding newFinding = new SimpleFinding();
+    newFinding.setInjectId(injectId);
+    newFinding.setField(contractOutputElement.getKey());
+    newFinding.setType(contractOutputElement.getType().toString());
+    newFinding.setValue(finalValue);
+    newFinding.setName(contractOutputElement.getName());
+    newFinding.getAssets().add(assetId);
+    newFinding.setTags(
+        new HashSet<>(contractOutputElement.getTags().stream().map(Tag::getId).toList()));
+    return newFinding;
+  }
+
   private void handleRaceCondition(
       Inject inject, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
     Optional<Finding> retryFinding =

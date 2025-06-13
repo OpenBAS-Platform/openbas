@@ -25,24 +25,24 @@ public class OutputParser implements Base {
   @UuidGenerator
   @JsonProperty("output_parser_id")
   @NotBlank
-  private String id;
+  protected String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "output_parser_payload_id")
   @JsonIgnore
-  private Payload payload;
+  protected Payload payload;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_mode")
   @JsonProperty("output_parser_mode")
   @NotNull
-  private ParserMode mode;
+  protected ParserMode mode;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_type")
   @JsonProperty("output_parser_type")
   @NotNull
-  private ParserType type;
+  protected ParserType type;
 
   @OneToMany(
       mappedBy = "outputParser",
@@ -51,17 +51,17 @@ public class OutputParser implements Base {
       orphanRemoval = true)
   @JsonProperty("output_parser_contract_output_elements")
   @NotNull
-  private Set<ContractOutputElement> contractOutputElements = new HashSet<>();
+  protected Set<ContractOutputElement> contractOutputElements = new HashSet<>();
 
   @Column(name = "output_parser_created_at")
   @JsonProperty("output_parser_created_at")
   @NotNull
-  private Instant createdAt = now();
+  protected Instant createdAt = now();
 
   @Column(name = "output_parser_updated_at")
   @JsonProperty("output_parser_updated_at")
   @NotNull
-  private Instant updatedAt = now();
+  protected Instant updatedAt = now();
 
   public void setContractOutputElements(final Set<ContractOutputElement> contractOutputElements) {
     this.contractOutputElements.clear();
