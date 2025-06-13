@@ -140,6 +140,34 @@ public class InjectStatusRepositoryHelper {
     return new HashMap<>();
   }
 
+  public Map<String, Integer> getAssetsNumberByInjectId(List<String> injectIds) {
+    if (!injectIds.isEmpty()) {
+      String query =
+          "SELECT ia.inject_id, COUNT(ag.agent_id) as number "
+              + "FROM injects_assets ia "
+              + "LEFT JOIN assets ON ia.asset_id = assets.asset_id "
+              + "LEFT JOIN agents ag ON ag.agent_asset = ia.asset_id "
+              + "WHERE ia.inject_id IN (:inject_ids) "
+              + "AND assets.asset_type = 'Endpoint' "
+              + "GROUP BY ia.inject_id";
+
+      MapSqlParameterSource paramValues = new MapSqlParameterSource();
+      paramValues.addValue("inject_ids", injectIds);
+
+      Map<String, Integer> resultsByInjectId = new HashMap<>();
+      jt.queryForList(query, paramValues)
+          .forEach(
+              stringObjectMap -> {
+                String key = stringObjectMap.get("inject_id").toString();
+                Integer value = Math.toIntExact((Long) stringObjectMap.get("number"));
+                resultsByInjectId.putIfAbsent(key, 0);
+                resultsByInjectId.put(key, value);
+              });
+      return resultsByInjectId;
+    }
+    return new HashMap<>();
+  }
+
   public void saveFindings(Set<SimpleFinding> findingToSave) {
     if (!findingToSave.isEmpty()) {
       // First of all, we check for the unicity of the finding

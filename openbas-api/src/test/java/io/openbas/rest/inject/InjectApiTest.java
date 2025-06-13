@@ -938,7 +938,7 @@ class InjectApiTest extends IntegrationTest {
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
         // Check inject status
-        assertEquals(ExecutionStatus.ERROR, injectStatusSaved.getName());
+        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
         assertEquals(2, injectStatusSaved.getTraces().size());
         // The status of the complete trace should be ERROR
         List<ExecutionTrace> completeTraces =

@@ -106,13 +106,21 @@ public class BatchingInjectStatusService {
     if (agentId != null && executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)) {
       computeExecutionTraceStatusIfNeeded(traces, executionTrace, agentId);
     }
-
-    // If the execution trace is complete, we update the final status of the inject
-    if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)) {
-      updateFinalInjectStatus(
-          injectStatus, traces.stream().map(SimpleExecutionTrace::getStatus).toList());
-    }
     return executionTrace;
+  }
+
+  public boolean isAllInjectAgentsExecuted(List<SimpleExecutionTrace> traces, int numberAgent) {
+    int totalCompleteTrace =
+        traces.stream()
+            .filter(
+                simpleExecutionTrace ->
+                    simpleExecutionTrace.getAction() == ExecutionTraceAction.COMPLETE)
+            .map(SimpleExecutionTrace::getAgentId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList()
+            .size();
+    return numberAgent == totalCompleteTrace;
   }
 
   @Transactional
@@ -136,6 +144,14 @@ public class BatchingInjectStatusService {
     Map<String, List<SimpleExecutionTrace>> mapSimpleExecutionTraceByInjectStatusId =
         injectStatusRepositoryHelper.getSimpleExecutionTracesByInjectStatusId(
             simpleInjectStatus.values().stream().map(SimpleInjectStatus::getId).toList());
+
+    Map<String, Integer> mapAssetNumberByInjectId =
+        injectStatusRepositoryHelper.getAssetsNumberByInjectId(
+            sortedInjectExecutionCallbacks.stream()
+                .map(InjectExecutionCallback::getInjectId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList());
 
     Map<String, String> mapAssetIdByAgentId =
         agentRepository
@@ -164,7 +180,8 @@ public class BatchingInjectStatusService {
     // For each of the trace
     for (InjectExecutionCallback injectExecutionCallback : sortedInjectExecutionCallbacks) {
       try {
-        if (mapAssetIdByAgentId.get(injectExecutionCallback.getAgentId()) == null) {
+        if (injectExecutionCallback.getAgentId() != null
+            && mapAssetIdByAgentId.get(injectExecutionCallback.getAgentId()) == null) {
           throw new ElementNotFoundException(
               "Agent not found: " + injectExecutionCallback.getAgentId());
         }
@@ -190,6 +207,16 @@ public class BatchingInjectStatusService {
         mapSimpleExecutionTraceByInjectStatusId.computeIfAbsent(
             trace.getInjectStatusId(), k -> new ArrayList<>());
         mapSimpleExecutionTraceByInjectStatusId.get(trace.getInjectStatusId()).add(trace);
+
+        // If the execution trace is complete, we update the final status of the inject
+        if (trace.getAction().equals(ExecutionTraceAction.COMPLETE)
+            && (injectExecutionCallback.getAgentId() == null
+                || isAllInjectAgentsExecuted(
+                    mapSimpleExecutionTraceByInjectStatusId.get(trace.getInjectStatusId()),
+                    mapAssetNumberByInjectId.get(injectExecutionCallback.getInjectId())))) {
+          updateFinalInjectStatus(
+              injectStatus, traces.stream().map(SimpleExecutionTrace::getStatus).toList());
+        }
 
         executionTraceToSave.add(trace);
         injectsStatusToSave.add(injectStatus);
