@@ -610,6 +610,25 @@ public class ExpectationUtils {
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
             prefixSignature + injectId + "-agent-" + agentId));
 
+    signatures.add(
+            createSignature(
+                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS,
+                    "10.0.0.2"));
+    signatures.add(
+            createSignature(
+                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS,
+                    "192.168.1.2"));
+    signatures.add(
+            createSignature(
+                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS,
+                    "172.16.18.2"));
+
+    signatures.add(
+            createSignature(
+                    EXPECTATION_SIGNATURE_TYPE_TARGET_IPV4_ADDRESS,
+                    "68.183.68.83"));
+
+
     return signatures;
   }
 
