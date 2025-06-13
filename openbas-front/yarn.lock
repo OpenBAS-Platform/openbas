@@ -9933,7 +9933,7 @@ __metadata:
     remark-gfm: "npm:4.0.1"
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.2"
-    swagger-typescript-api: "npm:13.2.0"
+    swagger-typescript-api: "npm:13.2.1"
     tss-react: "npm:4.9.18"
     typescript: "npm:5.8.3"
     typescript-eslint: "npm:8.34.0"
@@ -12058,9 +12058,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-typescript-api@npm:13.2.0":
-  version: 13.2.0
-  resolution: "swagger-typescript-api@npm:13.2.0"
+"swagger-typescript-api@npm:13.2.1":
+  version: 13.2.1
+  resolution: "swagger-typescript-api@npm:13.2.1"
   dependencies:
     "@biomejs/js-api": "npm:^0.8.0-beta.3"
     "@biomejs/wasm-nodejs": "npm:^2.0.0-beta.6"
@@ -12078,7 +12078,7 @@ __metadata:
   bin:
     sta: ./dist/cli.js
     swagger-typescript-api: ./dist/cli.js
-  checksum: 10c0/126914d979ebc43b2fcfb0656a2122fef572a34fb6f26ef7c44f61472d3d0f61d3427b8080a6d3f1bdeef06434e89ee5a99816477cd7536c2315457ef6a7a63b
+  checksum: 10c0/d82fa8eb31c6a23856623796050461f4535f9df7f304c00fbf35a2eb695c3a6b9d1900816275fab180e90a53d91ad00d2247958dda121672f9e004461bc0e580
   languageName: node
   linkType: hard
 
