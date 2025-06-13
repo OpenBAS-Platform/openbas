@@ -8,7 +8,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.aop.UserRoleDescription;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
-import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
@@ -77,9 +76,7 @@ public class TagApi extends RestBehavior {
   public Tag updateTag(
       @PathVariable @Schema(description = "ID of the tag") String tagId,
       @Valid @RequestBody TagUpdateInput input) {
-    Tag tag = tagRepository.findById(tagId).orElseThrow(ElementNotFoundException::new);
-    tag.setUpdateAttributes(input);
-    return tagRepository.save(tag);
+    return tagService.updateTag(tagId, input);
   }
 
   @Secured(ROLE_ADMIN)

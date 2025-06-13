@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
@@ -7,6 +9,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +45,21 @@ public class Tag implements Base {
   @Queryable(sortable = true)
   @Schema(description = "Color of the tag")
   private String color;
+
+  @Getter
+  @Column(name = "tag_created_at")
+  @JsonProperty("tag_created_at")
+  @JsonIgnore
+  @NotNull
+  private Instant createdAt = now();
+
+  @Getter
+  @Setter
+  @Column(name = "tag_updated_at")
+  @JsonProperty("tag_updated_at")
+  @JsonIgnore
+  @NotNull
+  private Instant updatedAt = now();
 
   @JsonIgnore
   @Override
