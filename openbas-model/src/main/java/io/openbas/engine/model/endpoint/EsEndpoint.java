@@ -15,6 +15,17 @@ public class EsEndpoint extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */
 
+  // -- ASSET GENERIC
+  @Queryable(label = "endpoint name", filterable = true)
+  @EsQueryable(keyword = true)
+  private String endpoint_name;
+
+  @Queryable(label = "endpoint description", filterable = true)
+  @EsQueryable(keyword = true)
+  private String endpoint_description;
+
+  // -- ENDPOINT SPECIFIC --
+
   @Queryable(label = "endpoint ips", filterable = true)
   @EsQueryable(keyword = true)
   private Set<String> endpoint_ips;
@@ -40,4 +51,8 @@ public class EsEndpoint extends EsBase {
   @Queryable(label = "findings", filterable = true)
   @EsQueryable(keyword = true)
   private Set<String> base_findings_side; // Must finish by _side
+
+  @Queryable(label = "tags", filterable = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_tags_side; // Must finish by _side
 }

@@ -7,10 +7,16 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
+import java.time.Instant;
 import java.util.Objects;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
+
+import static java.time.Instant.now;
 
 @Entity
 @Table(name = "tags")
@@ -41,6 +47,20 @@ public class Tag implements Base {
   @Queryable(sortable = true)
   @Schema(description = "Color of the tag")
   private String color;
+
+  @Getter
+  @Column(name = "tag_created_at")
+  @JsonProperty("tag_created_at")
+  @JsonIgnore
+  @NotNull
+  private Instant createdAt = now();
+
+  @Getter
+  @Column(name = "tag_updated_at")
+  @JsonProperty("tag_updated_at")
+  @JsonIgnore
+  @NotNull
+  private Instant updatedAt = now();
 
   @JsonIgnore
   @Override
