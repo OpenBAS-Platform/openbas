@@ -121,7 +121,7 @@ class StructuredOutputUtilsTest {
 
   @Test
   @DisplayName("Should get cve from raw output command")
-  void given_raw_output_tasklist_should_return_credentials() {
+  void given_raw_output_tasklist_should_return_cve() {
     // username:RID:LM_Hash:NTLM_Hash:::
     String rawOutput =
         "{\n"
@@ -250,8 +250,8 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:cve (severity) from raw output command")
-  void given_raw_output_cve_should_return_cve() {
+  @DisplayName("Should get username:password from raw output command")
+  void given_raw_output_credentials_should_return_credentials() {
     String rawOutput =
         "SMB                      192.168.11.23   415    CASSANOVAS          [+] workgroup\\\\savacano:savacano (Pwn3d!)\\n";
 
