@@ -56,6 +56,7 @@ public class Tag implements Base {
   private Instant createdAt = now();
 
   @Getter
+  @Setter
   @Column(name = "tag_updated_at")
   @JsonProperty("tag_updated_at")
   @JsonIgnore

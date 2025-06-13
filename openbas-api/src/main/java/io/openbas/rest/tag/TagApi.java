@@ -77,9 +77,7 @@ public class TagApi extends RestBehavior {
   public Tag updateTag(
       @PathVariable @Schema(description = "ID of the tag") String tagId,
       @Valid @RequestBody TagUpdateInput input) {
-    Tag tag = tagRepository.findById(tagId).orElseThrow(ElementNotFoundException::new);
-    tag.setUpdateAttributes(input);
-    return tagRepository.save(tag);
+    return tagService.updateTag(tagId, input);
   }
 
   @Secured(ROLE_ADMIN)
