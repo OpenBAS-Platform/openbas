@@ -21,6 +21,13 @@ public class TagFixture {
     return tag;
   }
 
+  public static Tag getTagWithTextAndColour(String text, String colour) {
+    Tag tag = new Tag();
+    tag.setName(text);
+    tag.setColor(colour);
+    return tag;
+  }
+
   public static Tag getTag(final String id) {
     Tag tag = new Tag();
     tag.setId(id);
