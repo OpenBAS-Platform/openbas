@@ -8,7 +8,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.aop.UserRoleDescription;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
-import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;

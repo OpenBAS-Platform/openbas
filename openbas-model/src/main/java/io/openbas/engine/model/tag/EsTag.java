@@ -7,8 +7,6 @@ import io.openbas.engine.model.EsBase;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @Indexable(index = "tag", label = "Tag")
