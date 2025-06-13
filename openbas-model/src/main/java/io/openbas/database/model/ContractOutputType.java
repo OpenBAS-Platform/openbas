@@ -132,12 +132,7 @@ public enum ContractOutputType {
           jsonNode.get("id") != null
               && jsonNode.get("host") != null
               && jsonNode.get("severity") != null,
-      (JsonNode jsonNode) -> {
-        String id = buildString(jsonNode, "id");
-        String host = buildString(jsonNode, "host");
-        String severity = buildString(jsonNode, "severity");
-        return host + ":" + id + " (" + severity + ")";
-      },
+      (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
         if (jsonNode.get("asset_id") != null) {
           return List.of(jsonNode.get("asset_id").asText());
