@@ -88,7 +88,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_assets':
-      case 'base_endpoint_side':
+      case 'base_asset_side':
         searchEndpointAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });

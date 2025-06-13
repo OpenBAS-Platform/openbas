@@ -1,8 +1,9 @@
-package io.openbas.engine.model.endpoint;
+package io.openbas.engine.model.asset;
 
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.AssetType;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
 import lombok.Getter;
@@ -10,19 +11,27 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Indexable(index = "endpoint", label = "Endpoint")
-public class EsEndpoint extends EsBase {
+@Indexable(index = "asset", label = "Asset")
+public class EsAsset extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */
 
   // -- ASSET GENERIC
-  @Queryable(label = "endpoint name", filterable = true)
+  @Queryable(
+      label = "asset type",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = AssetType.class)
   @EsQueryable(keyword = true)
-  private String endpoint_name;
+  private String asset_type;
 
-  @Queryable(label = "endpoint description", filterable = true)
+  @Queryable(label = "asset description", filterable = true)
   @EsQueryable(keyword = true)
-  private String endpoint_description;
+  private String asset_description;
+
+  @Queryable(label = "asset external reference", filterable = true)
+  @EsQueryable(keyword = true)
+  private String asset_external_reference;
 
   // -- ENDPOINT SPECIFIC --
 
@@ -45,6 +54,15 @@ public class EsEndpoint extends EsBase {
   @Queryable(label = "endpoint mac addresses", filterable = true)
   @EsQueryable(keyword = true)
   private Set<String> endpoint_mac_addresses;
+
+  @Queryable(label = "endpoint seen ip", filterable = true)
+  @EsQueryable(keyword = true)
+  private String endpoint_seen_ip;
+
+  // -- SECURITY PLATFORM SPECIFIC
+  @Queryable(label = "security platform type", filterable = true)
+  @EsQueryable(keyword = true)
+  private String security_platform_type;
 
   // -- SIDE --
 

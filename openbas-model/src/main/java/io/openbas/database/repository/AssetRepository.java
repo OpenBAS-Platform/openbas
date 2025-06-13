@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.raw.RawAsset;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -61,4 +62,24 @@ public interface AssetRepository
               + "WHERE ia.inject_id in :injectIds",
       nativeQuery = true)
   List<Object[]> assetsByInjectIds(Set<String> injectIds);
+
+  @Query(
+      value =
+          "SELECT "
+              // ASSET GENERIC FIELDS
+              + "a.asset_id, a.asset_type, a.asset_name, "
+              + "a.asset_description, a.asset_created_at, a.asset_updated_at, a.asset_external_reference, "
+              // ENDPOINT FIELDS
+              + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, a.endpoint_seen_ip, "
+              + "a.endpoint_mac_addresses,"
+              // SECURITY PLATFORM FIELDS
+              + "a.security_platform_type, a.security_platform_logo_light, a.security_platform_logo_dark, "
+              // relations
+              + "fa.finding_id, at.tag_id "
+              + "FROM assets a "
+              + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
+              + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
+              + "WHERE a.asset_updated_at > :from ORDER BY a.asset_updated_at LIMIT 500;",
+      nativeQuery = true)
+  List<RawAsset> findForIndexing(@Param("from") Instant from);
 }
