@@ -5,7 +5,6 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.annotation.Resource;
 import jakarta.persistence.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +14,7 @@ import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 @Data
 @NoArgsConstructor
@@ -70,16 +70,17 @@ public class SimpleExecutionTrace implements Base {
     return Objects.hash(id);
   }
 
+  @Component
   public static class SimpleExecutionTraceRowMapper implements RowMapper<SimpleExecutionTrace> {
 
-    @Resource protected ObjectMapper mapper;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public SimpleExecutionTrace mapRow(ResultSet rs, int rowNum) throws SQLException {
       SimpleExecutionTrace simpleExecutionTrace = new SimpleExecutionTrace();
       simpleExecutionTrace.setId(rs.getString("execution_trace_id"));
       simpleExecutionTrace.setInjectStatusId(rs.getString("execution_inject_status_id"));
-      simpleExecutionTrace.setInjectTestStatusId(rs.getString("execution_test_inject_status_id"));
+      simpleExecutionTrace.setInjectTestStatusId(rs.getString("execution_inject_test_status_id"));
       simpleExecutionTrace.setAgentId(rs.getString("execution_agent_id"));
       simpleExecutionTrace.setMessage(rs.getString("execution_message"));
       simpleExecutionTrace.setAction(
@@ -89,10 +90,13 @@ public class SimpleExecutionTrace implements Base {
       simpleExecutionTrace.setTime(rs.getTimestamp("execution_time").toInstant());
       simpleExecutionTrace.setCreationDate(rs.getTimestamp("execution_created_at").toInstant());
       simpleExecutionTrace.setUpdateDate(rs.getTimestamp("execution_updated_at").toInstant());
-      simpleExecutionTrace.setIdentifiers((String[]) rs.getArray("execution_trace_id").getArray());
+      simpleExecutionTrace.setIdentifiers(
+          (String[]) rs.getArray("execution_context_identifiers").getArray());
       try {
-        simpleExecutionTrace.setStructuredOutput(
-            (ObjectNode) mapper.readTree(rs.getString("execution_trace_id")));
+        if (rs.getString("execution_structured_output") != null) {
+          simpleExecutionTrace.setStructuredOutput(
+              (ObjectNode) mapper.readTree(rs.getString("execution_structured_output")));
+        }
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }

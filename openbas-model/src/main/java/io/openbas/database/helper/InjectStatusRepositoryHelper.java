@@ -127,7 +127,8 @@ public class InjectStatusRepositoryHelper {
   public Map<String, List<SimpleExecutionTrace>> getSimpleExecutionTracesByInjectStatusId(
       List<String> injectIds) {
     if (!injectIds.isEmpty()) {
-      String query = "SELECT * FROM injects_statuses WHERE status_inject IN (:inject_ids)";
+      String query =
+          "SELECT * FROM execution_traces WHERE execution_traces.execution_inject_status_id IN (:inject_ids)";
 
       MapSqlParameterSource paramValues = new MapSqlParameterSource();
       paramValues.addValue("inject_ids", injectIds);
