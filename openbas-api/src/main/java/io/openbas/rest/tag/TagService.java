@@ -7,10 +7,9 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.tag.form.TagCreateInput;
+import io.openbas.rest.tag.form.TagUpdateInput;
 import java.util.List;
 import java.util.Optional;
-
-import io.openbas.rest.tag.form.TagUpdateInput;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;

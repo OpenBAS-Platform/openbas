@@ -1,10 +1,9 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Statement;
 
 @Component
 public class V3_92__tag_table_timestamps extends BaseJavaMigration {
@@ -17,7 +16,7 @@ public class V3_92__tag_table_timestamps extends BaseJavaMigration {
           """
           ALTER TABLE tags
           ADD COLUMN tag_created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
-          
+
           ALTER TABLE tags
           ADD COLUMN tag_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
           """;
