@@ -343,7 +343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/js-api@npm:^0.8.0-beta.3":
+"@biomejs/js-api@npm:0.8.0-beta.3":
   version: 0.8.0-beta.3
   resolution: "@biomejs/js-api@npm:0.8.0-beta.3"
   peerDependencies:
@@ -361,7 +361,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/wasm-nodejs@npm:^2.0.0-beta.6":
+"@biomejs/wasm-nodejs@npm:2.0.0-beta.6":
   version: 2.0.0-beta.6
   resolution: "@biomejs/wasm-nodejs@npm:2.0.0-beta.6"
   checksum: 10c0/cce971dc448c66f9db24a3f55dda7b369fab634eaad3414c55062c451ecb56a6a523b4e27eee6c7ce297032a625eba85077c6a1f138b8b3e949b32309edd014e
@@ -10003,7 +10003,7 @@ __metadata:
     remark-gfm: "npm:4.0.1"
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.2"
-    swagger-typescript-api: "npm:13.2.0"
+    swagger-typescript-api: "npm:13.2.2"
     tss-react: "npm:4.9.18"
     typescript: "npm:5.8.3"
     typescript-eslint: "npm:8.34.0"
@@ -12137,12 +12137,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-typescript-api@npm:13.2.0":
-  version: 13.2.0
-  resolution: "swagger-typescript-api@npm:13.2.0"
+"swagger-typescript-api@npm:13.2.2":
+  version: 13.2.2
+  resolution: "swagger-typescript-api@npm:13.2.2"
   dependencies:
-    "@biomejs/js-api": "npm:^0.8.0-beta.3"
-    "@biomejs/wasm-nodejs": "npm:^2.0.0-beta.6"
+    "@biomejs/js-api": "npm:0.8.0-beta.3"
+    "@biomejs/wasm-nodejs": "npm:2.0.0-beta.6"
     "@types/swagger-schema-official": "npm:^2.0.25"
     c12: "npm:^3.0.4"
     citty: "npm:^0.1.6"
@@ -12157,7 +12157,7 @@ __metadata:
   bin:
     sta: ./dist/cli.js
     swagger-typescript-api: ./dist/cli.js
-  checksum: 10c0/126914d979ebc43b2fcfb0656a2122fef572a34fb6f26ef7c44f61472d3d0f61d3427b8080a6d3f1bdeef06434e89ee5a99816477cd7536c2315457ef6a7a63b
+  checksum: 10c0/aae350a44489af4ae0aa345bb32d789b779c9f6bd7cb42158f18ce712dec75b1560fedeff0c108d469d9615d195ae9b07dd3e6e6f504378c03e25226243e65c0
   languageName: node
   linkType: hard
 
