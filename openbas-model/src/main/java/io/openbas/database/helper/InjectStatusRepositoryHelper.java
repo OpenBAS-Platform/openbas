@@ -22,7 +22,6 @@ public class InjectStatusRepositoryHelper {
     if (!executionTraceList.isEmpty()) {
       String insertExecutionTraceSQL =
           """
-
                     INSERT INTO execution_traces(
                              execution_action,
                              execution_agent_id,
