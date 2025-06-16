@@ -25,10 +25,11 @@ public class ContractText extends ContractElement {
   }
 
   public static ContractText textField(
-      String key, String label, String defaultValue, List<ContractElement> linkedFields) {
+      String key, String label, String defaultValue, List<ContractElement> visibleConditionFields) {
     ContractText contractText = new ContractText(key, label);
     contractText.setDefaultValue(defaultValue);
-    contractText.setLinkedFields(linkedFields);
+    contractText.setVisibleConditionFields(
+        visibleConditionFields.stream().map(ContractElement::getKey).toList());
     return contractText;
   }
 

@@ -70,7 +70,6 @@ public class ContractDef {
     }
 
     element.setMandatoryConditionFields(List.of(conditionalElement.getKey()));
-    element.setVisibleConditionFields(List.of(conditionalElement.getKey()));
     element.setMandatory(false);
     this.fields.add(element);
     return this;
@@ -90,8 +89,6 @@ public class ContractDef {
     }
 
     element.setMandatoryConditionFields(List.of(conditionalElement.getKey()));
-    element.setMandatoryConditionValues(Map.of(conditionalElement.getKey(), value));
-    element.setVisibleConditionFields(List.of(conditionalElement.getKey()));
     element.setMandatoryConditionValues(Map.of(conditionalElement.getKey(), value));
     element.setMandatory(false);
     this.fields.add(element);
