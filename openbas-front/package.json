@@ -108,7 +108,7 @@
     "globals": "16.2.0",
     "jsdom": "26.1.0",
     "monocart-coverage-reports": "2.12.6",
-    "monocart-reporter": "2.9.20",
+    "monocart-reporter": "2.9.21",
     "swagger-typescript-api": "13.2.0",
     "typescript": "5.8.3",
     "typescript-eslint": "8.34.0",
