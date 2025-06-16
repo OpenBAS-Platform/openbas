@@ -89,7 +89,7 @@
     "@types/react-grid-layout": "^1",
     "@types/react-syntax-highlighter": "15",
     "@typescript-eslint/utils": "8.34.0",
-    "@vitejs/plugin-react": "4.5.1",
+    "@vitejs/plugin-react": "4.5.2",
     "@vitest/eslint-plugin": "1.2.1",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
