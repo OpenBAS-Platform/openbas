@@ -1954,17 +1954,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fontsource/geologica@npm:5.2.5":
-  version: 5.2.5
-  resolution: "@fontsource/geologica@npm:5.2.5"
-  checksum: 10c0/7b5af7d0560ac55a33d4b08d75a36f11c506e8972a6e08877486d699bd9d63f36a41a6a4768b61890268f7e8ac684cfcd03dc71fa3ad96c43b649b33cfdffbb3
+"@fontsource/geologica@npm:5.2.6":
+  version: 5.2.6
+  resolution: "@fontsource/geologica@npm:5.2.6"
+  checksum: 10c0/8cb9a03a95d332dcc9de492d2f841ecdd832e9ef0a03539108cde3b66270c05d143b40fe1db8851f1ae528dc68645081d43a17ddb66b729d608d20162937849d
   languageName: node
   linkType: hard
 
-"@fontsource/ibm-plex-sans@npm:5.2.5":
-  version: 5.2.5
-  resolution: "@fontsource/ibm-plex-sans@npm:5.2.5"
-  checksum: 10c0/27fc8ea1fb0bb58fdcf2b0d95023b442ba632406b8db10826ce0fb9a36d9f84cb31b824a15196f2c1e533438b28a84803265a47df3fdefd2e97322a684518566
+"@fontsource/ibm-plex-sans@npm:5.2.6":
+  version: 5.2.6
+  resolution: "@fontsource/ibm-plex-sans@npm:5.2.6"
+  checksum: 10c0/3dd21b15b0ce4099db26ae711c62a7d4b3a2e185dbfed2374013364269684ffe2ea7af4b9e93cbe4f09b35c8155cef03d60f40a590a233bd45735a5160ffbf8c
   languageName: node
   linkType: hard
 
@@ -9843,8 +9843,8 @@ __metadata:
     "@emotion/styled": "npm:11.14.0"
     "@eslint/js": "npm:9.28.0"
     "@faker-js/faker": "npm:9.8.0"
-    "@fontsource/geologica": "npm:5.2.5"
-    "@fontsource/ibm-plex-sans": "npm:5.2.5"
+    "@fontsource/geologica": "npm:5.2.6"
+    "@fontsource/ibm-plex-sans": "npm:5.2.6"
     "@hookform/resolvers": "npm:5.1.1"
     "@microsoft/fetch-event-source": "npm:2.0.1"
     "@mui/icons-material": "npm:7.1.1"
