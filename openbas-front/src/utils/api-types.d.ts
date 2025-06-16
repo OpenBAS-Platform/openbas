@@ -1788,6 +1788,7 @@ export interface Group {
   group_id: string;
   group_name: string;
   group_organizations?: string[];
+  group_roles?: string[];
   group_users?: string[];
   listened?: boolean;
 }
@@ -3435,6 +3436,25 @@ export interface PageRawPaginationScenario {
   totalPages?: number;
 }
 
+export interface PageRoleOutput {
+  content?: RoleOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageSecurityPlatform {
   content?: SecurityPlatform[];
   empty?: boolean;
@@ -4074,6 +4094,19 @@ export interface ResultDistribution {
   label: string;
   /** @format int32 */
   value: number;
+}
+
+export interface RoleInput {
+  /** @uniqueItems true */
+  role_capabilities?: string[];
+  role_name: string;
+}
+
+export interface RoleOutput {
+  /** @uniqueItems true */
+  role_capabilities?: string[];
+  role_id: string;
+  role_name: string;
 }
 
 export interface RuleAttribute {
@@ -4814,6 +4847,56 @@ export interface User {
   team_exercises_users?: string[];
   /** True if the user is admin */
   user_admin?: boolean;
+  /** @uniqueItems true */
+  user_capabilities?: (
+    | "BYPASS"
+    | "ACCESS_ATOMIC_TESTING"
+    | "MANAGE_ATOMIC_TESTING"
+    | "DELETE_ATOMIC_TESTING"
+    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_SIMULATION"
+    | "MANAGE_SIMULATION"
+    | "DELETE_SIMULATION"
+    | "LAUNCH_SIMULATION"
+    | "ACCESS_SCENARIO"
+    | "MANAGE_SCENARIO"
+    | "DELETE_SCENARIO"
+    | "LAUNCH_SCENARIO"
+    | "ACCESS_TEAMS_AND_PLAYERS"
+    | "MANAGE_TEAMS_AND_PLAYERS"
+    | "DELETE_TEAMS_AND_PLAYERS"
+    | "MANAGE_ASSETS_FROM_TEAMS"
+    | "DELETE_ASSETS_FROM_TEAMS"
+    | "ACCESS_ASSETS"
+    | "MANAGE_ASSETS"
+    | "DELETE_ASSETS"
+    | "ACCESS_PAYLOADS"
+    | "MANAGE_PAYLOADS"
+    | "DELETE_PAYLOADS"
+    | "ACCESS_DASHBOARDS"
+    | "MANAGE_DASHBOARDS"
+    | "DELETE_DASHBOARDS"
+    | "ACCESS_FINDINGS"
+    | "MANAGE_FINDINGS"
+    | "DELETE_FINDINGS"
+    | "ACCESS_DOCUMENTS"
+    | "MANAGE_DOCUMENTS"
+    | "DELETE_DOCUMENTS"
+    | "ACCESS_CHANNELS"
+    | "MANAGE_CHANNELS"
+    | "DELETE_CHANNELS"
+    | "ACCESS_CHALLENGES"
+    | "MANAGE_CHALLENGES"
+    | "DELETE_CHALLENGES"
+    | "ACCESS_LESSONS_LEARNED"
+    | "MANAGE_LESSONS_LEARNED"
+    | "DELETE_LESSONS_LEARNED"
+    | "ACCESS_SECURITY_PLATFORMS"
+    | "MANAGE_SECURITY_PLATFORMS"
+    | "DELETE_SECURITY_PLATFORMS"
+    | "ACCESS_PLATFORM_SETTINGS"
+    | "MANAGE_PLATFORM_SETTINGS"
+  )[];
   /** City of the user */
   user_city?: string;
   user_communications?: string[];
