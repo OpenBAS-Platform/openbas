@@ -13,5 +13,5 @@ public interface RawEndpoint extends RawAsset {
 
   Set<String> getEndpoint_mac_addresses();
 
-  Set<String> getEndpoint_findings();
+  String getEndpoint_seen_ip();
 }

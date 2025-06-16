@@ -3,6 +3,7 @@ package io.openbas.engine.model.endpoint;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.Endpoint;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
 import lombok.Getter;
@@ -24,6 +25,10 @@ public class EsEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String endpoint_description;
 
+  @Queryable(label = "endpoint external reference", filterable = true)
+  @EsQueryable(keyword = true)
+  private String endpoint_external_reference;
+
   // -- ENDPOINT SPECIFIC --
 
   @Queryable(label = "endpoint ips", filterable = true)
@@ -34,11 +39,19 @@ public class EsEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String endpoint_hostname;
 
-  @Queryable(label = "endpoint platform", filterable = true)
+  @Queryable(
+      label = "endpoint platform",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = Endpoint.PLATFORM_TYPE.class)
   @EsQueryable(keyword = true)
   private String endpoint_platform;
 
-  @Queryable(label = "endpoint arch", filterable = true)
+  @Queryable(
+      label = "endpoint arch",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = Endpoint.PLATFORM_ARCH.class)
   @EsQueryable(keyword = true)
   private String endpoint_arch;
 
@@ -46,13 +59,17 @@ public class EsEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private Set<String> endpoint_mac_addresses;
 
+  @Queryable(label = "endpoint seen ip", filterable = true)
+  @EsQueryable(keyword = true)
+  private String endpoint_seen_ip;
+
   // -- SIDE --
 
-  @Queryable(label = "findings", filterable = true)
+  @Queryable(label = "findings")
   @EsQueryable(keyword = true)
   private Set<String> base_findings_side; // Must finish by _side
 
-  @Queryable(label = "tags", filterable = true)
+  @Queryable(label = "tags", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
   private Set<String> base_tags_side; // Must finish by _side
 }

@@ -1,5 +1,6 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.AssetType;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawEndpoint;
 import jakarta.validation.constraints.NotBlank;
@@ -102,12 +103,17 @@ public interface EndpointRepository
 
   @Query(
       value =
-          "SELECT a.asset_id, a.asset_type, a.asset_name, "
+          "SELECT a.asset_id, a.asset_type, a.asset_name, a.asset_external_reference, "
               + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, "
-              + "a.endpoint_mac_addresses, a.asset_created_at, a.asset_updated_at, fa.finding_id "
+              + "a.endpoint_mac_addresses, a.endpoint_seen_ip, a.asset_created_at, a.asset_updated_at, "
+              + "fa.finding_id, at.tag_id "
               + "FROM assets a "
               + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
-              + "WHERE a.asset_updated_at > :from ORDER BY a.asset_updated_at LIMIT 500;",
+              + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
+              + "WHERE a.asset_updated_at > :from AND a.asset_type = '"
+              + AssetType.Values.ENDPOINT_TYPE
+              + "' "
+              + "ORDER BY a.asset_updated_at LIMIT 500;",
       nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
 }
