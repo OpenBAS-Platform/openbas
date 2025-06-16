@@ -83,24 +83,20 @@ public class InjectStatusRepositoryHelper {
                               WHERE status_id IN (:status_ids)
 
                   """;
-      List<MapSqlParameterSource> paramsUpdate = new ArrayList<>();
       for (Map.Entry<ExecutionStatus, List<SimpleInjectStatus>> executionTrace :
           mapInjectStatus.entrySet()) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("current_status_name", executionTrace.getKey().name());
         param.addValue(
             "status_ids",
-            executionTrace.getValue().stream().map(SimpleInjectStatus::getId).toList());
-        paramsUpdate.add(param);
-      }
-      try {
-        jt.batchUpdate(updateInjectStatusSQL, paramsUpdate.toArray(new MapSqlParameterSource[0]));
-      } catch (Exception e) {
-        for (MapSqlParameterSource paramSource : paramsUpdate) {
-          log.error(
-              "Error during update : {}, {}", updateInjectStatusSQL, paramSource.getValues(), e);
+            new ArrayList<>(
+                executionTrace.getValue().stream().map(SimpleInjectStatus::getId).toList()));
+        try {
+          jt.update(updateInjectStatusSQL, param);
+        } catch (Exception e) {
+          log.error("Error during update : {}, {}", updateInjectStatusSQL, param.getValues(), e);
+          throw e;
         }
-        throw e;
       }
 
       String updateInjectUpdateDate =
