@@ -7,12 +7,15 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class InjectStatusRepositoryHelper {
 
   private final NamedParameterJdbcTemplate jt;
@@ -75,10 +78,9 @@ public class InjectStatusRepositoryHelper {
 
       String updateInjectStatusSQL =
           """
-
                         UPDATE injects_statuses SET
                                 tracking_end_date = NOW(),
-                                status_name = :status_name
+                                status_name = :current_status_name
                               WHERE status_id IN (:status_ids)
 
                   """;
@@ -86,12 +88,13 @@ public class InjectStatusRepositoryHelper {
       for (Map.Entry<ExecutionStatus, List<SimpleInjectStatus>> executionTrace :
           mapInjectStatus.entrySet()) {
         MapSqlParameterSource param = new MapSqlParameterSource();
-        param.addValue("status_name", executionTrace.getKey().name());
+        param.addValue("current_status_name", executionTrace.getKey().name());
         param.addValue(
             "status_ids",
             executionTrace.getValue().stream().map(SimpleInjectStatus::getId).toList());
         paramsUpdate.add(param);
       }
+      log.warn("Executing {} with {}", updateInjectStatusSQL, Strings.join(paramsUpdate, ','));
       jt.batchUpdate(updateInjectStatusSQL, paramsUpdate.toArray(new MapSqlParameterSource[0]));
 
       String updateInjectUpdateDate =
