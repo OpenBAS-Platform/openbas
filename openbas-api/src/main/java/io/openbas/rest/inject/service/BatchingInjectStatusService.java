@@ -11,6 +11,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
@@ -122,6 +123,7 @@ public class BatchingInjectStatusService {
     return numberAgent == totalCompleteTrace;
   }
 
+  @Transactional
   public void handleInjectExecutionCallbackList(
       List<InjectExecutionCallback> injectExecutionCallbacks) {
 
