@@ -15,7 +15,7 @@ public enum AssetType {
   }
 
   public static class Values {
-    public static final String ENDPOINT_TYPE= "Endpoint";
-    public static final String SECURITY_PLATFORM_TYPE= "SecurityPlatform";
+    public static final String ENDPOINT_TYPE = "Endpoint";
+    public static final String SECURITY_PLATFORM_TYPE = "SecurityPlatform";
   }
 }
