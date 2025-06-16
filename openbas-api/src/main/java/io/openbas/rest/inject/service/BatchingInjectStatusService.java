@@ -310,8 +310,6 @@ public class BatchingInjectStatusService {
     injectStatusRepositoryHelper.saveFindings(agregatedFindingsToSave);
   }
 
-  public void executeBatching() {}
-
   /**
    * Compute the status using a list of traces. To do that, we count the number of successes,
    * partial, errors and maybe prevented. If we have only success, we're in success. If we only have
@@ -356,9 +354,5 @@ public class BatchingInjectStatusService {
       executionStatus = ExecutionStatus.MAYBE_PARTIAL_PREVENTED;
     }
     return executionStatus;
-  }
-
-  public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses) {
-    return this.injectStatusRepository.saveAll(injectStatuses);
   }
 }
