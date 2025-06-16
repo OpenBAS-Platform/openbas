@@ -93,7 +93,15 @@ public class InjectStatusRepositoryHelper {
             executionTrace.getValue().stream().map(SimpleInjectStatus::getId).toList());
         paramsUpdate.add(param);
       }
-      jt.batchUpdate(updateInjectStatusSQL, paramsUpdate.toArray(new MapSqlParameterSource[0]));
+      try {
+        jt.batchUpdate(updateInjectStatusSQL, paramsUpdate.toArray(new MapSqlParameterSource[0]));
+      } catch (Exception e) {
+        for (MapSqlParameterSource paramSource : paramsUpdate) {
+          log.error(
+              "Error during update : {}, {}", updateInjectStatusSQL, paramSource.getValues(), e);
+        }
+        throw e;
+      }
 
       String updateInjectUpdateDate =
           """
