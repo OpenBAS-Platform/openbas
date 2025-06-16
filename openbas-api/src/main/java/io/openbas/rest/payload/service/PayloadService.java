@@ -1,7 +1,5 @@
 package io.openbas.rest.payload.service;
 
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSETS;
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;

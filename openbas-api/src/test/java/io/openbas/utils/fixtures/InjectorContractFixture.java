@@ -1,6 +1,6 @@
 package io.openbas.utils.fixtures;
 
-import static io.openbas.database.model.InjectorContract.*;
+import static io.openbas.database.model.InjectorContract.CONTRACT_CONTENT_FIELDS;
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractDef.contractBuilder;
 import static io.openbas.injector_contract.fields.ContractAsset.assetField;
@@ -116,21 +116,21 @@ public class InjectorContractFixture {
       throws JsonProcessingException {
     ObjectNode content = mapper.readValue(injectorContract.getContent(), ObjectNode.class);
     List<ContractElement> elements =
-        mapper.convertValue(content.get(CONTACT_CONTENT_FIELDS), new TypeReference<>() {});
+        mapper.convertValue(content.get(CONTRACT_CONTENT_FIELDS), new TypeReference<>() {});
     if (CollectionUtils.isEmpty(elements)) {
       elements = new ArrayList<>();
     }
 
     elements.addAll(contractElements);
 
-    content.set(CONTACT_CONTENT_FIELDS, mapper.valueToTree(elements));
+    content.set(CONTRACT_CONTENT_FIELDS, mapper.valueToTree(elements));
     injectorContract.setContent(mapper.writeValueAsString(content));
     injectorContract.setConvertedContent(content);
   }
 
   public static List<ContractElement> buildAssetField(final boolean mandatory) {
     ContractDef builder = contractBuilder();
-    ContractAsset assetField = assetField(CONTACT_ELEMENT_CONTENT_KEY_ASSETS, "Assets", Multiple);
+    ContractAsset assetField = assetField(Multiple);
     if (mandatory) {
       builder.mandatory(assetField);
     } else {
@@ -140,18 +140,16 @@ public class InjectorContractFixture {
   }
 
   public static List<ContractElement> buildMandatoryGroup() {
-    ContractAsset assetField = assetField(CONTACT_ELEMENT_CONTENT_KEY_ASSETS, "Assets", Multiple);
-    ContractAssetGroup assetGroupField =
-        assetGroupField(CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS, "Asset groups", Multiple);
+    ContractAsset assetField = assetField(Multiple);
+    ContractAssetGroup assetGroupField = assetGroupField(Multiple);
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
     return builder.build();
   }
 
   public static List<ContractElement> buildMandatoryOnCondition() {
-    ContractAsset assetField = assetField(CONTACT_ELEMENT_CONTENT_KEY_ASSETS, "Assets", Multiple);
-    ContractAssetGroup assetGroupField =
-        assetGroupField(CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS, "Asset groups", Multiple);
+    ContractAsset assetField = assetField(Multiple);
+    ContractAssetGroup assetGroupField = assetGroupField(Multiple);
     ContractDef builder = contractBuilder();
     return builder
         .mandatoryOnCondition(assetField, assetGroupField)
@@ -160,9 +158,8 @@ public class InjectorContractFixture {
   }
 
   public static List<ContractElement> buildMandatoryOnConditionValue(@NotBlank final String value) {
-    ContractAsset assetField = assetField(CONTACT_ELEMENT_CONTENT_KEY_ASSETS, "Assets", Multiple);
-    ContractAssetGroup assetGroupField =
-        assetGroupField(CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS, "Asset groups", Multiple);
+    ContractAsset assetField = assetField(Multiple);
+    ContractAssetGroup assetGroupField = assetGroupField(Multiple);
     ContractDef builder = contractBuilder();
     return builder
         .mandatoryOnConditionValue(assetField, assetGroupField, value)

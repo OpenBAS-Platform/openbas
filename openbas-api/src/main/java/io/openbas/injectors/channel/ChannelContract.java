@@ -93,7 +93,8 @@ public class ChannelContract extends Contractor {
             .optional(expectationsField)
             // Emailing zone
             .optional(emailingField)
-            .mandatory(
+            .mandatoryOnCondition(
+                emailingField,
                 textField(
                     "subject",
                     "Subject",

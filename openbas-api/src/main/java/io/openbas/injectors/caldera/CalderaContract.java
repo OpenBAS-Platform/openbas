@@ -1,7 +1,5 @@
 package io.openbas.injectors.caldera;
 
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSETS;
-import static io.openbas.database.model.InjectorContract.CONTACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS;
 import static io.openbas.executors.caldera.service.CalderaExecutorService.toPlatform;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
@@ -93,9 +91,9 @@ public class CalderaContract extends Contractor {
 
   private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {
     // Fields
-    ContractSelect obfuscatorField = obfuscatorField();
     ContractAsset assetField = assetField(Multiple);
     ContractAssetGroup assetGroupField = assetGroupField(Multiple);
+    ContractSelect obfuscatorField = obfuscatorField();
     ContractExpectations expectationsField = expectations();
 
     List<Ability> abilities =

@@ -57,16 +57,16 @@ public class InjectModelHelper {
     for (JsonNode jsonField : contractFields) {
 
       // If field is mandatory
-      if (jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean()) {
+      if (jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY).asBoolean()) {
         isReady =
             isFieldSet(
                 allTeams, teams, assets, assetGroups, jsonField, content, injectContractFields);
       }
 
       // If field is mandatory group
-      if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)) {
+      if (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS)) {
         ArrayNode mandatoryGroups =
-            (ArrayNode) jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS);
+            (ArrayNode) jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS);
         if (!mandatoryGroups.isEmpty()) {
           boolean atLeastOneSet = false;
           for (JsonNode mandatoryFieldKey : mandatoryGroups) {
@@ -76,7 +76,7 @@ public class InjectModelHelper {
                         jsonNode ->
                             mandatoryFieldKey
                                 .asText()
-                              .equals(jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
+                                .equals(jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
                     .findFirst();
             if (groupField.isPresent()
                 && isFieldSet(
@@ -99,77 +99,66 @@ public class InjectModelHelper {
 
       // If field is mandatory conditional, if the conditional field is set, check if the current
       // field is set
-      if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS)) {
-        JsonNode fields = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS);
-        List<String> values = new ArrayList<>();
+      if (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS)) {
+        JsonNode fields = jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS);
+
         if (fields.isArray()) {
           for (JsonNode node : fields) {
             if (!node.isNull()) {
-              values.add(node.get(CONTACT_ELEMENT_CONTENT_KEY).asText());
-            }
-          }
-        }
-        Optional<JsonNode> conditionalFieldOpt =
-            contractFields.stream()
-                .filter(
-                    jsonNode -> values.contains(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
-                .findFirst();
+              String fieldKey = node.asText();
 
-        // If field not exists -> skip
-        if (conditionalFieldOpt.isEmpty()) {
-          continue;
-        }
+              Optional<JsonNode> conditionalFieldOpt =
+                  contractFields.stream()
+                      .filter(
+                          jsonNode ->
+                              fieldKey.equals(jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
+                      .findFirst();
 
-        JsonNode conditionalField = conditionalFieldOpt.get();
+              // If field not exists -> skip
+              if (conditionalFieldOpt.isEmpty()) {
+                continue;
+              }
+              if (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES)) {
+                JsonNode conditionalValuesNode =
+                    jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES);
 
-        boolean conditionalFieldIsSet =
-            isFieldSet(
-                allTeams,
-                teams,
-                assets,
-                assetGroups,
-                conditionalField,
-                content,
-                injectContractFields);
+                if (conditionalValuesNode.has(fieldKey)) {
+                  String specificValuesNode = conditionalValuesNode.get(fieldKey).asText();
 
-        // If condition field not set -> skip
-        if (!conditionalFieldIsSet) {
-          continue;
-        }
+                  List<String> actualValues =
+                      getFieldValue(teams, assets, assetGroups, conditionalFieldOpt.get(), content);
+                  boolean conditionMet = actualValues.contains(specificValuesNode);
 
-        // If a specific value is required on conditional field
-        if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES)) {
-          JsonNode jsonFields = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES);
-          List<String> expectedValues = new ArrayList<>();
-          if (jsonFields.isArray()) {
-            for (JsonNode node : jsonFields) {
-              if (!node.isNull()) {
-                expectedValues.add(node.asText());
+                  if (!conditionMet) {
+                    continue; // condition not met → skip
+                  }
+                }
+              }
+              Optional<JsonNode> fieldOpt =
+                  contractFields.stream()
+                      .filter(
+                          jsonNode ->
+                              jsonField
+                                  .get(CONTRACT_ELEMENT_CONTENT_KEY)
+                                  .asText()
+                                  .equals(jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
+                      .findFirst();
+              // If field not exists -> skip
+              if (fieldOpt.isEmpty()) {
+                continue;
+              }
+              if (!isFieldSet(
+                  allTeams,
+                  teams,
+                  assets,
+                  assetGroups,
+                  fieldOpt.get(),
+                  content,
+                  injectContractFields)) {
+                isReady = false;
               }
             }
           }
-          List<String> actualValues =
-              getFieldValue(teams, assets, assetGroups, conditionalField, content);
-
-          boolean conditionMet = false;
-          for (String expectedValue : expectedValues) {
-            if (actualValues.contains(expectedValue)) {
-              conditionMet = true;
-              break;
-            }
-          }
-
-          if (!conditionMet) {
-            continue; // condition not met → skip
-          }
-        }
-
-        // if field is mandatory conditional on a specific value and this value is equals, check the
-        // field is set
-        if (!isFieldSet(
-            allTeams, teams, assets, assetGroups, jsonField, content, injectContractFields)) {
-          isReady = false;
-          break;
         }
       }
       if (!isReady) {
@@ -298,7 +287,7 @@ public class InjectModelHelper {
         }
       }
 
-      case CONTACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP -> {
+      case CONTRACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP -> {
         if (assetGroups.isEmpty()) {
           isSet = false;
         }
@@ -329,12 +318,12 @@ public class InjectModelHelper {
       @NotNull final ObjectNode content) {
 
     String key = jsonField.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
-    String type = jsonField.get(CONTACT_ELEMENT_CONTENT_TYPE).asText();
+    String type = jsonField.get(CONTRACT_ELEMENT_CONTENT_TYPE).asText();
 
     return switch (type) {
-      case CONTACT_ELEMENT_CONTENT_TYPE_TEAM -> teams;
-      case CONTACT_ELEMENT_CONTENT_TYPE_ASSET -> assets;
-      case CONTACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP -> assetGroups;
+      case CONTRACT_ELEMENT_CONTENT_TYPE_TEAM -> teams;
+      case CONTRACT_ELEMENT_CONTENT_TYPE_ASSET -> assets;
+      case CONTRACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP -> assetGroups;
       default -> {
         if (content == null || content.get(key) == null || content.get(key).isNull()) {
           yield List.of();

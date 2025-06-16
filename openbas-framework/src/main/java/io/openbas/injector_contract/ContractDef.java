@@ -4,6 +4,7 @@ import io.openbas.injector_contract.fields.ContractElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ContractDef {
 
@@ -68,7 +69,8 @@ public class ContractDef {
       throw new IllegalArgumentException("Fields cannot be null");
     }
 
-    element.setMandatoryConditionFields(List.of(conditionalElement));
+    element.setMandatoryConditionFields(List.of(conditionalElement.getKey()));
+    element.setVisibleConditionFields(List.of(conditionalElement.getKey()));
     element.setMandatory(false);
     this.fields.add(element);
     return this;
@@ -87,8 +89,10 @@ public class ContractDef {
       throw new IllegalArgumentException("Fields cannot be null");
     }
 
-    element.setMandatoryConditionFields(List.of(conditionalElement));
-    element.setMandatoryConditionValues(List.of(value));
+    element.setMandatoryConditionFields(List.of(conditionalElement.getKey()));
+    element.setMandatoryConditionValues(Map.of(conditionalElement.getKey(), value));
+    element.setVisibleConditionFields(List.of(conditionalElement.getKey()));
+    element.setMandatoryConditionValues(Map.of(conditionalElement.getKey(), value));
     element.setMandatory(false);
     this.fields.add(element);
     return this;

@@ -171,14 +171,14 @@ public class InjectorContract implements Base {
 
   // -- INJECTOR CONTRACT CONTENT --
 
-  public static final String CONTACT_CONTENT_FIELDS = "fields";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE = "type";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS =
+  public static final String CONTRACT_CONTENT_FIELDS = "fields";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY = "key";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE = "type";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_FIELDS =
       "mandatoryConditionFields";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES =
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUES =
       "mandatoryConditionValues";
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 
@@ -190,9 +190,9 @@ public class InjectorContract implements Base {
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_ATTACHMENTS = "attachments";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS = "expectations";
 
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP = "asset-group";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE_ASSET_GROUP = "asset-group";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
 
   public static final List<String> CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC =
       List.of(

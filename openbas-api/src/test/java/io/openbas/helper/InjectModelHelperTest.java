@@ -214,8 +214,9 @@ class InjectModelHelperTest {
     class MandatoryOnConditionTests {
 
       @Test
-      void given_an_injector_contract_with_mandatory_on_condition_and_no_element_should_be_ready()
-          throws JsonProcessingException {
+      void
+          given_an_injector_contract_with_mandatory_on_condition_and_no_element_should_not_be_ready()
+              throws JsonProcessingException {
         // -- PREPARE --
         InjectorContract injectorContract = prepareInjectorContract();
         addField(injectorContract, mapper, buildMandatoryOnCondition());
@@ -235,7 +236,7 @@ class InjectModelHelperTest {
                 assetGroups);
 
         // -- ASSERT --
-        assertTrue(isReady);
+        assertFalse(isReady);
       }
 
       @Test
