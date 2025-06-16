@@ -18,7 +18,7 @@ import org.hibernate.annotations.Type;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@DiscriminatorValue(AssetType.Values.SECURITY_PLATFORM_TYPE)
+@DiscriminatorValue(AssetType.Values.ENDPOINT_TYPE)
 @EntityListeners(ModelBaseListener.class)
 public class Endpoint extends Asset {
 
