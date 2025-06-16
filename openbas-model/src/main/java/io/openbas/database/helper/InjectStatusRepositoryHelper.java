@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -94,7 +93,6 @@ public class InjectStatusRepositoryHelper {
             executionTrace.getValue().stream().map(SimpleInjectStatus::getId).toList());
         paramsUpdate.add(param);
       }
-      log.warn("Executing {} with {}", updateInjectStatusSQL, Strings.join(paramsUpdate, ','));
       jt.batchUpdate(updateInjectStatusSQL, paramsUpdate.toArray(new MapSqlParameterSource[0]));
 
       String updateInjectUpdateDate =

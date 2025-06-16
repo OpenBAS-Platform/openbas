@@ -268,7 +268,7 @@ public class BatchQueueService<T> {
    * Process messages in the queue buffer. It will only process as many messages as what's
    * configures in openbas.queue-config.<name of the queue>.max-size
    */
-  protected void processBufferedBatch() {
+  public void processBufferedBatch() {
     if (insertInProgress.compareAndSet(false, true)) {
       do {
         // Draining the queue into the list with a max size

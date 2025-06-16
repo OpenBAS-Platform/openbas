@@ -11,7 +11,6 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
@@ -123,7 +122,6 @@ public class BatchingInjectStatusService {
     return numberAgent == totalCompleteTrace;
   }
 
-  @Transactional
   public void handleInjectExecutionCallbackList(
       List<InjectExecutionCallback> injectExecutionCallbacks) {
 
@@ -309,6 +307,8 @@ public class BatchingInjectStatusService {
     // Before Saving the finding, we need to check if it exists or not
     injectStatusRepositoryHelper.saveFindings(agregatedFindingsToSave);
   }
+
+  public void executeBatching() {}
 
   /**
    * Compute the status using a list of traces. To do that, we count the number of successes,

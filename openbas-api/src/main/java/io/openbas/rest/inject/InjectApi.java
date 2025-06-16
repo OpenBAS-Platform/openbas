@@ -20,6 +20,7 @@ import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.queue.BatchQueueService;
+import io.openbas.rest.helper.queue.executor.BatchExecutionTraceExecutor;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
@@ -78,8 +79,8 @@ public class InjectApi extends RestBehavior {
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final TargetService targetService;
-  private final BatchingInjectStatusService batchingInjectStatusService;
   private final UserRepository userRepository;
+  private final BatchExecutionTraceExecutor batchExecutionTraceExecutor;
 
   private final RabbitmqConfig rabbitmqConfig;
   private final OpenBASConfig openBASConfig;
@@ -94,7 +95,7 @@ public class InjectApi extends RestBehavior {
     injectTraceQueueService =
         new BatchQueueService<>(
             InjectExecutionCallback.class,
-            batchingInjectStatusService::handleInjectExecutionCallbackList,
+            batchExecutionTraceExecutor::handleInjectExecutionCallbackList,
             rabbitmqConfig,
             objectMapper,
             openBASConfig.getQueueConfig().get("inject-trace"));
