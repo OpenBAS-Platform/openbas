@@ -15,11 +15,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@DiscriminatorValue(SecurityPlatform.SECURITY_PLATFORM_TYPE)
+@DiscriminatorValue(AssetType.Values.SECURITY_PLATFORM_TYPE)
 @EntityListeners(ModelBaseListener.class)
 public class SecurityPlatform extends Asset {
-
-  public static final String SECURITY_PLATFORM_TYPE = "SecurityPlatform";
 
   public enum SECURITY_PLATFORM_TYPE {
     @JsonProperty("EDR")
