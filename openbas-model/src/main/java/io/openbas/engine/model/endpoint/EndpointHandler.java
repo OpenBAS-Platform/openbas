@@ -55,7 +55,7 @@ public class EndpointHandler implements Handler<EsEndpoint> {
               }
               if (!(endpoint.getAsset_tags() == null) && !endpoint.getAsset_tags().isEmpty()) {
                 dependencies.addAll(endpoint.getAsset_tags());
-                esEndpoint.setBase_findings_side(endpoint.getAsset_tags());
+                esEndpoint.setBase_tags_side(endpoint.getAsset_tags());
               }
               esEndpoint.setBase_dependencies(dependencies);
               return esEndpoint;
