@@ -14,7 +14,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
 import java.util.Optional;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -64,7 +63,6 @@ public class WithMockPlannerUserSecurityContextFactory
       newGroup.setName(groupName);
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
-      Hibernate.initialize(newGroup.getRoles());
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();
