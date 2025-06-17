@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class WithMockPlannerUserSecurityContextFactory
@@ -41,7 +42,8 @@ public class WithMockPlannerUserSecurityContextFactory
   }
 
   @PostConstruct
-  private void postConstruct() {
+  @Transactional
+  public void postConstruct() {
     this.createPlannerMockUser();
   }
 
@@ -73,6 +75,7 @@ public class WithMockPlannerUserSecurityContextFactory
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
+      Hibernate.initialize(group.getRoles());
     }
     // Create user
     Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
@@ -80,7 +83,6 @@ public class WithMockPlannerUserSecurityContextFactory
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_PLANNER_EMAIL);
-      user.getGroups().forEach(g -> Hibernate.initialize(g.getRoles()));
       this.userRepository.save(user);
     }
   }
