@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.AssetType;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawEndpoint;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -113,7 +114,7 @@ public interface EndpointRepository
               + "WHERE a.asset_updated_at > :from AND a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "' "
-              + "ORDER BY a.asset_updated_at LIMIT 500;",
+              + "ORDER BY a.asset_updated_at LIMIT " + Constants.INDEXING_RECORD_SET_SIZE + ";",
       nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
 }
