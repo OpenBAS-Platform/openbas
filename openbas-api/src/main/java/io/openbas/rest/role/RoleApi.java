@@ -3,7 +3,6 @@ package io.openbas.rest.role;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.aop.UserRoleDescription;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.role.form.RoleInput;
 import io.openbas.rest.role.form.RoleMapper;
@@ -43,14 +42,16 @@ public class RoleApi {
   @GetMapping(RoleApi.ROLE_URI + "/{roleId}")
   @Operation(description = "Get Role by Id", summary = "Get Role")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "Role found"),
-                  @ApiResponse(responseCode = "404", description = "Role not found")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "Role found"),
+        @ApiResponse(responseCode = "404", description = "Role not found")
+      })
   public RoleOutput findRole(
       @PathVariable @NotBlank @Schema(description = "ID of the role") final String roleId) {
-    return roleService.findById(roleId).map(roleMapper::toRoleOutput)
-            .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
+    return roleService
+        .findById(roleId)
+        .map(roleMapper::toRoleOutput)
+        .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
   }
 
   @LogExecutionTime
@@ -81,10 +82,11 @@ public class RoleApi {
   @PostMapping(RoleApi.ROLE_URI)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create Role")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Role created"),
-          @ApiResponse(responseCode = "409", description = "Role already exists")
-  })
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Role created"),
+        @ApiResponse(responseCode = "409", description = "Role already exists")
+      })
   public RoleOutput createRole(@Valid @RequestBody final RoleInput input) {
     return roleMapper.toRoleOutput(
         roleService.createRole(input.getName(), input.getCapabilities()));

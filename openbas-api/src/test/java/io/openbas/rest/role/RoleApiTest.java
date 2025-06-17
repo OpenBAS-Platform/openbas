@@ -97,10 +97,8 @@ public class RoleApiTest extends IntegrationTest {
   void test_findRole_WHEN_role_doesnt_exist() throws Exception {
 
     // Find call
-            mvc.perform(get(ROLE_URI + "/randomid")
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isNotFound());
-
+    mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
   }
 
   @Test
