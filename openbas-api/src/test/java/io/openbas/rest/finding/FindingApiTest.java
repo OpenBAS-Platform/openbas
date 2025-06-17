@@ -351,6 +351,46 @@ class FindingApiTest extends IntegrationTest {
     }
 
     @Nested
+    @DisplayName("When searching for findings on simulation")
+    class WhenSearchingForFindingsOnSimulation {
+      @Test
+      @DisplayName("Returns all findings for observed simulation")
+      public void ReturnsAllFindingsForObservedSimulation() throws Exception {
+        ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
+        scenarioWrapper.persist();
+
+        Exercise ex = scenarioWrapper.get().getExercises().getFirst();
+
+        SearchPaginationInput input = PaginationFixture.getDefault().build();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            performCallbackRequest(FINDING_URI + "/exercises/" + ex.getId() + "/search", input)
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FindingOutput> expectedFindings =
+            fromIterable(
+                    findingRepository.findAllById(
+                        ex.getInjects().stream()
+                            .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
+                            .toList()))
+                .stream()
+                .map(findingMapper::toFindingOutput)
+                .limit(input.getSize())
+                .toList();
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("content")
+            .isEqualTo(mapper.writeValueAsString(expectedFindings));
+      }
+    }
+
+    @Nested
     @DisplayName("When searching for findings on inject")
     class WhenSearchingForFindingsOnInject {
       @Test
@@ -591,46 +631,6 @@ class FindingApiTest extends IntegrationTest {
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
-                            .toList()))
-                .stream()
-                .map(findingMapper::toFindingOutput)
-                .limit(input.getSize())
-                .toList();
-
-        assertThatJson(response)
-            .when(Option.IGNORING_ARRAY_ORDER)
-            .node("content")
-            .isEqualTo(mapper.writeValueAsString(expectedFindings));
-      }
-    }
-
-    @Nested
-    @DisplayName("When searching for findings on simulation")
-    class WhenSearchingForFindingsOnSimulation {
-      @Test
-      @DisplayName("Returns all findings for observed simulation")
-      public void ReturnsAllFindingsForObservedSimulation() throws Exception {
-        ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
-        scenarioWrapper.persist();
-
-        Exercise ex = scenarioWrapper.get().getExercises().getFirst();
-
-        SearchPaginationInput input = PaginationFixture.getDefault().build();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        String response =
-            performCallbackRequest(FINDING_URI + "/exercises/" + ex.getId() + "/search", input)
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        List<FindingOutput> expectedFindings =
-            fromIterable(
-                    findingRepository.findAllById(
-                        ex.getInjects().stream()
-                            .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
                             .toList()))
                 .stream()
                 .map(findingMapper::toFindingOutput)

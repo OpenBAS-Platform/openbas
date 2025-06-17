@@ -134,8 +134,17 @@ public enum ContractOutputType {
               && jsonNode.get("severity") != null,
       (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
-        if (jsonNode.get("asset_id") != null) {
-          return List.of(jsonNode.get("asset_id").asText());
+        JsonNode assetIdNode = jsonNode.get("asset_id");
+        if (assetIdNode != null) {
+          if (assetIdNode.isArray()) {
+            List<String> result = new ArrayList<>();
+            for (JsonNode idNode : assetIdNode) {
+              result.add(idNode.asText());
+            }
+            return result;
+          } else {
+            return List.of(assetIdNode.asText());
+          }
         }
         return new ArrayList<>();
       },
