@@ -80,7 +80,6 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE exercises ALTER COLUMN exercise_created_at TYPE timestamp with time zone USING exercise_created_at::timestamp with time zone;
                   ALTER TABLE exercises ALTER COLUMN exercise_end_date TYPE timestamp with time zone USING exercise_end_date::timestamp with time zone;
                   ALTER TABLE exercises ALTER COLUMN exercise_pause_date TYPE timestamp with time zone USING exercise_pause_date::timestamp with time zone;
-                  ALTER TABLE exercises ALTER COLUMN exercise_start_date TYPE timestamp with time zone USING exercise_start_date::timestamp with time zone;
 
                   ALTER TABLE findings ALTER COLUMN finding_created_at TYPE timestamp with time zone USING finding_created_at::timestamp with time zone;
                   ALTER TABLE findings ALTER COLUMN finding_updated_at TYPE timestamp with time zone USING finding_updated_at::timestamp with time zone;
@@ -158,11 +157,11 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE output_parsers ALTER COLUMN output_parser_created_at TYPE timestamp with time zone USING output_parser_created_at::timestamp with time zone;
                   ALTER TABLE output_parsers ALTER COLUMN output_parser_updated_at TYPE timestamp with time zone USING output_parser_updated_at::timestamp with time zone;
 
-                  ALTER TABLE regex_groups ALTER COLUMN payload_created_at TYPE timestamp with time zone USING payload_created_at::timestamp with time zone;
-                  ALTER TABLE regex_groups ALTER COLUMN payload_updated_at TYPE timestamp with time zone USING payload_updated_at::timestamp with time zone;
+                  ALTER TABLE regex_groups ALTER COLUMN regex_group_created_at TYPE timestamp with time zone USING regex_group_created_at::timestamp with time zone;
+                  ALTER TABLE regex_groups ALTER COLUMN regex_group_updated_at TYPE timestamp with time zone USING regex_group_updated_at::timestamp with time zone;
 
-                  ALTER TABLE payloads ALTER COLUMN regex_group_created_at TYPE timestamp with time zone USING regex_group_created_at::timestamp with time zone;
-                  ALTER TABLE payloads ALTER COLUMN regex_group_updated_at TYPE timestamp with time zone USING regex_group_updated_at::timestamp with time zone;
+                  ALTER TABLE payloads ALTER COLUMN payload_created_at TYPE timestamp with time zone USING payload_created_at::timestamp with time zone;
+                  ALTER TABLE payloads ALTER COLUMN payload_updated_at TYPE timestamp with time zone USING payload_updated_at::timestamp with time zone;
 
                   ALTER TABLE reports ALTER COLUMN report_created_at TYPE timestamp with time zone USING report_created_at::timestamp with time zone;
                   ALTER TABLE reports ALTER COLUMN report_updated_at TYPE timestamp with time zone USING report_updated_at::timestamp with time zone;
@@ -174,9 +173,6 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE scenarios ALTER COLUMN scenario_updated_at TYPE timestamp with time zone USING scenario_updated_at::timestamp with time zone;
                   ALTER TABLE scenarios ALTER COLUMN scenario_recurrence_end TYPE timestamp with time zone USING scenario_recurrence_end::timestamp with time zone;
                   ALTER TABLE scenarios ALTER COLUMN scenario_recurrence_start TYPE timestamp with time zone USING scenario_recurrence_start::timestamp with time zone;
-
-                  ALTER TABLE tags ALTER COLUMN tag_created_at TYPE timestamp with time zone USING tag_created_at::timestamp with time zone;
-                  ALTER TABLE tags ALTER COLUMN tag_updated_at TYPE timestamp with time zone USING tag_updated_at::timestamp with time zone;
 
                   ALTER TABLE teams ALTER COLUMN team_created_at TYPE timestamp with time zone USING team_created_at::timestamp with time zone;
                   ALTER TABLE teams ALTER COLUMN team_updated_at TYPE timestamp with time zone USING team_updated_at::timestamp with time zone;
@@ -190,7 +186,7 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE variables ALTER COLUMN variable_updated_at TYPE timestamp with time zone USING variable_updated_at::timestamp with time zone;
 
                   ALTER TABLE widgets ALTER COLUMN widget_created_at TYPE timestamp with time zone USING widget_created_at::timestamp with time zone;
-                  ALTER TABLE variables ALTER COLUMN widget_updated_at TYPE timestamp with time zone USING widget_updated_at::timestamp with time zone;
+                  ALTER TABLE widgets ALTER COLUMN widget_updated_at TYPE timestamp with time zone USING widget_updated_at::timestamp with time zone;
               """);
     }
   }
