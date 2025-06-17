@@ -15,8 +15,6 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
           """
                   ALTER TABLE agents ALTER COLUMN agent_created_at type timestamp with time zone using agent_created_at::timestamp with time zone;
                   ALTER TABLE agents ALTER COLUMN agent_updated_at type timestamp with time zone using agent_updated_at::timestamp with time zone;
-                  ALTER TABLE agents ALTER COLUMN agent_cleared_at type timestamp with time zone using agent_cleared_at::timestamp with time zone;
-                  ALTER TABLE agents ALTER COLUMN agent_last_seen type timestamp with time zone using agent_last_seen::timestamp with time zone;
 
                   ALTER TABLE articles ALTER COLUMN article_created_at type timestamp with time zone using article_created_at::timestamp with time zone;
                   ALTER TABLE articles ALTER COLUMN article_updated_at type timestamp with time zone using article_updated_at::timestamp with time zone;
@@ -46,40 +44,22 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE channels ALTER COLUMN channel_updated_at TYPE timestamp with time zone USING channel_updated_at::timestamp with time zone;
 
                   ALTER TABLE collectors ALTER COLUMN collector_created_at TYPE timestamp with time zone USING collector_created_at::timestamp with time zone;
-                  ALTER TABLE collectors ALTER COLUMN collector_last_execution TYPE timestamp with time zone USING collector_last_execution::timestamp with time zone;
                   ALTER TABLE collectors ALTER COLUMN collector_updated_at TYPE timestamp with time zone USING collector_updated_at::timestamp with time zone;
-
-                  ALTER TABLE comchecks ALTER COLUMN comcheck_end_date TYPE timestamp with time zone USING comcheck_end_date::timestamp with time zone;
-                  ALTER TABLE comchecks ALTER COLUMN comcheck_start_date TYPE timestamp with time zone USING comcheck_start_date::timestamp with time zone;
-
-                  ALTER TABLE comchecks_statuses ALTER COLUMN status_receive_date TYPE timestamp with time zone USING status_receive_date::timestamp with time zone;
-                  ALTER TABLE comchecks_statuses ALTER COLUMN status_sent_date TYPE timestamp with time zone USING status_sent_date::timestamp with time zone;
-
-                  ALTER TABLE communications ALTER COLUMN communication_received_at TYPE timestamp with time zone USING communication_received_at::timestamp with time zone;
-                  ALTER TABLE communications ALTER COLUMN communication_sent_at TYPE timestamp with time zone USING communication_sent_at::timestamp with time zone;
-
-                  ALTER TABLE contract_output_elements ALTER COLUMN contract_output_element_created_at TYPE timestamp with time zone USING contract_output_element_created_at::timestamp with time zone;
-                  ALTER TABLE contract_output_elements ALTER COLUMN contract_output_element_updated_at TYPE timestamp with time zone USING contract_output_element_updated_at::timestamp with time zone;
 
                   ALTER TABLE custom_dashboards ALTER COLUMN custom_dashboard_created_at TYPE timestamp with time zone USING custom_dashboard_created_at::timestamp with time zone;
                   ALTER TABLE custom_dashboards ALTER COLUMN custom_dashboard_updated_at TYPE timestamp with time zone USING custom_dashboard_updated_at::timestamp with time zone;
-
-                  ALTER TABLE communications ALTER COLUMN communication_received_at TYPE timestamp with time zone USING communication_received_at::timestamp with time zone;
-                  ALTER TABLE communications ALTER COLUMN communication_sent_at TYPE timestamp with time zone USING communication_sent_at::timestamp with time zone;
 
                   ALTER TABLE evaluations ALTER COLUMN evaluation_created_at TYPE timestamp with time zone USING evaluation_created_at::timestamp with time zone;
                   ALTER TABLE evaluations ALTER COLUMN evaluation_updated_at TYPE timestamp with time zone USING evaluation_updated_at::timestamp with time zone;
 
                   ALTER TABLE execution_traces ALTER COLUMN execution_created_at TYPE timestamp with time zone USING execution_created_at::timestamp with time zone;
-                  ALTER TABLE execution_traces ALTER COLUMN execution_time TYPE timestamp with time zone USING execution_time::timestamp with time zone;
                   ALTER TABLE execution_traces ALTER COLUMN execution_updated_at TYPE timestamp with time zone USING execution_updated_at::timestamp with time zone;
 
                   ALTER TABLE executors ALTER COLUMN executor_created_at TYPE timestamp with time zone USING executor_created_at::timestamp with time zone;
                   ALTER TABLE executors ALTER COLUMN executor_updated_at TYPE timestamp with time zone USING executor_updated_at::timestamp with time zone;
 
                   ALTER TABLE exercises ALTER COLUMN exercise_created_at TYPE timestamp with time zone USING exercise_created_at::timestamp with time zone;
-                  ALTER TABLE exercises ALTER COLUMN exercise_end_date TYPE timestamp with time zone USING exercise_end_date::timestamp with time zone;
-                  ALTER TABLE exercises ALTER COLUMN exercise_pause_date TYPE timestamp with time zone USING exercise_pause_date::timestamp with time zone;
+                  ALTER TABLE exercises ALTER COLUMN exercise_updated_at TYPE timestamp with time zone USING exercise_updated_at::timestamp with time zone;
 
                   ALTER TABLE findings ALTER COLUMN finding_created_at TYPE timestamp with time zone USING finding_created_at::timestamp with time zone;
                   ALTER TABLE findings ALTER COLUMN finding_updated_at TYPE timestamp with time zone USING finding_updated_at::timestamp with time zone;
@@ -100,7 +80,6 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE injectors_contracts ALTER COLUMN injector_contract_updated_at TYPE timestamp with time zone USING injector_contract_updated_at::timestamp with time zone;
 
                   ALTER TABLE injects ALTER COLUMN inject_created_at TYPE timestamp with time zone USING inject_created_at::timestamp with time zone;
-                  ALTER TABLE injects ALTER COLUMN inject_trigger_now_date TYPE timestamp with time zone USING inject_trigger_now_date::timestamp with time zone;
                   ALTER TABLE injects ALTER COLUMN inject_updated_at TYPE timestamp with time zone USING inject_updated_at::timestamp with time zone;
 
                   ALTER TABLE injects_dependencies ALTER COLUMN dependency_created_at TYPE timestamp with time zone USING dependency_created_at::timestamp with time zone;
@@ -110,16 +89,10 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
                   ALTER TABLE injects_expectations ALTER COLUMN inject_expectation_updated_at TYPE timestamp with time zone USING inject_expectation_updated_at::timestamp with time zone;
 
                   ALTER TABLE injects_expectations_traces ALTER COLUMN inject_expectation_trace_created_at TYPE timestamp with time zone USING inject_expectation_trace_created_at::timestamp with time zone;
-                  ALTER TABLE injects_expectations_traces ALTER COLUMN inject_expectation_trace_date TYPE timestamp with time zone USING inject_expectation_trace_date::timestamp with time zone;
                   ALTER TABLE injects_expectations_traces ALTER COLUMN inject_expectation_trace_updated_at TYPE timestamp with time zone USING inject_expectation_trace_updated_at::timestamp with time zone;
-
-                  ALTER TABLE injects_statuses ALTER COLUMN tracking_end_date TYPE timestamp with time zone USING tracking_end_date::timestamp with time zone;
-                  ALTER TABLE injects_statuses ALTER COLUMN tracking_sent_date TYPE timestamp with time zone USING tracking_sent_date::timestamp with time zone;
 
                   ALTER TABLE injects_tests_statuses ALTER COLUMN status_created_at TYPE timestamp with time zone USING status_created_at::timestamp with time zone;
                   ALTER TABLE injects_tests_statuses ALTER COLUMN status_updated_at TYPE timestamp with time zone USING status_updated_at::timestamp with time zone;
-                  ALTER TABLE injects_tests_statuses ALTER COLUMN tracking_end_date TYPE timestamp with time zone USING tracking_end_date::timestamp with time zone;
-                  ALTER TABLE injects_tests_statuses ALTER COLUMN tracking_sent_date TYPE timestamp with time zone USING tracking_sent_date::timestamp with time zone;
 
                   ALTER TABLE kill_chain_phases ALTER COLUMN phase_created_at TYPE timestamp with time zone USING phase_created_at::timestamp with time zone;
                   ALTER TABLE kill_chain_phases ALTER COLUMN phase_updated_at TYPE timestamp with time zone USING phase_updated_at::timestamp with time zone;
@@ -171,8 +144,6 @@ public class V3_93__Alter_Creation_Date_With_Time_Zone extends BaseJavaMigration
 
                   ALTER TABLE scenarios ALTER COLUMN scenario_created_at TYPE timestamp with time zone USING scenario_created_at::timestamp with time zone;
                   ALTER TABLE scenarios ALTER COLUMN scenario_updated_at TYPE timestamp with time zone USING scenario_updated_at::timestamp with time zone;
-                  ALTER TABLE scenarios ALTER COLUMN scenario_recurrence_end TYPE timestamp with time zone USING scenario_recurrence_end::timestamp with time zone;
-                  ALTER TABLE scenarios ALTER COLUMN scenario_recurrence_start TYPE timestamp with time zone USING scenario_recurrence_start::timestamp with time zone;
 
                   ALTER TABLE teams ALTER COLUMN team_created_at TYPE timestamp with time zone USING team_created_at::timestamp with time zone;
                   ALTER TABLE teams ALTER COLUMN team_updated_at TYPE timestamp with time zone USING team_updated_at::timestamp with time zone;
