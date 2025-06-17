@@ -75,7 +75,7 @@ public class RoleService {
               try {
                 return Capability.valueOf(value);
               } catch (IllegalArgumentException e) {
-                throw new UnsupportedOperationException("Invalid capability: " + value);
+                throw new UnsupportedOperationException("Invalid capability: " + value, e);
               }
             })
         .collect(Collectors.toSet());

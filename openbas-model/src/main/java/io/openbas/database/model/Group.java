@@ -91,7 +91,7 @@ public class Group implements Base {
   private List<Organization> organizations = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "groups_roles",
       joinColumns = @JoinColumn(name = "group_id"),

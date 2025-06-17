@@ -94,6 +94,17 @@ public class RoleApiTest extends IntegrationTest {
 
   @Test
   @WithMockAdminUser
+  void test_findRole_WHEN_role_doesnt_exist() throws Exception {
+
+    // Find call
+            mvc.perform(get(ROLE_URI + "/randomid")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound());
+
+  }
+
+  @Test
+  @WithMockAdminUser
   void test_updateRole() throws Exception {
     String updatedRoleName = "roleNameUpdated";
     Role savedRole = roleRepository.save(RoleFixture.getRole());
