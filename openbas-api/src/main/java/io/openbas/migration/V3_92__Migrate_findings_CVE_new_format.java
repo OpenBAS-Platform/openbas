@@ -14,6 +14,11 @@ public class V3_92__Migrate_findings_CVE_new_format extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
 
+    // ES
+    statement.executeUpdate("DELETE FROM indexing_status WHERE indexing_status_type = 'finding';");
+
+    // POSTGRES - FINDINGS
+
     // 1. Drop the unique constraint
     statement.executeUpdate(
         "ALTER TABLE findings " + "DROP CONSTRAINT IF EXISTS unique_finding_constraint;");

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openbas.config.EngineConfig;
+import io.openbas.database.repository.IndexingStatusRepository;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.model.EsBase;
@@ -26,10 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +59,7 @@ public class ElasticDriver {
 
   private EsEngine esEngine;
   private final EngineConfig config;
+  private final IndexingStatusRepository indexingStatusRepository;
 
   @Autowired
   public void setEsEngine(EsEngine esEngine) {
@@ -304,6 +303,11 @@ public class ElasticDriver {
             esModel -> {
               Map<String, Property> mappings = mappingGeneratorForClass(esModel);
               try {
+                // Cleanup old index
+                if (indexingStatusRepository.findByType(esModel.getName()).isEmpty()) {
+                  log.info("Cleanup old Index {}", esModel.getName());
+                  cleanUpIndex(esModel.getName(), elasticClient);
+                }
                 log.info("Creating Index {}", esModel.getName());
                 createIndex(elasticClient, esModel.getName(), ES_MODEL_VERSION, mappings);
               } catch (IOException e) {
@@ -311,5 +315,29 @@ public class ElasticDriver {
               }
             });
     return elasticClient;
+  }
+
+  public void cleanUpIndex(String indexName, ElasticsearchClient client) throws IOException {
+    try {
+      String fullIndexName = config.getIndexPrefix() + "_" + indexName;
+      String fullIndexWithSuffix = fullIndexName + config.getIndexSuffix();
+
+      // 1. Delete index and alias if they exist
+      try {
+        client.indices().delete(d -> d.index(fullIndexWithSuffix));
+        log.info("Deleted index: {}", fullIndexWithSuffix);
+      } catch (ElasticsearchException e) {
+        log.warn("Index {} does not exist or already deleted", fullIndexWithSuffix);
+      }
+      // 2. Delete index template
+      try {
+        client.indices().deleteIndexTemplate(d -> d.name(fullIndexName));
+        log.info("Deleted index template: {}", fullIndexName);
+      } catch (ElasticsearchException e) {
+        log.warn("Index template {} does not exist or already deleted", fullIndexName);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to delete index " + indexName, e);
+    }
   }
 }
