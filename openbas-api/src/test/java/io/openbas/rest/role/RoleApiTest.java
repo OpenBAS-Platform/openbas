@@ -94,15 +94,6 @@ public class RoleApiTest extends IntegrationTest {
 
   @Test
   @WithMockAdminUser
-  void test_findRole_WHEN_role_doesnt_exist() throws Exception {
-
-    // Find call
-    mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNotFound());
-  }
-
-  @Test
-  @WithMockAdminUser
   void test_updateRole() throws Exception {
     String updatedRoleName = "roleNameUpdated";
     Role savedRole = roleRepository.save(RoleFixture.getRole());
@@ -223,14 +214,7 @@ public class RoleApiTest extends IntegrationTest {
   @WithMockAdminUser
   void test_findRole_WITH_nonexistent_id() throws Exception {
 
-    String response =
-        mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertEquals("", response);
+    mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
   }
 }
