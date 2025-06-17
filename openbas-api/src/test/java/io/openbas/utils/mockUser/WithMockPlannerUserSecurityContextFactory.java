@@ -80,6 +80,7 @@ public class WithMockPlannerUserSecurityContextFactory
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_PLANNER_EMAIL);
+      user.getGroups().forEach(g -> Hibernate.initialize(g.getRoles()));
       this.userRepository.save(user);
     }
   }
