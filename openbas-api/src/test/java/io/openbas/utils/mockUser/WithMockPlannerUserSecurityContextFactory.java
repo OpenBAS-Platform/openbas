@@ -64,12 +64,12 @@ public class WithMockPlannerUserSecurityContextFactory
       newGroup.setName(groupName);
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
-      Hibernate.initialize(newGroup.getRoles());
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();
       grant.setName(PLANNER);
       grant.setGroup(group);
+      Hibernate.initialize(group.getRoles());
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
