@@ -195,6 +195,7 @@ public class EndpointService {
       @NotBlank final String endpointId, @NotNull final EndpointInput input) {
     Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
+    toUpdate.setEoL(input.isEol());
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return updateEndpoint(toUpdate);
   }
