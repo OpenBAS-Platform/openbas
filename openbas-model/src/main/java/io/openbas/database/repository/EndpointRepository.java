@@ -114,7 +114,9 @@ public interface EndpointRepository
               + "WHERE a.asset_updated_at > :from AND a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "' "
-              + "ORDER BY a.asset_updated_at LIMIT " + Constants.INDEXING_RECORD_SET_SIZE + ";",
+              + "ORDER BY a.asset_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
 }

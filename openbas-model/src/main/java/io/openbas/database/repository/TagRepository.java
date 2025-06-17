@@ -2,11 +2,10 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawTag;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import io.openbas.utils.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -31,7 +30,9 @@ public interface TagRepository extends CrudRepository<Tag, String>, JpaSpecifica
           "SELECT t.tag_id, t.tag_name, t.tag_color, "
               + "t.tag_created_at, t.tag_updated_at "
               + "FROM tags t "
-              + "WHERE t.tag_updated_at > :from ORDER BY t.tag_updated_at LIMIT " + Constants.INDEXING_RECORD_SET_SIZE + ";",
+              + "WHERE t.tag_updated_at > :from ORDER BY t.tag_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawTag> findForIndexing(@Param("from") Instant from);
 }

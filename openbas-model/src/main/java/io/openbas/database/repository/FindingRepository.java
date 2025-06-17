@@ -40,7 +40,9 @@ public interface FindingRepository
               + "LEFT JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "LEFT JOIN scenarios_exercises se ON i.inject_exercise = se.exercise_id "
               + "LEFT JOIN findings_assets fa ON f.finding_id = fa.finding_id "
-              + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT " + Constants.INDEXING_RECORD_SET_SIZE + ";",
+              + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawFinding> findForIndexing(@Param("from") Instant from);
 }
