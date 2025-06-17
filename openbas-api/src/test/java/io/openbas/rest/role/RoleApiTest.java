@@ -214,14 +214,7 @@ public class RoleApiTest extends IntegrationTest {
   @WithMockAdminUser
   void test_findRole_WITH_nonexistent_id() throws Exception {
 
-    String response =
-        mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertEquals("", response);
+    mvc.perform(get(ROLE_URI + "/randomid").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
   }
 }
