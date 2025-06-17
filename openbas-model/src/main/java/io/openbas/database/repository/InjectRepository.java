@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectIndexing;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,9 @@ public interface InjectRepository
               + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
               + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
               + "LEFT JOIN attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
-              + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT 500 ",
+              + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawInjectIndexing> findForIndexing(@Param("from") Instant from);
 

@@ -35,7 +35,8 @@ const useStyles = makeStyles()(theme => ({
 
 const availableFilters = new Map([
   ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at']],
-  ['finding', ['base_created_at', 'finding_type', 'base_updated_at']],
+  ['finding', ['base_created_at', 'finding_type', 'base_updated_at', 'base_endpoint_side']],
+  ['endpoint', ['endpoint_arch', 'endpoint_platform', 'endpoint_ips', 'endpoint_hostname']],
 ]);
 
 const WidgetCreationSeries: FunctionComponent<{

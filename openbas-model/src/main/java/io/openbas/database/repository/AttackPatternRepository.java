@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.raw.RawAttackPattern;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -41,7 +42,9 @@ public interface AttackPatternRepository
               + " ap.attack_pattern_created_at, ap.attack_pattern_updated_at, ap.attack_pattern_parent, apkcp.phase_id AS attack_pattern_kill_chain_phases "
               + "FROM attack_patterns ap "
               + "LEFT JOIN attack_patterns_kill_chain_phases apkcp ON apkcp.attack_pattern_id = ap.attack_pattern_id "
-              + "WHERE ap.attack_pattern_updated_at > :from ORDER BY ap.attack_pattern_updated_at LIMIT 500;",
+              + "WHERE ap.attack_pattern_updated_at > :from ORDER BY ap.attack_pattern_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawAttackPattern> findForIndexing(@Param("from") Instant from);
 }

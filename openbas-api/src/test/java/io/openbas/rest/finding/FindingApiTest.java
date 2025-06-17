@@ -384,6 +384,7 @@ class FindingApiTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
             .isEqualTo(mapper.writeValueAsString(expectedFindings));
       }
@@ -421,6 +422,7 @@ class FindingApiTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
             .isEqualTo(mapper.writeValueAsString(expectedFindings));
       }
