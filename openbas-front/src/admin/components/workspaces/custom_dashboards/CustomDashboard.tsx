@@ -78,6 +78,22 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
         }),
       ),
     );
+    setCustomDashboardValue(prev => prev && {
+      ...prev,
+      custom_dashboard_widgets: prev.custom_dashboard_widgets?.map((widget) => {
+        const existingLayout = layouts.find(x => x.i === widget.widget_id)!;
+        if (!existingLayout) return widget;
+        return {
+          ...widget,
+          widget_layout: {
+            widget_layout_x: existingLayout.x,
+            widget_layout_y: existingLayout.y,
+            widget_layout_w: existingLayout.w,
+            widget_layout_h: existingLayout.h,
+          },
+        };
+      }),
+    });
   };
 
   return (
