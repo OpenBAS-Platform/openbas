@@ -16,14 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class WithMockPlannerUserSecurityContextFactory
@@ -44,9 +41,7 @@ public class WithMockPlannerUserSecurityContextFactory
   }
 
   @PostConstruct
-  @EventListener(ApplicationReadyEvent.class)
-  @Transactional
-  public void postConstruct() {
+  private void postConstruct() {
     this.createPlannerMockUser();
   }
 
@@ -69,16 +64,15 @@ public class WithMockPlannerUserSecurityContextFactory
       newGroup.setName(groupName);
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
+      Hibernate.initialize(newGroup.getRoles());
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();
       grant.setName(PLANNER);
       grant.setGroup(group);
-      Hibernate.initialize(group.getRoles());
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
-      Hibernate.initialize(group.getRoles());
     }
     // Create user
     Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
