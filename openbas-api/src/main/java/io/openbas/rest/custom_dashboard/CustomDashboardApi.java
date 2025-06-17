@@ -1,13 +1,21 @@
 package io.openbas.rest.custom_dashboard;
 
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.engine.api.CustomDashboardTimeRange;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardTimeFilterInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +36,13 @@ public class CustomDashboardApi extends RestBehavior {
   @PostMapping
   public ResponseEntity<CustomDashboard> createCustomDashboard(
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
+    CustomDashboard customDashboard = new CustomDashboard();
+    customDashboard.setTimeRange(CustomDashboardTimeRange.LAST_QUARTER);
+    customDashboard.setStartDate(Instant.now().minus(Duration.ofDays(90)));
+    customDashboard.setEndDate(Instant.now());
     return ResponseEntity.ok(
         this.customDashboardService.createCustomDashboard(
-            input.toCustomDashboard(new CustomDashboard())));
+            input.toCustomDashboard(customDashboard)));
   }
 
   @GetMapping
@@ -67,4 +79,20 @@ public class CustomDashboardApi extends RestBehavior {
     this.customDashboardService.deleteCustomDashboard(customDashboardId);
     return ResponseEntity.noContent().build();
   }
+
+  // -- TIME FILTERS--
+
+  @PutMapping("/{customDashboardId}/time")
+  public ResponseEntity<CustomDashboard> updateCustomDashboardTimeFilter(
+      @PathVariable @NotBlank final String customDashboardId,
+      @RequestBody @NotNull CustomDashboardTimeFilterInput timeFilterInput) {
+    CustomDashboard existingCustomDashboard =
+        this.customDashboardService.customDashboard(customDashboardId);
+    existingCustomDashboard.setTimeRange(timeFilterInput.getTimeRange());
+    existingCustomDashboard.setStartDate(timeFilterInput.getStartDate());
+    existingCustomDashboard.setEndDate(timeFilterInput.getEndDate());
+    return ResponseEntity.ok(
+        this.customDashboardService.updateCustomDashboard(existingCustomDashboard));
+  }
+
 }

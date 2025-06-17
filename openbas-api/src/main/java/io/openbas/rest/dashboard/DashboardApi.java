@@ -13,11 +13,13 @@ import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EsService;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,15 +56,9 @@ public class DashboardApi extends RestBehavior {
     Widget widget = this.widgetService.widget(widgetId);
     if (DateHistogramWidget.TEMPORAL_MODE.equals(widget.getHistogramWidget().getMode())) {
       DateHistogramWidget config = (DateHistogramWidget) widget.getHistogramWidget();
-      Map<String, String> parameters = new HashMap<>();
-      Instant end = Instant.now();
-      Instant start = end.minus(30, ChronoUnit.DAYS);
-      // FIXME: date is hardcoded
-      parameters.put("$start", start.toString());
-      parameters.put("$end", end.toString());
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-      DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
-      return esService.multiDateHistogram(userWithAuth, runtime);
+      DateHistogramRuntime runtime = new DateHistogramRuntime(config);
+      return esService.multiDateHistogram(userWithAuth, runtime, widget.getCustomDashboard());
     } else if (StructuralHistogramWidget.STRUCTURAL_MODE.equals(
         widget.getHistogramWidget().getMode())) {
       StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();

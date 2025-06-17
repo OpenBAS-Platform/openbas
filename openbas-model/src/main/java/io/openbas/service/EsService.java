@@ -14,6 +14,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
+import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.raw.RawUserAuth;
@@ -32,6 +33,7 @@ import io.openbas.schema.PropertySchema;
 import io.openbas.schema.SchemaUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -39,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -335,10 +338,28 @@ public class EsService {
 
   public EsSeries termHistogram(
       RawUserAuth user,
+      /*CustomDashboard dashboardConfig,*/
       StructuralHistogramWidget widgetConfig,
       StructuralHistogramSeries config,
       Map<String, String> parameters) {
+
+    /*BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Instant start = dashboardConfig.getStartDate();
+    Instant end = dashboardConfig.getEndDate();
+    Query dateRangeQuery =
+        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(String.valueOf(start)).lt(String.valueOf(end)))
+            ._toRangeQuery()
+            ._toQuery();*/
+
     Query query = buildQuery(user, null, config.getFilter(), parameters);
+
+    /*Query filterQuery = buildQuery(user, null, config.getFilter(), parameters);
+    Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
+    ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
+    bounds.min(FieldDateMath.of(m -> m.value((double) dashboardConfig.getStartDate().toEpochMilli())));
+    bounds.max(FieldDateMath.of(m -> m.value((double) dashboardConfig.getEndDate().toEpochMilli())));
+    ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();*/
+
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
@@ -438,23 +459,22 @@ public class EsService {
 
   public EsSeries dateHistogram(
       RawUserAuth user,
+      CustomDashboard dashboardConfig,
       DateHistogramWidget widgetConfig,
       DateHistogramSeries config,
       Map<String, String> parameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
-    Instant startInstant = Instant.parse(start);
-    String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
-    Instant endInstant = Instant.parse(end);
+    Instant start = dashboardConfig.getStartDate();
+    Instant end = dashboardConfig.getEndDate();
     Query dateRangeQuery =
-        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
+        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(String.valueOf(start)).lt(String.valueOf(end)))
             ._toRangeQuery()
             ._toQuery();
     Query filterQuery = buildQuery(user, null, config.getFilter(), parameters);
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
+    bounds.min(FieldDateMath.of(m -> m.value((double) dashboardConfig.getStartDate().toEpochMilli())));
+    bounds.max(FieldDateMath.of(m -> m.value((double) dashboardConfig.getEndDate().toEpochMilli())));
     ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
     try {
       String aggregationKey = "date_histogram";
@@ -492,11 +512,12 @@ public class EsService {
     return new EsSeries(config.getName());
   }
 
-  public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
+  public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime,
+      CustomDashboard customDashboard) {
     Map<String, String> parameters = runtime.getParameters();
     return runtime.getWidget().getSeries().stream()
         .parallel()
-        .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters))
+        .map(c -> dateHistogram(user, customDashboard, runtime.getWidget(), c, parameters))
         .toList();
   }
 

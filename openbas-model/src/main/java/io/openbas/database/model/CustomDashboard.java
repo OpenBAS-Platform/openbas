@@ -7,12 +7,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.engine.api.CustomDashboardTimeRange;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.List;
+
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -46,6 +49,20 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_widgets")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Widget> widgets;
+
+  @Column(name = "custom_dashboard_time_range")
+  @JsonProperty("custom_dashboard_time_range")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private CustomDashboardTimeRange timeRange;
+
+  @Column(name = "custom_dashboard_start_date")
+  @JsonProperty("custom_dashboard_start_date")
+  private Instant startDate;
+
+  @Column(name = "custom_dashboard_end_date")
+  @JsonProperty("custom_dashboard_end_date")
+  private Instant endDate;
 
   // -- AUDIT --
 
