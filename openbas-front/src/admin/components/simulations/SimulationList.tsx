@@ -124,7 +124,7 @@ const SimulationList: FunctionComponent<Props> = ({
       field: 'exercise_status',
       label: 'Status',
       isSortable: true,
-      value: (exercise: ExerciseSimple) => <ExerciseStatus variant="list" exerciseStatus={exercise.exercise_status} />,
+      value: (exercise: ExerciseSimple) => <ExerciseStatus variant="list" exerciseStartDate={exercise.exercise_start_date} exerciseStatus={exercise.exercise_status} />,
     },
     {
       field: 'exercise_targets',
