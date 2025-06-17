@@ -1206,6 +1206,7 @@ export interface Endpoint {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"
@@ -1232,6 +1233,8 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
+  /** True if the endpoint is in an End of Life or End of Sale state */
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"
@@ -1303,6 +1306,8 @@ export interface EndpointOverviewOutput {
    * @uniqueItems true
    */
   endpoint_ips?: string[];
+  /** True if the endpoint is in an End of Life or End of Sale state */
+  endpoint_is_eol?: boolean;
   /**
    * List of MAC addresses
    * @uniqueItems true
@@ -1339,6 +1344,8 @@ export interface EndpointRegisterInput {
    * @minItems 1
    */
   endpoint_ips: string[];
+  /** True if the endpoint is in an End of Life or End of Sale state */
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"

@@ -93,6 +93,10 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
 
+  @Column(name = "endpoint_is_eol")
+  @JsonProperty("endpoint_is_eol")
+  private boolean isEoL;
+
   @OneToMany(
       mappedBy = "asset",
       fetch = FetchType.EAGER,

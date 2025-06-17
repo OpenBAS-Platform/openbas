@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import AddressesFieldComponent from '../../../../components/fields/AddressesFieldComponent';
 import SelectFieldController from '../../../../components/fields/SelectFieldController';
+import SwitchFieldController from '../../../../components/fields/SwitchFieldController';
 import TagFieldController from '../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
@@ -63,6 +64,7 @@ const EndpointForm: FunctionComponent<Props> = ({
         endpoint_platform: z.enum(['Linux', 'Windows', 'MacOS', 'Container', 'Service', 'Generic', 'Internal', 'Unknown']),
         endpoint_arch: z.enum(['x86_64', 'arm64', 'Unknown']),
         endpoint_agent_version: z.string().optional(),
+        endpoint_is_eol: z.boolean().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -176,6 +178,7 @@ const EndpointForm: FunctionComponent<Props> = ({
         <AddressesFieldComponent name="endpoint_ips" helperText="Please provide one IP address per line." label={t('IP Addresses')} required />
         <AddressesFieldComponent name="endpoint_mac_addresses" helperText="Please provide one MAC address per line." label={t('MAC Addresses')} />
         <TagFieldController name="asset_tags" label={t('Tags')} />
+        <SwitchFieldController name="endpoint_is_eol" label={t('End of Life/End of Sale')} />
         <div style={{ alignSelf: 'flex-end' }}>
           <Button
             variant="contained"

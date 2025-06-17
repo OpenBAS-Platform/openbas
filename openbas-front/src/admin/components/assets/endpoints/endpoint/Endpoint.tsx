@@ -26,7 +26,7 @@ const useStyles = makeStyles()(theme => ({
   },
   endpointInformationContainer: {
     'display': 'grid',
-    'gridTemplateColumns': '1fr 1fr 1fr 1fr',
+    'gridTemplateColumns': '1fr 1fr 1fr 1fr 1fr',
     '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
   },
 }));
@@ -86,6 +86,7 @@ const Endpoint = () => {
         <Typography variant="h3" gutterBottom>{t('Hostname')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Seen IP address')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Platform')}</Typography>
+        <Typography variant="h3" gutterBottom>{t('End of Life/End of Sale')}</Typography>
 
         <ExpandableMarkdown source={endpoint.asset_description} limit={300} />
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_hostname)}</Typography>
@@ -95,11 +96,13 @@ const Endpoint = () => {
           &nbsp;
           {endpoint.endpoint_platform}
         </span>
+        <Typography variant="body2" gutterBottom>{endpoint.endpoint_is_eol ? t('Yes') : t('No')}</Typography>
 
         <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
         <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
+        <Typography variant="h3" gutterBottom></Typography>
 
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_arch)}</Typography>
         <div style={{
