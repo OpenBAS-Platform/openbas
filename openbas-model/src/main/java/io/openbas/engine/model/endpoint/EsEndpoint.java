@@ -65,7 +65,7 @@ public class EsEndpoint extends EsBase {
 
   // -- SIDE --
 
-  @Queryable(label = "findings")
+  @Queryable(label = "findings", filterable = true)
   @EsQueryable(keyword = true)
   private Set<String> base_findings_side; // Must finish by _side
 

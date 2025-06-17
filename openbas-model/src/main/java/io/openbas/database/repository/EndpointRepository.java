@@ -107,13 +107,15 @@ public interface EndpointRepository
           "SELECT a.asset_id, a.asset_type, a.asset_name, a.asset_external_reference, "
               + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, "
               + "a.endpoint_mac_addresses, a.endpoint_seen_ip, a.asset_created_at, a.asset_updated_at, "
-              + "fa.finding_id, at.tag_id "
+              + "array_agg(fa.finding_id) FILTER ( WHERE fa.finding_id IS NOT NULL ) as asset_findings, "
+              + "array_agg(at.tag_id) FILTER ( WHERE at.tag_id IS NOT NULL ) as asset_tags "
               + "FROM assets a "
               + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
               + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
               + "WHERE a.asset_updated_at > :from AND a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "' "
+              + "GROUP BY a.asset_id, a.asset_updated_at "
               + "ORDER BY a.asset_updated_at LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
