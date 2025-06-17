@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +44,7 @@ public class WithMockPlannerUserSecurityContextFactory
   }
 
   @PostConstruct
+  @EventListener(ApplicationReadyEvent.class)
   @Transactional
   public void postConstruct() {
     this.createPlannerMockUser();
