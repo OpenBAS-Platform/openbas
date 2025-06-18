@@ -17,10 +17,10 @@ type Props = {
 };
 
 export const inlineStyles: Record<string, CSSProperties> = {
-    asset_name: { width: '25%' },
+    endpoint_name: { width: '25%' },
     endpoint_active: { width: '10%' },
     endpoint_agents_privilege: { width: '12%' },
-    asset_platform: {
+    endpoint_platform: {
         width: '10%',
         display: 'flex',
         alignItems: 'center',
@@ -31,7 +31,14 @@ export const inlineStyles: Record<string, CSSProperties> = {
         display: 'flex',
         alignItems: 'center',
     },
-    asset_tags: { width: '15%' },
+    base_tags_side: { width: '15%' },
+    base_entity: { display: "none" },
+    base_id: { display: "none" },
+    base_representative: { display: "none" },
+    base_restrictions: { display: "none" },
+    base_dependencies: { display: "none" },
+    endpoint_ips: { display: "none" },
+    endpoint_mac_addresses: { display: "none" },
 };
 
 const EndpointElement = (props: Props) => {
@@ -55,32 +62,20 @@ const EndpointElement = (props: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
-  const headers = [
-    {
-      field: EndpointListItemFragments.ASSET_NAME,
-      label: 'Name',
-      isSortable: true,
-      value: (endpoint: EsEndpoint) => <AssetNameFragment endpoint={endpoint} />,
-    },
-    {
-      field: EndpointListItemFragments.ASSET_PLATFORM,
-      label: 'Platform',
-      isSortable: true,
-      value: (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />,
-    },
-      {
-          field: EndpointListItemFragments.ENDPOINT_ARCH,
-          label: 'Architecture',
-          isSortable: true,
-          value: (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />,
-      },
-    {
-      field: EndpointListItemFragments.ASSET_TAGS,
-      label: 'Tags',
-      isSortable: false,
-      value: (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />,
-    },
-  ];
+  const elementsFromColumn = (column: string) => {
+    switch (column) {
+        case 'endpoint_name':
+        case EndpointListItemFragments.ASSET_NAME:  return (endpoint: EsEndpoint) => <AssetNameFragment endpoint={endpoint} />;
+        case 'endpoint_platform':
+        case EndpointListItemFragments.ASSET_PLATFORM:  return (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />;
+        case EndpointListItemFragments.ENDPOINT_ARCH:  return (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />;
+        case EndpointListItemFragments.ASSET_TAGS:  return (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />;
+        default: return (endpoint: EsEndpoint) => {
+            let key = column as keyof typeof endpoint;
+            return endpoint[key];
+        };
+    }
+  }
 
   return (
     <>
@@ -93,15 +88,15 @@ const EndpointElement = (props: Props) => {
           <ListItemText
               primary={(
                   <div style={bodyItemsStyles.bodyItems}>
-                      {headers.map(header => (
+                      {props.columns.map(col => (
                           <div
-                              key={header.field}
+                              key={col}
                               style={{
                                   ...bodyItemsStyles.bodyItem,
-                                  ...inlineStyles[header.field],
+                                  ...inlineStyles[col],
                               }}
                           >
-                              {header.value(props.element)}
+                              {elementsFromColumn(col)(props.element)}
                           </div>
                       ))}
                   </div>

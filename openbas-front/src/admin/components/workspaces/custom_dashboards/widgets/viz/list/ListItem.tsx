@@ -2,6 +2,7 @@ import { ListItem as MuiListItem } from '@mui/material';
 
 import { type EsBase, type EsEndpoint } from '../../../../../../../utils/api-types';
 import EndpointElement from './elements/EndpointElement';
+import DefaultElement from "./elements/DefaultElement";
 
 type Props = {
   columns: string[];
@@ -11,14 +12,7 @@ type Props = {
 const getTypedUiElement = (element: EsBase, columns: string[]) => {
   switch (element.base_entity) {
     case 'endpoint': return (<EndpointElement element={element as EsEndpoint} columns={columns} />);
-    default: return (
-      <div>
-        {element.base_entity}
-        :
-        {' '}
-        {element.base_representative}
-      </div>
-    );
+    default: return (<DefaultElement columns={columns} element={element} />);
   }
 };
 

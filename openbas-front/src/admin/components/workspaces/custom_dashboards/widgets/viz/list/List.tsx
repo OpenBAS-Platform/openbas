@@ -50,7 +50,7 @@ const List = (props: Props) => {
     <MuiList>
       <MuiListItem
           classes={{ root: classes.itemHead }}
-          style={{ paddingTop: 0 }}
+          style={{ paddingTop: 0, overflow: "hidden" }}
           secondaryAction={<>&nbsp;</>}
       >
         <ListItemIcon />
