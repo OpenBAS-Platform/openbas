@@ -19,15 +19,13 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -351,6 +349,48 @@ class FindingApiTest extends IntegrationTest {
     }
 
     @Nested
+    @DisplayName("When searching for findings on simulation")
+    class WhenSearchingForFindingsOnSimulation {
+      @Test
+      @DisplayName("Returns all findings for observed simulation")
+      public void ReturnsAllFindingsForObservedSimulation() throws Exception {
+        ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
+        scenarioWrapper.persist();
+
+        Exercise ex = scenarioWrapper.get().getExercises().getFirst();
+
+        SearchPaginationInput input = PaginationFixture.getDefault().build();
+        input.setSorts(List.of(new SortField("finding_created_at", "asc")));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String response =
+            performCallbackRequest(FINDING_URI + "/exercises/" + ex.getId() + "/search", input)
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<FindingOutput> expectedFindings =
+            fromIterable(
+                    findingRepository.findAllById(
+                        ex.getInjects().stream()
+                            .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
+                            .toList()))
+                .stream()
+                .map(findingMapper::toFindingOutput)
+                .sorted(Comparator.comparing(FindingOutput::getCreationDate))
+                .limit(input.getSize())
+                .toList();
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("content")
+            .isEqualTo(mapper.writeValueAsString(expectedFindings));
+      }
+    }
+
+    @Nested
     @DisplayName("When searching for findings on inject")
     class WhenSearchingForFindingsOnInject {
       @Test
@@ -376,46 +416,6 @@ class FindingApiTest extends IntegrationTest {
             fromIterable(
                     findingRepository.findAllById(
                         inject.getFindings().stream().map(Finding::getId).toList()))
-                .stream()
-                .map(findingMapper::toFindingOutput)
-                .limit(input.getSize())
-                .toList();
-
-        assertThatJson(response)
-            .when(Option.IGNORING_ARRAY_ORDER)
-            .node("content")
-            .isEqualTo(mapper.writeValueAsString(expectedFindings));
-      }
-    }
-
-    @Nested
-    @DisplayName("When searching for findings on simulation")
-    class WhenSearchingForFindingsOnSimulation {
-      @Test
-      @DisplayName("Returns all findings for observed simulation")
-      public void ReturnsAllFindingsForObservedSimulation() throws Exception {
-        ScenarioComposer.Composer scenarioWrapper = getScenarioWithSimulationsWrapper();
-        scenarioWrapper.persist();
-
-        Exercise ex = scenarioWrapper.get().getExercises().getFirst();
-
-        SearchPaginationInput input = PaginationFixture.getDefault().build();
-
-        entityManager.flush();
-        entityManager.clear();
-
-        String response =
-            performCallbackRequest(FINDING_URI + "/exercises/" + ex.getId() + "/search", input)
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        List<FindingOutput> expectedFindings =
-            fromIterable(
-                    findingRepository.findAllById(
-                        ex.getInjects().stream()
-                            .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
-                            .toList()))
                 .stream()
                 .map(findingMapper::toFindingOutput)
                 .limit(input.getSize())
