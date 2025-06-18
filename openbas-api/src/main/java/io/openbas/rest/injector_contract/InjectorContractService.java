@@ -215,11 +215,16 @@ public class InjectorContractService {
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
           JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
           if (!defaultValueNode.isNull() && !defaultValueNode.asText().isEmpty()) {
-            String cardinality = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY).asText();
-            if (cardinality.equals(ContractCardinality.Multiple.name())) {
-              injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
+            JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
+            if (!cardinalityValueNode.isNull() && !cardinalityValueNode.asText().isEmpty()) {
+              String cardinality = cardinalityValueNode.asText();
+              if (cardinality.equals(ContractCardinality.Multiple.name())) {
+                injectContent.set(key, defaultValueNode);
+              } else {
+                injectContent.set(key, defaultValueNode.get(0));
+              }
             } else {
-              injectContent.set(key, field.get(DEFAULT_VALUE_FIELD).get(0));
+              injectContent.set(key, defaultValueNode);
             }
           }
         }
