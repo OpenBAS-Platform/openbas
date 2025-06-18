@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -210,9 +211,13 @@ public class InjectorContractService {
 
       for (JsonNode field : fieldsNode) {
         String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-        if (!CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
-            && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
-          injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
+        if (!CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key) && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
+          String cardinality = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY).asText();
+          if (cardinality.equals(ContractCardinality.Multiple.name())) {
+            injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
+          } else {
+            injectContent.set(key, field.get(DEFAULT_VALUE_FIELD).get(0));
+          }
         }
       }
 
