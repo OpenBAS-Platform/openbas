@@ -11,6 +11,7 @@ import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.ContractCardinality;
+import io.openbas.injector_contract.fields.ContractElement;
 import io.openbas.injector_contract.fields.ContractSelect;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class InjectorContractFixture {
   }
 
   private static InjectorContract createPayloadInjectorContractInternal(
-      Injector injector, Payload payloadCommand, List<ContractSelect> customContent)
+      Injector injector, Payload payloadCommand, List<ContractElement> customContent)
       throws JsonProcessingException {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setInjector(injector);

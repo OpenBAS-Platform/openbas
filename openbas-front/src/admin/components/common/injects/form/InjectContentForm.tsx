@@ -196,12 +196,12 @@ const InjectContentForm = ({
       show: fieldsMap.has('team'),
     },
     {
-      title: t('Targeted assets'),
+      title: t('Source assets'),
       render: renderTargetedAssets,
       show: fieldsMap.has('asset'),
     },
     {
-      title: t('Targeted asset groups'),
+      title: t('Source asset groups'),
       render: renderTargetedAssetGroups,
       show: fieldsMap.has('asset-group'),
     },

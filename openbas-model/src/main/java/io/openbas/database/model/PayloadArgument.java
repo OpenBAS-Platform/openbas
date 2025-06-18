@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-@Getter
-@Setter
 public class PayloadArgument {
   @NotBlank
   @JsonProperty("type")

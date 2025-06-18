@@ -149,7 +149,7 @@ const InjectContentFieldComponent = ({
         return (
           < >
             <Typography variant="h5">
-              {`${t('Remote Asset')} - ${field.key.split('.').at(-1)} ${field.mandatory ? '*' : ''}`}
+              {`${t('Targeted assets')} - ${field.key.split('.').at(-1)} ${field.mandatory ? '*' : ''}`}
             </Typography>
             <InjectEndpointsList
               name={field.key}

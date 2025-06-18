@@ -114,7 +114,6 @@ public class ExecutableInjectService {
 
       command = command.replace("#{" + argumentKey + "}", value);
     }
-    System.out.println("Command after replacing arguments: " + command);
     return command;
   }
 
