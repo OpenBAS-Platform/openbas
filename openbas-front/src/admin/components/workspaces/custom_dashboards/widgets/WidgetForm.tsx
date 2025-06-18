@@ -13,6 +13,7 @@ import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCovera
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
 import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import {Widget} from "../../../../../utils/api-types-custom";
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -98,7 +99,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'security-coverage', 'line', 'donut']),
+        widget_type: z.enum(['vertical-barchart', 'security-coverage', 'line', 'donut', 'list']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -153,6 +154,38 @@ const WidgetForm: FunctionComponent<Props> = ({
     })();
   };
 
+  const getSeriesComponent = (widgetType: Widget['widget_type']) => {
+    switch (widgetType) {
+      case 'security-coverage': return (
+          <Controller
+              control={control}
+              name="widget_config.series"
+              render={({ field: { value, onChange } }) => (
+                  <WidgetCreationSecurityCoverageSeries
+                      value={value}
+                      onChange={onChange}
+                      onSubmit={nextStep}
+                  />
+              )}
+          />
+      );
+      default: return (
+          <Controller
+              control={control}
+              name="widget_config.series"
+              render={({ field: { value, onChange } }) => (
+                  <WidgetCreationSeriesList
+                      widgetType={widgetType}
+                      currentSeries={value}
+                      onChange={onChange}
+                      onSubmit={nextStep}
+                  />
+              )}
+          />
+      );
+    }
+  }
+
   return (
     <form id="widgetCreationForm">
       <Dialog
@@ -186,35 +219,7 @@ const WidgetForm: FunctionComponent<Props> = ({
             />
           )}
           {activeStep === 1
-            && (widgetType === 'security-coverage'
-              ? (
-                  <Controller
-                    control={control}
-                    name="widget_config.series"
-                    render={({ field: { value, onChange } }) => (
-                      <WidgetCreationSecurityCoverageSeries
-                        value={value}
-                        onChange={onChange}
-                        onSubmit={nextStep}
-                      />
-                    )}
-                  />
-                )
-              : (
-                  <Controller
-                    control={control}
-                    name="widget_config.series"
-                    render={({ field: { value, onChange } }) => (
-                      <WidgetCreationSeriesList
-                        widgetType={widgetType}
-                        currentSeries={value}
-                        onChange={onChange}
-                        onSubmit={nextStep}
-                      />
-                    )}
-                  />
-                )
-            )}
+            && getSeriesComponent(widgetType)}
           {activeStep === 2 && (
             <WidgetCreationParameters
               widgetType={widgetType}

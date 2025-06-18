@@ -346,6 +346,22 @@ export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
 
+interface BaseEsBase {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+}
+
+type BaseEsBaseBaseEntityMapping<Key, Type> = {
+  base_entity: Key;
+} & Type;
+
 interface BaseHistogramWidget {
   display_legend?: boolean;
   field: string;
@@ -1204,6 +1220,148 @@ export interface EndpointTarget {
   target_type?: string;
 }
 
+export interface EsAttackPattern {
+  base_attack_pattern_side?: string;
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  /** @uniqueItems true */
+  base_kill_chain_phases_side?: string[];
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  description?: string;
+  externalId?: string;
+  name?: string;
+  platforms?: string[];
+  stixId?: string;
+}
+
+export type EsBase = BaseEsBase &
+  (
+    | BaseEsBaseBaseEntityMapping<"attack-pattern", EsAttackPattern>
+    | BaseEsBaseBaseEntityMapping<"endpoint", EsEndpoint>
+    | BaseEsBaseBaseEntityMapping<"finding", EsFinding>
+    | BaseEsBaseBaseEntityMapping<"inject", EsInject>
+    | BaseEsBaseBaseEntityMapping<"expectation-inject", EsInjectExpectation>
+    | BaseEsBaseBaseEntityMapping<"scenario", EsScenario>
+    | BaseEsBaseBaseEntityMapping<"tag", EsTag>
+  );
+
+export interface EsEndpoint {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  /** @uniqueItems true */
+  base_findings_side?: string[];
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  endpoint_arch?: string;
+  endpoint_description?: string;
+  endpoint_external_reference?: string;
+  endpoint_hostname?: string;
+  /** @uniqueItems true */
+  endpoint_ips?: string[];
+  /** @uniqueItems true */
+  endpoint_mac_addresses?: string[];
+  endpoint_name?: string;
+  endpoint_platform?: string;
+  endpoint_seen_ip?: string;
+}
+
+export interface EsFinding {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_endpoint_side?: string;
+  base_entity?: string;
+  base_id?: string;
+  base_inject_side?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_scenario_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  finding_field?: string;
+  finding_type?: string;
+  finding_value?: string;
+}
+
+export interface EsInject {
+  /** @uniqueItems true */
+  base_attack_patterns_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_inject_contract_side?: string;
+  /** @uniqueItems true */
+  base_kill_chain_phases_side?: string[];
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_scenario_side?: string;
+  base_simulation_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  inject_status?: string;
+  inject_title?: string;
+}
+
+export interface EsInjectExpectation {
+  base_agent_side?: string;
+  base_asset_group_side?: string;
+  base_asset_side?: string;
+  /** @uniqueItems true */
+  base_attack_patterns_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_inject_side?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_simulation_side?: string;
+  base_team_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  base_user_side?: string;
+  inject_expectation_description?: string;
+  /** @format double */
+  inject_expectation_expected_score?: number;
+  /** @format int64 */
+  inject_expectation_expiration_time?: number;
+  inject_expectation_group?: boolean;
+  inject_expectation_name?: string;
+  inject_expectation_results?: string;
+  /** @format double */
+  inject_expectation_score?: number;
+  inject_expectation_status?: string;
+  inject_expectation_type?: string;
+}
+
+export interface EsScenario {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+}
+
 export interface EsSearch {
   base_created_at?: string;
   base_entity?: string;
@@ -1225,6 +1383,19 @@ export interface EsSeriesData {
   label?: string;
   /** @format int64 */
   value?: number;
+}
+
+export interface EsTag {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  tag_color?: string;
 }
 
 export interface Evaluation {
@@ -5043,7 +5214,12 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "list";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -5051,7 +5227,12 @@ export interface Widget {
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "list";
 }
 
 export interface WidgetLayout {

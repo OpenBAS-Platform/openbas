@@ -26,6 +26,7 @@ import io.openbas.engine.api.DateHistogramWidget.DateHistogramSeries;
 import io.openbas.engine.api.StructuralHistogramWidget.StructuralHistogramSeries;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
+import io.openbas.engine.model.endpoint.EsEndpoint;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
@@ -497,6 +498,47 @@ public class EsService {
         .parallel()
         .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters))
         .toList();
+  }
+
+  public List<EsBase> entities(RawUserAuth user, StructuralHistogramRuntime runtime) {
+    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
+    String entityName =
+        searchFilters.getFilters().stream()
+            .filter(filter -> "base_entity".equals(filter.getKey()))
+            .findAny()
+            .orElseThrow()
+            .getValues()
+            .getFirst();
+    Query query =
+        buildQuery(user, "", searchFilters, new HashMap<>());
+    try {
+      SearchResponse<?> response =
+          elasticClient.search(
+              b ->
+                  b.index(engineConfig.getIndexPrefix() + "*")
+                      .size(engineConfig.getDefaultPagination())
+                      .query(query)
+                      .sort(
+                          SortOptions.of(
+                              s ->
+                                  s.field(
+                                      FieldSort.of(f -> f.field("_score").order(SortOrder.Desc))))),
+              getClassForEntity(entityName));
+      return response.hits().hits().stream()
+          .filter(hit -> hit.source() != null)
+          .map(hit -> (EsBase) hit.source())
+          .toList();
+    } catch (IOException e) {
+      log.error("query exception: {}", e.getMessage(), e);
+    }
+    return List.of();
+  }
+
+  private Class<?> getClassForEntity(String entity_name) {
+    return switch (entity_name) {
+      case "endpoint" -> EsEndpoint.class;
+      default -> EsBase.class;
+    };
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {

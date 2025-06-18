@@ -33,7 +33,9 @@ public class Widget implements Base {
     @JsonProperty("line")
     LINE("line"),
     @JsonProperty("donut")
-    DONUT("donut");
+    DONUT("donut"),
+    @JsonProperty("list")
+    LIST("list");
 
     public final String type;
 

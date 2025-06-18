@@ -1,4 +1,4 @@
-import { TableChart } from '@mui/icons-material';
+import { TableChart, List } from '@mui/icons-material';
 import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
 import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
@@ -38,6 +38,11 @@ export const widgetVisualizationTypes: {
     modes: ['structural'],
     seriesLimit: 1,
   },
+  {
+    category: 'list',
+    modes: ['structural'],
+    seriesLimit: 1,
+  },
 ];
 
 export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' | 'small' | 'medium') => {
@@ -50,6 +55,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
       return <ChartDonut fontSize={fontSize} color="primary" />;
     case 'security-coverage':
       return <TableChart fontSize={fontSize} color="primary" />;
+    case 'list':
+      return <List fontSize={fontSize} color="primary" />;
     default:
       return <div />;
   }

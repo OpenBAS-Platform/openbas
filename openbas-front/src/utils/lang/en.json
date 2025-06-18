@@ -309,6 +309,7 @@
   "custom_dashboard_name": "Name",
   "custom_dashboard_name_donut": "Donut",
   "custom_dashboard_name_line": "Line",
+  "custom_dashboard_name_list": "List",
   "custom_dashboard_name_security-coverage": "Security Coverage",
   "custom_dashboard_name_vertical-barchart": "Vertical Bar",
   "custom_dashboard_step_parameters": "Parameters",
