@@ -1,5 +1,5 @@
 import { GroupsOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { FormHelperText, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -23,9 +23,10 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   readOnly?: boolean;
   hideEnabledUsersNumber?: boolean;
+  error?: string | null;
 }
 
-const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabledUsersNumber = false }) => {
+const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabledUsersNumber = false, error }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -114,7 +115,12 @@ const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabl
           team_updated_at: '',
         }, allUsersEnabledNumber ?? 0)}
       </List>
-      {!allTeams && <InjectAddTeams disabled={readOnly} handleModifyTeams={onTeamsChange} injectTeamsIds={injectTeamIds} />}
+      {!allTeams && <InjectAddTeams disabled={readOnly} handleModifyTeams={onTeamsChange} injectTeamsIds={injectTeamIds} error={error} />}
+      {!allTeams && error && (
+        <FormHelperText error>
+          {error}
+        </FormHelperText>
+      )}
     </>
   );
 };

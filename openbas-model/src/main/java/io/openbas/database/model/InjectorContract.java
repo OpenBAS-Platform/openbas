@@ -184,7 +184,7 @@ public class InjectorContract implements Base {
 
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
-  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS = "assetgroups";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS = "asset_groups";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES = "articles";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_CHALLENGES = "challenges";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_ATTACHMENTS = "attachments";
@@ -197,8 +197,6 @@ public class InjectorContract implements Base {
   public static final List<String> CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC =
       List.of(
           CONTRACT_ELEMENT_CONTENT_KEY_TEAMS,
-          CONTRACT_ELEMENT_CONTENT_KEY_ASSETS,
-          CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS,
           CONTRACT_ELEMENT_CONTENT_KEY_ARTICLES,
           CONTRACT_ELEMENT_CONTENT_KEY_CHALLENGES,
           CONTRACT_ELEMENT_CONTENT_KEY_ATTACHMENTS,

@@ -26,6 +26,7 @@ interface Props {
   platforms?: string[];
   payloadArch?: string;
   errorLabel?: string | null;
+  label?: string | boolean;
 }
 
 const InjectAddEndpoints: FunctionComponent<Props> = ({
@@ -35,6 +36,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   platforms,
   payloadArch,
   errorLabel = null,
+  label,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -56,10 +58,15 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           <ControlPointOutlined color={errorLabel ? 'error' : 'primary'} />
         </ListItemIcon>
         <ListItemText
-          primary={t('Modify target assets')}
+          primary={t('Modify assets')}
           classes={{ primary: errorLabel ? classes.textError : classes.text }}
         />
       </ListItemButton>
+      {!errorLabel && label && (
+        <FormHelperText>
+          {label}
+        </FormHelperText>
+      )}
       {errorLabel && (
         <FormHelperText error>
           {errorLabel}

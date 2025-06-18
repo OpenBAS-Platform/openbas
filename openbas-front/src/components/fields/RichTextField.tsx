@@ -24,6 +24,7 @@ const RichTextField = ({
   disabled,
   askAi,
   inInject,
+  required,
 }: Props) => {
   return (
     <div style={{
@@ -31,13 +32,6 @@ const RichTextField = ({
       position: 'relative',
     }}
     >
-      <InputLabel
-        variant="standard"
-        shrink={true}
-        disabled={disabled}
-      >
-        {label}
-      </InputLabel>
 
       <Controller
         name={name}
@@ -48,6 +42,15 @@ const RichTextField = ({
           fieldState: { invalid, error: fieldError },
         }) => (
           <>
+            <InputLabel
+              variant="standard"
+              shrink={true}
+              disabled={disabled}
+              required={required}
+              error={!!fieldError}
+            >
+              {label}
+            </InputLabel>
             <CKEditor
               data={value || ''}
               onChange={(_, editor) => {

@@ -1,14 +1,15 @@
 import { HelpOutlineOutlined, RotateLeftOutlined } from '@mui/icons-material';
-import { Button, IconButton, Tooltip, Typography } from '@mui/material';
+import { Button, IconButton, InputLabel, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { findEndpoints } from '../../../../../actions/assets/endpoint-actions';
+import type { ContractVariable } from '../../../../../actions/contract/contract';
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Article, EndpointOutput, Variable } from '../../../../../utils/api-types';
-import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
+import { type ContractElement, type EnhancedContractElement } from '../../../../../utils/api-types-custom';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
@@ -25,8 +26,11 @@ import InjectContentFieldComponent from './InjectContentFieldComponent';
 import InjectTeamsList from './teams/InjectTeamsList';
 
 interface Props {
-  injectorContractContent: InjectorContractConverted['convertedContent'];
+  enhancedFields: EnhancedContractElement[];
+  enhancedFieldsMapByType: Map<ContractElement['type'], EnhancedContractElement>;
+  injectorContractVariables: ContractVariable[];
   isAtomic: boolean;
+  isCreation: boolean;
   readOnly?: boolean;
   articles?: Article[];
   uriVariable?: string;
@@ -34,8 +38,11 @@ interface Props {
 }
 
 const InjectContentForm = ({
-  injectorContractContent,
+  enhancedFields,
+  enhancedFieldsMapByType,
+  injectorContractVariables,
   isAtomic,
+  isCreation,
   readOnly,
   articles = [],
   uriVariable = '',
@@ -43,19 +50,23 @@ const InjectContentForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const { control, setValue, getValues } = useFormContext();
+  const { control, setValue, getValues, trigger, formState: { errors } } = useFormContext();
 
-  const injectorContractFields = injectorContractContent.fields;
-  const fieldsMap = new Map<string, ContractElement>();
-  injectorContractFields.forEach((field) => {
-    fieldsMap.set(field.type, field);
-  });
+  const renderTitle = (title: string, required: boolean = false) => {
+    return (
+      <Typography variant="h5">
+        {title}
+        {required ? '*' : '' }
+      </Typography>
+    );
+  };
 
   // -- TEAMS --
-  const renderTeams = (
+  const renderTeams = (err?: string | null) => (
     <InjectTeamsList
-      readOnly={fieldsMap.get('team')?.readOnly || readOnly}
+      readOnly={enhancedFieldsMapByType.get('team')?.readOnly || readOnly}
       hideEnabledUsersNumber={isAtomic}
+      error={err}
     />
   );
 
@@ -64,22 +75,24 @@ const InjectContentForm = ({
     control,
     name: 'inject_assets',
   }) as string[];
-  const [injectAsset, setInjectAsset] = useState<EndpointOutput[]>([]);
+  const [injectAssets, setInjectAssets] = useState<EndpointOutput[]>([]);
   useEffect(() => {
-    if (fieldsMap.has('asset') && injectAssetIds.length > 0) {
-      findEndpoints(injectAssetIds).then(result => setInjectAsset(result.data));
+    if (enhancedFieldsMapByType.has('asset') && injectAssetIds.length > 0) {
+      findEndpoints(injectAssetIds).then(result => setInjectAssets(result.data));
     } else {
-      setInjectAsset([]);
+      setInjectAssets([]);
     }
   }, [injectAssetIds]);
 
-  const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds);
-  const removeAsset = (assetId: string) => setValue('inject_assets', injectAssetIds.filter(id => id !== assetId));
+  const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset')?.isInMandatoryGroup } */);
+  const removeAsset = (assetId: string) => setValue('inject_assets', injectAssetIds.filter(id => id !== assetId)/* ,{ shouldValidate: enhancedFieldsMapByType.get('asset')?.isInMandatoryGroup } */);
 
-  const renderTargetedAssets = (
-    <>
+  const renderAssets = (err?: string | null, isInMandatoryGroup?: boolean, mandatoryGroupContractElementLabels?: string) => (
+    <div key="asset">
+      <InputLabel required={enhancedFieldsMapByType.get('asset')?.settings?.required} error={!!err}>{t(enhancedFieldsMapByType.get('asset')?.label || 'Assets')}</InputLabel>
       <EndpointsList
-        endpoints={injectAsset}
+        compact
+        endpoints={injectAssets}
         renderActions={endpoint => (
           <EndpointPopover
             inline
@@ -88,7 +101,7 @@ const InjectContentForm = ({
             onRemoveFromContext={removeAsset}
             removeFromContextLabel="Remove from the inject"
             onDelete={removeAsset}
-            disabled={fieldsMap.get('asset')?.readOnly || readOnly}
+            disabled={enhancedFieldsMapByType.get('asset')?.readOnly || readOnly}
           />
         )}
       />
@@ -97,9 +110,11 @@ const InjectContentForm = ({
         onSubmit={onAssetChange}
         platforms={getValues('inject_injector_contract.injector_contract_platforms')}
         payloadArch={getValues('inject_injector_contract.injector_contract_arch')}
-        disabled={fieldsMap.get('asset')?.readOnly || readOnly}
+        disabled={enhancedFieldsMapByType.get('asset')?.readOnly || readOnly}
+        errorLabel={err && isInMandatoryGroup ? t('At least one is required ({labels})', { labels: mandatoryGroupContractElementLabels || '' }) : err}
+        label={isInMandatoryGroup && t('At least one is required ({labels})', { labels: mandatoryGroupContractElementLabels || '' })}
       />
-    </>
+    </div>
   );
 
   // -- ASSETS GROUPS --
@@ -107,16 +122,17 @@ const InjectContentForm = ({
     control,
     name: 'inject_asset_groups',
   }) as string[];
-  const onAssetGroupChange = (assetGroupIds: string[]) => setValue('inject_asset_groups', assetGroupIds);
-  const removeAssetGroup = (assetGroupId: string) => setValue('inject_asset_groups', injectAssetGroupIds.filter(id => id !== assetGroupId));
+  const onAssetGroupChange = (assetGroupIds: string[]) => setValue('inject_asset_groups', assetGroupIds /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset-group')?.isInMandatoryGroup } */);
+  const removeAssetGroup = (assetGroupId: string) => setValue('inject_asset_groups', injectAssetGroupIds.filter(id => id !== assetGroupId) /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset-group')?.isInMandatoryGroup } */);
 
-  const renderTargetedAssetGroups = (
-    <div>
+  const renderAssetGroups = (err?: string | null, isInMandatoryGroup?: boolean, mandatoryGroupContractElementLabels?: string) => (
+    <div key="asset-group">
+      <InputLabel required={enhancedFieldsMapByType.get('asset-group')?.settings?.required} error={!!err}>{t(enhancedFieldsMapByType.get('asset-group')?.label || 'Asset groups')}</InputLabel>
       <AssetGroupsList
         assetGroupIds={injectAssetGroupIds}
         renderActions={assetGroup => (
           <AssetGroupPopover
-            disabled={fieldsMap.get('asset-group')?.readOnly || readOnly}
+            disabled={enhancedFieldsMapByType.get('asset-group')?.readOnly || readOnly}
             assetGroup={assetGroup}
             inline
             onRemoveAssetGroupFromList={removeAssetGroup}
@@ -124,66 +140,62 @@ const InjectContentForm = ({
         )}
       />
       <InjectAddAssetGroups
-        disabled={fieldsMap.get('asset-group')?.readOnly || readOnly}
+        disabled={enhancedFieldsMapByType.get('asset-group')?.readOnly || readOnly}
         assetGroupIds={injectAssetGroupIds}
         onSubmit={onAssetGroupChange}
+        errorLabel={err && isInMandatoryGroup ? t('At least one is required ({labels})', { labels: mandatoryGroupContractElementLabels || '' }) : err}
+        label={isInMandatoryGroup && t('At least one is required ({labels})', { labels: mandatoryGroupContractElementLabels || '' })}
       />
     </div>
   );
 
   // -- ARTICLES --
-  const renderArticles = (
+  const renderArticles = () => (
     <InjectArticlesList
       allArticles={articles}
-      readOnly={fieldsMap.get('article')?.readOnly || readOnly}
+      readOnly={enhancedFieldsMapByType.get('article')?.readOnly || readOnly}
     />
   );
 
   // -- CHALLENGES --
-  const renderChallenges = <InjectChallengesList readOnly={fieldsMap.get('challenge')?.readOnly || readOnly} />;
+  const renderChallenges = () => <InjectChallengesList readOnly={enhancedFieldsMapByType.get('challenge')?.readOnly || readOnly} />;
 
   // -- EXPECTATIONS --
   const injectExpectations = useWatch({
     control,
     name: 'inject_content.expectations',
   }) as ExpectationInput[];
-  const predefinedExpectations: ExpectationInput[] = injectorContractFields
+  const predefinedExpectations: ExpectationInput[] = enhancedFields
     .filter(n => n.type === 'expectation')
     .flatMap(f => f.predefinedExpectations ?? []);
   const onExpectationChange = (expectationIds: ExpectationInput[]) => setValue('inject_content.expectations', expectationIds);
 
-  const renderExpectations = (
+  const renderExpectations = () => (
     <InjectExpectations
       predefinedExpectationDatas={predefinedExpectations}
       expectationDatas={injectExpectations}
       handleExpectations={onExpectationChange}
-      readOnly={fieldsMap.get('expectation')?.readOnly || readOnly}
+      readOnly={enhancedFieldsMapByType.get('expectation')?.readOnly || readOnly}
     />
   );
 
   // -- DOCUMENTS --
-  const renderDocuments = (
+  const renderDocuments = () => (
     <InjectDocumentsList
-      hasAttachments={fieldsMap.has('attachment')}
-      readOnly={fieldsMap.get('attachment')?.readOnly || readOnly}
+      hasAttachments={enhancedFieldsMapByType.has('attachment')}
+      readOnly={enhancedFieldsMapByType.get('attachment')?.readOnly || readOnly}
     />
   );
 
   // -- DYNAMIC FIELDS --
   const [openVariables, setOpenVariables] = useState(false);
   const openVariablesDialog = () => setOpenVariables(true);
-  const dynamicFields = injectorContractFields
-    .filter(n => n.type !== 'team' && n.type !== 'asset' && n.type !== 'asset-group' && n.type !== 'article' && n.type !== 'challenge' && n.type !== 'expectation' && n.type !== 'attachment')
-    .map(field => ({
-      ...field,
-      key: `inject_content.${field.key}`,
-      type: field.type as 'number' | 'text' | 'checkbox' | 'textarea' | 'tags' | 'select' | 'choice' | 'dependency-select',
-    }));
+  const dynamicFields = enhancedFields.filter(field => field.isInjectContentType || field.type === 'asset-group' || field.type === 'asset');
 
   const resetDefaultValue = () => {
     dynamicFields
       .forEach((field) => {
-        let defaultValue = field.cardinality === '1' ? field.defaultValue?.[0] : field.defaultValue;
+        let defaultValue = field.cardinality === '1' ? (field.defaultValue?.[0] || '') : field.defaultValue;
         if (
           field.type === 'textarea'
           && field.richText
@@ -198,7 +210,7 @@ const InjectContentForm = ({
       });
   };
 
-  const renderDynamicFields = (
+  const renderDynamicFields = () => (
     <div style={{
       display: 'flex',
       flexDirection: 'column',
@@ -206,59 +218,69 @@ const InjectContentForm = ({
     }}
     >
       {
-        (dynamicFields ?? []).map(field => (
-          <InjectContentFieldComponent
-            key={field.key}
-            field={field}
-            readOnly={readOnly || field.readOnly}
-          />
-        ))
+        (dynamicFields ?? []).filter(field => field.isVisible).map((field) => {
+          if (field.type === 'asset') {
+            const key = enhancedFieldsMapByType.get('asset')?.key;
+            return renderAssets(key ? errors[key]?.message as string : null, enhancedFieldsMapByType.get('asset')?.isInMandatoryGroup, enhancedFieldsMapByType.get('asset')?.mandatoryGroupContractElementLabels);
+          } else if (field.type === 'asset-group') {
+            const key = enhancedFieldsMapByType.get('asset-group')?.key;
+            return renderAssetGroups(key ? errors[key]?.message as string : null, enhancedFieldsMapByType.get('asset-group')?.isInMandatoryGroup, enhancedFieldsMapByType.get('asset-group')?.mandatoryGroupContractElementLabels);
+          }
+
+          return (
+            <InjectContentFieldComponent
+              key={field.key}
+              field={field}
+              readOnly={readOnly || field.readOnly}
+            />
+          );
+        })
       }
     </div>
   );
 
   const injectContentParts = [
     {
-      title: t('Targeted teams'),
+      key: 'teams',
+      title: renderTitle(t('Targeted teams'), enhancedFieldsMapByType.get('team')?.settings?.required),
       renderRightButton: !isAtomic && (
         <SwitchFieldController
           name="inject_all_teams"
           label={<strong>{t('All teams')}</strong>}
-          disabled={fieldsMap.get('teams')?.readOnly || readOnly}
+          disabled={enhancedFieldsMapByType.get('team')?.readOnly || readOnly}
           size="small"
         />
       ),
-      render: renderTeams,
-      show: fieldsMap.has('team'),
+      render: () => {
+        const key = enhancedFieldsMapByType.get('team')?.key;
+        return renderTeams(key ? errors[key]?.message as string : null);
+      },
+      show: enhancedFieldsMapByType.has('team'),
     },
     {
-      title: t('Targeted assets'),
-      render: renderTargetedAssets,
-      show: fieldsMap.has('asset'),
-    },
-    {
-      title: t('Targeted asset groups'),
-      render: renderTargetedAssetGroups,
-      show: fieldsMap.has('asset-group'),
-    },
-    {
-      title: t('Media pressure to publish'),
+      key: 'media_pressure',
+      title: renderTitle(t('Media pressure to publish'), enhancedFieldsMapByType.get('article')?.settings?.required),
       render: renderArticles,
-      show: fieldsMap.has('article'),
+      show: enhancedFieldsMapByType.has('article') && enhancedFieldsMapByType.get('article')?.isVisible,
     },
     {
-      title: t('Challenges to publish'),
+      key: 'challenge',
+      title: renderTitle(t('Challenges to publish'), enhancedFieldsMapByType.get('challenge')?.settings?.required),
       render: renderChallenges,
-      show: fieldsMap.has('challenge'),
+      show: enhancedFieldsMapByType.has('challenge') && enhancedFieldsMapByType.get('challenge')?.isVisible,
     },
     {
-      title: t('Inject data'),
-      render: renderDynamicFields,
+      key: 'inject_data_title',
+      title: <Typography variant="h5" style={{ marginTop: 0 }}>{t('Inject data')}</Typography>,
+      parentStyle: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(-1),
+      },
       renderLeftButton: (
         <Tooltip title={t('Reset to default values')}>
           <IconButton
             color="primary"
-            disabled={fieldsMap.get('expectation')?.readOnly || readOnly}
+            disabled={enhancedFieldsMapByType.get('expectation')?.readOnly || readOnly}
             onClick={resetDefaultValue}
             size="small"
           >
@@ -277,49 +299,75 @@ const InjectContentForm = ({
           {t('Available variables')}
         </Button>
       ),
+      show: dynamicFields.length,
+    },
+    {
+      key: 'inject_data',
+      render: renderDynamicFields,
       show: true,
     },
     {
-      title: t('Inject expectations'),
+      key: 'expectations',
+      title: renderTitle(t('Inject expectations'), enhancedFieldsMapByType.get('expectation')?.settings?.required),
       render: renderExpectations,
-      show: fieldsMap.has('expectation'),
+      show: enhancedFieldsMapByType.has('expectation') && enhancedFieldsMapByType.get('expectation')?.isVisible,
     },
     {
-      title: t('Inject documents'),
+      key: 'documents',
+      title: renderTitle(t('Inject documents'), enhancedFieldsMapByType.get('attachment')?.settings?.required),
       render: renderDocuments,
-      show: !isAtomic,
+      show: !isAtomic && enhancedFieldsMapByType.has('attachment') && enhancedFieldsMapByType.get('attachment')?.isVisible,
     },
   ];
+
+  const triggerInitialValidation = () => {
+    useEffect(() => {
+      if (!isCreation) {
+        trigger();
+      }
+    }, []);
+  };
 
   return (
     <>
       {injectContentParts.filter(part => part.show).map(part => (
         <div
-          key={part.title}
+          key={part.key}
           style={{
             display: 'flex',
+            flexDirection: 'row',
             alignItems: 'center',
             flexWrap: 'wrap',
+            ...part.parentStyle,
           }}
         >
-          <Typography variant="h5">
-            {part.title}
-          </Typography>
+          {part.title}
           {part.renderLeftButton}
-          <div style={{ marginLeft: 'auto' }}>
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+          >
             {part.renderRightButton}
           </div>
-          <div style={{ width: '100%' }}>
-            {part.render}
-          </div>
+          {
+            part.render
+            && (
+              <div style={{ width: '100%' }}>
+                {part.render()}
+              </div>
+            )
+          }
         </div>
       ))}
+      {triggerInitialValidation()}
       <AvailableVariablesDialog
         uriVariable={uriVariable}
         variables={variables}
         open={openVariables}
         handleClose={() => setOpenVariables(false)}
-        variablesFromInjectorContract={injectorContractContent.variables ?? []}
+        variablesFromInjectorContract={injectorContractVariables ?? []}
       />
     </>
   );

@@ -12,34 +12,10 @@ import SwitchFieldController from '../../../../../components/fields/SwitchFieldC
 import TagFieldController from '../../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
-
-type ChoiceItem = {
-  label: string;
-  value: string;
-  information: string;
-};
-export type InjectField = {
-  key: string;
-  richText?: boolean;
-  cardinality?: string;
-  mandatory?: boolean;
-  defaultValue?: string | string[];
-  choices?: Record<string, string> | ChoiceItem[];
-  label: string;
-  contractAttachment?: {
-    key: string;
-    label: string;
-  }[];
-  type: 'textarea' | 'text' | 'select' | 'number' | 'checkbox' | 'dependency-select' | 'choice' | 'tags';
-  dependencyField?: string;
-  settings?: {
-    rows: number;
-    required?: boolean;
-  };
-};
+import { type ChoiceItem, type EnhancedContractElement } from '../../../../../utils/api-types-custom';
 
 interface Props {
-  field: InjectField;
+  field: EnhancedContractElement;
   readOnly: boolean;
 }
 
@@ -57,7 +33,7 @@ const InjectContentFieldComponent = ({
     name: field.key,
   });
   const [informationToDisplay, setInformationToDisplay] = useState<string>('');
-  let fieldType: InjectField['type'] | 'richText' = field.type;
+  let fieldType: EnhancedContractElement['type'] | 'richText' = field.type;
   if (field.type == 'textarea' && field.richText) {
     fieldType = 'richText';
   }
@@ -79,8 +55,9 @@ const InjectContentFieldComponent = ({
         return (
           <TagFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={t(field.label)}
             disabled={readOnly}
+            required={field.settings?.required}
           />
         );
       case 'richText':
@@ -88,19 +65,20 @@ const InjectContentFieldComponent = ({
           <RichTextField
             key={field.key}
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={t(field.label)}
             style={{ height: 250 }}
             disabled={readOnly}
             askAi={true}
             inInject={true}
             control={control}
+            required={field.settings?.required}
           />
         );
       case 'checkbox':
         return (
           <SwitchFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={t(field.label)}
             disabled={readOnly}
             required={field.settings?.required}
           />
@@ -129,7 +107,7 @@ const InjectContentFieldComponent = ({
         return (
           <SelectFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={t(field.label)}
             items={choices as ChoiceItem[]}
             multiple={field.cardinality === 'n'}
             disabled={readOnly}
@@ -141,7 +119,7 @@ const InjectContentFieldComponent = ({
         return (
           <TextFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={t(field.label)}
             disabled={readOnly}
             multiline={field.type == 'textarea'}
             rows={field.type == 'textarea' ? (field.settings?.rows ?? 10) : 1}
