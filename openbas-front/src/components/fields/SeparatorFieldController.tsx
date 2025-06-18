@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Chip, TextField } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useFormatter } from '../i18n';
