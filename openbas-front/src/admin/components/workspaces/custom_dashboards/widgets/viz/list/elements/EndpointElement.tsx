@@ -1,21 +1,37 @@
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import {CSSProperties, useTheme} from '@mui/material/styles';
+import {CSSProperties} from '@mui/material/styles';
 import {makeStyles} from 'tss-react/mui';
 
 import {type EsEndpoint} from '../../../../../../../../utils/api-types';
 import {EndpointListItemFragments} from "../../../../../../common/endpoints/EndpointListItemFragments";
-import {useFormatter} from "../../../../../../../../components/i18n";
 import {Link} from "react-router";
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import useBodyItemsStyles from "../../../../../../../../components/common/queryable/style/style";
 import AssetNameFragment from "../../../../../../common/endpoints/fragments/elastic/AssetNameFragment";
 import AssetPlatformFragment from "../../../../../../common/endpoints/fragments/elastic/AssetPlatformFragment";
 import AssetTagsFragment from "../../../../../../common/endpoints/fragments/elastic/AssetTagsFragment";
-import AssetTypeFragment from "../../../../../../common/endpoints/fragments/elastic/AssetTypeFragment";
-
+import EndpointArchFragment from "../../../../../../common/endpoints/fragments/elastic/EndpointArchFragment";
 type Props = {
   columns: string[];
   element: EsEndpoint;
+};
+
+export const inlineStyles: Record<string, CSSProperties> = {
+    asset_name: { width: '25%' },
+    endpoint_active: { width: '10%' },
+    endpoint_agents_privilege: { width: '12%' },
+    asset_platform: {
+        width: '10%',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    endpoint_arch: { width: '10%' },
+    endpoint_agents_executor: {
+        width: '13%',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    asset_tags: { width: '15%' },
 };
 
 const EndpointElement = (props: Props) => {
@@ -36,28 +52,8 @@ const EndpointElement = (props: Props) => {
       marginBottom: 5,
     },
   }));
-    const inlineStyles: Record<string, CSSProperties> = {
-        asset_name: { width: '25%' },
-        endpoint_active: { width: '10%' },
-        endpoint_agents_privilege: { width: '12%' },
-        endpoint_platform: {
-            width: '10%',
-            display: 'flex',
-            alignItems: 'center',
-        },
-        endpoint_arch: { width: '10%' },
-        endpoint_agents_executor: {
-            width: '13%',
-            display: 'flex',
-            alignItems: 'center',
-        },
-        asset_tags: { width: '15%' },
-    };
   const { classes } = useStyles();
-    const bodyItemsStyles = useBodyItemsStyles();
-    const {t} = useFormatter();
-
-    const theme = useTheme();
+  const bodyItemsStyles = useBodyItemsStyles();
 
   const headers = [
     {
@@ -72,17 +68,17 @@ const EndpointElement = (props: Props) => {
       isSortable: true,
       value: (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />,
     },
+      {
+          field: EndpointListItemFragments.ENDPOINT_ARCH,
+          label: 'Architecture',
+          isSortable: true,
+          value: (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />,
+      },
     {
       field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
       value: (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />,
-    },
-    {
-      field: EndpointListItemFragments.ASSET_TYPE,
-      label: 'Type',
-      isSortable: false,
-      value: (endpoint: EsEndpoint) => <AssetTypeFragment endpoint={endpoint} />,
     },
   ];
 
@@ -90,7 +86,7 @@ const EndpointElement = (props: Props) => {
     <>
       <ListItemButton component={Link}
                       to={`/admin/assets/endpoints/${props.element.base_id}`}
-                      classes={{ root: classes.item }}>
+                      classes={{ root: classes.item }} className="noDrag">
           <ListItemIcon>
               <DevicesOtherOutlined color="primary" />
           </ListItemIcon>
