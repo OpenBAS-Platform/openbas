@@ -56,7 +56,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           <ControlPointOutlined color={errorLabel ? 'error' : 'primary'} />
         </ListItemIcon>
         <ListItemText
-          primary={t('Modify target assets')}
+          primary={t('Modify assets')}
           classes={{ primary: errorLabel ? classes.textError : classes.text }}
         />
       </ListItemButton>

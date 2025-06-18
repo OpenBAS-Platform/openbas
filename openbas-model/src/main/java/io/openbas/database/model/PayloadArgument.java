@@ -26,4 +26,8 @@ public class PayloadArgument {
   @JsonProperty("description")
   @Schema(nullable = true)
   private String description;
+
+  @JsonProperty("separator")
+  @Schema(nullable = true)
+  private String separator;
 }
