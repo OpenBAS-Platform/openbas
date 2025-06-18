@@ -1,14 +1,18 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import ItemTags from '../../../../components/ItemTags';
+import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import { type EndpointOutput } from '../../../../utils/api-types';
+import { EndpointListItemFragments } from '../../common/endpoints/EndpointListItemFragments';
 import { type EndpointPopoverProps } from './EndpointPopover';
+import AssetNameFragment from "../../common/endpoints/fragments/output/AssetNameFragment";
+import AssetPlatformFragment from "../../common/endpoints/fragments/output/AssetPlatformFragment";
+import AssetTagsFragment from "../../common/endpoints/fragments/output/AssetTagsFragment";
+import AssetTypeFragment from "../../common/endpoints/fragments/output/AssetTypeFragment";
 
 const useStyles = makeStyles()(() => ({
   item: { height: 50 },
@@ -53,6 +57,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
+  const { t } = useFormatter();
 
   const component = (endpoint: EndpointOutput) => {
     return renderActions(endpoint);
@@ -63,40 +68,25 @@ const EndpointsList: FunctionComponent<Props> = ({
       field: 'asset_name',
       label: 'Name',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => endpoint.asset_name,
+      value: (endpoint: EndpointOutput) => <AssetNameFragment endpoint={endpoint} />,
     },
     {
-      field: 'asset_platform',
+      field: EndpointListItemFragments.ASSET_PLATFORM,
       label: 'Platform',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => (
-        <>
-          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
-          {endpoint.endpoint_platform}
-        </>
-      ),
+      value: (endpoint: EndpointOutput) => <AssetPlatformFragment endpoint={endpoint} />,
     },
     {
-      field: 'asset_tags',
+      field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => (
-        <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
-      ),
+      value: (endpoint: EndpointOutput) => <AssetTagsFragment endpoint={endpoint} />,
     },
     {
-      field: 'asset_type',
+      field: EndpointListItemFragments.ASSET_TYPE,
       label: 'Type',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => (
-        <Tooltip title={endpoint.asset_type}>
-          <Chip
-            variant="outlined"
-            className={classes.typeChip}
-            label={endpoint.asset_type}
-          />
-        </Tooltip>
-      ),
+      value: (endpoint: EndpointOutput) => <AssetTypeFragment endpoint={endpoint} />,
     },
   ];
 

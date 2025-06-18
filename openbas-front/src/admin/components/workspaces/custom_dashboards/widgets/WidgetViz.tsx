@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 
-import {entities, series} from '../../../../../actions/dashboards/dashboard-action';
+import { entities, series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
-import {EsBase, type EsSeries} from '../../../../../utils/api-types';
+import { type EsBase, type EsSeries } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
 import DonutChart from './viz/DonutChart';
 import LineChart from './viz/LineChart';
@@ -21,11 +21,11 @@ interface WidgetTemporalVizProps {
 const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps) => {
   const { t } = useFormatter();
   const [seriesVizData, setSeriesVizData] = useState<EsSeries[]>([]);
-  const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([])
+  const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    switch(widget.widget_type) {
+    switch (widget.widget_type) {
       case 'list':
         entities(widget.widget_id).then((response) => {
           if (response.data) {
@@ -90,7 +90,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
       );
     }
     case 'list':
-      return (<List elements={entitiesVizData} columns={['endpoint_hostname', 'endpoint_arch', 'endpoint_platform']}/>);
+      return (<List elements={entitiesVizData} columns={['endpoint_hostname', 'endpoint_arch', 'endpoint_platform']} />);
     default:
       return 'Not implemented yet';
   }

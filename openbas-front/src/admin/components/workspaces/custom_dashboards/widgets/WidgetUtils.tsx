@@ -1,4 +1,4 @@
-import { TableChart, List } from '@mui/icons-material';
+import { List, TableChart } from '@mui/icons-material';
 import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
 import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
