@@ -1,7 +1,6 @@
 import {List as MuiList, ListItem as MuiListItem, ListItemIcon, ListItemText} from '@mui/material';
 
 import {type EsBase, type EsEndpoint} from '../../../../../../../utils/api-types';
-import ListItem from './ListItem';
 import SortHeadersComponentV2 from "../../../../../../../components/common/queryable/sort/SortHeadersComponentV2";
 import {makeStyles} from "tss-react/mui";
 import {
@@ -10,7 +9,14 @@ import {
 import {buildSearchPagination} from "../../../../../../../components/common/queryable/QueryableUtils";
 import {initSorting} from "../../../../../../../components/common/queryable/Page";
 import {Header} from "../../../../../../../components/common/SortHeadersList";
-import { inlineStyles } from "./elements/EndpointElement";
+import EndpointListElement, { inlineStyles as EndpointElementStyles } from "./elements/EndpointListElement";
+import DefaultListElement, { inlineStyles as DefaultElementStyles } from "./elements/DefaultListElement";
+import { ArrowRight } from 'mdi-material-ui';
+
+const useStyles = makeStyles()(() => ({
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+}));
 
 type Props = {
   columns: string[];
@@ -18,10 +24,6 @@ type Props = {
 };
 
 const List = (props: Props) => {
-  const useStyles = makeStyles()(() => ({
-    itemHead: { textTransform: 'uppercase' },
-    item: { height: 50 },
-  }));
   const { classes } = useStyles();
 
   const headersFromColumns = (columns: string[]) : Header[] => {
@@ -36,8 +38,8 @@ const List = (props: Props) => {
 
   const stylesFromEntityType = (entityType: string) => {
     switch (entityType) {
-      case 'endpoint': return inlineStyles;
-      default: return {};
+      case 'endpoint': return EndpointElementStyles;
+      default: return DefaultElementStyles;
     }
   }
 
@@ -45,13 +47,19 @@ const List = (props: Props) => {
     sorts: initSorting('asset_name'),
   }));
 
+  const getTypedUiElement = (element: EsBase, columns: string[]) => {
+    switch (element.base_entity) {
+      case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} />);
+      default: return (<DefaultListElement columns={columns} element={element} />);
+    }
+  };
+
 
   return (
     <MuiList>
       <MuiListItem
           classes={{ root: classes.itemHead }}
-          style={{ paddingTop: 0, overflow: "hidden" }}
-          secondaryAction={<>&nbsp;</>}
+          style={{ paddingTop: 0 }}
       >
         <ListItemIcon />
         <ListItemText
@@ -65,7 +73,7 @@ const List = (props: Props) => {
         />
       </MuiListItem>
       {props.elements.map(e =>
-        <ListItem element={e} columns={props.columns} />,
+          <MuiListItem key={e.base_id} divider disablePadding>{getTypedUiElement(e, props.columns)}</MuiListItem>
       )}
     </MuiList>
   );

@@ -11,6 +11,12 @@ import AssetNameFragment from "../../../../../../common/endpoints/fragments/elas
 import AssetPlatformFragment from "../../../../../../common/endpoints/fragments/elastic/AssetPlatformFragment";
 import AssetTagsFragment from "../../../../../../common/endpoints/fragments/elastic/AssetTagsFragment";
 import EndpointArchFragment from "../../../../../../common/endpoints/fragments/elastic/EndpointArchFragment";
+
+const useStyles = makeStyles()(() => ({
+    itemHead: { textTransform: 'uppercase' },
+    item: { height: 50 },
+}));
+
 type Props = {
   columns: string[];
   element: EsEndpoint;
@@ -31,7 +37,7 @@ export const inlineStyles: Record<string, CSSProperties> = {
         display: 'flex',
         alignItems: 'center',
     },
-    base_tags_side: { width: '15%' },
+    base_tags_side: { width: '25%' },
     base_entity: { display: "none" },
     base_id: { display: "none" },
     base_representative: { display: "none" },
@@ -39,26 +45,16 @@ export const inlineStyles: Record<string, CSSProperties> = {
     base_dependencies: { display: "none" },
     endpoint_ips: { display: "none" },
     endpoint_mac_addresses: { display: "none" },
+    base_created_at: { display: "none" },
+    base_updated_at: { display: "none" },
+    endpoint_description: { display: "none" },
+    endpoint_external_reference: { display: "none" },
+    endpoint_hostname: { display: "none" },
+    endpoint_seen_ip: { display: "none" },
+    base_findings_side: { display: "none" },
 };
 
-const EndpointElement = (props: Props) => {
-  const useStyles = makeStyles()(() => ({
-    item: { height: 50 },
-    bodyItem: {
-      fontSize: 13,
-      float: 'left',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    typeChip: {
-      height: 20,
-      borderRadius: 4,
-      textTransform: 'uppercase',
-      width: 100,
-      marginBottom: 5,
-    },
-  }));
+const EndpointListElement = (props: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
@@ -69,6 +65,7 @@ const EndpointElement = (props: Props) => {
         case 'endpoint_platform':
         case EndpointListItemFragments.ASSET_PLATFORM:  return (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />;
         case EndpointListItemFragments.ENDPOINT_ARCH:  return (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />;
+        case 'base_tags_side':
         case EndpointListItemFragments.ASSET_TAGS:  return (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />;
         default: return (endpoint: EsEndpoint) => {
             let key = column as keyof typeof endpoint;
@@ -107,4 +104,4 @@ const EndpointElement = (props: Props) => {
   );
 };
 
-export default EndpointElement;
+export default EndpointListElement;

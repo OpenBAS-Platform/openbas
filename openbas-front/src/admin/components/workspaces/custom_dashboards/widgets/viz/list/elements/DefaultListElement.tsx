@@ -3,34 +3,24 @@ import {CSSProperties} from '@mui/material/styles';
 import {makeStyles} from 'tss-react/mui';
 
 import {EsBase, type EsEndpoint} from '../../../../../../../../utils/api-types';
-import {Link} from "react-router";
-import { DevicesOtherOutlined } from '@mui/icons-material';
 import useBodyItemsStyles from "../../../../../../../../components/common/queryable/style/style";
+import { Description } from '@mui/icons-material';
+
+const useStyles = makeStyles()(() => ({
+    itemHead: { textTransform: 'uppercase' },
+    item: { height: 50 },
+}));
+
 type Props = {
     columns: string[];
     element: EsBase;
 };
 
-export const inlineStyles: Record<string, CSSProperties> = {};
+export const inlineStyles = new Proxy({}, {
+    get: (target: Record<string, CSSProperties>, name: string) => name in target ? target[name] : { width: "10%" }
+})
 
-const DefaultElement = (props: Props) => {
-    const useStyles = makeStyles()(() => ({
-        item: { height: 50 },
-        bodyItem: {
-            fontSize: 13,
-            float: 'left',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-        },
-        typeChip: {
-            height: 20,
-            borderRadius: 4,
-            textTransform: 'uppercase',
-            width: 100,
-            marginBottom: 5,
-        },
-    }));
+const DefaultListElement = (props: Props) => {
     const { classes } = useStyles();
     const bodyItemsStyles = useBodyItemsStyles();
 
@@ -45,11 +35,9 @@ const DefaultElement = (props: Props) => {
 
     return (
         <>
-            <ListItemButton component={Link}
-                            to={`/admin/assets/endpoints/${props.element.base_id}`}
-                            classes={{ root: classes.item }} className="noDrag">
+            <ListItemButton classes={{ root: classes.item }} className="noDrag">
                 <ListItemIcon>
-                    <DevicesOtherOutlined color="primary" />
+                    <Description color="primary" />
                 </ListItemIcon>
                 <ListItemText
                     primary={(
@@ -73,4 +61,4 @@ const DefaultElement = (props: Props) => {
     );
 };
 
-export default DefaultElement;
+export default DefaultListElement;
