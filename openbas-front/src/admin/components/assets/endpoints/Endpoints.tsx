@@ -27,17 +27,17 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import useAuth from '../../../../utils/hooks/useAuth';
-import {EndpointListItemFragments} from '../../common/endpoints/EndpointListItemFragments';
+import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
+import AssetNameFragment from '../../common/endpoints/fragments/output/AssetNameFragment';
+import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
+import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
+import EndpointActiveFragment from '../../common/endpoints/fragments/output/EndpointActiveFragment';
+import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/output/EndpointAgentsExecutorsFragment';
+import EndpointAgentsPrivilegeFragment from '../../common/endpoints/fragments/output/EndpointAgentsPrivilegeFragment';
+import EndpointArchFragment from '../../common/endpoints/fragments/output/EndpointArchFragment';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import ImportUploaderEndpoints from './ImportUploaderEndpoints';
-import AssetNameFragment from "../../common/endpoints/fragments/output/AssetNameFragment";
-import EndpointActiveFragment from "../../common/endpoints/fragments/output/EndpointActiveFragment";
-import EndpointAgentsPrivilegeFragment from "../../common/endpoints/fragments/output/EndpointAgentsPrivilegeFragment";
-import AssetPlatformFragment from "../../common/endpoints/fragments/output/AssetPlatformFragment";
-import EndpointArchFragment from "../../common/endpoints/fragments/output/EndpointArchFragment";
-import AssetTagsFragment from "../../common/endpoints/fragments/output/AssetTagsFragment";
-import EndpointAgentsExecutorsFragment from "../../common/endpoints/fragments/output/EndpointAgentsExecutorsFragment";
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -66,17 +66,15 @@ const Endpoints = () => {
   // Standard hooks
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-  const {t} = useFormatter();
-  const {settings} = useAuth();
+  const { t } = useFormatter();
+  const { settings } = useAuth();
 
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const availableFilterNames = [
     'endpoint_platform',
     'endpoint_arch',

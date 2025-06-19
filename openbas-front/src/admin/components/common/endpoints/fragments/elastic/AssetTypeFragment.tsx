@@ -1,36 +1,31 @@
-import {EsEndpoint} from "../../../../../../utils/api-types";
-import PlatformIcon from "../../../../../../components/PlatformIcon";
-import {useTheme} from "@mui/material/styles";
-import {useFormatter} from "../../../../../../components/i18n";
-import ItemTags from "../../../../../../components/ItemTags";
-import {makeStyles} from "tss-react/mui";
-import {Chip, Tooltip} from "@mui/material";
+import { Chip, Tooltip } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
 
-type Props = {
-    endpoint: EsEndpoint
-}
+import { type EsEndpoint } from '../../../../../../utils/api-types';
 
-const AssetPlatformFragment = (props: Props) =>  {
-    const useStyles = makeStyles()(() => ({
-        typeChip: {
-            height: 20,
-            borderRadius: 4,
-            textTransform: 'uppercase',
-            width: 100,
-            marginBottom: 5,
-        },
-    }));
+type Props = { endpoint: EsEndpoint };
 
-    const { classes } = useStyles();
-    return (
-        <Tooltip title={props.endpoint.base_entity}>
-            <Chip
-                variant="outlined"
-                className={classes.typeChip}
-                label={props.endpoint.base_entity}
-            />
-        </Tooltip>
-    );
-}
+const AssetTypeFragment = (props: Props) => {
+  const useStyles = makeStyles()(() => ({
+    typeChip: {
+      height: 20,
+      borderRadius: 4,
+      textTransform: 'uppercase',
+      width: 100,
+      marginBottom: 5,
+    },
+  }));
 
-export default AssetPlatformFragment;
+  const { classes } = useStyles();
+  return (
+    <Tooltip title={props.endpoint.base_entity}>
+      <Chip
+        variant="outlined"
+        className={classes.typeChip}
+        label={props.endpoint.base_entity}
+      />
+    </Tooltip>
+  );
+};
+
+export default AssetTypeFragment;

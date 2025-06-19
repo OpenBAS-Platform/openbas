@@ -509,8 +509,7 @@ public class EsService {
             .orElseThrow()
             .getValues()
             .getFirst();
-    Query query =
-        buildQuery(user, "", searchFilters, new HashMap<>());
+    Query query = buildQuery(user, "", searchFilters, new HashMap<>());
     try {
       SearchResponse<?> response =
           elasticClient.search(

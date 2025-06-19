@@ -1,18 +1,16 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type EndpointOutput } from '../../../../utils/api-types';
-import { EndpointListItemFragments } from '../../common/endpoints/EndpointListItemFragments';
+import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
+import AssetNameFragment from '../../common/endpoints/fragments/output/AssetNameFragment';
+import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
+import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
+import AssetTypeFragment from '../../common/endpoints/fragments/output/AssetTypeFragment';
 import { type EndpointPopoverProps } from './EndpointPopover';
-import AssetNameFragment from "../../common/endpoints/fragments/output/AssetNameFragment";
-import AssetPlatformFragment from "../../common/endpoints/fragments/output/AssetPlatformFragment";
-import AssetTagsFragment from "../../common/endpoints/fragments/output/AssetTagsFragment";
-import AssetTypeFragment from "../../common/endpoints/fragments/output/AssetTypeFragment";
 
 const useStyles = makeStyles()(() => ({
   item: { height: 50 },
@@ -56,8 +54,6 @@ const EndpointsList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const theme = useTheme();
-  const { t } = useFormatter();
 
   const component = (endpoint: EndpointOutput) => {
     return renderActions(endpoint);

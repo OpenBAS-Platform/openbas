@@ -1,15 +1,10 @@
-import {EndpointOutput} from "../../../../../../utils/api-types";
-import PlatformIcon from "../../../../../../components/PlatformIcon";
-import {useTheme} from "@mui/material/styles";
-import {useFormatter} from "../../../../../../components/i18n";
-import ItemTags from "../../../../../../components/ItemTags";
+import ItemTags from '../../../../../../components/ItemTags';
+import { type EndpointOutput } from '../../../../../../utils/api-types';
 
-type Props = {
-    endpoint: EndpointOutput
-}
+type Props = { endpoint: EndpointOutput };
 
-const AssetTagsFragment = (props: Props) =>  {
-    return (<ItemTags variant="list" tags={props.endpoint.asset_tags} />);
-}
+const AssetTagsFragment = (props: Props) => {
+  return (<ItemTags variant="list" tags={props.endpoint.asset_tags} />);
+};
 
 export default AssetTagsFragment;

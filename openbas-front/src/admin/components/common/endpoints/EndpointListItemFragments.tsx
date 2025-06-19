@@ -1,6 +1,8 @@
-export enum EndpointListItemFragments {
+enum EndpointListItemFragments {
   ASSET_NAME = 'asset_name',
+  ENDPOINT_NAME = 'endpoint_name',
   ASSET_TAGS = 'asset_tags',
+  BASE_TAGS_SIDE = 'base_tags_side',
   ASSET_TYPE = 'asset_type',
   ENDPOINT_ACTIVE = 'endpoint_active',
   ENDPOINT_ARCH = 'endpoint_arch',
@@ -9,3 +11,5 @@ export enum EndpointListItemFragments {
   ASSET_PLATFORM = 'asset_platform',
   ENDPOINT_AGENTS_EXECUTOR = 'endpoint_agents_executor',
 }
+
+export default EndpointListItemFragments;

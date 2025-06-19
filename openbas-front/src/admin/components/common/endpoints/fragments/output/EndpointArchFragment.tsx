@@ -1,13 +1,11 @@
-import {EndpointOutput} from "../../../../../../utils/api-types";
-import {useFormatter} from "../../../../../../components/i18n";
+import { useFormatter } from '../../../../../../components/i18n';
+import { type EndpointOutput } from '../../../../../../utils/api-types';
 
-type Props = {
-    endpoint: EndpointOutput
-}
+type Props = { endpoint: EndpointOutput };
 
-const EndpointArchFragment = (props: Props) =>  {
-    const { t } = useFormatter();
-    return props.endpoint.endpoint_arch ?? t('Unknown');
-}
+const EndpointArchFragment = (props: Props) => {
+  const { t } = useFormatter();
+  return props.endpoint.endpoint_arch ?? t('Unknown');
+};
 
 export default EndpointArchFragment;
