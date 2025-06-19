@@ -63,6 +63,10 @@ public class EsEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String endpoint_seen_ip;
 
+  @Queryable(label = "endpoint is end of life", filterable = true)
+  @EsQueryable(keyword = true)
+  private Boolean endpoint_is_eol;
+
   // -- SIDE --
 
   @Queryable(label = "findings", filterable = true)
