@@ -224,7 +224,7 @@ public class InjectorContractService {
               String cardinality = cardinalityValueNode.asText();
               if (cardinality.equals(ContractCardinality.Multiple.name())) {
                 injectContent.set(key, defaultValueNode);
-              } else if(defaultValueNode.has(0)) {
+              } else if (defaultValueNode.has(0)) {
                 injectContent.set(key, defaultValueNode.get(0));
               }
             } else {
