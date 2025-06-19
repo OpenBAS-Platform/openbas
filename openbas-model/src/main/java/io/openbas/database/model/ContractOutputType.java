@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -135,18 +136,18 @@ public enum ContractOutputType {
       (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
         JsonNode assetIdNode = jsonNode.get("asset_id");
-        if (assetIdNode != null) {
-          if (assetIdNode.isArray()) {
-            List<String> result = new ArrayList<>();
-            for (JsonNode idNode : assetIdNode) {
-              result.add(idNode.asText());
-            }
-            return result;
-          } else {
-            return List.of(assetIdNode.asText());
-          }
+        if (assetIdNode == null) {
+          return Collections.emptyList();
         }
-        return new ArrayList<>();
+        if (assetIdNode.isArray()) {
+          List<String> result = new ArrayList<>();
+          for (JsonNode idNode : assetIdNode) {
+            result.add(idNode.asText());
+          }
+          return result;
+        } else {
+          return List.of(assetIdNode.asText());
+        }
       },
       null,
       null);
