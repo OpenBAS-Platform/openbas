@@ -3,7 +3,7 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
-import { type EsBase, type EsEndpoint } from '../../../../../../../../../utils/api-types';
+import { type EsBase } from '../../../../../../../../../utils/api-types';
 import DefaultElementStyles from './DefaultElementStyles';
 
 const useStyles = makeStyles()(() => ({
@@ -22,9 +22,9 @@ const DefaultListElement = (props: Props) => {
 
   const elementsFromColumn = (column: string) => {
     switch (column) {
-      default: return (endpoint: EsEndpoint) => {
-        const key = column as keyof typeof endpoint;
-        return endpoint[key];
+      default: return (element: EsBase) => {
+        const key = column as keyof typeof element;
+        return element[key];
       };
     }
   };
