@@ -38,7 +38,7 @@ public class EndpointInput extends AssetInput {
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
 
-  @Schema(description = "True if the endpoint is in an End of Life or End of Sale state")
+  @Schema(description = "True if the endpoint is in an End of Life state")
   @JsonProperty("endpoint_is_eol")
   private boolean isEol;
 }

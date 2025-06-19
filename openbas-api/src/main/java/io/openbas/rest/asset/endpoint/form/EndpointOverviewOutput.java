@@ -66,7 +66,7 @@ public class EndpointOverviewOutput {
   @JsonProperty("asset_tags")
   private Set<String> tags;
 
-  @Schema(description = "True if the endpoint is in an End of Life or End of Sale state")
+  @Schema(description = "True if the endpoint is in an End of Life state")
   @JsonProperty("endpoint_is_eol")
   private boolean isEol;
 }

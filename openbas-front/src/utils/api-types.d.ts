@@ -1044,7 +1044,7 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
-  /** True if the endpoint is in an End of Life or End of Sale state */
+  /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
@@ -1117,7 +1117,7 @@ export interface EndpointOverviewOutput {
    * @uniqueItems true
    */
   endpoint_ips?: string[];
-  /** True if the endpoint is in an End of Life or End of Sale state */
+  /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   /**
    * List of MAC addresses
@@ -1155,7 +1155,7 @@ export interface EndpointRegisterInput {
    * @minItems 1
    */
   endpoint_ips: string[];
-  /** True if the endpoint is in an End of Life or End of Sale state */
+  /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
