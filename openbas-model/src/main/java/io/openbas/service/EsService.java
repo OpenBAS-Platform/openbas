@@ -26,7 +26,6 @@ import io.openbas.engine.api.DateHistogramWidget.DateHistogramSeries;
 import io.openbas.engine.api.StructuralHistogramWidget.StructuralHistogramSeries;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
-import io.openbas.engine.model.endpoint.EsEndpoint;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
@@ -534,10 +533,11 @@ public class EsService {
   }
 
   private Class<?> getClassForEntity(String entity_name) {
-    return switch (entity_name) {
-      case "endpoint" -> EsEndpoint.class;
-      default -> EsBase.class;
-    };
+    Optional<EsModel<EsBase>> model =
+        esEngine.getModels().stream()
+            .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
+            .findAny();
+    return model.get().getModel();
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
