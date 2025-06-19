@@ -178,7 +178,7 @@ const EndpointForm: FunctionComponent<Props> = ({
         <AddressesFieldComponent name="endpoint_ips" helperText="Please provide one IP address per line." label={t('IP Addresses')} required />
         <AddressesFieldComponent name="endpoint_mac_addresses" helperText="Please provide one MAC address per line." label={t('MAC Addresses')} />
         <TagFieldController name="asset_tags" label={t('Tags')} />
-        <SwitchFieldController name="endpoint_is_eol" label={t('End of Life/End of Sale')} />
+        <SwitchFieldController name="endpoint_is_eol" label={t('End of Life')} />
         <div style={{ alignSelf: 'flex-end' }}>
           <Button
             variant="contained"

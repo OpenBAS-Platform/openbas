@@ -86,7 +86,7 @@ const Endpoint = () => {
         <Typography variant="h3" gutterBottom>{t('Hostname')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Seen IP address')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Platform')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('End of Life/End of Sale')}</Typography>
+        <Typography variant="h3" gutterBottom>{t('End of Life')}</Typography>
 
         <ExpandableMarkdown source={endpoint.asset_description} limit={300} />
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_hostname)}</Typography>
