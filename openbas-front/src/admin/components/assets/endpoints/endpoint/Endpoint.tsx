@@ -29,7 +29,7 @@ const useStyles = makeStyles()(theme => ({
     'gridTemplateColumns': '1fr 1fr 1fr 1fr 1fr',
     '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
   },
-  typeChip: {
+  typeChipEol: {
     textTransform: 'uppercase',
     borderRadius: 5,
     width: 80,
@@ -117,13 +117,13 @@ const Endpoint = () => {
         <span>
           { endpoint.endpoint_is_eol ? (
             <Chip
-              className={classes.typeChip}
+              className={classes.typeChipEol}
               style={inlineStyles.red}
               label={t('Yes')}
             />
           ) : (
             <Chip
-              className={classes.typeChip}
+              className={classes.typeChipEol}
               style={inlineStyles.green}
               label={t('No')}
             />
