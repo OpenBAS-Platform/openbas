@@ -43,7 +43,7 @@ export const isVisibleField = (field: ContractElement, fields: ContractElement[]
       } else {
         value = values[fieldVisibleConditionField];
       }
-      if (!field.visibleConditionValues?.[fieldVisibleConditionField] && (value === undefined || value === null || value.length === 0)) {
+      if (!field.visibleConditionValues?.[fieldVisibleConditionField] && (value === undefined || value === null || value.length === 0 || value === false)) {
         visible = false;
       } else if (value !== field.visibleConditionValues?.[fieldVisibleConditionField]) {
         visible = false;
