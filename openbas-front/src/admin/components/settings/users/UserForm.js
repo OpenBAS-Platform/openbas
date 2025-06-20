@@ -1,34 +1,40 @@
 import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { z } from 'zod';
 
 import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
 import TagField from '../../../../components/TagField';
+import { schemaValidator } from '../../../../utils/Zod.js';
 
 const UserForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;
   const { t } = useFormatter();
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = editing
-      ? ['user_email']
-      : ['user_email', 'user_plain_password'];
-    requiredFields.forEach((field) => {
-      if (!values[field]) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
+
+  const requiredFields = editing
+    ? ['user_email']
+    : ['user_email', 'user_plain_password'];
+
+  const userFormSchemaValidation = z.object({
+    user_email: z
+      .string()
+      .nonempty(t('This field is required.'))
+      .email(t('Should be a valid email address')),
+    ...(requiredFields.includes('user_plain_password') && {
+      user_plain_password: z
+        .string()
+        .nonempty(t('This field is required.')),
+    }),
+  });
   return (
     <Form
       keepDirtyOnReinitialize={true}
       initialValues={initialValues}
       onSubmit={onSubmit}
-      validate={validate}
+      validate={schemaValidator(userFormSchemaValidation)}
       mutators={{
         setValue: ([field, value], state, { changeValue }) => {
           changeValue(state, field, () => value);
