@@ -687,6 +687,7 @@
   "inject_import_json_action": "Import JSON",
   "inject_import_xls_action": "XLS import (mapper)",
   "inject_injector_contract": "Injector",
+  "inject_attack_patterns": "Attack pattern",
   "inject_kill_chain_phases": "Kill chain phase",
   "inject_platforms": "Platforms",
   "inject_tags": "Tags",

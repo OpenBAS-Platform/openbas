@@ -687,6 +687,7 @@
   "inject_import_json_action": "导入 JSON",
   "inject_import_xls_action": "XLS 导入（映射器）",
   "inject_injector_contract": "注入器",
+  "inject_attack_patterns": "攻击模式",
   "inject_kill_chain_phases": "杀伤链阶段",
   "inject_platforms": "平台",
   "inject_tags": "标签",
