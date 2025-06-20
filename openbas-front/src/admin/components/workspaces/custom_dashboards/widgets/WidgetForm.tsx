@@ -65,8 +65,8 @@ const WidgetForm: FunctionComponent<Props> = ({
       mode: z.literal('temporal'),
       title: z.string().optional(),
       field: z.string().min(1, { message: t('Should not be empty') }),
-      start: z.string().min(1, { message: t('Should not be empty') }),
-      end: z.string().min(1, { message: t('Should not be empty') }),
+      /* start: z.string().min(1, { message: t('Should not be empty') }),
+      end: z.string().min(1, { message: t('Should not be empty') }), */
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
