@@ -633,7 +633,7 @@ class InjectApiTest extends IntegrationTest {
       payloadArguments.put(
           "asset-separate-by-coma", List.of(endpoint1Saved.getId(), endpoint2Saved.getId()));
       payloadArguments.put(
-          CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-asset-separate-by-space", "local-ip");
+          CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-asset-separate-by-space", "local_ip");
       payloadArguments.put(
           CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR + "-asset-separate-by-space", " ");
 
