@@ -1,5 +1,7 @@
 package io.openbas.rest.payload.service;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
@@ -9,6 +11,7 @@ import static io.openbas.injector_contract.ContractDef.contractBuilder;
 import static io.openbas.injector_contract.fields.ContractAsset.assetField;
 import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
 import static io.openbas.injector_contract.fields.ContractText.textField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,10 +26,8 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
-import io.openbas.injector_contract.fields.ContractAsset;
-import io.openbas.injector_contract.fields.ContractAssetGroup;
-import io.openbas.injector_contract.fields.ContractChoiceInformation;
-import io.openbas.injector_contract.fields.ContractExpectations;
+import io.openbas.injector_contract.ContractTargetedProperty;
+import io.openbas.injector_contract.fields.*;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.payload.PayloadUtils;
 import jakarta.annotation.Resource;
@@ -58,54 +59,44 @@ public class PayloadService {
     injectors.forEach(injector -> updateInjectorContract(injector, payload));
   }
 
+  private void setInjectorContractPropertyBasedOnPayload(
+      InjectorContract injectorContract, Payload payload, Injector injector) {
+    Map<String, String> labels = Map.of("en", payload.getName(), "fr", payload.getName());
+    injectorContract.setLabels(labels);
+    injectorContract.setNeedsExecutor(true);
+    injectorContract.setManual(false);
+    injectorContract.setInjector(injector);
+    injectorContract.setPayload(payload);
+    injectorContract.setPlatforms(payload.getPlatforms());
+    injectorContract.setAttackPatterns(
+        fromIterable(
+            attackPatternRepository.findAllById(
+                payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
+    injectorContract.setAtomicTesting(true);
+
+    try {
+      Contract contract = buildContract(injectorContract.getId(), injector, payload);
+      injectorContract.setContent(mapper.writeValueAsString(contract));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private void updateInjectorContract(Injector injector, Payload payload) {
     Optional<InjectorContract> injectorContract =
         injectorContractRepository.findInjectorContractByInjectorAndPayload(injector, payload);
+
+    InjectorContract injectorContractToUpdate;
     if (injectorContract.isPresent()) {
-      InjectorContract existingInjectorContract = injectorContract.get();
-      Contract contract = buildContract(existingInjectorContract.getId(), injector, payload);
-      Map<String, String> labels = Map.of("en", payload.getName(), "fr", payload.getName());
-      existingInjectorContract.setLabels(labels);
-      existingInjectorContract.setNeedsExecutor(true);
-      existingInjectorContract.setManual(false);
-      existingInjectorContract.setInjector(injector);
-      existingInjectorContract.setPayload(payload);
-      existingInjectorContract.setPlatforms(payload.getPlatforms());
-      existingInjectorContract.setAttackPatterns(
-          fromIterable(
-              attackPatternRepository.findAllById(
-                  payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
-      existingInjectorContract.setAtomicTesting(true);
-      try {
-        existingInjectorContract.setContent(mapper.writeValueAsString(contract));
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-      injectorContractRepository.save(existingInjectorContract);
+      injectorContractToUpdate = injectorContract.get();
     } else {
       String contractId = String.valueOf(UUID.randomUUID());
-      Map<String, String> labels = Map.of("en", payload.getName(), "fr", payload.getName());
-      Contract contract = buildContract(contractId, injector, payload);
-      InjectorContract newInjectorContract = new InjectorContract();
-      newInjectorContract.setId(contractId);
-      newInjectorContract.setLabels(labels);
-      newInjectorContract.setNeedsExecutor(true);
-      newInjectorContract.setManual(false);
-      newInjectorContract.setInjector(injector);
-      newInjectorContract.setPayload(payload);
-      newInjectorContract.setPlatforms(payload.getPlatforms());
-      newInjectorContract.setAttackPatterns(
-          fromIterable(
-              attackPatternRepository.findAllById(
-                  payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())));
-      newInjectorContract.setAtomicTesting(true);
-      try {
-        newInjectorContract.setContent(mapper.writeValueAsString(contract));
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-      injectorContractRepository.save(newInjectorContract);
+      injectorContractToUpdate = new InjectorContract();
+      injectorContractToUpdate.setId(contractId);
     }
+
+    setInjectorContractPropertyBasedOnPayload(injectorContractToUpdate, payload, injector);
+    injectorContractRepository.save(injectorContractToUpdate);
   }
 
   private ContractChoiceInformation obfuscatorField() {
@@ -113,6 +104,31 @@ public class PayloadService {
     Map<String, String> obfuscationInfo = obfuscationMap.getAllObfuscationInfo();
     return ContractChoiceInformation.choiceInformationField(
         "obfuscator", "Obfuscators", obfuscationInfo, obfuscationMap.getDefaultObfuscator());
+  }
+
+  private List<ContractElement> targetedAssetFields(String key, PayloadArgument payloadArgument) {
+    ContractElement targetedAssetField = new ContractTargetedAsset(key, key);
+
+    Map<String, String> targetPropertySelectorMap = new HashMap<>();
+    for (ContractTargetedProperty property : ContractTargetedProperty.values()) {
+      targetPropertySelectorMap.put(property.name(), property.label);
+    }
+    ContractElement targetPropertySelector =
+        selectFieldWithDefault(
+            CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-" + key,
+            "Targeted Property",
+            targetPropertySelectorMap,
+            payloadArgument.getDefaultValue());
+    targetPropertySelector.setLinkedFields(List.of(targetedAssetField));
+
+    ContractElement separatorField =
+        textField(
+            CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR + "-" + key,
+            "Separator",
+            payloadArgument.getSeparator());
+    separatorField.setLinkedFields(List.of(targetedAssetField));
+
+    return List.of(targetedAssetField, targetPropertySelector, separatorField);
   }
 
   private Contract buildContract(
@@ -135,8 +151,7 @@ public class PayloadService {
     builder.mandatoryGroup(assetField, assetGroupField);
 
     if (payload.getType().equals("Command")) {
-      ContractChoiceInformation obfuscatorField = obfuscatorField();
-      builder.optional(obfuscatorField);
+      builder.optional(obfuscatorField());
     }
 
     builder.optional(expectationsField);
@@ -145,11 +160,19 @@ public class PayloadService {
           .getArguments()
           .forEach(
               payloadArgument -> {
-                builder.mandatory(
-                    textField(
-                        payloadArgument.getKey(),
-                        payloadArgument.getKey(),
-                        payloadArgument.getDefaultValue()));
+                if (ContractFieldType.Text.label.equals(payloadArgument.getType())) {
+                  builder.mandatory(
+                      textField(
+                          payloadArgument.getKey(),
+                          payloadArgument.getKey(),
+                          payloadArgument.getDefaultValue()));
+
+                } else if (ContractFieldType.TargetedAsset.label.equals(
+                    payloadArgument.getType())) {
+                  List<ContractElement> targetedAssetsFields =
+                      targetedAssetFields(payloadArgument.getKey(), payloadArgument);
+                  targetedAssetsFields.forEach(builder::mandatory);
+                }
               });
     }
     return executableContract(

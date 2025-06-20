@@ -1,17 +1,23 @@
-package io.openbas.rest;
+package io.openbas.rest.payload;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
+import static io.openbas.database.specification.InjectorContractSpecification.byPayloadId;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -23,6 +29,7 @@ import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +45,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
   @Autowired private DocumentRepository documentRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private PayloadRepository payloadRepository;
 
   @Resource private ObjectMapper objectMapper;
@@ -53,82 +61,151 @@ class PayloadApiTest extends IntegrationTest {
     this.payloadRepository.deleteAll();
   }
 
-  @Test
+  @Nested
+  @WithMockAdminUser
   @DisplayName("Create Payload")
-  @WithMockAdminUser
-  void createExecutablePayload() throws Exception {
-    PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
-    input.setExecutableFile(EXECUTABLE_FILE.getId());
+  class CreatePayload {
+    @Test
+    @DisplayName("Create Payload")
+    void createExecutablePayload() throws Exception {
+      PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
+      input.setExecutableFile(EXECUTABLE_FILE.getId());
 
-    mvc.perform(
-            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
-        .andExpect(jsonPath("$.payload_description").value("Executable description"))
-        .andExpect(jsonPath("$.payload_source").value("MANUAL"))
-        .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
-        .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(
-            jsonPath("$.payload_execution_arch")
-                .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()));
-  }
+      mvc.perform(
+              post(PAYLOAD_URI)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().is2xxSuccessful())
+          .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
+          .andExpect(jsonPath("$.payload_description").value("Executable description"))
+          .andExpect(jsonPath("$.payload_source").value("MANUAL"))
+          .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
+          .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
+          .andExpect(
+              jsonPath("$.payload_execution_arch")
+                  .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()));
+    }
 
-  @Test
-  @DisplayName("Creating a Payload with a null as arch should fail")
-  @WithMockAdminUser
-  void createPayloadWithNullArch() throws Exception {
-    PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-    input.setExecutionArch(null);
-    mvc.perform(
-            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().isBadRequest());
-  }
+    @Test
+    @DisplayName("Creating a Payload with a null as arch should fail")
+    void createPayloadWithNullArch() throws Exception {
+      PayloadCreateInput input =
+          PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+      input.setExecutionArch(null);
+      mvc.perform(
+              post(PAYLOAD_URI)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().isBadRequest());
+    }
 
-  @Test
-  @DisplayName(
-      "Creating an executable Payload with an arch different from x86_64 or arm64 should fail")
-  @WithMockAdminUser
-  void createExecutablePayloadWithoutArch() throws Exception {
-    PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
-    input.setExecutableFile(EXECUTABLE_FILE.getId());
-    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES);
+    @Test
+    @DisplayName(
+        "Creating an executable Payload with an arch different from x86_64 or arm64 should fail")
+    void createExecutablePayloadWithoutArch() throws Exception {
+      PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
+      input.setExecutableFile(EXECUTABLE_FILE.getId());
+      input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES);
 
-    mvc.perform(
-            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().isBadRequest())
-        .andExpect(
-            result -> {
-              String errorMessage = result.getResolvedException().getMessage();
-              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or arm64"));
-            });
-  }
+      mvc.perform(
+              post(PAYLOAD_URI)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().isBadRequest())
+          .andExpect(
+              result -> {
+                String errorMessage = result.getResolvedException().getMessage();
+                assertTrue(
+                    errorMessage.contains("Executable architecture must be x86_64 or arm64"));
+              });
+    }
 
-  @Test
-  @DisplayName("Create Payload with output parser")
-  @WithMockAdminUser
-  void given_payload_create_input_with_output_parsers_should_return_payload_with_output_parsers()
-      throws Exception {
-    PayloadCreateInput input =
-        PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
+    @Test
+    @DisplayName("Create Payload with output parser")
+    void given_payload_create_input_with_output_parsers_should_return_payload_with_output_parsers()
+        throws Exception {
+      PayloadCreateInput input =
+          PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
 
-    mvc.perform(
-            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.payload_name").value("Command line payload"))
-        .andExpect(
-            jsonPath("$.payload_output_parsers[0].output_parser_mode")
-                .value(ParserMode.STDOUT.name()))
-        .andExpect(
-            jsonPath("$.payload_output_parsers[0].output_parser_type")
-                .value(ParserType.REGEX.name()))
-        .andExpect(
-            jsonPath(
-                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
-                .value("rule"))
-        .andExpect(
-            jsonPath(
-                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
-                .value("IPV6"));
+      mvc.perform(
+              post(PAYLOAD_URI)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().is2xxSuccessful())
+          .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+          .andExpect(
+              jsonPath("$.payload_output_parsers[0].output_parser_mode")
+                  .value(ParserMode.STDOUT.name()))
+          .andExpect(
+              jsonPath("$.payload_output_parsers[0].output_parser_type")
+                  .value(ParserType.REGEX.name()))
+          .andExpect(
+              jsonPath(
+                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                  .value("rule"))
+          .andExpect(
+              jsonPath(
+                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
+                  .value("IPV6"));
+    }
+
+    @Test
+    @DisplayName("Create Payload with targeted asset")
+    void given_targetedAssetArgument_should_create_payload_with_targeted_asset() throws Exception {
+      PayloadCreateInput input =
+          PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+
+      PayloadArgument targetedAssetArgument = new PayloadArgument();
+      targetedAssetArgument.setKey("URL");
+      targetedAssetArgument.setType("targeted-asset");
+      targetedAssetArgument.setDefaultValue("hostname");
+      targetedAssetArgument.setSeparator("-u");
+      input.setArguments(List.of(targetedAssetArgument));
+
+      String response =
+          mvc.perform(
+                  post(PAYLOAD_URI)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().is2xxSuccessful())
+              .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+              //              .andExpect(jsonPath("$.payload_arguments]").value("targeted-asset"))
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertEquals("1", JsonPath.read(response, "$.payload_arguments.length()").toString());
+      assertEquals("targeted-asset", JsonPath.read(response, "$.payload_arguments[0].type"));
+      InjectorContract injectorContract =
+          injectorContractRepository
+              .findOne(byPayloadId(JsonPath.read(response, "$.payload_id")))
+              .orElse(null);
+
+      assertNotNull(injectorContract);
+
+      ArrayNode fields = (ArrayNode) injectorContract.getConvertedContent().get("fields");
+      List<JsonNode> fieldsForTargetedAsset = new ArrayList<>();
+      fields.forEach(
+          f -> {
+            String key = f.get("key").asText();
+            String type = f.get("type").asText();
+
+            if ("URL".equals(key)) {
+              assertEquals("targeted-asset", type);
+              fieldsForTargetedAsset.add(f);
+            } else if ((CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-URL").equals(key)) {
+              assertEquals("select", type);
+              assertEquals("[\"hostname\"]", f.get("defaultValue").toString());
+              fieldsForTargetedAsset.add(f);
+            } else if ((CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR + "-URL")
+                .equals(key)) {
+              assertEquals("text", type);
+              assertEquals("-u", f.get("defaultValue").asText());
+              fieldsForTargetedAsset.add(f);
+            }
+          });
+      assertEquals(3, fieldsForTargetedAsset.size(), "Fields size should be 3");
+    }
   }
 
   @Test

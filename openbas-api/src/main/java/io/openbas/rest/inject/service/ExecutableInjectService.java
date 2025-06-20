@@ -1,18 +1,27 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
+import io.openbas.injector_contract.ContractTargetedProperty;
+import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.service.PayloadService;
+import io.openbas.service.EndpointService;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +29,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutableInjectService {
 
+  private final EndpointService endpointService;
   private final InjectService injectService;
   private final InjectStatusService injectStatusService;
   private final PayloadService payloadService;
+
+  @Resource protected ObjectMapper mapper;
+
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
@@ -37,30 +50,66 @@ public class ExecutableInjectService {
     return commandParameters;
   }
 
+  private String getArgumentValueOrDefault(
+      String key, ObjectNode injectContent, String defaultValue) {
+    return injectContent.get(key) != null && !injectContent.get(key).asText().isEmpty()
+        ? injectContent.get(key).asText()
+        : defaultValue;
+  }
+
+  private String getTargetedAssetArgumentValue(
+      String argumentKey, ObjectNode injectContent, PayloadArgument defaultPayloadArgument) {
+    List<String> assetIds =
+        mapper.convertValue(injectContent.get(argumentKey), new TypeReference<List<String>>() {});
+    List<Endpoint> endpointList = endpointService.endpoints(assetIds);
+
+    String targetedProperty =
+        getArgumentValueOrDefault(
+            CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-" + argumentKey,
+            injectContent,
+            defaultPayloadArgument.getDefaultValue());
+    ContractTargetedProperty contractTargetedProperty =
+        ContractTargetedProperty.valueOf(targetedProperty);
+
+    String assetSeparator =
+        getArgumentValueOrDefault(
+            CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR + "-" + argumentKey,
+            injectContent,
+            defaultPayloadArgument.getSeparator());
+
+    return endpointList.stream()
+        .map(contractTargetedProperty.toEndpointValue)
+        .collect(Collectors.joining(assetSeparator));
+  }
+
   private String replaceArgumentsByValue(
       String command, List<PayloadArgument> defaultArguments, ObjectNode injectContent) {
 
-    List<String> arguments = getArgumentsFromCommandLines(command);
+    List<String> argumentKeys = getArgumentsFromCommandLines(command);
 
-    for (String argument : arguments) {
+    for (String argumentKey : argumentKeys) {
       String value = "";
+      PayloadArgument defaultPayloadArgument =
+          defaultArguments.stream()
+              .filter(a -> a.getKey().equals(argumentKey))
+              .findFirst()
+              .orElse(null);
 
-      // Try to get the value from injectContent
-      if (injectContent.has(argument) && !injectContent.get(argument).asText().isEmpty()) {
-        value = injectContent.get(argument).asText();
+      // If the argument is a targeted asset, we need to fetch the asset details
+      if (defaultPayloadArgument != null
+          && ContractFieldType.TargetedAsset.label.equals(defaultPayloadArgument.getType())) {
+        value = getTargetedAssetArgumentValue(argumentKey, injectContent, defaultPayloadArgument);
+
       } else {
-        // Fallback to defaultContent
         value =
-            defaultArguments.stream()
-                .filter(a -> a.getKey().equals(argument))
-                .map(PayloadArgument::getDefaultValue)
-                .findFirst()
-                .orElse("");
+            getArgumentValueOrDefault(
+                argumentKey,
+                injectContent,
+                defaultPayloadArgument != null ? defaultPayloadArgument.getDefaultValue() : "");
       }
 
-      command = command.replace("#{" + argument + "}", value);
+      command = command.replace("#{" + argumentKey + "}", value);
     }
-
     return command;
   }
 
