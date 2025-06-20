@@ -499,6 +499,47 @@ public class EsService {
         .toList();
   }
 
+  public List<EsBase> entities(RawUserAuth user, StructuralHistogramRuntime runtime) {
+    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
+    String entityName =
+        searchFilters.getFilters().stream()
+            .filter(filter -> "base_entity".equals(filter.getKey()))
+            .findAny()
+            .orElseThrow()
+            .getValues()
+            .getFirst();
+    Query query = buildQuery(user, "", searchFilters, new HashMap<>());
+    try {
+      SearchResponse<?> response =
+          elasticClient.search(
+              b ->
+                  b.index(engineConfig.getIndexPrefix() + "*")
+                      .size(engineConfig.getDefaultPagination())
+                      .query(query)
+                      .sort(
+                          SortOptions.of(
+                              s ->
+                                  s.field(
+                                      FieldSort.of(f -> f.field("_score").order(SortOrder.Desc))))),
+              getClassForEntity(entityName));
+      return response.hits().hits().stream()
+          .filter(hit -> hit.source() != null)
+          .map(hit -> (EsBase) hit.source())
+          .toList();
+    } catch (IOException e) {
+      log.error("query exception: {}", e.getMessage(), e);
+    }
+    return List.of();
+  }
+
+  private Class<?> getClassForEntity(String entity_name) {
+    Optional<EsModel<EsBase>> model =
+        esEngine.getModels().stream()
+            .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
+            .findAny();
+    return model.get().getModel();
+  }
+
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
     Query query = buildQuery(user, search, filter, new HashMap<>());
     try {

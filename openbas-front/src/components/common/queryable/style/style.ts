@@ -10,7 +10,8 @@ const useBodyItemsStyles: () => {
   return ({
     bodyItems: {
       display: 'flex',
-      flexWrap: 'wrap',
+      overflow: 'scroll',
+      flexWrap: 'nowrap',
       maxWidth: '100%',
     },
     bodyItem: {

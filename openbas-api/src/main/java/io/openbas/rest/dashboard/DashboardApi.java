@@ -74,6 +74,17 @@ public class DashboardApi extends RestBehavior {
     throw new RuntimeException("Unsupported widget: " + widget);
   }
 
+  @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
+  public List<EsBase> entities(@PathVariable final String widgetId) {
+    Widget widget = this.widgetService.widget(widgetId);
+    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();
+    Map<String, String> parameters = new HashMap<>();
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
+
+    return esService.entities(userWithAuth, runtime);
+  }
+
   @GetMapping(DASHBOARD_URI + "/search/{search}")
   public List<EsSearch> search(@PathVariable final String search) {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
