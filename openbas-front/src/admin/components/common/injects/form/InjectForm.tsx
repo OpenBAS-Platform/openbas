@@ -382,6 +382,12 @@ const InjectForm = ({
   }, [subscribe, injectorContractContent]);
 
   useEffect(() => {
+    if (!isCreation) {
+      trigger();
+    }
+  }, [isCreation, mandatoryKeys]);
+
+  useEffect(() => {
     if (injectorContractContent?.fields) {
       setFieldsMapByKey(injectorContractContent.fields.reduce<Record<ContractElement['key'], ContractElement>>((acc, field) => {
         acc[field.key] = field;

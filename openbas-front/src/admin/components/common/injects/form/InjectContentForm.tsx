@@ -42,7 +42,6 @@ const InjectContentForm = ({
   enhancedFieldsMapByType,
   injectorContractVariables,
   isAtomic,
-  isCreation,
   readOnly,
   articles = [],
   uriVariable = '',
@@ -50,7 +49,7 @@ const InjectContentForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const { control, setValue, getValues, trigger, formState: { errors } } = useFormContext();
+  const { control, setValue, getValues, formState: { errors } } = useFormContext();
 
   const renderTitle = (title: string, required: boolean = false, err: boolean = false) => {
     return (
@@ -317,14 +316,6 @@ const InjectContentForm = ({
     },
   ];
 
-  const triggerInitialValidation = () => {
-    useEffect(() => {
-      if (!isCreation) {
-        trigger();
-      }
-    }, []);
-  };
-
   return (
     <>
       {injectContentParts.filter(part => part.show).map(part => (
@@ -358,7 +349,6 @@ const InjectContentForm = ({
           }
         </div>
       ))}
-      {triggerInitialValidation()}
       <AvailableVariablesDialog
         uriVariable={uriVariable}
         variables={variables}

@@ -22,7 +22,7 @@ export const isRequiredField = (field: ContractElement, fields: ContractElement[
       }
       if (!field.mandatoryConditionValues?.[fieldMandatoryConditionField] && (value === undefined || value === null || value.length === 0)) {
         mandatory = false;
-      } else if (field.mandatoryConditionValues?.[fieldMandatoryConditionField] && value !== field.mandatoryConditionValues?.[fieldMandatoryConditionField]) {
+      } else if (field.visibleConditionValues?.[fieldMandatoryConditionField] && String(value) !== String(field.visibleConditionValues?.[fieldMandatoryConditionField])) {
         mandatory = false;
       }
     });
@@ -45,7 +45,7 @@ export const isVisibleField = (field: ContractElement, fields: ContractElement[]
       }
       if (!field.visibleConditionValues?.[fieldVisibleConditionField] && (value === undefined || value === null || value.length === 0)) {
         visible = false;
-      } else if (String(value) !== String(field.visibleConditionValues?.[fieldVisibleConditionField])) {
+      } else if (field.visibleConditionValues?.[fieldVisibleConditionField] && String(value) !== String(field.visibleConditionValues?.[fieldVisibleConditionField])) {
         visible = false;
       }
     });
