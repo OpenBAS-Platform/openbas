@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -212,7 +213,24 @@ public class InjectorContractService {
         String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
         if (!CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
-          injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
+          JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
+          if (defaultValueNode != null
+              && !defaultValueNode.isNull()
+              && !defaultValueNode.asText().isEmpty()) {
+            JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
+            if (cardinalityValueNode != null
+                && !cardinalityValueNode.isNull()
+                && !cardinalityValueNode.asText().isEmpty()) {
+              String cardinality = cardinalityValueNode.asText();
+              if (cardinality.equals(ContractCardinality.Multiple.name())) {
+                injectContent.set(key, defaultValueNode);
+              } else if (defaultValueNode.has(0)) {
+                injectContent.set(key, defaultValueNode.get(0));
+              }
+            } else {
+              injectContent.set(key, defaultValueNode);
+            }
+          }
         }
       }
 
