@@ -84,7 +84,7 @@ public class FindingService {
 
   // -- Extract findings from strctured output : Here we compute the findings from structured output
   // from ExecutionInjectInput sent by injectors
-  // This structrued output is generated based on injectorcontract where we can find the node
+  // This structured output is generated based on injectorcontract where we can find the node
   // Outputs and with that the injector generate this structure output--
 
   public void extractFindingsFromInjectorContract(Inject inject, ObjectNode structuredOutput) {

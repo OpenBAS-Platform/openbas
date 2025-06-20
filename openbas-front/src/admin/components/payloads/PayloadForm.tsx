@@ -84,10 +84,17 @@ const PayloadForm = ({
 
   const payloadArgumentZodObject = z.object({
     default_value: z.string().nonempty(t('Should not be empty')),
-    key: z.string().min(1, { message: t('Should not be empty') }),
-    type: z.string().min(1, { message: t('Should not be empty') }),
+    key: z.string().nonempty(t('Should not be empty')),
+    type: z.string().nonempty(t('Should not be empty')),
     description: z.string().optional().nullable(),
-  });
+    separator: z.string().optional().nullable(),
+  }).refine(
+    data => data.type !== 'targeted-asset' || !!data.separator,
+    {
+      message: t('Should not be empty'),
+      path: ['separator'],
+    },
+  );
 
   const baseSchema = {
     payload_name: z.string().min(1, { message: t('Should not be empty') }).describe('General-tab'),

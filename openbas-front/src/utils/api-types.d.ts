@@ -3746,6 +3746,7 @@ export interface PayloadArgument {
   default_value: string;
   description?: string | null;
   key: string;
+  separator?: string | null;
   type: string;
 }
 

@@ -19,15 +19,13 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.openbas.utils.pagination.SortField;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -362,6 +360,7 @@ class FindingApiTest extends IntegrationTest {
         Exercise ex = scenarioWrapper.get().getExercises().getFirst();
 
         SearchPaginationInput input = PaginationFixture.getDefault().build();
+        input.setSorts(List.of(new SortField("finding_created_at", "asc")));
 
         entityManager.flush();
         entityManager.clear();
@@ -380,6 +379,7 @@ class FindingApiTest extends IntegrationTest {
                             .toList()))
                 .stream()
                 .map(findingMapper::toFindingOutput)
+                .sorted(Comparator.comparing(FindingOutput::getCreationDate))
                 .limit(input.getSize())
                 .toList();
 

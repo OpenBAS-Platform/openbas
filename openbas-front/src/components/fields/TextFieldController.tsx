@@ -21,6 +21,7 @@ interface Props {
   endAdornmentLabel?: string;
   startAdornmentLabel?: string;
   type?: 'number' | 'text';
+  defaultValue?: string;
 }
 
 const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
@@ -39,6 +40,7 @@ const TextFieldController = ({
   endAdornmentLabel,
   startAdornmentLabel,
   type = 'text',
+  defaultValue = '',
 }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
@@ -47,6 +49,7 @@ const TextFieldController = ({
     <Controller
       name={name}
       control={control}
+      defaultValue={defaultValue}
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
