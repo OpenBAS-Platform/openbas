@@ -1,14 +1,14 @@
 import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { z } from 'zod';
 
 import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
 import TagField from '../../../../components/TagField';
-import {z} from "zod";
-import {schemaValidator} from "../../../../utils/Zod.js";
+import { schemaValidator } from '../../../../utils/Zod.js';
 
 const UserForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;
