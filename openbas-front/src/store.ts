@@ -11,7 +11,7 @@ import { entitiesInitializer } from './reducers/Referential';
 import createRootReducer from './reducers/Root';
 
 // Default application state
-const initialState = {
+export const initialState = {
   app: fromJS({
     logged: {},
     worker: { status: 'RUNNING' },
