@@ -78,7 +78,7 @@ export type EnhancedContractElement = ContractElement & {
   isInMandatoryGroup: boolean;
   mandatoryGroupContractElementLabels: string;
   settings?: {
-    rows: number;
+    rows?: number;
     required?: boolean;
   };
 };

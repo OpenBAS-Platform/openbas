@@ -54,11 +54,11 @@ const InjectTeamsList: FunctionComponent<Props> = ({ readOnly = false, hideEnabl
   }, [injectTeamIds]);
 
   // -- ACTIONS --
-  const onTeamsChange = (teamIds: string[]) => setValue('inject_teams', teamIds);
+  const onTeamsChange = (teamIds: string[]) => setValue('inject_teams', teamIds, { shouldValidate: true });
 
   const onRemoveTeam = (teamId: string) => {
     const updatedTeamIds = injectTeamIds.filter((id: string) => id !== teamId);
-    setValue('inject_teams', updatedTeamIds);
+    setValue('inject_teams', updatedTeamIds, { shouldValidate: true });
   };
 
   const teamListItem = (team: TeamOutput, userEnabled: number) => (

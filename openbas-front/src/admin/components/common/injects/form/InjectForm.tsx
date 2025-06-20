@@ -298,10 +298,7 @@ const InjectForm = ({
               newAcc += t(f.label);
               return newAcc;
             }, ''),
-            settings: {
-              rows: 1,
-              required: isRequired,
-            },
+            settings: { required: isRequired },
           };
 
           newEnhancedFields.push(enhancedField);

@@ -32,7 +32,6 @@ const RichTextField = ({
       position: 'relative',
     }}
     >
-
       <Controller
         name={name}
         control={control}

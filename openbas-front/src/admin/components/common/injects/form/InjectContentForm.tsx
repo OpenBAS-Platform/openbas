@@ -52,9 +52,9 @@ const InjectContentForm = ({
   const theme = useTheme();
   const { control, setValue, getValues, trigger, formState: { errors } } = useFormContext();
 
-  const renderTitle = (title: string, required: boolean = false) => {
+  const renderTitle = (title: string, required: boolean = false, err: boolean = false) => {
     return (
-      <Typography variant="h5">
+      <Typography variant="h5" color={err ? 'error' : 'textPrimary'}>
         {title}
         {required ? '*' : '' }
       </Typography>
@@ -84,8 +84,8 @@ const InjectContentForm = ({
     }
   }, [injectAssetIds]);
 
-  const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset')?.isInMandatoryGroup } */);
-  const removeAsset = (assetId: string) => setValue('inject_assets', injectAssetIds.filter(id => id !== assetId)/* ,{ shouldValidate: enhancedFieldsMapByType.get('asset')?.isInMandatoryGroup } */);
+  const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds, { shouldValidate: true });
+  const removeAsset = (assetId: string) => setValue('inject_assets', injectAssetIds.filter(id => id !== assetId), { shouldValidate: true });
 
   const renderAssets = (err?: string | null, isInMandatoryGroup?: boolean, mandatoryGroupContractElementLabels?: string) => (
     <div key="asset">
@@ -122,8 +122,8 @@ const InjectContentForm = ({
     control,
     name: 'inject_asset_groups',
   }) as string[];
-  const onAssetGroupChange = (assetGroupIds: string[]) => setValue('inject_asset_groups', assetGroupIds /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset-group')?.isInMandatoryGroup } */);
-  const removeAssetGroup = (assetGroupId: string) => setValue('inject_asset_groups', injectAssetGroupIds.filter(id => id !== assetGroupId) /* ,{ shouldValidate: enhancedFieldsMapByType.get('asset-group')?.isInMandatoryGroup } */);
+  const onAssetGroupChange = (assetGroupIds: string[]) => setValue('inject_asset_groups', assetGroupIds, { shouldValidate: true });
+  const removeAssetGroup = (assetGroupId: string) => setValue('inject_asset_groups', injectAssetGroupIds.filter(id => id !== assetGroupId), { shouldValidate: true });
 
   const renderAssetGroups = (err?: string | null, isInMandatoryGroup?: boolean, mandatoryGroupContractElementLabels?: string) => (
     <div key="asset-group">
@@ -168,7 +168,7 @@ const InjectContentForm = ({
   const predefinedExpectations: ExpectationInput[] = enhancedFields
     .filter(n => n.type === 'expectation')
     .flatMap(f => f.predefinedExpectations ?? []);
-  const onExpectationChange = (expectationIds: ExpectationInput[]) => setValue('inject_content.expectations', expectationIds);
+  const onExpectationChange = (expectationIds: ExpectationInput[]) => setValue('inject_content.expectations', expectationIds, { shouldValidate: true });
 
   const renderExpectations = () => (
     <InjectExpectations
@@ -242,7 +242,7 @@ const InjectContentForm = ({
   const injectContentParts = [
     {
       key: 'teams',
-      title: renderTitle(t('Targeted teams'), enhancedFieldsMapByType.get('team')?.settings?.required),
+      title: () => renderTitle(t('Targeted teams'), enhancedFieldsMapByType.get('team')?.settings?.required, !!errors[enhancedFieldsMapByType.get('team')!.key]),
       renderRightButton: !isAtomic && (
         <SwitchFieldController
           name="inject_all_teams"
@@ -251,27 +251,24 @@ const InjectContentForm = ({
           size="small"
         />
       ),
-      render: () => {
-        const key = enhancedFieldsMapByType.get('team')?.key;
-        return renderTeams(key ? errors[key]?.message as string : null);
-      },
+      render: () => renderTeams(errors[enhancedFieldsMapByType.get('team')!.key]?.message as string || null),
       show: enhancedFieldsMapByType.has('team'),
     },
     {
       key: 'media_pressure',
-      title: renderTitle(t('Media pressure to publish'), enhancedFieldsMapByType.get('article')?.settings?.required),
+      title: () => renderTitle(t('Media pressure to publish'), enhancedFieldsMapByType.get('article')?.settings?.required),
       render: renderArticles,
       show: enhancedFieldsMapByType.has('article') && enhancedFieldsMapByType.get('article')?.isVisible,
     },
     {
       key: 'challenge',
-      title: renderTitle(t('Challenges to publish'), enhancedFieldsMapByType.get('challenge')?.settings?.required),
+      title: () => renderTitle(t('Challenges to publish'), enhancedFieldsMapByType.get('challenge')?.settings?.required),
       render: renderChallenges,
       show: enhancedFieldsMapByType.has('challenge') && enhancedFieldsMapByType.get('challenge')?.isVisible,
     },
     {
       key: 'inject_data_title',
-      title: <Typography variant="h5" style={{ marginTop: 0 }}>{t('Inject data')}</Typography>,
+      title: () => <Typography variant="h5" style={{ marginTop: 0 }}>{t('Inject data')}</Typography>,
       parentStyle: {
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(-1),
@@ -308,13 +305,13 @@ const InjectContentForm = ({
     },
     {
       key: 'expectations',
-      title: renderTitle(t('Inject expectations'), enhancedFieldsMapByType.get('expectation')?.settings?.required),
+      title: () => renderTitle(t('Inject expectations'), enhancedFieldsMapByType.get('expectation')?.settings?.required),
       render: renderExpectations,
       show: enhancedFieldsMapByType.has('expectation') && enhancedFieldsMapByType.get('expectation')?.isVisible,
     },
     {
       key: 'documents',
-      title: renderTitle(t('Inject documents'), enhancedFieldsMapByType.get('attachment')?.settings?.required),
+      title: () => renderTitle(t('Inject documents'), enhancedFieldsMapByType.get('attachment')?.settings?.required),
       render: renderDocuments,
       show: !isAtomic && enhancedFieldsMapByType.has('attachment') && enhancedFieldsMapByType.get('attachment')?.isVisible,
     },
@@ -341,7 +338,7 @@ const InjectContentForm = ({
             ...part.parentStyle,
           }}
         >
-          {part.title}
+          {part.title && part.title()}
           {part.renderLeftButton}
           <div style={{
             flex: 1,
