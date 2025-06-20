@@ -3,9 +3,11 @@ package io.openbas.injector_contract.fields;
 import io.openbas.model.LinkedFieldModel;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class ContractElement {
 
   private String key;
@@ -22,12 +24,6 @@ public abstract class ContractElement {
 
   private String mandatoryConditionValue;
 
-  /**
-   * List of linked fields that can be used to link this field to other fields in the contract. This
-   * is useful for creating dependencies between fields. e.g : a targeted property field can be
-   * linked to a targeted asset field, so that the user can select the ip, hostname or seen_ip from
-   * the targeted asset.
-   */
   private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
   private List<String> linkedValues = new ArrayList<>();

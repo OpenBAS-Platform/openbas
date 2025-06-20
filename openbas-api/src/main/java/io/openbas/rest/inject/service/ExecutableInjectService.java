@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
@@ -57,28 +56,33 @@ public class ExecutableInjectService {
         : defaultValue;
   }
 
+  private String getAssetProperty(Endpoint asset, String property) {
+    return switch (property) {
+      case "seen_ip" -> asset.getSeenIp();
+      case "hostname" -> asset.getHostname();
+      default -> asset.getIps()[0];
+    };
+  }
+
   private String getTargetedAssetArgumentValue(
       String argumentKey, ObjectNode injectContent, PayloadArgument defaultPayloadArgument) {
     List<String> assetIds =
         mapper.convertValue(injectContent.get(argumentKey), new TypeReference<List<String>>() {});
-    List<Endpoint> endpointList = endpointService.endpoints(assetIds);
+    List<Endpoint> assetList = endpointService.endpoints(assetIds);
 
     String targetedProperty =
         getArgumentValueOrDefault(
             CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-" + argumentKey,
             injectContent,
             defaultPayloadArgument.getDefaultValue());
-    ContractTargetedProperty contractTargetedProperty =
-        ContractTargetedProperty.valueOf(targetedProperty);
-
     String assetSeparator =
         getArgumentValueOrDefault(
             CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR + "-" + argumentKey,
             injectContent,
             defaultPayloadArgument.getSeparator());
 
-    return endpointList.stream()
-        .map(contractTargetedProperty.toEndpointValue)
+    return assetList.stream()
+        .map(asset -> getAssetProperty(asset, targetedProperty))
         .collect(Collectors.joining(assetSeparator));
   }
 

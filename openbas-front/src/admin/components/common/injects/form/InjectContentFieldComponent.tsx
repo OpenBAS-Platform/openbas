@@ -78,17 +78,13 @@ const InjectContentFieldComponent = ({
     }
   }, [selectedValue]);
 
-  const label = field.linkedFields?.length && field.linkedFields?.length > 0
-    ? `${t(field.label)} - ${field.linkedFields.map(f => f.key).join(', ')}`
-    : t(field.label);
-
   const fieldComponent = () => {
     switch (fieldType) {
       case 'tags':
         return (
           <TagFieldController
             name={field.key}
-            label={`${label}${field.mandatory ? '*' : ''}`}
+            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
             disabled={readOnly}
           />
         );
@@ -97,7 +93,7 @@ const InjectContentFieldComponent = ({
           <RichTextField
             key={field.key}
             name={field.key}
-            label={`${label}${field.mandatory ? '*' : ''}`}
+            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
             style={{ height: 250 }}
             disabled={readOnly}
             askAi={true}
@@ -109,7 +105,7 @@ const InjectContentFieldComponent = ({
         return (
           <SwitchFieldController
             name={field.key}
-            label={`${label}${field.mandatory ? '*' : ''}`}
+            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
             disabled={readOnly}
             required={field.settings?.required}
           />
@@ -135,10 +131,13 @@ const InjectContentFieldComponent = ({
         } else {
           choices = field.choices as ChoiceItem[];
         }
+        const label = field.label?.toLowerCase().includes('targeted property')
+          ? `${field.label} - ${(field.key?.split('.')?.at(-1) ?? '').replace('targeted-property-', '')}`
+          : field.label;
         return (
           <SelectFieldController
             name={field.key}
-            label={`${label} ${field.mandatory ? '*' : ''}`}
+            label={`${t(label)} ${field.mandatory ? '*' : ''}`}
             items={choices as ChoiceItem[]}
             multiple={field.cardinality === 'n'}
             disabled={readOnly}
@@ -158,11 +157,14 @@ const InjectContentFieldComponent = ({
           </>
         );
       default:{
+        const label = field.linkedFields?.length && field.linkedFields?.length > 0
+          ? `${field.label} - ${field.linkedFields.map(f => f.key).join(', ')}`
+          : field.label;
         if (field.key.includes('targeted-asset-separator')) {
           return (
             <SeparatorFieldController
               name={field.key}
-              label={`${label}${field.mandatory ? ' *' : ''}`}
+              label={`${t(label)}${field.mandatory ? ' *' : ''}`}
               disabled={readOnly}
               defaultValue={field.defaultValue as string}
             />
@@ -171,7 +173,7 @@ const InjectContentFieldComponent = ({
         return (
           <TextFieldController
             name={field.key}
-            label={`${label}${field.mandatory ? ' *' : ''}`}
+            label={`${t(label)}${field.mandatory ? ' *' : ''}`}
             disabled={readOnly}
             multiline={field.type == 'textarea'}
             rows={field.type == 'textarea' ? (field.settings?.rows ?? 10) : 1}
