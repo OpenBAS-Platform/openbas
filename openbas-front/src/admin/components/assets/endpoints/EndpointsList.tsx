@@ -28,27 +28,18 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const inlineStyles: Record<string, CSSProperties> = {
-  asset_name: { width: '35%' },
-  asset_platform: {
-    width: '15%',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  asset_tags: { width: '35%' },
-  asset_type: { width: '10%' },
-};
-
 interface Props {
   endpoints: EndpointOutput[];
   renderActions: ((endpoint: EndpointOutput) => ReactElement<EndpointPopoverProps>);
   loading?: boolean;
+  compact?: boolean;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
   endpoints,
   renderActions,
   loading = false,
+  compact = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -56,6 +47,17 @@ const EndpointsList: FunctionComponent<Props> = ({
 
   const component = (endpoint: EndpointOutput) => {
     return renderActions(endpoint);
+  };
+
+  const inlineStyles: Record<string, CSSProperties> = {
+    asset_name: { width: compact ? '40%' : '30%' },
+    asset_platform: {
+      width: compact ? '10%' : '20%',
+      display: 'flex',
+      alignItems: 'center',
+    },
+    asset_tags: { width: '30%' },
+    asset_type: { width: '20%' },
   };
 
   const headers = [
@@ -72,7 +74,7 @@ const EndpointsList: FunctionComponent<Props> = ({
       value: (endpoint: EndpointOutput) => (
         <>
           <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
-          {endpoint.endpoint_platform}
+          {!compact && endpoint.endpoint_platform}
         </>
       ),
     },

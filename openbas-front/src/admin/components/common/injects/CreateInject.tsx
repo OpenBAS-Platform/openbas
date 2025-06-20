@@ -5,7 +5,7 @@ import {
   List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type CSSProperties, type FunctionComponent, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -90,7 +90,6 @@ const CreateInject: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
-  const drawerRef = useRef<HTMLDivElement | null>(null);
   const { t, tPick } = useFormatter();
 
   // Fetching data
@@ -206,9 +205,6 @@ const CreateInject: FunctionComponent<Props> = ({
 
   const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } | null>(null);
   const selectContract = (contract: InjectorContractOutput) => {
-    if (drawerRef.current) {
-      drawerRef.current.scrollTop = 0;
-    }
     const parsedContract: Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } = {
       ...contract,
       injector_contract_content: JSON.parse(contract.injector_contract_content),
@@ -238,7 +234,6 @@ const CreateInject: FunctionComponent<Props> = ({
       handleClose={handleCloseDrawer}
       title={title}
       variant="full"
-      PaperProps={{ ref: drawerRef }}
       disableEnforceFocus
       containerStyle={{
         display: 'grid',
@@ -347,7 +342,6 @@ const CreateInject: FunctionComponent<Props> = ({
             disabled={!selectedContract}
             isAtomic={isAtomic}
             isCreation
-            drawerRef={drawerRef}
             defaultInject={{
               inject_title: tPick(selectedContract?.injector_contract_labels),
               inject_description: '',
