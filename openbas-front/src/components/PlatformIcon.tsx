@@ -60,12 +60,14 @@ const renderIcon = (platform: string, width: number | undefined = 40, borderRadi
   const theme = useTheme();
   const { mode } = theme.palette;
   const src = platformIcons[platform]?.[mode] || platformIcons.Unknown[mode];
+  const height = 'fit-content';
   return (
     <img
       style={{
         width,
         borderRadius,
         marginRight,
+        height,
       }}
       src={src}
       alt={platform}

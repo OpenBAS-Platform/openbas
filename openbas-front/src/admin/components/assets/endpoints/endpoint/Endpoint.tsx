@@ -1,4 +1,4 @@
-import { List, Paper, Typography } from '@mui/material';
+import { Chip, List, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -26,8 +26,15 @@ const useStyles = makeStyles()(theme => ({
   },
   endpointInformationContainer: {
     'display': 'grid',
-    'gridTemplateColumns': '1fr 1fr 1fr 1fr',
+    'gridTemplateColumns': '1fr 1fr 1fr 1fr 1fr',
     '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
+  },
+  typeChipEol: {
+    textTransform: 'uppercase',
+    borderRadius: 5,
+    width: 80,
+    marginBottom: 5,
+    height: 20,
   },
 }));
 
@@ -37,6 +44,17 @@ const Endpoint = () => {
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
   const { t } = useFormatter();
   const theme = useTheme();
+
+  const inlineStyles = {
+    green: {
+      backgroundColor: 'rgba(76, 175, 80, 0.08)',
+      color: '#4caf50',
+    },
+    red: {
+      backgroundColor: 'rgba(244, 67, 54, 0.08)',
+      color: '#f44336',
+    },
+  };
 
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
@@ -86,6 +104,7 @@ const Endpoint = () => {
         <Typography variant="h3" gutterBottom>{t('Hostname')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Seen IP address')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Platform')}</Typography>
+        <Typography variant="h3" gutterBottom>{t('End of Life')}</Typography>
 
         <ExpandableMarkdown source={endpoint.asset_description} limit={300} />
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_hostname)}</Typography>
@@ -95,11 +114,26 @@ const Endpoint = () => {
           &nbsp;
           {endpoint.endpoint_platform}
         </span>
-
+        <span>
+          { endpoint.endpoint_is_eol ? (
+            <Chip
+              className={classes.typeChipEol}
+              style={inlineStyles.red}
+              label={t('Yes')}
+            />
+          ) : (
+            <Chip
+              className={classes.typeChipEol}
+              style={inlineStyles.green}
+              label={t('No')}
+            />
+          )}
+        </span>
         <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
         <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
+        <Typography variant="h3" gutterBottom></Typography>
 
         <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_arch)}</Typography>
         <div style={{
