@@ -1,6 +1,8 @@
 package io.openbas.injector_contract.fields;
 
 import java.util.List;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,11 +32,16 @@ public class ContractTextArea extends ContractElement {
   }
 
   public static ContractTextArea richTextareaField(
-      String key, String label, String defaultValue, List<ContractElement> visibleConditionFields) {
+      String key,
+      String label,
+      String defaultValue,
+      List<ContractElement> visibleConditionFields,
+      Map<String, String> values) {
     ContractTextArea contractText = new ContractTextArea(key, label, true);
     contractText.setDefaultValue(defaultValue);
     contractText.setVisibleConditionFields(
         visibleConditionFields.stream().map(ContractElement::getKey).toList());
+    contractText.setVisibleConditionValues(values);
     return contractText;
   }
 
