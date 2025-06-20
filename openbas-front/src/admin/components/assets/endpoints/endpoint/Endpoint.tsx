@@ -1,4 +1,4 @@
-import { List, Paper, Typography } from '@mui/material';
+import { Chip, List, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -29,6 +29,15 @@ const useStyles = makeStyles()(theme => ({
     'gridTemplateColumns': '1fr 1fr 1fr 1fr 1fr',
     '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
   },
+  chipInList: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 20,
+    float: 'left',
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 20,
+  },
 }));
 
 const Endpoint = () => {
@@ -37,6 +46,17 @@ const Endpoint = () => {
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
   const { t } = useFormatter();
   const theme = useTheme();
+
+  const inlineStyles = {
+    green: {
+      backgroundColor: 'rgba(76, 175, 80, 0.08)',
+      color: '#4caf50',
+    },
+    red: {
+      backgroundColor: 'rgba(244, 67, 54, 0.08)',
+      color: '#f44336',
+    },
+  };
 
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
@@ -96,8 +116,21 @@ const Endpoint = () => {
           &nbsp;
           {endpoint.endpoint_platform}
         </span>
-        <Typography variant="body2" gutterBottom>{endpoint.endpoint_is_eol ? t('Yes') : t('No')}</Typography>
-
+        { endpoint.endpoint_is_eol ? (
+          <Chip
+            className="chipInList"
+            size="small"
+            style={inlineStyles.red}
+            label={t('Yes')}
+          />
+        ) : (
+          <Chip
+            className="chipInList"
+            size="small"
+            style={inlineStyles.green}
+            label={t('No')}
+          />
+        )}
         <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
         <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
