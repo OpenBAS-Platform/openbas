@@ -26,6 +26,7 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
+import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.*;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.payload.PayloadUtils;
@@ -109,9 +110,9 @@ public class PayloadService {
     ContractElement targetedAssetField = new ContractTargetedAsset(key, key);
 
     Map<String, String> targetPropertySelectorMap = new HashMap<>();
-    targetPropertySelectorMap.put("hostname", "Hostname");
-    targetPropertySelectorMap.put("seen_ip", "Seen IP");
-    targetPropertySelectorMap.put("local_ip", "Local IP (first)");
+    for (ContractTargetedProperty property : ContractTargetedProperty.values()) {
+      targetPropertySelectorMap.put(property.name(), property.label);
+    }
     ContractElement targetPropertySelector =
         selectFieldWithDefault(
             CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-" + key,
