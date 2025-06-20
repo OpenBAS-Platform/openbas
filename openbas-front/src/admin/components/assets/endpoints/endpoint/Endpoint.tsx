@@ -29,14 +29,12 @@ const useStyles = makeStyles()(theme => ({
     'gridTemplateColumns': '1fr 1fr 1fr 1fr 1fr',
     '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
   },
-  chipInList: {
-    fontSize: 12,
-    lineHeight: '12px',
-    height: 20,
-    float: 'left',
+  typeChip: {
     textTransform: 'uppercase',
-    borderRadius: 4,
-    width: 20,
+    borderRadius: 5,
+    width: 80,
+    marginBottom: 5,
+    height: 20,
   },
 }));
 
@@ -116,21 +114,21 @@ const Endpoint = () => {
           &nbsp;
           {endpoint.endpoint_platform}
         </span>
-        { endpoint.endpoint_is_eol ? (
-          <Chip
-            className="chipInList"
-            size="small"
-            style={inlineStyles.red}
-            label={t('Yes')}
-          />
-        ) : (
-          <Chip
-            className="chipInList"
-            size="small"
-            style={inlineStyles.green}
-            label={t('No')}
-          />
-        )}
+        <span>
+          { endpoint.endpoint_is_eol ? (
+            <Chip
+              className={classes.typeChip}
+              style={inlineStyles.red}
+              label={t('Yes')}
+            />
+          ) : (
+            <Chip
+              className={classes.typeChip}
+              style={inlineStyles.green}
+              label={t('No')}
+            />
+          )}
+        </span>
         <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
         <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
         <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
