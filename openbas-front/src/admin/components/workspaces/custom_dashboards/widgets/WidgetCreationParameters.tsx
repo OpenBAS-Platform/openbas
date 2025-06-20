@@ -8,6 +8,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../utils/Option';
+import ListWidgetParameters from './viz/list/ListWidgetParameters';
 import { getAvailableFields, getAvailableModes, getBaseEntities, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
@@ -82,6 +83,181 @@ const WidgetCreationParameters: FunctionComponent<{
     }
   }, [mode, interval, control]);
 
+  const getGenericParameters = () => {
+    return (
+      <>
+        {availableModes.length > 1
+          && (
+            <Controller
+              control={control}
+              name="widget_config.mode"
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  select
+                  variant="standard"
+                  fullWidth
+                  label={t('Mode')}
+                  sx={{ mt: 2 }}
+                  value={field.value ?? ''}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  onChange={e => field.onChange(e.target.value)}
+                  required={true}
+                >
+                  {availableModes.map(mode => <MenuItem key={mode} value={mode}>{t(mode)}</MenuItem>)}
+                </TextField>
+              )}
+            />
+          )}
+        {fieldOptions.length > 1
+          && (
+            <Controller
+              control={control}
+              name="widget_config.field"
+              render={({ field, fieldState }) => {
+                return (
+                  <Autocomplete
+                    options={fieldOptions}
+                    groupBy={option => option.group}
+                    value={fieldOptions.find(o => o.id === field.value) ?? null}
+                    onChange={(_, value) => field.onChange(value?.id)}
+                    getOptionLabel={option => option.label ?? ''}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        label={t('Field')}
+                        variant="standard"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        required={true}
+                      />
+                    )}
+                    freeSolo={false}
+                  />
+                );
+              }}
+            />
+          )}
+        {mode === 'temporal' && (
+          <>
+            <Controller
+              control={control}
+              name="widget_config.interval"
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  select
+                  variant="standard"
+                  fullWidth
+                  label={t('Interval')}
+                  sx={{ mt: 2 }}
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value)}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  required={true}
+                >
+                  <MenuItem value="day">{t('Day')}</MenuItem>
+                  <MenuItem value="week">{t('Week')}</MenuItem>
+                  <MenuItem value="month">{t('Month')}</MenuItem>
+                  <MenuItem value="quarter">{t('Quarter')}</MenuItem>
+                  <MenuItem value="year">{t('Year')}</MenuItem>
+                </TextField>
+              )}
+            />
+            <Controller
+              control={control}
+              name="widget_config.start"
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label={t('Start date')}
+                  sx={{ mt: 2 }}
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={date => field.onChange(date?.toISOString() ?? '')}
+                  slotProps={{
+                    textField: {
+                      required: true,
+                      fullWidth: true,
+                      error: !!fieldState.error,
+                      helperText: fieldState.error?.message,
+                      variant: 'standard',
+                    },
+                  }}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="widget_config.end"
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  label={t('End date')}
+                  sx={{ mt: 2 }}
+                  value={field.value ? new Date(field.value) : null}
+                  onChange={date => field.onChange(date?.toISOString() ?? '')}
+                  slotProps={{
+                    textField: {
+                      required: true,
+                      fullWidth: true,
+                      error: !!fieldState.error,
+                      helperText: fieldState.error?.message,
+                      variant: 'standard',
+                    },
+                  }}
+                />
+              )}
+            />
+          </>
+        )}
+        {/* TODO: not functionnal for now */}
+        {/* <Controller */}
+        {/*  control={control} */}
+        {/*  name="widget_config.stacked" */}
+        {/*  render={({ field }) => ( */}
+        {/*    <FormControlLabel */}
+        {/*      style={{ marginTop: 20 }} */}
+        {/*      control={( */}
+        {/*        <Switch */}
+        {/*          checked={field.value ?? false} */}
+        {/*          onChange={field.onChange} */}
+        {/*        /> */}
+        {/*      )} */}
+        {/*      label={t('Stacked')} */}
+        {/*    /> */}
+        {/*  )} */}
+        {/* /> */}
+        {/* TODO: not functionnal for now */}
+        {/* <Controller */}
+        {/*  control={control} */}
+        {/*  name="widget_config.display_legend" */}
+        {/*  render={({ field }) => ( */}
+        {/*    <FormControlLabel */}
+        {/*      style={{ marginTop: 20 }} */}
+        {/*      control={( */}
+        {/*        <Switch */}
+        {/*          checked={field.value ?? false} */}
+        {/*          onChange={field.onChange} */}
+        {/*        /> */}
+        {/*      )} */}
+        {/*      label={t('Display legend')} */}
+        {/*    /> */}
+        {/*  )} */}
+        {/* /> */}
+      </>
+    );
+  };
+
+  const getParametersControl = (widgetType: Widget['widget_type']) => {
+    switch (widgetType) {
+      case 'list': return <ListWidgetParameters />;
+      default: return getGenericParameters();
+    }
+  };
+
   return (
     <>
       <Controller
@@ -98,167 +274,7 @@ const WidgetCreationParameters: FunctionComponent<{
           />
         )}
       />
-      {availableModes.length > 1
-        && (
-          <Controller
-            control={control}
-            name="widget_config.mode"
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                select
-                variant="standard"
-                fullWidth
-                label={t('Mode')}
-                sx={{ mt: 2 }}
-                value={field.value ?? ''}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                onChange={e => field.onChange(e.target.value)}
-                required={true}
-              >
-                {availableModes.map(mode => <MenuItem key={mode} value={mode}>{t(mode)}</MenuItem>)}
-              </TextField>
-            )}
-          />
-        )}
-      {fieldOptions.length > 1
-        && (
-          <Controller
-            control={control}
-            name="widget_config.field"
-            render={({ field, fieldState }) => {
-              return (
-                <Autocomplete
-                  options={fieldOptions}
-                  groupBy={option => option.group}
-                  value={fieldOptions.find(o => o.id === field.value) ?? null}
-                  onChange={(_, value) => field.onChange(value?.id)}
-                  getOptionLabel={option => option.label ?? ''}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      label={t('Field')}
-                      variant="standard"
-                      fullWidth
-                      sx={{ mt: 2 }}
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      required={true}
-                    />
-                  )}
-                  freeSolo={false}
-                />
-              );
-            }}
-          />
-        )}
-      {mode === 'temporal' && (
-        <>
-          <Controller
-            control={control}
-            name="widget_config.interval"
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                select
-                variant="standard"
-                fullWidth
-                label={t('Interval')}
-                sx={{ mt: 2 }}
-                value={field.value ?? ''}
-                onChange={e => field.onChange(e.target.value)}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                required={true}
-              >
-                <MenuItem value="day">{t('Day')}</MenuItem>
-                <MenuItem value="week">{t('Week')}</MenuItem>
-                <MenuItem value="month">{t('Month')}</MenuItem>
-                <MenuItem value="quarter">{t('Quarter')}</MenuItem>
-                <MenuItem value="year">{t('Year')}</MenuItem>
-              </TextField>
-            )}
-          />
-          <Controller
-            control={control}
-            name="widget_config.start"
-            render={({ field, fieldState }) => (
-              <DatePicker
-                label={t('Start date')}
-                sx={{ mt: 2 }}
-                value={field.value ? new Date(field.value) : null}
-                onChange={date => field.onChange(date?.toISOString() ?? '')}
-                slotProps={{
-                  textField: {
-                    required: true,
-                    fullWidth: true,
-                    error: !!fieldState.error,
-                    helperText: fieldState.error?.message,
-                    variant: 'standard',
-                  },
-                }}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="widget_config.end"
-            render={({ field, fieldState }) => (
-              <DatePicker
-                label={t('End date')}
-                sx={{ mt: 2 }}
-                value={field.value ? new Date(field.value) : null}
-                onChange={date => field.onChange(date?.toISOString() ?? '')}
-                slotProps={{
-                  textField: {
-                    required: true,
-                    fullWidth: true,
-                    error: !!fieldState.error,
-                    helperText: fieldState.error?.message,
-                    variant: 'standard',
-                  },
-                }}
-              />
-            )}
-          />
-        </>
-      )}
-      {/* TODO: not functionnal for now */}
-      {/* <Controller */}
-      {/*  control={control} */}
-      {/*  name="widget_config.stacked" */}
-      {/*  render={({ field }) => ( */}
-      {/*    <FormControlLabel */}
-      {/*      style={{ marginTop: 20 }} */}
-      {/*      control={( */}
-      {/*        <Switch */}
-      {/*          checked={field.value ?? false} */}
-      {/*          onChange={field.onChange} */}
-      {/*        /> */}
-      {/*      )} */}
-      {/*      label={t('Stacked')} */}
-      {/*    /> */}
-      {/*  )} */}
-      {/* /> */}
-      {/* TODO: not functionnal for now */}
-      {/* <Controller */}
-      {/*  control={control} */}
-      {/*  name="widget_config.display_legend" */}
-      {/*  render={({ field }) => ( */}
-      {/*    <FormControlLabel */}
-      {/*      style={{ marginTop: 20 }} */}
-      {/*      control={( */}
-      {/*        <Switch */}
-      {/*          checked={field.value ?? false} */}
-      {/*          onChange={field.onChange} */}
-      {/*        /> */}
-      {/*      )} */}
-      {/*      label={t('Display legend')} */}
-      {/*    /> */}
-      {/*  )} */}
-      {/* /> */}
+      {getParametersControl(widgetType)}
     </>
   );
 };

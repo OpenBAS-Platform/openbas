@@ -1,6 +1,6 @@
 package io.openbas.rest.custom_dashboard;
 
-import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
+import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
 import static io.openbas.rest.custom_dashboard.WidgetFixture.NAME;
@@ -53,7 +53,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     String name = "My new widget";
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     widgetConfig.setTitle(name);
-    input.setHistogramWidget(widgetConfig);
+    input.setWidgetConfiguration(widgetConfig);
     WidgetLayout widgetLayout = new WidgetLayout();
     input.setWidgetLayout(widgetLayout);
 

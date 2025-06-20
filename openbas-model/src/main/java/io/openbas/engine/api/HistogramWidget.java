@@ -14,36 +14,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Schema(
-    discriminatorProperty = "mode",
-    oneOf = {
-      DateHistogramWidget.class,
-      StructuralHistogramWidget.class,
-    },
-    discriminatorMapping = {
-      @DiscriminatorMapping(
-          value = DateHistogramWidget.TEMPORAL_MODE,
-          schema = DateHistogramWidget.class),
-      @DiscriminatorMapping(
-          value = StructuralHistogramWidget.STRUCTURAL_MODE,
-          schema = StructuralHistogramWidget.class),
-    })
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "mode",
-    visible = true)
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = DateHistogramWidget.class, name = "temporal"),
-  @JsonSubTypes.Type(value = StructuralHistogramWidget.class, name = "structural")
-})
-public abstract class HistogramWidget {
-
+public abstract class HistogramWidget extends WidgetConfiguration {
   @Setter(NONE)
   @NotNull
   private final String mode;
 
-  private String title;
   @NotBlank private String field;
   private boolean stacked;
 

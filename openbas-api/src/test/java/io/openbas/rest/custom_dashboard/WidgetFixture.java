@@ -1,6 +1,6 @@
 package io.openbas.rest.custom_dashboard;
 
-import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
+import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
@@ -15,7 +15,7 @@ public class WidgetFixture {
     widget.setType(VERTICAL_BAR_CHART);
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     widgetConfig.setTitle(NAME);
-    widget.setHistogramWidget(widgetConfig);
+    widget.setWidgetConfiguration(widgetConfig);
     WidgetLayout widgetLayout = new WidgetLayout();
     widget.setLayout(widgetLayout);
     return widget;
