@@ -395,8 +395,8 @@ public class Inject implements Base, Injection {
   public List<KillChainPhase> getKillChainPhases() {
     return getInjectorContract()
         .map(
-            injectorContract ->
-                injectorContract.getAttackPatterns().stream()
+            ic ->
+                ic.getAttackPatterns().stream()
                     .flatMap(attackPattern -> attackPattern.getKillChainPhases().stream())
                     .distinct()
                     .collect(Collectors.toList()))
@@ -404,6 +404,7 @@ public class Inject implements Base, Injection {
   }
 
   @JsonProperty("inject_attack_patterns")
+  @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.attackPatterns.id")
   public List<AttackPattern> getAttackPatterns() {
     return getInjectorContract().map(InjectorContract::getAttackPatterns).orElseGet(ArrayList::new);
   }

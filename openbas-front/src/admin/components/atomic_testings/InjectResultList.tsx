@@ -68,6 +68,7 @@ const InjectResultList: FunctionComponent<Props> = ({
 
   // Filter and sort hook
   const availableFilterNames = [
+    'inject_attack_patterns',
     'inject_kill_chain_phases',
     'inject_tags',
     'inject_title',
