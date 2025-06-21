@@ -21,6 +21,11 @@ const TaxonomiesMenuComponent: FunctionComponent = () => {
       icon: () => (<RouteOutlined />),
       label: 'Kill chain phases',
     },
+    {
+      path: '/admin/settings/taxonomies/cves',
+      icon: () => (<RouteOutlined />),
+      label: 'CVEs',
+    },
   ];
 
   return (
