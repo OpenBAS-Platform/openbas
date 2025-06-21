@@ -1292,12 +1292,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dagrejs/dagre@npm:1.1.4":
-  version: 1.1.4
-  resolution: "@dagrejs/dagre@npm:1.1.4"
+"@dagrejs/dagre@npm:1.1.5":
+  version: 1.1.5
+  resolution: "@dagrejs/dagre@npm:1.1.5"
   dependencies:
     "@dagrejs/graphlib": "npm:2.2.4"
-  checksum: 10c0/1717ecb1667a70199881871a69990fc2521b9e002e9cc5088cad55ae6fffe349b0bfd8fcb8a7c30e6d19c29dc6a080138bff2e675336bb5f85d5439e12581bf5
+  checksum: 10c0/738e2d86ee093b99ec96098f1a4d0b6290b6ddaef51db912885df0ab5d09291edb82ef875575a4b321bc13bab78b1cb00347b246aad4099ce4af3202a72a8586
   languageName: node
   linkType: hard
 
@@ -9908,7 +9908,7 @@ __metadata:
   resolution: "openbas-front@workspace:."
   dependencies:
     "@ckeditor/ckeditor5-react": "npm:9.5.0"
-    "@dagrejs/dagre": "npm:1.1.4"
+    "@dagrejs/dagre": "npm:1.1.5"
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.0"
     "@eslint/js": "npm:9.29.0"
