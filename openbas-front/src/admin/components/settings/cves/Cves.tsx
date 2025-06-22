@@ -1,148 +1,165 @@
+import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { SelectGroup } from 'mdi-material-ui';
+import { ShieldOutline } from 'mdi-material-ui';
 import { type CSSProperties, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type UserHelper } from '../../../../actions/helper';
-import { searchTagRules } from '../../../../actions/tag_rules/tagrule-actions';
+import { searchCves } from '../../../../actions/cve-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../components/common/SortHeadersList';
+import CVSSBadge from '../../../../components/CvssBadge';
 import { useFormatter } from '../../../../components/i18n';
-import ItemTargets from '../../../../components/ItemTargets';
-import { useHelper } from '../../../../store';
-import { type TagRuleOutput } from '../../../../utils/api-types';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
+import { type CveSimple, type SearchPaginationInput } from '../../../../utils/api-types';
+import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
-import TagRulePopover from './CvePopover';
+import CvePopover from './CvePopover';
 
-const useStyles = makeStyles()(() => ({ itemHead: { textTransform: 'uppercase' } }));
+const useStyles = makeStyles()(() => ({
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+}));
 
-const inlineStyles: Record<string, CSSProperties> = {
-  tag_rule_tag: { width: '20%' },
-  tag_rule_asset_groups: { width: '70%' },
-};
+const inlineStyles: Record<string, CSSProperties> = ({
+  cve_id: { width: '20%' },
+  cve_cvss: { width: '20%' },
+  cve_published: { width: '20%' },
+});
 
 const Cves = () => {
-  const { t } = useFormatter();
+  const { fldt, t } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
-
-  const [tagRules, setTagRules] = useState<TagRuleOutput[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Filter
   const availableFilterNames = [
-    'tag_rule_tag',
-    'tag_rule_asset_groups',
+    'cve_id',
   ];
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('tag-rules2', buildSearchPagination({}));
+  const [cves, setCves] = useState<CveSimple[]>([]);
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('cve', buildSearchPagination({
+    sorts: initSorting('cve_created_at', 'DESC'),
+    textSearch: search,
+  }));
 
-  // Headers
+  const searchCvesToload = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchCves(input).finally(() => {
+      setLoading(false);
+    });
+  };
+
   const headers: Header[] = useMemo(() => [
     {
-      field: 'tag_rule_tag',
-      label: 'Tag',
+      field: 'cve_id',
+      label: 'CVE',
       isSortable: true,
-      value: (tagRule: TagRuleOutput) => tagRule.tag_name,
+      value: (cve: CveSimple) => cve.cve_id,
     },
     {
-      field: 'tag_rule_asset_groups',
-      label: 'Asset Groups',
+      field: 'cve_cvss',
+      label: 'CVSS',
       isSortable: true,
-      value: (tagRule: TagRuleOutput) => (
-        <ItemTargets targets={Object.entries(tagRule.asset_groups ?? []).map(([target_id, target_name]) => ({
-          target_id,
-          target_name,
-          target_type: 'ASSETS_GROUPS',
-        }),
-        )}
-        />
+      value: (cve: CveSimple) => (
+        <CVSSBadge score={cve.cve_cvss}></CVSSBadge>
       ),
+    },
+    {
+      field: 'cve_published',
+      label: 'Published Date',
+      isSortable: true,
+      value: (cve: CveSimple) => fldt(cve.cve_published),
     },
   ], []);
 
   return (
-    <>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Customization') }, {
-          label: t('Default asset rules'),
-          current: true,
-        }]}
-      />
-      <PaginationComponentV2
-        fetch={searchTagRules}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setTagRules}
-        availableFilterNames={availableFilterNames}
-        queryableHelpers={queryableHelpers}
-        entityPrefix="tag_rule"
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-          secondaryAction={<>&nbsp;</>}
-        >
-          <ListItemIcon />
-          <ListItemText
-            primary={(
-              <SortHeadersComponentV2
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                sortHelpers={queryableHelpers.sortHelpers}
-              />
-            )}
-          />
-        </ListItem>
-        {tagRules.map((tagRule: TagRuleOutput) => (
-
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+            label: t('CVEs'),
+            current: true,
+          }]}
+        />
+        <PaginationComponentV2
+          fetch={searchCvesToload}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setCves}
+          availableFilterNames={availableFilterNames}
+          queryableHelpers={queryableHelpers}
+          entityPrefix="cve"
+        />
+        <List>
           <ListItem
-            key={tagRule.tag_rule_id}
-            secondaryAction={(
-              <TagRulePopover
-                tagRule={tagRule}
-                onDelete={result => setTagRules(tagRules.filter(ag => (ag.tag_rule_id !== result)))}
-                onUpdate={result => setTagRules(tagRules.map(existing => (existing.tag_rule_id !== result.tag_rule_id ? existing : result)))}
-              />
-            )}
-            divider
+            classes={{ root: classes.itemHead }}
+            style={{ paddingTop: 0 }}
+            secondaryAction={<>&nbsp;</>}
           >
-            <ListItemIcon>
-              <SelectGroup color="primary" />
-            </ListItemIcon>
+            <ListItemIcon />
             <ListItemText
               primary={(
-                <div style={bodyItemsStyles.bodyItems}>
-                  {headers.map(header => (
-                    <div
-                      key={header.field}
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles[header.field],
-                      }}
-                    >
-                      {header.value?.(tagRule)}
-                    </div>
-                  ))}
-                </div>
+                <SortHeadersComponentV2
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  sortHelpers={queryableHelpers.sortHelpers}
+                />
               )}
             />
           </ListItem>
-        ))}
-      </List>
-      {userAdmin && (
+
+          {loading ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} /> : cves.map(cve => (
+            <ListItem
+              key={cve.cve_id}
+              classes={{ root: classes.item }}
+              disablePadding
+              divider
+              secondaryAction={(
+                <CvePopover
+                  cve={cve}
+                  onUpdate={(result: CveSimple) => setCves(cves.map(a => (a.cve_id !== result.cve_id ? a : result)))}
+                  onDelete={(result: string) => setCves(cves.filter(a => (a.cve_id !== result)))}
+                />
+              )}
+            >
+              <ListItemIcon>
+                <ShieldOutline />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div style={bodyItemsStyles.bodyItems}>
+                    {headers.map(header => (
+                      <div
+                        key={header.field}
+                        style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles[header.field],
+                        }}
+                      >
+                        {header.value && header.value(cve)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              />
+            </ListItem>
+          ))}
+        </List>
         <CreateCve
-          onCreate={result => setTagRules([...tagRules, result])}
+          onCreate={(result: CveSimple) => setCves([result, ...cves])}
         />
-      )}
-    </>
+      </div>
+      <TaxonomiesMenu />
+    </div>
   );
 };
 

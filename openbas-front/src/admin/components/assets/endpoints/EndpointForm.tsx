@@ -196,7 +196,6 @@ const EndpointForm: FunctionComponent<Props> = ({
         </div>
       </form>
     </FormProvider>
-
   );
 };
 

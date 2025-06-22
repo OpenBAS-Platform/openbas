@@ -904,6 +904,96 @@ export interface CustomDashboardInput {
   custom_dashboard_name: string;
 }
 
+export interface CveCreateInput {
+  /** @format date-time */
+  cve_cisa_action_due?: string;
+  /** @format date-time */
+  cve_cisa_exploit_add?: string;
+  cve_cisa_required_action?: string;
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   */
+  cve_cvss: number;
+  /** @uniqueItems true */
+  cve_cwes?: CweInput[];
+  cve_description?: string;
+  cve_id: string;
+  /** @format date-time */
+  cve_published?: string;
+  cve_reference_urls?: string[];
+  cve_remediation?: string;
+  cve_source_identifier?: string;
+  cve_vuln_status?: string;
+}
+
+export interface CveOutput {
+  /** @format date-time */
+  cve_cisa_action_due?: string;
+  /** @format date-time */
+  cve_cisa_exploit_add?: string;
+  cve_cisa_required_action?: string;
+  cve_cisa_vulnerability_name?: string;
+  cve_cvss: number;
+  /** @uniqueItems true */
+  cve_cwes?: CweOutput[];
+  cve_description?: string;
+  cve_id: string;
+  /** @format date-time */
+  cve_published?: string;
+  cve_reference_urls?: string[];
+  cve_remediation?: string;
+  cve_source_identifier?: string;
+  cve_vuln_status?: string;
+}
+
+export interface CveSimple {
+  cve_cvss: number;
+  cve_id: string;
+  /** @format date-time */
+  cve_published?: string;
+}
+
+export interface CveUpdateInput {
+  /** @format date-time */
+  cve_cisa_action_due?: string;
+  /** @format date-time */
+  cve_cisa_exploit_add?: string;
+  cve_cisa_required_action?: string;
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   */
+  cve_cvss: number;
+  /** @uniqueItems true */
+  cve_cwes?: CweInput[];
+  cve_description?: string;
+  /** @format date-time */
+  cve_published?: string;
+  cve_reference_urls?: string[];
+  cve_remediation?: string;
+  cve_source_identifier?: string;
+  cve_vuln_status?: string;
+}
+
+export interface CweInput {
+  cwe_id: string;
+  cwe_source?: string;
+  cwe_value?: string;
+}
+
+export interface CweOutput {
+  cwe_id: string;
+  cwe_source?: string;
+  cwe_value?: string;
+}
+
 export interface DateHistogramSeries {
   /** Filter object to search within filterable attributes */
   filter?: FilterGroup;
@@ -3077,6 +3167,25 @@ export interface PageAttackPattern {
 
 export interface PageCustomDashboard {
   content?: CustomDashboard[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageCveSimple {
+  content?: CveSimple[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

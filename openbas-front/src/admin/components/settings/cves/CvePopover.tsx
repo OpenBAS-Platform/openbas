@@ -1,21 +1,23 @@
+import * as R from 'ramda';
 import { type FunctionComponent, useState } from 'react';
 
-import { deleteTagRule } from '../../../../actions/tag_rules/tagrule-actions';
+import { deleteCve, updateCve } from '../../../../actions/cve-actions';
 import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type TagRuleOutput } from '../../../../utils/api-types';
+import { type CveSimple, type CveUpdateInput } from '../../../../utils/api-types';
 import CveForm from './CveForm';
 
 interface Props {
   onDelete?: (result: string) => void;
-  onUpdate?: (result: TagRuleOutput) => void;
-  cve: CveOutput;
+  onUpdate?: (result: CveSimple) => void;
+  cve: CveSimple;
 }
 
 const CvePopover: FunctionComponent<Props> = ({
-  onDelete, onUpdate,
+  onDelete,
+  onUpdate,
   cve,
 }) => {
   const { t } = useFormatter();
@@ -24,24 +26,50 @@ const CvePopover: FunctionComponent<Props> = ({
   const [openEdit, setOpenEdit] = useState(false);
   const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
+  const onSubmitEdit = (data: CveUpdateInput) => {
+    return updateCve(cve.cve_id, data).then((result: { data: CveSimple }) => {
+      if (onUpdate) {
+        onUpdate(result.data);
+      }
+      handleCloseEdit();
+    });
+  };
 
   // Deletion
   const [openDelete, setOpenDelete] = useState(false);
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    deleteTagRule(tagRule.tag_rule_id);
+    deleteCve(cve.cve_id);
     if (onDelete) {
-      onDelete(tagRule.tag_rule_id);
+      onDelete(cve.cve_id);
     }
     handleCloseDelete();
   };
+
+  const initialValues = R.pipe(
+    R.pick([
+      'cve_id',
+      'cve_cvss',
+      'cve_description',
+      'cve_source_identifier',
+      'cve_published',
+      'cve_vuln_status',
+      'cve_cisa_action_due',
+      'cve_cisa_exploit_add',
+      'cve_cisa_required_action',
+      'cve_cisa_vulnerability_name',
+      'cve_cwes',
+      'cve_reference_urls',
+      'cve_remediation',
+    ]),
+  )(cve);
 
   const entries: PopoverEntry[] = [
     {
       label: 'Update',
       action: handleOpenEdit,
-    },{
+    }, {
       label: 'Delete',
       action: handleOpenDelete,
     },
@@ -51,14 +79,21 @@ const CvePopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} variant="icon" />
 
+      <DialogDelete
+        open={openDelete}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={`${t('Do you want to delete this payload: ')} ${cve.cve_id} ?`}
+      />
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
-        title={t('Update the asset rule')}
+        title={t('Update the CVE')}
       >
         <CveForm
-          cve={cve}
-          onUpdate={onUpdate}
+          editing
+          initialValues={initialValues}
+          onSubmit={onSubmitEdit}
           handleClose={handleCloseEdit}
         />
       </Drawer>

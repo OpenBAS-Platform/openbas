@@ -1,55 +1,88 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Typography } from '@mui/material';
-import { type FunctionComponent, type SyntheticEvent, useContext, useState } from 'react';
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import { Box, Button, Tab, Tabs } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { type FunctionComponent, type SyntheticEvent, useEffect, useState } from 'react';
+import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import TagFieldSingle from '../../../../components/fields/TagFieldSingle';
 import { useFormatter } from '../../../../components/i18n';
-import { type TagRuleInput, type TagRuleOutput } from '../../../../utils/api-types';
+import { type CveCreateInput, type CveOutput } from '../../../../utils/api-types';
+import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { zodImplement } from '../../../../utils/Zod';
-import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
-import { PermissionsContext } from '../../common/Context';
-import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
+import EEChip from '../../common/entreprise_edition/EEChip';
+import GeneralFormTab from './form/GeneralFormTab';
+import RemediationFormTab from './form/RemediationFormTab';
+import VulnerableAssetsFormTab from './form/VulnerableAssetsFormTab';
 
 interface Props {
-  onSubmit: SubmitHandler<TagRuleInput>;
+  onSubmit: SubmitHandler<CveCreateInput>;
+  handleClose: () => void;
   editing?: boolean;
-  initialValues?: TagRuleOutput;
+  initialValues?: CveOutput;
 }
 
 const CveForm: FunctionComponent<Props> = ({
   onSubmit,
+  handleClose,
   editing,
-  initialValues = {
-    tag_name: '',
-    asset_groups: [],
-  },
+  initialValues,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const { permissions } = useContext(PermissionsContext);
-
-  const [assetGroupIds] = useState<string[]>(Object.keys(initialValues.asset_groups ?? []));
-
+  const theme = useTheme();
+  const tabs = ['General', 'Remediation'];
+  const [activeTab, setActiveTab] = useState(tabs[0]);
   const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TagRuleInput>({
-    mode: 'onChange',
+    isValidated: isValidatedEnterpriseEdition,
+    openDialog: openEnterpriseEditionDialog,
+    setEEFeatureDetectedInfo,
+  } = useEnterpriseEdition();
+
+  useEffect(() => {
+    if (activeTab === 'Remediation' && !isValidatedEnterpriseEdition) {
+      setActiveTab('General');
+      setEEFeatureDetectedInfo(t('Remediation'));
+      openEnterpriseEditionDialog();
+    }
+  }, [activeTab, isValidatedEnterpriseEdition]);
+
+  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
+  };
+
+  const methods = useForm<CveCreateInput>({
+    mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<TagRuleInput>().with({
-        tag_name: z.string().min(1, { message: t('Should not be empty') }),
-        asset_groups: z.string().array().optional(),
+      zodImplement<CveCreateInput>().with({
+        cve_id: z.string().min(1, { message: t('Should not be empty') }),
+        cve_cvss: z.number({ required_error: t('CVSS score is required') }).min(0, { message: t('CVSS must be at least 0.0') }).max(10, { message: t('CVSS must be at most 10.0') }),
+        cve_description: z.string().optional(),
+        cve_source_identifier: z.string().optional(),
+        cve_published: z.string().optional(),
+        cve_vuln_status: z.string().optional(),
+        cve_cisa_action_due: z.string().optional(),
+        cve_cisa_exploit_add: z.string().optional(),
+        cve_cisa_required_action: z.string().optional(),
+        cve_cisa_vulnerability_name: z.string().optional(),
+        cve_cwes: z
+          .array(
+            z.object({
+              cwe_id: z.string().min(1, { message: t('CWE ID is required') }),
+              cwe_source: z.string().optional(),
+              cwe_value: z.string().optional(),
+            }),
+          )
+          .optional(),
+        cve_reference_urls: z.array(z.string().url({ message: t('Invalid URL') })).optional(),
+        cve_remediation: z.string().optional(),
       }),
     ),
-    defaultValues: {
-      tag_name: initialValues.tag_name,
-      asset_groups: assetGroupIds,
-    },
+    defaultValues: initialValues,
   });
+  const {
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+  } = methods;
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -58,91 +91,81 @@ const CveForm: FunctionComponent<Props> = ({
   };
 
   return (
-    <form id="tagForm" onSubmit={handleSubmitWithoutPropagation}>
-      <Typography
-        variant="h5"
+    <FormProvider {...methods}>
+      <form
+        id="cveForm"
         style={{
-          fontWeight: 500,
-          marginTop: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100%',
+          gap: theme.spacing(2),
         }}
+        onSubmit={handleSubmitWithoutPropagation}
       >
-        {t('Tag')}
-      </Typography>
-      <Controller
-        control={control}
-        name="tag_name"
-        render={({ field: { onChange, value } }) => {
-          return (
-            <TagFieldSingle
-              name="tag_name"
-              label={t('Select a Tag')}
-              fieldValue={value}
-              fieldOnChange={onChange}
-              errors={errors}
-              style={{ marginTop: 20 }}
-              disabled={value == OPEN_CTI_TAG_NAME}
-              forbiddenOptions={value !== OPEN_CTI_TAG_NAME ? [OPEN_CTI_TAG_NAME] : []}
-            />
-          );
-        }}
-      />
-      <Typography
-        variant="h5"
-        style={{
-          fontWeight: 500,
-          marginTop: 50,
-        }}
-      >
-        {t('Asset groups')}
-      </Typography>
-      <Controller
-        name="asset_groups"
-        control={control}
-        render={({ field: { onChange, value } }) => {
-          const assetGroupIds = value ?? [];
 
-          return (
-            <>
-              <AssetGroupsList
-                assetGroupIds={assetGroupIds}
-                renderActions={assetGroup => (
-                  <AssetGroupPopover
-                    inline
-                    assetGroup={assetGroup}
-                    onRemoveAssetGroupFromList={result =>
-                      onChange(assetGroupIds.filter(ag => ag !== result))}
-                    onDelete={result => onChange(assetGroupIds.filter(ag => ag !== result))}
-                    removeAssetGroupFromListMessage="Remove from the Asset Rule"
-                    disabled={permissions.readOnly}
-                  />
-                )}
-              />
-              <InjectAddAssetGroups
-                assetGroupIds={assetGroupIds}
-                onSubmit={(result) => {
-                  onChange(result);
-                }}
-                disabled={permissions.readOnly}
-              />
-            </>
-          );
-        }}
-      />
-
-      <div style={{
-        float: 'right',
-        marginTop: 20,
-      }}
-      >
-        <Button
-          variant="contained"
-          color="secondary"
-          type="submit"
+        <Tabs
+          value={activeTab}
+          onChange={handleActiveTabChange}
+          aria-label="tabs for cve form"
         >
-          {editing ? t('Update') : t('Create')}
-        </Button>
-      </div>
-    </form>
+          {tabs.map(tab => (
+            <Tab
+              key={tab}
+              label={
+                tab === 'Remediation' ? (
+                  <Box display="flex" alignItems="center">
+                    {tab}
+                    {!isValidatedEnterpriseEdition && (
+                      <EEChip
+                        style={{ marginLeft: theme.spacing(1) }}
+                        clickable
+                        featureDetectedInfo={t('Remediation')}
+                      />
+                    )}
+                  </Box>
+                ) : (
+                  tab
+                )
+              }
+              value={tab}
+            />
+          ))}
+        </Tabs>
+        {activeTab === 'General' && (
+          <GeneralFormTab />
+        )}
+        {activeTab === 'Vulnerable Assets' && (
+          <VulnerableAssetsFormTab />
+        )}
+        {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
+          <RemediationFormTab />
+        )}
+
+        <div style={{
+          marginTop: 'auto',
+          display: 'flex',
+          flexDirection: 'row-reverse',
+          gap: theme.spacing(1),
+        }}
+        >
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={!isDirty || isSubmitting}
+          >
+            {editing ? t('Update') : t('Create')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
+          </Button>
+        </div>
+      </form>
+    </FormProvider>
   );
 };
 

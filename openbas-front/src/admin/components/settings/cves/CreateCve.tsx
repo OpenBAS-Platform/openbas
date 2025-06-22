@@ -1,23 +1,32 @@
+import { Add } from '@mui/icons-material';
+import { Fab } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-import { addTagRule } from '../../../../actions/tag_rules/tagrule-actions';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
+import { addCve } from '../../../../actions/cve-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import {
-  type TagRuleInput,
-  type TagRuleOutput,
-} from '../../../../utils/api-types';
+import { type CveCreateInput, type CveSimple } from '../../../../utils/api-types';
 import CveForm from './CveForm';
 
-interface TagRuleCreateComponentProps { onCreate?: (result: TagRuleOutput) => void }
-const CreateCve: FunctionComponent<TagRuleCreateComponentProps> = ({ onCreate }) => {
+const useStyles = makeStyles()({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 230,
+  },
+});
+
+interface Props { onCreate?: (result: CveSimple) => void }
+
+const CreateCve: FunctionComponent<Props> = ({ onCreate }) => {
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();
+  const { classes } = useStyles();
 
-  const onSubmit = (data: TagRuleInput) => {
-    addTagRule(data).then(
-      (result: { data: TagRuleOutput }) => {
+  const onSubmit = (data: CveCreateInput) => {
+    addCve(data).then(
+      (result: { data: CveSimple }) => {
         if (result) {
           if (onCreate) {
             onCreate(result.data);
@@ -29,17 +38,28 @@ const CreateCve: FunctionComponent<TagRuleCreateComponentProps> = ({ onCreate })
     );
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <>
-      <ButtonCreate onClick={() => setOpen(true)} />
+      <Fab
+        onClick={() => setOpen(true)}
+        color="primary"
+        aria-label="Add"
+        className={classes.createButton}
+      >
+        <Add />
+      </Fab>
       <Drawer
         open={open}
         handleClose={() => setOpen(false)}
         title={t('Add a CVE')}
       >
         <CveForm
-          editing={false}
           onSubmit={onSubmit}
+          handleClose={handleClose}
         />
       </Drawer>
     </>
