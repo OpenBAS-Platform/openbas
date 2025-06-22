@@ -12,7 +12,6 @@ import { zodImplement } from '../../../../utils/Zod';
 import EEChip from '../../common/entreprise_edition/EEChip';
 import GeneralFormTab from './form/GeneralFormTab';
 import RemediationFormTab from './form/RemediationFormTab';
-import VulnerableAssetsFormTab from './form/VulnerableAssetsFormTab';
 
 interface Props {
   onSubmit: SubmitHandler<CveCreateInput>;
@@ -133,9 +132,6 @@ const CveForm: FunctionComponent<Props> = ({
         </Tabs>
         {activeTab === 'General' && (
           <GeneralFormTab />
-        )}
-        {activeTab === 'Vulnerable Assets' && (
-          <VulnerableAssetsFormTab />
         )}
         {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
           <RemediationFormTab />
