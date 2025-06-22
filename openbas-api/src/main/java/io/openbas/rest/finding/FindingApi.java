@@ -3,9 +3,11 @@ package io.openbas.rest.finding;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
+import io.openbas.rest.finding.form.FindingDetailOutput;
 import io.openbas.rest.finding.form.FindingInput;
 import io.openbas.rest.finding.form.FindingOutput;
 import io.openbas.rest.helper.RestBehavior;

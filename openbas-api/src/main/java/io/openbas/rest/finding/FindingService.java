@@ -13,6 +13,7 @@ import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.injector_contract.outputs.ContractOutputUtils;
+import io.openbas.rest.finding.form.FindingDetailOutput;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
@@ -186,5 +187,9 @@ public class FindingService {
                     }
                   });
         });
+  }
+
+  public List<Finding> fetchFindingsByValue(ContractOutputType type, String value) {
+    return findingRepository.findByTypeAndValue(type, value);
   }
 }
