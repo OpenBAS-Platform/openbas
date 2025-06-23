@@ -3,15 +3,16 @@ import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
+
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import { type FindingOutput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
 import GeneralFormTab from '../settings/cves/form/GeneralFormTab';
+import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
 import RelatedInjectsTab from '../settings/cves/form/RelatedInjectsTab';
 import RemediationFormTab from '../settings/cves/form/RemediationFormTab';
-import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -101,15 +102,15 @@ const FindingDetail = ({
 
       {isCVE ? (
         <>
-          {activeTab === 'General' && <GeneralVulnerabilityInfoTab />}
-          {activeTab === 'Vulnerable Assets' && <RelatedInjectsTab headers={headers} filterNames={filterNames} />}
+          {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} />}
+          {activeTab === 'Vulnerable Assets' && <RelatedInjectsTab finding={selectedFinding} headers={headers} filterNames={filterNames} />}
           {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
-            <RemediationVulnerabilityTab />
+            <RemediationFormTab finding={selectedFinding} />
           )}
         </>
       ) : (
         activeTab === 'Related Findings' && (
-          <RelatedInjectsTab headers={headers} filterNames={filterNames} />
+          <RelatedInjectsTab finding={selectedFinding} headers={headers} filterNames={filterNames} />
         )
       )}
     </>

@@ -23,12 +23,13 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
+  finding: FindingOutput;
   headers?: Header[];
   filterNames?: string[];
   contextId?: string;
 }
 
-const RelatedInjectsTab = ({ contextId, headers = [], filterNames = [] }: Props) => {
+const RelatedInjectsTab = ({ finding, contextId, headers = [], filterNames = [] }: Props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
@@ -47,7 +48,7 @@ const RelatedInjectsTab = ({ contextId, headers = [], filterNames = [] }: Props)
     sorts: initSorting('finding_created_at', 'DESC'),
     textSearch: search,
   }));
-  //`finding-detail-${selectedFinding.finding_type}-${selectedFinding.finding_value}`
+  // `finding-detail-${selectedFinding.finding_type}-${selectedFinding.finding_value}`
 
   const searchFindingsToload = (input: SearchPaginationInput) => {
     setLoading(true);
