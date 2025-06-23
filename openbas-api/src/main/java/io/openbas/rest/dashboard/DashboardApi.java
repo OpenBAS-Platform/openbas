@@ -52,7 +52,8 @@ public class DashboardApi extends RestBehavior {
   @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
-    if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(widget.getWidgetConfiguration().getConfigurationType())) {
+    if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
+        widget.getWidgetConfiguration().getConfigurationType())) {
       DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
       Map<String, String> parameters = new HashMap<>();
       Instant end = Instant.now();
@@ -65,7 +66,8 @@ public class DashboardApi extends RestBehavior {
       return esService.multiDateHistogram(userWithAuth, runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
-      StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
+      StructuralHistogramWidget config =
+          (StructuralHistogramWidget) widget.getWidgetConfiguration();
       Map<String, String> parameters = new HashMap<>();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);

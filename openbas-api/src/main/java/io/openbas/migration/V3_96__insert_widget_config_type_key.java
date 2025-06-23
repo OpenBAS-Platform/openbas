@@ -1,10 +1,9 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Statement;
 
 @Component
 public class V3_96__insert_widget_config_type_key extends BaseJavaMigration {
@@ -14,11 +13,11 @@ public class V3_96__insert_widget_config_type_key extends BaseJavaMigration {
     try (Statement statement = context.getConnection().createStatement()) {
 
       String widgetConfigType =
-              """
+          """
               UPDATE widgets
               SET widget_config = widget_config || '{"widget_configuration_type": "structural-histogram"}'
               WHERE widget_config @> '{"mode": "structural"}';
-              
+
               UPDATE widgets
               SET widget_config = widget_config || '{"widget_configuration_type": "temporal-histogram"}'
               WHERE widget_config @> '{"mode": "temporal"}';

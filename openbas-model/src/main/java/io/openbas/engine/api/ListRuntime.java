@@ -10,8 +10,7 @@ public class ListRuntime {
   private Map<String, String> parameters;
   private ListConfiguration widget;
 
-  public ListRuntime(
-          ListConfiguration widget, Map<String, String> parameters) {
+  public ListRuntime(ListConfiguration widget, Map<String, String> parameters) {
     this.widget = widget;
     this.parameters = parameters;
   }

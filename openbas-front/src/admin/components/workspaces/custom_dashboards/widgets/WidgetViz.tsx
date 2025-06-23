@@ -73,7 +73,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     case 'vertical-barchart':
       return (
         <VerticalBarChart
-          widgetMode={widget.widget_config.mode}
+          widgetConfig={widget.widget_config}
           series={seriesData}
         />
       );

@@ -5,9 +5,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Widget;
-import io.openbas.engine.api.WidgetType;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.WidgetConfiguration;
+import io.openbas.engine.api.WidgetType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
