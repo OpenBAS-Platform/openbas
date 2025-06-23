@@ -52,4 +52,8 @@ public abstract class WidgetConfiguration {
 
   @JsonProperty("title")
   private String title;
+
+  WidgetConfiguration(WidgetConfigurationType configurationType) {
+    this.configurationType = configurationType;
+  }
 }

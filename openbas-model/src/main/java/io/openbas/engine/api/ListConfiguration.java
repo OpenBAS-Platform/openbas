@@ -21,4 +21,8 @@ public class ListConfiguration extends WidgetConfiguration {
     private String name;
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
+
+  public ListConfiguration() {
+    super(WidgetConfigurationType.LIST);
+  }
 }

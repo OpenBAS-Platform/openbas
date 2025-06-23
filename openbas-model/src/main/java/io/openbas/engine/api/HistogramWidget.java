@@ -22,6 +22,10 @@ public abstract class HistogramWidget extends WidgetConfiguration {
   private boolean displayLegend;
 
   HistogramWidget(String mode) {
+    super(
+        "temporal".equals(mode)
+            ? WidgetConfigurationType.TEMPORAL_HISTOGRAM
+            : WidgetConfigurationType.STRUCTURAL_HISTOGRAM);
     this.mode = mode;
   }
 }
