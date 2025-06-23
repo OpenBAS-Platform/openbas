@@ -46,8 +46,6 @@ public interface FindingRepository
       nativeQuery = true)
   List<RawFinding> findForIndexing(@Param("from") Instant from);
 
-  @Query(
-      value =
-          "SELECT f FROM Finding f WHERE f.value = :value AND f.type = :type")
+  @Query(value = "SELECT f FROM Finding f WHERE f.value = :value AND f.type = :type")
   List<Finding> findByTypeAndValue(ContractOutputType type, String value);
 }

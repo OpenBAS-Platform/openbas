@@ -1,23 +1,19 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useState } from 'react';
-import { makeStyles } from 'tss-react/mui';
 
+import type { Page } from '../../../components/common/queryable/Page';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
-import { type FindingOutput } from '../../../utils/api-types';
+import { type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
 import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
 import RelatedInjectsTab from '../settings/cves/form/RelatedInjectsTab';
 import RemediationFormTab from '../settings/cves/form/RemediationFormTab';
 
-const useStyles = makeStyles()(() => ({
-  itemHead: { textTransform: 'uppercase' },
-  item: { height: 50 },
-}));
-
 interface Props {
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
   selectedFinding: FindingOutput;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
@@ -25,6 +21,7 @@ interface Props {
 }
 
 const FindingDetail = ({
+  searchFindings,
   selectedFinding,
   contextId,
   additionalHeaders = [],
@@ -42,7 +39,7 @@ const FindingDetail = ({
 
   const tabs = isCVE
     ? ['General', 'Vulnerable Assets', 'Remediation']
-    : ['Related Findings'];
+    : ['Related Injects'];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
@@ -53,10 +50,6 @@ const FindingDetail = ({
       openEnterpriseEditionDialog();
     }
   }, [activeTab, isValidatedEnterpriseEdition]);
-
-  useEffect(() => {
-    // Load all findings with same type and value
-  }, [selectedFinding]);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
@@ -96,14 +89,29 @@ const FindingDetail = ({
       {isCVE ? (
         <>
           {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} />}
-          {activeTab === 'Vulnerable Assets' && <RelatedInjectsTab finding={selectedFinding} additionalHeaders={additionalHeaders} additionalFilterNames={additionalFilterNames} />}
+          {activeTab === 'Vulnerable Assets'
+            && (
+              <RelatedInjectsTab
+                searchFindings={searchFindings}
+                contextId={contextId}
+                finding={selectedFinding}
+                additionalHeaders={additionalHeaders}
+                additionalFilterNames={additionalFilterNames}
+              />
+            )}
           {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
             <RemediationFormTab finding={selectedFinding} />
           )}
         </>
       ) : (
         activeTab === 'Related Injects' && (
-          <RelatedInjectsTab finding={selectedFinding} additionalHeaders={additionalHeaders} additionalFilterNames={additionalFilterNames} />
+          <RelatedInjectsTab
+            searchFindings={searchFindings}
+            contextId={contextId}
+            finding={selectedFinding}
+            additionalHeaders={additionalHeaders}
+            additionalFilterNames={additionalFilterNames}
+          />
         )
       )}
     </>

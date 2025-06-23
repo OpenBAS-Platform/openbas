@@ -1,4 +1,4 @@
-import { searchFindings } from '../../../actions/findings/finding-actions';
+import { searchDistinctFindings, searchFindings } from '../../../actions/findings/finding-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
@@ -45,6 +45,7 @@ const Findings = () => {
         }]}
       />
       <FindingList
+        searchDistinctFindings={searchDistinctFindings}
         searchFindings={searchFindings}
         additionalHeaders={additionalHeaders}
         additionalFilterNames={additionalFilterNames}

@@ -4,6 +4,7 @@ import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { searchDistinctFindings } from '../../../actions/findings/finding-actions';
 import Drawer from '../../../components/common/Drawer';
 import { initSorting, type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -26,6 +27,7 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
   searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
+  searchDistinctFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   filterLocalStorageKey: string;
@@ -57,7 +59,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
 
   const searchFindingsToload = (input: SearchPaginationInput) => {
     setLoading(true);
-    return searchFindings(input).finally(() => {
+    return searchDistinctFindings(input).finally(() => {
       setLoading(false);
     });
   };
@@ -172,7 +174,15 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
           handleClose={() => setSelectedFinding(null)}
           title={selectedFinding?.finding_value}
         >
-          {selectedFinding && (<FindingDetail selectedFinding={selectedFinding} additionalHeaders={additionalHeaders} additionalFilterNames={additionalFilterNames} />)}
+          {selectedFinding && (
+            <FindingDetail
+              selectedFinding={selectedFinding}
+              searchFindings={searchFindings}
+              contextId={contextId}
+              additionalHeaders={additionalHeaders}
+              additionalFilterNames={additionalFilterNames}
+            />
+          )}
         </Drawer>
       )}
     </>

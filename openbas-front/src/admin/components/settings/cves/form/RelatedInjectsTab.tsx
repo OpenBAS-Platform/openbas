@@ -1,11 +1,11 @@
 import { HubOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
-import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchFindings } from '../../../../../actions/findings/finding-actions';
-import { initSorting } from '../../../../../components/common/queryable/Page';
+import { buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
+import { initSorting, type Page } from '../../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -13,11 +13,9 @@ import useBodyItemsStyles from '../../../../../components/common/queryable/style
 import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import type { Header } from '../../../../../components/common/SortHeadersList';
 import FindingIcon from '../../../../../components/FindingIcon';
+import ItemTargets from '../../../../../components/ItemTargets';
 import PaginatedListLoader from '../../../../../components/PaginatedListLoader';
 import type { FilterGroup, FindingOutput, SearchPaginationInput, TargetSimple } from '../../../../../utils/api-types';
-import ItemTargets from '../../../../../components/ItemTargets';
-import { useTheme } from '@mui/material/styles';
-import { buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -25,13 +23,14 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
   finding: FindingOutput;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   contextId?: string;
 }
 
-const RelatedInjectsTab = ({ finding, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
+const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const theme = useTheme();
   const bodyItemsStyles = useBodyItemsStyles();
@@ -44,8 +43,6 @@ const RelatedInjectsTab = ({ finding, contextId, additionalHeaders = [], additio
     ...additionalFilterNames,
   ];
 
-  const [searchParams] = useSearchParams();
-  const [search] = searchParams.getAll('search');
   const [findings, setFindings] = useState<FindingOutput[]>([]);
 
   const baseFilter: FilterGroup = {
@@ -58,14 +55,12 @@ const RelatedInjectsTab = ({ finding, contextId, additionalHeaders = [], additio
   const {
     queryableHelpers,
     searchPaginationInput,
-  } = useQueryableWithLocalStorage(`finding-detail`, buildSearchPagination({
+  } = useQueryableWithLocalStorage(`related-injects-${finding.finding_type}-${finding.finding_value}-${contextId}`, buildSearchPagination({
     sorts: initSorting('finding_created_at', 'DESC'),
-    textSearch: search,
     filterGroup: baseFilter,
   }));
-  // `finding-detail-${selectedFinding.finding_type}-${selectedFinding.finding_value}`
 
-  const searchFindingsToload = (input: SearchPaginationInput) => {
+  const searchFindingsToLoad = (input: SearchPaginationInput) => {
     setLoading(true);
     return searchFindings(input).finally(() => {
       setLoading(false);
@@ -101,7 +96,7 @@ const RelatedInjectsTab = ({ finding, contextId, additionalHeaders = [], additio
   return (
     <Box pt={theme.spacing(2)}>
       <PaginationComponentV2
-        fetch={searchFindingsToload}
+        fetch={searchFindingsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setFindings}
         entityPrefix="finding"

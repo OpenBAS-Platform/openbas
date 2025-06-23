@@ -3,7 +3,6 @@ package io.openbas.utils;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Finding;
-import io.openbas.rest.finding.form.FindingDetailOutput;
 import io.openbas.rest.finding.form.FindingOutput;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,24 +23,6 @@ public class FindingMapper {
 
   public FindingOutput toFindingOutput(Finding finding) {
     return FindingOutput.builder()
-        .value(finding.getValue())
-        .type(finding.getType())
-        .endpoints(
-            finding.getAssets().stream()
-                .filter(asset -> asset instanceof Endpoint)
-                .map(asset -> endpointMapper.toEndpointSimple(asset))
-                .collect(Collectors.toSet()))
-        .assetGroups(
-            finding.getAssetGroups().stream()
-                .map(assetGroup -> assetGroupMapper.toAssetGroupSimple(assetGroup))
-                .collect(Collectors.toSet()))
-        .tagIds(finding.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
-        .creationDate(finding.getCreationDate())
-        .build();
-  }
-
-  public FindingDetailOutput toFindingDetailOutput(Finding finding) {
-    return FindingDetailOutput.builder()
         .value(finding.getValue())
         .type(finding.getType())
         .endpoints(

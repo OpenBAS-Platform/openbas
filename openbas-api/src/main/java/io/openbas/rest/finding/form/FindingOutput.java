@@ -25,7 +25,7 @@ public class FindingOutput {
 
   @Schema(
       description = "Represents the data type being extracted.",
-      example = "text, number, port, portscan, ipv4, ipv6, credentials")
+      example = "text, number, port, portscan, ipv4, ipv6, credentials, cve")
   @JsonProperty("finding_type")
   @NotNull
   private ContractOutputType type;
@@ -51,4 +51,17 @@ public class FindingOutput {
   @Schema(description = "Asset groups linked to endpoints")
   @JsonProperty("finding_asset_groups")
   private Set<AssetGroupSimple> assetGroups;
+
+  @Schema(description = "Inject linked to finding")
+  @JsonProperty("finding_inject")
+  @NotBlank
+  private InjectSimple inject;
+
+  @Schema(description = "Simulation linked to inject")
+  @JsonProperty("finding_simulation")
+  private ExerciseSimple simulation;
+
+  @Schema(description = "Scenario linked to inject")
+  @JsonProperty("finding_scenario")
+  private ScenarioSimple scenario;
 }
