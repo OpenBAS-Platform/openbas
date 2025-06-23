@@ -1,0 +1,21 @@
+package io.openbas.rest.payload.form;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class PayloadExportRequestInput {
+  @JsonProperty("payloads")
+  private List<PayloadExportTarget> payloads;
+
+  @JsonIgnore
+  public List<String> getTargetsIds() {
+    if (payloads == null) {
+      return List.of();
+    }
+    return payloads.stream().map(PayloadExportTarget::getId).toList();
+  }
+}
