@@ -1,8 +1,8 @@
-import type { Control, UseFormSetValue } from 'react-hook-form';
+import { useEffect } from 'react';
+import { type Control, Controller, type UseFormSetValue } from 'react-hook-form';
 
-import { useFormatter } from '../../../../../../../components/i18n';
 import type { Widget } from '../../../../../../../utils/api-types-custom';
-import type { WidgetInputWithoutLayout } from '../../WidgetUtils';
+import { type WidgetInputWithoutLayout } from '../../WidgetUtils';
 
 type Props = {
   widgetType: Widget['widget_type'];
@@ -10,12 +10,24 @@ type Props = {
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
 };
 
-const ListWidgetParameters = (_props: Props) => {
-  const { t } = useFormatter();
+const ListWidgetParameters = (props: Props) => {
+  useEffect(() => {
+    props.setValue('widget_config.widget_configuration_type', 'list');
+  }, []);
   return (
-    <p>
-      {t('hello list')}
-    </p>
+    <>
+      <Controller
+        control={props.control}
+        name="widget_config.widget_configuration_type"
+        render={({ field }) => (
+          <input
+            {...field}
+            type="hidden"
+            value={field.value ?? ''}
+          />
+        )}
+      />
+    </>
   );
 };
 

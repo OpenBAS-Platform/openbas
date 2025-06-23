@@ -54,7 +54,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
         setValue('widget_config.widget_configuration_type', 'temporal-histogram');
         break;
       default:
-        throw `Unknown temporal mode: ${mode}`;
+        setValue('widget_config.widget_configuration_type', 'structural-histogram');
     }
   }, [mode]);
 
