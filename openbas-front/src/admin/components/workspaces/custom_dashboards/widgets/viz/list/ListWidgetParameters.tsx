@@ -16,13 +16,10 @@ type Props = {
 
 const ListWidgetParameters = (props: Props) => {
     const [entityColumns, setEntityColumns] = useState<{attribute: string, label: string}[]>([]);
+    const [selectedColumns, setSelectedColumns] = useState<{attribute: string, label: string}[]>([]);
     const series = useWatch({
         control: props.control,
         name: 'widget_config.series',
-    });
-    const columns = useWatch({
-        control: props.control,
-        name: 'widget_config.columns',
     });
     const entities = series.map(v => getBaseEntities(v.filter)).flat();
 
@@ -42,6 +39,7 @@ const ListWidgetParameters = (props: Props) => {
     }, [series]);
 
     const onChange = (new_cols: { attribute: string, label: string}[]) => {
+        setSelectedColumns(new_cols);
         props.setValue("widget_config.columns", new_cols.map(c => c.attribute));
     }
 
@@ -62,7 +60,7 @@ const ListWidgetParameters = (props: Props) => {
           <WidgetColumnsCustomizationInput
               availableColumns={entityColumns}
               defaultColumns={entityColumns}
-              value={entityColumns}
+              value={selectedColumns}
               onChange={onChange}
           />
       )} />
