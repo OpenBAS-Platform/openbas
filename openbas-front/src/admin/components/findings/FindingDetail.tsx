@@ -9,7 +9,6 @@ import { useFormatter } from '../../../components/i18n';
 import { type FindingOutput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
-import GeneralFormTab from '../settings/cves/form/GeneralFormTab';
 import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
 import RelatedInjectsTab from '../settings/cves/form/RelatedInjectsTab';
 import RemediationFormTab from '../settings/cves/form/RemediationFormTab';
