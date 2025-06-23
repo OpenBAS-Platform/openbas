@@ -1,9 +1,10 @@
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { Close, DragIndicatorOutlined } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Checkbox, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { AccordionDetails, Box, Button, Checkbox, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect } from 'react';
 
+import { Accordion, AccordionSummary } from '../../../../../../../components/common/Accordion';
 import { useFormatter } from '../../../../../../../components/i18n';
 
 type ColumnMeta = {
@@ -60,7 +61,7 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
   const formatColumnName = ({ attribute, label }: ColumnMeta) => (label ? t(label) : t(attribute ?? ''));
 
   return (
-    <Accordion sx={{ width: '100%' }} expanded={true}>
+    <Accordion sx={{ width: '100%' }} defaultExpanded>
       <AccordionSummary>
         <Typography>
           {' '}
