@@ -1,5 +1,6 @@
 package io.openbas.engine.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
@@ -13,7 +14,7 @@ import static lombok.AccessLevel.NONE;
 @Getter
 @Setter
 @Schema(
-        discriminatorProperty = "configurationType",
+        discriminatorProperty = "widget_configuration_type",
         oneOf = {
                 HistogramWidget.class,
                 ListConfiguration.class,
@@ -32,17 +33,19 @@ import static lombok.AccessLevel.NONE;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "configurationType",
+        property = "widget_configuration_type",
         visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = DateHistogramWidget.class, name = WidgetConfigurationType.Values.LIST),
+        @JsonSubTypes.Type(value = ListConfiguration.class, name = WidgetConfigurationType.Values.LIST),
         @JsonSubTypes.Type(value = DateHistogramWidget.class, name = WidgetConfigurationType.Values.TEMPORAL_HISTOGRAM),
         @JsonSubTypes.Type(value = StructuralHistogramWidget.class, name = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM)
 })
 public abstract class WidgetConfiguration {
   @Setter(NONE)
   @NotNull
+  @JsonProperty("widget_configuration_type")
   private WidgetConfigurationType configurationType;
 
+  @JsonProperty("title")
   private String title;
 }

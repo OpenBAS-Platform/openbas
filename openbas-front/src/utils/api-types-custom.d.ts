@@ -3,20 +3,47 @@
 import type { ContractVariable } from '../actions/contract/contract';
 import type { ExpectationInput } from '../admin/components/common/injects/expectations/Expectation';
 import type * as ApiTypes from './api-types';
+import {
+  StructuralHistogramSeries,
+  DateHistogramSeries,
+  ListSeries,
+} from "./api-types";
 
-export type DateHistogramWidget = ApiTypes.UtilRequiredKeys<ApiTypes.BaseHistogramWidget, 'mode' | 'field'> & {
+interface BaseWidgetConfiguration {
+  title?: string;
+}
+
+export type DateHistogramWidget = BaseWidgetConfiguration & {
+  display_legend?: boolean;
+  widget_configuration_type: 'temporal-histogram';
+  stacked?: boolean;
   end: string;
+  mode: 'structural' | 'temporal';
+  field: string;
   interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
   series: DateHistogramSeries[];
   start: string;
 };
-export type HistogramWidget = ApiTypes.BaseHistogramWidget &
+export type ListConfiguration = BaseWidgetConfiguration & {
+  series: ListSeries[];
+  widget_configuration_type: 'list';
+}
+export type StructuralHistogramWidget = BaseWidgetConfiguration & {
+  widget_configuration_type: 'structural-histogram';
+  display_legend?: boolean;
+  stacked?: boolean;
+  mode: 'structural' | 'temporal';
+  field: string;
+  series: StructuralHistogramSeries[];
+};
+export type HistogramWidget = ApiTypes.BaseWidgetConfiguration &
   (
-    | ApiTypes.BaseHistogramWidgetModeMapping<'temporal', DateHistogramWidget>
-    | ApiTypes.BaseHistogramWidgetModeMapping<'structural', ApiTypes.StructuralHistogramWidget>
+    | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'temporal-histogram', DateHistogramWidget>
+    | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'structural-histogram', StructuralHistogramWidget>
     );
-export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<ApiTypes.StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) };
-export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<ApiTypes.StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) };
+export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) | ListConfiguration };
+export type HistogramInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) }
+export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) | ListConfiguration };
 type PayloadCreateInputOmit = 'payload_type' | 'payload_source' | 'payload_status' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_output_parsers';
 type PayloadCreateInputMore = {
   payload_output_parsers?: (

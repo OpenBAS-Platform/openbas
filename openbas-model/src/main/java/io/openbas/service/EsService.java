@@ -499,7 +499,7 @@ public class EsService {
         .toList();
   }
 
-  public List<EsBase> entities(RawUserAuth user, StructuralHistogramRuntime runtime) {
+  public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
     Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
     String entityName =
         searchFilters.getFilters().stream()

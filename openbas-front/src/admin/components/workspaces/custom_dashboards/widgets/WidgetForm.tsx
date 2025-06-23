@@ -61,7 +61,7 @@ const WidgetForm: FunctionComponent<Props> = ({
   const { t } = useFormatter();
 
   // Form
-  const widgetConfigSchema = z.discriminatedUnion('mode', [
+  const widgetConfigSchema = z.discriminatedUnion('widget_configuration_type', [
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
@@ -69,6 +69,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       start: z.string().min(1, { message: t('Should not be empty') }),
       end: z.string().min(1, { message: t('Should not be empty') }),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
+      widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
       series: z.array(z.object({
@@ -82,6 +83,15 @@ const WidgetForm: FunctionComponent<Props> = ({
       field: z.string().min(1, { message: t('Should not be empty') }),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
+      widget_configuration_type: z.literal('structural-histogram'),
+      series: z.array(z.object({
+        name: z.string().optional(),
+        filter: z.any().optional(),
+      })),
+    }),
+    z.object({
+      title: z.string().optional(),
+      widget_configuration_type: z.literal('list'),
       series: z.array(z.object({
         name: z.string().optional(),
         filter: z.any().optional(),

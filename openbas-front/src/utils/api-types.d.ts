@@ -362,18 +362,6 @@ type BaseEsBaseBaseEntityMapping<Key, Type> = {
   base_entity: Key;
 } & Type;
 
-interface BaseHistogramWidget {
-  display_legend?: boolean;
-  field: string;
-  mode: string;
-  stacked?: boolean;
-  title?: string;
-}
-
-type BaseHistogramWidgetModeMapping<Key, Type> = {
-  mode: Key;
-} & Type;
-
 interface BaseInjectTarget {
   target_detection_status?:
     | "FAILED"
@@ -494,6 +482,14 @@ type BasePayloadCreateInputPayloadTypeMapping<Key, Type> = {
 
 type BasePayloadPayloadTypeMapping<Key, Type> = {
   payload_type: Key;
+} & Type;
+
+interface BaseWidgetConfiguration {
+  widget_configuration_type: string;
+}
+
+type BaseWidgetConfigurationWidgetConfigurationTypeMapping<Key, Type> = {
+  widget_configuration_type: Key;
 } & Type;
 
 export interface Challenge {
@@ -927,12 +923,16 @@ export interface DateHistogramSeries {
 }
 
 export type DateHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
+  WidgetConfiguration,
+  "widget_configuration_type"
 > & {
+  display_legend?: boolean;
   end: string;
+  field: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  mode: string;
   series: DateHistogramSeries[];
+  stacked?: boolean;
   start: string;
 };
 
@@ -1984,11 +1984,17 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
-export type HistogramWidget = BaseHistogramWidget &
-  (
-    | BaseHistogramWidgetModeMapping<"temporal", DateHistogramWidget>
-    | BaseHistogramWidgetModeMapping<"structural", StructuralHistogramWidget>
-  );
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: string;
+  stacked?: boolean;
+  title?: string;
+  widget_configuration_type:
+    | "list"
+    | "temporal-histogram"
+    | "structural-histogram";
+}
 
 export interface ImportMapper {
   /** @format date-time */
@@ -2972,6 +2978,11 @@ export interface License {
   license_start_date?: string;
   license_type?: "trial" | "nfr" | "standard" | "lts";
 }
+
+export type ListConfiguration = UtilRequiredKeys<
+  WidgetConfiguration,
+  "widget_configuration_type"
+>;
 
 export interface Log {
   listened?: boolean;
@@ -4655,10 +4666,14 @@ export interface StructuralHistogramSeries {
 }
 
 export type StructuralHistogramWidget = UtilRequiredKeys<
-  BaseHistogramWidget,
-  "mode" | "field"
+  WidgetConfiguration,
+  "widget_configuration_type"
 > & {
+  display_legend?: boolean;
+  field: string;
+  mode: string;
   series: StructuralHistogramSeries[];
+  stacked?: boolean;
 };
 
 export interface Tag {
@@ -5209,7 +5224,10 @@ export interface ViolationErrorBag {
 
 export interface Widget {
   listened?: boolean;
-  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_config:
+    | DateHistogramWidget
+    | ListConfiguration
+    | StructuralHistogramWidget;
   /** @format date-time */
   widget_created_at: string;
   widget_custom_dashboard?: string;
@@ -5225,8 +5243,27 @@ export interface Widget {
   widget_updated_at: string;
 }
 
+export type WidgetConfiguration = BaseWidgetConfiguration &
+  (
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "list",
+        ListConfiguration
+      >
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "temporal-histogram",
+        DateHistogramWidget
+      >
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "structural-histogram",
+        StructuralHistogramWidget
+      >
+  );
+
 export interface WidgetInput {
-  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_config:
+    | DateHistogramWidget
+    | ListConfiguration
+    | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
   widget_type:
     | "vertical-barchart"

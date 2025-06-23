@@ -77,10 +77,10 @@ public class DashboardApi extends RestBehavior {
   @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
   public List<EsBase> entities(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
-    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
+    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
     Map<String, String> parameters = new HashMap<>();
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
+    ListRuntime runtime = new ListRuntime(config, parameters);
 
     return esService.entities(userWithAuth, runtime);
   }
