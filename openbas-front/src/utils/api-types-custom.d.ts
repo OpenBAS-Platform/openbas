@@ -3,15 +3,8 @@
 import type { ContractVariable } from '../actions/contract/contract';
 import type { ExpectationInput } from '../admin/components/common/injects/expectations/Expectation';
 import type * as ApiTypes from './api-types';
-import {
-  StructuralHistogramSeries,
-  DateHistogramSeries,
-  ListSeries,
-} from "./api-types";
 
-interface BaseWidgetConfiguration {
-  title?: string;
-}
+interface BaseWidgetConfiguration { title?: string }
 
 export type DateHistogramWidget = BaseWidgetConfiguration & {
   display_legend?: boolean;
@@ -27,7 +20,7 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
 export type ListConfiguration = BaseWidgetConfiguration & {
   series: ListSeries[];
   widget_configuration_type: 'list';
-}
+};
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   widget_configuration_type: 'structural-histogram';
   display_legend?: boolean;

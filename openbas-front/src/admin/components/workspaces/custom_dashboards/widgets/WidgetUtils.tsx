@@ -5,7 +5,7 @@ import { type Filter, type FilterGroup, type InjectExpectation, type StructuralH
 import {
   type HistogramWidget,
   type Widget,
-  type WidgetInput
+  type WidgetInput,
 } from '../../../../../utils/api-types-custom';
 
 export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;

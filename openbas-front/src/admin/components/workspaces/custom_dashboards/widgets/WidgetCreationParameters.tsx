@@ -1,16 +1,12 @@
-import { Autocomplete, MenuItem, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { type FunctionComponent, useEffect, useState } from 'react';
-import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
+import { TextField } from '@mui/material';
+import { type FunctionComponent } from 'react';
+import { type Control, Controller, type UseFormSetValue } from 'react-hook-form';
 
-import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
-import { type PropertySchemaDTO } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
-import { type GroupOption } from '../../../../../utils/Option';
+import HistogramParameters from './HistogramParameters';
 import ListWidgetParameters from './viz/list/ListWidgetParameters';
-import { getAvailableFields, getAvailableModes, getBaseEntities, type WidgetInputWithoutLayout } from './WidgetUtils';
-import HistogramParameters from "./HistogramParameters";
+import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
   widgetType: Widget['widget_type'];
