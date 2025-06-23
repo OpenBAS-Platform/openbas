@@ -4,6 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { type EsBase } from '../../../../../../../../../utils/api-types';
+import buildStyles from '../ColumnStyles';
 import DefaultElementStyles from './DefaultElementStyles';
 
 const useStyles = makeStyles()(() => ({
@@ -43,7 +44,7 @@ const DefaultListElement = (props: Props) => {
                   key={col}
                   style={{
                     ...bodyItemsStyles.bodyItem,
-                    ...DefaultElementStyles[col],
+                    ...buildStyles(props.columns, DefaultElementStyles)[col],
                   }}
                 >
                   {elementsFromColumn(col)(props.element)}

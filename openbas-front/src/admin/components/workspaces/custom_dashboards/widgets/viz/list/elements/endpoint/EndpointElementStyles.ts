@@ -1,6 +1,6 @@
 import type { CSSProperties } from '@mui/material/styles';
 
-const EndpointElementStyles = new Proxy({
+const EndpointElementStyles: Record<string, CSSProperties> = {
   endpoint_name: { width: '25%' },
   endpoint_active: { width: '10%' },
   endpoint_agents_privilege: { width: '12%' },
@@ -16,6 +16,6 @@ const EndpointElementStyles = new Proxy({
     alignItems: 'center',
   },
   base_tags_side: { width: '25%' },
-}, { get: (target: Record<string, CSSProperties>, name: string) => name in target ? target[name] : { width: '10%' } });
+};
 
 export default EndpointElementStyles;

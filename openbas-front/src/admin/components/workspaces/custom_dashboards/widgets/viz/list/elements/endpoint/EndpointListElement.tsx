@@ -10,6 +10,7 @@ import AssetNameFragment from '../../../../../../../common/endpoints/fragments/e
 import AssetPlatformFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetPlatformFragment';
 import AssetTagsFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetTagsFragment';
 import EndpointArchFragment from '../../../../../../../common/endpoints/fragments/elastic/EndpointArchFragment';
+import buildStyles from '../ColumnStyles';
 import EndpointElementStyles from './EndpointElementStyles';
 
 const useStyles = makeStyles()(() => ({
@@ -61,7 +62,7 @@ const EndpointListElement = (props: Props) => {
                   key={col}
                   style={{
                     ...bodyItemsStyles.bodyItem,
-                    ...EndpointElementStyles[col],
+                    ...buildStyles(props.columns, EndpointElementStyles)[col],
                   }}
                 >
                   {elementsFromColumn(col)(props.element)}

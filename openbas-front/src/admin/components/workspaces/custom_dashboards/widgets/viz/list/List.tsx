@@ -7,7 +7,8 @@ import SortHeadersComponentV2 from '../../../../../../../components/common/query
 import { useQueryableWithLocalStorage } from '../../../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../../../../components/common/SortHeadersList';
 import { type EsBase, type EsEndpoint } from '../../../../../../../utils/api-types';
-import { type Widget } from '../../../../../../../utils/api-types-custom';
+import { type ListConfiguration, type Widget } from '../../../../../../../utils/api-types-custom';
+import buildStyles from './elements/ColumnStyles';
 import DefaultElementStyles from './elements/default/DefaultElementStyles';
 import DefaultListElement from './elements/default/DefaultListElement';
 import EndpointElementStyles from './elements/endpoint/EndpointElementStyles';
@@ -26,6 +27,11 @@ type Props = {
 const List = (props: Props) => {
   const { classes } = useStyles();
 
+  // FIXME: we will always use ListConfiguration in this component
+  const config = (): ListConfiguration => {
+    return props.config as ListConfiguration;
+  };
+
   const headersFromColumns = (columns: string[]): Header[] => {
     return columns.map((col) => {
       return {
@@ -38,8 +44,8 @@ const List = (props: Props) => {
 
   const stylesFromEntityType = (entityType: string) => {
     switch (entityType) {
-      case 'endpoint': return EndpointElementStyles;
-      default: return DefaultElementStyles;
+      case 'endpoint': return buildStyles(config().columns, EndpointElementStyles);
+      default: return buildStyles(config().columns, DefaultElementStyles);
     }
   };
 
