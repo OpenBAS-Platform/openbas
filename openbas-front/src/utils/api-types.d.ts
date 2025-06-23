@@ -2982,7 +2982,16 @@ export interface License {
 export type ListConfiguration = UtilRequiredKeys<
   WidgetConfiguration,
   "widget_configuration_type"
->;
+> & {
+  columns?: string[];
+  series: ListSeries[];
+};
+
+export interface ListSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
 
 export interface Log {
   listened?: boolean;

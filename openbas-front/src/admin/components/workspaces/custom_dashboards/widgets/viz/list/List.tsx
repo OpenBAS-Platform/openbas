@@ -7,11 +7,11 @@ import SortHeadersComponentV2 from '../../../../../../../components/common/query
 import { useQueryableWithLocalStorage } from '../../../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../../../../components/common/SortHeadersList';
 import { type EsBase, type EsEndpoint } from '../../../../../../../utils/api-types';
+import { type Widget } from '../../../../../../../utils/api-types-custom';
 import DefaultElementStyles from './elements/default/DefaultElementStyles';
 import DefaultListElement from './elements/default/DefaultListElement';
 import EndpointElementStyles from './elements/endpoint/EndpointElementStyles';
 import EndpointListElement from './elements/endpoint/EndpointListElement';
-import {Widget} from "../../../../../../../utils/api-types-custom";
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -53,11 +53,11 @@ const List = (props: Props) => {
   };
 
   const columns = (widget_config: Widget['widget_config']) => {
-    if(widget_config.widget_configuration_type === 'list'){
+    if (widget_config.widget_configuration_type === 'list') {
       return widget_config.columns;
     }
     throw 'Bad configuration: must be configuration of type list';
-  }
+  };
 
   return (
     <MuiList>

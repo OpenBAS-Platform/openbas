@@ -1,16 +1,15 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import {DragDropContext, Draggable, Droppable, DropResult} from '@hello-pangea/dnd';
-import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, IconButton, Checkbox, Typography, Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { Close, DragIndicatorOutlined } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Checkbox, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Button from '@mui/material/Button';
+import { type FunctionComponent, useEffect } from 'react';
 
-import {useFormatter} from "../../../../../../../components/i18n";
+import { useFormatter } from '../../../../../../../components/i18n';
 
 type ColumnMeta = {
   attribute: string;
   label: string;
-}
+};
 
 type WidgetConfigColumnsCustomizationProps = {
   availableColumns: ColumnMeta[];
@@ -30,7 +29,7 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
 
   // Ensure columns only include available columns
   useEffect(() => {
-    const filteredColumns = value.filter((col) => availableColumns.some((availableCol) => availableCol.attribute === col.attribute));
+    const filteredColumns = value.filter(col => availableColumns.some(availableCol => availableCol.attribute === col.attribute));
     if (filteredColumns.length !== value.length) {
       onChange(filteredColumns);
     }
@@ -47,11 +46,11 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
   };
 
   const handleToggleColumn = (attribute?: string | null) => {
-    const columnExists = value.some((col) => col.attribute === attribute);
+    const columnExists = value.some(col => col.attribute === attribute);
     if (columnExists) {
-      onChange(value.filter((col) => col.attribute !== attribute));
+      onChange(value.filter(col => col.attribute !== attribute));
     } else {
-      const columnToAdd = availableColumns.find((col) => col.attribute === attribute);
+      const columnToAdd = availableColumns.find(col => col.attribute === attribute);
       if (columnToAdd) {
         onChange([...value, columnToAdd]);
       }
@@ -63,23 +62,40 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
   return (
     <Accordion sx={{ width: '100%' }}>
       <AccordionSummary>
-        <Typography> {t('Customize columns')} </Typography>
+        <Typography>
+          {' '}
+          {t('Customize columns')}
+          {' '}
+        </Typography>
       </AccordionSummary>
 
-      <AccordionDetails sx={{ background: 'none', paddingBlock: theme.spacing(2) }}>
-        <Box sx={{ display: 'flex', width: '100%', gap: theme.spacing(2) }}>
+      <AccordionDetails sx={{
+        background: 'none',
+        paddingBlock: theme.spacing(2),
+      }}
+      >
+        <Box sx={{
+          display: 'flex',
+          width: '100%',
+          gap: theme.spacing(2),
+        }}
+        >
           {/* Available Columns */}
           <Box sx={{ flex: 1 }}>
             <Typography variant="h4">{`${t('Available columns')} (${availableColumns.length})`}</Typography>
-            <List sx={{ border: `1px solid ${theme.palette.common.white}`, borderRadius: `${theme.borderRadius}px` }}>
-              {availableColumns.map((column) => (
+            <List sx={{
+              border: `1px solid ${theme.palette.common.white}`,
+              borderRadius: `${theme.borderRadius}px`,
+            }}
+            >
+              {availableColumns.map(column => (
                 <ListItem
                   disablePadding
                   key={column.attribute}
                   sx={{ height: 42 }}
                 >
                   <Checkbox
-                    checked={value.some((col) => col.attribute === column.attribute)}
+                    checked={value.some(col => col.attribute === column.attribute)}
                     onChange={() => handleToggleColumn(column.attribute)}
                   />
                   <ListItemText primary={formatColumnName(column)} />
@@ -89,11 +105,15 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
           </Box>
 
           {/* Selected Columns */}
-          <Box sx={{ flex: 1, height: '100%' }}>
+          <Box sx={{
+            flex: 1,
+            height: '100%',
+          }}
+          >
             <Typography variant="h4">{`${t('Selected columns')} (${value.length})`}</Typography>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="selected_columns">
-                {(providedDrop) => (
+                {providedDrop => (
                   <List
                     ref={providedDrop.innerRef}
                     {...providedDrop.droppableProps}
@@ -139,7 +159,12 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', marginTop: 2, justifyContent: 'flex-end' }}>
+        <Box sx={{
+          display: 'flex',
+          marginTop: 2,
+          justifyContent: 'flex-end',
+        }}
+        >
           <Button variant="outlined" onClick={() => onChange(defaultColumns)}>
             {t('Reset')}
           </Button>
