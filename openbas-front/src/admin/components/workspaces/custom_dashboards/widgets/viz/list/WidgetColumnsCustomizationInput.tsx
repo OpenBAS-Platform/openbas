@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import {DragDropContext, Draggable, Droppable, DroppableProvided, DropResult} from '@hello-pangea/dnd';
+import {DragDropContext, Draggable, Droppable, DropResult} from '@hello-pangea/dnd';
 import { List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, IconButton, Checkbox, Typography, Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Close, DragIndicatorOutlined } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
@@ -93,7 +93,7 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
             <Typography variant="h4">{`${t('Selected columns')} (${value.length})`}</Typography>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="selected_columns">
-                {(providedDrop: DroppableProvided) => (
+                {(providedDrop) => (
                   <List
                     ref={providedDrop.innerRef}
                     {...providedDrop.droppableProps}
