@@ -11,6 +11,7 @@ import DefaultElementStyles from './elements/default/DefaultElementStyles';
 import DefaultListElement from './elements/default/DefaultListElement';
 import EndpointElementStyles from './elements/endpoint/EndpointElementStyles';
 import EndpointListElement from './elements/endpoint/EndpointListElement';
+import {Widget} from "../../../../../../../utils/api-types-custom";
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -18,7 +19,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 type Props = {
-  columns: string[];
+  config: Widget['widget_config'];
   elements: EsBase[];
 };
 
@@ -51,6 +52,13 @@ const List = (props: Props) => {
     }
   };
 
+  const columns = (widget_config: Widget['widget_config']) => {
+    if(widget_config.widget_configuration_type === 'list'){
+      return widget_config.columns;
+    }
+    throw 'Bad configuration: must be configuration of type list';
+  }
+
   return (
     <MuiList>
       <MuiListItem
@@ -61,7 +69,7 @@ const List = (props: Props) => {
         <ListItemText
           primary={(
             <SortHeadersComponentV2
-              headers={headersFromColumns(props.columns)}
+              headers={headersFromColumns(columns(props.config))}
               inlineStylesHeaders={stylesFromEntityType(props.elements[0].base_entity)}
               sortHelpers={queryableHelpers.sortHelpers}
             />
@@ -69,7 +77,7 @@ const List = (props: Props) => {
         />
       </MuiListItem>
       {props.elements.map(e =>
-        <MuiListItem key={e.base_id} divider disablePadding>{getTypedUiElement(e, props.columns)}</MuiListItem>,
+        <MuiListItem key={e.base_id} divider disablePadding>{getTypedUiElement(e, columns(props.config))}</MuiListItem>,
       )}
     </MuiList>
   );

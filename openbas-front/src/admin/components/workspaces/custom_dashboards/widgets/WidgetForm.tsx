@@ -92,6 +92,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
+      columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),
         filter: z.any().optional(),

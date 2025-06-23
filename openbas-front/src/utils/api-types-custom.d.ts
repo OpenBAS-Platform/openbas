@@ -19,6 +19,7 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
 };
 export type ListConfiguration = BaseWidgetConfiguration & {
   series: ListSeries[];
+  columns: string[];
   widget_configuration_type: 'list';
 };
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {

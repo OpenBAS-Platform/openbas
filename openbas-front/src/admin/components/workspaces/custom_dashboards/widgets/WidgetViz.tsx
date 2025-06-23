@@ -90,7 +90,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
       );
     }
     case 'list':
-      return (<List elements={entitiesVizData} columns={Object.keys(entitiesVizData[0])} />);
+      return (<List elements={entitiesVizData} config={widget.widget_config} />);
     default:
       return 'Not implemented yet';
   }
