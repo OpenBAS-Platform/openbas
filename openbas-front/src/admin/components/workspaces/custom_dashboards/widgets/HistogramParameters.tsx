@@ -12,7 +12,7 @@ import {
     getAvailableFields,
     getAvailableModes,
     getBaseEntities,
-    HistogramInputWithoutLayout, WidgetInputWithoutLayout,
+    WidgetInputWithoutLayout,
 } from './WidgetUtils';
 
 type Props = {
@@ -96,7 +96,6 @@ const HistogramParameters = ({widgetType, control, setValue}: Props) => {
                     <input
                         {...field}
                         type="hidden"
-                        hidden={true}
                         value={field.value ?? ''}
                     />
                 )}

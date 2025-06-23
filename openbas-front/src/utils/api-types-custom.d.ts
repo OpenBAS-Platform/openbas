@@ -18,7 +18,7 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
   widget_configuration_type: 'temporal-histogram';
   stacked?: boolean;
   end: string;
-  mode: 'structural' | 'temporal';
+  mode: 'temporal';
   field: string;
   interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
   series: DateHistogramSeries[];
@@ -32,7 +32,7 @@ export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   widget_configuration_type: 'structural-histogram';
   display_legend?: boolean;
   stacked?: boolean;
-  mode: 'structural' | 'temporal';
+  mode: 'structural';
   field: string;
   series: StructuralHistogramSeries[];
 };
@@ -41,9 +41,8 @@ export type HistogramWidget = ApiTypes.BaseWidgetConfiguration &
     | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'temporal-histogram', DateHistogramWidget>
     | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'structural-histogram', StructuralHistogramWidget>
     );
-export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) | ListConfiguration };
-export type HistogramInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) }
-export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: (Omit<DateHistogramWidget, 'mode'> & { mode: 'temporal' }) | (Omit<StructuralHistogramWidget, 'mode'> & { mode: 'structural' }) | ListConfiguration };
+export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration };
+export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration };
 type PayloadCreateInputOmit = 'payload_type' | 'payload_source' | 'payload_status' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_output_parsers';
 type PayloadCreateInputMore = {
   payload_output_parsers?: (
