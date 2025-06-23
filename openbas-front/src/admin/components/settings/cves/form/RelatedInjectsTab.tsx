@@ -1,5 +1,5 @@
 import { HubOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -13,9 +13,11 @@ import useBodyItemsStyles from '../../../../../components/common/queryable/style
 import { useQueryableWithLocalStorage } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import type { Header } from '../../../../../components/common/SortHeadersList';
 import FindingIcon from '../../../../../components/FindingIcon';
-import { useFormatter } from '../../../../../components/i18n';
 import PaginatedListLoader from '../../../../../components/PaginatedListLoader';
-import type { FindingOutput, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { FilterGroup, FindingOutput, SearchPaginationInput, TargetSimple } from '../../../../../utils/api-types';
+import ItemTargets from '../../../../../components/ItemTargets';
+import { useTheme } from '@mui/material/styles';
+import { buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -24,22 +26,34 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
   finding: FindingOutput;
-  headers?: Header[];
-  filterNames?: string[];
+  additionalHeaders?: Header[];
+  additionalFilterNames?: string[];
   contextId?: string;
 }
 
-const RelatedInjectsTab = ({ finding, contextId, headers = [], filterNames = [] }: Props) => {
+const RelatedInjectsTab = ({ finding, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
-  const { t } = useFormatter();
+  const theme = useTheme();
   const bodyItemsStyles = useBodyItemsStyles();
   const [loading, setLoading] = useState<boolean>(true);
 
+  const availableFilterNames = [
+    'finding_created_at',
+    'finding_asset_groups',
+    'finding_assets',
+    ...additionalFilterNames,
+  ];
+
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-
   const [findings, setFindings] = useState<FindingOutput[]>([]);
-  const [selectedFinding, setSelectedFinding] = useState<FindingOutput | null>(null);
+
+  const baseFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildFilter('finding_value', [finding.finding_value], 'eq'),
+    ],
+  };
 
   const {
     queryableHelpers,
@@ -47,6 +61,7 @@ const RelatedInjectsTab = ({ finding, contextId, headers = [], filterNames = [] 
   } = useQueryableWithLocalStorage(`finding-detail`, buildSearchPagination({
     sorts: initSorting('finding_created_at', 'DESC'),
     textSearch: search,
+    filterGroup: baseFilter,
   }));
   // `finding-detail-${selectedFinding.finding_type}-${selectedFinding.finding_value}`
 
@@ -57,23 +72,40 @@ const RelatedInjectsTab = ({ finding, contextId, headers = [], filterNames = [] 
     });
   };
 
-  const basis = `${90 / (headers.length - 1)}%`;
+  const headers = [
+    {
+      field: 'finding_assets',
+      label: 'Endpoints',
+      isSortable: false,
+      value: (finding: FindingOutput) => (
+        <ItemTargets targets={(finding.finding_assets || []).map(asset => ({
+          target_id: asset.asset_id,
+          target_name: asset.asset_name,
+          target_type: 'ASSETS',
+        })) as TargetSimple[]}
+        />
+      ),
+    },
+    ...additionalHeaders,
+  ];
+
+  const basis = `${50 / (additionalHeaders.length - 1)}%`;
   const inlineStyles: Record<string, CSSProperties> = ({
-    finding_type: { width: '10%' },
-    finding_name: { width: basis },
-    finding_value: { width: basis },
     finding_assets: { width: basis },
-    finding_tags: { width: basis },
+    ...additionalHeaders.reduce((acc, header) => {
+      acc[header.field] = { width: basis };
+      return acc;
+    }, {} as Record<string, CSSProperties>),
   });
 
   return (
-    <>
+    <Box pt={theme.spacing(2)}>
       <PaginationComponentV2
         fetch={searchFindingsToload}
         searchPaginationInput={searchPaginationInput}
         setContent={setFindings}
         entityPrefix="finding"
-        availableFilterNames={filterNames}
+        availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         contextId={contextId}
       />
@@ -99,35 +131,30 @@ const RelatedInjectsTab = ({ finding, contextId, headers = [], filterNames = [] 
             classes={{ root: classes.item }}
             divider
           >
-            <ListItemButton
-              classes={{ root: classes.item }}
-              onClick={() => setSelectedFinding(finding)}
-            >
-              <ListItemIcon>
-                <FindingIcon findingType={finding.finding_type} tooltip={true} />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div style={bodyItemsStyles.bodyItems}>
-                    {headers.map(header => (
-                      <div
-                        key={header.field}
-                        style={{
-                          ...bodyItemsStyles.bodyItem,
-                          ...inlineStyles[header.field],
-                        }}
-                      >
-                        {header.value && header.value(finding)}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              />
-            </ListItemButton>
+            <ListItemIcon>
+              <FindingIcon findingType={finding.finding_type} tooltip />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <div style={bodyItemsStyles.bodyItems}>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles[header.field],
+                      }}
+                    >
+                      {header.value && header.value(finding)}
+                    </div>
+                  ))}
+                </div>
+              )}
+            />
           </ListItem>
         ))}
       </List>
-    </>
+    </Box>
   );
 };
 

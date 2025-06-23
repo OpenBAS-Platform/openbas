@@ -1,7 +1,6 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type Header } from '../../../components/common/SortHeadersList';
@@ -20,24 +19,19 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
   selectedFinding: FindingOutput;
-  headers?: Header[];
-  filterNames?: string[];
+  additionalHeaders?: Header[];
+  additionalFilterNames?: string[];
   contextId?: string;
 }
 
 const FindingDetail = ({
   selectedFinding,
   contextId,
-  headers = [],
-  filterNames = [],
+  additionalHeaders = [],
+  additionalFilterNames = [],
 }: Props) => {
-  const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [searchParams] = useSearchParams();
-
-  const [findings, setFindings] = useState<FindingOutput[]>([]);
   const isCVE = selectedFinding.finding_type === 'cve';
 
   const {
@@ -102,14 +96,14 @@ const FindingDetail = ({
       {isCVE ? (
         <>
           {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} />}
-          {activeTab === 'Vulnerable Assets' && <RelatedInjectsTab finding={selectedFinding} headers={headers} filterNames={filterNames} />}
+          {activeTab === 'Vulnerable Assets' && <RelatedInjectsTab finding={selectedFinding} additionalHeaders={additionalHeaders} additionalFilterNames={additionalFilterNames} />}
           {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
             <RemediationFormTab finding={selectedFinding} />
           )}
         </>
       ) : (
-        activeTab === 'Related Findings' && (
-          <RelatedInjectsTab finding={selectedFinding} headers={headers} filterNames={filterNames} />
+        activeTab === 'Related Injects' && (
+          <RelatedInjectsTab finding={selectedFinding} additionalHeaders={additionalHeaders} additionalFilterNames={additionalFilterNames} />
         )
       )}
     </>
