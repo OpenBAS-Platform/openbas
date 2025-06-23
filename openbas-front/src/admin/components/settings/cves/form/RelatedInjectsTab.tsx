@@ -1,5 +1,5 @@
 import { HubOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -94,7 +94,7 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
   });
 
   return (
-    <Box pt={theme.spacing(2)}>
+    <div style={{ padding: theme.spacing(2, 1, 0, 0) }}>
       <PaginationComponentV2
         fetch={searchFindingsToLoad}
         searchPaginationInput={searchPaginationInput}
@@ -149,7 +149,7 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
           </ListItem>
         ))}
       </List>
-    </Box>
+    </div>
   );
 };
 

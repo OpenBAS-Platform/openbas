@@ -1,10 +1,7 @@
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
-import type { FindingOutput } from '../../../../../utils/api-types';
 
-interface Props { finding: FindingOutput }
-
-const RemediationFormTab = ({ finding }: Props) => {
+const RemediationFormTab = () => {
   const { t } = useFormatter();
 
   return (

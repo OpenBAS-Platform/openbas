@@ -94,3 +94,27 @@ export const formatMacAddress = (mac) => {
 export const formatIp = (ip) => {
   return ip.toUpperCase();
 };
+
+// CVSS
+export const getSeverityAndColor = (score) => {
+  if (score >= 9.0) return {
+    severity: 'CRITICAL',
+    color: 'red',
+  };
+  if (score >= 7.0) return {
+    severity: 'HIGH',
+    color: 'orangered',
+  };
+  if (score >= 4.0) return {
+    severity: 'MEDIUM',
+    color: 'orange',
+  };
+  if (score > 0.0) return {
+    severity: 'LOW',
+    color: 'green',
+  };
+  return {
+    severity: 'NONE',
+    color: 'gray',
+  };
+};

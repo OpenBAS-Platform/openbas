@@ -18,6 +18,7 @@ interface Props {
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   contextId?: string;
+  onCvssScore?: (score: number) => void;
 }
 
 const FindingDetail = ({
@@ -26,6 +27,7 @@ const FindingDetail = ({
   contextId,
   additionalHeaders = [],
   additionalFilterNames = [],
+  onCvssScore,
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
@@ -88,7 +90,7 @@ const FindingDetail = ({
 
       {isCVE ? (
         <>
-          {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} />}
+          {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} onCvssScore={onCvssScore} />}
           {activeTab === 'Vulnerable Assets'
             && (
               <RelatedInjectsTab
@@ -100,7 +102,7 @@ const FindingDetail = ({
               />
             )}
           {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
-            <RemediationFormTab finding={selectedFinding} />
+            <RemediationFormTab />
           )}
         </>
       ) : (
