@@ -1,8 +1,5 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,15 +14,19 @@ import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
 
 @Slf4j
 @Service
@@ -41,7 +42,8 @@ public class FindingService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
 
-  @Resource private ObjectMapper mapper;
+  @Resource
+  private ObjectMapper mapper;
 
   // -- CRUD --
 
@@ -157,7 +159,9 @@ public class FindingService {
     return finding;
   }
 
-  /** Extracts findings from structured output that was generated using output parsers. */
+  /**
+   * Extracts findings from structured output that was generated using output parsers.
+   */
   public void extractFindingsFromOutputParsers(
       Inject inject, Agent agent, Set<OutputParser> outputParsers, JsonNode structuredOutput) {
 
@@ -186,9 +190,5 @@ public class FindingService {
                     }
                   });
         });
-  }
-
-  public List<Finding> fetchFindingsByValue(ContractOutputType type, String value) {
-    return findingRepository.findByTypeAndValue(type, value);
   }
 }
