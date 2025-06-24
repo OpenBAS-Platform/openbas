@@ -1,5 +1,5 @@
 import { TableChart } from '@mui/icons-material';
-import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
+import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
 import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import { type HistogramWidget, type Widget, type WidgetInput } from '../../../../../utils/api-types-custom';
@@ -29,6 +29,11 @@ export const widgetVisualizationTypes: {
     seriesLimit: 5,
   },
   {
+    category: 'horizontal-barchart',
+    seriesLimit: 2,
+    modes: ['structural'],
+  },
+  {
     category: 'line',
     modes: ['temporal'],
     seriesLimit: 5,
@@ -44,6 +49,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
   switch (type) {
     case 'vertical-barchart':
       return <ChartBar fontSize={fontSize} color="primary" />;
+    case 'horizontal-barchart':
+      return <AlignHorizontalLeft fontSize={fontSize} color="primary" />;
     case 'line':
       return <ChartLine fontSize={fontSize} color="primary" />;
     case 'donut':
@@ -83,6 +90,15 @@ export const getWidgetTitle = (widgetTitle: Widget['widget_config']['title'], ty
 export const BASE_ENTITY_FILTER_KEY = 'base_entity';
 export const getBaseEntities = (filterGroup: FilterGroup | undefined) => {
   return filterGroup?.filters?.filter(f => f.key === BASE_ENTITY_FILTER_KEY).map(f => f.values ?? []).flat();
+};
+export const excludeBaseEntities = (filterGroup: FilterGroup | undefined) => {
+  if (!filterGroup) {
+    return undefined;
+  }
+  return {
+    mode: filterGroup.mode,
+    filters: filterGroup.filters?.filter(f => f.key !== BASE_ENTITY_FILTER_KEY) ?? [],
+  };
 };
 
 // -- MATRIX MITRE --
