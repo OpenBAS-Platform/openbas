@@ -31,9 +31,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Cve implements Base {
 
   public enum VULNERABILITY_STATUS {
-    ANALYZED,
-    DEFERRED,
-    MODIFIED,
+    Analyzed,
+    Deferred,
+    Modified,
   }
 
   @Id

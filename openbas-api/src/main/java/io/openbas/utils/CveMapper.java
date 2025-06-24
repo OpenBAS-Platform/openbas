@@ -31,6 +31,7 @@ public class CveMapper {
         .cvss(cve.getCvss())
         .published(cve.getPublished())
         .description(cve.getDescription())
+        .vulnStatus(cve.getVulnStatus())
         .cisaActionDue(cve.getCisaActionDue())
         .cisaExploitAdd(cve.getCisaExploitAdd())
         .cisaRequiredAction(cve.getCisaRequiredAction())

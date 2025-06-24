@@ -918,7 +918,6 @@ export interface CveCreateInput {
    * @exclusiveMax false
    */
   cve_cvss: number;
-  /** @uniqueItems true */
   cve_cwes?: CweInput[];
   cve_description?: string;
   cve_id: string;
@@ -927,7 +926,7 @@ export interface CveCreateInput {
   cve_reference_urls?: string[];
   cve_remediation?: string;
   cve_source_identifier?: string;
-  cve_vuln_status?: string;
+  cve_vuln_status?: "Analyzed" | "Deferred" | "Modified";
 }
 
 export interface CveOutput {
@@ -938,7 +937,6 @@ export interface CveOutput {
   cve_cisa_required_action?: string;
   cve_cisa_vulnerability_name?: string;
   cve_cvss: number;
-  /** @uniqueItems true */
   cve_cwes?: CweOutput[];
   cve_description?: string;
   cve_id: string;
@@ -947,7 +945,7 @@ export interface CveOutput {
   cve_reference_urls?: string[];
   cve_remediation?: string;
   cve_source_identifier?: string;
-  cve_vuln_status?: string;
+  cve_vuln_status?: "Analyzed" | "Deferred" | "Modified";
 }
 
 export interface CveSimple {
@@ -971,7 +969,6 @@ export interface CveUpdateInput {
    * @exclusiveMax false
    */
   cve_cvss: number;
-  /** @uniqueItems true */
   cve_cwes?: CweInput[];
   cve_description?: string;
   /** @format date-time */
@@ -979,7 +976,7 @@ export interface CveUpdateInput {
   cve_reference_urls?: string[];
   cve_remediation?: string;
   cve_source_identifier?: string;
-  cve_vuln_status?: string;
+  cve_vuln_status?: "Analyzed" | "Deferred" | "Modified";
 }
 
 export interface CweInput {

@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, type SyntheticEvent, useEffect, useState } from 'react';
+import { type FormEvent, type SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
-import { type CveCreateInput, type CveOutput } from '../../../../utils/api-types';
+import { type CveCreateInput } from '../../../../utils/api-types';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { zodImplement } from '../../../../utils/Zod';
 import EEChip from '../../common/entreprise_edition/EEChip';
@@ -17,20 +17,39 @@ interface Props {
   onSubmit: SubmitHandler<CveCreateInput>;
   handleClose: () => void;
   editing?: boolean;
-  initialValues?: CveOutput;
+  initialValues?: Partial<CveCreateInput>;
 }
 
-const CveForm: FunctionComponent<Props> = ({
+const CveForm = ({
   onSubmit,
   handleClose,
   editing,
-  initialValues,
-}) => {
+  initialValues = {
+    cve_id: '',
+    cve_cvss: undefined,
+    cve_description: '',
+    cve_source_identifier: '',
+    cve_published: '',
+    cve_vuln_status: undefined,
+    cve_cisa_action_due: '',
+    cve_cisa_exploit_add: '',
+    cve_cisa_required_action: '',
+    cve_cisa_vulnerability_name: '',
+    cve_cwes: [],
+    cve_reference_urls: [],
+    cve_remediation: '',
+  },
+}: Props) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
   const tabs = ['General', 'Remediation'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
+
+  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
+  };
+
   const {
     isValidated: isValidatedEnterpriseEdition,
     openDialog: openEnterpriseEditionDialog,
@@ -45,9 +64,10 @@ const CveForm: FunctionComponent<Props> = ({
     }
   }, [activeTab, isValidatedEnterpriseEdition]);
 
-  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
-    setActiveTab(newValue);
-  };
+  const cwesObject = z.object({
+    cwe_id: z.string().min(1, { message: t('CWE ID is required') }),
+    cwe_source: z.string().optional(),
+  });
 
   const methods = useForm<CveCreateInput>({
     mode: 'onTouched',
@@ -58,19 +78,12 @@ const CveForm: FunctionComponent<Props> = ({
         cve_description: z.string().optional(),
         cve_source_identifier: z.string().optional(),
         cve_published: z.string().optional(),
-        cve_vuln_status: z.string().optional(),
+        cve_vuln_status: z.enum(['Analyzed', 'Deferred', 'Modified']).optional(),
         cve_cisa_action_due: z.string().optional(),
         cve_cisa_exploit_add: z.string().optional(),
         cve_cisa_required_action: z.string().optional(),
         cve_cisa_vulnerability_name: z.string().optional(),
-        cve_cwes: z
-          .array(
-            z.object({
-              cwe_id: z.string().min(1, { message: t('CWE ID is required') }),
-              cwe_source: z.string().optional(),
-            }),
-          )
-          .optional(),
+        cve_cwes: z.array(cwesObject).optional(),
         cve_reference_urls: z.array(z.string().url({ message: t('Invalid URL') })).optional(),
         cve_remediation: z.string().optional(),
       }),
@@ -82,10 +95,13 @@ const CveForm: FunctionComponent<Props> = ({
     formState: { isSubmitting, isDirty },
   } = methods;
 
-  const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
+  const handleSubmitWithoutPropagation = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    handleSubmit(onSubmit)(e);
+    const isValid = await methods.trigger();
+    if (isValid) {
+      handleSubmit(onSubmit)(e);
+    }
   };
 
   return (

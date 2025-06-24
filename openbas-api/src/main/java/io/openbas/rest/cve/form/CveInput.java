@@ -2,6 +2,8 @@ package io.openbas.rest.cve.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Cve;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +24,7 @@ public class CveInput {
   @JsonProperty("cve_description")
   private String description;
 
+  @Enumerated(EnumType.STRING)
   @JsonProperty("cve_vuln_status")
   private Cve.VULNERABILITY_STATUS vulnStatus;
 

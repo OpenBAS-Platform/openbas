@@ -24,13 +24,13 @@ const GeneralFormTab = () => {
 
   const vulnerabilityStatus = [
     {
-      value: 'ANALYZED',
+      value: 'Analyzed',
       label: t('Analyzed'),
     }, {
-      value: 'DEFERRED',
+      value: 'Deferred',
       label: t('Deferred'),
     }, {
-      value: 'MODIFIED',
+      value: 'Modified',
       label: t('Modified'),
     },
   ];
@@ -73,6 +73,7 @@ const GeneralFormTab = () => {
           key={cwesField.id}
         >
           <TextFieldController name={`cve_cwes.${cwesIndex}.cwe_id` as const} label={t('CWE')} />
+          <TextFieldController name={`cve_cwes.${cwesIndex}.cwe_source` as const} label={t('Source')} />
           <IconButton
             onClick={() => cwesRemove(cwesIndex)}
             size="small"
@@ -85,7 +86,10 @@ const GeneralFormTab = () => {
       <Button
         variant="outlined"
         onClick={() => {
-          cwesAppend({ cve_cwes: '' });
+          cwesAppend({
+            cwe_id: '',
+            cwe_source: '',
+          });
         }}
         style={{
           width: '100%',
@@ -106,7 +110,7 @@ const GeneralFormTab = () => {
           }}
           key={referencesField.id}
         >
-          <TextFieldController name={`cve_references.${referencesIndex}.cve_reference_url` as const} label={t('Url')} />
+          <TextFieldController name={`cve_reference_urls.${referencesIndex}` as const} label={t('Url')} />
           <IconButton
             onClick={() => referencesRemove(referencesIndex)}
             size="small"
@@ -119,7 +123,7 @@ const GeneralFormTab = () => {
       <Button
         variant="outlined"
         onClick={() => {
-          referencesAppend({ cve_reference_url: '' });
+          referencesAppend('');
         }}
         style={{
           width: '100%',
