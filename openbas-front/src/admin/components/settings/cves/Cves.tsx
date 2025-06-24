@@ -21,15 +21,15 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
 import CvePopover from './CvePopover';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
-}));
+});
 
 const inlineStyles: Record<string, CSSProperties> = ({
-  cve_id: { width: '30%' },
+  cve_id: { width: '20%' },
   cve_cvss: { width: '20%' },
-  cve_published: { width: '50%' },
+  cve_published: { width: '60%' },
 });
 
 const Cves = () => {
@@ -60,7 +60,7 @@ const Cves = () => {
   const headers: Header[] = useMemo(() => [
     {
       field: 'cve_id',
-      label: 'CVE',
+      label: 'CVE ID',
       isSortable: true,
       value: (cve: CveSimple) => cve.cve_id,
     },
@@ -74,7 +74,7 @@ const Cves = () => {
     },
     {
       field: 'cve_published',
-      label: 'Published Date',
+      label: 'NVD Published Date',
       isSortable: true,
       value: (cve: CveSimple) => fldt(cve.cve_published),
     },
@@ -120,7 +120,6 @@ const Cves = () => {
             <ListItem
               key={cve.cve_id}
               classes={{ root: classes.item }}
-              disablePadding
               divider
               secondaryAction={(
                 <CvePopover

@@ -202,6 +202,7 @@
   "Childrens": "儿童",
   "Chinese": "中国人",
   "Choose your platform": "选择您的平台",
+  "CISA's Known Exploited Vulnerabilities Catalog": "CISA 已知漏洞目录",
   "Cleanup command": "清理命令",
   "Cleanup command and executor must be defined together or none at all": "清理命令和执行器必须一起定义，否则根本无法定义",
   "Cleanup executor": "清理执行器",
