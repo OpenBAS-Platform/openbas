@@ -20,7 +20,8 @@ public class Grant implements Base {
 
   public enum GRANT_TYPE {
     OBSERVER,
-    PLANNER
+    PLANNER,
+    LAUNCHER
   }
 
   @Id
