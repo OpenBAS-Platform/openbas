@@ -2,11 +2,10 @@ package io.openbas.rest.cve.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Cve;
-import java.time.Instant;
-import java.util.List;
-
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.time.Instant;
+import java.util.List;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 

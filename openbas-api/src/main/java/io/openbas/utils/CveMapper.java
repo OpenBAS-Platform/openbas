@@ -30,6 +30,7 @@ public class CveMapper {
         .id(cve.getId())
         .cvss(cve.getCvss())
         .published(cve.getPublished())
+        .sourceIdentifier(cve.getSourceIdentifier())
         .description(cve.getDescription())
         .vulnStatus(cve.getVulnStatus())
         .cisaActionDue(cve.getCisaActionDue())
