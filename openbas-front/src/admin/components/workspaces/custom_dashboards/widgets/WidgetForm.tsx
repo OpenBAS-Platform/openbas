@@ -12,7 +12,12 @@ import WidgetCreationParameters from './WidgetCreationParameters';
 import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
-import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import {
+  getAvailableSteps,
+  lastStepIndex,
+  steps,
+  type WidgetInputWithoutLayout,
+} from './WidgetUtils';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -98,7 +103,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'security-coverage', 'line', 'donut']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut']),
         widget_config: widgetConfigSchema,
       }),
     ),

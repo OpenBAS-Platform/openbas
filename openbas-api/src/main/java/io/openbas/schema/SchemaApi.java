@@ -58,7 +58,10 @@ public class SchemaApi extends RestBehavior {
                 throw new RuntimeException(e);
               }
             })
-        .filter(PropertySchema::isFilterable)
+        .filter(
+            model -> {
+              return model.isFilterable();
+            })
         .map(PropertySchemaDTO::new)
         .collect(Collectors.toSet());
   }

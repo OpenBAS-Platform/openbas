@@ -5043,7 +5043,12 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "horizontal-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -5051,7 +5056,12 @@ export interface Widget {
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "horizontal-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut";
 }
 
 export interface WidgetLayout {

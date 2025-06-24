@@ -13,7 +13,7 @@ interface Props {
   onChange: (value: string | null) => void;
 }
 
-const ENTITIES = ['expectation-inject', 'finding', 'endpoint'];
+const ENTITIES = ['expectation-inject', 'finding', 'endpoint', 'inject'];
 
 const FilterFieldBaseEntity: FunctionComponent<Props> = ({
   value,

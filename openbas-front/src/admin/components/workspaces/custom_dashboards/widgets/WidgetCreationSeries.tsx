@@ -7,11 +7,18 @@ import { makeStyles } from 'tss-react/mui';
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../components/common/queryable/filter/FilterAutocomplete';
 import FilterChips from '../../../../../components/common/queryable/filter/FilterChips';
-import { availableOperators, buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
+import {
+  availableOperators,
+  buildFilter,
+} from '../../../../../components/common/queryable/filter/FilterUtils';
 import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import {
+  type DateHistogramSeries,
+  type PropertySchemaDTO,
+  type StructuralHistogramSeries,
+} from '../../../../../utils/api-types';
 import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
 import { BASE_ENTITY_FILTER_KEY } from './WidgetUtils';
@@ -37,6 +44,7 @@ const availableFilters = new Map([
   ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at']],
   ['finding', ['base_created_at', 'finding_type', 'base_updated_at', 'base_endpoint_side']],
   ['endpoint', ['endpoint_arch', 'endpoint_platform', 'endpoint_ips', 'endpoint_hostname']],
+  ['inject', ['inject_title']],
 ]);
 
 const WidgetCreationSeries: FunctionComponent<{
