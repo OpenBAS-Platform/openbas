@@ -83,7 +83,7 @@ const CvePopover: FunctionComponent<Props> = ({
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={submitDelete}
-        text={`${t('Do you want to delete this payload: ')} ${cve.cve_id} ?`}
+        text={`${t('Do you want to delete this CVE: ')} ${cve.cve_id} ?`}
       />
       <Drawer
         open={openEdit}
