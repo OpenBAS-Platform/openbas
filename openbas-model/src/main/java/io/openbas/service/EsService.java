@@ -508,6 +508,31 @@ public class EsService {
             .orElseThrow()
             .getValues()
             .getFirst();
+    List<EngineSortField> sorts = runtime.getWidget().getSorts();
+
+    List<SortOptions> engineSorts;
+    if (sorts != null && !sorts.isEmpty()) {
+      engineSorts =
+          sorts.stream()
+              .map(
+                  sort ->
+                      SortOptions.of(
+                          so ->
+                              so.field(
+                                  FieldSort.of(
+                                      fs ->
+                                          fs.field(toElasticField(sort.getFieldName()))
+                                              .order(
+                                                  sort.getDirection() == SortDirection.DESC
+                                                      ? SortOrder.Desc
+                                                      : SortOrder.Asc)))))
+              .toList();
+    } else {
+      engineSorts =
+          List.of(
+              SortOptions.of(
+                  so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
+    }
     Query query = buildQuery(user, "", searchFilters, new HashMap<>());
     try {
       SearchResponse<?> response =
@@ -516,11 +541,7 @@ public class EsService {
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(engineConfig.getDefaultPagination())
                       .query(query)
-                      .sort(
-                          SortOptions.of(
-                              s ->
-                                  s.field(
-                                      FieldSort.of(f -> f.field("_score").order(SortOrder.Desc))))),
+                      .sort(engineSorts),
               getClassForEntity(entityName));
       return response.hits().hits().stream()
           .filter(hit -> hit.source() != null)

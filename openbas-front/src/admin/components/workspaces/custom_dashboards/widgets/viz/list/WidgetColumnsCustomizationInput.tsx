@@ -61,7 +61,13 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
   const formatColumnName = ({ attribute, label }: ColumnMeta) => (label ? t(label) : t(attribute ?? ''));
 
   return (
-    <Accordion sx={{ width: '100%' }} defaultExpanded>
+    <Accordion
+      sx={{
+        width: '100%',
+        marginTop: theme.spacing(2),
+      }}
+      defaultExpanded
+    >
       <AccordionSummary>
         <Typography>
           {' '}

@@ -1220,6 +1220,11 @@ export interface EndpointTarget {
   target_type?: string;
 }
 
+export interface EngineSortField {
+  direction: "ASC" | "DESC";
+  fieldName: string;
+}
+
 export interface EsAttackPattern {
   base_attack_pattern_side?: string;
   /** @format date-time */
@@ -2985,6 +2990,7 @@ export type ListConfiguration = UtilRequiredKeys<
 > & {
   columns?: string[];
   series: ListSeries[];
+  sorts?: EngineSortField[];
 };
 
 export interface ListSeries {

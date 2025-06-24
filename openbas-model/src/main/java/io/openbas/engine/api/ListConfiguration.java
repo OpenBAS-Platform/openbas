@@ -16,6 +16,8 @@ public class ListConfiguration extends WidgetConfiguration {
 
   List<String> columns = new ArrayList<>();
 
+  List<EngineSortField> sorts;
+
   @Data
   public static class ListSeries {
     private String name;

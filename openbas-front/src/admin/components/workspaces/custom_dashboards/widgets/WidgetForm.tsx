@@ -92,6 +92,10 @@ const WidgetForm: FunctionComponent<Props> = ({
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
+      sorts: z.array(z.object({
+        direction: z.literal('ASC').or(z.literal('DESC')),
+        fieldName: z.string(),
+      })).optional(),
       columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),

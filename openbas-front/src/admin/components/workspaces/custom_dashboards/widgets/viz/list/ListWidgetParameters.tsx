@@ -1,7 +1,9 @@
+import { MenuItem, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
 
 import { engineSchemas } from '../../../../../../../actions/schema/schema-action';
+import { useFormatter } from '../../../../../../../components/i18n';
 import type { PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import type { Widget } from '../../../../../../../utils/api-types-custom';
 import { getBaseEntities, type WidgetInputWithoutLayout } from '../../WidgetUtils';
@@ -14,6 +16,7 @@ type Props = {
 };
 
 const ListWidgetParameters = (props: Props) => {
+  const { t } = useFormatter();
   const [entityColumns, setEntityColumns] = useState<{
     attribute: string;
     label: string;
@@ -58,6 +61,48 @@ const ListWidgetParameters = (props: Props) => {
             type="hidden"
             value={field.value ?? ''}
           />
+        )}
+      />
+      <Controller
+        control={props.control}
+        name="widget_config.sorts.0.fieldName"
+        render={({ field, fieldState }) => (
+          <TextField
+            {...field}
+            select
+            variant="standard"
+            fullWidth
+            label={t('Sort field')}
+            sx={{ mt: 2 }}
+            value={field.value ?? ''}
+            error={!!fieldState.error}
+            helperText={fieldState.error?.message}
+            onChange={e => field.onChange(e.target.value)}
+            required={true}
+          >
+            {entityColumns.map(col => <MenuItem key={col.attribute} value={col.attribute}>{t(col.label)}</MenuItem>)}
+          </TextField>
+        )}
+      />
+      <Controller
+        control={props.control}
+        name="widget_config.sorts.0.direction"
+        render={({ field, fieldState }) => (
+          <TextField
+            {...field}
+            select
+            variant="standard"
+            fullWidth
+            label={t('Direction')}
+            sx={{ mt: 2 }}
+            value={field.value ?? ''}
+            error={!!fieldState.error}
+            helperText={fieldState.error?.message}
+            onChange={e => field.onChange(e.target.value)}
+            required={true}
+          >
+            {['ASC', 'DESC'].map(dir => <MenuItem key={dir} value={dir}>{t(dir)}</MenuItem>)}
+          </TextField>
         )}
       />
       <Controller

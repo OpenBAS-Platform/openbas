@@ -20,6 +20,7 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
 export type ListConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.ListSeries[];
   columns: string[];
+  sorts?: ApiTypes.EngineSortField[];
   widget_configuration_type: 'list';
 };
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {
