@@ -54,7 +54,7 @@ const CveForm: FunctionComponent<Props> = ({
     resolver: zodResolver(
       zodImplement<CveCreateInput>().with({
         cve_id: z.string().min(1, { message: t('Should not be empty') }),
-        cve_cvss: z.number({ required_error: t('CVSS score is required') }).min(0, { message: t('CVSS must be at least 0.0') }).max(10, { message: t('CVSS must be at most 10.0') }),
+        cve_cvss: z.coerce.number().min(0).max(10),
         cve_description: z.string().optional(),
         cve_source_identifier: z.string().optional(),
         cve_published: z.string().optional(),
