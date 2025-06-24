@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -19,8 +21,6 @@ import java.util.Set;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import static java.time.Instant.now;
 
 @Entity
 @Getter
@@ -46,6 +46,7 @@ public class Cve implements Base {
 
   @Column(name = "cve_published")
   @JsonProperty("cve_published")
+  @Queryable(sortable = true)
   private Instant published;
 
   @Column(name = "cve_description")
@@ -81,6 +82,7 @@ public class Cve implements Base {
   @NotNull
   @Column(name = "cve_cvss", precision = 3, scale = 1)
   @JsonProperty("cve_cvss")
+  @Queryable(searchable = true, filterable = true, sortable = true)
   private BigDecimal cvss;
 
   @ArraySchema(schema = @Schema(type = "string"))
