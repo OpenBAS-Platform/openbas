@@ -1,7 +1,9 @@
 package io.openbas.utils;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.Cve;
 import io.openbas.database.model.Cwe;
+import io.openbas.ee.Ee;
 import io.openbas.rest.cve.form.CveOutput;
 import io.openbas.rest.cve.form.CveSimple;
 import io.openbas.rest.cve.form.CweOutput;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class CveMapper {
+
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
 
   public CveSimple toCveSimple(Cve cve) {
     return CveSimple.builder()
@@ -37,7 +42,10 @@ public class CveMapper {
         .cisaExploitAdd(cve.getCisaExploitAdd())
         .cisaRequiredAction(cve.getCisaRequiredAction())
         .cisaVulnerabilityName(cve.getCisaVulnerabilityName())
-        .remediation(cve.getRemediation())
+        .remediation(
+            eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())
+                ? cve.getRemediation()
+                : null)
         .referenceUrls(new ArrayList<>(cve.getReferenceUrls()))
         .cwes(toCweOutputs(cve.getCwes()))
         .build();

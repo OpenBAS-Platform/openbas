@@ -2,8 +2,10 @@ package io.openbas.rest.cve.service;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.Cve;
 import io.openbas.database.repository.CveRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.cve.form.CveCreateInput;
 import io.openbas.rest.cve.form.CveUpdateInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -21,11 +23,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CveService {
 
+  private final Ee eeService;
   private final CveRepository cveRepository;
+  private final LicenseCacheManager licenseCacheManager;
 
   public Cve createCve(@Valid CveCreateInput input) {
     Cve cve = new Cve();
     cve.setUpdateAttributes(input);
+    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      cve.setRemediation(null);
+    }
     return cveRepository.save(cve);
   }
 
@@ -40,6 +47,9 @@ public class CveService {
   public Cve updateCve(String cveId, @Valid CveUpdateInput input) {
     Cve savedCve = findByCveId(cveId);
     savedCve.setUpdateAttributes(input);
+    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      savedCve.setRemediation(null);
+    }
     return cveRepository.save(savedCve);
   }
 
