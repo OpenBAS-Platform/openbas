@@ -1,9 +1,9 @@
 package io.openbas.rest.cve.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Cve;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -18,7 +18,7 @@ public class CveOutput extends CveSimple {
   private String description;
 
   @JsonProperty("cve_vuln_status")
-  private String vulnStatus;
+  private Cve.VULNERABILITY_STATUS vulnStatus;
 
   @JsonProperty("cve_cisa_exploit_add")
   private Instant cisaExploitAdd;
@@ -39,5 +39,5 @@ public class CveOutput extends CveSimple {
   private List<String> referenceUrls;
 
   @JsonProperty("cve_cwes")
-  private Set<CweOutput> cwes;
+  private List<CweOutput> cwes;
 }

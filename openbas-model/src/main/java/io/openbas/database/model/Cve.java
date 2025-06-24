@@ -15,9 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,6 +29,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "cves")
 @EntityListeners(ModelBaseListener.class)
 public class Cve implements Base {
+
+  public enum VULNERABILITY_STATUS {
+    ANALYZED,
+    DEFERRED,
+    MODIFIED,
+  }
 
   @Id
   @Column(name = "cve_id")
@@ -48,6 +52,11 @@ public class Cve implements Base {
   @JsonProperty("cve_published")
   @Queryable(sortable = true)
   private Instant published;
+
+  @Column(name = "cve_vuln_status")
+  @JsonProperty("cve_vuln_status")
+  @Enumerated(EnumType.STRING)
+  private VULNERABILITY_STATUS vulnStatus;
 
   @Column(name = "cve_description")
   @JsonProperty("cve_description")
@@ -93,7 +102,7 @@ public class Cve implements Base {
       inverseJoinColumns = @JoinColumn(name = "cwe_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("cves_cwes")
-  private Set<Cwe> cwes = new HashSet<>();
+  private List<Cwe> cwes = new ArrayList<>();
 
   // -- AUDIT --
 

@@ -20,7 +20,7 @@ public class V3_96__Cves extends BaseJavaMigration {
                     cve_source_identifier VARCHAR(255),
                     cve_published TIMESTAMP WITH TIME ZONE,
                     cve_description TEXT,
-                    cve_vuln_status VARCHAR(255),
+                    cve_vuln_status VARCHAR(255) DEFAULT 'ANALYZED',
                     cve_cvss DECIMAL(3,1),
                     cve_cisa_exploit_add TIMESTAMP WITH TIME ZONE,
                     cve_cisa_action_due TIMESTAMP WITH TIME ZONE,

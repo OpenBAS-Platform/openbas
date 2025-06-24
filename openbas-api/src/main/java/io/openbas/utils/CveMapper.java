@@ -6,7 +6,7 @@ import io.openbas.rest.cve.form.CveOutput;
 import io.openbas.rest.cve.form.CveSimple;
 import io.openbas.rest.cve.form.CweOutput;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +41,8 @@ public class CveMapper {
         .build();
   }
 
-  private Set<CweOutput> toCweOutputs(Set<Cwe> cwes) {
-    return cwes.stream().map(this::toCweOutput).collect(Collectors.toSet());
+  private List<CweOutput> toCweOutputs(List<Cwe> cwes) {
+    return cwes.stream().map(this::toCweOutput).collect(Collectors.toList());
   }
 
   public CweOutput toCweOutput(Cwe cwe) {

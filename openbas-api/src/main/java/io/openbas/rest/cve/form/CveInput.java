@@ -1,13 +1,13 @@
 package io.openbas.rest.cve.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Cve;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 
 @Getter
@@ -23,7 +23,7 @@ public class CveInput {
   private String description;
 
   @JsonProperty("cve_vuln_status")
-  private String vulnStatus;
+  private Cve.VULNERABILITY_STATUS vulnStatus;
 
   @JsonProperty("cve_cvss")
   @NotNull
@@ -50,5 +50,5 @@ public class CveInput {
   private List<String> referenceUrls;
 
   @JsonProperty("cve_cwes")
-  private Set<CweInput> cwes;
+  private List<CweInput> cwes;
 }
