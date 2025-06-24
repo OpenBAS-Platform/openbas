@@ -1,5 +1,6 @@
 import { Description } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { type ReactNode, useEffect } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
@@ -15,11 +16,16 @@ const useStyles = makeStyles()(() => ({
 type Props = {
   columns: string[];
   element: EsBase;
+  secondaryAction: (node: ReactNode) => void;
 };
 
 const DefaultListElement = (props: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
+
+  useEffect(() => {
+    props.secondaryAction(<>&nbsp;</>);
+  }, [props.secondaryAction]);
 
   const elementsFromColumn = (column: string) => {
     switch (column) {
@@ -32,7 +38,7 @@ const DefaultListElement = (props: Props) => {
 
   return (
     <>
-      <ListItemButton classes={{ root: classes.item }} className="noDrag">
+      <ListItemButton classes={{ root: classes.item }} inert={true}>
         <ListItemIcon>
           <Description color="primary" />
         </ListItemIcon>

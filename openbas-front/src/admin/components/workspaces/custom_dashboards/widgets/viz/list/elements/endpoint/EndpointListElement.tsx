@@ -1,5 +1,6 @@
-import { DevicesOtherOutlined } from '@mui/icons-material';
+import { ArrowForwardIos, DevicesOtherOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { type ReactNode, useEffect } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -21,11 +22,18 @@ const useStyles = makeStyles()(() => ({
 type Props = {
   columns: string[];
   element: EsEndpoint;
+  secondaryAction: (node: ReactNode) => void;
 };
 
 const EndpointListElement = (props: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
+
+  const endpointUrl = `/admin/assets/endpoints/${props.element.base_id}`;
+
+  useEffect(() => {
+    props.secondaryAction(<Link to={endpointUrl} className="noDrag"><ArrowForwardIos /></Link>);
+  }, [props.secondaryAction]);
 
   /* eslint-disable react/display-name */
   // eslint doesn't seem to be able to infer the display names of subcomponents but react can
@@ -47,7 +55,7 @@ const EndpointListElement = (props: Props) => {
     <>
       <ListItemButton
         component={Link}
-        to={`/admin/assets/endpoints/${props.element.base_id}`}
+        to={endpointUrl}
         classes={{ root: classes.item }}
         className="noDrag"
       >

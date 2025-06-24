@@ -1,4 +1,5 @@
 import { List as MuiList, ListItem as MuiListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { type ReactNode, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { initSorting } from '../../../../../../../components/common/queryable/Page';
@@ -27,6 +28,8 @@ type Props = {
 const List = (props: Props) => {
   const { classes } = useStyles();
 
+  const [listItemSecondaryAction, setListItemSecondaryAction] = useState<ReactNode>();
+
   // FIXME: we will always use ListConfiguration in this component
   const config = (): ListConfiguration => {
     return props.config as ListConfiguration;
@@ -53,8 +56,8 @@ const List = (props: Props) => {
 
   const getTypedUiElement = (element: EsBase, columns: string[]) => {
     switch (element.base_entity) {
-      case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} />);
-      default: return (<DefaultListElement columns={columns} element={element} />);
+      case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} secondaryAction={setListItemSecondaryAction} />);
+      default: return (<DefaultListElement columns={columns} element={element} secondaryAction={setListItemSecondaryAction} />);
     }
   };
 
@@ -70,6 +73,7 @@ const List = (props: Props) => {
       <MuiListItem
         classes={{ root: classes.itemHead }}
         style={{ paddingTop: 0 }}
+        secondaryAction={(<>&nbsp;</>)}
       >
         <ListItemIcon />
         <ListItemText
@@ -83,7 +87,7 @@ const List = (props: Props) => {
         />
       </MuiListItem>
       {props.elements.map(e =>
-        <MuiListItem key={e.base_id} divider disablePadding>{getTypedUiElement(e, columns(props.config))}</MuiListItem>,
+        <MuiListItem key={e.base_id} divider disablePadding secondaryAction={listItemSecondaryAction}>{getTypedUiElement(e, columns(props.config))}</MuiListItem>,
       )}
     </MuiList>
   );
