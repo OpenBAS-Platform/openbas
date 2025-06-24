@@ -30,6 +30,7 @@ public class V3_96__Cves extends BaseJavaMigration {
                     cve_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                     cve_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
                 );
+                CREATE INDEX idx_cves_cve_cvss on cves(cve_cvss);
             """);
 
       // cwe
