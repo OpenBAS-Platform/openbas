@@ -37,16 +37,16 @@ public class CveService {
         Cve.class);
   }
 
+  public Cve updateCve(String cveId, @Valid CveUpdateInput input) {
+    Cve savedCve = findByCveId(cveId);
+    savedCve.setUpdateAttributes(input);
+    return cveRepository.save(savedCve);
+  }
+
   public Cve findByCveId(String cveId) {
     return cveRepository
         .findById(cveId)
         .orElseThrow(() -> new EntityNotFoundException("CVE not found with id: " + cveId));
-  }
-
-  public Cve updateCve(@Valid CveUpdateInput input) {
-    Cve cve = new Cve();
-    cve.setUpdateAttributes(input);
-    return cveRepository.save(cve);
   }
 
   public void deleteById(String cveId) {

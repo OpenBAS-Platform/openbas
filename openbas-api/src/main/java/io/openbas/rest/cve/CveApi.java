@@ -51,7 +51,7 @@ public class CveApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public CveSimple updateCve(
       @NotBlank @PathVariable final String cveId, @Valid @RequestBody CveUpdateInput input) {
-    return cveMapper.toCveSimple(cveService.updateCve(input));
+    return cveMapper.toCveSimple(cveService.updateCve(cveId, input));
   }
 
   @Secured(ROLE_ADMIN)

@@ -95,7 +95,7 @@ const CveForm = ({
 
   const {
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { isSubmitting, isDirty },
   } = methods;
 
   const handleSubmitWithoutPropagation = async (e: FormEvent<HTMLFormElement>) => {

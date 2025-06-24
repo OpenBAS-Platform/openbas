@@ -8,6 +8,7 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type CveOutput, type CveSimple, type CveUpdateInput } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
 import CveForm from './CveForm';
 
 interface Props {
@@ -16,88 +17,88 @@ interface Props {
   cve: CveSimple;
 }
 
-const CvePopover: FunctionComponent<Props> = ({
-  onDelete,
-  onUpdate,
-  cve,
-}) => {
-  // Standard hooks
+const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   const { t } = useFormatter();
-  const [fullCve, setFullCve] = useState<CveOutput | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch full CVE
+  const [fullCve, setFullCve] = useState<CveOutput | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const handleOpenEdit = () => setOpenEdit(true);
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+    setFullCve(null);
+  };
+
+  const handleOpenDelete = () => setOpenDelete(true);
+  const handleCloseDelete = () => setOpenDelete(false);
+
+  const handleDelete = () => {
+    deleteCve(cve.cve_id)
+      .then(() => {
+        onDelete?.(cve.cve_id);
+      })
+      .catch(() => {
+        MESSAGING$.notifyError(t('Failed to delete CVE.'));
+      })
+      .finally(() => {
+        handleCloseDelete();
+      });
+  };
+
+  const handleSubmitEdit = (data: CveUpdateInput) => {
+    updateCve(cve.cve_id, data)
+      .then((response) => {
+        onUpdate?.(response.data);
+      })
+      .catch(() => {
+        MESSAGING$.notifyError(t('Failed to update CVE.'));
+      })
+      .finally(() => {
+        handleCloseEdit();
+      });
+  };
+
   useEffect(() => {
-    if (!cve?.cve_id) return;
+    if (!openEdit || !cve?.cve_id) return;
 
     setLoading(true);
     fetchCve(cve.cve_id)
-      .then((res) => {
-        setFullCve(res.data);
-      })
-      .catch(() => {
-        setFullCve(null); // Optional: set error state if needed
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [cve]);
-
-  // Edition
-  const [openEdit, setOpenEdit] = useState(false);
-  const handleOpenEdit = () => setOpenEdit(true);
-  const handleCloseEdit = () => setOpenEdit(false);
-
-  const onSubmitEdit = (data: CveUpdateInput) => {
-    return updateCve(cve.cve_id, data).then((result: { data: CveSimple }) => {
-      if (onUpdate) {
-        onUpdate(result.data);
-      }
-      handleCloseEdit();
-    });
-  };
-
-  // Deletion
-  const [openDelete, setOpenDelete] = useState(false);
-  const handleOpenDelete = () => setOpenDelete(true);
-  const handleCloseDelete = () => setOpenDelete(false);
-  const submitDelete = () => {
-    deleteCve(cve.cve_id);
-    if (onDelete) {
-      onDelete(cve.cve_id);
-    }
-    handleCloseDelete();
-  };
-
-  // Prevent rendering if data not ready
-  if (loading || !fullCve) return <Loader />;
-
-  const initialValues = R.pick([
-    'cve_id',
-    'cve_cvss',
-    'cve_description',
-    'cve_source_identifier',
-    'cve_published',
-    'cve_vuln_status',
-    'cve_cisa_action_due',
-    'cve_cisa_exploit_add',
-    'cve_cisa_required_action',
-    'cve_cisa_vulnerability_name',
-    'cve_cwes',
-    'cve_reference_urls',
-    'cve_remediation',
-  ], fullCve);
+      .then(res => setFullCve(res.data))
+      .catch(() => setFullCve(null))
+      .finally(() => setLoading(false));
+  }, [openEdit, cve?.cve_id]);
 
   const entries: PopoverEntry[] = [
     {
-      label: 'Update',
+      label: t('Update'),
       action: handleOpenEdit,
     },
     {
-      label: 'Delete',
+      label: t('Delete'),
       action: handleOpenDelete,
     },
   ];
+
+  const initialValues = fullCve
+    ? R.pick([
+        'cve_id',
+        'cve_cvss',
+        'cve_description',
+        'cve_source_identifier',
+        'cve_published',
+        'cve_vuln_status',
+        'cve_cisa_action_due',
+        'cve_cisa_exploit_add',
+        'cve_cisa_required_action',
+        'cve_cisa_vulnerability_name',
+        'cve_cwes',
+        'cve_reference_urls',
+        'cve_remediation',
+      ], fullCve)
+    : {};
 
   return (
     <>
@@ -106,8 +107,8 @@ const CvePopover: FunctionComponent<Props> = ({
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}
-        handleSubmit={submitDelete}
-        text={`${t('Do you want to delete this CVE:')} ${cve.cve_id} ?`}
+        handleSubmit={handleDelete}
+        text={`${t('Do you want to delete this CVE:')} ${cve.cve_id}?`}
       />
 
       <Drawer
@@ -115,12 +116,16 @@ const CvePopover: FunctionComponent<Props> = ({
         handleClose={handleCloseEdit}
         title={t('Update the CVE')}
       >
-        <CveForm
-          editing
-          initialValues={initialValues}
-          onSubmit={onSubmitEdit}
-          handleClose={handleCloseEdit}
-        />
+        {loading || !fullCve ? (
+          <Loader />
+        ) : (
+          <CveForm
+            editing
+            initialValues={initialValues}
+            onSubmit={handleSubmitEdit}
+            handleClose={handleCloseEdit}
+          />
+        )}
       </Drawer>
     </>
   );
