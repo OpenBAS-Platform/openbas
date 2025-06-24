@@ -67,11 +67,11 @@ const WidgetCreationSeries: FunctionComponent<{
       filter: entity === null
         ? undefined
         : {
-          mode: 'and',
-          filters: [
-            buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
-          ],
-        },
+            mode: 'and',
+            filters: [
+              buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
+            ],
+          },
     });
   };
 
@@ -87,12 +87,12 @@ const WidgetCreationSeries: FunctionComponent<{
       filter: entity === null
         ? undefined
         : {
-          mode: 'and',
-          filters: [
-            buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
-            ...searchPaginationInput.filterGroup?.filters ?? [],
-          ],
-        },
+            mode: 'and',
+            filters: [
+              buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
+              ...searchPaginationInput.filterGroup?.filters ?? [],
+            ],
+          },
     });
   }, [searchPaginationInput]);
 
