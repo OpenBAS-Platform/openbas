@@ -583,6 +583,8 @@
   "FAILED": "Echoué",
   "Failed": "Echoué",
   "failed": "Échoué",
+  "Failed to delete CVE.": "Échec de la suppression de CVE.",
+  "Failed to update CVE.": "Échec de la mise à jour du CVE.",
   "Failure": "Echec",
   "Field": "Champ",
   "File": "Fichier",

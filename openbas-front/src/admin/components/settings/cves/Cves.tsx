@@ -27,9 +27,9 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = ({
-  cve_id: { width: '20%' },
+  cve_id: { width: '30%' },
   cve_cvss: { width: '20%' },
-  cve_published: { width: '20%' },
+  cve_published: { width: '50%' },
 });
 
 const Cves = () => {

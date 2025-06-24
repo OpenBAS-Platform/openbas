@@ -583,6 +583,8 @@
   "FAILED": "Failed",
   "Failed": "Failed",
   "failed": "failed",
+  "Failed to delete CVE.": "Failed to delete CVE.",
+  "Failed to update CVE.": "Failed to update CVE.",
   "Failure": "Failure",
   "Field": "Field",
   "File": "File",

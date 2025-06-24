@@ -583,6 +583,8 @@
   "FAILED": "失败",
   "Failed": "已失败",
   "failed": "已失败",
+  "Failed to delete CVE.": "删除 CVE 失败。",
+  "Failed to update CVE.": "更新 CVE 失败。",
   "Failure": "失败",
   "Field": "字段",
   "File": "文件",
