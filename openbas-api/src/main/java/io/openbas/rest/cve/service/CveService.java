@@ -45,6 +45,7 @@ public class CveService {
 
   public Cve updateCve(@Valid CveUpdateInput input) {
     Cve cve = new Cve();
+    cve.setUpdateAttributes(input);
     return cveRepository.save(cve);
   }
 
