@@ -71,6 +71,14 @@ public class PermissionServiceTest {
   }
 
   @Test
+  public void test_hasPermission_read_WHEN_has_bypass_capa() {
+    User user = getUser(USER_ID, false);
+    user.setGroups(List.of(getGroup(Capability.BYPASS)));
+    assertTrue(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.CHANNEL, Action.READ));
+  }
+
+  @Test
   public void test_hasPermission_write_WHEN_has_read_capa() {
     User user = getUser(USER_ID, false);
     user.setGroups(List.of(getGroup(Capability.ACCESS_CHANNELS)));

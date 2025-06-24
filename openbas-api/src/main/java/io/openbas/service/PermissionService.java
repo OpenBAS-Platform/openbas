@@ -1,10 +1,8 @@
 package io.openbas.service;
 
-import io.openbas.database.model.Action;
-import io.openbas.database.model.Capability;
-import io.openbas.database.model.ResourceType;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.EnumSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PermissionService {
 
+  private static final EnumSet<ResourceType> RESSOURCES_MANAGED_BY_GRANTS =
+      EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
   private final GrantService grantService;
 
   @Transactional
@@ -29,8 +29,7 @@ public class PermissionService {
 
     /************ GRANT ************/
     // Scenario and simulation are  only accessible by GRANT
-    if (ResourceType.SCENARIO.equals(resourceType)
-        || ResourceType.SIMULATION.equals(resourceType)) {
+    if (RESSOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
 
       // user can access search apis but the result will be filtered
       if (Action.SEARCH.equals(action)) {
@@ -47,6 +46,10 @@ public class PermissionService {
     } else {
       /************ CAPA ************/
       Set<Capability> userCapabilities = user.getCapabilities();
+
+      if (userCapabilities.contains(Capability.BYPASS)) {
+        return true;
+      }
 
       Capability requiredCapability = Capability.of(resourceType, action).orElse(Capability.BYPASS);
 

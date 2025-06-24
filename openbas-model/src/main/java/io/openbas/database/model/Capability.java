@@ -88,7 +88,6 @@ public enum Capability {
     this.pairs = Set.of(pairs);
   }
 
-  /** Fast map : (resource,action) ➜ capability */
   private static final Map<ResourceTypeActionPair, Capability> LOOKUP =
       Arrays.stream(values())
           .flatMap(cap -> cap.pairs.stream().map(k -> entry(k, cap)))
