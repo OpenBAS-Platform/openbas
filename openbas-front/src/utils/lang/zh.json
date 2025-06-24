@@ -164,6 +164,7 @@
   "base_attack_patterns_side": "攻击模式",
   "base_created_at": "创建于",
   "base_endpoint_side": "终点",
+  "base_tags_side": "标签",
   "base_updated_at": "更新于",
   "Bash": "Bash",
   "Best regards": "此致",
