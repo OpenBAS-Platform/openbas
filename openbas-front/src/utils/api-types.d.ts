@@ -985,13 +985,11 @@ export interface CveUpdateInput {
 export interface CweInput {
   cwe_id: string;
   cwe_source?: string;
-  cwe_value?: string;
 }
 
 export interface CweOutput {
   cwe_id: string;
   cwe_source?: string;
-  cwe_value?: string;
 }
 
 export interface DateHistogramSeries {

@@ -68,7 +68,6 @@ const CveForm: FunctionComponent<Props> = ({
             z.object({
               cwe_id: z.string().min(1, { message: t('CWE ID is required') }),
               cwe_source: z.string().optional(),
-              cwe_value: z.string().optional(),
             }),
           )
           .optional(),

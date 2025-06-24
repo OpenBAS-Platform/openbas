@@ -46,10 +46,6 @@ public class CveMapper {
   }
 
   public CweOutput toCweOutput(Cwe cwe) {
-    return CweOutput.builder()
-        .id(cwe.getId())
-        .value(cwe.getValue())
-        .source(cwe.getSource())
-        .build();
+    return CweOutput.builder().id(cwe.getId()).source(cwe.getSource()).build();
   }
 }

@@ -24,10 +24,6 @@ public class Cwe implements Base {
   @NotBlank
   private String id;
 
-  @Column(name = "cwe_value")
-  @JsonProperty("cwe_value")
-  private String value;
-
   @Column(name = "cwe_source")
   @JsonProperty("cwe_source")
   private String source;
