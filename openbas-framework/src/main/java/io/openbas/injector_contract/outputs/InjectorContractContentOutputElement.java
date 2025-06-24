@@ -2,12 +2,10 @@ package io.openbas.injector_contract.outputs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class ContractOutputElement {
+@Data
+public class InjectorContractContentOutputElement {
   @JsonProperty("type")
   private ContractOutputType type;
 

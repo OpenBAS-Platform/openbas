@@ -14,6 +14,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.*;
+import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
@@ -670,7 +671,7 @@ class InjectServiceTest {
 
     injectInput.setInjectorContract(injectorContractId);
     when(injectorContractService.injectorContract(injectorContractId)).thenReturn(injectorContract);
-    when(injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract))
+    when(InjectorContractContentUtils.getDynamicInjectorContractFieldsForInject(injectorContract))
         .thenReturn(injectorContentJson);
 
     injectService.createInject(null, scenario, injectInput);

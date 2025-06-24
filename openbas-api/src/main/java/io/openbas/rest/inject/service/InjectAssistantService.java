@@ -8,6 +8,7 @@ import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
 import io.openbas.rest.inject.form.InjectAssistantInput;
+import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
@@ -90,7 +91,7 @@ public class InjectAssistantService {
     inject.setDependsDuration(0L);
     inject.setEnabled(enabled);
     inject.setContent(
-        this.injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract));
+        InjectorContractContentUtils.getDynamicInjectorContractFieldsForInject(injectorContract));
     return inject;
   }
 
