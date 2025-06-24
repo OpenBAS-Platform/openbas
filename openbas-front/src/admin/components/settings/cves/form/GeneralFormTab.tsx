@@ -8,7 +8,9 @@ import SelectFieldController from '../../../../../components/fields/SelectFieldC
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 
-const GeneralFormTab = () => {
+interface Props { editing?: boolean }
+
+const GeneralFormTab = ({ editing = false }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const { control } = useFormContext();
@@ -37,8 +39,8 @@ const GeneralFormTab = () => {
 
   return (
     <>
-      <TextFieldController name="cve_id" label={t('CVE ID')} required />
-      <TextFieldController name="cve_cvss" label={t('CVSS')} required type="number" />
+      <TextFieldController name="cve_id" label={t('CVE ID')} required disabled={editing} />
+      <TextFieldController name="cve_cvss" label={t('CVSS')} required type="number" disabled={editing} />
 
       <TextFieldController variant="standard" name="cve_description" label={t('Description')} multiline rows={5} />
 

@@ -37,7 +37,6 @@ const CveForm = ({
     cve_cisa_vulnerability_name: '',
     cve_cwes: [],
     cve_reference_urls: [],
-    cve_remediation: '',
   },
 }: Props) => {
   // Standard hooks
@@ -69,30 +68,34 @@ const CveForm = ({
     cwe_source: z.string().optional(),
   });
 
+  const schema = zodImplement<CveCreateInput>().with({
+    cve_id: z.string().min(1, { message: t('Should not be empty') }),
+    cve_cvss: z.coerce.number().min(0).max(10),
+    cve_description: z.string().optional(),
+    cve_source_identifier: z.string().optional(),
+    cve_published: z.string().optional(),
+    cve_vuln_status: z.enum(['Analyzed', 'Deferred', 'Modified']).optional(),
+    cve_cisa_action_due: z.string().optional(),
+    cve_cisa_exploit_add: z.string().optional(),
+    cve_cisa_required_action: z.string().optional(),
+    cve_cisa_vulnerability_name: z.string().optional(),
+    cve_cwes: z.array(cwesObject).optional(),
+    cve_reference_urls: z.array(z.string().url({ message: t('Invalid URL') })).optional(),
+    cve_remediation: z.string().optional(),
+  });
+
   const methods = useForm<CveCreateInput>({
     mode: 'onTouched',
-    resolver: zodResolver(
-      zodImplement<CveCreateInput>().with({
-        cve_id: z.string().min(1, { message: t('Should not be empty') }),
-        cve_cvss: z.coerce.number().min(0).max(10),
-        cve_description: z.string().optional(),
-        cve_source_identifier: z.string().optional(),
-        cve_published: z.string().optional(),
-        cve_vuln_status: z.enum(['Analyzed', 'Deferred', 'Modified']).optional(),
-        cve_cisa_action_due: z.string().optional(),
-        cve_cisa_exploit_add: z.string().optional(),
-        cve_cisa_required_action: z.string().optional(),
-        cve_cisa_vulnerability_name: z.string().optional(),
-        cve_cwes: z.array(cwesObject).optional(),
-        cve_reference_urls: z.array(z.string().url({ message: t('Invalid URL') })).optional(),
-        cve_remediation: z.string().optional(),
-      }),
-    ),
-    defaultValues: initialValues,
+    resolver: zodResolver(schema),
+    defaultValues: {
+      ...initialValues,
+      cve_remediation: initialValues.cve_remediation ?? '',
+    },
   });
+
   const {
     handleSubmit,
-    formState: { isSubmitting, isDirty },
+    formState: { errors, isSubmitting, isDirty },
   } = methods;
 
   const handleSubmitWithoutPropagation = async (e: FormEvent<HTMLFormElement>) => {
@@ -146,7 +149,7 @@ const CveForm = ({
           ))}
         </Tabs>
         {activeTab === 'General' && (
-          <GeneralFormTab />
+          <GeneralFormTab editing={editing} />
         )}
         {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
           <RemediationFormTab />
