@@ -37,7 +37,6 @@ public class V3_96__Cves extends BaseJavaMigration {
           """
                 CREATE TABLE cwes (
                     cwe_id VARCHAR(255) PRIMARY KEY,
-                    cwe_value VARCHAR(255),
                     cwe_source VARCHAR(255),
                     cwe_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                     cwe_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -49,7 +48,7 @@ public class V3_96__Cves extends BaseJavaMigration {
           """
                 CREATE TABLE cves_cwes (
                     cve_id VARCHAR(255) NOT NULL CONSTRAINT cve_id_fk REFERENCES cves ON DELETE CASCADE,
-                    cwe_id VARCHAR(255) NOT NULL CONSTRAINT cwe_id_fk REFERENCES cves ON DELETE CASCADE,
+                    cwe_id VARCHAR(255) NOT NULL CONSTRAINT cwe_id_fk REFERENCES cwes ON DELETE CASCADE,
                     PRIMARY KEY (cve_id, cwe_id),
                     FOREIGN KEY (cve_id) REFERENCES cves(cve_id) ON DELETE CASCADE,
                     FOREIGN KEY (cwe_id) REFERENCES cwes(cwe_id) ON DELETE CASCADE
