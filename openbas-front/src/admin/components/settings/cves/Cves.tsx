@@ -1,6 +1,5 @@
-import { HubOutlined } from '@mui/icons-material';
+import { HubOutlined, ReportProblemOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { ShieldOutline } from 'mdi-material-ui';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -132,7 +131,7 @@ const Cves = () => {
               )}
             >
               <ListItemIcon>
-                <ShieldOutline />
+                <ReportProblemOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={(

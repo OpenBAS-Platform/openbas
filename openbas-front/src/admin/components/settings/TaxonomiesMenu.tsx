@@ -1,5 +1,5 @@
-import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
-import { LockPattern, ShieldOutline } from 'mdi-material-ui';
+import { ReportProblemOutlined, RouteOutlined, StyleOutlined } from '@mui/icons-material';
+import { LockPattern } from 'mdi-material-ui';
 import { type FunctionComponent, memo } from 'react';
 
 import RightMenu, { type RightMenuEntry } from '../../../components/common/menu/RightMenu';
@@ -23,7 +23,7 @@ const TaxonomiesMenuComponent: FunctionComponent = () => {
     },
     {
       path: '/admin/settings/taxonomies/cves',
-      icon: () => (<ShieldOutline />),
+      icon: () => (<ReportProblemOutlined />),
       label: 'CVEs',
     },
   ];
