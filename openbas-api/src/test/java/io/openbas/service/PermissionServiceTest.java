@@ -4,7 +4,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.Capability;
+import io.openbas.database.model.Group;
+import io.openbas.database.model.ResourceType;
+import io.openbas.database.model.Role;
+import io.openbas.database.model.User;
 import io.openbas.utils.fixtures.UserFixture;
 import java.util.ArrayList;
 import java.util.HashSet;

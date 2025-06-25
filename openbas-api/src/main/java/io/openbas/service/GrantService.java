@@ -2,7 +2,11 @@ package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Grant;
+import io.openbas.database.model.Group;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.database.repository.GroupRepository;
 import jakarta.validation.constraints.NotBlank;
@@ -76,23 +80,22 @@ public class GrantService {
   }
 
   public boolean hasReadGrant(@NotBlank final String resourceId, @NotNull final User user) {
-    return this.grantRepository.rawByResourceIdAndUserId(resourceId, user.getId()).stream()
-        .anyMatch(
-            rawGrant ->
-                READ_AUTHORIZED_GRANTS.contains(
-                    Grant.GRANT_TYPE.valueOf(rawGrant.getGrant_name())));
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.OBSERVER);
   }
 
   public boolean hasWriteGrant(@NotBlank final String resourceId, @NotNull final User user) {
-    return this.grantRepository.rawByResourceIdAndUserId(resourceId, user.getId()).stream()
-        .anyMatch(
-            rawGrant ->
-                WRITE_AUTHORIZED_GRANTS.contains(
-                    Grant.GRANT_TYPE.valueOf(rawGrant.getGrant_name())));
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.PLANNER);
   }
 
   public boolean hasLaunchGrant(@NotBlank final String resourceId, @NotNull final User user) {
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.LAUNCHER);
+  }
+
+  private boolean hasGrant(
+      @NotBlank final String resourceId,
+      @NotNull final User user,
+      @NotNull final Grant.GRANT_TYPE grantType) {
     return this.grantRepository.rawByResourceIdAndUserId(resourceId, user.getId()).stream()
-        .anyMatch(rawGrant -> Grant.GRANT_TYPE.LAUNCHER.name().equals(rawGrant.getGrant_name()));
+        .anyMatch(rawGrant -> grantType.name().equals(rawGrant.getGrant_name()));
   }
 }

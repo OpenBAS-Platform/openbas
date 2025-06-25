@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PermissionService {
 
-  private static final EnumSet<ResourceType> RESSOURCES_MANAGED_BY_GRANTS =
+  private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
   private final GrantService grantService;
 
@@ -27,38 +27,50 @@ public class PermissionService {
       return true;
     }
 
-    /************ GRANT ************/
     // Scenario and simulation are  only accessible by GRANT
-    if (RESSOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
-
-      // user can access search apis but the result will be filtered
-      if (Action.SEARCH.equals(action)) {
-        return true;
-      }
-
-      if (Action.READ.equals(action)) {
-        return grantService.hasReadGrant(resourceId, user);
-      } else if (Action.WRITE.equals(action)) {
-        return grantService.hasWriteGrant(resourceId, user);
-      } else if (Action.LAUNCH.equals(action)) {
-        return grantService.hasLaunchGrant(resourceId, user);
-      }
+    if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
+      return hasGrantPermission(user, resourceId, resourceType, action);
     } else {
-      /************ CAPA ************/
-      Set<Capability> userCapabilities = user.getCapabilities();
-
-      if (userCapabilities.contains(Capability.BYPASS)) {
-        return true;
-      }
-
-      Capability requiredCapability = Capability.of(resourceType, action).orElse(Capability.BYPASS);
-
-      if (userCapabilities.contains(requiredCapability)) {
-        return true;
-      } else {
-        return false;
-      }
+      return hasCapaPermission(user, resourceType, action);
     }
-    return false;
+  }
+
+  private boolean hasGrantPermission(
+      @NotNull final User user,
+      final String resourceId,
+      final ResourceType resourceType,
+      final Action action) {
+    // user can access search apis but the result will be filtered
+    if (Action.SEARCH.equals(action)) {
+      return true;
+    }
+
+    switch (action) {
+      case READ:
+        return grantService.hasReadGrant(resourceId, user);
+      case WRITE:
+        return grantService.hasWriteGrant(resourceId, user);
+      case LAUNCH:
+        return grantService.hasLaunchGrant(resourceId, user);
+      default:
+        return false;
+    }
+  }
+
+  private boolean hasCapaPermission(
+      @NotNull final User user, final ResourceType resourceType, final Action action) {
+    Set<Capability> userCapabilities = user.getCapabilities();
+
+    if (userCapabilities.contains(Capability.BYPASS)) {
+      return true;
+    }
+
+    Capability requiredCapability = Capability.of(resourceType, action).orElse(Capability.BYPASS);
+
+    if (userCapabilities.contains(requiredCapability)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
