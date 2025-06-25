@@ -3,7 +3,6 @@ package io.openbas.rest.asset.endpoint;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Agent;
@@ -11,7 +10,6 @@ import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
-import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.*;
@@ -46,7 +44,6 @@ public class EndpointApi extends RestBehavior {
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
-  private final TagRepository tagRepository;
 
   private final EndpointMapper endpointMapper;
 
