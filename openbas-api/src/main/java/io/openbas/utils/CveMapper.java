@@ -28,6 +28,7 @@ public class CveMapper {
       return null;
     }
     return CveSimple.builder()
+        .id(cve.getId())
         .cveId(cve.getCveId())
         .cvss(cve.getCvss())
         .published(cve.getPublished())
@@ -39,6 +40,7 @@ public class CveMapper {
       return null;
     }
     return CveOutput.builder()
+        .id(cve.getId())
         .cveId(cve.getCveId())
         .cvss(cve.getCvss())
         .published(cve.getPublished())
