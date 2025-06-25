@@ -74,7 +74,7 @@ const CveForm = ({
     cve_description: z.string().optional(),
     cve_source_identifier: z.string().optional(),
     cve_published: z.string().optional(),
-    cve_vuln_status: z.enum(['Analyzed', 'Deferred', 'Modified']).optional(),
+    cve_vuln_status: z.enum(['ANALYZED', 'DEFERRED', 'MODIFIED']).optional(),
     cve_cisa_action_due: z.string().optional(),
     cve_cisa_exploit_add: z.string().optional(),
     cve_cisa_required_action: z.string().optional(),
@@ -89,13 +89,19 @@ const CveForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       ...initialValues,
+      cve_published: initialValues?.cve_published ?? undefined,
+      cve_vuln_status: initialValues?.cve_vuln_status ?? undefined,
+      cve_cisa_action_due: initialValues?.cve_cisa_action_due ?? undefined,
+      cve_cisa_exploit_add: initialValues?.cve_cisa_exploit_add ?? undefined,
+      cve_cwes: initialValues.cve_cwes ?? [],
+      cve_reference_urls: initialValues.cve_reference_urls ?? [],
       cve_remediation: initialValues.cve_remediation ?? '',
     },
   });
 
   const {
     handleSubmit,
-    formState: { isSubmitting, isDirty },
+    formState: { errors, isSubmitting, isDirty },
   } = methods;
 
   const handleSubmitWithoutPropagation = async (e: FormEvent<HTMLFormElement>) => {
@@ -182,5 +188,4 @@ const CveForm = ({
     </FormProvider>
   );
 };
-
 export default CveForm;

@@ -1,16 +1,22 @@
 package io.openbas.rest.cve.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
+@Schema(description = "CWE input used in CVE creation/update")
 public class CweInput {
 
-  @JsonProperty("cwe_id")
   @NotBlank
+  @JsonProperty("cwe_id")
+  @Schema(description = "CWE identifier", example = "CWE-79")
   private String id;
 
   @JsonProperty("cwe_source")
+  @Schema(description = "Source of the CWE", example = "NIST")
   private String source;
 }

@@ -1,7 +1,5 @@
 package io.openbas.database.model;
 
-import static java.time.Instant.now;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -21,19 +19,19 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Getter
-@Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "cves")
 @EntityListeners(ModelBaseListener.class)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cve implements Base {
 
-  public enum VULNERABILITY_STATUS {
-    Analyzed,
-    Deferred,
-    Modified,
+  public enum VulnerabilityStatus {
+    ANALYZED,
+    DEFERRED,
+    MODIFIED,
   }
 
   @Id
@@ -53,10 +51,10 @@ public class Cve implements Base {
   @Queryable(sortable = true)
   private Instant published;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "cve_vuln_status")
   @JsonProperty("cve_vuln_status")
-  @Enumerated(EnumType.STRING)
-  private VULNERABILITY_STATUS vulnStatus;
+  private VulnerabilityStatus vulnStatus;
 
   @Column(name = "cve_description")
   @JsonProperty("cve_description")
@@ -106,17 +104,15 @@ public class Cve implements Base {
 
   // -- AUDIT --
 
-  @Queryable(filterable = true, sortable = true, label = "created at")
   @CreationTimestamp
-  @Column(name = "cve_created_at", updatable = false, nullable = false)
+  @Queryable(filterable = true, sortable = true, label = "created at")
+  @Column(name = "cve_created_at", updatable = false)
   @JsonProperty("cve_created_at")
-  @NotNull
-  private Instant creationDate = now();
+  private Instant creationDate;
 
-  @Queryable(filterable = true, sortable = true, label = "updated at")
   @UpdateTimestamp
-  @Column(name = "cve_updated_at", nullable = false)
+  @Queryable(filterable = true, sortable = true, label = "updated at")
+  @Column(name = "cve_updated_at")
   @JsonProperty("cve_updated_at")
-  @NotNull
-  private Instant updateDate = now();
+  private Instant updateDate;
 }

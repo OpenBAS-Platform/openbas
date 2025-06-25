@@ -26,13 +26,13 @@ const GeneralFormTab = ({ editing = false }: Props) => {
 
   const vulnerabilityStatus = [
     {
-      value: 'Analyzed',
+      value: 'ANALYZED',
       label: t('Analyzed'),
     }, {
-      value: 'Deferred',
+      value: 'DEFERRED',
       label: t('Deferred'),
     }, {
-      value: 'Modified',
+      value: 'MODIFIED',
       label: t('Modified'),
     },
   ];

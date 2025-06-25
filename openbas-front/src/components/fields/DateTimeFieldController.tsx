@@ -25,8 +25,7 @@ const DateTimeFieldController = ({
           label={label}
           views={['year', 'month', 'day']}
           value={field.value ? new Date(field.value) : null}
-          minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
-          onChange={startDate => field.onChange(startDate?.toISOString())}
+          onChange={date => field.onChange(date?.toISOString())}
           className={classes.root}
           slotProps={{
             textField: {

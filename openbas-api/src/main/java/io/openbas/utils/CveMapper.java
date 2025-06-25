@@ -8,6 +8,7 @@ import io.openbas.rest.cve.form.CveOutput;
 import io.openbas.rest.cve.form.CveSimple;
 import io.openbas.rest.cve.form.CweOutput;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,10 @@ public class CveMapper {
   private final Ee eeService;
   private final LicenseCacheManager licenseCacheManager;
 
-  public CveSimple toCveSimple(Cve cve) {
+  public CveSimple toCveSimple(final Cve cve) {
+    if (cve == null) {
+      return null;
+    }
     return CveSimple.builder()
         .id(cve.getId())
         .cvss(cve.getCvss())
@@ -30,7 +34,10 @@ public class CveMapper {
         .build();
   }
 
-  public CveOutput toCveOutput(Cve cve) {
+  public CveOutput toCveOutput(final Cve cve) {
+    if (cve == null) {
+      return null;
+    }
     return CveOutput.builder()
         .id(cve.getId())
         .cvss(cve.getCvss())
@@ -42,20 +49,32 @@ public class CveMapper {
         .cisaExploitAdd(cve.getCisaExploitAdd())
         .cisaRequiredAction(cve.getCisaRequiredAction())
         .cisaVulnerabilityName(cve.getCisaVulnerabilityName())
-        .remediation(
-            eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())
-                ? cve.getRemediation()
-                : null)
+        .remediation(getRemediationIfLicensed(cve))
         .referenceUrls(new ArrayList<>(cve.getReferenceUrls()))
         .cwes(toCweOutputs(cve.getCwes()))
         .build();
   }
 
-  private List<CweOutput> toCweOutputs(List<Cwe> cwes) {
+  private List<CweOutput> toCweOutputs(final List<Cwe> cwes) {
+    if (cwes == null || cwes.isEmpty()) {
+      return Collections.emptyList();
+    }
     return cwes.stream().map(this::toCweOutput).collect(Collectors.toList());
   }
 
-  public CweOutput toCweOutput(Cwe cwe) {
+  public CweOutput toCweOutput(final Cwe cwe) {
+    if (cwe == null) {
+      return null;
+    }
     return CweOutput.builder().id(cwe.getId()).source(cwe.getSource()).build();
+  }
+
+  private String getRemediationIfLicensed(final Cve cve) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return cve.getRemediation();
+    } else {
+      log.debug("Enterprise Edition license inactive - omitting remediation field");
+      return null;
+    }
   }
 }
