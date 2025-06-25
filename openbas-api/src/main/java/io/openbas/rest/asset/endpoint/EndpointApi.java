@@ -54,13 +54,7 @@ public class EndpointApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
-    Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(input);
-    endpoint.setIps(EndpointMapper.setIps(input.getIps()));
-    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(input.getMacAddresses()));
-    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    endpoint.setEoL(input.isEol());
-    return this.endpointService.createEndpoint(endpoint);
+    return this.endpointService.createEndpoint(input);
   }
 
   @Secured(ROLE_ADMIN)
