@@ -12,9 +12,9 @@ import lombok.Setter;
 public class CweInput {
 
   @NotBlank
-  @JsonProperty("cwe_id")
+  @JsonProperty("cwe_cwe_id")
   @Schema(description = "CWE identifier", example = "CWE-79")
-  private String id;
+  private String cweId;
 
   @JsonProperty("cwe_source")
   @Schema(description = "Source of the CWE", example = "NIST")

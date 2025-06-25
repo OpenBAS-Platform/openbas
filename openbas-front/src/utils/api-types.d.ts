@@ -921,6 +921,11 @@ export interface CveCreateInput {
   /** Vulnerability name used by CISA */
   cve_cisa_vulnerability_name?: string;
   /**
+   * Unique CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_cve_id: string;
+  /**
    * CVSS score
    * @min 0
    * @exclusiveMin false
@@ -933,11 +938,6 @@ export interface CveCreateInput {
   cve_cwes?: CweInput[];
   /** Description of the CVE */
   cve_description?: string;
-  /**
-   * Unique CVE identifier
-   * @example "CVE-2024-0001"
-   */
-  cve_id: string;
   /**
    * Publication date of the CVE
    * @format date-time
@@ -976,6 +976,11 @@ export interface CveOutput {
   /** Name used by CISA for the vulnerability */
   cve_cisa_vulnerability_name?: string;
   /**
+   * CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_cve_id: string;
+  /**
    * CVSS score
    * @example 7.8
    */
@@ -984,11 +989,6 @@ export interface CveOutput {
   cve_cwes?: CweOutput[];
   /** Detailed CVE description */
   cve_description?: string;
-  /**
-   * CVE identifier
-   * @example "CVE-2024-0001"
-   */
-  cve_id: string;
   /**
    * CVE published date
    * @format date-time
@@ -1007,15 +1007,15 @@ export interface CveOutput {
 /** Simplified CVE representation */
 export interface CveSimple {
   /**
+   * CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_cve_id: string;
+  /**
    * CVSS score
    * @example 7.8
    */
   cve_cvss: number;
-  /**
-   * CVE identifier
-   * @example "CVE-2024-0001"
-   */
-  cve_id: string;
   /**
    * CVE published date
    * @format date-time
@@ -1070,7 +1070,7 @@ export interface CweInput {
    * CWE identifier
    * @example "CWE-79"
    */
-  cwe_id: string;
+  cwe_cwe_id: string;
   /**
    * Source of the CWE
    * @example "NIST"
@@ -1084,7 +1084,7 @@ export interface CweOutput {
    * CWE identifier
    * @example "CWE-79"
    */
-  cwe_id: string;
+  cwe_cwe_id: string;
   /** Source of the CWE */
   cwe_source?: string;
 }

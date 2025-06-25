@@ -39,7 +39,7 @@ const GeneralFormTab = ({ editing = false }: Props) => {
 
   return (
     <>
-      <TextFieldController name="cve_id" label={t('CVE ID')} required disabled={editing} />
+      <TextFieldController name="cve_cve_id" label={t('CVE ID')} required disabled={editing} />
       <TextFieldController name="cve_cvss" label={t('CVSS')} required type="number" disabled={editing} />
 
       <TextFieldController variant="standard" name="cve_description" label={t('Description')} multiline rows={5} />
@@ -74,7 +74,7 @@ const GeneralFormTab = ({ editing = false }: Props) => {
           }}
           key={cwesField.id}
         >
-          <TextFieldController name={`cve_cwes.${cwesIndex}.cwe_id` as const} label={t('CWE')} />
+          <TextFieldController name={`cve_cwes.${cwesIndex}.cwe_cwe_id` as const} label={t('CWE')} />
           <TextFieldController name={`cve_cwes.${cwesIndex}.cwe_source` as const} label={t('Source')} />
           <IconButton
             onClick={() => cwesRemove(cwesIndex)}

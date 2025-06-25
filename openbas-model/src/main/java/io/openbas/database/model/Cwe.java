@@ -28,6 +28,12 @@ public class Cwe implements Base {
   @NotBlank
   private String id;
 
+  @Column(name = "cwe_cwe_id")
+  @JsonProperty("cwe_cwe_id")
+  @NotBlank
+  @Queryable(searchable = true, filterable = true, sortable = true)
+  private String cweId;
+
   @Column(name = "cwe_source")
   @JsonProperty("cwe_source")
   private String source;

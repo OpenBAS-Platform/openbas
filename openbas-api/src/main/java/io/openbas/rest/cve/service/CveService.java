@@ -38,12 +38,11 @@ public class CveService {
 
   public Cve createCve(final @Valid CveCreateInput input) {
     final Cve cve = new Cve();
+    if (isEnterpriseLicenseInactive()) {
+      input.setRemediation(null);
+    }
     cve.setUpdateAttributes(input);
     updateCweAssociations(cve, input.getCwes());
-
-    if (isEnterpriseLicenseInactive()) {
-      cve.setRemediation(null);
-    }
     return cveRepository.save(cve);
   }
 
@@ -56,18 +55,17 @@ public class CveService {
 
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
     final Cve existingCve = findByCveId(cveId);
+    if (isEnterpriseLicenseInactive()) {
+      input.setRemediation(null);
+    }
     existingCve.setUpdateAttributes(input);
     updateCweAssociations(existingCve, input.getCwes());
-
-    if (isEnterpriseLicenseInactive()) {
-      existingCve.setRemediation(null);
-    }
     return cveRepository.save(existingCve);
   }
 
   public Cve findByCveId(final String cveId) {
     return cveRepository
-        .findById(cveId)
+        .findByCveId(cveId)
         .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + cveId));
   }
 
@@ -90,11 +88,11 @@ public class CveService {
             .map(
                 input ->
                     cweRepository
-                        .findById(input.getId())
+                        .findByCveId(input.getCweId())
                         .orElseGet(
                             () -> {
                               Cwe newCwe = new Cwe();
-                              newCwe.setId(input.getId());
+                              newCwe.setCweId(input.getCweId());
                               newCwe.setSource(input.getSource());
                               return cweRepository.save(newCwe);
                             }))

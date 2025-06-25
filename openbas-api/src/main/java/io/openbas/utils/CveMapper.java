@@ -28,7 +28,7 @@ public class CveMapper {
       return null;
     }
     return CveSimple.builder()
-        .id(cve.getId())
+        .cveId(cve.getCveId())
         .cvss(cve.getCvss())
         .published(cve.getPublished())
         .build();
@@ -39,7 +39,7 @@ public class CveMapper {
       return null;
     }
     return CveOutput.builder()
-        .id(cve.getId())
+        .cveId(cve.getCveId())
         .cvss(cve.getCvss())
         .published(cve.getPublished())
         .sourceIdentifier(cve.getSourceIdentifier())
@@ -66,7 +66,7 @@ public class CveMapper {
     if (cwe == null) {
       return null;
     }
-    return CweOutput.builder().id(cwe.getId()).source(cwe.getSource()).build();
+    return CweOutput.builder().cweId(cwe.getCweId()).source(cwe.getSource()).build();
   }
 
   private String getRemediationIfLicensed(final Cve cve) {

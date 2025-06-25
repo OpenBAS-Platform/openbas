@@ -16,7 +16,8 @@ public class V3_96__Cves extends BaseJavaMigration {
       stmt.execute(
           """
           CREATE TABLE cves (
-            cve_id VARCHAR(255) PRIMARY KEY,
+            cve_id varchar(255) NOT NULL CONSTRAINT cves_pkey PRIMARY KEY ,
+            cve_cve_id VARCHAR(255) NOT NULL UNIQUE,
             cve_source_identifier VARCHAR(255),
             cve_published TIMESTAMPTZ,
             cve_description TEXT,
@@ -39,7 +40,8 @@ public class V3_96__Cves extends BaseJavaMigration {
       stmt.execute(
           """
           CREATE TABLE cwes (
-            cwe_id VARCHAR(255) PRIMARY KEY,
+            cwe_id VARCHAR(255) NOT NULL CONSTRAINT cwes_pkey PRIMARY KEY ,
+            cwe_cwe_id VARCHAR(255) UNIQUE,
             cwe_source VARCHAR(255),
             cwe_created_at TIMESTAMPTZ DEFAULT now(),
             cwe_updated_at TIMESTAMPTZ DEFAULT now()

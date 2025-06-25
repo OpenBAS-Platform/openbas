@@ -36,9 +36,9 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   const handleCloseDelete = () => setOpenDelete(false);
 
   const handleDelete = () => {
-    deleteCve(cve.cve_id)
+    deleteCve(cve.cve_cve_id)
       .then(() => {
-        onDelete?.(cve.cve_id);
+        onDelete?.(cve.cve_cve_id);
       })
       .catch(() => {
         MESSAGING$.notifyError(t('Failed to delete CVE.'));
@@ -49,7 +49,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   };
 
   const handleSubmitEdit = (data: CveUpdateInput) => {
-    updateCve(cve.cve_id, data)
+    updateCve(cve.cve_cve_id, data)
       .then((response) => {
         onUpdate?.(response.data);
       })
@@ -62,14 +62,14 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   };
 
   useEffect(() => {
-    if (!openEdit || !cve?.cve_id) return;
+    if (!openEdit || !cve?.cve_cve_id) return;
 
     setLoading(true);
-    fetchCve(cve.cve_id)
+    fetchCve(cve.cve_cve_id)
       .then(res => setFullCve(res.data))
       .catch(() => setFullCve(null))
       .finally(() => setLoading(false));
-  }, [openEdit, cve?.cve_id]);
+  }, [openEdit, cve?.cve_cve_id]);
 
   const entries: PopoverEntry[] = [
     {
@@ -84,7 +84,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
 
   const initialValues = fullCve
     ? R.pick([
-        'cve_id',
+        'cve_cve_id',
         'cve_cvss',
         'cve_description',
         'cve_source_identifier',
@@ -108,7 +108,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={handleDelete}
-        text={`${t('Do you want to delete this CVE:')} ${cve.cve_id}?`}
+        text={`${t('Do you want to delete this CVE:')} ${cve.cve_cve_id}?`}
       />
 
       <Drawer

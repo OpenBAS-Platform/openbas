@@ -17,9 +17,9 @@ import lombok.experimental.SuperBuilder;
 public class CveSimple {
 
   @NotBlank
-  @JsonProperty("cve_id")
+  @JsonProperty("cve_cve_id")
   @Schema(description = "CVE identifier", example = "CVE-2024-0001")
-  private String id;
+  private String cveId;
 
   @NotNull
   @JsonProperty("cve_cvss")
