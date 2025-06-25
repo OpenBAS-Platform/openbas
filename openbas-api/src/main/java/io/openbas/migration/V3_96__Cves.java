@@ -41,7 +41,7 @@ public class V3_96__Cves extends BaseJavaMigration {
           """
           CREATE TABLE cwes (
             cwe_id VARCHAR(255) NOT NULL CONSTRAINT cwes_pkey PRIMARY KEY ,
-            cwe_cwe_id VARCHAR(255) UNIQUE,
+            cwe_cwe_id VARCHAR(255) NOT NULL UNIQUE,
             cwe_source VARCHAR(255),
             cwe_created_at TIMESTAMPTZ DEFAULT now(),
             cwe_updated_at TIMESTAMPTZ DEFAULT now()
