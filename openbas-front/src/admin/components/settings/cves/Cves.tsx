@@ -1,11 +1,12 @@
 import { HubOutlined, ReportProblemOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchCves } from '../../../../actions/cve-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import Drawer from '../../../../components/common/Drawer';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -14,11 +15,13 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../components/common/SortHeadersList';
 import CVSSBadge from '../../../../components/CvssBadge';
+import CvssChip from '../../../../components/CvssChip';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type CveSimple, type SearchPaginationInput } from '../../../../utils/api-types';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
+import CveDetail from './CveDetail';
 import CvePopover from './CvePopover';
 
 const useStyles = makeStyles()({
@@ -37,7 +40,7 @@ const Cves = () => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [selectedCve, setSelectedCve] = useState<CveSimple | null>(null);
   // Filter
   const availableFilterNames = [
     'cve_external_id',
@@ -119,8 +122,8 @@ const Cves = () => {
           {loading ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} /> : cves.map(cve => (
             <ListItem
               key={cve.cve_id}
-              classes={{ root: classes.item }}
               divider
+              disablePadding
               secondaryAction={(
                 <CvePopover
                   cve={cve}
@@ -129,32 +132,73 @@ const Cves = () => {
                 />
               )}
             >
-              <ListItemIcon>
-                <ReportProblemOutlined />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div style={bodyItemsStyles.bodyItems}>
-                    {headers.map(header => (
-                      <div
-                        key={header.field}
-                        style={{
-                          ...bodyItemsStyles.bodyItem,
-                          ...inlineStyles[header.field],
-                        }}
-                      >
-                        {header.value && header.value(cve)}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              />
+              <ListItemButton
+                classes={{ root: classes.item }}
+                onClick={() => setSelectedCve(cve)}
+              >
+                <ListItemIcon>
+                  <ReportProblemOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div style={bodyItemsStyles.bodyItems}>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles[header.field],
+                          }}
+                        >
+                          {header.value && header.value(cve)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
+              </ListItemButton>
             </ListItem>
           ))}
         </List>
         <CreateCve
           onCreate={(result: CveSimple) => setCves([result, ...cves])}
         />
+        {selectedCve && (
+          <Drawer
+            open={true}
+            handleClose={() => setSelectedCve(null)}
+            title={
+              selectedCve && (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 0.15fr',
+                    width: '100%',
+                  }}
+                >
+                  <Typography variant="subtitle1">{selectedCve.cve_id}</Typography>
+                  <Box sx={{
+                    display: 'flex',
+                    gap: 1,
+                    alignItems: 'center',
+                  }}
+                  >
+                    <Typography variant="subtitle1">CVSS</Typography>
+                    <CvssChip score={selectedCve.cve_cvss} />
+                  </Box>
+                </Box>
+              )
+            }
+          >
+            {selectedCve && (
+              <>
+                <CveDetail
+                  selectedCve={selectedCve}
+                />
+              </>
+            )}
+          </Drawer>
+        )}
       </div>
       <TaxonomiesMenu />
     </div>

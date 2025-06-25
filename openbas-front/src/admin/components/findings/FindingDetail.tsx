@@ -1,18 +1,17 @@
-import { Box, Tab, Tabs, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Tab, Tabs } from '@mui/material';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 
 import { fetchCve } from '../../../actions/cve-actions';
 import type { Page } from '../../../components/common/queryable/Page';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
-import Loader from '../../../components/Loader';
 import { type CveOutput, type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
-import EEChip from '../common/entreprise_edition/EEChip';
-import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
-import RelatedInjectsTab from '../settings/cves/form/RelatedInjectsTab';
-import RemediationInfoTab from '../settings/cves/form/RemediationInfoTab';
+import CveTabPanel from '../settings/cves/CveTabPanel';
+import GeneralVulnerabilityInfoTab from '../settings/cves/GeneralVulnerabilityInfoTab';
+import RelatedInjectsTab from '../settings/cves/RelatedInjectsTab';
+import RemediationInfoTab from '../settings/cves/RemediationInfoTab';
+import TabLabelWithEE from '../settings/cves/TabLabelWithEE';
 
 interface Props {
   searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
@@ -32,7 +31,6 @@ const FindingDetail = ({
   onCvssScore,
 }: Props) => {
   const { t } = useFormatter();
-  const theme = useTheme();
   const isCVE = selectedFinding.finding_type === 'cve';
 
   const {
@@ -85,22 +83,7 @@ const FindingDetail = ({
         {tabs.map(tab => (
           <Tab
             key={tab}
-            label={
-              tab === 'Remediation' ? (
-                <Box display="flex" alignItems="center">
-                  {tab}
-                  {!isEE && (
-                    <EEChip
-                      style={{ marginLeft: theme.spacing(1) }}
-                      clickable
-                      featureDetectedInfo={t('Remediation')}
-                    />
-                  )}
-                </Box>
-              ) : (
-                tab
-              )
-            }
+            label={tab === 'Remediation' ? <TabLabelWithEE label={tab} /> : tab}
             value={tab}
           />
         ))}
@@ -109,21 +92,9 @@ const FindingDetail = ({
       {isCVE ? (
         <>
           {activeTab === 'General' && (
-            loading
-              ? (
-                  <Loader />
-                )
-              : notAvailable
-                ? (
-                    <Box padding={theme.spacing(2, 1, 0, 0)}>
-                      <Typography variant="subtitle1" gutterBottom>{t('There is no information about this CVE yet.')}</Typography>
-                    </Box>
-                  )
-                : cve
-                  ? (
-                      <GeneralVulnerabilityInfoTab cve={cve} />
-                    )
-                  : null
+            <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
+              <GeneralVulnerabilityInfoTab cve={cve!} />
+            </CveTabPanel>
           )}
 
           {activeTab === 'Vulnerable Assets' && (
@@ -137,21 +108,9 @@ const FindingDetail = ({
           )}
 
           {activeTab === 'Remediation' && isEE && (
-            loading
-              ? (
-                  <Loader />
-                )
-              : notAvailable
-                ? (
-                    <Box padding={theme.spacing(2, 1, 0, 0)}>
-                      <Typography variant="subtitle1" gutterBottom>{t('There is no information about this CVE yet.')}</Typography>
-                    </Box>
-                  )
-                : cve
-                  ? (
-                      <RemediationInfoTab cve={cve} />
-                    )
-                  : null
+            <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
+              <RemediationInfoTab cve={cve!} />
+            </CveTabPanel>
           )}
         </>
       ) : (
