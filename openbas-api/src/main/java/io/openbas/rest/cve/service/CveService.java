@@ -4,13 +4,19 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.Cve;
+import io.openbas.database.model.Cwe;
 import io.openbas.database.repository.CveRepository;
+import io.openbas.database.repository.CweRepository;
 import io.openbas.ee.Ee;
 import io.openbas.rest.cve.form.CveCreateInput;
 import io.openbas.rest.cve.form.CveUpdateInput;
+import io.openbas.rest.cve.form.CweInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,11 +33,13 @@ public class CveService {
 
   private final Ee eeService;
   private final CveRepository cveRepository;
+  private final CweRepository cweRepository;
   private final LicenseCacheManager licenseCacheManager;
 
   public Cve createCve(final @Valid CveCreateInput input) {
     final Cve cve = new Cve();
     cve.setUpdateAttributes(input);
+    updateCweAssociations(cve, input.getCwes());
 
     if (isEnterpriseLicenseInactive()) {
       cve.setRemediation(null);
@@ -49,6 +57,7 @@ public class CveService {
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
     final Cve existingCve = findByCveId(cveId);
     existingCve.setUpdateAttributes(input);
+    updateCweAssociations(existingCve, input.getCwes());
 
     if (isEnterpriseLicenseInactive()) {
       existingCve.setRemediation(null);
@@ -68,5 +77,29 @@ public class CveService {
 
   private boolean isEnterpriseLicenseInactive() {
     return !eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo());
+  }
+
+  private void updateCweAssociations(Cve cve, List<CweInput> cweInputs) {
+    if (cweInputs == null || cweInputs.isEmpty()) {
+      cve.setCwes(Collections.emptyList());
+      return;
+    }
+
+    List<Cwe> cweEntities =
+        cweInputs.stream()
+            .map(
+                input ->
+                    cweRepository
+                        .findById(input.getId())
+                        .orElseGet(
+                            () -> {
+                              Cwe newCwe = new Cwe();
+                              newCwe.setId(input.getId());
+                              newCwe.setSource(input.getSource());
+                              return cweRepository.save(newCwe);
+                            }))
+            .collect(Collectors.toList());
+
+    cve.setCwes(cweEntities);
   }
 }
