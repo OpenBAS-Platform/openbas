@@ -1,9 +1,11 @@
 import { Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useCallback, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type CustomDashboard } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
+import CustomDashboardParameters from './CustomDashboardParameters';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -15,11 +17,12 @@ const useStyles = makeStyles()(() => ({
   rightAligned: { justifySelf: 'end' },
 }));
 
-interface Props { customDashboard: CustomDashboard }
+interface Props {customDashboard: CustomDashboard;}
 
 const CustomDashboardHeader: FunctionComponent<Props> = ({ customDashboard }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const theme = useTheme();
 
   const [currentCustomDashboard, setCustomDashboard] = useState(customDashboard);
 
@@ -35,11 +38,19 @@ const CustomDashboardHeader: FunctionComponent<Props> = ({ customDashboard }) =>
 
   return (
     <div className={classes.container}>
-      <Tooltip title={currentCustomDashboard.custom_dashboard_name}>
-        <Typography variant="h1" style={{ margin: 0 }}>
-          {truncate(currentCustomDashboard.custom_dashboard_name, 80)}
-        </Typography>
-      </Tooltip>
+      <div style={{
+        display: 'flex',
+        gap: theme.spacing(2),
+        alignItems: 'center',
+      }}
+      >
+        <Tooltip title={currentCustomDashboard.custom_dashboard_name}>
+          <Typography variant="h1" style={{ margin: 0 }}>
+            {truncate(currentCustomDashboard.custom_dashboard_name, 80)}
+          </Typography>
+        </Tooltip>
+        <CustomDashboardParameters customDashboard={customDashboard} />
+      </div>
       <div className={classes.rightAligned}>
         <CustomDashboardPopover
           customDashboard={currentCustomDashboard}

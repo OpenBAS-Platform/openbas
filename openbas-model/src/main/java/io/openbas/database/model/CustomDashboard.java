@@ -5,6 +5,7 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiModelDeserializer;
@@ -12,9 +13,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -46,6 +51,11 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_widgets")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Widget> widgets;
+
+  @Column(name = "custom_dashboard_parameters")
+  @JsonProperty("custom_dashboard_parameters")
+  @Type(PostgreSQLHStoreType.class)
+  private Map<String, String> parameters = new HashMap<>();
 
   // -- AUDIT --
 

@@ -893,6 +893,7 @@ export interface CustomDashboard {
   custom_dashboard_description?: string;
   custom_dashboard_id: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: Record<string, string>;
   /** @format date-time */
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
@@ -900,8 +901,19 @@ export interface CustomDashboard {
 }
 
 export interface CustomDashboardInput {
-  custom_dashboard_description?: string;
+  custom_dashboard_description?: striDng;
   custom_dashboard_name: string;
+}
+
+export interface DashboardParameters {
+  parameters_id: string;
+  parameters_name: string;
+  parameters_type: string;
+}
+
+export interface DashboardParametersInput {
+  parameters_id: string;
+  parameters_value?: string;
 }
 
 export interface DateHistogramSeries {
