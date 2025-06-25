@@ -989,6 +989,8 @@ export interface CveOutput {
   cve_cwes?: CweOutput[];
   /** Detailed CVE description */
   cve_description?: string;
+  /** Id */
+  cve_id: string;
   /**
    * CVE published date
    * @format date-time
@@ -1016,6 +1018,8 @@ export interface CveSimple {
    * @example 7.8
    */
   cve_cvss: number;
+  /** Id */
+  cve_id: string;
   /**
    * CVE published date
    * @format date-time

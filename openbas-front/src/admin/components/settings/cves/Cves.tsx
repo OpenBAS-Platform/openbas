@@ -118,14 +118,14 @@ const Cves = () => {
 
           {loading ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} /> : cves.map(cve => (
             <ListItem
-              key={cve.cve_cve_id}
+              key={cve.cve_id}
               classes={{ root: classes.item }}
               divider
               secondaryAction={(
                 <CvePopover
                   cve={cve}
-                  onUpdate={(result: CveSimple) => setCves(cves.map(a => (a.cve_cve_id !== result.cve_cve_id ? a : result)))}
-                  onDelete={(result: string) => setCves(cves.filter(a => (a.cve_cve_id !== result)))}
+                  onUpdate={(result: CveSimple) => setCves(cves.map(a => (a.cve_id !== result.cve_id ? a : result)))}
+                  onDelete={(result: string) => setCves(cves.filter(a => (a.cve_id !== result)))}
                 />
               )}
             >

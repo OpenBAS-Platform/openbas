@@ -42,7 +42,7 @@ public class CveApi extends RestBehavior {
   @Operation(summary = "Get a CVE by ID", description = "Fetches detailed CVE info by CVE ID")
   @GetMapping(CVE_API + "/{cveId}")
   public CveOutput getCve(@PathVariable String cveId) {
-    return cveMapper.toCveOutput(cveService.findByCveId(cveId));
+    return cveMapper.toCveOutput(cveService.findById(cveId));
   }
 
   @Secured(ROLE_ADMIN)

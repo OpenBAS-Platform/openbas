@@ -79,7 +79,7 @@ class CveApiTest extends IntegrationTest {
       cveComposer.forCve(cve).persist();
 
       String response =
-          mvc.perform(get(CVE_URI + "/" + cve.getId()))
+          mvc.perform(get(CVE_URI + "/" + cve.getCveId()))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -100,21 +100,20 @@ class CveApiTest extends IntegrationTest {
       CveUpdateInput updateInput = new CveUpdateInput();
       updateInput.setDescription("Updated Summary");
 
-      String response =
-          mvc.perform(
-                  put(CVE_URI + "/" + cve.getId())
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(asJsonString(updateInput)))
-              .andExpect(status().isOk())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
+      mvc.perform(
+              put(CVE_URI + "/" + cve.getCveId())
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(updateInput)))
+          .andExpect(status().isOk())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
 
       Assertions.assertTrue(
           updateInput
               .getDescription()
               .equals(
-                  cveRepository.findById(cve.getId()).map(cve1 -> cve1.getDescription()).get()));
+                  cveRepository.findById(cve.getCveId()).map(cve1 -> cve1.getDescription()).get()));
     }
 
     @Test
@@ -126,9 +125,9 @@ class CveApiTest extends IntegrationTest {
       cve.setDescription("To be deleted");
       cveComposer.forCve(cve).persist();
 
-      mvc.perform(delete(CVE_URI + "/" + cve.getId())).andExpect(status().isOk());
+      mvc.perform(delete(CVE_URI + "/" + cve.getCveId())).andExpect(status().isOk());
 
-      Assertions.assertFalse(cveRepository.findById(cve.getId()).isPresent());
+      Assertions.assertFalse(cveRepository.findById(cve.getCveId()).isPresent());
     }
 
     @Test

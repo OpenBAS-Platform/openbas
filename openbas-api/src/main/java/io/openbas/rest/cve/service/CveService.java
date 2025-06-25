@@ -54,7 +54,7 @@ public class CveService {
   }
 
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
-    final Cve existingCve = findByCveId(cveId);
+    final Cve existingCve = findById(cveId);
     if (isEnterpriseLicenseInactive()) {
       input.setRemediation(null);
     }
@@ -63,9 +63,9 @@ public class CveService {
     return cveRepository.save(existingCve);
   }
 
-  public Cve findByCveId(final String cveId) {
+  public Cve findById(final String cveId) {
     return cveRepository
-        .findByCveId(cveId)
+        .findById(cveId)
         .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + cveId));
   }
 
