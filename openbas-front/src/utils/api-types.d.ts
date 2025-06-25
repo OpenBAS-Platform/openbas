@@ -1801,13 +1801,17 @@ export interface GroupCreateInput {
   group_default_user_assign?: boolean;
   group_description?: string;
   group_name: string;
-  group_roles?: string[];
 }
 
 export interface GroupGrantInput {
   grant_exercise?: string;
   grant_name?: "OBSERVER" | "PLANNER";
   grant_scenario?: string;
+}
+
+export interface GroupUpdateRolesInput {
+  /** List of role ids associated with the group */
+  group_roles?: string[];
 }
 
 export interface GroupUpdateUsersInput {
