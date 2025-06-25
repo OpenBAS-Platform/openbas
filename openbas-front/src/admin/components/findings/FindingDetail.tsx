@@ -1,16 +1,18 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 
+import { fetchCve } from '../../../actions/cve-actions';
 import type { Page } from '../../../components/common/queryable/Page';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
-import { type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import Loader from '../../../components/Loader';
+import { type CveOutput, type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
 import GeneralVulnerabilityInfoTab from '../settings/cves/form/GeneralVulnerabilityInfoTab';
 import RelatedInjectsTab from '../settings/cves/form/RelatedInjectsTab';
-import RemediationFormTab from '../settings/cves/form/RemediationFormTab';
+import RemediationInfoTab from '../settings/cves/form/RemediationInfoTab';
 
 interface Props {
   searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
@@ -34,8 +36,8 @@ const FindingDetail = ({
   const isCVE = selectedFinding.finding_type === 'cve';
 
   const {
-    isValidated: isValidatedEnterpriseEdition,
-    openDialog: openEnterpriseEditionDialog,
+    isValidated: isEE,
+    openDialog: openEEDialog,
     setEEFeatureDetectedInfo,
   } = useEnterpriseEdition();
 
@@ -44,26 +46,42 @@ const FindingDetail = ({
     : ['Related Injects'];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [cve, setCve] = useState<CveOutput | null>(null);
+  const [loading, setLoading] = useState(isCVE);
+  const [notAvailable, setNotAvailable] = useState(false);
 
   useEffect(() => {
-    if (activeTab === 'Remediation' && !isValidatedEnterpriseEdition) {
+    if (activeTab === 'Remediation' && !isEE) {
       setActiveTab('General');
       setEEFeatureDetectedInfo(t('Remediation'));
-      openEnterpriseEditionDialog();
+      openEEDialog();
     }
-  }, [activeTab, isValidatedEnterpriseEdition]);
+  }, [activeTab, isEE]);
 
-  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
-    setActiveTab(newValue);
+  useEffect(() => {
+    if (!isCVE || !selectedFinding.finding_value) return;
+
+    setLoading(true);
+    setNotAvailable(false);
+
+    fetchCve(selectedFinding.finding_value)
+      .then((res) => {
+        setCve(res.data);
+        if (res.data?.cve_cvss && onCvssScore) {
+          onCvssScore(res.data.cve_cvss);
+        }
+      })
+      .catch(() => setNotAvailable(true))
+      .finally(() => setLoading(false));
+  }, [selectedFinding, isCVE]);
+
+  const handleTabChange = (_: SyntheticEvent, newTab: string) => {
+    setActiveTab(newTab);
   };
 
   return (
     <>
-      <Tabs
-        value={activeTab}
-        onChange={handleActiveTabChange}
-        aria-label="tabs for finding detail"
-      >
+      <Tabs value={activeTab} onChange={handleTabChange} aria-label="finding detail tabs">
         {tabs.map(tab => (
           <Tab
             key={tab}
@@ -71,7 +89,7 @@ const FindingDetail = ({
               tab === 'Remediation' ? (
                 <Box display="flex" alignItems="center">
                   {tab}
-                  {!isValidatedEnterpriseEdition && (
+                  {!isEE && (
                     <EEChip
                       style={{ marginLeft: theme.spacing(1) }}
                       clickable
@@ -90,19 +108,50 @@ const FindingDetail = ({
 
       {isCVE ? (
         <>
-          {activeTab === 'General' && <GeneralVulnerabilityInfoTab finding={selectedFinding} onCvssScore={onCvssScore} />}
-          {activeTab === 'Vulnerable Assets'
-            && (
-              <RelatedInjectsTab
-                searchFindings={searchFindings}
-                contextId={contextId}
-                finding={selectedFinding}
-                additionalHeaders={additionalHeaders}
-                additionalFilterNames={additionalFilterNames}
-              />
-            )}
-          {activeTab === 'Remediation' && isValidatedEnterpriseEdition && (
-            <RemediationFormTab />
+          {activeTab === 'General' && (
+            loading
+              ? (
+                  <Loader />
+                )
+              : notAvailable
+                ? (
+                    <Box padding={theme.spacing(2, 1, 0, 0)}>
+                      <Typography variant="subtitle1" gutterBottom>{t('There is no information about this CVE yet.')}</Typography>
+                    </Box>
+                  )
+                : cve
+                  ? (
+                      <GeneralVulnerabilityInfoTab cve={cve} />
+                    )
+                  : null
+          )}
+
+          {activeTab === 'Vulnerable Assets' && (
+            <RelatedInjectsTab
+              searchFindings={searchFindings}
+              contextId={contextId}
+              finding={selectedFinding}
+              additionalHeaders={additionalHeaders}
+              additionalFilterNames={additionalFilterNames}
+            />
+          )}
+
+          {activeTab === 'Remediation' && isEE && (
+            loading
+              ? (
+                  <Loader />
+                )
+              : notAvailable
+                ? (
+                    <Box padding={theme.spacing(2, 1, 0, 0)}>
+                      <Typography variant="subtitle1" gutterBottom>{t('There is no information about this CVE yet.')}</Typography>
+                    </Box>
+                  )
+                : cve
+                  ? (
+                      <RemediationInfoTab cve={cve} />
+                    )
+                  : null
           )}
         </>
       ) : (

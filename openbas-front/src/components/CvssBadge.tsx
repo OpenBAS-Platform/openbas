@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { getSeverityAndColor } from '../utils/String';
+import { getSeverityAndColor } from '../utils/Colors';
 import { useFormatter } from './i18n';
 
 interface CvssBadgeProps { score: number }

@@ -1,4 +1,3 @@
-import colorStyles from '../components/Color';
 import { isNotEmptyField } from './utils';
 
 export const truncate = (str, limit) => {
@@ -72,20 +71,6 @@ export const capitalize = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
 
-// compute color for status
-export const computeColorStyle = (status) => {
-  if (status === 'PENDING') {
-    return colorStyles.blueGrey;
-  }
-  if (status === 'SUCCESS') {
-    return colorStyles.green;
-  }
-  if (status === 'PARTIAL') {
-    return colorStyles.orange;
-  }
-  return colorStyles.red;
-};
-
 export const formatMacAddress = (mac) => {
   const address = mac.toUpperCase();
   return address.match(/.{1,2}/g)?.join(':') || '-';
@@ -93,28 +78,4 @@ export const formatMacAddress = (mac) => {
 
 export const formatIp = (ip) => {
   return ip.toUpperCase();
-};
-
-// CVSS
-export const getSeverityAndColor = (score) => {
-  if (score >= 9.0) return {
-    severity: 'CRITICAL',
-    color: 'red',
-  };
-  if (score >= 7.0) return {
-    severity: 'HIGH',
-    color: 'orangered',
-  };
-  if (score >= 4.0) return {
-    severity: 'MEDIUM',
-    color: 'orange',
-  };
-  if (score > 0.0) return {
-    severity: 'LOW',
-    color: 'green',
-  };
-  return {
-    severity: 'NONE',
-    color: 'gray',
-  };
 };

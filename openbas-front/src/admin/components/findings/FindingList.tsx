@@ -146,7 +146,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
               onClick={() => setSelectedFinding(finding)}
             >
               <ListItemIcon>
-                <FindingIcon findingType={finding.finding_type} tooltip={true} />
+                <FindingIcon findingType={finding.finding_type} tooltip />
               </ListItemIcon>
               <ListItemText
                 primary={(

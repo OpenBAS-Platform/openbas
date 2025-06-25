@@ -1,7 +1,7 @@
 import { Chip } from '@mui/material';
 import type React from 'react';
 
-import { getSeverityAndColor } from '../utils/String';
+import { getSeverityAndColor } from '../utils/Colors';
 
 interface CvssChipProps { score: number }
 
