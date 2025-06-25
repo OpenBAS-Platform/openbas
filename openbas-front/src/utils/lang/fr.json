@@ -320,7 +320,7 @@
   "custom_dashboard_step_type": "Visualisation",
   "Customization": "Personnalisation",
   "CVE ID": "ID CVE",
-  "cve_id": "ID CVE",
+  "cve_cve_id": "ID CVE",
   "CVEs": "CVEs",
   "CVSS": "CVSS",
   "CVSS must be at least 0.0": "CVSS doit être au moins égal à 0.0",

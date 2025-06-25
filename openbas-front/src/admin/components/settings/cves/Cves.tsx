@@ -40,7 +40,7 @@ const Cves = () => {
 
   // Filter
   const availableFilterNames = [
-    'cve_id',
+    'cve_cve_id',
   ];
   const [cves, setCves] = useState<CveSimple[]>([]);
   const [searchParams] = useSearchParams();
