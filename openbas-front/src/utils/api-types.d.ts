@@ -1801,6 +1801,7 @@ export interface GroupCreateInput {
   group_default_user_assign?: boolean;
   group_description?: string;
   group_name: string;
+  group_roles?: string[];
 }
 
 export interface GroupGrantInput {
