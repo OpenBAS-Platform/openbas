@@ -79,7 +79,7 @@ class CveApiTest extends IntegrationTest {
       cveComposer.forCve(cve).persist();
 
       String response =
-          mvc.perform(get(CVE_URI + "/" + cve.getCveId()))
+          mvc.perform(get(CVE_URI + "/" + cve.getId()))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -101,7 +101,7 @@ class CveApiTest extends IntegrationTest {
       updateInput.setDescription("Updated Summary");
 
       mvc.perform(
-              put(CVE_URI + "/" + cve.getCveId())
+              put(CVE_URI + "/" + cve.getId())
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(updateInput)))
           .andExpect(status().isOk())
@@ -113,7 +113,7 @@ class CveApiTest extends IntegrationTest {
           updateInput
               .getDescription()
               .equals(
-                  cveRepository.findById(cve.getCveId()).map(cve1 -> cve1.getDescription()).get()));
+                  cveRepository.findById(cve.getId()).map(cve1 -> cve1.getDescription()).get()));
     }
 
     @Test
