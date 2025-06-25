@@ -88,7 +88,7 @@ public class CveService {
             .map(
                 input ->
                     cweRepository
-                        .findByCveId(input.getCweId())
+                        .findByCweId(input.getCweId())
                         .orElseGet(
                             () -> {
                               Cwe newCwe = new Cwe();

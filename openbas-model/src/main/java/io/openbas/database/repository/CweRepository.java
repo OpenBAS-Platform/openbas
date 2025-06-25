@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CweRepository extends CrudRepository<Cwe, String>, JpaSpecificationExecutor<Cwe> {
 
-  Optional<Cwe> findByCveId(@NotBlank String cweId);
+  Optional<Cwe> findByCweId(@NotBlank String cweId);
 }
