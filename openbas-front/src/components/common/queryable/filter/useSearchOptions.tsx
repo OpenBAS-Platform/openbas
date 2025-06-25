@@ -9,19 +9,30 @@ import { searchInjectLinkedToFindingsAsOption, searchTargetOptions } from '../..
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchSimulationAsOptions } from '../../../../actions/simulations/simulation-action';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
-import { type Option } from '../../../../utils/Option';
+import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
+import { SIMULATIONS } from './constants';
 
 const useSearchOptions = () => {
   // Standard hooks
   const { t } = useFormatter();
 
-  const [options, setOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<GroupOption[] | Option[]>([]);
 
-  const searchOptions = (filterKey: string, search: string = '', contextId: string = '') => {
+  const searchOptions = (filterKey: string, search: string = '', contextId: string = '', defaultValues: GroupOption[] = []) => {
     switch (filterKey) {
+      case SIMULATIONS:
+      case 'base_simulation_side':
+        searchSimulationAsOptions(search).then((response) => {
+          setOptions([...defaultValues, ...response.data.map((d: Option) => ({
+            ...d,
+            group: 'Values',
+          }))]);
+        });
+        break;
       case 'injector_contract_injector':
       case 'inject_injector_contract':
         searchInjectorsByNameAsOption(search).then((response) => {

@@ -2,6 +2,8 @@ package io.openbas.rest.custom_dashboard;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardParameterValueInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -34,7 +36,7 @@ public class CustomDashboardApi extends RestBehavior {
   }
 
   @GetMapping
-  public ResponseEntity<List<CustomDashboard>> customDashboards() {
+  public ResponseEntity<List<CustomDashboardOutput>> customDashboards() {
     return ResponseEntity.ok(this.customDashboardService.customDashboards());
   }
 
@@ -66,5 +68,19 @@ public class CustomDashboardApi extends RestBehavior {
       @PathVariable @NotBlank final String customDashboardId) {
     this.customDashboardService.deleteCustomDashboard(customDashboardId);
     return ResponseEntity.noContent().build();
+  }
+
+  // -- PARAMETERS --
+
+  @PutMapping("/{customDashboardId}/parameters/{parameterId}")
+  public ResponseEntity<CustomDashboard> updateCustomDashboardParameter(
+      @PathVariable @NotBlank final String customDashboardId,
+      @PathVariable @NotBlank final String parameterId,
+      @RequestBody final CustomDashboardParameterValueInput value) {
+    CustomDashboard existingCustomDashboard =
+        this.customDashboardService.customDashboard(customDashboardId);
+    return ResponseEntity.ok(
+        this.customDashboardService.updateCustomDashboardParameter(
+            existingCustomDashboard, parameterId, value.getValue()));
   }
 }

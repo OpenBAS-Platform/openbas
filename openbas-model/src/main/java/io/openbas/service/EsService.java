@@ -1,5 +1,8 @@
 package io.openbas.service;
 
+import static io.openbas.utils.EsUtils.*;
+import static java.util.Optional.ofNullable;
+
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
@@ -79,7 +82,7 @@ public class EsService {
 
   private FieldValue toVal(String field, String value, Map<String, String> parameters) {
     FieldValue.Builder builder = new FieldValue.Builder();
-    String target = parameters.getOrDefault(value, value);
+    String target = ofNullable(parameters.getOrDefault(value, value)).orElse("");
     PropertySchema propertyField = getIndexingSchema().get(field);
     if (propertyField == null) {
       throw new RuntimeException("Unknown field: " + field);
@@ -103,6 +106,7 @@ public class EsService {
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
     String elasticField = toElasticField(field);
+    PropertySchema propertyField = getIndexingSchema().get(field);
     switch (operator) {
       case eq:
         List<Query> queryList =
@@ -127,6 +131,58 @@ public class EsService {
                             ._toQuery())
                 .toList();
         boolQuery.mustNot(queryNotList);
+        break;
+      case contains:
+        List<Query> containsQueries =
+            filter.getValues().stream()
+                .map(
+                    v -> {
+                      FieldValue val = toVal(field, v, parameters);
+                      if (propertyField.isKeyword()) {
+                        // Champ keyword : wildcard
+                        return WildcardQuery.of(
+                                w ->
+                                    w.field(toElasticField(field))
+                                        .value("*" + val.stringValue() + "*"))
+                            ._toQuery();
+                      } else {
+                        // Champ text : match
+                        return MatchQuery.of(m -> m.field(toElasticField(field)).query(val))
+                            ._toQuery();
+                      }
+                    })
+                .toList();
+
+        if (filterMode == Filters.FilterMode.and) {
+          boolQuery.must(containsQueries);
+        } else {
+          boolQuery.should(containsQueries).minimumShouldMatch("1");
+        }
+        break;
+      case not_contains:
+        List<Query> notContainsQueries =
+            filter.getValues().stream()
+                .map(
+                    v -> {
+                      FieldValue val = toVal(field, v, parameters);
+                      if (propertyField.isKeyword()) {
+                        return WildcardQuery.of(
+                                w -> w.field(elasticField).value("*" + val.stringValue() + "*"))
+                            ._toQuery();
+                      } else {
+                        return MatchQuery.of(m -> m.field(elasticField).query(val))._toQuery();
+                      }
+                    })
+                .toList();
+        boolQuery.mustNot(notContainsQueries);
+        break;
+      case empty:
+        boolQuery
+            .should(List.of(notExistsQuery(elasticField), emptyFieldQuery(elasticField)))
+            .minimumShouldMatch("1");
+        break;
+      case not_empty:
+        boolQuery.must(List.of(existsQuery(elasticField), notEmptyFieldQuery(elasticField)));
         break;
       default:
         throw new UnsupportedOperationException("Filter operator " + operator + " not supported");

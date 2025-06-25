@@ -1,10 +1,11 @@
 import { CancelOutlined } from '@mui/icons-material';
 import { Box, IconButton, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useState } from 'react';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
+import { FilterContext } from '../../../../../components/common/queryable/filter/context';
 import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../components/common/queryable/filter/FilterAutocomplete';
 import FilterChips from '../../../../../components/common/queryable/filter/FilterChips';
 import { availableOperators, buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
@@ -12,7 +13,10 @@ import { buildSearchPagination } from '../../../../../components/common/queryabl
 import { useQueryable } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../components/i18n';
 import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import { createGroupOption, type GroupOption } from '../../../../../utils/Option';
+import { capitalize } from '../../../../../utils/String';
 import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
+import { CustomDashboardContext } from '../CustomDashboardContext';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
 import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from './WidgetUtils';
 
@@ -34,8 +38,8 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 const availableFilters = new Map([
-  ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at']],
-  ['finding', ['base_created_at', 'finding_type', 'base_updated_at', 'base_endpoint_side']],
+  ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at', 'base_simulation_side']],
+  ['finding', ['base_created_at', 'finding_type', 'base_updated_at', 'base_endpoint_side', 'base_simulation_side']],
   ['endpoint', ['endpoint_arch', 'endpoint_platform', 'endpoint_ips', 'endpoint_hostname']],
   ['vulnerable-endpoint', ['vulnerable_endpoint_architecture', 'vulnerable_endpoint_agents_active_status', 'vulnerable_endpoint_agents_privileges', 'vulnerable_endpoint_platform', 'base_simulation_side']],
 ]);
@@ -50,6 +54,7 @@ const WidgetCreationSeries: FunctionComponent<{
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
+  const { customDashboard } = useContext(CustomDashboardContext);
 
   const [label, setLabel] = useState<string>(series.name ?? '');
   const onChangeLabel = (label: string) => {
@@ -99,6 +104,7 @@ const WidgetCreationSeries: FunctionComponent<{
 
   const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);
   const [propertyOptions, setPropertyOptions] = useState<OptionPropertySchema[]>([]);
+  const [defaultValues, setDefaultValues] = useState<Map<string, GroupOption[]>>(new Map());
   const [pristine, setPristine] = useState(true);
   useEffect(() => {
     if (entity) {
@@ -109,7 +115,7 @@ const WidgetCreationSeries: FunctionComponent<{
           .map(property => (
             {
               id: property.schema_property_name,
-              label: t(property.schema_property_label),
+              label: capitalize(t(property.schema_property_label)),
               operator: availableOperators(property)[0],
             } as OptionPropertySchema
           ))
@@ -118,6 +124,15 @@ const WidgetCreationSeries: FunctionComponent<{
         setProperties(response.data);
       });
     }
+    (customDashboard?.custom_dashboard_parameters ?? []).forEach((p) => {
+      if (p.custom_dashboards_parameter_type === 'simulation') {
+        const values = defaultValues;
+        const items = values.get('base_simulation_side') ?? [];
+        const option = createGroupOption(p.custom_dashboards_parameter_id, p.custom_dashboards_parameter_name, 'Parameters');
+        if (!items.map(i => i.id).includes(option.id)) values.set('base_simulation_side', [...items, option]);
+        setDefaultValues(values);
+      }
+    });
   }, [entity]);
 
   return (
@@ -158,12 +173,14 @@ const WidgetCreationSeries: FunctionComponent<{
             options={propertyOptions}
             setPristine={setPristine}
           />
-          <FilterChips
-            propertySchemas={properties}
-            filterGroup={searchPaginationInput.filterGroup}
-            helpers={queryableHelpers.filterHelpers}
-            pristine={pristine}
-          />
+          <FilterContext.Provider value={{ defaultValues: defaultValues }}>
+            <FilterChips
+              propertySchemas={properties}
+              filterGroup={searchPaginationInput.filterGroup}
+              helpers={queryableHelpers.filterHelpers}
+              pristine={pristine}
+            />
+          </FilterContext.Provider>
         </div>
       </Box>
     </div>

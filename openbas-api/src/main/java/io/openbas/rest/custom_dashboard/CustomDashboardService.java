@@ -5,11 +5,14 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +31,9 @@ public class CustomDashboardService {
   }
 
   @Transactional(readOnly = true)
-  public List<CustomDashboard> customDashboards() {
-    return fromIterable(this.customDashboardRepository.findAll());
+  public List<CustomDashboardOutput> customDashboards() {
+    List<CustomDashboard> customDashboards = fromIterable(this.customDashboardRepository.findAll());
+    return customDashboards.stream().map(CustomDashboardOutput::toCustomDashboard).toList();
   }
 
   @Transactional(readOnly = true)
@@ -49,6 +53,7 @@ public class CustomDashboardService {
 
   @Transactional
   public CustomDashboard updateCustomDashboard(@NotNull final CustomDashboard customDashboard) {
+    customDashboard.setUpdateDate(Instant.now());
     return this.customDashboardRepository.save(customDashboard);
   }
 
@@ -58,5 +63,23 @@ public class CustomDashboardService {
       throw new EntityNotFoundException("Custom dashboard not found with id: " + id);
     }
     this.customDashboardRepository.deleteById(id);
+  }
+
+  // -- PARAMETERS --
+
+  @Transactional
+  public CustomDashboard updateCustomDashboardParameter(
+      @NotNull final CustomDashboard customDashboard,
+      @NotNull final String parameterId,
+      @Nullable final String value) {
+    customDashboard
+        .getParameters()
+        .forEach(
+            p -> {
+              if (p.getId().equals(parameterId)) {
+                p.setValue(value);
+              }
+            });
+    return updateCustomDashboard(customDashboard);
   }
 }

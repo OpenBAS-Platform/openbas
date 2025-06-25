@@ -52,7 +52,6 @@ const FilterChip: FunctionComponent<Props> = ({
       setAnchorEl(chipRef.current);
     }
   }, [chipRef.current]);
-
   return (
     <>
       <Chip

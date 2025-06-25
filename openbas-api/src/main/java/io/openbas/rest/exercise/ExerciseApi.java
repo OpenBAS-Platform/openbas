@@ -146,6 +146,18 @@ public class ExerciseApi extends RestBehavior {
 
   // endregion
 
+  // region custom dashboards
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/custom-dashboards/{customDashboardId}")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackFor = Exception.class)
+  public void updateCustomDashboard(
+      @PathVariable String exerciseId, @PathVariable String customDashboardId) {
+    exerciseRepository.setCustomDashboardForExercise(
+        exerciseId, "-".equals(customDashboardId) ? null : customDashboardId);
+  }
+
+  // endregion
+
   // region comchecks
   @GetMapping(EXERCISE_URI + "/{exercise}/comchecks")
   public Iterable<Comcheck> comchecks(@PathVariable String exercise) {

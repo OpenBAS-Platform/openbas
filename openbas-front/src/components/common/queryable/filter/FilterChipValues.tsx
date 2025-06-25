@@ -1,10 +1,11 @@
 import { Box } from '@mui/material';
-import { Fragment, type FunctionComponent, useEffect } from 'react';
+import { Fragment, type FunctionComponent, useContext, useEffect } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
 import { type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
+import { FilterContext } from './context';
 import { convertOperatorToIcon } from './FilterUtils';
 import useRetrieveOptions from './useRetrieveOptions';
 
@@ -47,10 +48,10 @@ const FilterChipValues: FunctionComponent<Props> = ({
   const { classes, cx } = useStyles();
 
   const { options, searchOptions } = useRetrieveOptions();
-
+  const { defaultValues } = useContext(FilterContext);
   useEffect(() => {
     if (filter.values) {
-      searchOptions(filter.key, filter.values);
+      searchOptions(filter.key, filter.values, defaultValues.get(filter.key));
     }
   }, [filter]);
 

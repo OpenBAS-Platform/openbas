@@ -23,6 +23,15 @@ export interface Option {
 
 export interface GroupOption extends Option { group: string }
 
+export const createGroupOption: (id: string, label: string, group: string, color?: string) => GroupOption = (id, label, group, color?) => {
+  return {
+    id: id,
+    label: label,
+    group: group,
+    color: color,
+  };
+};
+
 export const documentOptions = (
   document_ids: string[] | undefined,
   documentsMap: Record<string, Document>,

@@ -1,7 +1,9 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
-import type { CustomDashboardInput, SearchPaginationInput } from '../../utils/api-types';
+import { type CustomDashboardInput, type CustomDashboardParameterValueInput, type SearchPaginationInput } from '../../utils/api-types';
 
 export const CUSTOM_DASHBOARD_URI = '/api/custom-dashboards';
+
+// -- CRUD --
 
 export const createCustomDashboard = (input: CustomDashboardInput) => {
   return simplePostCall(CUSTOM_DASHBOARD_URI, input);
@@ -25,4 +27,10 @@ export const updateCustomDashboard = (id: string, input: CustomDashboardInput) =
 
 export const deleteCustomDashboard = (id: string) => {
   return simpleDelCall(`${CUSTOM_DASHBOARD_URI}/${id}`);
+};
+
+// -- PARAMETERS --
+
+export const updateCustomDashboardParameter = (customDashboardId: string, parameterId: string, value: CustomDashboardParameterValueInput) => {
+  return simplePutCall(`${CUSTOM_DASHBOARD_URI}/${customDashboardId}/parameters/${parameterId}`, value);
 };

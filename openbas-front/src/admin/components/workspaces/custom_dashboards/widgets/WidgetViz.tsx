@@ -1,10 +1,11 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useContext, useEffect, useState } from 'react';
 
 import { entities, series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsBase, type EsSeries } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
+import { CustomDashboardContext } from '../CustomDashboardContext';
 import DonutChart from './viz/DonutChart';
 import HorizontalBarChart from './viz/HorizontalBarChart';
 import LineChart from './viz/LineChart';
@@ -25,6 +26,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { series } = useContext(CustomDashboardContext);
   useEffect(() => {
     switch (widget.widget_type) {
       case 'list':

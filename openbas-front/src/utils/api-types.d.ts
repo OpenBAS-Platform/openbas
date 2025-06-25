@@ -906,6 +906,7 @@ export interface CustomDashboard {
   custom_dashboard_description?: string;
   custom_dashboard_id: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParameters[];
   /** @format date-time */
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
@@ -915,6 +916,7 @@ export interface CustomDashboard {
 export interface CustomDashboardInput {
   custom_dashboard_description?: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParametersInput[];
 }
 
 /** Payload to create a CVE */
@@ -1104,6 +1106,29 @@ export interface CweOutput {
   cwe_external_id: string;
   /** Source of the CWE */
   cwe_source?: string;
+}
+
+export interface CustomDashboardOutput {
+  custom_dashboard_id?: string;
+  custom_dashboard_name?: string;
+}
+
+export interface CustomDashboardParameterValueInput {
+  custom_dashboards_parameter_value?: string;
+}
+
+export interface CustomDashboardParameters {
+  custom_dashboards_parameter_id: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_value?: string;
+  listened?: boolean;
+}
+
+export interface CustomDashboardParametersInput {
+  custom_dashboards_parameter_id?: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
 }
 
 export interface DateHistogramSeries {
@@ -1809,6 +1834,7 @@ export interface Exercise {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_documents?: string[];
   /** @format date-time */
@@ -4843,6 +4869,7 @@ export interface SimulationDetails {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   /** @format date-time */
   exercise_end_date?: string;

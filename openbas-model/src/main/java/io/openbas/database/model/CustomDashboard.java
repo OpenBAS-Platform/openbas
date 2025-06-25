@@ -12,7 +12,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -47,6 +50,15 @@ public class CustomDashboard implements Base {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Widget> widgets;
 
+  @OneToMany(
+      mappedBy = "customDashboard",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  @JsonProperty("custom_dashboard_parameters")
+  @OrderBy("id ASC")
+  private List<CustomDashboardParameters> parameters = new ArrayList<>();
+
   // -- AUDIT --
 
   @CreationTimestamp
@@ -60,4 +72,14 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_updated_at")
   @NotNull
   private Instant updateDate = now();
+
+  // -- UTILS --
+
+  public Map<String, String> toParametersMap() {
+    return this.getParameters().stream()
+        .filter(param -> param.getValue() != null)
+        .collect(
+            Collectors.toMap(
+                CustomDashboardParameters::getId, CustomDashboardParameters::getValue));
+  }
 }
