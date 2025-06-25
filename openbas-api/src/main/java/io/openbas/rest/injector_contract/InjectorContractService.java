@@ -216,7 +216,7 @@ public class InjectorContractService {
           JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
           if (defaultValueNode != null
               && !defaultValueNode.isNull()
-              && !defaultValueNode.asText().isEmpty()) {
+              && !defaultValueNode.isEmpty()) {
             JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
             if (cardinalityValueNode != null
                 && !cardinalityValueNode.isNull()
