@@ -172,13 +172,13 @@ public class InjectorContract implements Base {
 
   // -- INJECTOR CONTRACT CONTENT --
 
-  public static final String CONTACT_CONTENT_FIELDS = "fields";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
-  public static final String CONTACT_ELEMENT_CONTENT_TYPE = "type";
+  public static final String CONTRACT_CONTENT_FIELDS = "fields";
+  public static final String CONTRACT_ELEMENT_CONTENT_KEY = "key";
+  public static final String CONTRACT_ELEMENT_CONTENT_TYPE = "type";
   public static final String CONTRACT_ELEMENT_CONTENT_CARDINALITY = "cardinality";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
-  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
+  public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
       "mandatoryConditionField";
   public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE =
       "mandatoryConditionValue";
