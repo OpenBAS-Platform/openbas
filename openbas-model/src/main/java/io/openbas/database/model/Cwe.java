@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "cwes")
@@ -24,6 +25,8 @@ public class Cwe implements Base {
   @Id
   @Column(name = "cwe_id")
   @JsonProperty("cwe_id")
+  @GeneratedValue(generator = "UUID")
+  @UuidGenerator
   @EqualsAndHashCode.Include
   @NotBlank
   private String id;
