@@ -38,8 +38,8 @@ public class PermissionService {
   private boolean hasGrantPermission(
       @NotNull final User user,
       final String resourceId,
-      final ResourceType resourceType,
-      final Action action) {
+      @NotNull final ResourceType resourceType,
+      @NotNull final Action action) {
     // user can access search apis but the result will be filtered
     if (Action.SEARCH.equals(action)) {
       return true;
@@ -58,7 +58,9 @@ public class PermissionService {
   }
 
   private boolean hasCapaPermission(
-      @NotNull final User user, final ResourceType resourceType, final Action action) {
+      @NotNull final User user,
+      @NotNull final ResourceType resourceType,
+      @NotNull final Action action) {
     Set<Capability> userCapabilities = user.getCapabilities();
 
     if (userCapabilities.contains(Capability.BYPASS)) {
