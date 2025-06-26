@@ -2,7 +2,6 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.FindingFixture.TEXT_FIELD;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -705,7 +704,6 @@ class FindingApiTest extends IntegrationTest {
       SearchPaginationInput input =
           buildDefaultFilters(
               ContractOutputType.Text,
-              "Text",
               savedFinding,
               savedSimulation,
               savedScenario,
@@ -717,8 +715,6 @@ class FindingApiTest extends IntegrationTest {
 
       performCallbackRequest(FINDING_URI + "/search", input)
           .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
-          .andExpect(jsonPath("$.content.[0].finding_name").value("Text"))
-          .andExpect(jsonPath("$.content.[0].finding_field").value(TEXT_FIELD))
           .andExpect(jsonPath("$.content.[0].finding_value").value("text_value"))
           .andExpect(
               jsonPath("$.content.[0].finding_assets.[0].asset_id").value(savedEndpoint.getId()))
@@ -745,13 +741,7 @@ class FindingApiTest extends IntegrationTest {
               .get();
       SearchPaginationInput input =
           buildDefaultFilters(
-              ContractOutputType.IPv6,
-              "IPv6",
-              savedFinding,
-              savedSimulation,
-              null,
-              savedEndpoint,
-              null);
+              ContractOutputType.IPv6, savedFinding, savedSimulation, null, savedEndpoint, null);
 
       performCallbackRequest(
               FINDING_URI + "/exercises/" + savedSimulation.getId() + "/search", input)
@@ -776,7 +766,6 @@ class FindingApiTest extends IntegrationTest {
       SearchPaginationInput input =
           buildDefaultFilters(
               ContractOutputType.Credentials,
-              "Credentials",
               savedFinding,
               null,
               savedScenario,
@@ -806,7 +795,7 @@ class FindingApiTest extends IntegrationTest {
               .get();
       SearchPaginationInput input =
           buildDefaultFilters(
-              ContractOutputType.Text, "Text", savedFinding, null, null, savedEndpoint, null);
+              ContractOutputType.Text, savedFinding, null, null, savedEndpoint, null);
 
       performCallbackRequest(FINDING_URI + "/endpoints/" + savedEndpoint.getId() + "/search", input)
           .andExpect(
@@ -818,7 +807,6 @@ class FindingApiTest extends IntegrationTest {
 
   private SearchPaginationInput buildDefaultFilters(
       ContractOutputType type,
-      String name,
       Finding finding,
       Exercise simulation,
       Scenario scenario,
@@ -833,7 +821,6 @@ class FindingApiTest extends IntegrationTest {
     List<Filters.Filter> filters = new ArrayList<>();
 
     filters.add(buildFilter("finding_type", Filters.FilterOperator.contains, List.of(type.label)));
-    filters.add(buildFilter("finding_name", Filters.FilterOperator.contains, List.of(name)));
     filters.add(
         buildFilter("finding_created_at", Filters.FilterOperator.gt, List.of(now.toString())));
     filters.add(
