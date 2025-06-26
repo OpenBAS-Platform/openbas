@@ -4,9 +4,10 @@ import { useTheme } from '@mui/material/styles';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type CveOutput } from '../../../../utils/api-types';
+import { type CveStatus } from './CveDetail';
 
 interface CveTabPanelProps {
-  status: 'loading' | 'loaded' | 'notAvailable';
+  status: CveStatus;
   cve: CveOutput | null;
   children: React.ReactNode;
 }

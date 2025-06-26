@@ -7,6 +7,7 @@ import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import { type CveOutput, type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
+import { type CveStatus } from '../settings/cves/CveDetail';
 import CveTabPanel from '../settings/cves/CveTabPanel';
 import GeneralVulnerabilityInfoTab from '../settings/cves/GeneralVulnerabilityInfoTab';
 import RelatedInjectsTab from '../settings/cves/RelatedInjectsTab';
@@ -22,8 +23,6 @@ interface Props {
   onCvssScore?: (score: number) => void;
 }
 
-type CveStatus = 'loading' | 'loaded' | 'notAvailable';
-
 const FindingDetail = ({
   searchFindings,
   selectedFinding,
@@ -33,13 +32,14 @@ const FindingDetail = ({
   onCvssScore,
 }: Props) => {
   const { t } = useFormatter();
-  const isCVE = selectedFinding.finding_type === 'cve';
 
   const {
     isValidated: isEE,
     openDialog: openEEDialog,
     setEEFeatureDetectedInfo,
   } = useEnterpriseEdition();
+
+  const isCVE = selectedFinding.finding_type === 'cve';
   const tabs = isCVE
     ? ['General', 'Vulnerable Assets', 'Remediation']
     : ['Related Injects'];

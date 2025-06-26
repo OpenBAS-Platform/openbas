@@ -12,6 +12,8 @@ import TabLabelWithEE from './TabLabelWithEE';
 
 interface Props { selectedCve: CveSimple }
 
+export type CveStatus = 'loading' | 'loaded' | 'notAvailable';
+
 const CveDetail = ({ selectedCve }: Props) => {
   const { t } = useFormatter();
 
