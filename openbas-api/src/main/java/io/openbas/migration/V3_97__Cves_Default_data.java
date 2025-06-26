@@ -100,7 +100,7 @@ public class V3_97__Cves_Default_data extends BaseJavaMigration {
           "Apply mitigations per vendor instructions or discontinue product if unavailable.",
           "Fortinet FortiClient EMS SQL Injection Vulnerability",
           "CWE-789",
-          "NVD", // adjust CWE id if needed
+          "NVD",
           new String[] {"https://nvd.nist.gov/vuln/detail/CVE-2023-48788"});
 
       insertEntry(
@@ -115,7 +115,7 @@ public class V3_97__Cves_Default_data extends BaseJavaMigration {
           "Apply mitigations per vendor instructions or discontinue product if unavailable.",
           "Cisco ASA and FTD Denial of Service Vulnerability",
           "CWE-416",
-          "MITRE", // adjust CWE id if needed
+          "MITRE",
           new String[] {
             "https://github.com/insi2304/mongoose-6.13-fuzz/blob/master/Simplest_Web_Server_Use_After_Free-read-mg_http_get_proto_data5932.png"
           });
