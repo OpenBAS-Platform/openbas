@@ -35,7 +35,7 @@ public class Cwe implements Base {
   @JsonProperty("cwe_external_id")
   @NotBlank
   @Queryable(searchable = true, filterable = true, sortable = true)
-  private String cweId;
+  private String externalId;
 
   @Column(name = "cwe_source")
   @JsonProperty("cwe_source")

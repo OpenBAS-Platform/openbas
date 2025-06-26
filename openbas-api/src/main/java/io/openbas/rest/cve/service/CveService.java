@@ -94,11 +94,11 @@ public class CveService {
             .map(
                 input ->
                     cweRepository
-                        .findByCweId(input.getExternalId())
+                        .findByExternalId(input.getExternalId())
                         .orElseGet(
                             () -> {
                               Cwe newCwe = new Cwe();
-                              newCwe.setCweId(input.getExternalId());
+                              newCwe.setExternalId(input.getExternalId());
                               newCwe.setSource(input.getSource());
                               return cweRepository.save(newCwe);
                             }))

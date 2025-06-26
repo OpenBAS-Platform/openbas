@@ -68,7 +68,7 @@ public class CveMapper {
     if (cwe == null) {
       return null;
     }
-    return CweOutput.builder().externalId(cwe.getCweId()).source(cwe.getSource()).build();
+    return CweOutput.builder().externalId(cwe.getExternalId()).source(cwe.getSource()).build();
   }
 
   private String getRemediationIfLicensed(final Cve cve) {
