@@ -9,6 +9,7 @@ import {
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
+import { SCENARIO_URI } from '../scenarios/scenario-actions';
 import { payload } from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
@@ -40,14 +41,9 @@ export const exportPayloads = (data: PayloadExportRequestInput) => {
   });
 };
 
-export const importPayloads = (file: File) => {
-  const uri = '/api/payloads/import';
-  const formData = new FormData();
-  formData.append('file', file);
-  return simplePostCall(uri, formData).catch((error) => {
-    MESSAGING$.notifyError('Could not import payloads');
-    throw error;
-  });
+export const importPayloads = (formData: FormData) => (dispatch: Dispatch) => {
+  const uri = `/api/payloads/import`;
+  return postReferential(null, uri, formData)(dispatch);
 };
 
 export const duplicatePayload = (payloadId: Payload['payload_id']) => (dispatch: Dispatch) => {

@@ -29,8 +29,8 @@ import { useHelper } from '../../../store';
 import { type Payload, type SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
-import ImportUploaderScenario from '../scenarios/ImportUploaderScenario';
 import CreatePayload from './CreatePayload';
+import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
@@ -264,7 +264,7 @@ const Payloads = () => {
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderScenario />
+            <ImportUploaderPayloads />
           </ToggleButtonGroup>
         )}
       />

@@ -1,19 +1,18 @@
 package io.openbas.rest.payload.exports;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Payload;
 import io.openbas.database.model.Tag;
 import io.openbas.export.FileExportBase;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import lombok.Getter;
 
 @Getter
 @JsonInclude(NON_NULL)
@@ -27,6 +26,16 @@ public class PayloadFileExport extends FileExportBase {
     allTags.addAll(this.payload.getTags().stream().toList());
     allTags.addAll(this.payload.getAttachedDocument().orElseThrow().getTags().stream().toList());
     return allTags;
+  }
+
+  @JsonProperty("payload_document")
+  private Document getDocument() {
+    return this.payload.getAttachedDocument().orElseThrow();
+  }
+
+  @JsonProperty("payload_attack_patterns")
+  private List<AttackPattern> getAttackPatterns() {
+    return this.payload.getAttackPatterns().stream().toList();
   }
 
   private PayloadFileExport(Payload payload, ObjectMapper objectMapper) {

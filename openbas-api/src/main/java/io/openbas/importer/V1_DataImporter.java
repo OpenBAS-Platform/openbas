@@ -145,17 +145,28 @@ public class V1_DataImporter implements Importer {
       Exercise exercise,
       Scenario scenario) {
     Map<String, Base> baseIds = new HashMap<>();
-    final String prefix =
-        importNode.has("exercise_information")
-            ? "exercise_"
-            : importNode.has("scenario_information") ? "scenario_" : "inject_";
 
+    String prefix = "inject_";
+    if (importNode.has("exercise_information")) {
+      prefix = "exercise_";
+    } else if (importNode.has("scenario_information")) {
+      prefix = "scenario_";
+    } else if (importNode.has("payload_information")) {
+      prefix = "payload_";
+    }
     importTags(importNode, prefix, baseIds);
     Exercise savedExercise =
         Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
     Scenario savedScenario =
         Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
     importDocuments(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
+    importDocument(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
+
+    // Should be done after tags & documents
+    if (prefix.equals("payload_")) {
+      importPayloadAsMain(importNode, baseIds);
+    }
+
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -369,6 +380,21 @@ public class V1_DataImporter implements Importer {
             handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
           }
         });
+  }
+
+  private void importDocument(
+      JsonNode importNode,
+      String prefix,
+      Map<String, ImportEntry> docReferences,
+      Exercise savedExercise,
+      Scenario savedScenario,
+      Map<String, Base> baseIds) {
+    JsonNode nodeDoc = importNode.get(prefix + "document");
+    String target = nodeDoc.get("document_target").textValue();
+    ImportEntry entry = docReferences.get(target);
+    if (entry != null) {
+      handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+    }
   }
 
   private void handleDocumentWithEntry(
@@ -1177,6 +1203,47 @@ public class V1_DataImporter implements Importer {
       outputParserInputs.add(buildOutputParserFromJsonNode(outputParserNode, baseIds));
     }
     return outputParserInputs;
+  }
+
+  private String importPayloadAsMain(
+      @NotNull final JsonNode importNode, Map<String, Base> baseIds) {
+    JsonNode payloadNode = importNode.get("payload_information");
+    if (payloadNode == null) {
+      return null;
+    }
+
+    if (payloadNode.has("executable_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "executable_file",
+              baseIds.get(payloadNode.get("executable_file").textValue()).getId());
+    }
+    if (payloadNode.has("file_drop_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
+    }
+
+    PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
+    payloadCreateInput.setOutputParsers(
+        buildOutputParsersFromPayloadJsonNode(payloadNode, baseIds));
+
+    List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
+    payloadCreateInput.setAttackPatternsIds(attackPatternIds);
+    Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    payload.setTags(
+        resolveJsonIds(payloadNode, "payload_tags").stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet()));
+    Optional<InjectorContract> injectorContractFromPayload =
+        this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+    if (injectorContractFromPayload.isPresent()) {
+      return injectorContractFromPayload.get().getId();
+    } else {
+      log.warn("An error has occurred when importing the payload: {}", payload.getName());
+      return null;
+    }
   }
 
   private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {

@@ -8,15 +8,10 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.exception.UnprocessableContentException;
-import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.inject.form.InjectExportRequestInput;
-import io.openbas.rest.inject.form.InjectImportInput;
-import io.openbas.rest.inject.form.InjectImportTargetType;
 import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.*;
-import io.openbas.rest.security.SecurityExpression;
+import io.openbas.service.ImportService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,22 +19,16 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
 @Secured(ROLE_USER)
@@ -48,12 +37,13 @@ public class PayloadApi extends RestBehavior {
 
   public static final String PAYLOAD_URI = "/api/payloads";
 
+  private final ImportService importService;
   private final PayloadRepository payloadRepository;
   private final PayloadService payloadService;
   private final PayloadCreationService payloadCreationService;
   private final PayloadUpdateService payloadUpdateService;
   private final PayloadUpsertService payloadUpsertService;
-  private final io.openbas.rest.payload.service.PayloadExportService payloadExportService;
+  private final PayloadExportService payloadExportService;
 
   @PostMapping(PAYLOAD_URI + "/search")
   public Page<Payload> payloads(
@@ -101,15 +91,24 @@ public class PayloadApi extends RestBehavior {
 
   @PostMapping(PAYLOAD_URI + "/export")
   public void payloadsExport(
-          @RequestBody @Valid final PayloadExportRequestInput payloadExportRequestInput,
-          HttpServletResponse response)
-          throws IOException {
+      @RequestBody @Valid final PayloadExportRequestInput payloadExportRequestInput,
+      HttpServletResponse response)
+      throws IOException {
     List<String> targetIds = payloadExportRequestInput.getTargetsIds();
-    List<Payload> payloads = StreamSupport.stream(payloadRepository.findAllById(targetIds).spliterator(), false).toList();
+    List<Payload> payloads =
+        StreamSupport.stream(payloadRepository.findAllById(targetIds).spliterator(), false)
+            .toList();
     runPayloadExport(payloads, response);
   }
 
-  private void runPayloadExport(List<Payload> payloads, HttpServletResponse response) throws IOException {
+  @PostMapping(PAYLOAD_URI + "/import")
+  @PreAuthorize("isPlanner()")
+  public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
+    this.importService.handleFileImport(file, null, null);
+  }
+
+  private void runPayloadExport(List<Payload> payloads, HttpServletResponse response)
+      throws IOException {
     byte[] zippedExport = payloadExportService.exportPayloadsToZip(payloads);
     String zipName = payloadExportService.getZipFileName();
 
