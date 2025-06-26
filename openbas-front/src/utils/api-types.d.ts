@@ -1770,16 +1770,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -1805,7 +1805,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
 }
 
@@ -4855,19 +4855,9 @@ export interface User {
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
     | "LAUNCH_ATOMIC_TESTING"
-    | "ACCESS_SIMULATION"
-    | "MANAGE_SIMULATION"
-    | "DELETE_SIMULATION"
-    | "LAUNCH_SIMULATION"
-    | "ACCESS_SCENARIO"
-    | "MANAGE_SCENARIO"
-    | "DELETE_SCENARIO"
-    | "LAUNCH_SCENARIO"
     | "ACCESS_TEAMS_AND_PLAYERS"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
-    | "MANAGE_ASSETS_FROM_TEAMS"
-    | "DELETE_ASSETS_FROM_TEAMS"
     | "ACCESS_ASSETS"
     | "MANAGE_ASSETS"
     | "DELETE_ASSETS"
