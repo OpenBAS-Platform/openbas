@@ -39,4 +39,8 @@ public class EndpointExportImport {
   @CsvBindByName(column = "asset_tags", required = true)
   @CsvBindByPosition(position = 7)
   private String tags;
+
+  @CsvBindByName(column = "endpoint_is_eol", required = true)
+  @CsvBindByPosition(position = 8)
+  private boolean isEol;
 }
