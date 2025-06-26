@@ -17,7 +17,7 @@ public class CveCreateInput extends CveInput {
 
   @NotBlank
   @JsonProperty("cve_external_id")
-  @Schema(description = "Unique CVE identifier", example = "CVE-2024-0001")
+  @Schema(description = "External Unique CVE identifier", example = "CVE-2024-0001")
   private String externalId;
 
   @NotNull
