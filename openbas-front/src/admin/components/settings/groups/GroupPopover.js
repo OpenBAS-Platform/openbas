@@ -325,8 +325,8 @@ class GroupPopover extends Component {
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantLauncher = R.find(
-                        g => g.grant_scenario === scenario.scenario_id
-                            && g.grant_name === 'LAUNCHER',
+                      g => g.grant_scenario === scenario.scenario_id
+                        && g.grant_name === 'LAUNCHER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
                       null,
@@ -339,9 +339,9 @@ class GroupPopover extends Component {
                       grantObserver,
                     );
                     const grantLauncherId = R.propOr(
-                        null,
-                        'grant_id',
-                        grantLauncher,
+                      null,
+                      'grant_id',
+                      grantLauncher,
                     );
                     return (
                       <TableRow key={scenario.scenario_id}>
@@ -352,18 +352,18 @@ class GroupPopover extends Component {
                         }}
                         >
                           <Checkbox
-                              checked={
-                                  grantObserverId !== null
-                                  || grantPlannerId !== null
-                                  || grantLauncherId !== null
-                              }
-                              disabled={grantPlannerId !== null}
-                              onChange={this.handleGrantScenarioCheck.bind(
-                                  this,
-                                  scenario.scenario_id,
-                                  grantObserverId,
-                                  'OBSERVER',
-                              )}
+                            checked={
+                              grantObserverId !== null
+                              || grantPlannerId !== null
+                              || grantLauncherId !== null
+                            }
+                            disabled={grantPlannerId !== null}
+                            onChange={this.handleGrantScenarioCheck.bind(
+                              this,
+                              scenario.scenario_id,
+                              grantObserverId,
+                              'OBSERVER',
+                            )}
                           />
                         </TableCell>
                         <TableCell style={{
@@ -373,8 +373,8 @@ class GroupPopover extends Component {
                         >
                           <Checkbox
                             checked={
-                                  grantLauncherId !== null
-                                || grantPlannerId !== null
+                              grantLauncherId !== null
+                              || grantPlannerId !== null
                             }
                             onChange={this.handleGrantScenarioCheck.bind(
                               this,
@@ -390,13 +390,13 @@ class GroupPopover extends Component {
                         }}
                         >
                           <Checkbox
-                              checked={grantLauncherId !== null}
-                              onChange={this.handleGrantScenarioCheck.bind(
-                                  this,
-                                  scenario.scenario_id,
-                                  grantLauncherId,
-                                  'LAUNCHER',
-                              )}
+                            checked={grantLauncherId !== null}
+                            onChange={this.handleGrantScenarioCheck.bind(
+                              this,
+                              scenario.scenario_id,
+                              grantLauncherId,
+                              'LAUNCHER',
+                            )}
                           />
                         </TableCell>
                       </TableRow>
@@ -432,8 +432,8 @@ class GroupPopover extends Component {
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantLauncher = R.find(
-                        g => g.grant_exercise === exercise.exercise_id
-                            && g.grant_name === 'LAUNCHER',
+                      g => g.grant_exercise === exercise.exercise_id
+                        && g.grant_name === 'LAUNCHER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
                       null,
@@ -446,9 +446,9 @@ class GroupPopover extends Component {
                       grantObserver,
                     );
                     const grantLauncherId = R.propOr(
-                        null,
-                        'grant_id',
-                        grantLauncher,
+                      null,
+                      'grant_id',
+                      grantLauncher,
                     );
                     return (
                       <TableRow key={exercise.exercise_id}>
@@ -459,18 +459,18 @@ class GroupPopover extends Component {
                         }}
                         >
                           <Checkbox
-                              checked={
-                                  grantObserverId !== null
-                                  || grantPlannerId !== null
-                                  || grantLauncherId !== null
-                              }
-                              disabled={grantPlannerId !== null}
-                              onChange={this.handleGrantExerciseCheck.bind(
-                                  this,
-                                  exercise.exercise_id,
-                                  grantObserverId,
-                                  'OBSERVER',
-                              )}
+                            checked={
+                              grantObserverId !== null
+                              || grantPlannerId !== null
+                              || grantLauncherId !== null
+                            }
+                            disabled={grantPlannerId !== null}
+                            onChange={this.handleGrantExerciseCheck.bind(
+                              this,
+                              exercise.exercise_id,
+                              grantObserverId,
+                              'OBSERVER',
+                            )}
                           />
                         </TableCell>
                         <TableCell style={{
@@ -480,8 +480,8 @@ class GroupPopover extends Component {
                         >
                           <Checkbox
                             checked={
-                                grantLauncherId !== null
-                                || grantPlannerId !== null
+                              grantLauncherId !== null
+                              || grantPlannerId !== null
                             }
                             onChange={this.handleGrantExerciseCheck.bind(
                               this,
@@ -497,13 +497,13 @@ class GroupPopover extends Component {
                         }}
                         >
                           <Checkbox
-                              checked={grantLauncherId !== null}
-                              onChange={this.handleGrantExerciseCheck.bind(
-                                  this,
-                                  exercise.exercise_id,
-                                  grantLauncherId,
-                                  'LAUNCHER',
-                              )}
+                            checked={grantLauncherId !== null}
+                            onChange={this.handleGrantExerciseCheck.bind(
+                              this,
+                              exercise.exercise_id,
+                              grantLauncherId,
+                              'LAUNCHER',
+                            )}
                           />
                         </TableCell>
                       </TableRow>
