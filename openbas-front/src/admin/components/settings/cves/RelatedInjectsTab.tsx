@@ -86,7 +86,7 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
 
   const basis = `${50 / (additionalHeaders.length - 1)}%`;
   const inlineStyles: Record<string, CSSProperties> = ({
-    finding_assets: { width: basis },
+    finding_assets: { width: '20%' },
     ...additionalHeaders.reduce((acc, header) => {
       acc[header.field] = { width: basis };
       return acc;

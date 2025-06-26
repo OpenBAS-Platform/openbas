@@ -13,16 +13,14 @@ const FindingDrawerTitle = ({ finding, cvssScore }: Props) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto',
-        width: '100%',
+        gridTemplateColumns: '1fr 0.1fr',
       }}
     >
       <Typography variant="subtitle1">{finding.finding_value}</Typography>
       {finding.finding_type === 'cve' && cvssScore && (
         <div style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: 1,
+          gap: 5,
         }}
         >
           <Typography variant="subtitle1">CVSS</Typography>

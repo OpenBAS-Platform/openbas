@@ -57,7 +57,8 @@ public class FindingSpecification {
     };
   }
 
-  public static Specification<Finding> distinctTypeValeurWithFilter(Specification<Finding> baseSpec) {
+  public static Specification<Finding> distinctTypeValueWithFilter(
+      Specification<Finding> baseSpec) {
     return (root, query, cb) -> {
       query.distinct(true);
 

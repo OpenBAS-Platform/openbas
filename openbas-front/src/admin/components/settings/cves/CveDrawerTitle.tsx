@@ -10,16 +10,14 @@ const CveDrawerTitle = ({ cve }: Props) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto',
-        width: '100%',
+        gridTemplateColumns: '1fr 0.10fr',
       }}
     >
       <Typography variant="subtitle1">{cve.cve_external_id}</Typography>
       {cve.cve_cvss && (
         <div style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: 1,
+          gap: 5,
         }}
         >
           <Typography variant="subtitle1">CVSS</Typography>

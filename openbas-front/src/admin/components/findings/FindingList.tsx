@@ -99,13 +99,11 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
     },
   ];
 
-  const basis = `${90 / (headers.length - 1)}%`;
   const inlineStyles: Record<string, CSSProperties> = ({
-    finding_type: { width: '10%' },
-    finding_name: { width: basis },
-    finding_value: { width: basis },
-    finding_assets: { width: basis },
-    finding_tags: { width: basis },
+    finding_type: { width: '20%' },
+    finding_value: { width: '30%' },
+    finding_assets: { width: '30%' },
+    finding_tags: { width: '20%' },
   });
 
   return (
@@ -173,7 +171,10 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       {selectedFinding?.finding_value && (
         <Drawer
           open={Boolean(selectedFinding)}
-          handleClose={() => setSelectedFinding(null)}
+          handleClose={() => {
+            setSelectedFinding(null);
+            setCvssScore(null);
+          }}
           title={selectedFinding && <FindingDrawerTitle finding={selectedFinding} cvssScore={cvssScore} />}
         >
           {selectedFinding && (
