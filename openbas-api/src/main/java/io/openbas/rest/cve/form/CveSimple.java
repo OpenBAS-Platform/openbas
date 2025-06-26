@@ -23,7 +23,7 @@ public class CveSimple {
 
   @NotBlank
   @JsonProperty("cve_external_id")
-  @Schema(description = "CVE identifier", example = "CVE-2024-0001")
+  @Schema(description = "External CVE identifier", example = "CVE-2024-0001")
   private String externalId;
 
   @NotNull

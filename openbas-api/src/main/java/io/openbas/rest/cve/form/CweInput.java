@@ -13,7 +13,7 @@ public class CweInput {
 
   @NotBlank
   @JsonProperty("cwe_external_id")
-  @Schema(description = "CWE identifier", example = "CWE-79")
+  @Schema(description = "External CWE identifier", example = "CWE-79")
   private String externalId;
 
   @JsonProperty("cwe_source")

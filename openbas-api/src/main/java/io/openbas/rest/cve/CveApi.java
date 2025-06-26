@@ -47,7 +47,7 @@ public class CveApi extends RestBehavior {
 
   @Operation(
       summary = "Get a CVE by external ID",
-      description = "Fetches detailed CVE info by CVE ID")
+      description = "Fetches detailed CVE info by external CVE ID")
   @GetMapping(CVE_API + "/external-id/{externalId}")
   public CveOutput getCvebyExternalId(@PathVariable String externalId) {
     return cveMapper.toCveOutput(cveService.findByExternalId(externalId));
