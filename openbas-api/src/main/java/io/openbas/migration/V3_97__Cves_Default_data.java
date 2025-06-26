@@ -16,13 +16,13 @@ public class V3_97__Cves_Default_data extends BaseJavaMigration {
 
     try (PreparedStatement insertCve =
             connection.prepareStatement(
-                "INSERT INTO cves (cve_id, cve_cve_id, cve_source_identifier, cve_published, "
+                "INSERT INTO cves (cve_id, cve_external_id, cve_source_identifier, cve_published, "
                     + "cve_description, cve_cvss, cve_cisa_exploit_add, cve_cisa_action_due, "
                     + "cve_cisa_required_action, cve_cisa_vulnerability_name) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (cve_id) DO NOTHING");
         PreparedStatement insertCwe =
             connection.prepareStatement(
-                "INSERT INTO cwes (cwe_id, cwe_cwe_id, cwe_source) "
+                "INSERT INTO cwes (cwe_id, cwe_external_id, cwe_source) "
                     + "VALUES (?, ?, ?) ON CONFLICT (cwe_id) DO NOTHING");
         PreparedStatement linkCveCwe =
             connection.prepareStatement(

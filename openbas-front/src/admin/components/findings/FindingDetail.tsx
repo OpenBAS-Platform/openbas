@@ -1,7 +1,7 @@
 import { Tab, Tabs } from '@mui/material';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 
-import { fetchCve } from '../../../actions/cve-actions';
+import { fetchCveByExternalId } from '../../../actions/cve-actions';
 import type { Page } from '../../../components/common/queryable/Page';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
@@ -62,7 +62,7 @@ const FindingDetail = ({
     setLoading(true);
     setNotAvailable(false);
 
-    fetchCve(selectedFinding.finding_value)
+    fetchCveByExternalId(selectedFinding.finding_value)
       .then((res) => {
         setCve(res.data);
         if (res.data?.cve_cvss && onCvssScore) {

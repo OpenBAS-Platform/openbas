@@ -14,7 +14,7 @@ const CveDrawerTitle = ({ cve }: Props) => {
         width: '100%',
       }}
     >
-      <Typography variant="subtitle1">{cve.cve_cve_id}</Typography>
+      <Typography variant="subtitle1">{cve.cve_external_id}</Typography>
       {cve.cve_cvss && (
         <div style={{
           display: 'flex',
