@@ -904,6 +904,195 @@ export interface CustomDashboardInput {
   custom_dashboard_name: string;
 }
 
+/** Payload to create a CVE */
+export interface CveCreateInput {
+  /**
+   * Date when action is due by CISA
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * Date when CISA added the CVE to the exploited list
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Vulnerability name used by CISA */
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * CVSS score
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   * @example 7.5
+   */
+  cve_cvss: number;
+  /** List of linked CWEs */
+  cve_cwes?: CweInput[];
+  /** Description of the CVE */
+  cve_description?: string;
+  /**
+   * External Unique CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /**
+   * Publication date of the CVE
+   * @format date-time
+   */
+  cve_published?: string;
+  /** List of reference URLs */
+  cve_reference_urls?: string[];
+  /** Suggested remediation */
+  cve_remediation?: string;
+  /**
+   * Identifier of the CVE source
+   * @example "MITRE"
+   */
+  cve_source_identifier?: string;
+  /**
+   * Vulnerability status
+   * @example "ANALYZED"
+   */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** Full CVE output including references and CWEs */
+export interface CveOutput {
+  /**
+   * CISA required action due date
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * CISA exploit addition date
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Name used by CISA for the vulnerability */
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss: number;
+  /** List of CWE outputs */
+  cve_cwes?: CweOutput[];
+  /** Detailed CVE description */
+  cve_description?: string;
+  /**
+   * External CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /** Id */
+  cve_id: string;
+  /**
+   * CVE published date
+   * @format date-time
+   */
+  cve_published?: string;
+  /** External references */
+  cve_reference_urls?: string[];
+  /** Remediation suggestions */
+  cve_remediation?: string;
+  /** Source identifier */
+  cve_source_identifier?: string;
+  /** Status of the vulnerability */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** Simplified CVE representation */
+export interface CveSimple {
+  /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss: number;
+  /**
+   * External CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /** Id */
+  cve_id: string;
+  /**
+   * CVE published date
+   * @format date-time
+   */
+  cve_published?: string;
+}
+
+/** Payload to update a CVE */
+export interface CveUpdateInput {
+  /**
+   * Date when action is due by CISA
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * Date when CISA added the CVE to the exploited list
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Vulnerability name used by CISA */
+  cve_cisa_vulnerability_name?: string;
+  /** List of linked CWEs */
+  cve_cwes?: CweInput[];
+  /** Description of the CVE */
+  cve_description?: string;
+  /**
+   * Publication date of the CVE
+   * @format date-time
+   */
+  cve_published?: string;
+  /** List of reference URLs */
+  cve_reference_urls?: string[];
+  /** Suggested remediation */
+  cve_remediation?: string;
+  /**
+   * Identifier of the CVE source
+   * @example "MITRE"
+   */
+  cve_source_identifier?: string;
+  /**
+   * Vulnerability status
+   * @example "ANALYZED"
+   */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** CWE input used in CVE creation/update */
+export interface CweInput {
+  /**
+   * External CWE identifier
+   * @example "CWE-79"
+   */
+  cwe_external_id: string;
+  /**
+   * Source of the CWE
+   * @example "NIST"
+   */
+  cwe_source?: string;
+}
+
+/** CWE output data */
+export interface CweOutput {
+  /**
+   * CWE identifier
+   * @example "CWE-79"
+   */
+  cwe_external_id: string;
+  /** Source of the CWE */
+  cwe_source?: string;
+}
+
 export interface DateHistogramSeries {
   /** Filter object to search within filterable attributes */
   filter?: FilterGroup;
@@ -3077,6 +3266,25 @@ export interface PageAttackPattern {
 
 export interface PageCustomDashboard {
   content?: CustomDashboard[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageCveSimple {
+  content?: CveSimple[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
