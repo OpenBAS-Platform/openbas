@@ -3,6 +3,11 @@ kind: pipeline
 name: openbas-tests
 
 steps:
+  - name: Runner information
+    image: alpine:3.19
+    commands:
+    - echo DRONE_RUNNER_NAME ${DRONE_RUNNER_NAME}
+
   - name: api-tests
     image: maven:3.9.9-eclipse-temurin-22
     environment:
