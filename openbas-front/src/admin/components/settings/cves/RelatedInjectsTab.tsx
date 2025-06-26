@@ -30,6 +30,17 @@ interface Props {
   contextId?: string;
 }
 
+const contractOutputElementLabels = {
+  text: 'Text',
+  number: 'Number',
+  port: 'Port',
+  portscan: 'Portscan',
+  ipv4: 'IPv4',
+  ipv6: 'IPv6',
+  credentials: 'Credentials',
+  cve: 'CVE',
+};
+
 const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const theme = useTheme();
@@ -49,6 +60,7 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
     mode: 'and',
     filters: [
       buildFilter('finding_value', [finding.finding_value], 'eq'),
+      buildFilter('finding_type', [contractOutputElementLabels[finding.finding_type]], 'eq'),
     ],
   };
 
