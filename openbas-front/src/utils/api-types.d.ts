@@ -934,7 +934,7 @@ export interface CveCreateInput {
   /** Description of the CVE */
   cve_description?: string;
   /**
-   * Unique CVE identifier
+   * External Unique CVE identifier
    * @example "CVE-2024-0001"
    */
   cve_external_id: string;
@@ -985,7 +985,7 @@ export interface CveOutput {
   /** Detailed CVE description */
   cve_description?: string;
   /**
-   * CVE identifier
+   * External CVE identifier
    * @example "CVE-2024-0001"
    */
   cve_external_id: string;
@@ -1014,7 +1014,7 @@ export interface CveSimple {
    */
   cve_cvss: number;
   /**
-   * CVE identifier
+   * External CVE identifier
    * @example "CVE-2024-0001"
    */
   cve_external_id: string;
@@ -1071,7 +1071,7 @@ export interface CveUpdateInput {
 /** CWE input used in CVE creation/update */
 export interface CweInput {
   /**
-   * CWE identifier
+   * External CWE identifier
    * @example "CWE-79"
    */
   cwe_external_id: string;
