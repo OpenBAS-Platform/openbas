@@ -16,9 +16,9 @@ import lombok.Setter;
 public class CveCreateInput extends CveInput {
 
   @NotBlank
-  @JsonProperty("cve_cve_id")
+  @JsonProperty("cve_external_id")
   @Schema(description = "Unique CVE identifier", example = "CVE-2024-0001")
-  private String cveId;
+  private String externalId;
 
   @NotNull
   @DecimalMin("0.0")

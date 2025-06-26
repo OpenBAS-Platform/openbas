@@ -84,7 +84,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
 
   const initialValues = fullCve
     ? R.pick([
-        'cve_cve_id',
+        'cve_external_id',
         'cve_cvss',
         'cve_description',
         'cve_source_identifier',
@@ -108,7 +108,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={handleDelete}
-        text={`${t('Do you want to delete this CVE:')} ${cve.cve_cve_id}?`}
+        text={`${t('Do you want to delete this CVE:')} ${cve.cve_external_id}?`}
       />
 
       <Drawer

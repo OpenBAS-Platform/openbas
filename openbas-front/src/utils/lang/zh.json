@@ -320,7 +320,7 @@
   "custom_dashboard_step_type": "可视化",
   "Customization": "自定义",
   "CVE ID": "CVE ID",
-  "cve_cve_id": "CVE ID",
+  "cve_external_id": "CVE ID",
   "CVEs": "CVE",
   "CVSS": "CVSS",
   "CVSS must be at least 0.0": "CVSS 必须至少为 0.0",

@@ -25,7 +25,7 @@ const CveForm = ({
   handleClose,
   editing,
   initialValues = {
-    cve_cve_id: '',
+    cve_external_id: '',
     cve_cvss: undefined,
     cve_description: '',
     cve_source_identifier: '',
@@ -64,12 +64,12 @@ const CveForm = ({
   }, [activeTab, isValidatedEnterpriseEdition]);
 
   const cwesObject = z.object({
-    cwe_cwe_id: z.string().min(1, { message: t('CWE ID is required') }),
+    cwe_external_id: z.string().min(1, { message: t('CWE ID is required') }),
     cwe_source: z.string().optional(),
   });
 
   const schema = zodImplement<CveCreateInput>().with({
-    cve_cve_id: z.string().min(1, { message: t('Should not be empty') }),
+    cve_external_id: z.string().min(1, { message: t('Should not be empty') }),
     cve_cvss: z.coerce.number().min(0).max(10),
     cve_description: z.string().optional(),
     cve_source_identifier: z.string().optional(),

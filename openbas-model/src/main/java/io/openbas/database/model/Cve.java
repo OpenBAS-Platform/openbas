@@ -44,11 +44,11 @@ public class Cve implements Base {
   @NotBlank
   private String id;
 
-  @Column(name = "cve_cve_id")
-  @JsonProperty("cve_cve_id")
+  @Column(name = "cve_external_id")
+  @JsonProperty("cve_external_id")
   @NotBlank
   @Queryable(searchable = true, filterable = true, sortable = true)
-  private String cveId;
+  private String externalId;
 
   @Column(name = "cve_source_identifier")
   @JsonProperty("cve_source_identifier")

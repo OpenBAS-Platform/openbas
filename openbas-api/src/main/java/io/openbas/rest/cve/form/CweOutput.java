@@ -14,9 +14,9 @@ import lombok.Setter;
 public class CweOutput {
 
   @NotBlank
-  @JsonProperty("cwe_cwe_id")
+  @JsonProperty("cwe_external_id")
   @Schema(description = "CWE identifier", example = "CWE-79")
-  private String cweId;
+  private String externalId;
 
   @JsonProperty("cwe_source")
   @Schema(description = "Source of the CWE")

@@ -69,6 +69,12 @@ public class CveService {
         .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + cveId));
   }
 
+  public Cve findByExternalId(String externalId) {
+    return cveRepository
+        .findByExternalId(externalId)
+        .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + externalId));
+  }
+
   public void deleteById(final String cveId) {
     cveRepository.deleteById(cveId);
   }
@@ -88,11 +94,11 @@ public class CveService {
             .map(
                 input ->
                     cweRepository
-                        .findByCweId(input.getCweId())
+                        .findByCweId(input.getExternalId())
                         .orElseGet(
                             () -> {
                               Cwe newCwe = new Cwe();
-                              newCwe.setCweId(input.getCweId());
+                              newCwe.setCweId(input.getExternalId());
                               newCwe.setSource(input.getSource());
                               return cweRepository.save(newCwe);
                             }))

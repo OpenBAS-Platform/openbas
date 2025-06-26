@@ -27,7 +27,7 @@ const useStyles = makeStyles()({
 });
 
 const inlineStyles: Record<string, CSSProperties> = ({
-  cve_cve_id: { width: '20%' },
+  cve_external_id: { width: '20%' },
   cve_cvss: { width: '20%' },
   cve_published: { width: '60%' },
 });
@@ -40,7 +40,7 @@ const Cves = () => {
 
   // Filter
   const availableFilterNames = [
-    'cve_cve_id',
+    'cve_external_id',
   ];
   const [cves, setCves] = useState<CveSimple[]>([]);
   const [searchParams] = useSearchParams();
@@ -59,10 +59,10 @@ const Cves = () => {
 
   const headers: Header[] = useMemo(() => [
     {
-      field: 'cve_cve_id',
+      field: 'cve_external_id',
       label: 'CVE ID',
       isSortable: true,
-      value: (cve: CveSimple) => cve.cve_cve_id,
+      value: (cve: CveSimple) => cve.cve_external_id,
     },
     {
       field: 'cve_cvss',
