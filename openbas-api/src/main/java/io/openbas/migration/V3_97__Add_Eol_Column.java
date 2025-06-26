@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_96__Add_Eol_Column extends BaseJavaMigration {
+public class V3_97__Add_Eol_Column extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
