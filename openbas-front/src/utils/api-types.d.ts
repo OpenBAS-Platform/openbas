@@ -1895,6 +1895,8 @@ export interface FindingOutput {
   finding_assets: EndpointSimple[];
   /** @format date-time */
   finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
   /** Inject linked to finding */
   finding_inject: InjectSimple;
   /** Scenario linked to inject */

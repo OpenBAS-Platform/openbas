@@ -23,6 +23,7 @@ public class FindingMapper {
 
   public FindingOutput toFindingOutput(Finding finding) {
     return FindingOutput.builder()
+        .id(finding.getId())
         .value(finding.getValue())
         .type(finding.getType())
         .endpoints(

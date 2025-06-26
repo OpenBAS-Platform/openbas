@@ -23,6 +23,11 @@ import lombok.Data;
 @JsonInclude(NON_NULL)
 public class FindingOutput {
 
+  @Schema(description = "Finding Id")
+  @JsonProperty("finding_id")
+  @NotBlank
+  private String id;
+
   @Schema(
       description = "Represents the data type being extracted.",
       example = "text, number, port, portscan, ipv4, ipv6, credentials, cve")
