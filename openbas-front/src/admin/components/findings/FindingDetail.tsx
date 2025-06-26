@@ -22,6 +22,8 @@ interface Props {
   onCvssScore?: (score: number) => void;
 }
 
+type CveStatus = 'loading' | 'loaded' | 'notAvailable';
+
 const FindingDetail = ({
   searchFindings,
   selectedFinding,
@@ -38,15 +40,13 @@ const FindingDetail = ({
     openDialog: openEEDialog,
     setEEFeatureDetectedInfo,
   } = useEnterpriseEdition();
-
   const tabs = isCVE
     ? ['General', 'Vulnerable Assets', 'Remediation']
     : ['Related Injects'];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [cve, setCve] = useState<CveOutput | null>(null);
-  const [loading, setLoading] = useState(isCVE);
-  const [notAvailable, setNotAvailable] = useState(false);
+  const [cveStatus, setCveStatus] = useState<CveStatus>('loading');
 
   useEffect(() => {
     if (activeTab === 'Remediation' && !isEE) {
@@ -59,8 +59,7 @@ const FindingDetail = ({
   useEffect(() => {
     if (!isCVE || !selectedFinding.finding_value) return;
 
-    setLoading(true);
-    setNotAvailable(false);
+    setCveStatus('loading');
 
     fetchCveByExternalId(selectedFinding.finding_value)
       .then((res) => {
@@ -68,13 +67,62 @@ const FindingDetail = ({
         if (res.data?.cve_cvss && onCvssScore) {
           onCvssScore(res.data.cve_cvss);
         }
+
+        setCveStatus(res.data ? 'loaded' : 'notAvailable');
       })
-      .catch(() => setNotAvailable(true))
-      .finally(() => setLoading(false));
+      .catch(() => setCveStatus('notAvailable'));
   }, [selectedFinding, isCVE]);
 
   const handleTabChange = (_: SyntheticEvent, newTab: string) => {
     setActiveTab(newTab);
+  };
+
+  const renderTabPanels = () => {
+    if (isCVE) {
+      switch (activeTab) {
+        case 'General':
+          return (
+            <CveTabPanel status={cveStatus} cve={cve}>
+              <GeneralVulnerabilityInfoTab cve={cve!} />
+            </CveTabPanel>
+          );
+        case 'Vulnerable Assets':
+          return (
+            <RelatedInjectsTab
+              searchFindings={searchFindings}
+              contextId={contextId}
+              finding={selectedFinding}
+              additionalHeaders={additionalHeaders}
+              additionalFilterNames={additionalFilterNames}
+            />
+          );
+        case 'Remediation':
+          return isEE
+            ? (
+                <CveTabPanel status={cveStatus} cve={cve}>
+                  <RemediationInfoTab cve={cve!} />
+                </CveTabPanel>
+              )
+            : null;
+        default:
+          return null;
+      }
+    }
+
+    // Non-CVE
+    if (activeTab === 'Related Injects') {
+      return (
+        <RelatedInjectsTab
+          searchFindings={searchFindings}
+          contextId={contextId}
+          finding={selectedFinding}
+          additionalHeaders={additionalHeaders}
+          additionalFilterNames={additionalFilterNames}
+        />
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -89,41 +137,7 @@ const FindingDetail = ({
         ))}
       </Tabs>
 
-      {isCVE ? (
-        <>
-          {activeTab === 'General' && (
-            <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
-              <GeneralVulnerabilityInfoTab cve={cve!} />
-            </CveTabPanel>
-          )}
-
-          {activeTab === 'Vulnerable Assets' && (
-            <RelatedInjectsTab
-              searchFindings={searchFindings}
-              contextId={contextId}
-              finding={selectedFinding}
-              additionalHeaders={additionalHeaders}
-              additionalFilterNames={additionalFilterNames}
-            />
-          )}
-
-          {activeTab === 'Remediation' && isEE && (
-            <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
-              <RemediationInfoTab cve={cve!} />
-            </CveTabPanel>
-          )}
-        </>
-      ) : (
-        activeTab === 'Related Injects' && (
-          <RelatedInjectsTab
-            searchFindings={searchFindings}
-            contextId={contextId}
-            finding={selectedFinding}
-            additionalHeaders={additionalHeaders}
-            additionalFilterNames={additionalFilterNames}
-          />
-        )
-      )}
+      {renderTabPanels()}
     </>
   );
 };

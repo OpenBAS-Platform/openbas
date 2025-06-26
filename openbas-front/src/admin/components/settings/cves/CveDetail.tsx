@@ -25,8 +25,7 @@ const CveDetail = ({ selectedCve }: Props) => {
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [cve, setCve] = useState<CveOutput | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [notAvailable, setNotAvailable] = useState(false);
+  const [cveStatus, setCveStatus] = useState<CveStatus>('loading');
 
   useEffect(() => {
     if (activeTab === 'Remediation' && !isEE) {
@@ -39,19 +38,37 @@ const CveDetail = ({ selectedCve }: Props) => {
   useEffect(() => {
     if (!selectedCve.cve_id) return;
 
-    setLoading(true);
-    setNotAvailable(false);
+    setCveStatus('loading');
 
     fetchCve(selectedCve.cve_id)
       .then((res) => {
         setCve(res.data);
+        setCveStatus(res.data ? 'loaded' : 'notAvailable');
       })
-      .catch(() => setNotAvailable(true))
-      .finally(() => setLoading(false));
+      .catch(() => setCveStatus('notAvailable'));
   }, [selectedCve]);
 
   const handleTabChange = (_: SyntheticEvent, newTab: string) => {
     setActiveTab(newTab);
+  };
+
+  const renderTabPanels = () => {
+    switch (activeTab) {
+      case 'General':
+        return (
+          <CveTabPanel status={cveStatus} cve={cve}>
+            <GeneralVulnerabilityInfoTab cve={cve!} />
+          </CveTabPanel>
+        );
+      case 'Remediation':
+        return (
+          <CveTabPanel status={cveStatus} cve={cve}>
+            <RemediationInfoTab cve={cve!} />
+          </CveTabPanel>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -66,17 +83,7 @@ const CveDetail = ({ selectedCve }: Props) => {
         ))}
       </Tabs>
 
-      {activeTab === 'General' && (
-        <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
-          <GeneralVulnerabilityInfoTab cve={cve!} />
-        </CveTabPanel>
-      )}
-
-      {activeTab === 'Remediation' && isEE && (
-        <CveTabPanel isLoading={loading} notAvailable={notAvailable} cve={cve}>
-          <RemediationInfoTab cve={cve!} />
-        </CveTabPanel>
-      )}
+      {renderTabPanels()}
     </>
   );
 };
