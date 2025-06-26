@@ -1,5 +1,5 @@
 import { Close } from '@mui/icons-material';
-import { Box, Drawer as DrawerMUI, IconButton, type PaperProps } from '@mui/material';
+import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
 import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -40,14 +40,6 @@ const useStyles = makeStyles()(theme => ({
     padding: '10px 0',
     display: 'inline-flex',
     alignItems: 'center',
-  },
-  titleHeader: {
-    margin: '0',
-    fontWeight: 400,
-    fontSize: '18px',
-    fontFamily: 'IBM Plex Sans',
-    lineHeight: 1.57,
-    color: theme.palette.text.secondary,
   },
 }));
 
@@ -107,7 +99,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         >
           <Close fontSize="small" color="primary" />
         </IconButton>
-        <Box className={classes.titleHeader} display="flex" alignItems="center" width="100%" gap={1}>{title}</Box>
+        <Typography variant="subtitle2" sx={{ width: '100%' }}>{title}</Typography>
       </div>
       <div style={{
         padding: '10px 20px 20px 20px',

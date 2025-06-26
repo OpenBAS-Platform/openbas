@@ -140,6 +140,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
             key={finding.finding_id}
             classes={{ root: classes.item }}
             divider
+            disablePadding
           >
             <ListItemButton
               classes={{ root: classes.item }}

@@ -56,4 +56,26 @@ public class FindingSpecification {
               cb.isNull(exerciseJoin1.get("id"))));
     };
   }
+
+  public static Specification<Finding> distinctTypeValeurWithFilter(Specification<Finding> baseSpec) {
+    return (root, query, cb) -> {
+      query.distinct(true);
+
+      Subquery<String> subquery = query.subquery(String.class);
+      Root<Finding> subRoot = subquery.from(Finding.class);
+
+      Predicate specPredicate = null;
+      if (baseSpec != null) {
+        specPredicate = baseSpec.toPredicate(subRoot, query, cb);
+      }
+
+      subquery.select(cb.least(subRoot.<String>get("id")));
+      if (specPredicate != null) {
+        subquery.where(specPredicate);
+      }
+      subquery.groupBy(subRoot.get("type"), subRoot.get("value"));
+
+      return root.get("id").in(subquery);
+    };
+  }
 }
