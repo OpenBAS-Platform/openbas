@@ -1,5 +1,5 @@
 import { HubOutlined, ReportProblemOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -15,13 +15,13 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../components/common/SortHeadersList';
 import CVSSBadge from '../../../../components/CvssBadge';
-import CvssChip from '../../../../components/CvssChip';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type CveSimple, type SearchPaginationInput } from '../../../../utils/api-types';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
 import CveDetail from './CveDetail';
+import CveDrawerTitle from './CveDrawerTitle';
 import CvePopover from './CvePopover';
 
 const useStyles = makeStyles()({
@@ -165,37 +165,16 @@ const Cves = () => {
         />
         {selectedCve && (
           <Drawer
-            open={true}
+            open
             handleClose={() => setSelectedCve(null)}
             title={
-              selectedCve && (
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 0.15fr',
-                    width: '100%',
-                  }}
-                >
-                  <Typography variant="subtitle1">{selectedCve.cve_id}</Typography>
-                  <Box sx={{
-                    display: 'flex',
-                    gap: 1,
-                    alignItems: 'center',
-                  }}
-                  >
-                    <Typography variant="subtitle1">CVSS</Typography>
-                    <CvssChip score={selectedCve.cve_cvss} />
-                  </Box>
-                </Box>
-              )
+              selectedCve && <CveDrawerTitle cve={selectedCve} />
             }
           >
             {selectedCve && (
-              <>
-                <CveDetail
-                  selectedCve={selectedCve}
-                />
-              </>
+              <CveDetail
+                selectedCve={selectedCve}
+              />
             )}
           </Drawer>
         )}

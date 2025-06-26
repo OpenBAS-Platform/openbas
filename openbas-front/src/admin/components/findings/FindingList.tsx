@@ -1,5 +1,5 @@
 import { HubOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -13,13 +13,13 @@ import SortHeadersComponentV2 from '../../../components/common/queryable/sort/So
 import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../components/common/SortHeadersList';
-import CvssChip from '../../../components/CvssChip';
 import FindingIcon from '../../../components/FindingIcon';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
 import FindingDetail from './FindingDetail';
+import FindingDrawerTitle from './FindingDrawerTitle';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -172,44 +172,19 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       </List>
       {selectedFinding?.finding_value && (
         <Drawer
-          open={selectedFinding !== null}
+          open={Boolean(selectedFinding)}
           handleClose={() => setSelectedFinding(null)}
-          title={
-            selectedFinding && (
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 0.15fr',
-                  width: '100%',
-                }}
-              >
-                <Typography variant="subtitle1">{selectedFinding.finding_value}</Typography>
-                {selectedFinding.finding_type === 'cve' && (
-                  <Box sx={{
-                    display: 'flex',
-                    gap: 1,
-                    alignItems: 'center',
-                  }}
-                  >
-                    <Typography variant="subtitle1">CVSS</Typography>
-                    {cvssScore && <CvssChip score={cvssScore} />}
-                  </Box>
-                )}
-              </Box>
-            )
-          }
+          title={selectedFinding && <FindingDrawerTitle finding={selectedFinding} cvssScore={cvssScore} />}
         >
           {selectedFinding && (
-            <>
-              <FindingDetail
-                selectedFinding={selectedFinding}
-                searchFindings={searchFindings}
-                contextId={contextId}
-                additionalHeaders={additionalHeaders}
-                additionalFilterNames={additionalFilterNames}
-                onCvssScore={score => setCvssScore(score)}
-              />
-            </>
+            <FindingDetail
+              selectedFinding={selectedFinding}
+              searchFindings={searchFindings}
+              contextId={contextId}
+              additionalHeaders={additionalHeaders}
+              additionalFilterNames={additionalFilterNames}
+              onCvssScore={setCvssScore}
+            />
           )}
         </Drawer>
       )}
