@@ -18,5 +18,4 @@ public class DashboardParameters {
   @JsonProperty("parameters_type")
   @NotBlank
   private String type;
-
 }

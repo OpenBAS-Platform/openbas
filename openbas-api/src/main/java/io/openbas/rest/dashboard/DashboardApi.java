@@ -1,5 +1,8 @@
 package io.openbas.rest.dashboard;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.User.ROLE_USER;
+
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.raw.RawUserAuth;
@@ -10,20 +13,16 @@ import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EsService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Secured(ROLE_USER)

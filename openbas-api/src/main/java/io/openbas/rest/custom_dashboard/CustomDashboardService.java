@@ -5,6 +5,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -28,8 +29,11 @@ public class CustomDashboardService {
   }
 
   @Transactional(readOnly = true)
-  public List<CustomDashboard> customDashboards() {
-    return fromIterable(this.customDashboardRepository.findAll());
+  public List<CustomDashboardOutput> customDashboards() {
+    List<CustomDashboard> customDashboards = fromIterable(this.customDashboardRepository.findAll());
+    return customDashboards.stream()
+        .map(customDashboard -> CustomDashboardOutput.toCustomDashboard(customDashboard))
+        .toList();
   }
 
   @Transactional(readOnly = true)

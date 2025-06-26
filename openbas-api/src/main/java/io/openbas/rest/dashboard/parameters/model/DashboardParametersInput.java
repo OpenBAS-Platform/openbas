@@ -13,5 +13,4 @@ public class DashboardParametersInput {
 
   @JsonProperty("parameters_value")
   private String value;
-
 }

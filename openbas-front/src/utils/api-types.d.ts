@@ -901,8 +901,13 @@ export interface CustomDashboard {
 }
 
 export interface CustomDashboardInput {
-  custom_dashboard_description?: striDng;
+  custom_dashboard_description?: string;
   custom_dashboard_name: string;
+}
+
+export interface CustomDashboardOutput {
+  custom_dashboard_id?: string;
+  custom_dashboard_name?: string;
 }
 
 export interface DashboardParameters {

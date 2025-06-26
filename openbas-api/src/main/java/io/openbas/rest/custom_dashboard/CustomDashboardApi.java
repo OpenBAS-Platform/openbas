@@ -2,6 +2,7 @@ package io.openbas.rest.custom_dashboard;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class CustomDashboardApi extends RestBehavior {
   }
 
   @GetMapping
-  public ResponseEntity<List<CustomDashboard>> customDashboards() {
+  public ResponseEntity<List<CustomDashboardOutput>> customDashboards() {
     return ResponseEntity.ok(this.customDashboardService.customDashboards());
   }
 

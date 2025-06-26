@@ -1,14 +1,13 @@
 package io.openbas.rest.simulation;
 
+import static io.openbas.database.model.User.ROLE_USER;
+
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FilterUtilsJpa.Option;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static io.openbas.database.model.User.ROLE_USER;
 
 @RequestMapping(SimulationApi.SIMULATION_URI)
 @RestController
@@ -23,8 +22,7 @@ public class SimulationApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping("/options")
-  public List<Option> optionsByName(
-      @RequestParam(required = false) final String searchText) {
+  public List<Option> optionsByName(@RequestParam(required = false) final String searchText) {
     return this.simulationService.findAllAsOptions(searchText);
   }
 
@@ -32,5 +30,4 @@ public class SimulationApi extends RestBehavior {
   public List<Option> optionsById(@RequestBody final List<String> ids) {
     return this.simulationService.findAllByIdsAsOptions(ids);
   }
-
 }
