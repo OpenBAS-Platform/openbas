@@ -891,8 +891,21 @@ export interface CustomDashboard {
   /** @format date-time */
   custom_dashboard_created_at: string;
   custom_dashboard_description?: string;
+  /** @format date-time */
+  custom_dashboard_end_date?: string;
   custom_dashboard_id: string;
   custom_dashboard_name: string;
+  /** @format date-time */
+  custom_dashboard_start_date?: string;
+  custom_dashboard_time_range:
+    | "ALL_TIME"
+    | "CUSTOM"
+    | "LAST_DAY"
+    | "LAST_WEEK"
+    | "LAST_MONTH"
+    | "LAST_QUARTER"
+    | "LAST_SEMESTER"
+    | "LAST_YEAR";
   /** @format date-time */
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
@@ -902,6 +915,22 @@ export interface CustomDashboard {
 export interface CustomDashboardInput {
   custom_dashboard_description?: string;
   custom_dashboard_name: string;
+}
+
+export interface CustomDashboardTimeFilterInput {
+  /** @format date-time */
+  custom_dashboard_end_date?: string;
+  /** @format date-time */
+  custom_dashboard_start_date?: string;
+  custom_dashboard_time_range:
+    | "ALL_TIME"
+    | "CUSTOM"
+    | "LAST_DAY"
+    | "LAST_WEEK"
+    | "LAST_MONTH"
+    | "LAST_QUARTER"
+    | "LAST_SEMESTER"
+    | "LAST_YEAR";
 }
 
 export interface DateHistogramSeries {
@@ -914,10 +943,8 @@ export type DateHistogramWidget = UtilRequiredKeys<
   HistogramWidget,
   "mode" | "field"
 > & {
-  end: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
-  start: string;
 };
 
 export interface DirectInjectInput {

@@ -181,7 +181,7 @@ const WidgetCreationParameters: FunctionComponent<{
               </TextField>
             )}
           />
-          <Controller
+          {/* <Controller
             control={control}
             name="widget_config.start"
             render={({ field, fieldState }) => (
@@ -222,7 +222,7 @@ const WidgetCreationParameters: FunctionComponent<{
                 }}
               />
             )}
-          />
+          /> */}
         </>
       )}
       {/* TODO: not functionnal for now */}
