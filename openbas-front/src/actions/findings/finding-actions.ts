@@ -33,6 +33,8 @@ export const searchFindingsForScenarios = (scenarioId: string, searchPaginationI
   return simplePostCall(uri, data);
 };
 
+// -- DISTINCT --
+
 export const searchDistinctFindings = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = `${FINDING_URI}/search/distinct`;

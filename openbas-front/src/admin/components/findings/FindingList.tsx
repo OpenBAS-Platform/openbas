@@ -4,7 +4,6 @@ import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchDistinctFindings } from '../../../actions/findings/finding-actions';
 import Drawer from '../../../components/common/Drawer';
 import { initSorting, type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -35,7 +34,7 @@ interface Props {
   contextId?: string;
 }
 
-const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
+const FindingList = ({ searchFindings, searchDistinctFindings, filterLocalStorageKey, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const [loading, setLoading] = useState<boolean>(true);
