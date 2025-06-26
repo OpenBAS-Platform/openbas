@@ -5,18 +5,22 @@ import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.model.Endpoint;
 import io.openbas.engine.model.EsBase;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Indexable(index = "vulnerable endpoint", label = "Vulnerable Endpoint")
+@Indexable(index = "vulnerable-endpoint", label = "Vulnerable Endpoint")
 public class EsVulnerableEndpoint extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */
 
-  // -- ASSET GENERIC
+  @Queryable(label = "vulnerable endpoint id")
+  @EsQueryable(keyword = true)
+  private String vulnerable_endpoint_id;
+
   @Queryable(label = "vulnerable endpoint hostname", filterable = true)
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_hostname;
@@ -37,17 +41,47 @@ public class EsVulnerableEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_architecture;
 
+  // -- DENORMALISATION --
+
+  @Queryable(
+      label = "vulnerable endpoint agents privileges",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = AgentPrivilege.class)
+  @EsQueryable(keyword = true)
+  private Set<String> vulnerable_endpoint_agents_privileges;
+
+  @Queryable(
+      label = "vulnerable endpoint agents active status",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = AgentStatus.class)
+  @EsQueryable(keyword = true)
+  private List<Boolean> vulnerable_endpoint_agents_active_status;
+
+  @Queryable(
+      label = "vulnerable endpoint action",
+      filterable = true,
+      dynamicValues = true,
+      refEnumClazz = VulnerableEndpointAction.class)
+  @EsQueryable(keyword = true)
+  private String vulnerable_endpoint_action;
+
+  @Queryable(label = "vulnerable endpoint findings summary")
+  @EsQueryable(keyword = true)
+  private String vulnerable_endpoint_findings_summary;
+
   // -- SIDE --
 
   @Queryable(label = "simulation", filterable = true)
   @EsQueryable(keyword = true)
   private String base_simulation_side; // Must finish by _side
 
-  @Queryable(label = "agents", filterable = true)
+  @Queryable(label = "agents")
   @EsQueryable(keyword = true)
   private Set<String> base_agents_side; // Must finish by _side
 
-  @Queryable(label = "findings", filterable = true)
+  @Queryable(label = "findings")
   @EsQueryable(keyword = true)
   private Set<String> base_findings_side; // Must finish by _side
 

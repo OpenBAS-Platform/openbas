@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.AgentHelper;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -24,8 +25,6 @@ import lombok.Setter;
 @Table(name = "agents")
 @EntityListeners(ModelBaseListener.class)
 public class Agent implements Base {
-
-  public static final int ACTIVE_THRESHOLD = 3600000; // 3 600 000 ms = 1 hour
 
   public static final String ADMIN_SYSTEM_WINDOWS = "nt authority\\system";
   public static final String ADMIN_SYSTEM_UNIX = "root";
@@ -111,8 +110,7 @@ public class Agent implements Base {
 
   @JsonProperty("agent_active")
   public boolean isActive() {
-    return this.getLastSeen() != null
-        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
+    return new AgentHelper().isAgentActiveFromLastSeen(this.getLastSeen());
   }
 
   /** Used for Caldera only */
