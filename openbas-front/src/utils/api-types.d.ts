@@ -1895,14 +1895,8 @@ export interface FindingOutput {
   finding_assets: EndpointSimple[];
   /** @format date-time */
   finding_created_at: string;
-  /** Finding field that corresponds to the key of the output parser */
-  finding_field: string;
-  /** Finding Id */
-  finding_id: string;
   /** Inject linked to finding */
   finding_inject: InjectSimple;
-  /** Finding Name */
-  finding_name: string;
   /** Scenario linked to inject */
   finding_scenario?: ScenarioSimple;
   finding_simulation?: ExerciseSimple;
@@ -1913,7 +1907,7 @@ export interface FindingOutput {
   finding_tags?: string[];
   /**
    * Represents the data type being extracted.
-   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
    */
   finding_type:
     | "text"
