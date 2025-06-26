@@ -9,7 +9,6 @@ const useStyles = makeStyles()(() => ({
   labelChip: {
     textTransform: 'uppercase',
     borderRadius: 5,
-    width: 80,
     marginBottom: 5,
     height: 20,
   },
@@ -18,11 +17,13 @@ const useStyles = makeStyles()(() => ({
 interface Props {
   label: string;
   color: string;
+  size?: number;
 }
 
 const LabelChip: FunctionComponent<Props> = ({
   label,
   color,
+  size = 80,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -33,6 +34,7 @@ const LabelChip: FunctionComponent<Props> = ({
     <Chip
       className={classes.labelChip}
       style={theme.palette.labelChipMap.get(color)}
+      sx={{ width: size }}
       label={t(label)}
     />
   );
