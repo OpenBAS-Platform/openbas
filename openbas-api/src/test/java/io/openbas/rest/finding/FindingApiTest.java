@@ -3,6 +3,7 @@ package io.openbas.rest.finding;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
+import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.FindingOutput;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.fixtures.*;
@@ -25,9 +27,11 @@ import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -652,6 +656,7 @@ class FindingApiTest extends IntegrationTest {
     private AssetGroup savedAssetGroup;
     private Endpoint savedEndpoint;
     private InjectComposer.Composer injectWrapper;
+    private InjectComposer.Composer injectWrapper2;
 
     @BeforeEach
     void setup() {
@@ -674,6 +679,8 @@ class FindingApiTest extends IntegrationTest {
           injectComposer
               .forInject(InjectFixture.getDefaultInject())
               .withAssetGroup(assetGroupWrapper);
+
+      injectWrapper2 = injectComposer.forInject(InjectFixture.getDefaultInject());
 
       ExerciseComposer.Composer simulationWrapper =
           simulationComposer
@@ -802,6 +809,54 @@ class FindingApiTest extends IntegrationTest {
               jsonPath("$.content.[0].finding_assets.[0].asset_id").value(savedEndpoint.getId()))
           .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
           .andExpect(jsonPath("$.content.[0].finding_value").value("text_value"));
+    }
+
+    @Test
+    void distinctTypeValueWithFilter_returnsDistinctFindings() {
+      // Create two findings with the same type and value (duplicates)
+      Finding f1 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+
+      Finding f2 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper2)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+
+      // Create a unique finding with different type or value
+      Finding f3 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultIPV6Finding())
+              .withInject(injectWrapper)
+              .persist()
+              .get();
+
+      // base specification can be null (no additional filtering)
+      Specification<Finding> baseSpec = null;
+
+      Specification<Finding> distinctSpec =
+          FindingSpecification.distinctTypeValueWithFilter(baseSpec);
+
+      List<Finding> results = findingRepository.findAll(distinctSpec);
+
+      // Should return only 2 distinct findings (f1/f2 collapse to one)
+      assertThat(results).hasSize(2);
+
+      Set<String> distinctPairs =
+          results.stream()
+              .map(f -> f.getType().label + "::" + f.getValue())
+              .collect(Collectors.toSet());
+
+      assertThat(distinctPairs)
+          .containsExactlyInAnyOrder(
+              f1.getType().label + "::" + f1.getValue(), f3.getType().label + "::" + f3.getValue());
     }
   }
 
