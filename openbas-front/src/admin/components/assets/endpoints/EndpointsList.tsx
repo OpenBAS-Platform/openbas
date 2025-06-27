@@ -6,7 +6,6 @@ import { makeStyles } from 'tss-react/mui';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type EndpointOutput } from '../../../../utils/api-types';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
-import AssetNameFragment from '../../common/endpoints/fragments/output/AssetNameFragment';
 import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
 import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
 import AssetTypeFragment from '../../common/endpoints/fragments/output/AssetTypeFragment';
@@ -64,7 +63,7 @@ const EndpointsList: FunctionComponent<Props> = ({
       field: 'asset_name',
       label: 'Name',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => <AssetNameFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => endpoint.asset_name,
     },
     {
       field: EndpointListItemFragments.ASSET_PLATFORM,

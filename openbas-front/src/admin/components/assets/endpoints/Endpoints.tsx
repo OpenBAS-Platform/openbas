@@ -28,7 +28,6 @@ import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import useAuth from '../../../../utils/hooks/useAuth';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
-import AssetNameFragment from '../../common/endpoints/fragments/output/AssetNameFragment';
 import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
 import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
 import EndpointActiveFragment from '../../common/endpoints/fragments/output/EndpointActiveFragment';
@@ -109,7 +108,7 @@ const Endpoints = () => {
       field: EndpointListItemFragments.ASSET_NAME,
       label: 'Name',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => <AssetNameFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => endpoint.asset_name,
     },
     {
       field: EndpointListItemFragments.ENDPOINT_ACTIVE,

@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_96__insert_widget_config_type_key extends BaseJavaMigration {
+public class V3_98__insert_widget_config_type_key extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
