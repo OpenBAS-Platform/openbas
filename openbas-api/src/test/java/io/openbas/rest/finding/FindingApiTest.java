@@ -11,14 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.ContractOutputType;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Filters;
 import io.openbas.database.model.Finding;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Filters;
-import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.FindingOutput;
