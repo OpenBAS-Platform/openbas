@@ -1,11 +1,11 @@
 package io.openbas.rest.custom_dashboard;
 
-import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
+import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
-import static io.openbas.rest.custom_dashboard.WidgetFixture.NAME;
-import static io.openbas.rest.custom_dashboard.WidgetFixture.createDefaultWidget;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.WidgetFixture.NAME;
+import static io.openbas.utils.fixtures.WidgetFixture.createDefaultWidget;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,6 +18,7 @@ import io.openbas.database.model.WidgetLayout;
 import io.openbas.database.repository.WidgetRepository;
 import io.openbas.engine.api.DateHistogramWidget;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
+import io.openbas.utils.fixtures.composers.WidgetComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     String name = "My new widget";
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     widgetConfig.setTitle(name);
-    input.setHistogramWidget(widgetConfig);
+    input.setWidgetConfiguration(widgetConfig);
     WidgetLayout widgetLayout = new WidgetLayout();
     input.setWidgetLayout(widgetLayout);
 

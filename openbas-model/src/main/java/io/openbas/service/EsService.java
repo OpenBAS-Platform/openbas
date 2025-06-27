@@ -223,6 +223,7 @@ public class EsService {
       List<Hit<EsBase>> hits = response.hits().hits();
       return hits.stream()
           .map(Hit::source)
+          .filter(Objects::nonNull)
           .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
     } catch (Exception e) {
       log.error(String.format("resolveIdsRepresentative exception: %s", e.getMessage()), e);
@@ -233,62 +234,54 @@ public class EsService {
   // endregion
 
   // region indexing
-  public <T extends EsBase> void bulkParallelProcessing() {
-    List<EsModel<T>> models = this.esEngine.getModels();
-    log.info("Executing bulk parallel processing for {} models", models.size());
-    models.stream()
-        .parallel()
-        .forEach(
-            model -> {
-              Optional<IndexingStatus> indexingStatus =
-                  indexingStatusRepository.findByType(model.getName());
-              Handler<? extends EsBase> handler = model.getHandler();
-              String index = model.getIndex(engineConfig);
-              Instant fetchInstant =
-                  indexingStatus.map(IndexingStatus::getLastIndexing).orElse(null);
-              List<? extends EsBase> results = handler.fetch(fetchInstant);
-              if (!results.isEmpty()) {
-                // Create bulk for the data
-                BulkRequest.Builder br = new BulkRequest.Builder();
-                for (EsBase result : results) {
-                  br.operations(
-                      op ->
-                          op.index(
-                              idx -> idx.index(index).id(result.getBase_id()).document(result)));
-                }
-                // Execute the bulk
-                try {
-                  log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
-                  BulkRequest bulkRequest = br.build();
-                  BulkResponse result = elasticClient.bulk(bulkRequest);
-                  // Log errors, if any
-                  if (result.errors()) {
-                    for (BulkResponseItem item : result.items()) {
-                      if (item.error() != null) {
-                        log.error(item.error().reason());
-                      }
-                    }
-                  } else {
-                    // Update the status for the next round
-                    if (indexingStatus.isPresent()) {
-                      IndexingStatus status = indexingStatus.get();
-                      status.setLastIndexing(results.getLast().getBase_updated_at());
-                      indexingStatusRepository.save(status);
-                    } else {
-                      IndexingStatus status = new IndexingStatus();
-                      status.setType(model.getName());
-                      status.setLastIndexing(results.getLast().getBase_updated_at());
-                      indexingStatusRepository.save(status);
-                    }
+  public <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models) {
+    models.forEach(
+        model -> {
+          Optional<IndexingStatus> indexingStatus =
+              indexingStatusRepository.findByType(model.getName());
+          Handler<? extends EsBase> handler = model.getHandler();
+          String index = model.getIndex(engineConfig);
+          Instant fetchInstant = indexingStatus.map(IndexingStatus::getLastIndexing).orElse(null);
+          List<? extends EsBase> results = handler.fetch(fetchInstant);
+          if (!results.isEmpty()) {
+            // Create bulk for the data
+            BulkRequest.Builder br = new BulkRequest.Builder();
+            for (EsBase result : results) {
+              br.operations(
+                  op -> op.index(idx -> idx.index(index).id(result.getBase_id()).document(result)));
+            }
+            // Execute the bulk
+            try {
+              log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
+              BulkRequest bulkRequest = br.build();
+              BulkResponse result = elasticClient.bulk(bulkRequest);
+              // Log errors, if any
+              if (result.errors()) {
+                for (BulkResponseItem item : result.items()) {
+                  if (item.error() != null) {
+                    log.error(item.error().reason());
                   }
-                } catch (IOException e) {
-                  log.error(
-                      String.format("bulkParallelProcessing exception: %s", e.getMessage()), e);
                 }
               } else {
-                log.info("Indexing <up to date> for {}", model.getName());
+                // Update the status for the next round
+                if (indexingStatus.isPresent()) {
+                  IndexingStatus status = indexingStatus.get();
+                  status.setLastIndexing(results.getLast().getBase_updated_at());
+                  indexingStatusRepository.save(status);
+                } else {
+                  IndexingStatus status = new IndexingStatus();
+                  status.setType(model.getName());
+                  status.setLastIndexing(results.getLast().getBase_updated_at());
+                  indexingStatusRepository.save(status);
+                }
               }
-            });
+            } catch (IOException e) {
+              log.error(String.format("bulkParallelProcessing exception: %s", e.getMessage()), e);
+            }
+          } else {
+            log.info("Indexing <up to date> for {}", model.getName());
+          }
+        });
   }
 
   public void bulkDelete(List<String> ids) {
@@ -497,6 +490,68 @@ public class EsService {
         .parallel()
         .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters))
         .toList();
+  }
+
+  public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
+    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
+    String entityName =
+        searchFilters.getFilters().stream()
+            .filter(filter -> "base_entity".equals(filter.getKey()))
+            .findAny()
+            .orElseThrow()
+            .getValues()
+            .getFirst();
+    List<EngineSortField> sorts = runtime.getWidget().getSorts();
+
+    List<SortOptions> engineSorts;
+    if (sorts != null && !sorts.isEmpty()) {
+      engineSorts =
+          sorts.stream()
+              .map(
+                  sort ->
+                      SortOptions.of(
+                          so ->
+                              so.field(
+                                  FieldSort.of(
+                                      fs ->
+                                          fs.field(toElasticField(sort.getFieldName()))
+                                              .order(
+                                                  sort.getDirection() == SortDirection.DESC
+                                                      ? SortOrder.Desc
+                                                      : SortOrder.Asc)))))
+              .toList();
+    } else {
+      engineSorts =
+          List.of(
+              SortOptions.of(
+                  so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
+    }
+    Query query = buildQuery(user, "", searchFilters, new HashMap<>());
+    try {
+      SearchResponse<?> response =
+          elasticClient.search(
+              b ->
+                  b.index(engineConfig.getIndexPrefix() + "*")
+                      .size(engineConfig.getDefaultPagination())
+                      .query(query)
+                      .sort(engineSorts),
+              getClassForEntity(entityName));
+      return response.hits().hits().stream()
+          .filter(hit -> hit.source() != null)
+          .map(hit -> (EsBase) hit.source())
+          .toList();
+    } catch (IOException e) {
+      log.error("query exception: {}", e.getMessage(), e);
+    }
+    return List.of();
+  }
+
+  private Class<?> getClassForEntity(String entity_name) {
+    Optional<EsModel<EsBase>> model =
+        esEngine.getModels().stream()
+            .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
+            .findAny();
+    return model.get().getModel();
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {

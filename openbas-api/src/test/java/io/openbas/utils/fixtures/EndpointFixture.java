@@ -53,6 +53,7 @@ public class EndpointFixture {
     endpoint.setIps(EndpointMapper.setIps(IPS));
     endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    endpoint.setUpdatedAt(Instant.now());
     return endpoint;
   }
 

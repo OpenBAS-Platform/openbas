@@ -4,26 +4,33 @@ import { type FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Widget } from '../../../../../../utils/api-types';
+import type { Widget } from '../../../../../../utils/api-types-custom';
 import { verticalBarsChartOptions } from '../../../../../../utils/Charts';
 
 interface Props {
-  widgetMode: Widget['widget_config']['mode'];
+  widgetConfig: Widget['widget_config'];
   series: ApexOptions['series'];
 }
 
-const VerticalBarChart: FunctionComponent<Props> = ({ widgetMode, series }) => {
+const VerticalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) => {
   const theme = useTheme();
   const { t, fld } = useFormatter();
+
+  const widgetMode = (): 'structural' | 'temporal' => {
+    if (widgetConfig.widget_configuration_type === 'temporal-histogram' || widgetConfig.widget_configuration_type === 'structural-histogram') {
+      return widgetConfig.mode;
+    }
+    return 'structural';
+  };
 
   return (
     <Chart
       options={verticalBarsChartOptions(
         theme,
-        widgetMode === 'temporal' ? fld : null,
+        widgetMode() === 'temporal' ? fld : null,
         undefined,
         false,
-        widgetMode === 'temporal',
+        widgetMode() === 'temporal',
         false,
         true,
         'dataPoints',

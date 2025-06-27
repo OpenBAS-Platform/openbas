@@ -323,12 +323,15 @@ public class ElasticDriver {
       String fullIndexWithSuffix = fullIndexName + config.getIndexSuffix();
 
       // 1. Delete index and alias if they exist
-      try {
-        client.indices().delete(d -> d.index(fullIndexWithSuffix));
-        log.info("Deleted index: {}", fullIndexWithSuffix);
-      } catch (ElasticsearchException e) {
-        log.warn("Index {} does not exist or already deleted", fullIndexWithSuffix);
+      for (String name : List.of(fullIndexName, fullIndexWithSuffix)) {
+        try {
+          client.indices().delete(d -> d.index(name));
+          log.info("Deleted index: {}", name);
+        } catch (ElasticsearchException e) {
+          log.warn("Index {} does not exist or already deleted", name);
+        }
       }
+
       // 2. Delete index template
       try {
         client.indices().deleteIndexTemplate(d -> d.name(fullIndexName));

@@ -18,7 +18,6 @@ public class StructuralHistogramWidget extends HistogramWidget {
 
   @Data
   public static class StructuralHistogramSeries {
-
     private String name;
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
