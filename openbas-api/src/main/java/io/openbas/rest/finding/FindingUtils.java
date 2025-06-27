@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class FindingUtils {
 
-  private FindingUtils() {}
-
   public static Finding createFinding(@NotNull final InjectorContractContentOutputElement element) {
     Finding finding = new Finding();
     finding.setType(element.getType());

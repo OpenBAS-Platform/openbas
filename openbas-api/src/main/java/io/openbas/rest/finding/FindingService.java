@@ -80,6 +80,15 @@ public class FindingService {
     this.findingRepository.deleteById(id);
   }
 
+  /**
+   * Builds a Finding based on the provided parameters. If a Finding with the same inject ID, value,
+   * type, and key already exists, it will update the assets associated with it.
+   *
+   * @param inject the Inject object associated with the Finding
+   * @param asset the Asset to be linked to the Finding
+   * @param contractOutputElement the ContractOutputElement defining the type and key of the Finding
+   * @param finalValue the value of the Finding to be stored
+   */
   public void buildFinding(
       Inject inject, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
     try {
