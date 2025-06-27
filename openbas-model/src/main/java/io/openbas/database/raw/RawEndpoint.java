@@ -14,4 +14,6 @@ public interface RawEndpoint extends RawAsset {
   Set<String> getEndpoint_mac_addresses();
 
   String getEndpoint_seen_ip();
+
+  boolean getEndpoint_is_eol();
 }

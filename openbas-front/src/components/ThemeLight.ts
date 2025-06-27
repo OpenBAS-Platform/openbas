@@ -4,6 +4,7 @@ import LogoCollapsed from '../static/images/logo_light.png';
 import LogoText from '../static/images/logo_text_light.png';
 import { hexToRGB } from '../utils/Colors';
 import { fileUri } from '../utils/Environment';
+import { type LabelColor, LabelColorDict } from './Theme';
 
 const EE_COLOR = '#0c7e69';
 
@@ -39,6 +40,18 @@ const ThemeLight = (
     primary: { main: primary || THEME_LIGHT_DEFAULT_PRIMARY },
     secondary: { main: secondary || THEME_LIGHT_DEFAULT_SECONDARY },
     chip: { main: '#000000' },
+    labelChipMap: new Map<string, LabelColor>([
+      [
+        LabelColorDict.Red, {
+          backgroundColor: 'rgba(244, 67, 54, 0.08)',
+          color: '#f44336',
+        }], [
+        LabelColorDict.Green, {
+          backgroundColor: 'rgba(76, 175, 80, 0.08)',
+          color: '#4caf50',
+        },
+      ],
+    ]),
     ai: {
       main: '#9c27b0',
       light: '#ba68c8',
