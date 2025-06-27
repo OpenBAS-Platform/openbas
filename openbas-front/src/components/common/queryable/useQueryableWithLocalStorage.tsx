@@ -65,8 +65,8 @@ const buildUseQueryable = (
   });
 };
 
-export const useQueryable = (initSearchPaginationInput: Partial<SearchPaginationInput>) => {
-  const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
+export const useQueryable = (initSearchPaginationInput: Partial<SearchPaginationInput>, currentSearchPaginationInput?: Partial<SearchPaginationInput>) => {
+  const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(currentSearchPaginationInput ?? initSearchPaginationInput);
 
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(finalSearchPaginationInput);
 
