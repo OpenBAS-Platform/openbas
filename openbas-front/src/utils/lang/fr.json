@@ -1572,6 +1572,7 @@
   "Verified": "Vérifié",
   "Version": "Version",
   "view custom variables": "afficher les variables personnalisées",
+  "vulnerable-endpoint": "Endpoint vulnérable",
   "Vulnerability Name": "Nom de la vulnérabilité",
   "Vulnerability Remediation": "Remédiation de la vulnérabilité",
   "Vulnerability status": "Statut de la vulnérabilité",

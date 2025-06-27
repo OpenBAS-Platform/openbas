@@ -40,12 +40,12 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
               + "JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "JOIN exercises e ON i.inject_exercise = e.exercise_id "
-              + "WHERE e.exercise_updated_at > :from "
+              + "WHERE e.exercise_updated_at > :from OR a.asset_updated_at > :from "
               + "AND a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "' "
               + "GROUP BY a.asset_id, i.inject_exercise, e.exercise_updated_at, e.exercise_created_at "
-              + "ORDER BY e.exercise_updated_at LIMIT "
+              + "ORDER BY e.exercise_updated_at LIMIT 500 "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)

@@ -105,6 +105,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'finding_simulation':
+      case 'base_simulation_side':
         searchExerciseLinkedToFindingsAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
