@@ -67,6 +67,12 @@ public class PermissionService {
       return true;
     }
 
+    // we authorize team and player READ to all the users
+    if (Action.READ.equals(action)
+        && (ResourceType.TEAM.equals(resourceType) || ResourceType.PLAYER.equals(resourceType))) {
+      return true;
+    }
+
     Capability requiredCapability = Capability.of(resourceType, action).orElse(Capability.BYPASS);
 
     if (userCapabilities.contains(requiredCapability)) {
