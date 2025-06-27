@@ -181,6 +181,14 @@ public class Exercise implements Base {
   // -- RELATION --
 
   @Getter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "exercise_custom_dashboard")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("exercise_custom_dashboard")
+  @Schema(type = "string")
+  private CustomDashboard customDashboard;
+
+  @Getter
   @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
   @JsonIgnore
   private List<Grant> grants = new ArrayList<>();

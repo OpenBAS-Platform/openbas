@@ -40,6 +40,8 @@ public interface RawSimulation {
 
   String getScenario_id();
 
+  String getExercise_custom_dashboard();
+
   Set<String> getExercise_reply_to();
 
   List<String> getExercise_tags();

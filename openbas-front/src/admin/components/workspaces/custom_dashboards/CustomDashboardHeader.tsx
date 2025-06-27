@@ -5,7 +5,6 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type CustomDashboard } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
-import CustomDashboardParameters from './CustomDashboardParameters';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -49,7 +48,6 @@ const CustomDashboardHeader: FunctionComponent<Props> = ({ customDashboard }) =>
             {truncate(currentCustomDashboard.custom_dashboard_name, 80)}
           </Typography>
         </Tooltip>
-        <CustomDashboardParameters customDashboard={customDashboard} />
       </div>
       <div className={classes.rightAligned}>
         <CustomDashboardPopover

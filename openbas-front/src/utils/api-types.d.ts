@@ -1423,6 +1423,7 @@ export interface Exercise {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_documents?: string[];
   /** @format date-time */
@@ -4367,6 +4368,7 @@ export interface SimulationDetails {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   /** @format date-time */
   exercise_end_date?: string;

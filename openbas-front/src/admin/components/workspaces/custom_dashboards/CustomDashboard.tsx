@@ -3,7 +3,6 @@ import { Box, IconButton, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
-import { useParams } from 'react-router';
 
 import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { ErrorBoundary } from '../../../../components/Error';
@@ -23,7 +22,6 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
   const ReactGridLayout = useMemo(() => WidthProvider(RGL), []);
   const [fullscreenWidgets, setFullscreenWidgets] = useState<Record<Widget['widget_id'], boolean | never>>({});
 
-  const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>(customDashboard);
 
   const [idToResize, setIdToResize] = useState<string | null>(null);
@@ -70,7 +68,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
   const onLayoutChange = async (layouts: Layout[]) => {
     await Promise.all(
       layouts.map(layout =>
-        updateCustomDashboardWidgetLayout(customDashboardId, layout.i, {
+        updateCustomDashboardWidgetLayout(customDashboardValue.custom_dashboard_id, layout.i, {
           widget_layout_h: layout.h,
           widget_layout_w: layout.w,
           widget_layout_x: layout.x,
@@ -172,7 +170,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                     )}
                     <WidgetPopover
                       className="noDrag"
-                      customDashboardId={customDashboardId}
+                      customDashboardId={customDashboardValue.custom_dashboard_id}
                       widget={widget}
                       onUpdate={widget => handleWidgetUpdate(widget)}
                       onDelete={widgetId => handleWidgetDelete(widgetId)}
@@ -201,7 +199,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
           })}
         </ReactGridLayout>
         <WidgetCreation
-          customDashboardId={customDashboardId}
+          customDashboardId={customDashboardValue.custom_dashboard_id}
           widgets={customDashboardValue?.custom_dashboard_widgets ?? []}
           onCreate={widget => handleWidgetCreate(widget)}
         />
