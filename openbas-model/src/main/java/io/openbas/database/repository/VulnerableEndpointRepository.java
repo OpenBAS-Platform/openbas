@@ -21,8 +21,7 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "i.inject_exercise as vulnerable_endpoint_simulation, "
               + "a.endpoint_hostname as vulnerable_endpoint_hostname, "
               + "a.endpoint_platform as vulnerable_endpoint_platform, "
-              // FIXME: hook to the real eol flag when available
-              + "false as vulnerable_endpoint_eol, "
+              + "a.endpoint_is_eol as vulnerable_endpoint_eol, "
               + "a.endpoint_arch as vulnerable_endpoint_architecture, "
               + "e.exercise_created_at as vulnerable_endpoint_created_at, "
               + "e.exercise_updated_at as vulnerable_endpoint_updated_at, "
