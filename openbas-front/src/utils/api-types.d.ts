@@ -1472,6 +1472,7 @@ export interface EsEndpoint {
   endpoint_hostname?: string;
   /** @uniqueItems true */
   endpoint_ips?: string[];
+  endpoint_is_eol?: boolean;
   /** @uniqueItems true */
   endpoint_mac_addresses?: string[];
   endpoint_name?: string;
