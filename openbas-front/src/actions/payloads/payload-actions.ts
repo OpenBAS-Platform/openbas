@@ -2,14 +2,13 @@ import type { Dispatch } from 'redux';
 
 import { delReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
-  type InjectExportRequestInput, type InjectImportInput,
   type Payload,
-  type PayloadCreateInput, type PayloadExportRequestInput,
+  type PayloadCreateInput,
+  type PayloadExportRequestInput,
   type PayloadUpdateInput,
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
-import { SCENARIO_URI } from '../scenarios/scenario-actions';
 import { payload } from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
