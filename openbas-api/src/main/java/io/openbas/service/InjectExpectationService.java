@@ -404,19 +404,20 @@ public class InjectExpectationService {
     // Update inject expectation at agent level
     String collectorName = collector.getName();
 
-    String fullName = Optional.ofNullable(collector.getSecurityPlatform())
-        .map(sp -> collectorName + " (" + sp.getSecurityPlatformType() + ")")
-        .orElse(collectorName);
+    String fullName =
+        Optional.ofNullable(collector.getSecurityPlatform())
+            .map(sp -> collectorName + " (" + sp.getSecurityPlatformType() + ")")
+            .orElse(collectorName);
 
-    injectExpectation = this.computeExpectation(
-        injectExpectation,
-        collector.getId(),
-        COLLECTOR,
-        fullName,
-        input.getResult(),
-        input.getIsSuccess(),
-        input.getMetadata()
-    );
+    injectExpectation =
+        this.computeExpectation(
+            injectExpectation,
+            collector.getId(),
+            COLLECTOR,
+            fullName,
+            input.getResult(),
+            input.getIsSuccess(),
+            input.getMetadata());
 
     Inject inject = injectExpectation.getInject();
     // Compute potential expectations for asset
