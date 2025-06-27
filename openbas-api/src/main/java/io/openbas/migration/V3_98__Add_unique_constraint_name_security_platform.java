@@ -62,7 +62,17 @@ public class V3_98__Add_unique_constraint_name_security_platform extends BaseJav
                   AND m.old_id != m.new_id;
             """);
 
-      // 6. Delete duplicate SecurityPlatform assets
+      // 6. Update tags
+      stmt.execute(
+          """
+                UPDATE assets_tags at
+                SET asset_id = m.new_id
+                FROM temp_security_platform_mapping m
+                WHERE at.asset_d = m.old_id
+                  AND m.old_id != m.new_id;
+            """);
+
+      // 7. Delete duplicate SecurityPlatform assets
       stmt.execute(
           """
                 DELETE FROM assets
@@ -73,7 +83,7 @@ public class V3_98__Add_unique_constraint_name_security_platform extends BaseJav
                 );
             """);
 
-      // 7. Add the unique constraint
+      // 8. Add the unique constraint
       stmt.execute(
           """
                 CREATE UNIQUE INDEX unique_security_platform_name_idx
