@@ -101,11 +101,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
                 />
               </div>
               <div className={classes.text}>
-                {option.label}
-                {' '}
-                (
-                {option.type}
-                )
+                {`${option.label} (${option.type})`}
               </div>
             </Box>
           );
