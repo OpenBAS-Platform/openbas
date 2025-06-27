@@ -27,4 +27,17 @@ public interface GrantRepository
               + "WHERE grants.grant_exercise IN :ids ;",
       nativeQuery = true)
   List<RawGrant> rawByExerciseIds(@Param("ids") List<String> ids);
+
+  @Query(
+      value =
+          "SELECT users_groups.user_id, grants.grant_name, grants.grant_id "
+              + "FROM grants "
+              + "LEFT JOIN groups ON grants.grant_group = groups.group_id "
+              + "LEFT JOIN users_groups ON groups.group_id = grants.grant_group "
+              + "WHERE (grants.grant_exercise = :resourceId "
+              + "OR grants.grant_scenario = :resourceId)"
+              + "AND users_groups.user_id = :userId;",
+      nativeQuery = true)
+  List<RawGrant> rawByResourceIdAndUserId(
+      @Param("resourceId") String resourceId, @Param("userId") String userId);
 }

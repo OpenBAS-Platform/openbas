@@ -37,6 +37,7 @@ const useRetrieveOptions = () => {
         break;
       case 'payload_attack_patterns':
       case 'base_attack_patterns_side':
+      case 'inject_attack_patterns':
         searchAttackPatternsByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
