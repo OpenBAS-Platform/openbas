@@ -1,4 +1,4 @@
-import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
+import { ReportProblemOutlined, RouteOutlined, StyleOutlined } from '@mui/icons-material';
 import { LockPattern } from 'mdi-material-ui';
 import { type FunctionComponent, memo } from 'react';
 
@@ -20,6 +20,11 @@ const TaxonomiesMenuComponent: FunctionComponent = () => {
       path: '/admin/settings/taxonomies/kill_chain_phases',
       icon: () => (<RouteOutlined />),
       label: 'Kill chain phases',
+    },
+    {
+      path: '/admin/settings/taxonomies/cves',
+      icon: () => (<ReportProblemOutlined />),
+      label: 'CVEs',
     },
   ];
 

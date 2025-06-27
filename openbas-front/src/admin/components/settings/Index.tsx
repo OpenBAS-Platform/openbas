@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router';
 import { errorWrapper } from '../../../components/Error';
 import NotFound from '../../../components/NotFound';
 import AttackPatterns from './attack_patterns/AttackPatterns';
+import Cves from './cves/Cves';
 import XlsMappers from './data_ingestion/XlsMappers';
 import Groups from './groups/Groups';
 import KillChainPhases from './kill_chain_phases/KillChainPhases';
@@ -24,6 +25,7 @@ const Index = () => (
     <Route path="taxonomies/tags" element={errorWrapper(Tags)()} />
     <Route path="taxonomies/attack_patterns" element={errorWrapper(AttackPatterns)()} />
     <Route path="taxonomies/kill_chain_phases" element={errorWrapper(KillChainPhases)()} />
+    <Route path="taxonomies/cves" element={errorWrapper(Cves)()} />
     <Route path="data_ingestion" element={<Navigate to="xls_mappers" replace={true} />} />
     <Route path="data_ingestion/xls_mappers" element={errorWrapper(XlsMappers)()} />
     <Route path="asset_rules" element={errorWrapper(TagRules)()} />
