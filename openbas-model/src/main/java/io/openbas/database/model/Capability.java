@@ -20,8 +20,6 @@ public enum Capability {
   LAUNCH_ATOMIC_TESTING(pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH)),
 
   // Teams & Players
-  ACCESS_TEAMS_AND_PLAYERS(
-      pair(ResourceType.TEAM, Action.READ), pair(ResourceType.PLAYER, Action.READ)),
   MANAGE_TEAMS_AND_PLAYERS(
       pair(ResourceType.TEAM, Action.WRITE), pair(ResourceType.PLAYER, Action.WRITE)),
   DELETE_TEAMS_AND_PLAYERS(
