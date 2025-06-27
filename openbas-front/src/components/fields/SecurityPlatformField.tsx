@@ -43,6 +43,7 @@ const securityPlatformsToOptions = (securityPlatforms: SecurityPlatform[], filte
       label: n.asset_name,
       logo_dark: n.security_platform_logo_dark,
       logo_light: n.security_platform_logo_light,
+      type: n.security_platform_type,
     }));
 };
 
@@ -77,12 +78,10 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
       <MuiAutocomplete
         value={selectedValue}
         size="small"
-        multiple={false}
         selectOnFocus
         autoHighlight
-        clearOnBlur={false}
-        clearOnEscape={false}
         options={securityPlatformsOptions}
+        getOptionLabel={option => option ? `${option.label} (${option.type})` : ''}
         disabled={editing}
         onChange={(_, value) => {
           fieldOnChange(value?.id ?? '');
@@ -101,7 +100,13 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
                   }}
                 />
               </div>
-              <div className={classes.text}>{option.label}</div>
+              <div className={classes.text}>
+                {option.label}
+                {' '}
+                (
+                {option.type}
+                )
+              </div>
             </Box>
           );
         }}
