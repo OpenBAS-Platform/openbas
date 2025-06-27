@@ -49,7 +49,8 @@ public class InjectorContractContentUtils {
    * @param injectorContract InjectorContract object containing the converted content
    * @return ObjectNode containing the dynamic fields for inject
    */
-  public ObjectNode getDynamicInjectorContractFieldsForInject(InjectorContract injectorContract) {
+  public static ObjectNode getDynamicInjectorContractFieldsForInject(
+      InjectorContract injectorContract) {
     ObjectNode convertedContent = injectorContract.getConvertedContent();
 
     if (convertedContent.has("fields") && convertedContent.get("fields").isArray()) {
