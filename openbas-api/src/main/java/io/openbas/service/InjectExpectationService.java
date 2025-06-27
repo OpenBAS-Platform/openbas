@@ -407,7 +407,10 @@ public class InjectExpectationService {
             injectExpectation,
             collector.getId(),
             COLLECTOR,
-            collector.getName(),
+            collector.getName()
+                + " ("
+                + collector.getSecurityPlatform().getSecurityPlatformType()
+                + ")",
             input.getResult(),
             input.getIsSuccess(),
             input.getMetadata());
