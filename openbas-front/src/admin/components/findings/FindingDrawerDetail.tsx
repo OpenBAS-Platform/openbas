@@ -3,7 +3,6 @@ import type { Page } from '../../../components/common/queryable/Page';
 import type { Header } from '../../../components/common/SortHeadersList';
 import type { FindingOutput, SearchPaginationInput } from '../../../utils/api-types';
 import FindingDetail from './FindingDetail';
-import FindingDrawerTitle from './FindingDrawerTitle';
 
 interface Props {
   selectedFinding: FindingOutput | null;
@@ -35,9 +34,9 @@ const FindingDrawerDetail = ({
         setSelectedFinding(null);
         setCvssScore(null);
       }}
-      title={
-        <FindingDrawerTitle finding={selectedFinding} cvssScore={cvssScore} />
-      }
+      title={selectedFinding.finding_value}
+      additionalTitle={cvssScore ? 'CVSS' : undefined}
+      additionalChipLabel={cvssScore?.toFixed(1)}
     >
       <FindingDetail
         selectedFinding={selectedFinding}

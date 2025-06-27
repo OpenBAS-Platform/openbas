@@ -1,9 +1,11 @@
 import { Close } from '@mui/icons-material';
-import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
+import { Chip, Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { computeBannerSettings } from '../../public/components/systembanners/utils';
+import { getSeverityAndColor } from '../../utils/Colors';
 import useAuth from '../../utils/hooks/useAuth';
 
 const useStyles = makeStyles()(theme => ({
@@ -46,7 +48,9 @@ const useStyles = makeStyles()(theme => ({
 interface DrawerProps {
   open: boolean;
   handleClose: () => void;
-  title: React.ReactNode;
+  title: string;
+  additionalTitle?: string;
+  additionalChipLabel?: string;
   children:
     (() => ReactElement)
     | ReactElement
@@ -61,12 +65,15 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   open = false,
   handleClose,
   title,
+  additionalTitle,
+  additionalChipLabel,
   children,
   variant = 'half',
   PaperProps = undefined,
   disableEnforceFocus = false,
   containerStyle = {},
 }) => {
+  const theme = useTheme();
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
 
@@ -79,6 +86,9 @@ const Drawer: FunctionComponent<DrawerProps> = ({
       component = cloneElement(children as ReactElement);
     }
   }
+
+  const { color } = getSeverityAndColor(additionalChipLabel);
+
   return (
     <DrawerMUI
       open={open}
@@ -99,7 +109,40 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         >
           <Close fontSize="small" color="primary" />
         </IconButton>
-        <Typography variant="subtitle2" sx={{ width: '100%' }}>{title}</Typography>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
+        >
+          <Typography variant="subtitle2">
+            {title}
+          </Typography>
+          {(additionalTitle || additionalChipLabel) && (
+            <div style={{
+              display: 'flex',
+              float: 'right',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 10,
+              paddingRight: theme.spacing(2),
+            }}
+            >
+              {additionalTitle && (<Typography variant="subtitle1">{additionalTitle}</Typography>)}
+              {additionalChipLabel && (
+                <Chip
+                  label={additionalChipLabel}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    borderColor: color,
+                    color: color,
+                  }}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <div style={{
         padding: '10px 20px 20px 20px',

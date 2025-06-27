@@ -21,7 +21,6 @@ import { type CveSimple, type SearchPaginationInput } from '../../../../utils/ap
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
 import CveDetail from './CveDetail';
-import CveDrawerTitle from './CveDrawerTitle';
 import CvePopover from './CvePopover';
 
 const useStyles = makeStyles()({
@@ -167,9 +166,9 @@ const Cves = () => {
           <Drawer
             open
             handleClose={() => setSelectedCve(null)}
-            title={
-              selectedCve && <CveDrawerTitle cve={selectedCve} />
-            }
+            title={selectedCve.cve_external_id}
+            additionalTitle={selectedCve.cve_cvss ? 'CVSS' : undefined}
+            additionalChipLabel={selectedCve.cve_cvss.toFixed(1)}
           >
             {selectedCve && (
               <CveDetail
