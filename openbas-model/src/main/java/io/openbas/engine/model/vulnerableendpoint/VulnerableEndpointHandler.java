@@ -67,6 +67,13 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
                         .map(
                             status ->
                                 agentHelper.isAgentActiveFromLastSeen(
+                                    /*
+                                      timestamp in database has no timezone but was recorded as UTC
+                                      first convert to a LocalDateTime (which has no timezone) and
+                                      then assign a UTC timezone without changing the numbers.
+                                      The .toInstant() method wasn't suitable as it assumed the numbers
+                                      were of the local timezone and was doing an offset to convert to UTC.
+                                    */
                                     status.toLocalDateTime().toInstant(ZoneOffset.UTC)))
                         .toList());
               }
