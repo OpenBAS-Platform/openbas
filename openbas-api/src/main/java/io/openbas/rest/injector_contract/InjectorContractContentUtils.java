@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injector_contract.outputs.InjectorContractContentOutputElement;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -48,8 +49,7 @@ public class InjectorContractContentUtils {
    * @param injectorContract InjectorContract object containing the converted content
    * @return ObjectNode containing the dynamic fields for inject
    */
-  public static ObjectNode getDynamicInjectorContractFieldsForInject(
-      InjectorContract injectorContract) {
+  public ObjectNode getDynamicInjectorContractFieldsForInject(InjectorContract injectorContract) {
     ObjectNode convertedContent = injectorContract.getConvertedContent();
 
     if (convertedContent.has("fields") && convertedContent.get("fields").isArray()) {
@@ -61,7 +61,24 @@ public class InjectorContractContentUtils {
         String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
         if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
-          injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
+          JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
+          if (defaultValueNode != null
+              && !defaultValueNode.isNull()
+              && !defaultValueNode.isEmpty()) {
+            JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
+            if (cardinalityValueNode != null
+                && !cardinalityValueNode.isNull()
+                && !cardinalityValueNode.asText().isEmpty()) {
+              String cardinality = cardinalityValueNode.asText();
+              if (cardinality.equals(ContractCardinality.Multiple.name())) {
+                injectContent.set(key, defaultValueNode);
+              } else if (defaultValueNode.has(0)) {
+                injectContent.set(key, defaultValueNode.get(0));
+              }
+            } else {
+              injectContent.set(key, defaultValueNode);
+            }
+          }
         }
       }
 
