@@ -12,7 +12,7 @@ public class V3_98__Add_unique_constraint_name_security_platform extends BaseJav
   public void migrate(Context context) throws Exception {
     try (Statement stmt = context.getConnection().createStatement()) {
 
-      // 1. Extract (name, type)
+      // 1. Extract security platforms uniques by name and type
       stmt.execute(
           """
           CREATE TEMP TABLE temp_security_platform_mapping AS
