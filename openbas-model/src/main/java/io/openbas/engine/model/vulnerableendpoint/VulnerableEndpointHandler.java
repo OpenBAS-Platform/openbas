@@ -9,6 +9,7 @@ import io.openbas.database.repository.VulnerableEndpointRepository;
 import io.openbas.engine.Handler;
 import io.openbas.helper.AgentHelper;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,12 +64,16 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
                 AgentHelper agentHelper = new AgentHelper();
                 esVulnerableEndpoint.setVulnerable_endpoint_agents_active_status(
                     endpoint.getVulnerable_endpoint_agents_last_seen().stream()
-                        .map(status -> agentHelper.isAgentActiveFromLastSeen(status.toInstant()))
+                        .map(
+                            status ->
+                                agentHelper.isAgentActiveFromLastSeen(
+                                    status.toLocalDateTime().toInstant(ZoneOffset.UTC)))
                         .toList());
               }
 
               // update/replace flag
-              if (endpoint.getVulnerable_endpoint_cves().isEmpty()) {
+              if (endpoint.getVulnerable_endpoint_cves() == null
+                  || endpoint.getVulnerable_endpoint_cves().isEmpty()) {
                 esVulnerableEndpoint.setVulnerable_endpoint_action(
                     VulnerableEndpointAction.OK.name());
               } else {
