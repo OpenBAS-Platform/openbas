@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class SpecificationUtils {
 
+  private SpecificationUtils() {}
+
   /**
    * Full Text Search with several properties instead of just one
    *

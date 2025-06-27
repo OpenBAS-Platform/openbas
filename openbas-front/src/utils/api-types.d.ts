@@ -4321,7 +4321,6 @@ export interface RoleInput {
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
     | "LAUNCH_ATOMIC_TESTING"
-    | "ACCESS_TEAMS_AND_PLAYERS"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5109,7 +5108,6 @@ export interface User {
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
     | "LAUNCH_ATOMIC_TESTING"
-    | "ACCESS_TEAMS_AND_PLAYERS"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5288,7 +5286,12 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "horizontal-barchart";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -5296,7 +5299,12 @@ export interface Widget {
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "horizontal-barchart";
 }
 
 export interface WidgetLayout {

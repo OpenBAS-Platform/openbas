@@ -6,6 +6,7 @@ import Loader from '../../../../../components/Loader';
 import { type EsSeries } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
 import DonutChart from './viz/DonutChart';
+import HorizontalBarChart from './viz/HorizontalBarChart';
 import LineChart from './viz/LineChart';
 import SecurityCoverage from './viz/SecurityCoverage';
 import VerticalBarChart from './viz/VerticalBarChart';
@@ -61,6 +62,13 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     case 'vertical-barchart':
       return (
         <VerticalBarChart
+          widgetMode={widget.widget_config.mode}
+          series={seriesData}
+        />
+      );
+    case 'horizontal-barchart':
+      return (
+        <HorizontalBarChart
           widgetMode={widget.widget_config.mode}
           series={seriesData}
         />
