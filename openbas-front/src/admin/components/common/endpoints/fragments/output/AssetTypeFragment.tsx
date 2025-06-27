@@ -1,8 +1,8 @@
 import { Chip, Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointOutput } from '../../../../../../utils/api-types';
-import {useTheme} from "@mui/material/styles";
 
 type Props = { endpoint: EndpointOutput };
 
