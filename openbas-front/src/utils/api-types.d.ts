@@ -2005,6 +2005,11 @@ export interface GroupGrantInput {
   grant_scenario?: string;
 }
 
+export interface GroupUpdateRolesInput {
+  /** List of role ids associated with the group */
+  group_roles?: string[];
+}
+
 export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
