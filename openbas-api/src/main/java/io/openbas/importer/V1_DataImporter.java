@@ -383,12 +383,12 @@ public class V1_DataImporter implements Importer {
   }
 
   private void importDocument(
-          JsonNode importNode,
-          String prefix,
-          Map<String, ImportEntry> docReferences,
-          Exercise savedExercise,
-          Scenario savedScenario,
-          Map<String, Base> baseIds) {
+      JsonNode importNode,
+      String prefix,
+      Map<String, ImportEntry> docReferences,
+      Exercise savedExercise,
+      Scenario savedScenario,
+      Map<String, Base> baseIds) {
 
     if (importNode == null) {
       return;
