@@ -15,7 +15,7 @@ import PlatformIcon from '../../../../../components/PlatformIcon';
 import { LabelColorDict } from '../../../../../components/Theme';
 import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
-import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
+import { type AggregatedFindingOutput, type EndpointOverviewOutput as EndpointType, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
@@ -61,19 +61,19 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
+      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_asset_groups',
       label: 'Asset groups',
       isSortable: false,
-      value: (finding: FindingOutput) => (
+      value: (finding: AggregatedFindingOutput) => (
         <ItemTargets targets={(finding.finding_asset_groups || []).map(group => ({
           target_id: group.asset_group_id,
           target_name: group.asset_group_name,

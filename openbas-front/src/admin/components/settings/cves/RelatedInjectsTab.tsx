@@ -15,7 +15,8 @@ import type { Header } from '../../../../components/common/SortHeadersList';
 import FindingIcon from '../../../../components/FindingIcon';
 import ItemTargets from '../../../../components/ItemTargets';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import type { FilterGroup, FindingOutput, SearchPaginationInput, TargetSimple } from '../../../../utils/api-types';
+import type { FilterGroup, RelatedFindingOutput, SearchPaginationInput, TargetSimple } from '../../../../utils/api-types';
+import ContractOutputElementType from '../../findings/Finding';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -23,23 +24,12 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
-  finding: FindingOutput;
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
+  finding: RelatedFindingOutput;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   contextId?: string;
 }
-
-const contractOutputElementLabels = {
-  text: 'Text',
-  number: 'Number',
-  port: 'Port',
-  portscan: 'Portscan',
-  ipv4: 'IPv4',
-  ipv6: 'IPv6',
-  credentials: 'Credentials',
-  cve: 'CVE',
-};
 
 const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
@@ -54,13 +44,13 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
     ...additionalFilterNames,
   ];
 
-  const [findings, setFindings] = useState<FindingOutput[]>([]);
+  const [findings, setFindings] = useState<RelatedFindingOutput[]>([]);
 
   const baseFilter: FilterGroup = {
     mode: 'and',
     filters: [
       buildFilter('finding_value', [finding.finding_value], 'eq'),
-      buildFilter('finding_type', [contractOutputElementLabels[finding.finding_type]], 'eq'),
+      buildFilter('finding_type', [ContractOutputElementType[finding.finding_type as keyof typeof ContractOutputElementType]], 'eq'),
     ],
   };
 
@@ -78,27 +68,28 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
       setLoading(false);
     });
   };
-
   const headers = [
     {
       field: 'finding_assets',
       label: 'Endpoints',
       isSortable: false,
-      value: (finding: FindingOutput) => (
-        <ItemTargets targets={(finding.finding_assets || []).map(asset => ({
-          target_id: asset.asset_id,
-          target_name: asset.asset_name,
-          target_type: 'ASSETS',
-        })) as TargetSimple[]}
+      value: (finding: RelatedFindingOutput) => (
+        <ItemTargets
+          targets={(finding.finding_assets || []).map(asset => ({
+            target_id: asset.asset_id,
+            target_name: asset.asset_name,
+            target_type: 'ASSETS',
+          })) as TargetSimple[]}
+          variant="reduced-view"
         />
       ),
     },
     ...additionalHeaders,
   ];
 
-  const basis = `${50 / (additionalHeaders.length - 1)}%`;
+  const basis = `${40 / (additionalHeaders.length - 1)}%`;
   const inlineStyles: Record<string, CSSProperties> = ({
-    finding_assets: { width: '20%' },
+    finding_assets: { width: '30%' },
     ...additionalHeaders.reduce((acc, header) => {
       acc[header.field] = { width: basis };
       return acc;
@@ -115,6 +106,7 @@ const RelatedInjectsTab = ({ searchFindings, finding, contextId, additionalHeade
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         contextId={contextId}
+        topPagination
       />
       <List>
         <ListItem

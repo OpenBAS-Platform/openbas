@@ -12,10 +12,9 @@ import useBodyItemsStyles from '../../../components/common/queryable/style/style
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../components/common/SortHeadersList';
 import FindingIcon from '../../../components/FindingIcon';
-import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import { type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
+import { type AggregatedFindingOutput, type RelatedFindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
 import FindingDrawerDetail from './FindingDrawerDetail';
 
 const useStyles = makeStyles()(() => ({
@@ -24,8 +23,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
-  searchDistinctFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
+  searchDistinctFindings: (input: SearchPaginationInput) => Promise<{ data: Page<AggregatedFindingOutput> }>;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   filterLocalStorageKey: string;
@@ -39,7 +38,6 @@ const FindingList = ({ searchFindings, searchDistinctFindings, filterLocalStorag
 
   const availableFilterNames = [
     'finding_type',
-    'finding_tags',
     'finding_created_at',
     'finding_asset_groups',
     'finding_assets',
@@ -48,8 +46,8 @@ const FindingList = ({ searchFindings, searchDistinctFindings, filterLocalStorag
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [cvssScore, setCvssScore] = useState<number | null>(null);
-  const [findings, setFindings] = useState<FindingOutput[]>([]);
-  const [selectedFinding, setSelectedFinding] = useState<FindingOutput | null>(null);
+  const [findings, setFindings] = useState<AggregatedFindingOutput[]>([]);
+  const [selectedFinding, setSelectedFinding] = useState<AggregatedFindingOutput | null>(null);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(filterLocalStorageKey, buildSearchPagination({
     sorts: initSorting('finding_created_at', 'DESC'),
     textSearch: search,
@@ -67,25 +65,19 @@ const FindingList = ({ searchFindings, searchDistinctFindings, filterLocalStorag
       field: 'finding_type',
       label: 'Type',
       isSortable: true,
-      value: (finding: FindingOutput) => finding.finding_type,
+      value: (finding: AggregatedFindingOutput) => finding.finding_type,
     },
     {
       field: 'finding_value',
       label: 'Value',
       isSortable: true,
-      value: (finding: FindingOutput) => <Tooltip title={finding.finding_value}><span>{finding.finding_value}</span></Tooltip>,
-    },
-    {
-      field: 'finding_tags',
-      label: 'Tags',
-      isSortable: false,
-      value: (finding: FindingOutput) => <ItemTags variant="list" tags={finding.finding_tags} />,
+      value: (finding: AggregatedFindingOutput) => <Tooltip title={finding.finding_value}><span>{finding.finding_value}</span></Tooltip>,
     },
     {
       field: 'finding_assets',
       label: 'Endpoints',
       isSortable: false,
-      value: (finding: FindingOutput) => (
+      value: (finding: AggregatedFindingOutput) => (
         <ItemTargets targets={(finding.finding_assets || []).map(asset => ({
           target_id: asset.asset_id,
           target_name: asset.asset_name,

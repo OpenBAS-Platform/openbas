@@ -90,6 +90,38 @@ export interface AgentTarget {
   target_type?: string;
 }
 
+export interface AggregatedFindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve";
+  /** Finding Value */
+  finding_value: string;
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -1889,48 +1921,6 @@ export interface FindingInput {
   finding_value: string;
 }
 
-export interface FindingOutput {
-  /**
-   * Asset groups linked to endpoints
-   * @uniqueItems true
-   */
-  finding_asset_groups?: AssetGroupSimple[];
-  /**
-   * Endpoint linked to finding
-   * @uniqueItems true
-   */
-  finding_assets: EndpointSimple[];
-  /** @format date-time */
-  finding_created_at: string;
-  /** Finding Id */
-  finding_id: string;
-  /** Inject linked to finding */
-  finding_inject: InjectSimple;
-  /** Scenario linked to inject */
-  finding_scenario?: ScenarioSimple;
-  finding_simulation?: ExerciseSimple;
-  /**
-   * Tags that correspond to the output parser tags
-   * @uniqueItems true
-   */
-  finding_tags?: string[];
-  /**
-   * Represents the data type being extracted.
-   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
-   */
-  finding_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials"
-    | "cve";
-  /** Finding Value */
-  finding_value: string;
-}
-
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -3234,6 +3224,25 @@ export interface OutputParserSimple {
   output_parser_type: "REGEX";
 }
 
+export interface PageAggregatedFindingOutput {
+  content?: AggregatedFindingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageAssetGroupOutput {
   content?: AssetGroupOutput[];
   empty?: boolean;
@@ -3331,25 +3340,6 @@ export interface PageEndpointOutput {
 
 export interface PageExerciseSimple {
   content?: ExerciseSimple[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageFindingOutput {
-  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3635,6 +3625,25 @@ export interface PageRawPaginationImportMapper {
 
 export interface PageRawPaginationScenario {
   content?: RawPaginationScenario[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageRelatedFindingOutput {
+  content?: RelatedFindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -4239,6 +4248,43 @@ export interface RegexGroupSimple {
   regex_group_id: string;
   /** Represents the indexes of specific captured groups. */
   regex_group_index_values: string;
+}
+
+export interface RelatedFindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
+  /** Inject linked to finding */
+  finding_inject: InjectSimple;
+  /** Scenario linked to inject */
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve";
+  /** Finding Value */
+  finding_value: string;
 }
 
 export interface RenewTokenInput {

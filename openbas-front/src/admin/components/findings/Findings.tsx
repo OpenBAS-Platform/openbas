@@ -2,7 +2,7 @@ import { searchDistinctFindings, searchFindings } from '../../../actions/finding
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
-import type { FindingOutput } from '../../../utils/api-types';
+import type { AggregatedFindingOutput } from '../../../utils/api-types';
 import FindingContextLink from './FindingContextLink';
 import FindingList from './FindingList';
 
@@ -20,19 +20,19 @@ const Findings = () => {
       field: 'finding_scenario',
       label: 'Scenario',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SCENARIO} />,
+      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={SCENARIO} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
+      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
   ];
   return (

@@ -21,7 +21,7 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(NON_NULL)
-public class FindingOutput {
+public class RelatedFindingOutput {
 
   @Schema(description = "Finding Id")
   @JsonProperty("finding_id")
@@ -43,10 +43,6 @@ public class FindingOutput {
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate;
-
-  @Schema(description = "Tags that correspond to the output parser tags")
-  @JsonProperty("finding_tags")
-  private Set<String> tagIds;
 
   @Schema(description = "Endpoint linked to finding")
   @JsonProperty("finding_assets")

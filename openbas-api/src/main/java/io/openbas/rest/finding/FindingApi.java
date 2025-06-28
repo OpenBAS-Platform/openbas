@@ -3,16 +3,23 @@ package io.openbas.rest.finding;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.Asset;
+import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.Finding;
+import io.openbas.database.model.TypeValueKey;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
+import io.openbas.rest.finding.form.AggregatedFindingOutput;
 import io.openbas.rest.finding.form.FindingInput;
-import io.openbas.rest.finding.form.FindingOutput;
+import io.openbas.rest.finding.form.RelatedFindingOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +42,7 @@ public class FindingApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/search")
-  public Page<FindingOutput> findings(
+  public Page<RelatedFindingOutput> findings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
             (specification, pageable) ->
@@ -43,28 +50,68 @@ public class FindingApi extends RestBehavior {
                     FindingSpecification.forLatestSimulations().and(specification), pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toRelatedFindingOutput);
   }
 
-  @LogExecutionTime
   @PostMapping("/search/distinct")
-  public Page<FindingOutput> searchDistinctFindings(
+  public Page<AggregatedFindingOutput> searchDistinctFindings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
+
+    // Step 1: Get page of unique findings (one per type+value)
+    Page<Finding> page =
+        buildPaginationJPA(
             (specification, pageable) ->
-                this.findingRepository.findAll(
+                findingRepository.findAll(
                     FindingSpecification.distinctTypeValueWithFilter(
                         FindingSpecification.forLatestSimulations().and(specification)),
                     pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toFindingOutput);
+            Finding.class);
+
+    // Step 2: Extract distinct (type, value) keys
+    List<TypeValueKey> typeValueKeys =
+        page.getContent().stream()
+            .map(f -> new TypeValueKey(f.getType(), f.getValue()))
+            .distinct()
+            .toList();
+
+    // Step 3: Batch fetch all findings + assets for these keys
+    List<ContractOutputType> types =
+        typeValueKeys.stream().map(TypeValueKey::getType).distinct().toList();
+
+    List<String> values = typeValueKeys.stream().map(TypeValueKey::getValue).distinct().toList();
+
+    // Step 3: Fetch all findings with assets for those values/types
+    List<Finding> findingsWithAssets =
+        findingRepository.findAllWithAssetsByTypeValueIn(types, values);
+
+    // Step 4: Group assets by (type, value)
+    Map<TypeValueKey, List<Asset>> groupedAssets =
+        findingsWithAssets.stream()
+            .filter(f -> typeValueKeys.contains(new TypeValueKey(f.getType(), f.getValue())))
+            .flatMap(
+                f ->
+                    f.getAssets().stream()
+                        .map(
+                            asset -> Map.entry(new TypeValueKey(f.getType(), f.getValue()), asset)))
+            .collect(
+                Collectors.groupingBy(
+                    Map.Entry::getKey,
+                    Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+    // Step 5: Map page findings + grouped assets to DTO
+    return page.map(
+        finding -> {
+          TypeValueKey key = new TypeValueKey(finding.getType(), finding.getValue());
+          List<Asset> relatedAssets = groupedAssets.getOrDefault(key, List.of());
+          return findingMapper.toAggregatedFindingOutput(finding, relatedAssets);
+        });
   }
 
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
   @PreAuthorize("isObserver()")
-  public Page<FindingOutput> findingsByInject(
+  public Page<RelatedFindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -74,13 +121,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toRelatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search/distinct")
   @PreAuthorize("isObserver()")
-  public Page<FindingOutput> searchDistinctFindingsByInject(
+  public Page<AggregatedFindingOutput> searchDistinctFindingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -91,13 +138,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toAggregatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Page<FindingOutput> findingsBySimulation(
+  public Page<RelatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -107,13 +154,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toRelatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search/distinct")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Page<FindingOutput> searchDistinctFindingsBySimulation(
+  public Page<AggregatedFindingOutput> searchDistinctFindingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -125,13 +172,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toAggregatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Page<FindingOutput> findingsByScenario(
+  public Page<RelatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -143,13 +190,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toRelatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search/distinct")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Page<FindingOutput> searchDistinctFindingsByScenario(
+  public Page<AggregatedFindingOutput> searchDistinctFindingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -162,13 +209,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toAggregatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
   @PreAuthorize("isObserver()")
-  public Page<FindingOutput> findingsByEndpoint(
+  public Page<RelatedFindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -180,13 +227,13 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toRelatedFindingOutput);
   }
 
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search/distinct")
   @PreAuthorize("isObserver()")
-  public Page<FindingOutput> searchDistinctFindingsByEndpoint(
+  public Page<AggregatedFindingOutput> searchDistinctFindingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -199,7 +246,7 @@ public class FindingApi extends RestBehavior {
                     pageable),
             searchPaginationInput,
             Finding.class)
-        .map(findingMapper::toFindingOutput);
+        .map(findingMapper::toAggregatedFindingOutput);
   }
 
   @GetMapping("/{id}")
