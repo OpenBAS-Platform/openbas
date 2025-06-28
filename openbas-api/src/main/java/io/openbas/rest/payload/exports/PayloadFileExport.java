@@ -22,15 +22,16 @@ public class PayloadFileExport extends FileExportBase {
 
   @JsonProperty("payload_tags")
   private List<Tag> getTags() {
-    List<Tag> allTags = new ArrayList<>();
-    allTags.addAll(this.payload.getTags().stream().toList());
-    allTags.addAll(this.payload.getAttachedDocument().orElseThrow().getTags().stream().toList());
+    List<Tag> allTags = new ArrayList<>(this.payload.getTags().stream().toList());
+    if (this.payload.getAttachedDocument().isPresent()) {
+      allTags.addAll(this.payload.getAttachedDocument().orElseThrow().getTags().stream().toList());
+    }
     return allTags;
   }
 
   @JsonProperty("payload_document")
   private Document getDocument() {
-    return this.payload.getAttachedDocument().orElseThrow();
+    return this.payload.getAttachedDocument().orElse(null);
   }
 
   @JsonProperty("payload_attack_patterns")
