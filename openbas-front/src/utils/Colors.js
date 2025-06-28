@@ -1,3 +1,5 @@
+import colorStyles from '../components/Color.js';
+
 export const stringToColour = (str, reversed = false) => {
   if (!str) {
     return '#5d4037';
@@ -60,4 +62,42 @@ export const inlineStylesColors = {
     backgroundColor: 'rgba(96, 125, 139, 0.08)',
     color: '#607d8b',
   },
+};
+
+// compute color for status
+export const computeColorStyle = (status) => {
+  if (status === 'PENDING') {
+    return colorStyles.blueGrey;
+  }
+  if (status === 'SUCCESS') {
+    return colorStyles.green;
+  }
+  if (status === 'PARTIAL') {
+    return colorStyles.orange;
+  }
+  return colorStyles.red;
+};
+
+// CVSS
+export const getSeverityAndColor = (score) => {
+  if (score >= 9.0) return {
+    severity: 'CRITICAL',
+    color: 'red',
+  };
+  if (score >= 7.0) return {
+    severity: 'HIGH',
+    color: 'orangered',
+  };
+  if (score >= 4.0) return {
+    severity: 'MEDIUM',
+    color: 'orange',
+  };
+  if (score > 0.0) return {
+    severity: 'LOW',
+    color: 'green',
+  };
+  return {
+    severity: 'NONE',
+    color: 'gray',
+  };
 };

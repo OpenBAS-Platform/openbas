@@ -1,4 +1,3 @@
-import colorStyles from '../components/Color';
 import { isNotEmptyField } from './utils';
 
 export const truncate = (str, limit) => {
@@ -70,20 +69,6 @@ export const computeLabel = (status) => {
 
 export const capitalize = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-};
-
-// compute color for status
-export const computeColorStyle = (status) => {
-  if (status === 'PENDING') {
-    return colorStyles.blueGrey;
-  }
-  if (status === 'SUCCESS') {
-    return colorStyles.green;
-  }
-  if (status === 'PARTIAL') {
-    return colorStyles.orange;
-  }
-  return colorStyles.red;
 };
 
 export const formatMacAddress = (mac) => {

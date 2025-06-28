@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
-import { searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import { searchDistinctFindingsOnEndpoint, searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
 import LabelChip from '../../../../../components/common/chips/LabelChip';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
@@ -86,6 +86,9 @@ const Endpoint = () => {
 
   const search = (input: SearchPaginationInput) => {
     return searchFindingsOnEndpoint(endpointId, input);
+  };
+  const searchDistinct = (input: SearchPaginationInput) => {
+    return searchDistinctFindingsOnEndpoint(endpointId, input);
   };
 
   return (
@@ -183,6 +186,7 @@ const Endpoint = () => {
       <Paper className="paper" variant="outlined">
         <FindingList
           filterLocalStorageKey="endpoint-findings"
+          searchDistinctFindings={searchDistinct}
           searchFindings={search}
           additionalHeaders={additionalHeaders}
           additionalFilterNames={additionalFilterNames}

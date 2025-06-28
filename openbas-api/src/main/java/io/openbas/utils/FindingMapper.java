@@ -24,10 +24,8 @@ public class FindingMapper {
   public FindingOutput toFindingOutput(Finding finding) {
     return FindingOutput.builder()
         .id(finding.getId())
-        .field(finding.getField())
         .value(finding.getValue())
         .type(finding.getType())
-        .name(finding.getName())
         .endpoints(
             finding.getAssets().stream()
                 .filter(asset -> asset instanceof Endpoint)

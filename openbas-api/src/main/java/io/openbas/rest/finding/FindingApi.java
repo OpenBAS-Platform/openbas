@@ -47,6 +47,21 @@ public class FindingApi extends RestBehavior {
   }
 
   @LogExecutionTime
+  @PostMapping("/search/distinct")
+  public Page<FindingOutput> searchDistinctFindings(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (specification, pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.distinctTypeValueWithFilter(
+                        FindingSpecification.forLatestSimulations().and(specification)),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
   @PreAuthorize("isObserver()")
   public Page<FindingOutput> findingsByInject(
@@ -56,6 +71,23 @@ public class FindingApi extends RestBehavior {
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
                     FindingSpecification.findFindingsForInject(injectId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @LogExecutionTime
+  @PostMapping("/injects/{injectId}/search/distinct")
+  @PreAuthorize("isObserver()")
+  public Page<FindingOutput> searchDistinctFindingsByInject(
+      @PathVariable @NotNull final String injectId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.distinctTypeValueWithFilter(
+                        FindingSpecification.findFindingsForInject(injectId).and(specification)),
                     pageable),
             searchPaginationInput,
             Finding.class)
@@ -79,24 +111,58 @@ public class FindingApi extends RestBehavior {
   }
 
   @LogExecutionTime
+  @PostMapping("/exercises/{simulationId}/search/distinct")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  public Page<FindingOutput> searchDistinctFindingsBySimulation(
+      @PathVariable @NotNull final String simulationId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.distinctTypeValueWithFilter(
+                        FindingSpecification.findFindingsForSimulation(simulationId)
+                            .and(specification)),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<FindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    Page<FindingOutput> page =
-        buildPaginationJPA(
-                (Specification<Finding> specification, Pageable pageable) ->
-                    this.findingRepository.findAll(
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.findFindingsForScenario(scenarioId)
+                        .and(FindingSpecification.forLatestSimulations())
+                        .and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @LogExecutionTime
+  @PostMapping("/scenarios/{scenarioId}/search/distinct")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  public Page<FindingOutput> searchDistinctFindingsByScenario(
+      @PathVariable @NotNull final String scenarioId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.distinctTypeValueWithFilter(
                         FindingSpecification.findFindingsForScenario(scenarioId)
                             .and(FindingSpecification.forLatestSimulations())
-                            .and(specification),
-                        pageable),
-                searchPaginationInput,
-                Finding.class)
-            .map(findingMapper::toFindingOutput);
-
-    return page;
+                            .and(specification)),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
   }
 
   @LogExecutionTime
@@ -111,6 +177,25 @@ public class FindingApi extends RestBehavior {
                     FindingSpecification.findFindingsForEndpoint(endpointId)
                         .and(FindingSpecification.forLatestSimulations())
                         .and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @LogExecutionTime
+  @PostMapping("/endpoints/{endpointId}/search/distinct")
+  @PreAuthorize("isObserver()")
+  public Page<FindingOutput> searchDistinctFindingsByEndpoint(
+      @PathVariable @NotNull final String endpointId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.distinctTypeValueWithFilter(
+                        FindingSpecification.findFindingsForEndpoint(endpointId)
+                            .and(FindingSpecification.forLatestSimulations())
+                            .and(specification)),
                     pageable),
             searchPaginationInput,
             Finding.class)

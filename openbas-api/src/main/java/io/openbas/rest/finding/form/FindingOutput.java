@@ -28,14 +28,9 @@ public class FindingOutput {
   @NotBlank
   private String id;
 
-  @Schema(description = "Finding field that corresponds to the key of the output parser")
-  @JsonProperty("finding_field")
-  @NotBlank
-  private String field;
-
   @Schema(
       description = "Represents the data type being extracted.",
-      example = "text, number, port, portscan, ipv4, ipv6, credentials")
+      example = "text, number, port, portscan, ipv4, ipv6, credentials, cve")
   @JsonProperty("finding_type")
   @NotNull
   private ContractOutputType type;
@@ -45,11 +40,6 @@ public class FindingOutput {
   @NotBlank
   private String value;
 
-  @Schema(description = "Finding Name")
-  @JsonProperty("finding_name")
-  @NotBlank
-  private String name;
-
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate;
@@ -57,6 +47,15 @@ public class FindingOutput {
   @Schema(description = "Tags that correspond to the output parser tags")
   @JsonProperty("finding_tags")
   private Set<String> tagIds;
+
+  @Schema(description = "Endpoint linked to finding")
+  @JsonProperty("finding_assets")
+  @NotNull
+  private Set<EndpointSimple> endpoints;
+
+  @Schema(description = "Asset groups linked to endpoints")
+  @JsonProperty("finding_asset_groups")
+  private Set<AssetGroupSimple> assetGroups;
 
   @Schema(description = "Inject linked to finding")
   @JsonProperty("finding_inject")
@@ -70,13 +69,4 @@ public class FindingOutput {
   @Schema(description = "Scenario linked to inject")
   @JsonProperty("finding_scenario")
   private ScenarioSimple scenario;
-
-  @Schema(description = "Endpoint linked to finding")
-  @JsonProperty("finding_assets")
-  @NotNull
-  private Set<EndpointSimple> endpoints;
-
-  @Schema(description = "Asset groups linked to endpoints")
-  @JsonProperty("finding_asset_groups")
-  private Set<AssetGroupSimple> assetGroups;
 }
