@@ -383,17 +383,25 @@ public class V1_DataImporter implements Importer {
   }
 
   private void importDocument(
-      JsonNode importNode,
-      String prefix,
-      Map<String, ImportEntry> docReferences,
-      Exercise savedExercise,
-      Scenario savedScenario,
-      Map<String, Base> baseIds) {
-    JsonNode nodeDoc = importNode.get(prefix + "document");
-    String target = nodeDoc.get("document_target").textValue();
-    ImportEntry entry = docReferences.get(target);
-    if (entry != null) {
-      handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+          JsonNode importNode,
+          String prefix,
+          Map<String, ImportEntry> docReferences,
+          Exercise savedExercise,
+          Scenario savedScenario,
+          Map<String, Base> baseIds) {
+
+    if (importNode == null) {
+      return;
+    }
+
+    JsonNode nodeDoc = importNode.path(prefix + "document");
+    String target = nodeDoc.path("document_target").textValue();
+
+    if (target != null) {
+      ImportEntry entry = docReferences.get(target);
+      if (entry != null) {
+        handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+      }
     }
   }
 
