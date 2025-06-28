@@ -2,6 +2,9 @@
 kind: pipeline
 name: openbas-tests
 
+node:
+  env: kubernetes
+
 steps:
   - name: Runner information
     image: alpine:3.19
@@ -144,19 +147,19 @@ steps:
       - frontend-tests
       - frontend-e2e-tests
 
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-      username: drone
-      channel: notifications
-    when:
-      status: [ success, failure ]
-    depends_on:
-      - api-tests
-      - frontend-tests
-      - frontend-e2e-tests
+#  - name: slack
+#    image: plugins/slack
+#    settings:
+#      webhook:
+#        from_secret: slack_webhook
+#      username: drone
+#      channel: notifications
+#    when:
+#      status: [ success, failure ]
+#    depends_on:
+#      - api-tests
+#      - frontend-tests
+#      - frontend-e2e-tests
 
 services:
   - name: minio
