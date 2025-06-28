@@ -4,9 +4,11 @@ import { delReferential, postReferential, putReferential, simpleCall, simplePost
 import {
   type Payload,
   type PayloadCreateInput,
+  type PayloadExportRequestInput,
   type PayloadUpdateInput,
   type SearchPaginationInput,
 } from '../../utils/api-types';
+import { MESSAGING$ } from '../../utils/Environment';
 import { payload } from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
@@ -28,6 +30,19 @@ export const updatePayload = (payloadId: Payload['payload_id'], data: PayloadUpd
 export const addPayload = (data: PayloadCreateInput) => (dispatch: Dispatch) => {
   const uri = '/api/payloads';
   return postReferential(payload, uri, data)(dispatch);
+};
+
+export const exportPayloads = (data: PayloadExportRequestInput) => {
+  const uri = '/api/payloads/export';
+  return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
+    MESSAGING$.notifyError('Could not request export of payloads');
+    throw error;
+  });
+};
+
+export const importPayloads = (formData: FormData) => (dispatch: Dispatch) => {
+  const uri = `/api/payloads/import`;
+  return postReferential(null, uri, formData)(dispatch);
 };
 
 export const duplicatePayload = (payloadId: Payload['payload_id']) => (dispatch: Dispatch) => {
