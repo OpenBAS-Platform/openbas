@@ -8,16 +8,25 @@ export interface ResolvedTTPData {
   kill_chain_phase_external_id: string[] | undefined;
 }
 
+const retrieveParent = (attackPattern: AttackPattern, attackPatternMap: Record<string, AttackPattern>) => {
+  if (!attackPattern.attack_pattern_parent) {
+    return attackPattern;
+  } else {
+    const parent = attackPatternMap[attackPattern.attack_pattern_parent];
+    return retrieveParent(parent, attackPatternMap);
+  }
+};
+
 export const resolvedData = (attackPatternMap: Record<string, AttackPattern>, killChainPhaseMap: Record<string, KillChainPhase>, data: EsSeriesData[]) => {
   return data.map((d) => {
     const attackPattern = Object.values(attackPatternMap).find(a => a.attack_pattern_id === d.key);
     if (attackPattern) {
-      const match = attackPattern.attack_pattern_external_id.match(/(T\d{4})/);
+      const parent = retrieveParent(attackPattern, attackPatternMap);
       return {
         key: d.key,
         value: d.value,
         label: d.label,
-        attack_pattern_external_id: match ? match[1] : null,
+        attack_pattern_external_id: parent.attack_pattern_external_id,
         kill_chain_phase_external_id: attackPattern.attack_pattern_kill_chain_phases?.map(phase => killChainPhaseMap[phase].phase_external_id),
       };
     }
