@@ -104,6 +104,7 @@ public class EsService {
     String field = filter.getKey();
     String elasticField = toElasticField(field);
     switch (operator) {
+      case contains:
       case eq:
         List<Query> queryList =
             filter.getValues().stream()
@@ -118,6 +119,7 @@ public class EsService {
           boolQuery.should(queryList).minimumShouldMatch("1");
         }
         break;
+      case not_contains:
       case not_eq:
         List<Query> queryNotList =
             filter.getValues().stream()

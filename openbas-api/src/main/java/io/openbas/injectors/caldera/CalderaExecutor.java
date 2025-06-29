@@ -330,7 +330,7 @@ public class CalderaExecutor extends Injector {
                       agentCaldera.getExe_name().contains("implant")
                           && (now().toEpochMilli()
                                   - Time.toInstant(agentCaldera.getCreated()).toEpochMilli())
-                              < io.openbas.database.model.Agent.ACTIVE_THRESHOLD
+                              < io.openbas.helper.AgentHelper.ACTIVE_THRESHOLD
                           && (agentCaldera.getHost().equalsIgnoreCase(assetEndpoint.getHostname())
                               || agentCaldera
                                   .getHost()
