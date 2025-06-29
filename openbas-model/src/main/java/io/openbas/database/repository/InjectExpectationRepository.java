@@ -257,7 +257,7 @@ public interface InjectExpectationRepository
       ie.agent_id,
       ie.asset_id,
       ie.asset_group_id,
-      string_agg(ap.attack_pattern_id, ',') AS attack_pattern_ids
+      array_agg(ap.attack_pattern_id) AS attack_pattern_ids
     FROM injects_expectations ie
     LEFT JOIN exercises ex ON ex.exercise_id = ie.exercise_id
     LEFT JOIN injects i ON i.inject_id = ie.inject_id
