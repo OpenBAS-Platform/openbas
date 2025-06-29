@@ -402,12 +402,19 @@ public class InjectExpectationService {
             .orElseThrow(ElementNotFoundException::new);
 
     // Update inject expectation at agent level
+    String collectorName = collector.getName();
+
+    String fullName =
+        Optional.ofNullable(collector.getSecurityPlatform())
+            .map(sp -> collectorName + " (" + sp.getSecurityPlatformType() + ")")
+            .orElse(collectorName);
+
     injectExpectation =
         this.computeExpectation(
             injectExpectation,
             collector.getId(),
             COLLECTOR,
-            collector.getName(),
+            fullName,
             input.getResult(),
             input.getIsSuccess(),
             input.getMetadata());
