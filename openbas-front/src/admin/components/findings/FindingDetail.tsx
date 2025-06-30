@@ -5,7 +5,7 @@ import { fetchCveByExternalId } from '../../../actions/cve-actions';
 import type { Page } from '../../../components/common/queryable/Page';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
-import { type CveOutput, type FindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import { type AggregatedFindingOutput, type CveOutput, type RelatedFindingOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import { type CveStatus } from '../settings/cves/CveDetail';
 import CveTabPanel from '../settings/cves/CveTabPanel';
@@ -15,8 +15,8 @@ import RemediationInfoTab from '../settings/cves/RemediationInfoTab';
 import TabLabelWithEE from '../settings/cves/TabLabelWithEE';
 
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
-  selectedFinding: FindingOutput;
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
+  selectedFinding: AggregatedFindingOutput;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   contextId?: string;

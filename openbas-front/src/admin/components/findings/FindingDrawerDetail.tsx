@@ -1,16 +1,16 @@
 import Drawer from '../../../components/common/Drawer';
 import type { Page } from '../../../components/common/queryable/Page';
 import type { Header } from '../../../components/common/SortHeadersList';
-import type { FindingOutput, SearchPaginationInput } from '../../../utils/api-types';
+import type { AggregatedFindingOutput, RelatedFindingOutput, SearchPaginationInput } from '../../../utils/api-types';
 import FindingDetail from './FindingDetail';
 
 interface Props {
-  selectedFinding: FindingOutput | null;
-  setSelectedFinding: (finding: FindingOutput | null) => void;
+  selectedFinding: AggregatedFindingOutput | null;
+  setSelectedFinding: (finding: AggregatedFindingOutput | null) => void;
   setCvssScore: (score: number | null) => void;
   cvssScore: number | null;
   contextId?: string;
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
 }

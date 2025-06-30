@@ -15,7 +15,7 @@ import type { Header } from '../../../../components/common/SortHeadersList';
 import FindingIcon from '../../../../components/FindingIcon';
 import ItemTargets from '../../../../components/ItemTargets';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import type { FilterGroup, RelatedFindingOutput, SearchPaginationInput, TargetSimple } from '../../../../utils/api-types';
+import type { AggregatedFindingOutput, FilterGroup, RelatedFindingOutput, SearchPaginationInput, TargetSimple } from '../../../../utils/api-types';
 import ContractOutputElementType from '../../findings/Finding';
 
 const useStyles = makeStyles()(() => ({
@@ -25,7 +25,7 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
   searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
-  finding: RelatedFindingOutput;
+  finding: AggregatedFindingOutput;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   contextId?: string;
