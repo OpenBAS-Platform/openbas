@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { type EsEndpoint } from '../../../../../../../../../utils/api-types';
 import EndpointListItemFragments from '../../../../../../../common/endpoints/EndpointListItemFragments';
+import AssetEolFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetEolFragment';
 import AssetPlatformFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetPlatformFragment';
 import AssetTagsFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetTagsFragment';
 import EndpointArchFragment from '../../../../../../../common/endpoints/fragments/elastic/EndpointArchFragment';
@@ -35,6 +36,7 @@ const EndpointListElement = (props: Props) => {
       case EndpointListItemFragments.ENDPOINT_PLATFORM: return (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />;
       case EndpointListItemFragments.ENDPOINT_ARCH: return (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />;
       case EndpointListItemFragments.BASE_TAGS_SIDE: return (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />;
+      case EndpointListItemFragments.ENDPOINT_IS_EOL: return (endpoint: EsEndpoint) => <AssetEolFragment endpoint={endpoint} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
         return endpoint[key]?.toString();

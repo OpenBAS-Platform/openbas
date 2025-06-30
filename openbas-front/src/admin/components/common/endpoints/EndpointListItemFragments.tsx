@@ -7,6 +7,7 @@ enum EndpointListItemFragments {
   ENDPOINT_ARCH = 'endpoint_arch',
   ENDPOINT_AGENTS_PRIVILEGE = 'endpoint_agents_privilege',
   ENDPOINT_PLATFORM = 'endpoint_platform',
+  ENDPOINT_IS_EOL = 'endpoint_is_eol',
   ASSET_PLATFORM = 'asset_platform',
 }
 
