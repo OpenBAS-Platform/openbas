@@ -51,7 +51,7 @@ const ListWidgetParameters = (props: Props) => {
           label: d.schema_property_label,
         };
       });
-      setEntityColumns(newCols);
+      setEntityColumns(newCols.toSorted((a, b) => a.label.localeCompare(b.label)));
 
       if (!columns) {
         onColumnSelectionChange(newCols);
