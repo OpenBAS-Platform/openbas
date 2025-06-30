@@ -344,6 +344,7 @@ export interface AttackPatternUpdateInput {
 
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
+  ignore_dependencies?: boolean;
 }
 
 interface BaseHistogramWidget {
