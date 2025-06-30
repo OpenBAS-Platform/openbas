@@ -30,7 +30,8 @@ public class FindingSearchDistinctApi extends RestBehavior {
   public Page<AggregatedFindingOutput> searchDistinctFindingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return findingDistinctSearchService.searchDistinctFindingsByInject(injectId, searchPaginationInput);
+    return findingDistinctSearchService.searchDistinctFindingsByInject(
+        injectId, searchPaginationInput);
   }
 
   @LogExecutionTime
@@ -49,7 +50,8 @@ public class FindingSearchDistinctApi extends RestBehavior {
   public Page<AggregatedFindingOutput> searchDistinctFindingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return findingDistinctSearchService.searchDistinctFindingsByScenario(scenarioId, searchPaginationInput);
+    return findingDistinctSearchService.searchDistinctFindingsByScenario(
+        scenarioId, searchPaginationInput);
   }
 
   @LogExecutionTime
@@ -58,6 +60,7 @@ public class FindingSearchDistinctApi extends RestBehavior {
   public Page<AggregatedFindingOutput> searchDistinctFindingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return findingDistinctSearchService.searchDistinctFindingsByEndpoint(endpointId, searchPaginationInput);
+    return findingDistinctSearchService.searchDistinctFindingsByEndpoint(
+        endpointId, searchPaginationInput);
   }
 }

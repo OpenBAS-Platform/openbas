@@ -14,8 +14,6 @@ public class V3_98__Cves_Default_data extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
 
-    //Add index type value findings
-
     try (PreparedStatement insertCve =
             connection.prepareStatement(
                 "INSERT INTO cves (cve_id, cve_external_id, cve_source_identifier, cve_published, "
