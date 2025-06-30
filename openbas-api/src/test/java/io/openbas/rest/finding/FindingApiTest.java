@@ -21,7 +21,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
-import io.openbas.rest.finding.form.AggregatedFindingOutput;
+import io.openbas.rest.finding.form.RelatedFindingOutput;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -217,14 +217,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -286,14 +286,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -340,14 +340,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -381,15 +381,15 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         ex.getInjects().stream()
                             .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
-                .sorted(Comparator.comparing(AggregatedFindingOutput::getCreationDate))
+                .map(findingMapper::toRelatedFindingOutput)
+                .sorted(Comparator.comparing(RelatedFindingOutput::getCreationDate))
                 .limit(input.getSize())
                 .toList();
 
@@ -422,12 +422,12 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         inject.getFindings().stream().map(Finding::getId).toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -496,14 +496,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -560,14 +560,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -636,14 +636,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<AggregatedFindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toAggregatedFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 

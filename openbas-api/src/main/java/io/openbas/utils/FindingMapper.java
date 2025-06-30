@@ -38,15 +38,6 @@ public class FindingMapper {
         .build();
   }
 
-  public AggregatedFindingOutput toAggregatedFindingOutput(Finding finding) {
-    return AggregatedFindingOutput.builder()
-        .id(finding.getId())
-        .value(finding.getValue())
-        .type(finding.getType())
-        .creationDate(finding.getCreationDate())
-        .build();
-  }
-
   public RelatedFindingOutput toRelatedFindingOutput(Finding finding) {
     return RelatedFindingOutput.builder()
         .id(finding.getId())
