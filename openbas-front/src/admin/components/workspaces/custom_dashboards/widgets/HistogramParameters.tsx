@@ -8,8 +8,8 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO } from '../../../../../utils/api-types';
 import { type Widget } from '../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../utils/Option';
+import getEntityPropertiesListOptions from './EntityPropertiesListOptions';
 import {
-  getAvailableFields,
   getAvailableModes,
   getBaseEntities,
   type WidgetInputWithoutLayout,
@@ -63,29 +63,10 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
 
   useEffect(() => {
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
-      const newOptions: GroupOption[] = response.data
-        .filter(d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
-        .reduce<GroupOption[]>((acc, d) => {
-          let group = 'Specific properties';
-          if (d.schema_property_name.includes('_side')) {
-            group = 'Relationship properties';
-          } else if (d.schema_property_name.includes('base_')) {
-            group = 'Common properties';
-          }
-          acc.push({
-            id: d.schema_property_name,
-            label: d.schema_property_label,
-            group,
-          });
-          return acc;
-        }, [])
-        .sort((a, b) => {
-          if (a.group < b.group) return -1;
-          if (a.group > b.group) return 1;
-          return a.label.localeCompare(b.label);
-        });
-      const availableFields = getAvailableFields(widgetType);
-      const finalOptions = !availableFields ? newOptions : newOptions.filter(o => availableFields.includes(o.id));
+      const finalOptions = getEntityPropertiesListOptions(
+        response.data,
+        widgetType,
+        d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant');
       setFieldOptions(finalOptions);
       if (finalOptions.length === 1) {
         setValue('widget_config.field', finalOptions[0].id); // If only one option is available, hide the field and set it automatically

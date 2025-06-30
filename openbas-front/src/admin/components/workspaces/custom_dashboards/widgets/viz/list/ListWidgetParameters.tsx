@@ -1,4 +1,4 @@
-import { MenuItem, TextField } from '@mui/material';
+import { Autocomplete, MenuItem, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
 
@@ -6,6 +6,8 @@ import { engineSchemas } from '../../../../../../../actions/schema/schema-action
 import { useFormatter } from '../../../../../../../components/i18n';
 import type { PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import type { Widget } from '../../../../../../../utils/api-types-custom';
+import { type GroupOption } from '../../../../../../../utils/Option';
+import getEntityPropertiesListOptions from '../../EntityPropertiesListOptions';
 import { getBaseEntities, type WidgetInputWithoutLayout } from '../../WidgetUtils';
 import WidgetColumnsCustomizationInput from './WidgetColumnsCustomizationInput';
 
@@ -17,6 +19,7 @@ type Props = {
 
 const ListWidgetParameters = (props: Props) => {
   const { t } = useFormatter();
+  const [propertySelection, setPropertySelection] = useState<GroupOption[]>([]);
   const [entityColumns, setEntityColumns] = useState<{
     attribute: string;
     label: string;
@@ -45,10 +48,14 @@ const ListWidgetParameters = (props: Props) => {
   // get the entity schema for column names
   useEffect(() => {
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
-      const newCols = response.data.map((d) => {
+      const finalOptions = getEntityPropertiesListOptions(
+        response.data,
+        props.widgetType);
+      setPropertySelection(finalOptions);
+      const newCols = finalOptions.map((d) => {
         return {
-          attribute: d.schema_property_name,
-          label: d.schema_property_label,
+          attribute: d.id,
+          label: d.label,
         };
       });
       setEntityColumns(newCols.toSorted((a, b) => a.label.localeCompare(b.label)));
@@ -76,21 +83,27 @@ const ListWidgetParameters = (props: Props) => {
         control={props.control}
         name="widget_config.sorts.0.fieldName"
         render={({ field, fieldState }) => (
-          <TextField
-            {...field}
-            select
-            variant="standard"
-            fullWidth
-            label={t('Sort field')}
-            sx={{ mt: 2 }}
-            value={field.value ?? ''}
-            error={!!fieldState.error}
-            helperText={fieldState.error?.message}
-            onChange={e => field.onChange(e.target.value)}
-            required={true}
-          >
-            {entityColumns.map(col => <MenuItem key={col.attribute} value={col.attribute}>{t(col.label)}</MenuItem>)}
-          </TextField>
+          <Autocomplete
+            options={propertySelection}
+            groupBy={option => option.group}
+            value={propertySelection.find(o => o.id === field.value) ?? null}
+            onChange={(_, value) => field.onChange(value?.id)}
+            getOptionLabel={option => option.label ?? ''}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label={t('Sort field')}
+                variant="standard"
+                fullWidth
+                sx={{ mt: 2 }}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                required={true}
+              />
+            )}
+            freeSolo={false}
+          />
         )}
       />
       <Controller
