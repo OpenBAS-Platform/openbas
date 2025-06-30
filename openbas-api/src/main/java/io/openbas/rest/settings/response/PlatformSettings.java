@@ -10,10 +10,12 @@ import io.openbas.rest.settings.form.ThemeInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -121,10 +123,10 @@ public class PlatformSettings {
   @Schema(
       description = "Type of AI (mistralai or openai)",
       externalDocs =
-          @ExternalDocumentation(
-              description = "How to configure AI service",
-              url =
-                  "https://docs.openbas.io/latest/deployment/configuration/?h=ai+type#ai-service"))
+      @ExternalDocumentation(
+          description = "How to configure AI service",
+          url =
+              "https://docs.openbas.io/latest/deployment/configuration/?h=ai+type#ai-service"))
   private String aiType;
 
   @JsonProperty("platform_ai_model")
@@ -192,6 +194,11 @@ public class PlatformSettings {
   @JsonProperty("expectation_prevention_expiration_time")
   @Schema(description = "Time to wait before prevention time has expired")
   private long preventionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_vulnerability_expiration_time")
+  @Schema(description = "Time to wait before vulnerability time has expired")
+  private long vulnerabilityExpirationTime;
 
   @NotNull
   @JsonProperty("expectation_challenge_expiration_time")

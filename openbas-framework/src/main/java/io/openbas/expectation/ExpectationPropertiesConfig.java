@@ -25,6 +25,9 @@ public class ExpectationPropertiesConfig {
   @Value("${openbas.expectation.prevention.expiration-time:#{null}}")
   private Long preventionExpirationTime;
 
+  @Value("${openbas.expectation.vulnerability.expiration-time:#{null}}")
+  private Long vulnerabilityExpirationTime;
+
   @Value("${openbas.expectation.human.expiration-time:#{null}}")
   private Long humanExpirationTime;
 
@@ -40,6 +43,7 @@ public class ExpectationPropertiesConfig {
   @Value("${openbas.expectation.manual.default-score-value:#{null}}")
   private Integer defaultManualExpectationScore;
 
+
   public long getDetectionExpirationTime() {
     return ofNullable(this.detectionExpirationTime)
         .orElse(
@@ -49,6 +53,13 @@ public class ExpectationPropertiesConfig {
 
   public long getPreventionExpirationTime() {
     return ofNullable(this.preventionExpirationTime)
+        .orElse(
+            ofNullable(this.technicalExpirationTime)
+                .orElse(DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME));
+  }
+
+  public long getVulnerabilityExpirationTime() {
+    return ofNullable(this.vulnerabilityExpirationTime)
         .orElse(
             ofNullable(this.technicalExpirationTime)
                 .orElse(DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME));
@@ -82,4 +93,5 @@ public class ExpectationPropertiesConfig {
     }
     return defaultManualExpectationScore;
   }
+
 }

@@ -88,6 +88,12 @@ export interface AgentTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface AggregatedFindingOutput {
@@ -295,6 +301,12 @@ export interface AssetGroupTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Full contract */
@@ -425,6 +437,12 @@ interface BaseInjectTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 type BaseInjectTargetTargetTypeMapping<Key, Type> = {
@@ -1468,6 +1486,12 @@ export interface EndpointTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface EngineSortField {
@@ -2011,7 +2035,7 @@ export interface ExercisesGlobalScoresOutput {
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
-  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
+  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION" | "VULNERABILITY";
 }
 
 export interface ExpectationUpdateInput {
@@ -2468,7 +2492,8 @@ export interface InjectExpectation {
     | "CHALLENGE"
     | "MANUAL"
     | "PREVENTION"
-    | "DETECTION";
+    | "DETECTION"
+    | "VULNERABILITY";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: string;
@@ -4216,6 +4241,11 @@ export interface PlatformSettings {
    * @format int64
    */
   expectation_prevention_expiration_time: number;
+  /**
+   * Time to wait before vulnerability time has expired
+   * @format int64
+   */
+  expectation_vulnerability_expiration_time: number;
   /** Current version of Java */
   java_version?: string;
   /** URL of the server containing the map tile with dark theme */
@@ -4348,6 +4378,12 @@ export interface PlayerTarget {
   /** @uniqueItems true */
   target_teams?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Policies of the platform */
@@ -5270,6 +5306,12 @@ export interface TeamTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface TeamUpdateInput {

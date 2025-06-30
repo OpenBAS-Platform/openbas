@@ -46,9 +46,12 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface Props { expectationExpectedScore: number }
+interface Props {
+  expectationExpectedScore: number;
+  expectationType: string;
+}
 
-const ScaleBar: FunctionComponent<Props> = ({ expectationExpectedScore }) => {
+const ScaleBar: FunctionComponent<Props> = ({ expectationExpectedScore, expectationType }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
@@ -57,7 +60,7 @@ const ScaleBar: FunctionComponent<Props> = ({ expectationExpectedScore }) => {
     min: {
       value: 0,
       backgroundColor: theme.palette.error.main!,
-      label: t('Failure'),
+      label: expectationType === 'VULNERABILITY' ? t('Vulnerable') : t('Failure'),
     },
     max: {
       value: 100,
@@ -68,7 +71,7 @@ const ScaleBar: FunctionComponent<Props> = ({ expectationExpectedScore }) => {
       {
         value: expectationExpectedScore,
         backgroundColor: theme.palette.success.main!,
-        label: t('Success'),
+        label: expectationType === 'VULNERABILITY' ? t('Not vulnerable') : t('Success'),
       },
     ],
   };

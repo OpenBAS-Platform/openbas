@@ -9,8 +9,10 @@ import io.openbas.service.targets.search.specifications.SearchSpecificationUtils
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+
 import java.util.List;
 import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final AgentRepository agentRepository;
   private final InjectExpectationService injectExpectationService;
   private final SearchSpecificationUtils<Agent> specificationUtils;
@@ -116,6 +119,7 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
       switch (result.type()) {
         case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
         case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
+        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
         case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
       }
     }

@@ -33,8 +33,10 @@ import io.openbas.rest.payload.PayloadUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -45,7 +47,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PayloadService {
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   private final PayloadRepository payloadRepository;
   private final InjectorRepository injectorRepository;
@@ -188,7 +191,8 @@ public class PayloadService {
     return expectationsField(
         List.of(
             this.expectationBuilderService.buildPreventionExpectation(),
-            this.expectationBuilderService.buildDetectionExpectation()));
+            this.expectationBuilderService.buildDetectionExpectation(),
+            this.expectationBuilderService.buildVulnerabilityExpectation()));
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {

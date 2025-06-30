@@ -28,9 +28,11 @@ import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.rest.stream.ai.AiConfig;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,10 +64,14 @@ public class PlatformSettingsService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource private OpenBASConfig openBASConfig;
-  @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
-  @Resource private RabbitmqConfig rabbitmqConfig;
-  @Autowired private LicenseCacheManager licenseCacheManager;
+  @Resource
+  private OpenBASConfig openBASConfig;
+  @Resource
+  private ExpectationPropertiesConfig expectationPropertiesConfig;
+  @Resource
+  private RabbitmqConfig rabbitmqConfig;
+  @Autowired
+  private LicenseCacheManager licenseCacheManager;
 
   @Autowired
   public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
@@ -302,6 +308,8 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDetectionExpirationTime());
     platformSettings.setPreventionExpirationTime(
         expectationPropertiesConfig.getPreventionExpirationTime());
+    platformSettings.setVulnerabilityExpirationTime(
+        expectationPropertiesConfig.getVulnerabilityExpirationTime());
     platformSettings.setChallengeExpirationTime(
         expectationPropertiesConfig.getChallengeExpirationTime());
     platformSettings.setArticleExpirationTime(

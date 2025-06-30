@@ -10,13 +10,16 @@ import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+
 import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService;
   private final InjectExpectationService injectExpectationService;
   private final AssetGroupService assetGroupService;
@@ -77,6 +80,7 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
       switch (result.type()) {
         case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
         case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
+        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
         case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
       }
     }

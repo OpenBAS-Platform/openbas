@@ -1,4 +1,4 @@
-import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { ReportProblemOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
@@ -52,6 +52,14 @@ const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
       <Tooltip key={2} title={t('Human Response')}>
         <SensorOccupiedOutlined style={{
           color: getColor(target.target_human_response_status),
+          marginRight: theme.spacing(2),
+          fontSize: 22,
+        }}
+        />
+      </Tooltip>
+      <Tooltip key={2} title={t('Vulnerability')}>
+        <ReportProblemOutlined style={{
+          color: getColor(target.target_vulnerability_status),
           marginRight: theme.spacing(2),
           fontSize: 22,
         }}

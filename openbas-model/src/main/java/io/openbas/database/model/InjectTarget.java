@@ -6,27 +6,30 @@ import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.Set;
+
 import lombok.Data;
 
 @Data
 @Schema(
     discriminatorProperty = "target_type",
     oneOf = {
-      AssetGroupTarget.class,
-      TeamTarget.class,
-      EndpointTarget.class,
-      AgentTarget.class,
-      PlayerTarget.class
+        AssetGroupTarget.class,
+        TeamTarget.class,
+        EndpointTarget.class,
+        AgentTarget.class,
+        PlayerTarget.class
     },
     discriminatorMapping = {
-      @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
-      @DiscriminatorMapping(value = "ASSETS", schema = EndpointTarget.class),
-      @DiscriminatorMapping(value = "TEAMS", schema = TeamTarget.class),
-      @DiscriminatorMapping(value = "PLAYERS", schema = PlayerTarget.class),
-      @DiscriminatorMapping(value = "AGENT", schema = AgentTarget.class),
+        @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
+        @DiscriminatorMapping(value = "ASSETS", schema = EndpointTarget.class),
+        @DiscriminatorMapping(value = "TEAMS", schema = TeamTarget.class),
+        @DiscriminatorMapping(value = "PLAYERS", schema = PlayerTarget.class),
+        @DiscriminatorMapping(value = "AGENT", schema = AgentTarget.class),
     })
 public abstract class InjectTarget {
+
   @Id
   @NotBlank
   @JsonProperty("target_id")
@@ -49,6 +52,10 @@ public abstract class InjectTarget {
 
   @JsonProperty("target_prevention_status")
   private InjectExpectation.EXPECTATION_STATUS targetPreventionStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+
+  @JsonProperty("target_vulnerability_status")
+  private InjectExpectation.EXPECTATION_STATUS targetVulnerabilityStatus =
       InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 
   @JsonProperty("target_human_response_status")

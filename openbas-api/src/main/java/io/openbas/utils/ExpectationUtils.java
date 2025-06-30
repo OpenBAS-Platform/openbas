@@ -8,6 +8,8 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAgent;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
+import static io.openbas.model.expectation.VulnerabilityExpectation.vulnerabilityExpectationForAgent;
+import static io.openbas.model.expectation.VulnerabilityExpectation.vulnerabilityExpectationForAsset;
 import static io.openbas.utils.AgentUtils.getActiveAgents;
 
 import io.openbas.database.model.*;
@@ -15,8 +17,10 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.model.expectation.VulnerabilityExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.AssetToExecute;
+
 import java.time.Instant;
 import java.util.*;
 
@@ -28,7 +32,8 @@ public class ExpectationUtils {
   public static final List<EXPECTATION_TYPE> HUMAN_EXPECTATION =
       List.of(MANUAL, CHALLENGE, ARTICLE);
 
-  private ExpectationUtils() {}
+  private ExpectationUtils() {
+  }
 
   public static List<InjectExpectation> processByValidationType(
       boolean isaNewExpectationResult,
@@ -483,6 +488,66 @@ public class ExpectationUtils {
     return returnList;
   }
 
+  public static List<VulnerabilityExpectation> getVulnerabilityExpectations(
+      AssetToExecute assetToExecute,
+      Inject inject,
+      io.openbas.model.inject.form.Expectation expectation) {
+    List<VulnerabilityExpectation> vulnerabilityExpectationList = new ArrayList<>();
+    List<VulnerabilityExpectation> returnList = new ArrayList<>();
+
+    if (assetToExecute.isDirectlyLinkedToInject()) {
+      VulnerabilityExpectation vulnerabilityExpectation =
+          vulnerabilityExpectationForAsset(
+              expectation.getScore(),
+              expectation.getName(),
+              expectation.getDescription(),
+              assetToExecute.asset(),
+              null,
+              expectation.getExpirationTime());
+
+      // We propagate the assetToExecute expectation to agents
+      vulnerabilityExpectationList.addAll(
+          getVulnerabilityExpectationList(assetToExecute.asset(), null, inject, vulnerabilityExpectation));
+
+      // If any expectation for agent is created then we create also expectation
+      // for asset
+      if (!vulnerabilityExpectationList.isEmpty()) {
+        returnList.add(vulnerabilityExpectation);
+        returnList.addAll(vulnerabilityExpectationList);
+      }
+    }
+
+    assetToExecute
+        .assetGroups()
+        .forEach(
+            (assetGroup) -> {
+              List<VulnerabilityExpectation> finalVulnerabilityExpectationList = new ArrayList<>();
+
+              VulnerabilityExpectation vulnerabilityExpectation =
+                  vulnerabilityExpectationForAsset(
+                      expectation.getScore(),
+                      expectation.getName(),
+                      expectation.getDescription(),
+                      assetToExecute.asset(),
+                      assetGroup,
+                      expectation.getExpirationTime());
+
+              // We propagate the assetToExecute expectation to agents
+              finalVulnerabilityExpectationList.addAll(
+                  getVulnerabilityExpectationList(
+                      assetToExecute.asset(), assetGroup, inject, vulnerabilityExpectation));
+
+              // If any expectation for agent is created then we create also expectation
+              // for asset
+              if (!finalVulnerabilityExpectationList.isEmpty()) {
+                returnList.add(vulnerabilityExpectation);
+                returnList.addAll(finalVulnerabilityExpectationList);
+              }
+            });
+
+    return returnList;
+  }
+
   public static List<ManualExpectation> getManualExpectations(
       AssetToExecute assetToExecute,
       Inject inject,
@@ -579,6 +644,26 @@ public class ExpectationUtils {
                     asset,
                     assetGroup,
                     detectionExpectation.getExpirationTime(),
+                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
+        .toList();
+  }
+
+  public static List<VulnerabilityExpectation> getVulnerabilityExpectationList(
+      Asset asset,
+      AssetGroup assetGroup,
+      Inject inject,
+      VulnerabilityExpectation vulnerabilityExpectation) {
+    return getActiveAgents(asset, inject).stream()
+        .map(
+            agent ->
+                vulnerabilityExpectationForAgent(
+                    vulnerabilityExpectation.getScore(),
+                    vulnerabilityExpectation.getName(),
+                    vulnerabilityExpectation.getDescription(),
+                    agent,
+                    asset,
+                    assetGroup,
+                    vulnerabilityExpectation.getExpirationTime(),
                     computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
         .toList();
   }

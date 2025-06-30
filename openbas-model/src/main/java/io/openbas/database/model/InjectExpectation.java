@@ -13,10 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -36,6 +38,7 @@ public class InjectExpectation implements Base {
     MANUAL,
     PREVENTION,
     DETECTION,
+    VULNERABILITY
   }
 
   public enum EXPECTATION_STATUS {
@@ -102,7 +105,9 @@ public class InjectExpectation implements Base {
   @NotNull
   private Double expectedScore;
 
-  /** Expiration time in seconds */
+  /**
+   * Expiration time in seconds
+   */
   @Setter
   @Column(name = "inject_expiration_time")
   @JsonProperty("inject_expiration_time")
@@ -244,6 +249,16 @@ public class InjectExpectation implements Base {
       @NotNull final Asset asset,
       @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.DETECTION;
+    this.agent = agent;
+    this.asset = asset;
+    this.assetGroup = assetGroup;
+  }
+
+  public void setVulnerability(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
+    this.type = EXPECTATION_TYPE.VULNERABILITY;
     this.agent = agent;
     this.asset = asset;
     this.assetGroup = assetGroup;
