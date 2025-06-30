@@ -19,14 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ElasticSyncExecutionJob implements Job {
 
-  private EsService esService;
-  private EsEngine esEngine;
-
-  @Autowired
-  public void setEsService(EsService esService, EsEngine esEngine) {
-    this.esService = esService;
-    this.esEngine = esEngine;
-  }
+  private final EsService esService;
+  private final EsEngine esEngine;
 
   @Override
   @Transactional(rollbackFor = Exception.class)
