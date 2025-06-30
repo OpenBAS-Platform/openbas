@@ -1,8 +1,10 @@
 package io.openbas.database.specification;
 
+import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Finding;
 import jakarta.persistence.criteria.*;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -78,5 +80,25 @@ public class FindingSpecification {
 
       return root.get("id").in(subquery);
     };
+  }
+
+  public static Specification<Finding> withAssets() {
+    return (root, query, cb) -> {
+      root.fetch("assets", JoinType.LEFT);
+      query.distinct(true);
+      return null;
+    };
+  }
+
+  public static Specification<Finding> findAllWithAssetsByTypeValueIn(
+      List<ContractOutputType> types, List<String> values, Specification<Finding> specification) {
+    return Specification.where(specification)
+        .and(withAssets())
+        .and(
+            (root, query, cb) -> {
+              Predicate typeIn = root.get("type").in(types);
+              Predicate valueIn = root.get("value").in(values);
+              return cb.and(typeIn, valueIn);
+            });
   }
 }

@@ -45,14 +45,4 @@ public interface FindingRepository
               + ";",
       nativeQuery = true)
   List<RawFinding> findForIndexing(@Param("from") Instant from);
-
-  @Query(
-      """
-        SELECT DISTINCT f FROM Finding f
-        JOIN FETCH f.assets a
-        WHERE f.type IN :types
-          AND f.value IN :values
-      """)
-  List<Finding> findAllWithAssetsByTypeValueIn(
-      @Param("types") List<ContractOutputType> types, @Param("values") List<String> values);
 }
