@@ -1,5 +1,4 @@
 import { List as MuiList, ListItem as MuiListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { type ReactNode, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { initSorting } from '../../../../../../../components/common/queryable/Page';
@@ -12,6 +11,7 @@ import { type ListConfiguration, type Widget } from '../../../../../../../utils/
 import buildStyles from './elements/ColumnStyles';
 import DefaultElementStyles from './elements/default/DefaultElementStyles';
 import DefaultListElement from './elements/default/DefaultListElement';
+import EndpointElementSecondaryAction from './elements/endpoint/EndpointElementSecondaryAction';
 import EndpointElementStyles from './elements/endpoint/EndpointElementStyles';
 import EndpointListElement from './elements/endpoint/EndpointListElement';
 
@@ -27,8 +27,6 @@ type Props = {
 
 const List = (props: Props) => {
   const { classes } = useStyles();
-
-  const [listItemSecondaryAction, setListItemSecondaryAction] = useState<ReactNode>();
 
   // FIXME: we will always use ListConfiguration in this component
   const config = (): ListConfiguration => {
@@ -61,8 +59,15 @@ const List = (props: Props) => {
 
   const getTypedUiElement = (element: EsBase, columns: string[]) => {
     switch (element.base_entity) {
-      case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} secondaryAction={setListItemSecondaryAction} />);
-      default: return (<DefaultListElement columns={columns} element={element} secondaryAction={setListItemSecondaryAction} />);
+      case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} />);
+      default: return (<DefaultListElement columns={columns} element={element} />);
+    }
+  };
+
+  const getTypedSecondaryAction = (element: EsBase) => {
+    switch (element.base_entity) {
+      case 'endpoint': return (<EndpointElementSecondaryAction element={element as EsEndpoint} />);
+      default: return (<>&nbsp;</>);
     }
   };
 
@@ -92,7 +97,7 @@ const List = (props: Props) => {
         />
       </MuiListItem>
       {props.elements.map(e =>
-        <MuiListItem key={e.base_id} divider disablePadding secondaryAction={listItemSecondaryAction}>{getTypedUiElement(e, columns(props.config))}</MuiListItem>,
+        <MuiListItem key={e.base_id} divider disablePadding secondaryAction={getTypedSecondaryAction(e)}>{getTypedUiElement(e, columns(props.config))}</MuiListItem>,
       )}
     </MuiList>
   );
