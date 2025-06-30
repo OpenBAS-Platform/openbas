@@ -37,7 +37,7 @@ const EndpointListElement = (props: Props) => {
       case EndpointListItemFragments.BASE_TAGS_SIDE: return (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
-        return endpoint[key];
+        return endpoint[key]?.toString();
       };
     }
   };

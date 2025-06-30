@@ -25,7 +25,7 @@ const DefaultListElement = (props: Props) => {
     switch (column) {
       default: return (element: EsBase) => {
         const key = column as keyof typeof element;
-        return element[key];
+        return element[key]?.toString();
       };
     }
   };
