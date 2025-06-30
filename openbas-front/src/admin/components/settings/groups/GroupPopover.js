@@ -357,7 +357,10 @@ class GroupPopover extends Component {
                               || grantPlannerId !== null
                               || grantLauncherId !== null
                             }
-                            disabled={grantPlannerId !== null}
+                            disabled={
+                              grantLauncherId !== null
+                              || grantPlannerId !== null
+                            }
                             onChange={this.handleGrantScenarioCheck.bind(
                               this,
                               scenario.scenario_id,
@@ -376,6 +379,8 @@ class GroupPopover extends Component {
                               grantLauncherId !== null
                               || grantPlannerId !== null
                             }
+
+                            disabled={grantLauncherId !== null}
                             onChange={this.handleGrantScenarioCheck.bind(
                               this,
                               scenario.scenario_id,
@@ -464,7 +469,10 @@ class GroupPopover extends Component {
                               || grantPlannerId !== null
                               || grantLauncherId !== null
                             }
-                            disabled={grantPlannerId !== null}
+                            disabled={
+                              grantLauncherId !== null
+                              || grantPlannerId !== null
+                            }
                             onChange={this.handleGrantExerciseCheck.bind(
                               this,
                               exercise.exercise_id,
@@ -483,6 +491,7 @@ class GroupPopover extends Component {
                               grantLauncherId !== null
                               || grantPlannerId !== null
                             }
+                            disabled={grantLauncherId !== null}
                             onChange={this.handleGrantExerciseCheck.bind(
                               this,
                               exercise.exercise_id,
