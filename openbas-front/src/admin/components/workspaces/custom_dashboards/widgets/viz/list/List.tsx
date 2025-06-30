@@ -45,10 +45,15 @@ const List = (props: Props) => {
     });
   };
 
-  const stylesFromEntityType = (entityType: string) => {
+  const stylesFromEntityType = (elements: EsBase[]) => {
+    const defaultStyles = buildStyles(config().columns, DefaultElementStyles);
+    if (elements === undefined || elements.length === 0) {
+      return defaultStyles;
+    }
+    const entityType = elements[0].base_entity;
     switch (entityType) {
       case 'endpoint': return buildStyles(config().columns, EndpointElementStyles);
-      default: return buildStyles(config().columns, DefaultElementStyles);
+      default: return defaultStyles;
     }
   };
 
@@ -80,7 +85,7 @@ const List = (props: Props) => {
           primary={(
             <SortHeadersComponentV2
               headers={headersFromColumns(columns(props.config))}
-              inlineStylesHeaders={stylesFromEntityType(props.elements[0].base_entity)}
+              inlineStylesHeaders={stylesFromEntityType(props.elements)}
               sortHelpers={queryableHelpers.sortHelpers}
             />
           )}

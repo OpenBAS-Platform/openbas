@@ -1,6 +1,6 @@
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { Close, DragIndicatorOutlined } from '@mui/icons-material';
-import { AccordionDetails, Box, Button, Checkbox, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
+import { AccordionDetails, Box, Button, Checkbox, IconButton, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect } from 'react';
 
@@ -143,9 +143,9 @@ const WidgetColumnsCustomizationInput: FunctionComponent<WidgetConfigColumnsCust
                               height: 42,
                             }}
                             secondaryAction={(
-                                <IconButton onClick={() => handleToggleColumn(column.attribute)}>
-                                  <Close />
-                                </IconButton>
+                              <IconButton onClick={() => handleToggleColumn(column.attribute)}>
+                                <Close />
+                              </IconButton>
                             )}
                           >
                             <ListItemIcon {...providedDrag.dragHandleProps}>

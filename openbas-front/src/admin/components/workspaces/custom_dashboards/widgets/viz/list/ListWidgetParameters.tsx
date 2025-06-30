@@ -25,7 +25,18 @@ const ListWidgetParameters = (props: Props) => {
     control: props.control,
     name: 'widget_config.series',
   });
+  const columns = useWatch({
+    control: props.control,
+    name: 'widget_config.columns',
+  });
   const entities = series.map(v => getBaseEntities(v.filter)).flat();
+
+  const onColumnSelectionChange = (new_cols: {
+    attribute: string;
+    label: string;
+  }[]) => {
+    props.setValue('widget_config.columns', new_cols.map(c => c.attribute));
+  };
 
   useEffect(() => {
     props.setValue('widget_config.widget_configuration_type', 'list');
@@ -34,21 +45,19 @@ const ListWidgetParameters = (props: Props) => {
   // get the entity schema for column names
   useEffect(() => {
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
-      setEntityColumns(response.data.map((d) => {
+      const newCols = response.data.map((d) => {
         return {
           attribute: d.schema_property_name,
           label: d.schema_property_label,
         };
-      }));
+      });
+      setEntityColumns(newCols);
+
+      if (!columns) {
+        onColumnSelectionChange(newCols);
+      }
     });
   }, [series]);
-
-  const onChange = (new_cols: {
-    attribute: string;
-    label: string;
-  }[]) => {
-    props.setValue('widget_config.columns', new_cols.map(c => c.attribute));
-  };
 
   return (
     <>
@@ -113,7 +122,7 @@ const ListWidgetParameters = (props: Props) => {
             availableColumns={entityColumns}
             defaultColumns={entityColumns}
             value={field.value?.map(v => entityColumns.find(ev => ev.attribute === v) ?? null).filter(v => v !== null) ?? entityColumns}
-            onChange={onChange}
+            onChange={onColumnSelectionChange}
           />
         )}
       />
