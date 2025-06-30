@@ -82,7 +82,7 @@ public class ImportService {
         String entryType = entry.getComment();
         String entryName = entry.getName();
         ByteArrayOutputStream encryptedAttachmentsBuffer = null;
-        if( entry.isDirectory() ) {
+        if (entry.isDirectory()) {
           continue;
         }
         // Handle direct import of payloads
