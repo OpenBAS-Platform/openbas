@@ -81,6 +81,25 @@ public class ImportService {
         ZipEntry entry = entries.nextElement();
         String entryType = entry.getComment();
         String entryName = entry.getName();
+        ByteArrayOutputStream encryptedAttachmentsBuffer = null;
+        if( entry.isDirectory() ) {
+          continue;
+        }
+        // Handle direct import of payloads
+        if (entryName.contains("payload.json")) {
+          try (InputStream dataStream = parentZip.getInputStream(entry)) {
+            ByteArrayOutputStream jsonBuffer = new ByteArrayOutputStream();
+            IOUtils.copy(dataStream, jsonBuffer);
+            dataImports.add(new ByteArrayInputStream(jsonBuffer.toByteArray()));
+            entryType = "DIRECT_IMPORT";
+          }
+        } else if (entryName.contains("attachments.zip")) {
+          try (InputStream dataStream = parentZip.getInputStream(entry)) {
+            encryptedAttachmentsBuffer = new ByteArrayOutputStream();
+            IOUtils.copy(dataStream, encryptedAttachmentsBuffer);
+            entryType = "DIRECT_IMPORT";
+          }
+        }
 
         if (entryType == null) {
           throw new UnsupportedMediaTypeException(
@@ -93,7 +112,6 @@ public class ImportService {
             try (ZipInputStream payloadZipInputStream =
                 new ZipInputStream(new ByteArrayInputStream(payloadZipBytes))) {
               ZipEntry payloadEntry;
-              ByteArrayOutputStream encryptedAttachmentsBuffer = null;
               while ((payloadEntry = payloadZipInputStream.getNextEntry()) != null) {
                 String payloadEntryName = payloadEntry.getName();
                 if ("payload.json".equals(payloadEntryName)) {
@@ -105,33 +123,6 @@ public class ImportService {
                   IOUtils.copy(payloadZipInputStream, encryptedAttachmentsBuffer);
                 }
                 payloadZipInputStream.closeEntry();
-              }
-
-              // If encrypted attachments exist, extract with zip4j
-              if (encryptedAttachmentsBuffer != null) {
-                File tempEncryptedAttachmentFile = createTempFile("encrypted-attachment", ".zip");
-                try {
-                  FileUtils.writeByteArrayToFile(
-                      tempEncryptedAttachmentFile, encryptedAttachmentsBuffer.toByteArray());
-                  try (net.lingala.zip4j.ZipFile encryptedZip =
-                      new net.lingala.zip4j.ZipFile(
-                          tempEncryptedAttachmentFile, ZIP_PASSWORD.toCharArray())) {
-                    encryptedZip.setRunInThread(false);
-                    for (net.lingala.zip4j.model.FileHeader encHeader :
-                        encryptedZip.getFileHeaders()) {
-                      try (InputStream fileInZip = encryptedZip.getInputStream(encHeader)) {
-                        String filename = encHeader.getFileName();
-                        byte[] fileBytes = IOUtils.toByteArray(fileInZip);
-                        ZipEntry fakeEntry = new ZipEntry(filename);
-                        docReferences.put(
-                            filename,
-                            new ImportEntry(fakeEntry, new ByteArrayInputStream(fileBytes)));
-                      }
-                    }
-                  }
-                } finally {
-                  tempEncryptedAttachmentFile.delete();
-                }
               }
             }
           }
@@ -149,6 +140,31 @@ public class ImportService {
             ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream();
             IOUtils.copy(dataStream, dataBuffer);
             dataImports.add(new ByteArrayInputStream(dataBuffer.toByteArray()));
+          }
+        }
+
+        // If encrypted attachments exist, extract with zip4j
+        if (encryptedAttachmentsBuffer != null) {
+          File tempEncryptedAttachmentFile = createTempFile("encrypted-attachment", ".zip");
+          try {
+            FileUtils.writeByteArrayToFile(
+                tempEncryptedAttachmentFile, encryptedAttachmentsBuffer.toByteArray());
+            try (net.lingala.zip4j.ZipFile encryptedZip =
+                new net.lingala.zip4j.ZipFile(
+                    tempEncryptedAttachmentFile, ZIP_PASSWORD.toCharArray())) {
+              encryptedZip.setRunInThread(false);
+              for (net.lingala.zip4j.model.FileHeader encHeader : encryptedZip.getFileHeaders()) {
+                try (InputStream fileInZip = encryptedZip.getInputStream(encHeader)) {
+                  String filename = encHeader.getFileName();
+                  byte[] fileBytes = IOUtils.toByteArray(fileInZip);
+                  ZipEntry fakeEntry = new ZipEntry(filename);
+                  docReferences.put(
+                      filename, new ImportEntry(fakeEntry, new ByteArrayInputStream(fileBytes)));
+                }
+              }
+            }
+          } finally {
+            tempEncryptedAttachmentFile.delete();
           }
         }
       }
