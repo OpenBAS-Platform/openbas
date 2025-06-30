@@ -81,7 +81,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     case 'horizontal-barchart':
       return (
         <HorizontalBarChart
-          widgetMode={widget.widget_config.mode}
+          widgetConfig={widget.widget_config}
           series={seriesData}
         />
       );
