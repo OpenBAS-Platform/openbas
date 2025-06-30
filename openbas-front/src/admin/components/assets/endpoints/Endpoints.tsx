@@ -24,6 +24,7 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
+import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import useAuth from '../../../../utils/hooks/useAuth';
@@ -225,7 +226,7 @@ const Endpoints = () => {
                   >
                     <ListItemButton
                       component={Link}
-                      to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+                      to={`${ENDPOINT_BASE_URL}/${endpoint.asset_id}`}
                       classes={{ root: classes.item }}
                     >
                       <ListItemIcon>

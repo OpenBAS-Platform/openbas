@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
+import { ENDPOINT_BASE_URL } from '../../../../../../../../../constants/BaseUrls';
 import { type EsEndpoint } from '../../../../../../../../../utils/api-types';
 import EndpointListItemFragments from '../../../../../../../common/endpoints/EndpointListItemFragments';
 import AssetEolFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetEolFragment';
@@ -27,7 +28,7 @@ const EndpointListElement = (props: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
-  const endpointUrl = `/admin/assets/endpoints/${props.element.base_id}`;
+  const endpointUrl = `${ENDPOINT_BASE_URL}/${props.element.base_id}`;
 
   /* eslint-disable react/display-name */
   // eslint doesn't seem to be able to infer the display names of subcomponents but react can
