@@ -12,9 +12,14 @@ const RemediationInfoTab = ({ cve }: Props) => {
 
   return (
     <div style={{ padding: theme.spacing(2, 1, 0, 0) }}>
-      <Typography variant="body2" gutterBottom>
-        {cve?.cve_remediation ?? t('There is no information yet on a vulnerability remediation for this CVE.')}
+      <Typography variant="subtitle2" gutterBottom>
+        {t('Vulnerability Remediation')}
       </Typography>
+      <pre>
+        <Typography variant="body2" gutterBottom>
+          {cve?.cve_remediation ?? t('There is no information yet on a vulnerability remediation for this CVE.')}
+        </Typography>
+      </pre>
     </div>
   );
 };
