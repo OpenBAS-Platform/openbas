@@ -31,30 +31,28 @@ const DefaultListElement = (props: Props) => {
   };
 
   return (
-    <>
-      <ListItemButton classes={{ root: classes.item }} inert={true}>
-        <ListItemIcon>
-          <Description color="primary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={(
-            <div style={bodyItemsStyles.bodyItems}>
-              {props.columns.map(col => (
-                <div
-                  key={col}
-                  style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...buildStyles(props.columns, DefaultElementStyles)[col],
-                  }}
-                >
-                  {elementsFromColumn(col)(props.element)}
-                </div>
-              ))}
-            </div>
-          )}
-        />
-      </ListItemButton>
-    </>
+    <ListItemButton classes={{ root: classes.item }} inert={true}>
+      <ListItemIcon>
+        <Description color="primary" />
+      </ListItemIcon>
+      <ListItemText
+        primary={(
+          <div style={bodyItemsStyles.bodyItems}>
+            {props.columns.map(col => (
+              <div
+                key={col}
+                style={{
+                  ...bodyItemsStyles.bodyItem,
+                  ...buildStyles(props.columns, DefaultElementStyles)[col],
+                }}
+              >
+                {elementsFromColumn(col)(props.element)}
+              </div>
+            ))}
+          </div>
+        )}
+      />
+    </ListItemButton>
   );
 };
 
