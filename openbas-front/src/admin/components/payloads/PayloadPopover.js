@@ -4,12 +4,18 @@ import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/payloads/payload-actions';
+import {
+  deletePayload,
+  duplicatePayload,
+  exportPayloads,
+  updatePayload,
+} from '../../../actions/payloads/payload-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import { documentOptions } from '../../../utils/Option';
+import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
@@ -66,12 +72,12 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     });
   };
 
+  // Duplicate
   const handleOpenDuplicate = () => {
     setOpenDuplicate(true);
     handlePopoverClose();
   };
   const handleCloseDuplicate = () => setOpenDuplicate(false);
-
   const submitDuplicate = () => {
     return dispatch(duplicatePayload(payload.payload_id)).then((result) => {
       if (onDuplicate) {
@@ -81,6 +87,22 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       handleCloseDuplicate();
     });
   };
+
+  const handleExportJsonSingle = () => {
+    handlePopoverClose();
+    const exportData = {
+      payloads: [
+        { payload_id: payload.payload_id },
+      ],
+    };
+    exportPayloads(exportData).then((result) => {
+      const contentDisposition = result.headers['content-disposition'];
+      const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      const filename = match[1];
+      download(result.data, filename, result.headers['content-type']);
+    });
+  };
+
   const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
   const initialValues = R.pipe(
     R.pick([
@@ -115,6 +137,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       >
         <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
         <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
+        <MenuItem onClick={handleExportJsonSingle}>{t('Export')}</MenuItem>
         <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <DialogDelete

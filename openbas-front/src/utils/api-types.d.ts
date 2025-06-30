@@ -344,6 +344,7 @@ export interface AttackPatternUpdateInput {
 
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
+  ignore_dependencies?: boolean;
 }
 
 interface BaseEsBase {
@@ -2182,6 +2183,11 @@ export interface GroupGrantInput {
   grant_scenario?: string;
 }
 
+export interface GroupUpdateRolesInput {
+  /** List of role ids associated with the group */
+  group_roles?: string[];
+}
+
 export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
@@ -4007,6 +4013,14 @@ export type PayloadCreateInput = BasePayloadCreateInput &
     | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
   );
 
+export interface PayloadExportRequestInput {
+  payloads?: PayloadExportTarget[];
+}
+
+export interface PayloadExportTarget {
+  payload_id?: string;
+}
+
 export interface PayloadPrerequisite {
   check_command?: string;
   description?: string | null;
@@ -4512,7 +4526,44 @@ export interface ResultDistribution {
 
 export interface RoleInput {
   /** @uniqueItems true */
-  role_capabilities?: string[];
+  role_capabilities?: (
+    | "BYPASS"
+    | "ACCESS_ATOMIC_TESTING"
+    | "MANAGE_ATOMIC_TESTING"
+    | "DELETE_ATOMIC_TESTING"
+    | "LAUNCH_ATOMIC_TESTING"
+    | "MANAGE_TEAMS_AND_PLAYERS"
+    | "DELETE_TEAMS_AND_PLAYERS"
+    | "ACCESS_ASSETS"
+    | "MANAGE_ASSETS"
+    | "DELETE_ASSETS"
+    | "ACCESS_PAYLOADS"
+    | "MANAGE_PAYLOADS"
+    | "DELETE_PAYLOADS"
+    | "ACCESS_DASHBOARDS"
+    | "MANAGE_DASHBOARDS"
+    | "DELETE_DASHBOARDS"
+    | "ACCESS_FINDINGS"
+    | "MANAGE_FINDINGS"
+    | "DELETE_FINDINGS"
+    | "ACCESS_DOCUMENTS"
+    | "MANAGE_DOCUMENTS"
+    | "DELETE_DOCUMENTS"
+    | "ACCESS_CHANNELS"
+    | "MANAGE_CHANNELS"
+    | "DELETE_CHANNELS"
+    | "ACCESS_CHALLENGES"
+    | "MANAGE_CHALLENGES"
+    | "DELETE_CHALLENGES"
+    | "ACCESS_LESSONS_LEARNED"
+    | "MANAGE_LESSONS_LEARNED"
+    | "DELETE_LESSONS_LEARNED"
+    | "ACCESS_SECURITY_PLATFORMS"
+    | "MANAGE_SECURITY_PLATFORMS"
+    | "DELETE_SECURITY_PLATFORMS"
+    | "ACCESS_PLATFORM_SETTINGS"
+    | "MANAGE_PLATFORM_SETTINGS"
+  )[];
   role_name: string;
 }
 
@@ -5272,7 +5323,6 @@ export interface User {
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
     | "LAUNCH_ATOMIC_TESTING"
-    | "ACCESS_TEAMS_AND_PLAYERS"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5456,6 +5506,7 @@ export interface Widget {
   widget_layout: WidgetLayout;
   widget_type:
     | "vertical-barchart"
+    | "horizontal-barchart"
     | "security-coverage"
     | "line"
     | "donut"
@@ -5488,6 +5539,7 @@ export interface WidgetInput {
   widget_layout: WidgetLayout;
   widget_type:
     | "vertical-barchart"
+    | "horizontal-barchart"
     | "security-coverage"
     | "line"
     | "donut"

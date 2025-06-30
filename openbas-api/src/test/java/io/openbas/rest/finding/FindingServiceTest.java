@@ -7,11 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.Finding;
 import io.openbas.database.model.Inject;
+import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.FindingRepository;
+import io.openbas.database.repository.TeamRepository;
+import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.inject.service.InjectService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -22,22 +27,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class FindingUtilsTest {
+class FindingServiceTest extends IntegrationTest {
 
   public static final String ASSET_1 = "asset1";
   public static final String ASSET_2 = "asset2";
 
+  @Mock private InjectService injectService;
   @Mock private FindingRepository findingRepository;
-
-  private FindingUtils findingUtils;
+  @Mock private AssetRepository assetRepository;
+  @Mock private TeamRepository teamRepository;
+  @Mock private UserRepository userRepository;
+  @InjectMocks private FindingService findingService;
 
   @BeforeEach
-  void setup() {
-    findingUtils = new FindingUtils(findingRepository);
+  void setUp() {
+    findingService =
+        new FindingService(
+            injectService, findingRepository, assetRepository, teamRepository, userRepository);
   }
 
   @Test
@@ -62,7 +73,7 @@ class FindingUtilsTest {
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
+    findingService.buildFinding(inject, asset2, contractOutputElement, value);
 
     ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
     verify(findingRepository).save(findingCaptor.capture());
@@ -95,7 +106,7 @@ class FindingUtilsTest {
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
+    findingService.buildFinding(inject, asset1, contractOutputElement, value);
 
     verify(findingRepository, never()).save(any());
   }

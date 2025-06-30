@@ -91,6 +91,33 @@ public class PermissionServiceTest {
         permissionService.hasPermission(user, RESOURCE_ID, ResourceType.CHANNEL, Action.WRITE));
   }
 
+  @Test
+  public void test_hasPermission_read_player_WHEN_has_no_capa() {
+    User user = getUser(USER_ID, false);
+    assertTrue(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.PLAYER, Action.READ));
+  }
+
+  @Test
+  public void test_hasPermission_read_team_WHEN_has_no_capa() {
+    User user = getUser(USER_ID, false);
+    assertTrue(permissionService.hasPermission(user, RESOURCE_ID, ResourceType.TEAM, Action.READ));
+  }
+
+  @Test
+  public void test_hasPermission_write_player_WHEN_has_no_capa() {
+    User user = getUser(USER_ID, false);
+    assertFalse(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.PLAYER, Action.WRITE));
+  }
+
+  @Test
+  public void test_hasPermission_write_team_WHEN_has_no_capa() {
+    User user = getUser(USER_ID, false);
+    assertFalse(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.TEAM, Action.WRITE));
+  }
+
   private User getUser(final String id, final boolean isAdmin) {
     User user = UserFixture.getUser();
     user.setAdmin(isAdmin);
