@@ -186,7 +186,8 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                       display="flex"
                       flexDirection="column"
                       minHeight={0}
-                      padding={theme.spacing(0, 2)}
+                      padding={theme.spacing(3, 2)}
+                      overflow="auto"
                     >
                       <WidgetViz
                         widget={widget}
