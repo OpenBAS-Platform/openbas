@@ -3,10 +3,10 @@ import { type FunctionComponent } from 'react';
 import ContextLink from '../../../components/ContextLink';
 import { ATOMIC_BASE_URL, SCENARIO_BASE_URL, SIMULATION_BASE_URL } from '../../../constants/BaseUrls';
 import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
-import { type AggregatedFindingOutput } from '../../../utils/api-types';
+import { type RelatedFindingOutput } from '../../../utils/api-types';
 
 interface Props {
-  finding: AggregatedFindingOutput;
+  finding: RelatedFindingOutput;
   type: string;
 }
 

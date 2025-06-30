@@ -2,7 +2,7 @@ import { useParams } from 'react-router';
 
 import { searchDistinctFindingsForScenarios, searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
 import { SIMULATION } from '../../../../../constants/Entities';
-import type { AggregatedFindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { RelatedFindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 
@@ -26,7 +26,7 @@ const ScenarioFindings = () => {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: AggregatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
   ];
 

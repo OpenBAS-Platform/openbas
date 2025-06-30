@@ -22,7 +22,7 @@ const CveTabPanel = ({ status, cve, children }: CveTabPanelProps) => {
     case 'notAvailable':
       return (
         <Box padding={theme.spacing(2, 1, 0, 0)}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="body2" gutterBottom>
             {t('There is no information about this CVE yet.')}
           </Typography>
         </Box>
