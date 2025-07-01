@@ -1,4 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -60,7 +61,9 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
           ...style,
         }}
       >
-        <div className={classes.headerItemText}>{t(header.label)}</div>
+        <Tooltip title={t(header.label)}>
+          <div className={classes.headerItemText}>{t(header.label)}</div>
+        </Tooltip>
       </div>
     );
   };

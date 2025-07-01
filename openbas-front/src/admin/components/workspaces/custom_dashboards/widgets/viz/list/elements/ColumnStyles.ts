@@ -22,7 +22,14 @@ const buildStyles = (all_columns: string[], staticStyles: Record<string, CSSProp
     defaultStyle = divided < minComputedWidthPercent ? { width: `${minComputedWidthPercent}%` } : { width: `${divided}%` };
   }
 
-  return new Proxy(staticStyles, { get: (target: Record<string, CSSProperties>, name: string) => name in target ? target[name] : defaultStyle });
+  return new Proxy(staticStyles, {
+    get: (target: Record<string, CSSProperties>, name: string) => name in target
+      ? {
+          ...target[name],
+          ...defaultStyle,
+        }
+      : defaultStyle,
+  });
 };
 
 export default buildStyles;
