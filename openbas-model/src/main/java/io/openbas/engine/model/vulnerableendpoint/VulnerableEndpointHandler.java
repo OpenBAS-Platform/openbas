@@ -103,7 +103,9 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
                       .toList();
               HashMap<String, List<Finding>> byCategory = new HashMap<>();
               for (Finding finding : findings) {
-                byCategory.computeIfAbsent(finding.getType().name(), s -> new ArrayList<>()).add(finding);
+                byCategory
+                    .computeIfAbsent(finding.getType().name(), s -> new ArrayList<>())
+                    .add(finding);
               }
               List<String> summaryItems =
                   byCategory.keySet().stream()
