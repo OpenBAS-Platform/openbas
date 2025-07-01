@@ -21,7 +21,7 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "array_agg(ag.agent_id) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_ids, "
               + "array_agg(ag.agent_privilege) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_privs, "
               + "array_agg(ag.agent_last_seen) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_last_seen "
-              + "FROM assets a JOIN agents ag ON a.asset_id = ag.agent_asset "
+              + "FROM assets a LEFT JOIN agents ag ON a.asset_id = ag.agent_asset "
               + "WHERE a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "'"
