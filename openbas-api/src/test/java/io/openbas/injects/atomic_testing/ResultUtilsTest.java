@@ -11,8 +11,10 @@ import io.openbas.database.repository.*;
 import io.openbas.service.AssetGroupService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
+
 import java.util.List;
 import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +24,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ResultUtilsTest {
-  @Mock private InjectExpectationRepository injectExpectationRepository;
-  @Mock private TeamRepository teamRepository;
-  @Mock private UserRepository userRepository;
-  @Mock private AssetRepository assetRepository;
-  @Mock private AgentRepository agentRepository;
-  @Mock private AssetGroupRepository assetGroupRepository;
-  @Mock private AssetGroupService assetGroupService;
+
+  @Mock
+  private InjectExpectationRepository injectExpectationRepository;
+  @Mock
+  private TeamRepository teamRepository;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private AssetRepository assetRepository;
+  @Mock
+  private AgentRepository agentRepository;
+  @Mock
+  private AssetGroupRepository assetGroupRepository;
+  @Mock
+  private AssetGroupService assetGroupService;
 
   private ResultUtils resultUtils;
 
@@ -61,17 +71,23 @@ class ResultUtilsTest {
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.PREVENTION.toString(), 50.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.PREVENTION.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0)));
 
@@ -83,12 +99,16 @@ class ResultUtilsTest {
     ExpectationResultsByType expectedDetectionResult =
         createDefaultExpectationResultsByType(
             DETECTION, InjectExpectation.EXPECTATION_STATUS.SUCCESS, 3, 0, 0, 0);
+    ExpectationResultsByType expectedVulnerabilityResult =
+        createDefaultExpectationResultsByType(
+            VULNERABILITY, InjectExpectation.EXPECTATION_STATUS.SUCCESS, 3, 0, 0, 0);
     ExpectationResultsByType expectedHumanResponseResult =
         createDefaultExpectationResultsByType(
             HUMAN_RESPONSE, InjectExpectation.EXPECTATION_STATUS.FAILED, 0, 0, 0, 3);
 
     assertEquals(
-        List.of(expectedPreventionResult, expectedDetectionResult, expectedHumanResponseResult),
+        List.of(expectedPreventionResult, expectedDetectionResult, expectedVulnerabilityResult,
+            expectedHumanResponseResult),
         result);
   }
 }
