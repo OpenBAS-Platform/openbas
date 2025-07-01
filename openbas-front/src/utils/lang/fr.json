@@ -895,6 +895,8 @@
   "PREREQUISITE_EXECUTION": "Commande d'obtention des prérequis",
   "Page not found": "Page non trouvée",
   "Paper color": "Couleur du papier",
+  "Parameter Name": "Nom du paramètre",
+  "Parameter Type": "Type de paramètre",
   "Parameters": "Configuration",
   "Parent": "Parent",
   "Parent scenario": "Scénario parent",
