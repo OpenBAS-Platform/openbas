@@ -112,7 +112,7 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
                       .map(k -> String.format("%d %s", byCategory.get(k).size(), k))
                       .toList();
               esVulnerableEndpoint.setVulnerable_endpoint_findings_summary(
-                  String.join(",", summaryItems));
+                  String.join(", ", summaryItems));
 
               // Dependencies
               List<String> dependencies = new ArrayList<>();

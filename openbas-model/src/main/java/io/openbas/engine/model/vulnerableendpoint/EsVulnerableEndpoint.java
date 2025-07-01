@@ -67,7 +67,7 @@ public class EsVulnerableEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_action;
 
-  @Queryable(label = "vulnerable endpoint findings summary")
+  @Queryable(label = "vulnerable endpoint findings summary", filterable = true)
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_findings_summary;
 

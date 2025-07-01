@@ -1451,6 +1451,7 @@ export type EsBase = BaseEsBase &
     | BaseEsBaseBaseEntityMapping<"expectation-inject", EsInjectExpectation>
     | BaseEsBaseBaseEntityMapping<"scenario", EsScenario>
     | BaseEsBaseBaseEntityMapping<"tag", EsTag>
+    | BaseEsBaseBaseEntityMapping<"vulnerable-endpoint", EsVulnerableEndpoint>
   );
 
 export interface EsEndpoint {
@@ -1599,6 +1600,34 @@ export interface EsTag {
   /** @format date-time */
   base_updated_at?: string;
   tag_color?: string;
+}
+
+export interface EsVulnerableEndpoint {
+  /** @uniqueItems true */
+  base_agents_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  /** @uniqueItems true */
+  base_findings_side?: string[];
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_simulation_side?: string;
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  vulnerable_endpoint_action?: string;
+  vulnerable_endpoint_agents_active_status?: boolean[];
+  /** @uniqueItems true */
+  vulnerable_endpoint_agents_privileges?: string[];
+  vulnerable_endpoint_architecture?: string;
+  vulnerable_endpoint_findings_summary?: string;
+  vulnerable_endpoint_hostname?: string;
+  vulnerable_endpoint_id?: string;
+  vulnerable_endpoint_platform?: string;
 }
 
 export interface Evaluation {
