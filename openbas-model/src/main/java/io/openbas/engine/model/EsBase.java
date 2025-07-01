@@ -11,6 +11,7 @@ import io.openbas.engine.model.inject.EsInject;
 import io.openbas.engine.model.injectexpectation.EsInjectExpectation;
 import io.openbas.engine.model.scenario.EsScenario;
 import io.openbas.engine.model.tag.EsTag;
+import io.openbas.engine.model.vulnerableendpoint.EsVulnerableEndpoint;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -31,6 +32,7 @@ import lombok.Setter;
       EsInjectExpectation.class,
       EsScenario.class,
       EsTag.class,
+      EsVulnerableEndpoint.class,
     },
     discriminatorMapping = {
       @DiscriminatorMapping(value = "attack-pattern", schema = EsAttackPattern.class),
@@ -40,6 +42,7 @@ import lombok.Setter;
       @DiscriminatorMapping(value = "expectation-inject", schema = EsInjectExpectation.class),
       @DiscriminatorMapping(value = "scenario", schema = EsScenario.class),
       @DiscriminatorMapping(value = "tag", schema = EsTag.class),
+      @DiscriminatorMapping(value = "vulnerable-endpoint", schema = EsVulnerableEndpoint.class),
     })
 public class EsBase {
 

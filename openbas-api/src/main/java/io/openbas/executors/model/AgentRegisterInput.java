@@ -1,10 +1,8 @@
 package io.openbas.executors.model;
 
-import static java.time.Instant.now;
-
-import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
+import io.openbas.helper.AgentHelper;
 import io.openbas.utils.EndpointMapper;
 import java.time.Instant;
 import lombok.Data;
@@ -42,7 +40,6 @@ public class AgentRegisterInput {
   }
 
   public boolean isActive() {
-    return this.getLastSeen() != null
-        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < Agent.ACTIVE_THRESHOLD;
+    return new AgentHelper().isAgentActiveFromLastSeen(this.getLastSeen());
   }
 }
