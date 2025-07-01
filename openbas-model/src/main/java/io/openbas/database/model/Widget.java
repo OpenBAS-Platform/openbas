@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.engine.api.HistogramWidget;
+import io.openbas.engine.api.WidgetConfiguration;
+import io.openbas.engine.api.WidgetType;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -24,25 +25,6 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "widgets")
 @EntityListeners(ModelBaseListener.class)
 public class Widget implements Base {
-
-  public enum WidgetType {
-    @JsonProperty("vertical-barchart")
-    VERTICAL_BAR_CHART("vertical-barchart"),
-    @JsonProperty("security-coverage")
-    SECURITY_COVERAGE_CHART("security-coverage"),
-    @JsonProperty("line")
-    LINE("line"),
-    @JsonProperty("donut")
-    DONUT("donut"),
-    @JsonProperty("horizontal-barchart")
-    HORIZONTAL_BAR_CHART("horizontal-barchart");
-
-    public final String type;
-
-    WidgetType(@NotNull final String type) {
-      this.type = type;
-    }
-  }
 
   @Id
   @Column(name = "widget_id", updatable = false, nullable = false)
@@ -62,7 +44,7 @@ public class Widget implements Base {
   @Column(name = "widget_config", columnDefinition = "JSONB")
   @JsonProperty("widget_config")
   @NotNull
-  private HistogramWidget histogramWidget;
+  private WidgetConfiguration widgetConfiguration;
 
   @Type(JsonType.class)
   @Column(name = "widget_layout", columnDefinition = "JSONB")
