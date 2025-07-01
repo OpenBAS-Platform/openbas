@@ -1,13 +1,13 @@
 import { Tooltip } from '@mui/material';
 
-import { fetchExecutors } from '../../../../../../actions/Executor';
-import type { ExecutorHelper } from '../../../../../../actions/executors/executor-helper';
-import { useFormatter } from '../../../../../../components/i18n';
-import { useHelper } from '../../../../../../store';
-import { type EndpointOutput } from '../../../../../../utils/api-types';
-import { getExecutorsCount } from '../../../../../../utils/endpoints/utils';
-import { useAppDispatch } from '../../../../../../utils/hooks';
-import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
+import { fetchExecutors } from '../../../../../actions/Executor';
+import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import { useFormatter } from '../../../../../components/i18n';
+import { useHelper } from '../../../../../store';
+import { type EndpointOutput } from '../../../../../utils/api-types';
+import { getExecutorsCount } from '../../../../../utils/endpoints/utils';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 
 type Props = { endpoint: EndpointOutput };
 

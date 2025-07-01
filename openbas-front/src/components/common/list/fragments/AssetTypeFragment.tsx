@@ -2,9 +2,7 @@ import { Chip, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
-import { type EsEndpoint } from '../../../../../../utils/api-types';
-
-type Props = { endpoint: EsEndpoint };
+type Props = { type?: string };
 
 const AssetTypeFragment = (props: Props) => {
   const theme = useTheme();
@@ -20,11 +18,11 @@ const AssetTypeFragment = (props: Props) => {
 
   const { classes } = useStyles();
   return (
-    <Tooltip title={props.endpoint.base_entity}>
+    <Tooltip title={props.type}>
       <Chip
         variant="outlined"
         className={classes.typeChip}
-        label={props.endpoint.base_entity}
+        label={props.type}
       />
     </Tooltip>
   );
