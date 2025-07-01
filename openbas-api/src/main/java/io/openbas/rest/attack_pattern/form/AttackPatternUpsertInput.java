@@ -10,4 +10,7 @@ public class AttackPatternUpsertInput {
 
   @JsonProperty("attack_patterns")
   private List<AttackPatternCreateInput> attackPatterns = new ArrayList<>();
+
+  @JsonProperty("ignore_dependencies")
+  private Boolean ignoreDependencies = false;
 }

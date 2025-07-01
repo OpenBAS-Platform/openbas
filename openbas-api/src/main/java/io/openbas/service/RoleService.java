@@ -30,17 +30,18 @@ public class RoleService {
         .collect(Collectors.toList());
   }
 
-  public Role createRole(@NotBlank final String roleName, @NotNull final Set<String> capabilities) {
+  public Role createRole(
+      @NotBlank final String roleName, @NotNull final Set<Capability> capabilities) {
     Role role = new Role();
     role.setName(roleName);
-    role.setCapabilities(getCapabilities(capabilities));
+    role.setCapabilities(capabilities);
     return roleRepository.save(role);
   }
 
   public Role updateRole(
       @NotBlank final String roleId,
       @NotBlank final String roleName,
-      @NotNull final Set<String> capabilities) {
+      @NotNull final Set<Capability> capabilities) {
 
     // verify that the role exists
     Role role =
@@ -49,7 +50,7 @@ public class RoleService {
             .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
 
     role.setName(roleName);
-    role.setCapabilities(getCapabilities(capabilities));
+    role.setCapabilities(capabilities);
 
     return roleRepository.save(role);
   }
@@ -66,18 +67,5 @@ public class RoleService {
             .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
 
     roleRepository.deleteById(roleId);
-  }
-
-  private Set<Capability> getCapabilities(@NotNull final Set<String> capabilities) {
-    return capabilities.stream()
-        .map(
-            value -> {
-              try {
-                return Capability.valueOf(value);
-              } catch (IllegalArgumentException e) {
-                throw new UnsupportedOperationException("Invalid capability: " + value, e);
-              }
-            })
-        .collect(Collectors.toSet());
   }
 }

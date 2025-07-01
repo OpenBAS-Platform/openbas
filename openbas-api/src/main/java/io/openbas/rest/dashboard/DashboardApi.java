@@ -52,8 +52,9 @@ public class DashboardApi extends RestBehavior {
   @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
-    if (DateHistogramWidget.TEMPORAL_MODE.equals(widget.getHistogramWidget().getMode())) {
-      DateHistogramWidget config = (DateHistogramWidget) widget.getHistogramWidget();
+    if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
+        widget.getWidgetConfiguration().getConfigurationType())) {
+      DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
       Map<String, String> parameters = new HashMap<>();
       Instant end = Instant.now();
       Instant start = end.minus(30, ChronoUnit.DAYS);
@@ -63,15 +64,27 @@ public class DashboardApi extends RestBehavior {
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
-    } else if (StructuralHistogramWidget.STRUCTURAL_MODE.equals(
-        widget.getHistogramWidget().getMode())) {
-      StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();
+    } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
+        widget.getWidgetConfiguration().getConfigurationType())) {
+      StructuralHistogramWidget config =
+          (StructuralHistogramWidget) widget.getWidgetConfiguration();
       Map<String, String> parameters = new HashMap<>();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
     }
     throw new RuntimeException("Unsupported widget: " + widget);
+  }
+
+  @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
+  public List<EsBase> entities(@PathVariable final String widgetId) {
+    Widget widget = this.widgetService.widget(widgetId);
+    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
+    Map<String, String> parameters = new HashMap<>();
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    ListRuntime runtime = new ListRuntime(config, parameters);
+
+    return esService.entities(userWithAuth, runtime);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

@@ -6,9 +6,11 @@ import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
 import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
 
 import io.openbas.database.model.*;
+import io.openbas.injector_contract.fields.ContractFieldType;
 import jakarta.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class PayloadFixture {
 
@@ -29,7 +31,7 @@ public class PayloadFixture {
       String commandLine,
       @Nullable List<PayloadPrerequisite> prerequisites,
       @Nullable String cleanupCmd) {
-    Command command = new Command("command-id", COMMAND_TYPE, "command payload");
+    Command command = new Command(UUID.randomUUID().toString(), COMMAND_TYPE, "command payload");
     command.setContent(commandLine);
     command.setExecutor(executor);
     if (prerequisites != null) {
@@ -78,5 +80,15 @@ public class PayloadFixture {
     filedrop.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
     initializeDefaultPayload(filedrop, MACOS_PLATFORM);
     return filedrop;
+  }
+
+  public static PayloadArgument createPayloadArgument(
+      String key, ContractFieldType type, String defaultValue, String separator) {
+    PayloadArgument payloadArgument = new PayloadArgument();
+    payloadArgument.setKey(key);
+    payloadArgument.setType(type.label);
+    payloadArgument.setDefaultValue(defaultValue);
+    payloadArgument.setSeparator(separator);
+    return payloadArgument;
   }
 }
