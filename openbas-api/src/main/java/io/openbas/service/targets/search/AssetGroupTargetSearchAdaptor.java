@@ -10,9 +10,7 @@ import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
-
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;

@@ -6,7 +6,6 @@ public enum ExpectationType {
   PREVENTION("Blocked", "Pending", "Partially Prevented", "Not Prevented"),
   VULNERABILITY("Not vulnerable", "Pending", "Partially vulnerable", "Vulnerable");
 
-
   public final String successLabel;
   public final String pendingLabel;
   public final String partialLabel;

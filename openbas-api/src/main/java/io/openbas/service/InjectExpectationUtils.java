@@ -9,7 +9,6 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.*;
 
@@ -118,7 +117,8 @@ public class InjectExpectationUtils {
             vulnerabilityExpectation.getAgent(),
             vulnerabilityExpectation.getAsset(),
             vulnerabilityExpectation.getAssetGroup());
-        expectationExecution.setSignatures(vulnerabilityExpectation.getInjectExpectationSignatures());
+        expectationExecution.setSignatures(
+            vulnerabilityExpectation.getInjectExpectationSignatures());
       }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;

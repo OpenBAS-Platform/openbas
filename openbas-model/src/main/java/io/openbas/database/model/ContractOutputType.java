@@ -129,7 +129,6 @@ public enum ContractOutputType {
               new ContractOutputField("host", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
       true,
-
       (JsonNode jsonNode) ->
           jsonNode.hasNonNull("id")
               && jsonNode.hasNonNull("host")

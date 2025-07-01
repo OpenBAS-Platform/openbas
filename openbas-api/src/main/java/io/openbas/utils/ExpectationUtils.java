@@ -20,7 +20,6 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.model.expectation.VulnerabilityExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.AssetToExecute;
-
 import java.time.Instant;
 import java.util.*;
 
@@ -32,8 +31,7 @@ public class ExpectationUtils {
   public static final List<EXPECTATION_TYPE> HUMAN_EXPECTATION =
       List.of(MANUAL, CHALLENGE, ARTICLE);
 
-  private ExpectationUtils() {
-  }
+  private ExpectationUtils() {}
 
   public static List<InjectExpectation> processByValidationType(
       boolean isaNewExpectationResult,
@@ -507,7 +505,8 @@ public class ExpectationUtils {
 
       // We propagate the assetToExecute expectation to agents
       vulnerabilityExpectationList.addAll(
-          getVulnerabilityExpectationList(assetToExecute.asset(), null, inject, vulnerabilityExpectation));
+          getVulnerabilityExpectationList(
+              assetToExecute.asset(), null, inject, vulnerabilityExpectation));
 
       // If any expectation for agent is created then we create also expectation
       // for asset

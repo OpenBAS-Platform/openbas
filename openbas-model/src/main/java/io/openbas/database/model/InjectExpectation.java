@@ -13,12 +13,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -105,9 +103,7 @@ public class InjectExpectation implements Base {
   @NotNull
   private Double expectedScore;
 
-  /**
-   * Expiration time in seconds
-   */
+  /** Expiration time in seconds */
   @Setter
   @Column(name = "inject_expiration_time")
   @JsonProperty("inject_expiration_time")

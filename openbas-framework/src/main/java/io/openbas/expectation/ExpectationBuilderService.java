@@ -44,7 +44,8 @@ public class ExpectationBuilderService {
     vulnerabilityExpectation.setType(VULNERABILITY);
     vulnerabilityExpectation.setName(VULNERABILITY_NAME);
     vulnerabilityExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
-    vulnerabilityExpectation.setExpirationTime(this.expectationPropertiesConfig.getVulnerabilityExpirationTime());
+    vulnerabilityExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getVulnerabilityExpirationTime());
     return vulnerabilityExpectation;
   }
 

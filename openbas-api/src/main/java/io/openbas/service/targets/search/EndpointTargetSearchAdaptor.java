@@ -12,10 +12,8 @@ import io.openbas.service.targets.search.specifications.SearchSpecificationUtils
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

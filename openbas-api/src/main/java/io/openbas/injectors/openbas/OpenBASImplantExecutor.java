@@ -22,10 +22,8 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.*;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -76,9 +74,7 @@ public class OpenBASImplantExecutor extends Injector {
 
   // -- PRIVATE --
 
-  /**
-   * In case of direct assetToExecute, we have an individual expectation for the assetToExecute
-   */
+  /** In case of direct assetToExecute, we have an individual expectation for the assetToExecute */
   private void computeExpectationsForAssetAndAgents(
       @NotNull final List<Expectation> expectations,
       @NotNull final OpenBASImplantInjectContent content,
@@ -90,11 +86,15 @@ public class OpenBASImplantExecutor extends Injector {
               .flatMap(
                   expectation ->
                       switch (expectation.getType()) {
-                        case PREVENTION -> getPreventionExpectations(assetToExecute, inject, expectation).stream();
-                        case DETECTION -> getDetectionExpectations(assetToExecute, inject, expectation).stream();
+                        case PREVENTION ->
+                            getPreventionExpectations(assetToExecute, inject, expectation).stream();
+                        case DETECTION ->
+                            getDetectionExpectations(assetToExecute, inject, expectation).stream();
                         case VULNERABILITY ->
-                            getVulnerabilityExpectations(assetToExecute, inject, expectation).stream();
-                        case MANUAL -> getManualExpectations(assetToExecute, inject, expectation).stream();
+                            getVulnerabilityExpectations(assetToExecute, inject, expectation)
+                                .stream();
+                        case MANUAL ->
+                            getManualExpectations(assetToExecute, inject, expectation).stream();
                         default -> Stream.of();
                       })
               .toList());
@@ -102,8 +102,8 @@ public class OpenBASImplantExecutor extends Injector {
   }
 
   /**
-   * In case of asset group if expectation group -> we have an expectation for the group and one for each asset if not
-   * expectation group -> we have an individual expectation for each asset
+   * In case of asset group if expectation group -> we have an expectation for the group and one for
+   * each asset if not expectation group -> we have an individual expectation for each asset
    */
   private void computeExpectationsForAssetGroup(
       @NotNull final List<Expectation> expectations,
@@ -130,12 +130,12 @@ public class OpenBASImplantExecutor extends Injector {
                                           .anyMatch(
                                               prevExpectation ->
                                                   ((PreventionExpectation) prevExpectation)
-                                                      .getAsset()
-                                                      != null
+                                                              .getAsset()
+                                                          != null
                                                       && ((PreventionExpectation) prevExpectation)
-                                                      .getAsset()
-                                                      .getId()
-                                                      .equals(asset.getId())))) {
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
                             yield Stream.of(
                                 preventionExpectationForAssetGroup(
                                     expectation.getScore(),
@@ -162,11 +162,11 @@ public class OpenBASImplantExecutor extends Injector {
                                           .anyMatch(
                                               detExpectation ->
                                                   ((DetectionExpectation) detExpectation).getAsset()
-                                                      != null
+                                                          != null
                                                       && ((DetectionExpectation) detExpectation)
-                                                      .getAsset()
-                                                      .getId()
-                                                      .equals(asset.getId())))) {
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
                             yield Stream.of(
                                 detectionExpectationForAssetGroup(
                                     expectation.getScore(),
@@ -192,12 +192,13 @@ public class OpenBASImplantExecutor extends Injector {
                                                       == vulExpectation.type())
                                           .anyMatch(
                                               vulExpectation ->
-                                                  ((VulnerabilityExpectation) vulExpectation).getAsset()
-                                                      != null
+                                                  ((VulnerabilityExpectation) vulExpectation)
+                                                              .getAsset()
+                                                          != null
                                                       && ((VulnerabilityExpectation) vulExpectation)
-                                                      .getAsset()
-                                                      .getId()
-                                                      .equals(asset.getId())))) {
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
                             yield Stream.of(
                                 vulnerabilityExpectationForAssetGroup(
                                     expectation.getScore(),
@@ -224,11 +225,11 @@ public class OpenBASImplantExecutor extends Injector {
                                           .anyMatch(
                                               manExpectation ->
                                                   ((ManualExpectation) manExpectation).getAsset()
-                                                      != null
+                                                          != null
                                                       && ((ManualExpectation) manExpectation)
-                                                      .getAsset()
-                                                      .getId()
-                                                      .equals(asset.getId())))) {
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
                             yield Stream.of(
                                 manualExpectationForAssetGroup(
                                     expectation.getScore(),

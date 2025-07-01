@@ -43,7 +43,6 @@ public class ExpectationPropertiesConfig {
   @Value("${openbas.expectation.manual.default-score-value:#{null}}")
   private Integer defaultManualExpectationScore;
 
-
   public long getDetectionExpirationTime() {
     return ofNullable(this.detectionExpirationTime)
         .orElse(
@@ -93,5 +92,4 @@ public class ExpectationPropertiesConfig {
     }
     return defaultManualExpectationScore;
   }
-
 }

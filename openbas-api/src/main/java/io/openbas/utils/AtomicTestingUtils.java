@@ -5,7 +5,6 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.*;
 
 public class AtomicTestingUtils {
@@ -50,7 +49,8 @@ public class AtomicTestingUtils {
         getScores(
             List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
             expectations);
-    List<Double> vulnerabilityScores = getScores(List.of(EXPECTATION_TYPE.VULNERABILITY), expectations);
+    List<Double> vulnerabilityScores =
+        getScores(List.of(EXPECTATION_TYPE.VULNERABILITY), expectations);
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
@@ -177,12 +177,8 @@ public class AtomicTestingUtils {
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
-      @NotNull List<ResultDistribution> distribution) {
-
-  }
+      @NotNull List<ResultDistribution> distribution) {}
 
   public record ResultDistribution(
-      @NotNull String id, @NotNull String label, @NotNull Integer value) {
-
-  }
+      @NotNull String id, @NotNull String label, @NotNull Integer value) {}
 }

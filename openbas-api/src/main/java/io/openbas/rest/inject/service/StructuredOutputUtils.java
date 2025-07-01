@@ -9,14 +9,12 @@ import com.fasterxml.jackson.databind.node.*;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import jakarta.annotation.Resource;
-
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -26,8 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StructuredOutputUtils {
 
-  @Resource
-  private final ObjectMapper mapper;
+  @Resource private final ObjectMapper mapper;
 
   Set<OutputParser> extractOutputParsers(Inject inject) {
     Optional<Payload> optionalPayload = inject.getPayload();
@@ -48,8 +45,9 @@ public class StructuredOutputUtils {
    * Computes the structured output from the injection execution input.
    *
    * <p>Initially, it verifies if the structured output is already available. If it is not, and the
-   * input pertains to an execution action, the method attempts to generate the structured output from the raw execution
-   * output using the output parsers defined in the payload used for the injection.
+   * input pertains to an execution action, the method attempts to generate the structured output
+   * from the raw execution output using the output parsers defined in the payload used for the
+   * injection.
    */
   public Optional<ObjectNode> computeStructuredOutput(
       Set<OutputParser> outputParsers, InjectExecutionInput input) throws JsonProcessingException {

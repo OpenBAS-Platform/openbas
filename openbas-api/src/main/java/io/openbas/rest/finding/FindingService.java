@@ -39,8 +39,7 @@ public class FindingService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
 
-  @Resource
-  private ObjectMapper mapper;
+  @Resource private ObjectMapper mapper;
 
   // -- CRUD --
 

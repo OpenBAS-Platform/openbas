@@ -61,9 +61,11 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting, isValid },
     getValues,
   } = useForm<ExpectationInputForm>(formProps(formInitialValues, t));
+  const watchType = watch('expectation_type');
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -147,7 +149,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
       </div>
       <div style={{ marginTop: 20 }}>
         <Typography variant="h4">{t('Scores')}</Typography>
-        <ScaleBar expectationExpectedScore={initialValues.expectation_score} />
+        <ScaleBar expectationType={watchType} expectationExpectedScore={initialValues.expectation_score} />
       </div>
       <MuiTextField
         variant="standard"
