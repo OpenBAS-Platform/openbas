@@ -919,6 +919,29 @@ export interface CustomDashboardInput {
   custom_dashboard_parameters?: CustomDashboardParametersInput[];
 }
 
+export interface CustomDashboardOutput {
+  custom_dashboard_id?: string;
+  custom_dashboard_name?: string;
+}
+
+export interface CustomDashboardParameterValueInput {
+  custom_dashboards_parameter_value?: string;
+}
+
+export interface CustomDashboardParameters {
+  custom_dashboards_parameter_id: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_value?: string;
+  listened?: boolean;
+}
+
+export interface CustomDashboardParametersInput {
+  custom_dashboards_parameter_id?: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+}
+
 /** Payload to create a CVE */
 export interface CveCreateInput {
   /**
@@ -1106,29 +1129,6 @@ export interface CweOutput {
   cwe_external_id: string;
   /** Source of the CWE */
   cwe_source?: string;
-}
-
-export interface CustomDashboardOutput {
-  custom_dashboard_id?: string;
-  custom_dashboard_name?: string;
-}
-
-export interface CustomDashboardParameterValueInput {
-  custom_dashboards_parameter_value?: string;
-}
-
-export interface CustomDashboardParameters {
-  custom_dashboards_parameter_id: string;
-  custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
-  custom_dashboards_parameter_value?: string;
-  listened?: boolean;
-}
-
-export interface CustomDashboardParametersInput {
-  custom_dashboards_parameter_id?: string;
-  custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
 }
 
 export interface DateHistogramSeries {
@@ -1518,6 +1518,7 @@ export interface EsFinding {
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
+  base_simulation_side?: string;
   /** @format date-time */
   base_updated_at?: string;
   finding_field?: string;
