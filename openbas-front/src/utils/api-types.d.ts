@@ -4982,6 +4982,8 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
 > & {
   display_legend?: boolean;
   field: string;
+  /** @format int32 */
+  limit?: number;
   mode: string;
   series: StructuralHistogramSeries[];
   stacked?: boolean;

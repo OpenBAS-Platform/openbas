@@ -30,6 +30,7 @@ export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   mode: 'structural';
   field: string;
   series: ApiTypes.StructuralHistogramSeries[];
+  limit?: number;
 };
 export type HistogramWidget = ApiTypes.BaseWidgetConfiguration &
   (
