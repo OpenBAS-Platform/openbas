@@ -96,6 +96,7 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'finding_simulation':
+      case 'base_simulation_side':
         searchExerciseByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
