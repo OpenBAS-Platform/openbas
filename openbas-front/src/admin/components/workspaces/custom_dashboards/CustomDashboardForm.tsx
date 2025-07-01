@@ -68,7 +68,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
   const handleAddParameter = (type: CustomDashboardParametersInput['custom_dashboards_parameter_type']) => {
     if (type) {
       append({
-        custom_dashboards_parameter_name: '',
+        custom_dashboards_parameter_name: type,
         custom_dashboards_parameter_type: type,
       });
     }
