@@ -1,4 +1,4 @@
-import { MenuItem, Select, type SelectChangeEvent } from '@mui/material';
+import { InputLabel, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useState } from 'react';
 import { useParams } from 'react-router';
@@ -69,6 +69,7 @@ const SimulationAnalysis = () => {
 
   return (
     <>
+      <InputLabel id="dashboard">{t('Dashboard')}</InputLabel>
       <Select
         value={customDashboardIdValue}
         labelId="simulation_custom_dashboard"
