@@ -181,6 +181,14 @@ public class Payload implements Base {
   @Schema(type = "string")
   private Collector collector;
 
+  @OneToMany(
+      mappedBy = "payload",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @JsonProperty("payload_detection_remediations")
+  private List<PayloadDetectionRemediation> detectionRemediations = new ArrayList<>();
+
   // -- TAG --
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -194,6 +202,16 @@ public class Payload implements Base {
   @JsonProperty("payload_tags")
   private Set<Tag> tags = new HashSet<>();
 
+  // -- OUTPUT PARSERS
+
+  @OneToMany(
+      mappedBy = "payload",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParser> outputParsers = new HashSet<>();
+
   // -- AUDIT --
 
   @Column(name = "payload_created_at")
@@ -206,14 +224,6 @@ public class Payload implements Base {
   @JsonProperty("payload_updated_at")
   @NotNull
   private Instant updatedAt = now();
-
-  @OneToMany(
-      mappedBy = "payload",
-      fetch = FetchType.EAGER,
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
-  @JsonProperty("payload_output_parsers")
-  private Set<OutputParser> outputParsers = new HashSet<>();
 
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {

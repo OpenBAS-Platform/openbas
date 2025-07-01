@@ -4,6 +4,7 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ import java.time.Instant;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Getter
 @Setter
@@ -62,6 +64,12 @@ public class Collector implements Base {
   @JoinColumn(name = "collector_security_platform")
   @JsonProperty("collector_security_platform")
   private SecurityPlatform securityPlatform;
+
+  @Type(JsonType.class)
+  @Column(name = "collector_detection_remediation_config", columnDefinition = "JSONB")
+  @JsonProperty("collector_detection_remediation_config")
+  @NotNull
+  private String detectionRemediationConfig;
 
   @JsonIgnore
   @Override
