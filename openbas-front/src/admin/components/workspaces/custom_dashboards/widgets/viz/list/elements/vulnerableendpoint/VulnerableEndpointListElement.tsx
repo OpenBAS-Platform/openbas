@@ -48,7 +48,8 @@ const VulnerableEndpointListElement = (props: Props) => {
         return (endpoint: EsVulnerableEndpoint) => <EndpointAgentsPrivilegeFragment privileges={endpoint.vulnerable_endpoint_agents_privileges} />;
       case EndpointListItemFragments.VULNERABLE_ENDPOINT_ACTION:
         return (endpoint: EsVulnerableEndpoint) => <VulnerableEndpointActionFragment action={endpoint.vulnerable_endpoint_action} />;
-      case EndpointListItemFragments.BASE_TAGS_SIDE: return (endpoint: EsVulnerableEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side} />;
+      case EndpointListItemFragments.BASE_TAGS_SIDE:
+        return (endpoint: EsVulnerableEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side ?? []} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
         return endpoint[key]?.toString();
