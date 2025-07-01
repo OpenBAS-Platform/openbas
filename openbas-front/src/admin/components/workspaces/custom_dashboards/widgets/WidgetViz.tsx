@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useState } from 'react';
 
-import { entities, series } from '../../../../../actions/dashboards/dashboard-action';
+import { entities } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsBase, type EsSeries } from '../../../../../utils/api-types';
