@@ -15,7 +15,7 @@ public class V4_01__Detection_Remediation extends BaseJavaMigration {
     try (Statement statement = connection.createStatement()) {
       statement.execute(
           """
-                  CREATE TABLE payload_detection_remediations (
+                  CREATE TABLE detection_remediations (
                   detection_remediation_id VARCHAR(255) NOT NULL CONSTRAINT detection_remediation_pkey PRIMARY KEY,
                   detection_remediation_collector_id VARCHAR(255) NOT NULL REFERENCES collectors(collector_id) ON DELETE CASCADE,
                   detection_remediation_payload_id VARCHAR(255) NOT NULL REFERENCES payloads(payload_id) ON DELETE CASCADE,

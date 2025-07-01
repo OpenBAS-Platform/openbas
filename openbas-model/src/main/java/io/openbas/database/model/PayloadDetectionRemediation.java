@@ -18,7 +18,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "payload_detection_remediations")
+@Table(name = "detection_remediations")
 @EntityListeners(ModelBaseListener.class)
 @Getter
 @Setter
