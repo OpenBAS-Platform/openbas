@@ -11,10 +11,8 @@ import io.openbas.database.repository.*;
 import io.openbas.service.AssetGroupService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
-
 import java.util.List;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,20 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ResultUtilsTest {
 
-  @Mock
-  private InjectExpectationRepository injectExpectationRepository;
-  @Mock
-  private TeamRepository teamRepository;
-  @Mock
-  private UserRepository userRepository;
-  @Mock
-  private AssetRepository assetRepository;
-  @Mock
-  private AgentRepository agentRepository;
-  @Mock
-  private AssetGroupRepository assetGroupRepository;
-  @Mock
-  private AssetGroupService assetGroupService;
+  @Mock private InjectExpectationRepository injectExpectationRepository;
+  @Mock private TeamRepository teamRepository;
+  @Mock private UserRepository userRepository;
+  @Mock private AssetRepository assetRepository;
+  @Mock private AgentRepository agentRepository;
+  @Mock private AssetGroupRepository assetGroupRepository;
+  @Mock private AssetGroupService assetGroupService;
 
   private ResultUtils resultUtils;
 
@@ -107,7 +98,10 @@ class ResultUtilsTest {
             HUMAN_RESPONSE, InjectExpectation.EXPECTATION_STATUS.FAILED, 0, 0, 0, 3);
 
     assertEquals(
-        List.of(expectedPreventionResult, expectedDetectionResult, expectedVulnerabilityResult,
+        List.of(
+            expectedPreventionResult,
+            expectedDetectionResult,
+            expectedVulnerabilityResult,
             expectedHumanResponseResult),
         result);
   }

@@ -7,11 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.service.StructuredOutputUtils;
-
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +48,12 @@ class StructuredOutputUtilsTest {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Empty output");
     regexGroup.setIndexValues("$2");
-    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "Text", "^(\\S+)",
+    testRegexExtraction(
+        "",
+        Set.of(regexGroup),
+        ContractOutputType.Text,
+        "Text",
+        "^(\\S+)",
         Arrays.toString(Arrays.copyOf(new String[0], 0)));
   }
 
