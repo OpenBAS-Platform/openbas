@@ -4,6 +4,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Widget;
+import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
@@ -42,12 +43,7 @@ public class DashboardApi extends RestBehavior {
   @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
   public List<EsBase> entities(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
-    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
-    Map<String, String> parameters = new HashMap<>();
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    ListRuntime runtime = new ListRuntime(config, parameters);
-
-    return esService.entities(userWithAuth, runtime);
+    return this.dashboardService.entities(widget);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

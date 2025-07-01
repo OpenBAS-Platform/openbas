@@ -7,9 +7,11 @@ import io.openbas.database.model.Widget;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.engine.api.*;
+import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.service.EsService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -37,19 +39,30 @@ public class DashboardService {
   }
 
   public List<EsSeries> series(@NotNull final Widget widget, Map<String, String> parameters) {
-    if (DateHistogramWidget.TEMPORAL_MODE.equals(widget.getHistogramWidget().getMode())) {
-      DateHistogramWidget config = (DateHistogramWidget) widget.getHistogramWidget();
+    if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
+        widget.getWidgetConfiguration().getConfigurationType())) {
+      DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
-    } else if (StructuralHistogramWidget.STRUCTURAL_MODE.equals(
-        widget.getHistogramWidget().getMode())) {
-      StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();
+    } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
+        widget.getWidgetConfiguration().getConfigurationType())) {
+      StructuralHistogramWidget config =
+          (StructuralHistogramWidget) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
     }
     throw new RuntimeException("Unsupported widget: " + widget);
+  }
+
+  public List<EsBase> entities(@NotNull final Widget widget) {
+    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
+    Map<String, String> parameters = new HashMap<>();
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    ListRuntime runtime = new ListRuntime(config, parameters);
+
+    return esService.entities(userWithAuth, runtime);
   }
 
   public List<EsSearch> search(final String search) {
