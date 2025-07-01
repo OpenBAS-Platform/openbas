@@ -103,10 +103,7 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
                       .toList();
               HashMap<String, List<Finding>> byCategory = new HashMap<>();
               for (Finding finding : findings) {
-                if (!byCategory.containsKey(finding.getType().name())) {
-                  byCategory.put(finding.getType().name(), new ArrayList<>());
-                }
-                byCategory.get(finding.getType().name()).add(finding);
+                byCategory.computeIfAbsent(finding.getType().name(), s -> new ArrayList<>()).add(finding);
               }
               List<String> summaryItems =
                   byCategory.keySet().stream()
@@ -117,23 +114,23 @@ public class VulnerableEndpointHandler implements Handler<EsVulnerableEndpoint> 
 
               // Dependencies
               List<String> dependencies = new ArrayList<>();
-              if (!(endpoint.getVulnerable_endpoint_findings() == null)
+              if (endpoint.getVulnerable_endpoint_findings() != null
                   && !endpoint.getVulnerable_endpoint_findings().isEmpty()) {
                 dependencies.addAll(endpoint.getVulnerable_endpoint_findings());
                 esVulnerableEndpoint.setBase_findings_side(
                     endpoint.getVulnerable_endpoint_findings());
               }
-              if (!(endpoint.getVulnerable_endpoint_tags() == null)
+              if (endpoint.getVulnerable_endpoint_tags() != null
                   && !endpoint.getVulnerable_endpoint_tags().isEmpty()) {
                 dependencies.addAll(endpoint.getVulnerable_endpoint_tags());
                 esVulnerableEndpoint.setBase_tags_side(endpoint.getVulnerable_endpoint_tags());
               }
-              if (!(endpoint.getVulnerable_endpoint_agents() == null)
+              if (endpoint.getVulnerable_endpoint_agents() != null
                   && !endpoint.getVulnerable_endpoint_agents().isEmpty()) {
                 dependencies.addAll(endpoint.getVulnerable_endpoint_agents());
                 esVulnerableEndpoint.setBase_tags_side(endpoint.getVulnerable_endpoint_agents());
               }
-              if (!(endpoint.getVulnerable_endpoint_simulation() == null)) {
+              if (endpoint.getVulnerable_endpoint_simulation() != null) {
                 dependencies.add(endpoint.getVulnerable_endpoint_simulation());
                 esVulnerableEndpoint.setBase_simulation_side(
                     endpoint.getVulnerable_endpoint_simulation());
