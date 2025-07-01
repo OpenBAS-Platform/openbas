@@ -75,6 +75,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         expectation_type: predefinedExpectation.expectation_type ?? '',
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
+        // eslint-disable-next-line max-len
         expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : getExpectationDefaultScoreByType(predefinedExpectation.expectation_type),
         expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
         expiration_time_days: parseInt(expirationTime.days, 10),
