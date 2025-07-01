@@ -75,7 +75,7 @@ const SimulationAnalysis = () => {
         id="simulation_custom_dashboard"
         label={t('Custom dashboards')}
         onChange={handleOnChange}
-        fullWidth
+        style={{ fontSize: 22 }}
       >
         <MenuItem key="-" value="-">-</MenuItem>
         {customDashboardValues?.map(customDashboardValue => (
