@@ -337,7 +337,7 @@ public class EsService {
       PropertySchema propertyField = getIndexingSchema().get(field);
       String elasticField = toElasticField(field);
       TermsAggregation termsAggregation =
-          new TermsAggregation.Builder().field(elasticField).size(100).build();
+          new TermsAggregation.Builder().field(elasticField).size(widgetConfig.getLimit()).build();
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
