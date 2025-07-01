@@ -1,17 +1,16 @@
 package io.openbas.engine.model.attackpattern;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
+
 import io.openbas.database.raw.RawAttackPattern;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.engine.Handler;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static org.springframework.util.StringUtils.hasText;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +29,9 @@ public class AttackPatternHandler implements Handler<EsAttackPattern> {
               // Base
               esAttackPattern.setBase_id(attackPattern.getAttack_pattern_id());
               esAttackPattern.setBase_representative(
-                  attackPattern.getAttack_pattern_external_id() + " - " + attackPattern.getAttack_pattern_name()
-              );
+                  attackPattern.getAttack_pattern_external_id()
+                      + " - "
+                      + attackPattern.getAttack_pattern_name());
               esAttackPattern.setBase_created_at(attackPattern.getAttack_pattern_created_at());
               esAttackPattern.setBase_updated_at(attackPattern.getAttack_pattern_updated_at());
               // Specific
