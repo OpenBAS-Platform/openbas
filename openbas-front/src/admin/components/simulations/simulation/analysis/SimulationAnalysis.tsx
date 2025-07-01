@@ -76,7 +76,7 @@ const SimulationAnalysis = () => {
         id="simulation_custom_dashboard"
         label={t('Custom dashboards')}
         onChange={handleOnChange}
-        style={{ fontSize: 22 }}
+        style={{ fontSize: theme.typography.h1.fontSize }}
       >
         <MenuItem key="-" value="-">-</MenuItem>
         {customDashboardValues?.map(customDashboardValue => (
