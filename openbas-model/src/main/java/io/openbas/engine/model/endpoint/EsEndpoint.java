@@ -25,7 +25,7 @@ public class EsEndpoint extends EsBase {
   @EsQueryable(keyword = true)
   private String endpoint_description;
 
-  @Queryable(label = "endpoint external reference", filterable = true)
+  @Queryable(label = "endpoint external reference")
   @EsQueryable(keyword = true)
   private String endpoint_external_reference;
 

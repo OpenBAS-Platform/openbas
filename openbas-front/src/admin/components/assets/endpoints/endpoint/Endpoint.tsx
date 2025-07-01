@@ -5,18 +5,17 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import { searchDistinctFindingsOnEndpoint, searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
-import LabelChip from '../../../../../components/common/chips/LabelChip';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
-import { LabelColorDict } from '../../../../../components/Theme';
 import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
 import { type AggregatedFindingOutput, type EndpointOverviewOutput as EndpointType, type RelatedFindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
+import AssetEolFragment from '../../../common/endpoints/fragments/output/AssetEolFragment';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
@@ -117,17 +116,7 @@ const Endpoint = () => {
         </div>
         <div>
           <Typography variant="h3" gutterBottom>{t('End of Life')}</Typography>
-          {endpoint.endpoint_is_eol ? (
-            <LabelChip
-              label="Yes"
-              color={LabelColorDict.Red}
-            />
-          ) : (
-            <LabelChip
-              label="No"
-              color={LabelColorDict.Green}
-            />
-          )}
+          <AssetEolFragment endpoint={endpoint} />
         </div>
         <div>
           <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>

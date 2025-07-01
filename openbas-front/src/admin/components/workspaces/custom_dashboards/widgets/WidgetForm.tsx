@@ -7,6 +7,7 @@ import { z } from 'zod';
 import Dialog from '../../../../../components/common/Dialog';
 import StepperComponent from '../../../../../components/common/StepperComponent';
 import { useFormatter } from '../../../../../components/i18n';
+import { type Widget } from '../../../../../utils/api-types-custom';
 import { zodImplement } from '../../../../../utils/Zod';
 import WidgetCreationParameters from './WidgetCreationParameters';
 import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
@@ -60,7 +61,7 @@ const WidgetForm: FunctionComponent<Props> = ({
   const { t } = useFormatter();
 
   // Form
-  const widgetConfigSchema = z.discriminatedUnion('mode', [
+  const widgetConfigSchema = z.discriminatedUnion('widget_configuration_type', [
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
@@ -68,6 +69,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       start: z.string().min(1, { message: t('Should not be empty') }),
       end: z.string().min(1, { message: t('Should not be empty') }),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
+      widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
       series: z.array(z.object({
@@ -81,6 +83,20 @@ const WidgetForm: FunctionComponent<Props> = ({
       field: z.string().min(1, { message: t('Should not be empty') }),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
+      widget_configuration_type: z.literal('structural-histogram'),
+      series: z.array(z.object({
+        name: z.string().optional(),
+        filter: z.any().optional(),
+      })),
+    }),
+    z.object({
+      title: z.string().optional(),
+      widget_configuration_type: z.literal('list'),
+      sorts: z.array(z.object({
+        direction: z.literal('ASC').or(z.literal('DESC')),
+        fieldName: z.string(),
+      })).optional(),
+      columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),
         filter: z.any().optional(),
@@ -98,7 +114,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -153,6 +169,38 @@ const WidgetForm: FunctionComponent<Props> = ({
     })();
   };
 
+  const getSeriesComponent = (widgetType: Widget['widget_type']) => {
+    switch (widgetType) {
+      case 'security-coverage': return (
+        <Controller
+          control={control}
+          name="widget_config.series"
+          render={({ field: { value, onChange } }) => (
+            <WidgetCreationSecurityCoverageSeries
+              value={value}
+              onChange={onChange}
+              onSubmit={nextStep}
+            />
+          )}
+        />
+      );
+      default: return (
+        <Controller
+          control={control}
+          name="widget_config.series"
+          render={({ field: { value, onChange } }) => (
+            <WidgetCreationSeriesList
+              widgetType={widgetType}
+              currentSeries={value}
+              onChange={onChange}
+              onSubmit={nextStep}
+            />
+          )}
+        />
+      );
+    }
+  };
+
   return (
     <form id="widgetCreationForm">
       <Dialog
@@ -186,35 +234,7 @@ const WidgetForm: FunctionComponent<Props> = ({
             />
           )}
           {activeStep === 1
-            && (widgetType === 'security-coverage'
-              ? (
-                  <Controller
-                    control={control}
-                    name="widget_config.series"
-                    render={({ field: { value, onChange } }) => (
-                      <WidgetCreationSecurityCoverageSeries
-                        value={value}
-                        onChange={onChange}
-                        onSubmit={nextStep}
-                      />
-                    )}
-                  />
-                )
-              : (
-                  <Controller
-                    control={control}
-                    name="widget_config.series"
-                    render={({ field: { value, onChange } }) => (
-                      <WidgetCreationSeriesList
-                        widgetType={widgetType}
-                        currentSeries={value}
-                        onChange={onChange}
-                        onSubmit={nextStep}
-                      />
-                    )}
-                  />
-                )
-            )}
+            && getSeriesComponent(widgetType)}
           {activeStep === 2 && (
             <WidgetCreationParameters
               widgetType={widgetType}
