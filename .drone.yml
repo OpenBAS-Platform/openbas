@@ -29,7 +29,10 @@ steps:
       - mvn test -q
 
   - name: frontend-tests
-    image: node:22.16.0-alpine
+    image: node:22.17.1-alpine
+    volumes:
+      - name: cache-node-frontend
+        path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
       - yarn install
@@ -75,7 +78,10 @@ steps:
       - frontend-tests
 
   - name: frontend-e2e-tests
-    image: node:22.16.0
+    image: node:22.17.1
+    volumes:
+      - name: cache-node-frontend-e2e
+        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -88,7 +94,10 @@ steps:
       - app-e2e
 
   - name: frontend-api-types
-    image: node:22.16.0
+    image: node:22.17.1
+    volumes:
+      - name: cache-node-frontend-api-types
+        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
