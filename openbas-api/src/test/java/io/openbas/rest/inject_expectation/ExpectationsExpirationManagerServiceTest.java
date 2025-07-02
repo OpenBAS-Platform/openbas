@@ -77,8 +77,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
   }
 
   @AfterAll
-  void afterAll() throws InterruptedException {
-    Thread.sleep(2000);
+  void afterAll() {
     agentRepository.deleteAll();
     injectRepository.deleteAll();
     endpointRepository.deleteAll();
