@@ -16,7 +16,7 @@ public class V3_100__Add_Parameters_Custom_Dashboard extends BaseJavaMigration {
       statement.execute(
           """
               ALTER TABLE exercises ADD COLUMN IF NOT EXISTS exercise_custom_dashboard VARCHAR(255) NULL;
-              ALTER TABLE exercises ADD CONSTRAINT exercise_custom_dashboard_fk FOREIGN KEY (exercise_custom_dashboard) REFERENCES custom_dashboards(custom_dashboard_id) ON DELETE SET NULL
+              ALTER TABLE exercises ADD CONSTRAINT exercise_custom_dashboard_fk FOREIGN KEY (exercise_custom_dashboard) REFERENCES custom_dashboards(custom_dashboard_id) ON DELETE SET NULL;
               ALTER TABLE scenarios ADD COLUMN IF NOT EXISTS scenario_custom_dashboard VARCHAR(255) NULL;
               ALTER TABLE scenarios ADD CONSTRAINT scenario_custom_dashboard_fk FOREIGN KEY (scenario_custom_dashboard) REFERENCES custom_dashboards(custom_dashboard_id) ON DELETE SET NULL;
               CREATE TABLE IF NOT EXISTS custom_dashboards_parameters (
