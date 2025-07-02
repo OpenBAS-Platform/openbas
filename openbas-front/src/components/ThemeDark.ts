@@ -51,8 +51,11 @@ const ThemeDark = (
         LabelColorDict.Green, {
           backgroundColor: 'rgba(76, 175, 80, 0.08)',
           color: '#4caf50',
-        },
-      ],
+        }], [
+        LabelColorDict.Orange, {
+          backgroundColor: 'rgba(246,177,27,0.08)',
+          color: '#f19710',
+        }],
     ]),
     ai: {
       main: '#9575cd',

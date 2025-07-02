@@ -1,17 +1,15 @@
 import { Tooltip } from '@mui/material';
 
-import { useFormatter } from '../../../../../../components/i18n';
-import { type EndpointOutput } from '../../../../../../utils/api-types';
-import AgentPrivilege from '../../../../assets/endpoints/AgentPrivilege';
+import AgentPrivilege from '../../../../admin/components/assets/endpoints/AgentPrivilege';
+import { useFormatter } from '../../../i18n';
 
-type Props = { endpoint: EndpointOutput };
+type Props = { privileges?: (string | undefined)[] };
 
 const EndpointAgentsPrivilegeFragment = (props: Props) => {
   const { t } = useFormatter();
 
-  const getPrivilegesCount = (endpoint: EndpointOutput) => {
-    if (endpoint.asset_agents.length > 0) {
-      const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
+  const getPrivilegesCount = (privileges: (string | undefined)[]) => {
+    if (privileges.length > 0) {
       const privilegeCount = privileges?.reduce((count, privilege) => {
         if (privilege === 'admin') {
           count.admin += 1;
@@ -36,7 +34,7 @@ const EndpointAgentsPrivilegeFragment = (props: Props) => {
     }
   };
 
-  const privileges = getPrivilegesCount(props.endpoint);
+  const privileges = getPrivilegesCount(props.privileges ?? []);
 
   return (
     <>
@@ -51,7 +49,7 @@ const EndpointAgentsPrivilegeFragment = (props: Props) => {
         </span>
       </Tooltip>
       {
-        props.endpoint.asset_agents.length === 0 && (
+        props.privileges && props.privileges.length === 0 && (
           <span>{t('N/A')}</span>
         )
       }

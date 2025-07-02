@@ -14,6 +14,7 @@ public class StructuralHistogramWidget extends HistogramWidget {
 
   public static final String STRUCTURAL_MODE = "structural";
 
+  private int limit = 100;
   @NotNull List<StructuralHistogramSeries> series = new ArrayList<>();
 
   @Data

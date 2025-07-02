@@ -49,7 +49,7 @@ public class EsVulnerableEndpoint extends EsBase {
       dynamicValues = true,
       refEnumClazz = AgentPrivilege.class)
   @EsQueryable(keyword = true)
-  private Set<String> vulnerable_endpoint_agents_privileges;
+  private List<String> vulnerable_endpoint_agents_privileges;
 
   @Queryable(
       label = "vulnerable endpoint agents active status",

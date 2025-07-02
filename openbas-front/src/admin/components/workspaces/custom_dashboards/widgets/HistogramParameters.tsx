@@ -104,7 +104,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 onChange={e => field.onChange(e.target.value)}
-                required={true}
+                required
               >
                 {availableModes.map(mode => <MenuItem key={mode} value={mode}>{t(mode)}</MenuItem>)}
               </TextField>
@@ -134,7 +134,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
                       sx={{ mt: 2 }}
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
-                      required={true}
+                      required
                     />
                   )}
                   freeSolo={false}
@@ -143,6 +143,27 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             }}
           />
         )}
+      {mode === 'structural' && (
+        <Controller
+          control={control}
+          name="widget_config.limit"
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              variant="standard"
+              fullWidth
+              type="number"
+              label={t('Number of results')}
+              sx={{ mt: 2 }}
+              value={field.value ?? 10}
+              onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              required
+            />
+          )}
+        />
+      )}
       {mode === 'temporal' && (
         <>
           <Controller
@@ -160,7 +181,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
                 onChange={e => field.onChange(e.target.value)}
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                required={true}
+                required
               >
                 <MenuItem value="day">{t('Day')}</MenuItem>
                 <MenuItem value="week">{t('Week')}</MenuItem>
@@ -214,40 +235,6 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
           />
         </>
       )}
-      {/* TODO: not functionnal for now */}
-      {/* <Controller */}
-      {/*  control={control} */}
-      {/*  name="widget_config.stacked" */}
-      {/*  render={({ field }) => ( */}
-      {/*    <FormControlLabel */}
-      {/*      style={{ marginTop: 20 }} */}
-      {/*      control={( */}
-      {/*        <Switch */}
-      {/*          checked={field.value ?? false} */}
-      {/*          onChange={field.onChange} */}
-      {/*        /> */}
-      {/*      )} */}
-      {/*      label={t('Stacked')} */}
-      {/*    /> */}
-      {/*  )} */}
-      {/* /> */}
-      {/* TODO: not functionnal for now */}
-      {/* <Controller */}
-      {/*  control={control} */}
-      {/*  name="widget_config.display_legend" */}
-      {/*  render={({ field }) => ( */}
-      {/*    <FormControlLabel */}
-      {/*      style={{ marginTop: 20 }} */}
-      {/*      control={( */}
-      {/*        <Switch */}
-      {/*          checked={field.value ?? false} */}
-      {/*          onChange={field.onChange} */}
-      {/*        /> */}
-      {/*      )} */}
-      {/*      label={t('Display legend')} */}
-      {/*    /> */}
-      {/*  )} */}
-      {/* /> */}
     </>
   );
 };

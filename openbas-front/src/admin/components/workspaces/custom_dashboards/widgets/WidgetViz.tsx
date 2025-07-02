@@ -8,7 +8,7 @@ import { type Widget } from '../../../../../utils/api-types-custom';
 import DonutChart from './viz/DonutChart';
 import HorizontalBarChart from './viz/HorizontalBarChart';
 import LineChart from './viz/LineChart';
-import List from './viz/list/List';
+import ListWidget from './viz/list/ListWidget';
 import SecurityCoverage from './viz/SecurityCoverage';
 import VerticalBarChart from './viz/VerticalBarChart';
 import { getWidgetTitle } from './WidgetUtils';
@@ -98,7 +98,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
       );
     }
     case 'list':
-      return (<List elements={entitiesVizData} config={widget.widget_config} />);
+      return (<ListWidget elements={entitiesVizData} config={widget.widget_config} />);
     default:
       return 'Not implemented yet';
   }

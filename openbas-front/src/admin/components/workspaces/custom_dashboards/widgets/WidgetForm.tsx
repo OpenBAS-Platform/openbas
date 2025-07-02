@@ -83,6 +83,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       field: z.string().min(1, { message: t('Should not be empty') }),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
+      limit: z.number().optional(),
       widget_configuration_type: z.literal('structural-histogram'),
       series: z.array(z.object({
         name: z.string().optional(),

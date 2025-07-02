@@ -337,7 +337,7 @@ public class EsService {
       PropertySchema propertyField = getIndexingSchema().get(field);
       String elasticField = toElasticField(field);
       TermsAggregation termsAggregation =
-          new TermsAggregation.Builder().field(elasticField).size(100).build();
+          new TermsAggregation.Builder().field(elasticField).size(widgetConfig.getLimit()).build();
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
@@ -532,7 +532,7 @@ public class EsService {
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(engineConfig.getDefaultPagination())
+                      .size(engineConfig.getDefaultEntitiesCap())
                       .query(query)
                       .sort(engineSorts),
               getClassForEntity(entityName));
@@ -561,7 +561,7 @@ public class EsService {
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(engineConfig.getDefaultPagination())
+                      .size(engineConfig.getDefaultSearchCap())
                       .query(query)
                       .sort(
                           SortOptions.of(

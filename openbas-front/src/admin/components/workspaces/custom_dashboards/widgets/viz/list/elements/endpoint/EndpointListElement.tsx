@@ -3,14 +3,14 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import AssetPlatformFragment from '../../../../../../../../../components/common/list/fragments/AssetPlatformFragment';
+import AssetTagsFragment from '../../../../../../../../../components/common/list/fragments/AssetTagsFragment';
+import EndpointArchFragment from '../../../../../../../../../components/common/list/fragments/EndpointArchFragment';
+import InverseBooleanFragment from '../../../../../../../../../components/common/list/fragments/InverseBooleanFragment';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { ENDPOINT_BASE_URL } from '../../../../../../../../../constants/BaseUrls';
 import { type EsEndpoint } from '../../../../../../../../../utils/api-types';
 import EndpointListItemFragments from '../../../../../../../common/endpoints/EndpointListItemFragments';
-import AssetEolFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetEolFragment';
-import AssetPlatformFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetPlatformFragment';
-import AssetTagsFragment from '../../../../../../../common/endpoints/fragments/elastic/AssetTagsFragment';
-import EndpointArchFragment from '../../../../../../../common/endpoints/fragments/elastic/EndpointArchFragment';
 import buildStyles from '../ColumnStyles';
 import EndpointElementStyles from './EndpointElementStyles';
 
@@ -34,10 +34,14 @@ const EndpointListElement = (props: Props) => {
   // eslint doesn't seem to be able to infer the display names of subcomponents but react can
   const elementsFromColumn = (column: string) => {
     switch (column) {
-      case EndpointListItemFragments.ENDPOINT_PLATFORM: return (endpoint: EsEndpoint) => <AssetPlatformFragment endpoint={endpoint} />;
-      case EndpointListItemFragments.ENDPOINT_ARCH: return (endpoint: EsEndpoint) => <EndpointArchFragment endpoint={endpoint} />;
-      case EndpointListItemFragments.BASE_TAGS_SIDE: return (endpoint: EsEndpoint) => <AssetTagsFragment endpoint={endpoint} />;
-      case EndpointListItemFragments.ENDPOINT_IS_EOL: return (endpoint: EsEndpoint) => <AssetEolFragment endpoint={endpoint} />;
+      case EndpointListItemFragments.ENDPOINT_PLATFORM:
+        return (endpoint: EsEndpoint) => <AssetPlatformFragment platform={endpoint.endpoint_platform} />;
+      case EndpointListItemFragments.ENDPOINT_ARCH:
+        return (endpoint: EsEndpoint) => <EndpointArchFragment arch={endpoint.endpoint_arch} />;
+      case EndpointListItemFragments.BASE_TAGS_SIDE:
+        return (endpoint: EsEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side ?? []} />;
+      case EndpointListItemFragments.ENDPOINT_IS_EOL:
+        return (endpoint: EsEndpoint) => <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
         return endpoint[key]?.toString();
