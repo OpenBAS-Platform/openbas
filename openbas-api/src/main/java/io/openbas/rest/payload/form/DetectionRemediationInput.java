@@ -10,14 +10,13 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-@Schema(description = "Common base input for CVE creation and update")
 public class DetectionRemediationInput {
 
   @JsonProperty("detection_remediation_id")
   private String id;
 
   @JsonProperty("detection_remediation_collector")
-  @Schema(description = "Colelctor id")
+  @Schema(description = "Collector id")
   @NotNull
   private String collectorId;
 
