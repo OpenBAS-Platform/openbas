@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.ee.Ee;
+import io.openbas.integrations.CollectorService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class PayloadUtils {
   private final LicenseCacheManager licenseCacheManager;
   private final OutputParserUtils outputParserUtils;
   private final DetectionRemediationUtils detectionRemediationUtils;
+  private final CollectorService collectorService;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -149,7 +151,8 @@ public class PayloadUtils {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
 
-    BeanUtils.copyProperties(payloadInput, target, "outputParsers", "tags", "attackPatterns", "detectionRemediations");
+    BeanUtils.copyProperties(
+        payloadInput, target, "outputParsers", "tags", "attackPatterns", "detectionRemediations");
 
     if (payloadInput instanceof PayloadCreateInput) {
       outputParserUtils.copyOutputParsers(

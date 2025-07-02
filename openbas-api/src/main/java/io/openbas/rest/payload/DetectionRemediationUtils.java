@@ -2,8 +2,10 @@ package io.openbas.rest.payload;
 
 import static java.time.Instant.now;
 
+import io.openbas.database.model.Collector;
 import io.openbas.database.model.DetectionRemediation;
 import io.openbas.database.model.Payload;
+import io.openbas.database.repository.CollectorRepository;
 import io.openbas.rest.payload.form.DetectionRemediationInput;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class DetectionRemediationUtils {
+
+  CollectorRepository collectorRepository;
 
   public <T> void copy(List<T> detectionRemediations, Payload target, boolean copyId) {
     if (detectionRemediations == null) {
@@ -53,6 +57,10 @@ public class DetectionRemediationUtils {
       DetectionRemediation newDetectionRemediation,
       boolean copyId) {
     BeanUtils.copyProperties(input, newDetectionRemediation, "id");
+
+    Collector collector = collectorRepository.findById(input.getCollectorId()).orElseThrow();
+    newDetectionRemediation.setCollector(collector);
+
     if (copyId) {
       newDetectionRemediation.setId(input.getId());
     }
@@ -61,6 +69,9 @@ public class DetectionRemediationUtils {
   private void copy(
       DetectionRemediation origin, DetectionRemediation newDetectionRemediation, boolean copyId) {
     BeanUtils.copyProperties(origin, newDetectionRemediation, "id");
+
+    newDetectionRemediation.setCollector(origin.getCollector());
+
     if (copyId) {
       newDetectionRemediation.setId(origin.getId());
     }
