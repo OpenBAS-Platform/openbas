@@ -7,9 +7,14 @@ import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.AggregatedFindingOutput;
+import io.openbas.rest.finding.form.PageAggregatedFindingOutput;
+import io.openbas.rest.finding.form.PageRelatedFindingOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,13 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/search")
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              schema =
+                  @Schema(
+                      oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
   public Page<AggregatedFindingOutput> findings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
       @RequestParam(value = "distinct", required = false, defaultValue = "false")
@@ -49,6 +61,13 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              schema =
+                  @Schema(
+                      oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
   @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
@@ -71,6 +90,13 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              schema =
+                  @Schema(
+                      oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<AggregatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
@@ -93,6 +119,13 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              schema =
+                  @Schema(
+                      oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<AggregatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
@@ -117,6 +150,13 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              schema =
+                  @Schema(
+                      oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
   @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,

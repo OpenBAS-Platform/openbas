@@ -2686,6 +2686,14 @@ export interface InjectResultOverviewOutput {
   injects_tags?: string[];
 }
 
+/** Inject linked to finding */
+export interface InjectSimple {
+  /** Inject Id */
+  inject_id: string;
+  /** Inject Title */
+  inject_title: string;
+}
+
 export interface InjectStatus {
   listened?: boolean;
   status_id?: string;
@@ -3862,6 +3870,25 @@ export interface PageRawPaginationScenario {
   totalPages?: number;
 }
 
+export interface PageRelatedFindingOutput {
+  content?: RelatedFindingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageRoleOutput {
   content?: RoleOutput[];
   empty?: boolean;
@@ -4459,6 +4486,43 @@ export interface RegexGroupSimple {
   regex_group_index_values: string;
 }
 
+export interface RelatedFindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
+  /** Inject linked to finding */
+  finding_inject: InjectSimple;
+  /** Scenario linked to inject */
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve";
+  /** Finding Value */
+  finding_value: string;
+}
+
 export interface RenewTokenInput {
   token_id: string;
 }
@@ -4695,6 +4759,7 @@ export interface ScenarioRecurrenceInput {
   scenario_recurrence_start?: string;
 }
 
+/** Scenario linked to inject */
 export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
