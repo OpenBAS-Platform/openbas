@@ -72,6 +72,7 @@ public class PayloadUpdateInput {
   private List<String> attackPatternsIds = new ArrayList<>();
 
   @JsonProperty("payload_detection_remediations")
+  @Schema(description = "List of detection remediation gaps for collectors")
   private List<DetectionRemediationInput> detectionRemediations = new ArrayList<>();
 
   @JsonProperty("payload_output_parsers")
