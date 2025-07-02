@@ -25,9 +25,6 @@ steps:
 
   - name: frontend-tests
     image: node:22.16.0-alpine
-    volumes:
-      - name: cache-node-frontend
-        path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
       - yarn install
@@ -74,9 +71,6 @@ steps:
 
   - name: frontend-e2e-tests
     image: node:22.16.0
-    volumes:
-      - name: cache-node-frontend-e2e
-        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -90,9 +84,6 @@ steps:
 
   - name: frontend-api-types
     image: node:22.16.0
-    volumes:
-      - name: cache-node-frontend-api-types
-        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -198,14 +189,3 @@ services:
       discovery.type: single-node
       xpack.security.enabled: false
       ES_JAVA_OPTS: -Xms2g -Xmx2g
-
-volumes:
-  - name: cache-node-frontend
-    host:
-      path: /tmp/cache-node-frontend
-  - name: cache-node-frontend-e2e
-    host:
-      path: /tmp/cache-node-frontend-e2e
-  - name: cache-python
-    host:
-      path: /tmp/cache-python
