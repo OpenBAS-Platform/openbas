@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DetectionRemediationUtils {
 
-  CollectorRepository collectorRepository;
+  private final CollectorRepository collectorRepository;
 
   public <T> void copy(List<T> detectionRemediations, Payload target, boolean copyId) {
     if (detectionRemediations == null) {
