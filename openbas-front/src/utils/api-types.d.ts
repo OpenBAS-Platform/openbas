@@ -925,15 +925,10 @@ export interface CustomDashboardOutput {
   custom_dashboard_name?: string;
 }
 
-export interface CustomDashboardParameterValueInput {
-  custom_dashboards_parameter_value?: string;
-}
-
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
   custom_dashboards_parameter_type: "simulation";
-  custom_dashboards_parameter_value?: string;
   listened?: boolean;
 }
 
