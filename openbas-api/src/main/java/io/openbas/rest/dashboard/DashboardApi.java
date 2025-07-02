@@ -28,7 +28,11 @@ public class DashboardApi extends RestBehavior {
 
   @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(
-      @PathVariable final String widgetId, @RequestBody Map<String, String> parameters) {
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
     Widget widget = this.widgetService.widget(widgetId);
     CustomDashboard customDashboard = widget.getCustomDashboard();
     Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
@@ -37,7 +41,11 @@ public class DashboardApi extends RestBehavior {
 
   @PostMapping(DASHBOARD_URI + "/entities/{widgetId}")
   public List<EsBase> entities(
-      @PathVariable final String widgetId, @RequestBody Map<String, String> parameters) {
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
     Widget widget = this.widgetService.widget(widgetId);
     CustomDashboard customDashboard = widget.getCustomDashboard();
     Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
