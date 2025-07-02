@@ -1,5 +1,5 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
-import { type CustomDashboardInput, type CustomDashboardParameterValueInput, type SearchPaginationInput } from '../../utils/api-types';
+import { type CustomDashboardInput, type SearchPaginationInput } from '../../utils/api-types';
 
 export const CUSTOM_DASHBOARD_URI = '/api/custom-dashboards';
 
@@ -9,15 +9,11 @@ export const createCustomDashboard = (input: CustomDashboardInput) => {
   return simplePostCall(CUSTOM_DASHBOARD_URI, input);
 };
 
-export const customDashboards = () => {
-  return simpleCall(CUSTOM_DASHBOARD_URI);
-};
-
 export const searchCustomDashboards = (searchPaginationInput: SearchPaginationInput) => {
   return simplePostCall(`${CUSTOM_DASHBOARD_URI}/search`, searchPaginationInput);
 };
 
-export const customDashboard = (id: string) => {
+export const fetchCustomDashboard = (id: string) => {
   return simpleCall(`${CUSTOM_DASHBOARD_URI}/${id}`);
 };
 
@@ -29,8 +25,13 @@ export const deleteCustomDashboard = (id: string) => {
   return simpleDelCall(`${CUSTOM_DASHBOARD_URI}/${id}`);
 };
 
-// -- PARAMETERS --
+// -- OPTION --
 
-export const updateCustomDashboardParameter = (customDashboardId: string, parameterId: string, value: CustomDashboardParameterValueInput) => {
-  return simplePutCall(`${CUSTOM_DASHBOARD_URI}/${customDashboardId}/parameters/${parameterId}`, value);
+export const searchCustomDashboardAsOptions = (searchText: string = '') => {
+  const params = { searchText };
+  return simpleCall(`${CUSTOM_DASHBOARD_URI}/options`, { params });
+};
+
+export const searchCustomDashboardByIdAsOptions = (ids: string[]) => {
+  return simplePostCall(`${CUSTOM_DASHBOARD_URI}/options`, ids);
 };

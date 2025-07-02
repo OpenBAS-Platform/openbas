@@ -55,6 +55,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? [],
     exercise_message_header: exercise.exercise_message_header ?? '',
     exercise_message_footer: exercise.exercise_message_footer ?? '',
+    exercise_custom_dashboard: exercise.exercise_custom_dashboard ?? '',
     apply_tag_rule: false,
   };
 
@@ -156,8 +157,8 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_mail_from: data.exercise_mail_from,
       exercise_message_header: data.exercise_message_header,
       exercise_message_footer: data.exercise_message_footer,
+      exercise_custom_dashboard: data.exercise_custom_dashboard,
       apply_tag_rule: data.apply_tag_rule,
-
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };

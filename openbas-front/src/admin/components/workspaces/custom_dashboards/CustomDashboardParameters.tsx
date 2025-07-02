@@ -1,15 +1,20 @@
 import { type FunctionComponent, useContext } from 'react';
 
-import { updateCustomDashboardParameter } from '../../../../actions/custom_dashboards/customdashboard-action';
 import SimulationField from '../../../../components/fields/SimulationField';
 import { CustomDashboardContext } from './CustomDashboardContext';
 
 const CustomDashboardParameters: FunctionComponent = () => {
-  const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
-  const handleParameters = (parameterId: string, value: string | undefined) => {
+  const { customDashboard, customDashboardParameters, setCustomDashboardParameters } = useContext(CustomDashboardContext);
+
+  const getParameterValue = (parameterId: string) => {
+    if (!customDashboard) return undefined;
+    return customDashboardParameters.get(parameterId);
+  };
+  const handleParameters = (parameterId: string, value: string) => {
     if (!customDashboard) return;
-    updateCustomDashboardParameter(customDashboard.custom_dashboard_id, parameterId, { custom_dashboards_parameter_value: value })
-      .then(res => setCustomDashboard(res.data));
+    const params = new Map(customDashboardParameters);
+    params.set(parameterId, value);
+    setCustomDashboardParameters(params);
   };
 
   return (
@@ -20,8 +25,8 @@ const CustomDashboardParameters: FunctionComponent = () => {
             <div key={p.custom_dashboards_parameter_id} style={{ width: 250 }}>
               <SimulationField
                 label={p.custom_dashboards_parameter_name}
-                value={p.custom_dashboards_parameter_value}
-                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value)}
+                value={getParameterValue(p.custom_dashboards_parameter_id)}
+                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
               />
             </div>
           );

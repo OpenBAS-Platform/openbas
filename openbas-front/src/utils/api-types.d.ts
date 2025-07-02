@@ -861,6 +861,7 @@ export interface ContractOutputElementSimple {
 
 export interface CreateExerciseInput {
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -4668,6 +4669,7 @@ export interface Scenario {
   scenario_communications_number?: number;
   /** @format date-time */
   scenario_created_at: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_documents?: string[];
   scenario_exercises?: string[];
@@ -4722,6 +4724,7 @@ export interface ScenarioChallengesReader {
 
 export interface ScenarioInput {
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
@@ -5282,6 +5285,7 @@ export interface UpdateAssetsOnAssetGroupInput {
 export interface UpdateExerciseInput {
   apply_tag_rule?: boolean;
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -5316,6 +5320,7 @@ export interface UpdateProfileInput {
 export interface UpdateScenarioInput {
   apply_tag_rule?: boolean;
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;

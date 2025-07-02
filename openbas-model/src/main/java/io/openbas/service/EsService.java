@@ -2,6 +2,7 @@ package io.openbas.service;
 
 import static io.openbas.utils.EsUtils.*;
 import static java.util.Optional.ofNullable;
+import static org.springframework.util.StringUtils.hasText;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldSort;
@@ -17,6 +18,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.raw.RawUserAuth;
@@ -100,37 +102,56 @@ public class EsService {
   }
 
   // region utils
-  private Query queryFromBaseFilter(Filters.Filter filter, Map<String, String> parameters) {
+  private Query queryFromBaseFilter(
+      Filters.Filter filter,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     Filters.FilterOperator operator = filter.getOperator();
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
     String elasticField = toElasticField(field);
     PropertySchema propertyField = getIndexingSchema().get(field);
+    boolean hasFilteringValues =
+        filter.getValues().stream()
+            .anyMatch(
+                value -> {
+                  CustomDashboardParameters parameter = definitionParameters.get(value);
+                  String computeValue = parameters.getOrDefault(value, "");
+                  return parameter == null
+                      || !parameter.getType().isInstance
+                      || hasText(computeValue);
+                });
     switch (operator) {
       case eq:
-        List<Query> queryList =
-            filter.getValues().stream()
-                .map(
-                    v ->
-                        TermQuery.of(t -> t.field(elasticField).value(toVal(field, v, parameters)))
-                            ._toQuery())
-                .toList();
-        if (filterMode == Filters.FilterMode.and) {
-          boolQuery.must(queryList);
-        } else {
-          boolQuery.should(queryList).minimumShouldMatch("1");
+        if (hasFilteringValues) {
+          List<Query> queryList =
+              filter.getValues().stream()
+                  .map(
+                      v ->
+                          TermQuery.of(
+                                  t -> t.field(elasticField).value(toVal(field, v, parameters)))
+                              ._toQuery())
+                  .toList();
+          if (filterMode == Filters.FilterMode.and) {
+            boolQuery.must(queryList);
+          } else {
+            boolQuery.should(queryList).minimumShouldMatch("1");
+          }
         }
         break;
       case not_eq:
-        List<Query> queryNotList =
-            filter.getValues().stream()
-                .map(
-                    v ->
-                        TermQuery.of(t -> t.field(elasticField).value(toVal(field, v, parameters)))
-                            ._toQuery())
-                .toList();
-        boolQuery.mustNot(queryNotList);
+        if (hasFilteringValues) {
+          List<Query> queryNotList =
+              filter.getValues().stream()
+                  .map(
+                      v ->
+                          TermQuery.of(
+                                  t -> t.field(elasticField).value(toVal(field, v, parameters)))
+                              ._toQuery())
+                  .toList();
+          boolQuery.mustNot(queryNotList);
+        }
         break;
       case contains:
         List<Query> containsQueries =
@@ -218,12 +239,16 @@ public class EsService {
     return queryStringQuery.build()._toQuery();
   }
 
-  private Query queryFromFilter(Filters.FilterGroup groupFilter, Map<String, String> parameters) {
+  private Query queryFromFilter(
+      Filters.FilterGroup groupFilter,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     Filters.FilterMode filterMode = groupFilter.getMode();
     BoolQuery.Builder filterQuery = new BoolQuery.Builder();
     List<Query> filterQueries = new ArrayList<>();
     List<Filters.Filter> filters = groupFilter.getFilters();
-    filters.forEach(f -> filterQueries.add(queryFromBaseFilter(f, parameters)));
+    filters.forEach(
+        f -> filterQueries.add(queryFromBaseFilter(f, parameters, definitionParameters)));
     if (filterMode == Filters.FilterMode.and) {
       filterQuery.must(filterQueries);
     } else {
@@ -237,7 +262,8 @@ public class EsService {
       RawUserAuth user,
       String search,
       Filters.FilterGroup groupFilter,
-      Map<String, String> parameters) {
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder mainQuery = new BoolQuery.Builder();
     List<Query> mainMust = new ArrayList<>();
     Query restrictionQuery = buildQueryRestrictions(user);
@@ -251,7 +277,7 @@ public class EsService {
       shouldList.add(searchQuery);
     }
     if (groupFilter != null && groupFilter.getFilters() != null) {
-      Query filterQuery = queryFromFilter(groupFilter, parameters);
+      Query filterQuery = queryFromFilter(groupFilter, parameters, definitionParameters);
       shouldList.add(filterQuery);
     }
     if (shouldList.isEmpty()) {
@@ -270,7 +296,7 @@ public class EsService {
     filter.setOperator(Filters.FilterOperator.eq);
     filter.setValues(ids);
     filterGroup.setFilters(List.of(filter));
-    Query query = buildQuery(user, null, filterGroup, new HashMap<>());
+    Query query = buildQuery(user, null, filterGroup, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsBase> response =
           elasticClient.search(
@@ -371,7 +397,13 @@ public class EsService {
   public long count(RawUserAuth user, CountRuntime runtime) {
     try {
       CountConfig config = runtime.getConfig();
-      Query query = buildQuery(user, null, config.getFilter(), runtime.getParameters());
+      Query query =
+          buildQuery(
+              user,
+              null,
+              config.getFilter(),
+              runtime.getParameters(),
+              runtime.getDefinitionParameters());
       return elasticClient
           .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
           .count();
@@ -385,8 +417,9 @@ public class EsService {
       RawUserAuth user,
       StructuralHistogramWidget widgetConfig,
       StructuralHistogramSeries config,
-      Map<String, String> parameters) {
-    Query query = buildQuery(user, null, config.getFilter(), parameters);
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
+    Query query = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
@@ -478,9 +511,10 @@ public class EsService {
 
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
     return runtime.getWidget().getSeries().stream()
         .parallel()
-        .map(c -> termHistogram(user, runtime.getWidget(), c, parameters))
+        .map(c -> termHistogram(user, runtime.getWidget(), c, parameters, definitionParameters))
         .toList();
   }
 
@@ -488,7 +522,8 @@ public class EsService {
       RawUserAuth user,
       DateHistogramWidget widgetConfig,
       DateHistogramSeries config,
-      Map<String, String> parameters) {
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
     String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
     Instant startInstant = Instant.parse(start);
@@ -498,7 +533,8 @@ public class EsService {
         DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
             ._toRangeQuery()
             ._toQuery();
-    Query filterQuery = buildQuery(user, null, config.getFilter(), parameters);
+    Query filterQuery =
+        buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
     bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
@@ -542,9 +578,10 @@ public class EsService {
 
   public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
     return runtime.getWidget().getSeries().stream()
         .parallel()
-        .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters))
+        .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters, definitionParameters))
         .toList();
   }
 
@@ -582,7 +619,8 @@ public class EsService {
               SortOptions.of(
                   so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
     }
-    Query query = buildQuery(user, "", searchFilters, new HashMap<>());
+    Query query =
+        buildQuery(user, "", searchFilters, new HashMap<>(), runtime.getDefinitionParameters());
     try {
       SearchResponse<?> response =
           elasticClient.search(
@@ -611,7 +649,7 @@ public class EsService {
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
-    Query query = buildQuery(user, search, filter, new HashMap<>());
+    Query query = buildQuery(user, search, filter, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsSearch> response =
           elasticClient.search(

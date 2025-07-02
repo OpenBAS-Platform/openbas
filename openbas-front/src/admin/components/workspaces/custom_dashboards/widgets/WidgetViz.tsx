@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useState } from 'react';
 
-import { entities } from '../../../../../actions/dashboards/dashboard-action';
+import { entities, series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsBase, type EsSeries } from '../../../../../utils/api-types';
@@ -26,24 +26,24 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { series } = useContext(CustomDashboardContext);
+  const { customDashboardParameters } = useContext(CustomDashboardContext);
   useEffect(() => {
     switch (widget.widget_type) {
       case 'list':
-        entities(widget.widget_id).then((response) => {
+        entities(widget.widget_id, customDashboardParameters).then((response) => {
           if (response.data) {
             setEntitiesVizData(response.data);
           }
         }).finally(() => setLoading(false));
         break;
       default:
-        series(widget.widget_id).then((response) => {
+        series(widget.widget_id, customDashboardParameters).then((response) => {
           if (response.data) {
             setSeriesVizData(response.data);
           }
         }).finally(() => setLoading(false));
     }
-  }, [widget]);
+  }, [widget, customDashboardParameters]);
 
   if (loading) {
     return <Loader variant="inElement" />;

@@ -52,7 +52,7 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) =
       isOptionEqualToValue={(option, value) => option.id === value.id}
       onInputChange={(_, search, reason) => {
         if (reason === 'input') {
-          searchOptions('simulations', search);
+          searchOptions(SIMULATIONS, search);
         }
       }}
       onChange={(_, newValue) => {

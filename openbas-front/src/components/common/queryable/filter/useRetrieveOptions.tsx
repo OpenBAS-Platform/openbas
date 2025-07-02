@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchCustomDashboardByIdAsOptions } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { searchInjectByIdAsOption, searchTargetOptionsById } from '../../../../actions/injects/inject-action';
@@ -13,7 +14,7 @@ import { searchSimulationByIdAsOptions } from '../../../../actions/simulations/s
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
-import { SIMULATIONS } from './constants';
+import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -117,6 +118,11 @@ const useRetrieveOptions = () => {
         break;
       case 'user_organization':
         searchOrganizationByIdAsOptions(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case CUSTOM_DASHBOARD:
+        searchCustomDashboardByIdAsOptions(ids).then((response) => {
           setOptions(response.data);
         });
         break;

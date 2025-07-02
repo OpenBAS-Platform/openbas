@@ -1,23 +1,22 @@
 package io.openbas.engine.api;
 
-import java.util.HashMap;
+import io.openbas.database.model.CustomDashboardParameters;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CountRuntime {
+public class CountRuntime extends Runtime {
+
   private CountConfig config;
-  private Map<String, String> parameters;
 
-  public CountRuntime(CountConfig config) {
-    this.config = config;
-    this.parameters = new HashMap<>();
-  }
-
-  public CountRuntime(CountConfig config, Map<String, String> parameters) {
+  public CountRuntime(
+      CountConfig config,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     this.config = config;
     this.parameters = parameters;
+    this.definitionParameters = definitionParameters;
   }
 }

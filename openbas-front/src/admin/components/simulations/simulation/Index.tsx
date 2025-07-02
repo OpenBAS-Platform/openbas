@@ -1,12 +1,12 @@
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
-import { type FunctionComponent, lazy, Suspense, useMemo, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router';
+import { type FunctionComponent, lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
-import { customDashboardForSimulation, seriesForSimulation } from '../../../../actions/simulations/simulation-customdashboard-action';
+import { seriesForSimulation } from '../../../../actions/simulations/simulation-customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
@@ -49,11 +49,13 @@ const useStyles = makeStyles()(() => ({
 const SimulationAnalysisComponent = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
+  const [parameters, setParameters] = useState<Map<string, string>>(new Map());
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,
-    fetchCustomDashboard: (customDashboardId: string) => customDashboardForSimulation(exerciseId, customDashboardId),
     series: (widgetId: string) => seriesForSimulation(exerciseId, widgetId),
+    customDashboardParameters: parameters,
+    setCustomDashboardParameters: setParameters,
   }), [customDashboardValue, setCustomDashboardValue]);
 
   return (
@@ -66,6 +68,7 @@ const SimulationAnalysisComponent = () => {
 const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercise }) => {
   const { t, fldt } = useFormatter();
   const location = useLocation();
+  const navigate = useNavigate();
   const { classes } = useStyles();
   const permissionsContext: PermissionsContextType = { permissions: usePermissions(exercise.exercise_id) };
   const documentContext: DocumentContextType = {
@@ -80,6 +83,18 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
         : [],
     }),
   };
+
+  useEffect(() => {
+    const analysisPath = `/admin/simulations/${exercise.exercise_id}/analysis`;
+
+    if (
+      location.pathname.startsWith(analysisPath)
+      && !exercise.exercise_custom_dashboard
+    ) {
+      navigate(`/admin/simulations/${exercise.exercise_id}`, { replace: true });
+    }
+  }, [exercise.exercise_custom_dashboard, location.pathname, exercise.exercise_id, navigate]);
+
   let tabValue = location.pathname;
   if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/definition`)) {
     tabValue = `/admin/simulations/${exercise.exercise_id}/definition`;
@@ -90,6 +105,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
   } else if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/tests`)) {
     tabValue = `/admin/simulations/${exercise.exercise_id}/tests`;
   }
+
   return (
     <PermissionsContext.Provider value={permissionsContext}>
       <DocumentContext.Provider value={documentContext}>
@@ -158,12 +174,14 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
                 value={`/admin/simulations/${exercise.exercise_id}/findings`}
                 label={t('Findings')}
               />
-              <Tab
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}/analysis`}
-                value={`/admin/simulations/${exercise.exercise_id}/analysis`}
-                label={t('Analysis')}
-              />
+              {exercise.exercise_custom_dashboard && (
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/analysis`}
+                  value={`/admin/simulations/${exercise.exercise_id}/analysis`}
+                  label={t('Analysis')}
+                />
+              )}
             </Tabs>
             <div className={classes.scheduling}>
               <ExerciseDatePopover exercise={exercise} />

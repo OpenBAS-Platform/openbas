@@ -2,7 +2,7 @@ package io.openbas.rest.dashboard;
 
 import static io.openbas.config.SessionHelper.currentUser;
 
-import io.openbas.database.model.Filters;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
@@ -11,7 +11,6 @@ import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.service.EsService;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -25,42 +24,36 @@ public class DashboardService {
   private final EsService esService;
   private final UserRepository userRepository;
 
-  public long count(final String type) {
-    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
-    Filters.Filter filter = new Filters.Filter();
-    filter.setKey("base_entity");
-    filter.setOperator(Filters.FilterOperator.eq);
-    filter.setValues(List.of(type));
-    filterGroup.setFilters(List.of(filter));
-    CountConfig config = new CountConfig("Series01", filterGroup);
-    CountRuntime runtime = new CountRuntime(config);
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.count(userWithAuth, runtime);
-  }
-
-  public List<EsSeries> series(@NotNull final Widget widget, Map<String, String> parameters) {
+  public List<EsSeries> series(
+      @NotNull final Widget widget,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
       DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-      DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
+      DateHistogramRuntime runtime =
+          new DateHistogramRuntime(config, parameters, definitionParameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
       StructuralHistogramWidget config =
           (StructuralHistogramWidget) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-      StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
+      StructuralHistogramRuntime runtime =
+          new StructuralHistogramRuntime(config, parameters, definitionParameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
     }
     throw new RuntimeException("Unsupported widget: " + widget);
   }
 
-  public List<EsBase> entities(@NotNull final Widget widget) {
+  public List<EsBase> entities(
+      @NotNull final Widget widget,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
-    Map<String, String> parameters = new HashMap<>();
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    ListRuntime runtime = new ListRuntime(config, parameters);
+    ListRuntime runtime = new ListRuntime(config, parameters, definitionParameters);
 
     return esService.entities(userWithAuth, runtime);
   }

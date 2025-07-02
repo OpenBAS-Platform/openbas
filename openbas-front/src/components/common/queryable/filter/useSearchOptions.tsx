@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { searchAssetGroupAsOption, searchAssetGroupLinkedToFindingsAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointAsOption, searchEndpointLinkedToFindingsAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
+import { searchCustomDashboardAsOptions } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { searchExerciseLinkedToFindingsAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
 import { searchInjectLinkedToFindingsAsOption, searchTargetOptions } from '../../../../actions/injects/inject-action';
@@ -14,7 +15,7 @@ import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
-import { SIMULATIONS } from './constants';
+import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -140,6 +141,11 @@ const useSearchOptions = () => {
             id: d.id,
             label: t(d.label),
           })));
+        });
+        break;
+      case CUSTOM_DASHBOARD:
+        searchCustomDashboardAsOptions(search).then((response) => {
+          setOptions(response.data);
         });
         break;
       default:

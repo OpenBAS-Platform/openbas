@@ -3,8 +3,8 @@ package io.openbas.rest.custom_dashboard;
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
-import io.openbas.rest.custom_dashboard.form.CustomDashboardParameterValueInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -70,17 +70,16 @@ public class CustomDashboardApi extends RestBehavior {
     return ResponseEntity.noContent().build();
   }
 
-  // -- PARAMETERS --
+  // -- OPTION --
 
-  @PutMapping("/{customDashboardId}/parameters/{parameterId}")
-  public ResponseEntity<CustomDashboard> updateCustomDashboardParameter(
-      @PathVariable @NotBlank final String customDashboardId,
-      @PathVariable @NotBlank final String parameterId,
-      @RequestBody final CustomDashboardParameterValueInput value) {
-    CustomDashboard existingCustomDashboard =
-        this.customDashboardService.customDashboard(customDashboardId);
-    return ResponseEntity.ok(
-        this.customDashboardService.updateCustomDashboardParameter(
-            existingCustomDashboard, parameterId, value.getValue()));
+  @GetMapping("/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return this.customDashboardService.findAllAsOptions(searchText);
+  }
+
+  @PostMapping("/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return this.customDashboardService.findAllByIdsAsOptions(ids);
   }
 }

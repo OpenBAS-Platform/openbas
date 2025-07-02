@@ -16,7 +16,15 @@ import org.hibernate.annotations.UuidGenerator;
 public class CustomDashboardParameters implements Base {
 
   public enum CustomDashboardParameterType {
-    simulation
+    simulation("simulation", true);
+
+    public final String name;
+    public final boolean isInstance;
+
+    CustomDashboardParameterType(String name, boolean isInstance) {
+      this.name = name;
+      this.isInstance = isInstance;
+    }
   }
 
   @Id
@@ -36,10 +44,6 @@ public class CustomDashboardParameters implements Base {
   @NotNull
   @JsonProperty("custom_dashboards_parameter_type")
   private CustomDashboardParameterType type;
-
-  @Column(name = "custom_dashboards_parameter_value")
-  @JsonProperty("custom_dashboards_parameter_value")
-  private String value;
 
   // -- RELATION --
 

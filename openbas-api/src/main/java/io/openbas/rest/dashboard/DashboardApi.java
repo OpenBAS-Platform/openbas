@@ -3,6 +3,7 @@ package io.openbas.rest.dashboard;
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
@@ -13,9 +14,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Secured(ROLE_USER)
@@ -27,23 +26,22 @@ public class DashboardApi extends RestBehavior {
   private final WidgetService widgetService;
   private final DashboardService dashboardService;
 
-  @GetMapping(DASHBOARD_URI + "/count/{type}")
-  public long count(@PathVariable String type) {
-    return this.dashboardService.count(type);
-  }
-
-  @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
-  public List<EsSeries> series(@PathVariable final String widgetId) {
+  @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
+  public List<EsSeries> series(
+      @PathVariable final String widgetId, @RequestBody Map<String, String> parameters) {
     Widget widget = this.widgetService.widget(widgetId);
     CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, String> parameters = customDashboard.toParametersMap();
-    return this.dashboardService.series(widget, parameters);
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.series(widget, parameters, definitionParameters);
   }
 
-  @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
-  public List<EsBase> entities(@PathVariable final String widgetId) {
+  @PostMapping(DASHBOARD_URI + "/entities/{widgetId}")
+  public List<EsBase> entities(
+      @PathVariable final String widgetId, @RequestBody Map<String, String> parameters) {
     Widget widget = this.widgetService.widget(widgetId);
-    return this.dashboardService.entities(widget);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.entities(widget, parameters, definitionParameters);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

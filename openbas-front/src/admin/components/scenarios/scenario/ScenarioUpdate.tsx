@@ -49,6 +49,7 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     scenario_message_footer,
     scenario_mail_from,
     scenario_mails_reply_to,
+    scenario_custom_dashboard,
   }) => ({
     scenario_name,
     scenario_subtitle: scenario_subtitle ?? '',
@@ -63,6 +64,7 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     scenario_message_footer: scenario_message_footer ?? '',
     scenario_mail_from: scenario_mail_from ?? '',
     scenario_mails_reply_to: scenario_mails_reply_to ?? [],
+    scenario_custom_dashboard: scenario_custom_dashboard ?? '',
   }))(scenario);
 
   const [scenarioFormData, setScenarioFormData] = useState<UpdateScenarioInput>(initialValues);

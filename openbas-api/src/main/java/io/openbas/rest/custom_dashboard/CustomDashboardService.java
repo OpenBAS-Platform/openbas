@@ -1,19 +1,21 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.specification.CustomDashboardSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,21 +67,20 @@ public class CustomDashboardService {
     this.customDashboardRepository.deleteById(id);
   }
 
-  // -- PARAMETERS --
+  // -- OPTION --
 
-  @Transactional
-  public CustomDashboard updateCustomDashboardParameter(
-      @NotNull final CustomDashboard customDashboard,
-      @NotNull final String parameterId,
-      @Nullable final String value) {
-    customDashboard
-        .getParameters()
-        .forEach(
-            p -> {
-              if (p.getId().equals(parameterId)) {
-                p.setValue(value);
-              }
-            });
-    return updateCustomDashboard(customDashboard);
+  public List<FilterUtilsJpa.Option> findAllAsOptions(final String searchText) {
+    return fromIterable(
+            customDashboardRepository.findAll(
+                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  public List<FilterUtilsJpa.Option> findAllByIdsAsOptions(final List<String> ids) {
+    return fromIterable(customDashboardRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

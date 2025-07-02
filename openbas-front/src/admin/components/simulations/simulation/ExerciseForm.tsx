@@ -5,6 +5,7 @@ import { type FunctionComponent, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import CustomDashboardFieldController from '../../../../components/fields/CustomDashboardFieldController';
 import SelectField from '../../../../components/fields/SelectField';
 import TagField from '../../../../components/fields/TagField';
 import TextField from '../../../../components/fields/TextField';
@@ -66,6 +67,7 @@ const ExerciseForm: FunctionComponent<Props> = ({
         exercise_mails_reply_to: z.array(z.string().email(t('Should be a valid email address'))).optional(),
         exercise_message_header: z.string().optional(),
         exercise_message_footer: z.string().optional(),
+        exercise_custom_dashboard: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -327,6 +329,13 @@ const ExerciseForm: FunctionComponent<Props> = ({
         inputProps={register('exercise_message_footer')}
         disabled={disabled}
       />
+      <div style={{ marginTop: 20 }}>
+        <CustomDashboardFieldController
+          control={control}
+          name="exercise_custom_dashboard"
+          label={t('Dashboard')}
+        />
+      </div>
 
       <div style={{
         float: 'right',

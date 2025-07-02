@@ -150,6 +150,7 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
                     sx={{
                       margin: 0,
                       paddingLeft: theme.spacing(2),
+                      paddingTop: theme.spacing(2.5),
                       textTransform: 'uppercase',
                     }}
                   >

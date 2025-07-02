@@ -12,12 +12,14 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
+import io.openbas.rest.custom_dashboard.CustomDashboardService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.exercise.exports.*;
@@ -70,6 +72,7 @@ public class ExerciseApi extends RestBehavior {
   public static final String EXERCISE_URI = "/api/exercises";
 
   // region repositories
+  private final CustomDashboardService customDashboardService;
   private final LogRepository logRepository;
   private final TagRepository tagRepository;
   private final UserRepository userRepository;
@@ -315,6 +318,12 @@ public class ExerciseApi extends RestBehavior {
     Exercise exercise = new Exercise();
     exercise.setUpdateAttributes(input);
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    if (hasText(input.getCustomDashboard())) {
+      exercise.setCustomDashboard(
+          this.customDashboardService.customDashboard(input.getCustomDashboard()));
+    } else {
+      exercise.setCustomDashboard(null);
+    }
     return this.exerciseService.createExercise(exercise);
   }
 
@@ -334,6 +343,12 @@ public class ExerciseApi extends RestBehavior {
     Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
+    if (hasText(input.getCustomDashboard())) {
+      exercise.setCustomDashboard(
+          this.customDashboardService.customDashboard(input.getCustomDashboard()));
+    } else {
+      exercise.setCustomDashboard(null);
+    }
     return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 

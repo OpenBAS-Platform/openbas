@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static java.time.Instant.now;
+import static java.util.function.Function.identity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -75,11 +76,8 @@ public class CustomDashboard implements Base {
 
   // -- UTILS --
 
-  public Map<String, String> toParametersMap() {
+  public Map<String, CustomDashboardParameters> toParametersMap() {
     return this.getParameters().stream()
-        .filter(param -> param.getValue() != null)
-        .collect(
-            Collectors.toMap(
-                CustomDashboardParameters::getId, CustomDashboardParameters::getValue));
+        .collect(Collectors.toMap(CustomDashboardParameters::getId, identity()));
   }
 }

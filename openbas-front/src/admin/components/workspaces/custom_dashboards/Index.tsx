@@ -2,8 +2,7 @@ import { Alert, AlertTitle } from '@mui/material';
 import { type FunctionComponent, lazy, Suspense, useContext, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router';
 
-import { customDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
-import { series } from '../../../../actions/dashboards/dashboard-action';
+import { fetchCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
@@ -19,7 +18,7 @@ const CustomDashboardIndexComponent: FunctionComponent = () => {
   const { t } = useFormatter();
 
   const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
-  const { customDashboard, setCustomDashboard, fetchCustomDashboard } = useContext(CustomDashboardContext);
+  const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,12 +76,13 @@ const CustomDashboardIndexComponent: FunctionComponent = () => {
 
 const CustomDashboardIndex = () => {
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
+  const [parameters, setParameters] = useState<Map<string, string>>(new Map());
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,
-    fetchCustomDashboard: (customDashboardId: string) => customDashboard(customDashboardId),
-    series: (widgetId: string) => series(widgetId),
-  }), [customDashboardValue, setCustomDashboardValue]);
+    customDashboardParameters: parameters,
+    setCustomDashboardParameters: setParameters,
+  }), [customDashboardValue, setCustomDashboardValue, parameters, setParameters]);
 
   return (
     <CustomDashboardContext.Provider value={contextValue}>
