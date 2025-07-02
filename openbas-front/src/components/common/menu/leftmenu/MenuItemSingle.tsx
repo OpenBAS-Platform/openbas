@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router';
 import { useFormatter } from '../../../i18n';
 import { type LeftMenuItem } from './leftmenu-model';
 import StyledTooltip from './StyledTooltip';
+import { ADMIN_PATH } from '../../../../admin/components/nav/LeftBar';
 
 interface Props {
   navOpen: boolean;
@@ -16,7 +17,14 @@ const MenuItemSingle: FunctionComponent<Props> = ({ navOpen, item }) => {
   const { t } = useFormatter();
   const location = useLocation();
 
-  const isCurrentTab = location.pathname === item.path;
+  let isCurrentTab;
+
+  if (ADMIN_PATH === item.path) {
+    isCurrentTab = location.pathname === item.path;
+  } else {
+    isCurrentTab = location.pathname.includes(item.path);
+  }
+
   return (
     <StyledTooltip title={!navOpen && t(item.label)} placement="right">
       <MenuItem
