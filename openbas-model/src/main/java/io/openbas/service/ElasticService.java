@@ -5,7 +5,10 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.*;
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
@@ -371,7 +374,6 @@ public class ElasticService implements EngineService {
           BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1"))._toQuery();
       elasticClient.deleteByQuery(
           new DeleteByQueryRequest.Builder()
-              .conflicts(Conflicts.Proceed)
               .index(engineConfig.getIndexPrefix() + "*")
               .query(query)
               .build());
