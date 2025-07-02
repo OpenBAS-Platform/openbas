@@ -185,7 +185,7 @@ public class Payload implements Base {
       mappedBy = "payload",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
-      fetch = FetchType.LAZY)
+      fetch = FetchType.EAGER)
   @JsonProperty("payload_detection_remediations")
   private List<DetectionRemediation> detectionRemediations = new ArrayList<>();
 

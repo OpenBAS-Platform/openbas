@@ -52,6 +52,7 @@ public class AtomicTestingService {
   private final TeamRepository teamRepository;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
+  private final PayloadRepository payloadRepository;
   private final AssetGroupService assetGroupService;
 
   private final InjectSearchService injectSearchService;
@@ -249,5 +250,9 @@ public class AtomicTestingService {
         searchPaginationInput,
         Inject.class,
         joinMap);
+  }
+
+  public List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId) {
+    return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
   }
 }

@@ -12,6 +12,7 @@ const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
 const AtomicTestingFindings = lazy(() => import('./AtomicTestingFindings'));
 const AtomicTestingPayloadInfo = lazy(() => import('./payload_info/AtomicTestingPayloadInfo'));
+const AtomicTestingRemediations = lazy(() => import('./AtomicTestingRemediations'));
 
 const AtomicTestingRoutes = ({ injectResultOverview }: Props) => {
   return (
@@ -23,7 +24,10 @@ const AtomicTestingRoutes = ({ injectResultOverview }: Props) => {
       )}
       <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
       {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
-        <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
+        <>
+          <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
+          <Route path="remediations" element={errorWrapper(AtomicTestingRemediations)()} />
+        </>
       )}
       <Route path="*" element={<NotFound />} />
     </Routes>
