@@ -26,9 +26,9 @@ public class V4_01__Detection_Remediation extends BaseJavaMigration {
               """);
 
       statement.execute(
-          "CREATE INDEX idx_detection_remediation_collector ON payload_detection_remediations(detection_remediation_collector_id);");
+          "CREATE INDEX idx_detection_remediation_collector ON detection_remediations(detection_remediation_collector_id);");
       statement.execute(
-          "CREATE INDEX idx_detection_remediation_payload ON payload_detection_remediations(detection_remediation_payload_id);");
+          "CREATE INDEX idx_detection_remediation_payload ON detection_remediations(detection_remediation_payload_id);");
     }
   }
 }
