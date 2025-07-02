@@ -22,7 +22,9 @@ public class EngineConfig {
 
   private int maxResultWindow = 100000;
 
-  private int defaultPagination = 500;
+  private int defaultEntitiesCap = 100;
+
+  private int defaultSearchCap = 500;
 
   private long maxPrimaryShardDocs = 75000000;
 
