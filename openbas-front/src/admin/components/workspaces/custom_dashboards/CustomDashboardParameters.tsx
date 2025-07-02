@@ -8,13 +8,14 @@ const CustomDashboardParameters: FunctionComponent = () => {
 
   const getParameterValue = (parameterId: string) => {
     if (!customDashboard) return undefined;
-    return customDashboardParameters.get(parameterId);
+    return customDashboardParameters[parameterId];
   };
   const handleParameters = (parameterId: string, value: string) => {
     if (!customDashboard) return;
-    const params = new Map(customDashboardParameters);
-    params.set(parameterId, value);
-    setCustomDashboardParameters(params);
+    setCustomDashboardParameters(prev => ({
+      ...prev,
+      [parameterId]: value,
+    }));
   };
 
   return (

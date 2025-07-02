@@ -2,6 +2,7 @@ import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
 import { type FunctionComponent, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
@@ -49,7 +50,7 @@ const useStyles = makeStyles()(() => ({
 const SimulationAnalysisComponent = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [parameters, setParameters] = useState<Map<string, string>>(new Map());
+  const [parameters, setParameters] = useLocalStorage<Record<string, string>>('custom-dashboard-simulation-' + exerciseId, Object.fromEntries(new Map()));
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,

@@ -1,6 +1,7 @@
 import { Alert, AlertTitle } from '@mui/material';
 import { type FunctionComponent, lazy, Suspense, useContext, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { fetchCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -75,8 +76,9 @@ const CustomDashboardIndexComponent: FunctionComponent = () => {
 };
 
 const CustomDashboardIndex = () => {
+  const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [parameters, setParameters] = useState<Map<string, string>>(new Map());
+  const [parameters, setParameters] = useLocalStorage<Record<string, string>>('custom-dashboard-' + customDashboardId, Object.fromEntries(new Map()));
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,

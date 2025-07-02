@@ -25,14 +25,14 @@ const SimulationAnalysis = () => {
           // FIXME: Revise the parameter definition to indicate a hidden filter
           setCustomDashboard(dashboard);
 
-          const params = new Map();
+          const params: Record<string, string> = {};
           dashboard.custom_dashboard_parameters?.forEach((p: {
             custom_dashboards_parameter_type: string;
             custom_dashboards_parameter_id: string;
           }) => {
             // FIXME: Rework the parameter definition to flag it as a hidden filter, which should also be treated as contextual and not displayed
             if ('simulation' === p.custom_dashboards_parameter_type) {
-              params.set(p.custom_dashboards_parameter_id, exerciseId);
+              params[p.custom_dashboards_parameter_id] = exerciseId;
             }
           });
           setCustomDashboardParameters(params);
