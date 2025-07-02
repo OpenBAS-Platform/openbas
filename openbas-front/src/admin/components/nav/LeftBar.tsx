@@ -21,8 +21,7 @@ import {
 import { type UserHelper } from '../../../actions/helper';
 import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
 import { useHelper } from '../../../store';
-
-export const ADMIN_PATH = `/admin`;
+import { ADMIN_BASE_URL } from '../../../constants/BaseUrls';
 
 const LeftBar = () => {
   const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
@@ -30,7 +29,7 @@ const LeftBar = () => {
     {
       items: [
         {
-          path: ADMIN_PATH,
+          path: ADMIN_BASE_URL,
           icon: () => (<DashboardOutlined />),
           label: 'Home',
         },
