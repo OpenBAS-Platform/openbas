@@ -56,6 +56,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
         data: data.map(n => ({
           x: n.label,
           y: n.value,
+          meta: n.key,
         })),
       });
     }

@@ -361,20 +361,25 @@ export const verticalBarsChartOptions = (
   }),
 });
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type CustomClickBarFunction = (event: any, charContext?: any, config?: any) => void;
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type CustomCursorBarFunction = (event: any, charContext?: any, config?: any) => void;
+
 /**
  * @param {Theme} theme
  * @param {boolean} adjustTicks
  * @param {function} xFormatter
  * @param {function} yFormatter
  * @param {boolean} distributed
- * @param {function} navigate
- * @param {object[]} redirectionUtils
  * @param {boolean} stacked
  * @param {boolean} total
  * @param {string[]} categories
  * @param {boolean} legend
  * @param {boolean} isFakeData
  * @param {string} emptyChartText
+ * @param {function} customClickBarFunction
+ * @param {function} customCursorBarFunction
  */
 export const horizontalBarsChartOptions = (
   theme: Theme,
@@ -388,8 +393,22 @@ export const horizontalBarsChartOptions = (
   legend = false,
   isFakeData = false,
   emptyChartText = '',
+  customClickBarFunction?: CustomClickBarFunction,
+  customCursorBarFunction?: CustomCursorBarFunction,
 ): ApexOptions => ({
   chart: {
+    events: {
+      dataPointSelection(event, charContext?, config?) {
+        if (customClickBarFunction) {
+          customClickBarFunction(event, charContext, config);
+        }
+      },
+      dataPointMouseEnter(event, charContext?, config?) {
+        if (customCursorBarFunction) {
+          customCursorBarFunction(event, charContext, config);
+        }
+      },
+    },
     type: 'bar',
     background: 'transparent',
     toolbar: toolbarOptions,
