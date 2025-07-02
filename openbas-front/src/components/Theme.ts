@@ -65,4 +65,5 @@ export interface LabelColor {
 export const LabelColorDict = {
   Red: 'RED',
   Green: 'GREEN',
+  Orange: 'ORANGE',
 } as const;

@@ -3,12 +3,12 @@ import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
+import AssetTagsFragment from '../../../../components/common/list/fragments/AssetTagsFragment';
+import AssetTypeFragment from '../../../../components/common/list/fragments/AssetTypeFragment';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type EndpointOutput } from '../../../../utils/api-types';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
-import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
-import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
-import AssetTypeFragment from '../../common/endpoints/fragments/output/AssetTypeFragment';
 import { type EndpointPopoverProps } from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -69,19 +69,19 @@ const EndpointsList: FunctionComponent<Props> = ({
       field: EndpointListItemFragments.ASSET_PLATFORM,
       label: 'Platform',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => <AssetPlatformFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <AssetPlatformFragment platform={endpoint.endpoint_platform} />,
     },
     {
       field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <AssetTagsFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <AssetTagsFragment tags={endpoint.asset_tags} />,
     },
     {
       field: EndpointListItemFragments.ASSET_TYPE,
       label: 'Type',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <AssetTypeFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <AssetTypeFragment type={endpoint.asset_type} />,
     },
   ];
 

@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import { searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import InverseBooleanFragment from '../../../../../components/common/list/fragments/InverseBooleanFragment';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
@@ -15,7 +16,6 @@ import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
-import AssetEolFragment from '../../../common/endpoints/fragments/output/AssetEolFragment';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 import AgentList from './AgentList';
@@ -113,7 +113,7 @@ const Endpoint = () => {
         </div>
         <div>
           <Typography variant="h3" gutterBottom>{t('End of Life')}</Typography>
-          <AssetEolFragment endpoint={endpoint} />
+          <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />
         </div>
         <div>
           <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>

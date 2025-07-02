@@ -27,7 +27,7 @@ const SimulationFindings = () => {
 
   return (
     <FindingList
-      filterLocalStorageKey="simulation-findings"
+      filterLocalStorageKey={`simulation-findings_${exerciseId}`}
       searchFindings={search}
       additionalHeaders={additionalHeaders}
       additionalFilterNames={additionalFilterNames}

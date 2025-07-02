@@ -16,7 +16,18 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
 
   @Query(
       value =
-          "SELECT CONCAT(a.asset_id, '_', i.inject_exercise) as base_id, "
+          "WITH agents_per_asset AS ("
+              + "SELECT a.asset_id, "
+              + "array_agg(ag.agent_id) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_ids, "
+              + "array_agg(ag.agent_privilege) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_privs, "
+              + "array_agg(ag.agent_last_seen) FILTER ( WHERE ag.agent_id IS NOT NULL ) as agent_last_seen "
+              + "FROM assets a LEFT JOIN agents ag ON a.asset_id = ag.agent_asset "
+              + "WHERE a.asset_type = '"
+              + AssetType.Values.ENDPOINT_TYPE
+              + "'"
+              + "GROUP BY a.asset_id"
+              + ")"
+              + "SELECT CONCAT(a.asset_id, '_', i.inject_exercise) as base_id, "
               + "a.asset_id as vulnerable_endpoint_id, "
               + "i.inject_exercise as vulnerable_endpoint_simulation, "
               + "a.endpoint_hostname as vulnerable_endpoint_hostname, "
@@ -28,16 +39,16 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "  THEN e.exercise_updated_at ELSE a.asset_updated_at END as vulnerable_endpoint_updated_at, "
               + "array_agg(fa.finding_id) FILTER ( WHERE fa.finding_id IS NOT NULL ) as vulnerable_endpoint_findings, "
               + "array_agg(distinct at.tag_id) FILTER ( WHERE at.tag_id IS NOT NULL ) as vulnerable_endpoint_tags, "
-              + "array_agg(distinct ag.agent_id) FILTER ( WHERE ag.agent_id IS NOT NULL ) as vulnerable_endpoint_agents, "
+              + "ag.agent_ids as vulnerable_endpoint_agents, "
 
               // denormalised
               + "array_agg(f.finding_id) FILTER ( WHERE f.finding_id IS NOT NULL AND f.finding_type = 'CVE' ) as vulnerable_endpoint_cves, "
-              + "array_agg(ag.agent_last_seen) FILTER ( WHERE ag.agent_id IS NOT NULL ) as vulnerable_endpoint_agents_last_seen, "
-              + "array_agg(distinct ag.agent_privilege) FILTER ( WHERE ag.agent_id IS NOT NULL ) as vulnerable_endpoint_agents_privileges "
+              + "ag.agent_last_seen as vulnerable_endpoint_agents_last_seen, "
+              + "ag.agent_privs as vulnerable_endpoint_agents_privileges "
               + "FROM findings f "
               + "JOIN findings_assets fa ON f.finding_id = fa.finding_id "
               + "JOIN assets a ON a.asset_id = fa.asset_id "
-              + "LEFT JOIN agents ag ON a.asset_id = ag.agent_asset "
+              + "LEFT JOIN agents_per_asset ag ON a.asset_id = ag.asset_id "
               + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
               + "JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "JOIN exercises e ON i.inject_exercise = e.exercise_id "
@@ -45,7 +56,7 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "AND a.asset_type = '"
               + AssetType.Values.ENDPOINT_TYPE
               + "' "
-              + "GROUP BY a.asset_id, i.inject_exercise, e.exercise_updated_at, e.exercise_created_at "
+              + "GROUP BY a.asset_id, i.inject_exercise, e.exercise_updated_at, e.exercise_created_at, ag.agent_ids, ag.agent_last_seen, ag.agent_privs "
               + "ORDER BY e.exercise_updated_at LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",

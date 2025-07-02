@@ -532,7 +532,7 @@ public class EsService {
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(engineConfig.getDefaultPagination())
+                      .size(engineConfig.getDefaultEntitiesCap())
                       .query(query)
                       .sort(engineSorts),
               getClassForEntity(entityName));
@@ -561,7 +561,7 @@ public class EsService {
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(engineConfig.getDefaultPagination())
+                      .size(engineConfig.getDefaultSearchCap())
                       .query(query)
                       .sort(
                           SortOptions.of(

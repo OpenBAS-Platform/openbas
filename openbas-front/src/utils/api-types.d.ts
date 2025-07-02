@@ -1621,7 +1621,6 @@ export interface EsVulnerableEndpoint {
   base_updated_at?: string;
   vulnerable_endpoint_action?: string;
   vulnerable_endpoint_agents_active_status?: boolean[];
-  /** @uniqueItems true */
   vulnerable_endpoint_agents_privileges?: string[];
   vulnerable_endpoint_architecture?: string;
   vulnerable_endpoint_findings_summary?: string;
