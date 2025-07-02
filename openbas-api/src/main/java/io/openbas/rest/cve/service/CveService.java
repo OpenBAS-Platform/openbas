@@ -11,8 +11,8 @@ import io.openbas.ee.Ee;
 import io.openbas.rest.cve.form.CveCreateInput;
 import io.openbas.rest.cve.form.CveUpdateInput;
 import io.openbas.rest.cve.form.CweInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
@@ -66,13 +66,13 @@ public class CveService {
   public Cve findById(final String cveId) {
     return cveRepository
         .findById(cveId)
-        .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + cveId));
+        .orElseThrow(() -> new ElementNotFoundException(CVE_NOT_FOUND_MSG + cveId));
   }
 
   public Cve findByExternalId(String externalId) {
     return cveRepository
         .findByExternalId(externalId)
-        .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + externalId));
+        .orElseThrow(() -> new ElementNotFoundException(CVE_NOT_FOUND_MSG + externalId));
   }
 
   public void deleteById(final String cveId) {

@@ -14,9 +14,10 @@ import { fetchUsers } from '../../../../../../actions/User';
 import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
 import { type Team, type User } from '../../../../../../utils/api-types';
+import { computeColorStyle } from '../../../../../../utils/Colors';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
-import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
+import { computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
 import { zodImplement } from '../../../../../../utils/Zod';
 import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 

@@ -1,9 +1,10 @@
 package io.openbas.utils;
 
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Finding;
-import io.openbas.rest.finding.form.FindingOutput;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.FindingRepository;
+import io.openbas.rest.finding.form.AggregatedFindingOutput;
+import io.openbas.rest.finding.form.RelatedFindingOutput;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +16,33 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FindingMapper {
 
+  private final FindingRepository findingRepository;
   private final EndpointMapper endpointMapper;
   private final AssetGroupMapper assetGroupMapper;
   private final ExerciseMapper exerciseMapper;
   private final ScenarioMapper scenarioMapper;
   private final InjectMapper injectMapper;
 
-  public FindingOutput toFindingOutput(Finding finding) {
-    return FindingOutput.builder()
+  public AggregatedFindingOutput toAggregatedFindingOutput(
+      Finding finding, List<Asset> relatedAssets) {
+    return AggregatedFindingOutput.builder()
         .id(finding.getId())
-        .field(finding.getField())
         .value(finding.getValue())
         .type(finding.getType())
-        .name(finding.getName())
+        .creationDate(finding.getCreationDate())
+        .endpoints(
+            relatedAssets.stream()
+                .filter(asset -> asset instanceof Endpoint)
+                .map(endpointMapper::toEndpointSimple)
+                .collect(Collectors.toSet()))
+        .build();
+  }
+
+  public RelatedFindingOutput toRelatedFindingOutput(Finding finding) {
+    return RelatedFindingOutput.builder()
+        .id(finding.getId())
+        .value(finding.getValue())
+        .type(finding.getType())
         .endpoints(
             finding.getAssets().stream()
                 .filter(asset -> asset instanceof Endpoint)
@@ -47,7 +62,6 @@ public class FindingMapper {
                 .map(Exercise::getScenario)
                 .map(scenario -> scenarioMapper.toScenarioSimple(scenario))
                 .orElse(null))
-        .tagIds(finding.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
         .creationDate(finding.getCreationDate())
         .build();
   }

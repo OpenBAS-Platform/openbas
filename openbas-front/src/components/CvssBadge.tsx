@@ -1,34 +1,9 @@
 import type React from 'react';
 
+import { getSeverityAndColor } from '../utils/Colors';
 import { useFormatter } from './i18n';
 
 interface CvssBadgeProps { score: number }
-
-const getSeverityAndColor = (score: number): {
-  severity: string;
-  color: string;
-} => {
-  if (score >= 9.0) return {
-    severity: 'CRITICAL',
-    color: 'red',
-  };
-  if (score >= 7.0) return {
-    severity: 'HIGH',
-    color: 'orangered',
-  };
-  if (score >= 4.0) return {
-    severity: 'MEDIUM',
-    color: 'orange',
-  };
-  if (score > 0.0) return {
-    severity: 'LOW',
-    color: 'green',
-  };
-  return {
-    severity: 'NONE',
-    color: 'gray',
-  };
-};
 
 const CVSSBadge: React.FC<CvssBadgeProps> = ({ score }) => {
   const { t } = useFormatter();

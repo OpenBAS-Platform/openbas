@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
-import { searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import { searchDistinctFindingsOnEndpoint, searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
 import InverseBooleanFragment from '../../../../../components/common/list/fragments/InverseBooleanFragment';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
@@ -14,7 +14,7 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
-import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
+import { type AggregatedFindingOutput, type EndpointOverviewOutput as EndpointType, type RelatedFindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
@@ -60,19 +60,19 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_asset_groups',
       label: 'Asset groups',
       isSortable: false,
-      value: (finding: FindingOutput) => (
+      value: (finding: AggregatedFindingOutput) => (
         <ItemTargets targets={(finding.finding_asset_groups || []).map(group => ({
           target_id: group.asset_group_id,
           target_name: group.asset_group_name,
@@ -85,6 +85,9 @@ const Endpoint = () => {
 
   const search = (input: SearchPaginationInput) => {
     return searchFindingsOnEndpoint(endpointId, input);
+  };
+  const searchDistinct = (input: SearchPaginationInput) => {
+    return searchDistinctFindingsOnEndpoint(endpointId, input);
   };
 
   return (
@@ -172,6 +175,7 @@ const Endpoint = () => {
       <Paper className="paper" variant="outlined">
         <FindingList
           filterLocalStorageKey="endpoint-findings"
+          searchDistinctFindings={searchDistinct}
           searchFindings={search}
           additionalHeaders={additionalHeaders}
           additionalFilterNames={additionalFilterNames}
