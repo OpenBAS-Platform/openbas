@@ -34,7 +34,7 @@ const HorizontalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) 
         false,
         false,
         [],
-        false,
+        true,
         false,
         t('No data to display'),
       )}
