@@ -3,12 +3,15 @@ package io.openbas.rest.payload.service;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
+import static java.util.Collections.emptyList;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
@@ -25,6 +28,8 @@ public class PayloadCreationService {
   private final PayloadUtils payloadUtils;
 
   private final PayloadService payloadService;
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final TagRepository tagRepository;
   private final AttackPatternRepository attackPatternRepository;
@@ -33,6 +38,9 @@ public class PayloadCreationService {
 
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(PayloadCreateInput input) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      input.setDetectionRemediations(emptyList());
+    }
     return create(input);
   }
 

@@ -38,7 +38,7 @@ public class CveService {
 
   public Cve createCve(final @Valid CveCreateInput input) {
     final Cve cve = new Cve();
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
     }
     cve.setUpdateAttributes(input);
@@ -55,7 +55,7 @@ public class CveService {
 
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
     final Cve existingCve = findById(cveId);
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
     }
     existingCve.setUpdateAttributes(input);
@@ -77,10 +77,6 @@ public class CveService {
 
   public void deleteById(final String cveId) {
     cveRepository.deleteById(cveId);
-  }
-
-  private boolean isEnterpriseLicenseInactive() {
-    return !eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo());
   }
 
   private void updateCweAssociations(Cve cve, List<CweInput> cweInputs) {
