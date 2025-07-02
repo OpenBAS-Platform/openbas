@@ -88,6 +88,9 @@ public class PayloadUpsertInput {
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsExternalIds = new ArrayList<>();
 
+  @JsonProperty("payload_detection_remediations")
+  private List<DetectionRemediationInput> detectionRemediations = new ArrayList<>();
+
   @JsonProperty("payload_elevation_required")
   private boolean elevationRequired;
 

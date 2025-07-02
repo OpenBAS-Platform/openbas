@@ -187,7 +187,7 @@ public class Payload implements Base {
       orphanRemoval = true,
       fetch = FetchType.LAZY)
   @JsonProperty("payload_detection_remediations")
-  private List<PayloadDetectionRemediation> detectionRemediations = new ArrayList<>();
+  private List<DetectionRemediation> detectionRemediations = new ArrayList<>();
 
   // -- TAG --
 

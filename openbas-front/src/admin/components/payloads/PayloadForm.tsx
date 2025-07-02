@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FormEvent, type SyntheticEvent, useState } from 'react';
+import React, { type FormEvent, type SyntheticEvent, useState } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
@@ -10,6 +10,7 @@ import { type PayloadCreateInput } from '../../../utils/api-types-custom';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
+import RemediationFormTab from './form/RemediationFormTab';
 
 interface Props {
   onSubmit: SubmitHandler<PayloadCreateInput>;
@@ -45,7 +46,7 @@ const PayloadForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const tabs = ['General', 'Commands', 'Output'];
+  const tabs = ['General', 'Commands', 'Output', 'Remediation'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
@@ -201,6 +202,10 @@ const PayloadForm = ({
 
         {activeTab === 'Output' && (
           <OutputFormTab />
+        )}
+
+        {activeTab === 'Remediation' && (
+          <RemediationFormTab />
         )}
 
         <div style={{

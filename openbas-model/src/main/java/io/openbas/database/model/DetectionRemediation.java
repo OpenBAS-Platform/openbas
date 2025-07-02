@@ -25,7 +25,7 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PayloadDetectionRemediation implements Base {
+public class DetectionRemediation implements Base {
 
   @Id
   @Column(name = "detection_remediation_id")

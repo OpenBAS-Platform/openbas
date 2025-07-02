@@ -71,6 +71,9 @@ public class PayloadUpdateInput {
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
 
+  @JsonProperty("payload_detection_remediations")
+  private List<DetectionRemediationInput> detectionRemediations = new ArrayList<>();
+
   @JsonProperty("payload_output_parsers")
   @Schema(description = "Set of output parsers")
   private Set<OutputParserInput> outputParsers = new HashSet<>();
