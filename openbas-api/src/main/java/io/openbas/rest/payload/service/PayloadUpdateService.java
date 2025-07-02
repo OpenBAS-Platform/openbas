@@ -38,16 +38,17 @@ public class PayloadUpdateService {
 
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(String payloadId, PayloadUpdateInput input) {
+
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      input.setDetectionRemediations(emptyList());
+    }
+
     Payload payload =
         this.payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
     payload.setAttackPatterns(
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
-
-    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
-      input.setDetectionRemediations(emptyList());
-    }
     return update(input, payload);
   }
 

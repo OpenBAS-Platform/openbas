@@ -37,6 +37,11 @@ public class PayloadUpsertService {
   @Transactional(rollbackOn = Exception.class)
   public Payload upsertPayload(PayloadUpsertInput input) {
     Optional<Payload> payload = payloadRepository.findByExternalId(input.getExternalId());
+
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      input.setDetectionRemediations(emptyList());
+    }
+
     if (payload.isPresent()) {
       Payload existingPayload = payload.get();
       if (input.getCollector() != null) {
@@ -50,9 +55,6 @@ public class PayloadUpsertService {
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
 
-      if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
-        input.setDetectionRemediations(emptyList());
-      }
       return updatePayloadFromUpsert(input, existingPayload);
     } else {
       return createPayloadFromUpsert(input);

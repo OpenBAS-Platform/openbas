@@ -38,9 +38,11 @@ public class PayloadCreationService {
 
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(PayloadCreateInput input) {
+
     if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setDetectionRemediations(emptyList());
     }
+
     return create(input);
   }
 
