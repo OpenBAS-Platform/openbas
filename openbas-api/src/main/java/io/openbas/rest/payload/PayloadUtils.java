@@ -124,7 +124,14 @@ public class PayloadUtils {
   public <T extends Payload> void duplicateCommonProperties(
       @NotNull final T origin, @NotNull T duplicate) {
     BeanUtils.copyProperties(
-        origin, duplicate, "outputParsers", "tags", "attackPatterns", "arguments", "prerequisites");
+        origin,
+        duplicate,
+        "outputParsers",
+        "tags",
+        "attackPatterns",
+        "arguments",
+        "prerequisites",
+        "detectionRemediations");
     duplicate.setId(null);
     duplicate.setName(duplicateString(origin.getName()));
     duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
