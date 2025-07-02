@@ -6,7 +6,7 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
-import io.openbas.rest.finding.form.RelatedFindingOutput;
+import io.openbas.rest.finding.form.AggregatedFindingOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -25,13 +25,19 @@ import org.springframework.web.bind.annotation.*;
 public class FindingSearchApi extends RestBehavior {
 
   private final FindingRepository findingRepository;
+  private final FindingDistinctSearchService findingDistinctSearchService;
 
   private final FindingMapper findingMapper;
 
   @LogExecutionTime
   @PostMapping("/search")
-  public Page<RelatedFindingOutput> findings(
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+  public Page<AggregatedFindingOutput> findings(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
+      @RequestParam(value = "distinct", required = false, defaultValue = "false")
+          boolean distinct) {
+    if (distinct) {
+      return findingDistinctSearchService.searchDistinctFindings(searchPaginationInput);
+    }
     return buildPaginationJPA(
             (specification, pageable) ->
                 this.findingRepository.findAll(
@@ -44,9 +50,15 @@ public class FindingSearchApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
   @PreAuthorize("isObserver()")
-  public Page<RelatedFindingOutput> findingsByInject(
+  public Page<AggregatedFindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
+      @RequestParam(value = "distinct", required = false, defaultValue = "false")
+          boolean distinct) {
+    if (distinct) {
+      return findingDistinctSearchService.searchDistinctFindingsByInject(
+          injectId, searchPaginationInput);
+    }
     return buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
@@ -60,9 +72,15 @@ public class FindingSearchApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Page<RelatedFindingOutput> findingsBySimulation(
+  public Page<AggregatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
+      @RequestParam(value = "distinct", required = false, defaultValue = "false")
+          boolean distinct) {
+    if (distinct) {
+      return findingDistinctSearchService.searchDistinctFindingsBySimulation(
+          simulationId, searchPaginationInput);
+    }
     return buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
@@ -76,9 +94,15 @@ public class FindingSearchApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Page<RelatedFindingOutput> findingsByScenario(
+  public Page<AggregatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
+      @RequestParam(value = "distinct", required = false, defaultValue = "false")
+          boolean distinct) {
+    if (distinct) {
+      return findingDistinctSearchService.searchDistinctFindingsByScenario(
+          scenarioId, searchPaginationInput);
+    }
     return buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
@@ -94,9 +118,15 @@ public class FindingSearchApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
   @PreAuthorize("isObserver()")
-  public Page<RelatedFindingOutput> findingsByEndpoint(
+  public Page<AggregatedFindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
+      @RequestParam(value = "distinct", required = false, defaultValue = "false")
+          boolean distinct) {
+    if (distinct) {
+      return findingDistinctSearchService.searchDistinctFindingsByEndpoint(
+          endpointId, searchPaginationInput);
+    }
     return buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
