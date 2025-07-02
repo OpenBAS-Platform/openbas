@@ -264,4 +264,16 @@ public class Payload implements Base {
       this.outputParsers.add(outputParser);
     }
   }
+
+  public void setDetectionRemediations(final List<DetectionRemediation> detectionRemediations) {
+    this.detectionRemediations.clear();
+    detectionRemediations.forEach(this::addDetectionRemediation);
+  }
+
+  public void addDetectionRemediation(DetectionRemediation detectionRemediation) {
+    if (detectionRemediation != null) {
+      detectionRemediation.setPayload(this);
+      this.detectionRemediations.add(detectionRemediation);
+    }
+  }
 }
