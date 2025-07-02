@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
@@ -13,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -52,7 +50,6 @@ public class DetectionRemediation implements Base {
   @NotNull
   private Collector collector;
 
-  @Type(JsonType.class)
   @Column(name = "detection_remediation_values", columnDefinition = "JSONB")
   @JsonProperty("detection_remediation_values")
   @NotNull

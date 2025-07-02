@@ -19,7 +19,7 @@ public class V4_01__Detection_Remediation extends BaseJavaMigration {
                   detection_remediation_id VARCHAR(255) NOT NULL CONSTRAINT detection_remediation_pkey PRIMARY KEY,
                   detection_remediation_collector_id VARCHAR(255) NOT NULL REFERENCES collectors(collector_id) ON DELETE CASCADE,
                   detection_remediation_payload_id VARCHAR(255) NOT NULL REFERENCES payloads(payload_id) ON DELETE CASCADE,
-                  detection_remediation_values JSONB,
+                  detection_remediation_values TEXT,
                   detection_remediation_created_at TIMESTAMPTZ DEFAULT now(),
                   detection_remediation_updated_at TIMESTAMPTZ DEFAULT now()
                 );
