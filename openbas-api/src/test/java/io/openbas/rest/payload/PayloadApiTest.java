@@ -20,10 +20,7 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.PayloadUpdateInput;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
-import io.openbas.rest.payload.form.PayloadsDeprecateInput;
+import io.openbas.rest.payload.form.*;
 import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
@@ -126,6 +123,36 @@ class PayloadApiTest extends IntegrationTest {
         throws Exception {
       PayloadCreateInput input =
           PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
+
+      mvc.perform(
+              post(PAYLOAD_URI)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().is2xxSuccessful())
+          .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+          .andExpect(
+              jsonPath("$.payload_output_parsers[0].output_parser_mode")
+                  .value(ParserMode.STDOUT.name()))
+          .andExpect(
+              jsonPath("$.payload_output_parsers[0].output_parser_type")
+                  .value(ParserType.REGEX.name()))
+          .andExpect(
+              jsonPath(
+                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                  .value("rule"))
+          .andExpect(
+              jsonPath(
+                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
+                  .value("IPV6"));
+    }
+
+    @Test
+    @DisplayName("Create Payload with detection remediations")
+    void
+        given_payload_create_input_with_detection_remediation_should_return_payload_with_detection_remediation()
+            throws Exception {
+      PayloadCreateInput input =
+          PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
 
       mvc.perform(
               post(PAYLOAD_URI)
@@ -365,6 +392,38 @@ class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("Update Payload with detection remediations")
+  @WithMockAdminUser
+  void
+      given_payload_update_input_with_detection_remediations_should_return_updated_payload_with_detection_remediations()
+          throws Exception {
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+
+    String response =
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var payloadId = JsonPath.read(response, "$.payload_id");
+
+    PayloadUpdateInput updateInput =
+        PayloadInputFixture.getDefaultPayloadUpdateInputWithDetectionRemediation();
+
+    mvc.perform(
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"));
+  }
+
+  @Test
   @DisplayName("Upsert architecture of a Payload")
   @WithMockPlannerUser
   void upsertCommandPayloadToValidateArchitecture() throws Exception {
@@ -441,6 +500,30 @@ class PayloadApiTest extends IntegrationTest {
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_index_values")
                 .value("$1"));
+  }
+
+  @Test
+  @DisplayName("Upsert Payload with detection remediations")
+  @WithMockPlannerUser
+  void
+      given_payload_upsert_input_with_detection_remediation_should_return_updated_payload_with_detection_remediations()
+          throws Exception {
+    PayloadCreateInput input =
+        PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful());
+
+    PayloadUpsertInput upsertInput =
+        PayloadInputFixture.getDefaultCommandPayloadUpsertInputWithDetectionRemediations();
+    upsertInput.setExternalId("external-id");
+
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isOk());
   }
 
   // -- CHECK CLEANUP AND EXECUTOR --

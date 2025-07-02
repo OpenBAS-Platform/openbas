@@ -52,6 +52,18 @@ public class PayloadInputFixture {
     return input;
   }
 
+  public static PayloadCreateInput createDefaultPayloadCreateInputWithDetectionRemediation() {
+    PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
+
+    DetectionRemediationInput drInputCS = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput drInputSentinel = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput srInputDefender = DetectionRemediationInput.builder().build();
+
+    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
+
+    return input;
+  }
+
   public static PayloadCreateInput createDefaultPayloadCreateInputForExecutable() {
     PayloadCreateInput input = new PayloadCreateInput();
     input.setType("Executable");
@@ -105,6 +117,18 @@ public class PayloadInputFixture {
     return input;
   }
 
+  public static PayloadUpdateInput getDefaultPayloadUpdateInputWithDetectionRemediation() {
+    PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
+
+    DetectionRemediationInput drInputCS = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput drInputSentinel = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput srInputDefender = DetectionRemediationInput.builder().build();
+
+    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
+
+    return input;
+  }
+
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInput() {
     PayloadUpsertInput input = new PayloadUpsertInput();
     input.setType("Command");
@@ -136,6 +160,15 @@ public class PayloadInputFixture {
     outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
     input.setOutputParsers(Set.of(outputParserInput));
+    return input;
+  }
+
+  public static PayloadUpsertInput getDefaultCommandPayloadUpsertInputWithDetectionRemediations() {
+    PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
+    DetectionRemediationInput drInputCS = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput drInputSentinel = DetectionRemediationInput.builder().build();
+    DetectionRemediationInput srInputDefender = DetectionRemediationInput.builder().build();
+    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
     return input;
   }
 
