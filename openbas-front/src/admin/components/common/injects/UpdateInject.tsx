@@ -1,7 +1,7 @@
 import { HelpOutlined } from '@mui/icons-material';
 import { Avatar, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
@@ -9,14 +9,9 @@ import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import { PAYLOAD_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
-import {
-  type Article,
-  type AttackPattern,
-  type Inject,
-  type InjectInput,
-  type KillChainPhase, type Variable,
-} from '../../../../utils/api-types';
+import { type Article, type AttackPattern, type Inject, type InjectInput, type KillChainPhase, type Variable } from '../../../../utils/api-types';
 import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -25,6 +20,7 @@ import InjectForm from './form/InjectForm';
 import InjectCardComponent from './InjectCardComponent';
 import InjectIcon from './InjectIcon';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
+
 interface Props {
   open: boolean;
   handleClose: () => void;
@@ -37,6 +33,24 @@ interface Props {
   uriVariable?: string;
   variablesFromExerciseOrScenario?: Variable[];
 }
+
+interface FragmentProps { inject: InjectStore }
+
+const InjectCardContentFragment: FunctionComponent<FragmentProps> = ({ inject }) => {
+  return (
+    <>
+      {inject?.inject_injector_contract.injector_contract_payload?.payload_id ? (
+        <a
+          href={`${PAYLOAD_BASE_URL}/${inject.inject_injector_contract.injector_contract_payload.payload_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {inject?.inject_title}
+        </a>
+      ) : inject?.inject_title}
+    </>
+  );
+};
 
 const UpdateInject: React.FC<Props> = ({
   open,
@@ -114,19 +128,19 @@ const UpdateInject: React.FC<Props> = ({
         <InjectCardComponent
           avatar={injectorContractContent
             ? (
-                <InjectIcon
-                  type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
-                  isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
-                />
-              ) : (
-                <Avatar sx={{
-                  width: 24,
-                  height: 24,
-                }}
-                >
-                  <HelpOutlined />
-                </Avatar>
-              )}
+              <InjectIcon
+                type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
+                isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
+              />
+            ) : (
+              <Avatar sx={{
+                width: 24,
+                height: 24,
+              }}
+              >
+                <HelpOutlined />
+              </Avatar>
+            )}
           title={getInjectHeaderTitle()}
           action={(
             <div style={{
@@ -139,7 +153,7 @@ const UpdateInject: React.FC<Props> = ({
               )}
             </div>
           )}
-          content={inject?.inject_title}
+          content={(<InjectCardContentFragment inject={inject} />)}
         />
 
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (

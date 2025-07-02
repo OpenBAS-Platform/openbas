@@ -7,7 +7,7 @@ interface Props {
   title: string | undefined;
   disabled?: boolean;
   action: React.ReactNode;
-  content: string;
+  content: React.ReactNode | string;
 }
 
 const InjectCardComponent: FunctionComponent<Props> = ({
