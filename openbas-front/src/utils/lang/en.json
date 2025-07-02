@@ -1529,7 +1529,7 @@
   "TYPE_HUMAN_RESPONSE": "Human response",
   "TYPE_MANUAL": "Manual",
   "TYPE_PREVENTION": "Prevention",
-  "TYPE_VULNERABILITY": "TYPE_VULNERABILITY",
+  "TYPE_VULNERABILITY": "Vulnerability",
   "undefined": "undefined",
   "Unknown": "Unknown",
   "Unknown CVE": "Unknown CVE",

@@ -1529,7 +1529,7 @@
   "TYPE_HUMAN_RESPONSE": "人工响应",
   "TYPE_MANUAL": "手动",
   "TYPE_PREVENTION": "预防",
-  "TYPE_VULNERABILITY": "类型漏洞",
+  "TYPE_VULNERABILITY": "脆弱性",
   "undefined": "未定义",
   "Unknown": "未知",
   "Unknown CVE": "未知 CVE",
