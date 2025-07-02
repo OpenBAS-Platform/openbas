@@ -6,7 +6,9 @@ import static io.openbas.utils.StringUtils.duplicateString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
@@ -24,7 +26,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class PayloadUtils {
 
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
   private final OutputParserUtils outputParserUtils;
+  private final DetectionRemediationUtils detectionRemediationUtils;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -133,6 +138,10 @@ public class PayloadUtils {
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
     duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
     outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
+
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      detectionRemediationUtils.copy(origin.getDetectionRemediations(), duplicate, false);
+    }
   }
 
   public Payload copyProperties(Object payloadInput, Payload target, boolean copyId) {
@@ -145,12 +154,18 @@ public class PayloadUtils {
     if (payloadInput instanceof PayloadCreateInput) {
       outputParserUtils.copyOutputParsers(
           ((PayloadCreateInput) payloadInput).getOutputParsers(), target, copyId);
+      detectionRemediationUtils.copy(
+          ((PayloadCreateInput) payloadInput).getDetectionRemediations(), target, copyId);
     } else if (payloadInput instanceof PayloadUpdateInput) {
       outputParserUtils.copyOutputParsers(
           ((PayloadUpdateInput) payloadInput).getOutputParsers(), target, copyId);
+      detectionRemediationUtils.copy(
+          ((PayloadUpdateInput) payloadInput).getDetectionRemediations(), target, copyId);
     } else if (payloadInput instanceof PayloadUpsertInput) {
       outputParserUtils.copyOutputParsers(
           ((PayloadUpsertInput) payloadInput).getOutputParsers(), target, copyId);
+      detectionRemediationUtils.copy(
+          ((PayloadUpsertInput) payloadInput).getDetectionRemediations(), target, copyId);
     } else {
       throw new IllegalArgumentException("Unsupported payload input type");
     }
