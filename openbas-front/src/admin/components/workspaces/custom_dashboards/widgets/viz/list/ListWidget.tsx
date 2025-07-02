@@ -28,7 +28,7 @@ type Props = {
   elements: EsBase[];
 };
 
-const List = (props: Props) => {
+const ListWidget = (props: Props) => {
   const { classes } = useStyles();
 
   // FIXME: we will always use ListConfiguration in this component
@@ -108,4 +108,4 @@ const List = (props: Props) => {
   );
 };
 
-export default List;
+export default ListWidget;
