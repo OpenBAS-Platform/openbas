@@ -28,7 +28,6 @@ public class EsVulnerableEndpoint extends EsBase {
   @Queryable(
       label = "vulnerable endpoint platform",
       filterable = true,
-      dynamicValues = true,
       refEnumClazz = Endpoint.PLATFORM_TYPE.class)
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_platform;
@@ -36,7 +35,6 @@ public class EsVulnerableEndpoint extends EsBase {
   @Queryable(
       label = "vulnerable endpoint architecture",
       filterable = true,
-      dynamicValues = true,
       refEnumClazz = Endpoint.PLATFORM_ARCH.class)
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_architecture;
@@ -46,7 +44,6 @@ public class EsVulnerableEndpoint extends EsBase {
   @Queryable(
       label = "vulnerable endpoint agents privileges",
       filterable = true,
-      dynamicValues = true,
       refEnumClazz = AgentPrivilege.class)
   @EsQueryable(keyword = true)
   private List<String> vulnerable_endpoint_agents_privileges;
@@ -54,7 +51,6 @@ public class EsVulnerableEndpoint extends EsBase {
   @Queryable(
       label = "vulnerable endpoint agents active status",
       filterable = true,
-      dynamicValues = true,
       refEnumClazz = AgentStatus.class)
   @EsQueryable(keyword = true)
   private List<Boolean> vulnerable_endpoint_agents_active_status;
@@ -62,7 +58,6 @@ public class EsVulnerableEndpoint extends EsBase {
   @Queryable(
       label = "vulnerable endpoint action",
       filterable = true,
-      dynamicValues = true,
       refEnumClazz = VulnerableEndpointAction.class)
   @EsQueryable(keyword = true)
   private String vulnerable_endpoint_action;

@@ -3206,6 +3206,8 @@ export type ListConfiguration = UtilRequiredKeys<
   "widget_configuration_type"
 > & {
   columns?: string[];
+  /** @format int32 */
+  limit?: number;
   series: ListSeries[];
   sorts?: EngineSortField[];
 };

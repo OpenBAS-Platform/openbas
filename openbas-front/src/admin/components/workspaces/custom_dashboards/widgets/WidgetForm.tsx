@@ -97,6 +97,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         direction: z.literal('ASC').or(z.literal('DESC')),
         fieldName: z.string(),
       })).optional(),
+      limit: z.number().max(1000).min(0).optional(),
       columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),

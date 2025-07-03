@@ -10,27 +10,40 @@ import org.springframework.stereotype.Component;
 @Data
 public class EngineConfig {
 
-  private String engineSelector = "elk";
+  public static class Defaults {
+    public static final String ENGINE_SELECTOR = "elk";
+    public static final String INDEX_PREFIX = "openbas";
+    public static final String INDEX_SUFFIX = "-000001";
+    public static final String NUMBER_OF_SHARDS = "1";
+    public static final String NUMBER_OF_REPLICAS = "1";
+    public static final int MAX_RESULT_WINDOW = 100000;
+    public static final int ENTITIES_CAP = 100;
+    public static final int SEARCH_CAP = 500;
+    public static final int MAX_PRIMARY_SHARD_DOCS = 75000000;
+    public static final String MAX_PRIMARY_SHARDS_SIZE = "50Gb";
+    public static final String MAX_FIELD_SIZE = "4096";
+    public static final boolean REJECT_UNAUTHORIZED = true;
+  }
 
-  private String indexPrefix = "openbas";
+  private String engineSelector = Defaults.ENGINE_SELECTOR;
 
-  private String indexSuffix = "-000001";
+  private String indexPrefix = Defaults.INDEX_PREFIX;
 
-  private String numberOfShards = "1";
+  private String indexSuffix = Defaults.INDEX_SUFFIX;
 
-  private String numberOfReplicas = "1";
+  private String numberOfShards = Defaults.NUMBER_OF_SHARDS;
 
-  private int maxResultWindow = 100000;
+  private String numberOfReplicas = Defaults.NUMBER_OF_REPLICAS;
 
-  private int defaultEntitiesCap = 100;
+  private int maxResultWindow = Defaults.MAX_RESULT_WINDOW;
 
-  private int defaultSearchCap = 500;
+  private int searchCap = Defaults.SEARCH_CAP;
 
-  private long maxPrimaryShardDocs = 75000000;
+  private long maxPrimaryShardDocs = Defaults.MAX_PRIMARY_SHARD_DOCS;
 
-  private String maxPrimaryShardsSize = "50Gb";
+  private String maxPrimaryShardsSize = Defaults.MAX_PRIMARY_SHARDS_SIZE;
 
-  private String maxFieldsSize = "4096";
+  private String maxFieldsSize = Defaults.MAX_FIELD_SIZE;
 
   @NotNull private String url;
 
@@ -38,5 +51,5 @@ public class EngineConfig {
 
   private String password;
 
-  private boolean rejectUnauthorized = true;
+  private boolean rejectUnauthorized = Defaults.REJECT_UNAUTHORIZED;
 }
