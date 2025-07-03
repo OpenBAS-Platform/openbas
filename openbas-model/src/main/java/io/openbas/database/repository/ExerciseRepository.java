@@ -347,12 +347,4 @@ public interface ExerciseRepository
       nativeQuery = true)
   List<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
-
-  @Modifying
-  @Query(
-      value =
-          "UPDATE exercises SET exercise_custom_dashboard = :customDashboardId WHERE exercise_id = :exerciseId",
-      nativeQuery = true)
-  void setCustomDashboardForExercise(
-      @Param("exerciseId") String exerciseId, @Param("customDashboardId") String customDashboardId);
 }
