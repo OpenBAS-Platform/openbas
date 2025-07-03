@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { fetchExercise } from '../../../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../../../actions/exercises/exercise-helper';
+import Loader from '../../../../../../../components/Loader';
 import { useHelper } from '../../../../../../../store';
 import { type EsAttackPath } from '../../../../../../../utils/api-types';
 import type { StructuralHistogramWidget } from '../../../../../../../utils/api-types-custom';
 import { useAppDispatch } from '../../../../../../../utils/hooks';
+import useDataLoader from '../../../../../../../utils/hooks/useDataLoader';
 import AttackPath from './AttackPath';
 
 interface Props {
@@ -16,13 +18,21 @@ interface Props {
 
 const AttackPathContextLayer = ({ attackPathsData, widgetId, widgetConfig }: Props) => {
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
   const simulationId = (((widgetConfig.series[0] || []).filter?.filters || []).find(f => f.key == 'base_simulation_side')?.values ?? [])[0];
 
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(simulationId) }));
 
-  useEffect(() => {
-    dispatch(fetchExercise(simulationId));
+  useDataLoader(() => {
+    setLoading(true);
+    dispatch(fetchExercise(simulationId)).finally(() => {
+      setLoading(false);
+    });
   }, []);
+
+  if (loading || !exercise) {
+    return <Loader />;
+  }
 
   return (
     <AttackPath

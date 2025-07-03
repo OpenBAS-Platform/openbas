@@ -1,10 +1,10 @@
 import { Autocomplete, TextField } from '@mui/material';
-import { useDispatch } from 'react-redux';
 
 import { fetchExercises } from '../../actions/Exercise';
 import { type ExercisesHelper } from '../../actions/exercises/exercise-helper';
 import { useHelper } from '../../store';
 import { type Exercise } from '../../utils/api-types';
+import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import { useFormatter } from '../i18n';
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const ExerciseField = ({ value, className, onChange }: Props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { fldt } = useFormatter();
 
   const exercises: Exercise[] = useHelper((helper: ExercisesHelper) => helper.getExercises());
