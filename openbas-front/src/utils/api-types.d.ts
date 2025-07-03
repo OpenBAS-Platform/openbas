@@ -1221,6 +1221,16 @@ export interface DetectionRemediationInput {
   detection_remediation_values: string;
 }
 
+export interface DetectionRemediationOutput {
+  /** Collector id */
+  detection_remediation_collector: string;
+  detection_remediation_id?: string;
+  /** Payload id */
+  detection_remediation_payload: string;
+  /** Value of detection remediation, for exemple: query for sentinel */
+  detection_remediation_values: string;
+}
+
 export interface DirectInjectInput {
   inject_content?: object;
   inject_description?: string;

@@ -1,17 +1,18 @@
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
-import React, { type SyntheticEvent, useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import DOMPurify from 'dompurify';
+import { type SyntheticEvent, useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../../actions/Collector';
 import type { CollectorHelper } from '../../../../actions/collectors/collector-helper';
 import { fetchPayloadDetectionRemediationsByInject } from '../../../../actions/injects/inject-action';
+import { useFormatter } from '../../../../components/i18n';
+import { COLLECTOR_LIST } from '../../../../constants/Entities';
 import { useHelper } from '../../../../store';
-import { type Collector, type DetectionRemediation, type InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { type Collector, type DetectionRemediationOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import DOMPurify from 'dompurify';
-import {useFormatter} from "../../../../components/i18n";
-import {useTheme} from "@mui/material/styles";
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -20,12 +21,6 @@ const useStyles = makeStyles()(theme => ({
     gap: theme.spacing(3),
   },
 }));
-
-const acceptedCollectorRemediation = [
-  'openbas_crowdstrike',
-  'openbas_microsoft_defender',
-  'openbas_microsoft_sentinel',
-];
 
 const AtomicTestingRemediations = () => {
   const dispatch = useAppDispatch();
@@ -45,14 +40,14 @@ const AtomicTestingRemediations = () => {
 
   const [tabs, setTabs] = useState<Collector[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediation[]>([]);
+  const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediationOutput[]>([]);
   const [hasFetchedRemediations, setHasFetchedRemediations] = useState(false);
 
   // Filter valid collectors
   useEffect(() => {
     if (collectors.length > 0) {
       const filtered = collectors.filter((c: { collector_type: string }) =>
-        acceptedCollectorRemediation.includes(c.collector_type),
+        COLLECTOR_LIST.includes(c.collector_type),
       ).sort((a: Collector, b: Collector) => a.collector_name.localeCompare(b.collector_name));
       setTabs(filtered);
     }
@@ -73,7 +68,7 @@ const AtomicTestingRemediations = () => {
   };
 
   const activeCollectorRemediations = detectionRemediations.filter(
-    rem => rem.detection_remediation_collector_id === tabs[activeTab].collector_id,
+    rem => rem.detection_remediation_collector === tabs[activeTab].collector_id,
   );
 
   return (
@@ -92,7 +87,7 @@ const AtomicTestingRemediations = () => {
                     width: 20,
                     height: 20,
                     borderRadius: 4,
-                    marginRight: 8,
+                    marginRight: theme.spacing(2),
                   }}
                 />
                 {tab.collector_name}
@@ -110,15 +105,14 @@ const AtomicTestingRemediations = () => {
           </Typography>
         ) : (
           activeCollectorRemediations.map(rem => (
-            <Box sx={{ padding: 2 }}  key={rem.detection_remediation_id}>
+            <Box sx={{ padding: 2 }} key={rem.detection_remediation_id}>
               <Typography sx={{ paddingBottom: 2 }} variant="body2" fontWeight="bold" gutterBottom>
-                {t('Detection Rule')}:
+                {`${t('Detection Rule')}: `}
               </Typography>
               <div
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')),
-                }}
-              ></div>
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')) }}
+              >
+              </div>
             </Box>
           ))
         )}

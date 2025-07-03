@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {Box, Button, Tab, Tabs} from '@mui/material';
+import { Box, Button, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { type FormEvent, type SyntheticEvent, useState } from 'react';
+import { type FormEvent, type SyntheticEvent, useState } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
 import { type PayloadCreateInput } from '../../../utils/api-types-custom';
+import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
+import EEChip from '../common/entreprise_edition/EEChip';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
 import RemediationFormTab from './form/RemediationFormTab';
-import EEChip from "../common/entreprise_edition/EEChip";
-import useEnterpriseEdition from "../../../utils/hooks/useEnterpriseEdition";
 
 interface Props {
   onSubmit: SubmitHandler<PayloadCreateInput>;
@@ -49,15 +49,13 @@ const PayloadForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const {
-    isValidated: isValidatedEnterpriseEdition,
-  } = useEnterpriseEdition();
+  const { isValidated: isValidatedEnterpriseEdition } = useEnterpriseEdition();
   const tabs = [{
     key: 'General',
-    label: 'General'
+    label: 'General',
   }, {
     key: 'Commands',
-    label: 'Commands'
+    label: 'Commands',
   }, {
     key: 'Output',
     label: 'Output',
@@ -74,7 +72,7 @@ const PayloadForm = ({
           />
         )}
       </Box>
-    )
+    ),
   }];
   const [activeTab, setActiveTab] = useState(tabs[0].key);
 

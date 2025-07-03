@@ -1,25 +1,23 @@
-import {Box, Tab, Tabs, Typography} from '@mui/material';
-import React, { type SyntheticEvent, useEffect, useState } from 'react';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { type SyntheticEvent, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { fetchCollectors } from '../../../../actions/Collector';
 import type { CollectorHelper } from '../../../../actions/collectors/collector-helper';
 import CKEditor from '../../../../components/CKEditor';
+import { useFormatter } from '../../../../components/i18n';
+import { COLLECTOR_LIST } from '../../../../constants/Entities';
 import { useHelper } from '../../../../store';
-import { type Collector, DetectionRemediation } from '../../../../utils/api-types';
+import { type Collector } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import {useFormatter} from "../../../../components/i18n";
-import {useTheme} from "@mui/material/styles";
 
 const RemediationFormTab = () => {
   const [tabs, setTabs] = useState<Collector[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
-  const { control, setValue } = useFormContext();
+  const { control } = useFormContext();
   const { t } = useFormatter();
-  const theme = useTheme();
   const dispatch = useAppDispatch();
-  const acceptedCollectorRemediation = ['openbas_crowdstrike', 'openbas_microsoft_defender', 'openbas_microsoft_sentinel'];
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -33,7 +31,7 @@ const RemediationFormTab = () => {
   useEffect(() => {
     if (collectors.length > 0) {
       const filteredCollectors = collectors.filter((collector: Collector) =>
-        acceptedCollectorRemediation.includes(collector.collector_type),
+        COLLECTOR_LIST.includes(collector.collector_type),
       ).sort((a: Collector, b: Collector) => a.collector_name.localeCompare(b.collector_name));
       setTabs(filteredCollectors);
     }
