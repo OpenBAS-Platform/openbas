@@ -83,38 +83,36 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
         label={t('Inject Execution details')}
         className={classes.item}
       />
-      {
-        injectResultOverview.inject_injector_contract?.injector_contract_payload && (
-          <>
-            <Tab
-              component={Link}
-              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/payload_info`)}
-              value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/payload_info`}
-              label={t('Payload info')}
-              className={classes.item}
-            />
-            <Tab
-              component={Link}
-              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
-              onClick={handleRemediationClick}
-              value={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
-              label={(
-                <Box display="flex" alignItems="center">
-                  {t('Remediations')}
-                  {!isValidatedEnterpriseEdition && (
-                    <EEChip
-                      style={{ marginLeft: theme.spacing(1) }}
-                      clickable
-                      featureDetectedInfo={t('Remediation')}
-                    />
-                  )}
-                </Box>
+      {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
+        <Tab
+          component={Link}
+          to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/payload_info`)}
+          value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/payload_info`}
+          label={t('Payload info')}
+          className={classes.item}
+        />
+      )}
+      {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
+        <Tab
+          component={Link}
+          to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
+          onClick={handleRemediationClick}
+          value={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
+          label={(
+            <Box display="flex" alignItems="center">
+              {t('Remediations')}
+              {!isValidatedEnterpriseEdition && (
+                <EEChip
+                  style={{ marginLeft: theme.spacing(1) }}
+                  clickable
+                  featureDetectedInfo={t('Remediation')}
+                />
               )}
-              className={classes.item}
-            />
-          </>
-        )
-      }
+            </Box>
+          )}
+          className={classes.item}
+        />
+      )}
     </Tabs>
   );
 };

@@ -75,34 +75,34 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
         className={classes.item}
       />
       {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
-        <>
-          <Tab
-            component={Link}
-            to={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
-            value={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
-            label={t('Payload info')}
-            className={classes.item}
-          />
-          <Tab
-            component={Link}
-            to={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
-            onClick={handleRemediationClick}
-            value={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
-            label={(
-              <Box display="flex" alignItems="center">
-                {t('Remediations')}
-                {!isValidatedEnterpriseEdition && (
-                  <EEChip
-                    style={{ marginLeft: theme.spacing(1) }}
-                    clickable
-                    featureDetectedInfo={t('Remediation')}
-                  />
-                )}
-              </Box>
-            )}
-            className={classes.item}
-          />
-        </>
+        <Tab
+          component={Link}
+          to={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
+          value={`/admin/atomic_testings/${injectResultOverview.inject_id}/payload_info`}
+          label={t('Payload info')}
+          className={classes.item}
+        />
+      )}
+      {injectResultOverview.inject_injector_contract?.injector_contract_payload && (
+        <Tab
+          component={Link}
+          to={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
+          onClick={handleRemediationClick}
+          value={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
+          label={(
+            <Box display="flex" alignItems="center">
+              {t('Remediations')}
+              {!isValidatedEnterpriseEdition && (
+                <EEChip
+                  style={{ marginLeft: theme.spacing(1) }}
+                  clickable
+                  featureDetectedInfo={t('Remediation')}
+                />
+              )}
+            </Box>
+          )}
+          className={classes.item}
+        />
       )}
     </Tabs>
   );
