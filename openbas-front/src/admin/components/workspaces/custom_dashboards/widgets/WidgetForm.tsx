@@ -97,7 +97,10 @@ const WidgetForm: FunctionComponent<Props> = ({
         direction: z.literal('ASC').or(z.literal('DESC')),
         fieldName: z.string(),
       })).optional(),
-      limit: z.number().max(1000).min(0).optional(),
+      limit: z.number()
+        .min(0, { message: t('Minimum value is 0') })
+        .max(1000, { message: t('Maximum value is 1000') })
+        .optional(),
       columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),

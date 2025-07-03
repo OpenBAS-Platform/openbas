@@ -53,8 +53,6 @@ const ListWidgetParameters = (props: Props) => {
         props.widgetType);
       setPropertySelection(finalOptions);
       const newCols = finalOptions
-      // remove "simulation" foreign column from selectable columns
-        .filter(o => o.id != 'base_simulation_side')
         .map((d) => {
           return {
             attribute: d.id,
