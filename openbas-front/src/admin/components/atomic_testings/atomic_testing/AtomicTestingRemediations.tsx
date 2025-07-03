@@ -1,6 +1,7 @@
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { sanitize } from 'dompurify';
+// eslint-disable-next-line import/no-named-as-default
+import DOMPurify from 'dompurify';
 import { type SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -130,12 +131,12 @@ const AtomicTestingRemediations = () => {
                       fontWeight="bold"
                       gutterBottom
                     >
-                      {t('Detection Rule')}
-                      :
+                      {`${t('Detection Rule')}: `}
                     </Typography>
                     <div
-                      dangerouslySetInnerHTML={{ __html: sanitize(content.replace(/\n/g, '<br />')) }}
-                    />
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')) }}
+                    >
+                    </div>
                   </>
                 ) : (
                   <Typography variant="body2" color="textSecondary" gutterBottom>
