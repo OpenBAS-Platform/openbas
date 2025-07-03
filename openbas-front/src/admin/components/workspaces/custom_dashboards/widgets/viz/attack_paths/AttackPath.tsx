@@ -63,8 +63,8 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   const defaultEdgeOptions = {
     markerEnd: {
       type: MarkerType.ArrowClosed,
-      width: 30,
-      height: 30,
+      width: 15,
+      height: 15,
     },
   };
   const proOptions = {
