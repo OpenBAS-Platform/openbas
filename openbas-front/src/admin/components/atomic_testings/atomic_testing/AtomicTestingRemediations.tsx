@@ -86,7 +86,7 @@ const AtomicTestingRemediations = () => {
 
   return (
     <>
-      <Typography variant="h5">{t('Security platform')}</Typography>
+      <Typography variant="h5" gutterBottom>{t('Security platform')}</Typography>
       <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
         {tabs.map((tab, index) => (
           <Tab
