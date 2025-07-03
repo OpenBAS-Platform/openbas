@@ -493,4 +493,10 @@ public class InjectApi extends RestBehavior {
       @RequestParam String injectId) {
     return this.injectService.getInjectStatusWithGlobalExecutionTraces(injectId);
   }
+
+  @Operation(description = "Get detection remediation by inject based on the payload definition")
+  @GetMapping("/detection-remediations/{injectId}")
+  public List<DetectionRemediation> getPayloadDetectionRemediations(@PathVariable String injectId) {
+    return injectService.fetchDetectionRemediationsByInjectId(injectId);
+  }
 }

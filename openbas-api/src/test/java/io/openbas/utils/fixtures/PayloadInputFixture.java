@@ -55,20 +55,24 @@ public class PayloadInputFixture {
   public static PayloadCreateInput createDefaultPayloadCreateInputWithDetectionRemediation() {
     PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
 
+    input.setDetectionRemediations(buildDetectionRemediations());
+    return input;
+  }
+
+  @NotNull
+  private static List<DetectionRemediationInput> buildDetectionRemediations() {
     DetectionRemediationInput drInputCS = new DetectionRemediationInput();
     drInputCS.setCollectorId("CS");
     drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
 
     DetectionRemediationInput drInputSentinel = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Sentinel");
+    drInputSentinel.setCollectorId("SENTINEL");
+    drInputSentinel.setValues("Detection Remediation Gap for Sentinel");
 
     DetectionRemediationInput srInputDefender = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Defender");
-
-    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
-    return input;
+    srInputDefender.setCollectorId("DEFENDER");
+    srInputDefender.setValues("Detection Remediation Gap for Defender");
+    return List.of(drInputCS, drInputSentinel, srInputDefender);
   }
 
   public static PayloadCreateInput createDefaultPayloadCreateInputForExecutable() {
@@ -126,21 +130,7 @@ public class PayloadInputFixture {
 
   public static PayloadUpdateInput getDefaultPayloadUpdateInputWithDetectionRemediation() {
     PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
-
-    DetectionRemediationInput drInputCS = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
-
-    DetectionRemediationInput drInputSentinel = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Sentinel");
-
-    DetectionRemediationInput srInputDefender = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Defender");
-
-    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
-
+    input.setDetectionRemediations(buildDetectionRemediations());
     return input;
   }
 
@@ -180,19 +170,7 @@ public class PayloadInputFixture {
 
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInputWithDetectionRemediations() {
     PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
-    DetectionRemediationInput drInputCS = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
-
-    DetectionRemediationInput drInputSentinel = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Sentinel");
-
-    DetectionRemediationInput srInputDefender = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
-    drInputCS.setValues("Detection Remediation Gap for Defender");
-
-    input.setDetectionRemediations(List.of(drInputCS, drInputSentinel, srInputDefender));
+    input.setDetectionRemediations(buildDetectionRemediations());
     return input;
   }
 

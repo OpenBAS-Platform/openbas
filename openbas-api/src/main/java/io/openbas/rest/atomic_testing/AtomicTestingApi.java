@@ -1,7 +1,6 @@
 package io.openbas.rest.atomic_testing;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.database.model.DetectionRemediation;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.helper.RestBehavior;
@@ -51,11 +50,6 @@ public class AtomicTestingApi extends RestBehavior {
   @GetMapping("/{injectId}/payload")
   public StatusPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
     return atomicTestingService.findPayloadOutputByInjectId(injectId);
-  }
-
-  @GetMapping("/detection-remediations/{injectId}")
-  public List<DetectionRemediation> getPayloadDetectionRemediations(@PathVariable String injectId) {
-    return atomicTestingService.fetchDetectionRemediationsByInjectId(injectId);
   }
 
   @PostMapping()

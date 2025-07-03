@@ -84,6 +84,7 @@ public class InjectService {
   private final InjectStatusMapper injectStatusMapper;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
+  private final PayloadRepository payloadRepository;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -949,5 +950,15 @@ public class InjectService {
         });
 
     return valueTargetedAssetsMap;
+  }
+
+  /**
+   * Function used to fetch the detection remediations in a inject based on payload definition.
+   *
+   * @param injectId
+   * @return a list of detection remediations
+   */
+  public List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId) {
+    return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
   }
 }

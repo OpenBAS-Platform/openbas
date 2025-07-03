@@ -109,6 +109,6 @@ export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') 
 
 // Detection Remediation
 export const fetchPayloadDetectionRemediationsByInject = (injectId: string) => {
-  const uri = `/api/atomic-testings/detection-remediations/${injectId}`;
+  const uri = `${INJECT_URI}/detection-remediations/${injectId}`;
   return simpleCall(uri);
 };

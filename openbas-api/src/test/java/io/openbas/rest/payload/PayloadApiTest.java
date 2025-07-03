@@ -4,9 +4,16 @@ import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTEN
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.database.specification.InjectorContractSpecification.byPayloadId;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,14 +22,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.collector.form.CollectorCreateInput;
-import io.openbas.rest.payload.form.*;
+import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.rest.payload.form.PayloadUpdateInput;
+import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.payload.form.PayloadsDeprecateInput;
+import io.openbas.utils.fixtures.CollectorFixture;
 import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
+import io.openbas.utils.fixtures.composers.CollectorComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
@@ -30,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,11 +60,22 @@ class PayloadApiTest extends IntegrationTest {
   @Autowired private DocumentRepository documentRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private PayloadRepository payloadRepository;
+  @Autowired private CollectorRepository collectorRepository;
+
+  @Autowired private CollectorComposer collectorComposer;
 
   @Resource private ObjectMapper objectMapper;
 
+  @MockBean private Ee eeService;
+
+  @MockBean private LicenseCacheManager licenseCacheManager;
+
   @BeforeAll
   void beforeAll() {
+    collectorComposer.reset();
+    collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
+    collectorComposer.forCollector(CollectorFixture.createDefaultCollector("SENTINEL")).persist();
+    collectorComposer.forCollector(CollectorFixture.createDefaultCollector("DEFENDER")).persist();
     EXECUTABLE_FILE = documentRepository.save(PayloadInputFixture.createDefaultExecutableFile());
   }
 
@@ -56,12 +83,14 @@ class PayloadApiTest extends IntegrationTest {
   void afterAll() {
     this.documentRepository.deleteAll(List.of(EXECUTABLE_FILE));
     this.payloadRepository.deleteAll();
+    this.collectorRepository.deleteAll();
   }
 
   @Nested
   @WithMockAdminUser
   @DisplayName("Create Payload")
   class CreatePayload {
+
     @Test
     @DisplayName("Create Payload")
     void createExecutablePayload() throws Exception {
@@ -151,6 +180,8 @@ class PayloadApiTest extends IntegrationTest {
     void
         given_payload_create_input_with_detection_remediation_should_return_payload_with_detection_remediation()
             throws Exception {
+      when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
       PayloadCreateInput input =
           PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
 
@@ -160,20 +191,7 @@ class PayloadApiTest extends IntegrationTest {
                   .content(asJsonString(input)))
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.payload_name").value("Command line payload"))
-          .andExpect(
-              jsonPath("$.payload_output_parsers[0].output_parser_mode")
-                  .value(ParserMode.STDOUT.name()))
-          .andExpect(
-              jsonPath("$.payload_output_parsers[0].output_parser_type")
-                  .value(ParserType.REGEX.name()))
-          .andExpect(
-              jsonPath(
-                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
-                  .value("rule"))
-          .andExpect(
-              jsonPath(
-                      "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
-                  .value("IPV6"));
+          .andExpect(jsonPath("$.payload_detection_remediations.length()").value(3));
     }
 
     @Test
@@ -397,6 +415,8 @@ class PayloadApiTest extends IntegrationTest {
   void
       given_payload_update_input_with_detection_remediations_should_return_updated_payload_with_detection_remediations()
           throws Exception {
+    when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
@@ -406,6 +426,7 @@ class PayloadApiTest extends IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(createInput)))
             .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.payload_detection_remediations.length()").value(0))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -420,7 +441,8 @@ class PayloadApiTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(updateInput)))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"));
+        .andExpect(jsonPath("$.payload_detection_remediations.length()").value(3));
+    ;
   }
 
   @Test
@@ -508,12 +530,15 @@ class PayloadApiTest extends IntegrationTest {
   void
       given_payload_upsert_input_with_detection_remediation_should_return_updated_payload_with_detection_remediations()
           throws Exception {
+    when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
     PayloadCreateInput input =
         PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
 
     mvc.perform(
             post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().is2xxSuccessful());
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_detection_remediations.length()").value(0));
 
     PayloadUpsertInput upsertInput =
         PayloadInputFixture.getDefaultCommandPayloadUpsertInputWithDetectionRemediations();
@@ -523,7 +548,8 @@ class PayloadApiTest extends IntegrationTest {
             post(PAYLOAD_URI + "/upsert")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(upsertInput)))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.payload_detection_remediations.length()").value(3));
   }
 
   // -- CHECK CLEANUP AND EXECUTOR --
