@@ -1,7 +1,7 @@
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DOMPurify from 'dompurify';
-import { type SyntheticEvent, useEffect, useState } from 'react';
+import { type SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -13,6 +13,7 @@ import { COLLECTOR_LIST } from '../../../../constants/Entities';
 import { useHelper } from '../../../../store';
 import { type Collector, type DetectionRemediationOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -23,25 +24,23 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 const AtomicTestingRemediations = () => {
+  const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-  const theme = useTheme();
   const { classes } = useStyles();
+  const theme = useTheme();
   const location = useLocation();
-  const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
-
-  const isRemediationTab = location.pathname.includes('/remediations');
-
-  const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
-
-  useEffect(() => {
-    dispatch(fetchCollectors());
-  }, [dispatch]);
-
   const [tabs, setTabs] = useState<Collector[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediationOutput[]>([]);
   const [hasFetchedRemediations, setHasFetchedRemediations] = useState(false);
+
+  const isRemediationTab = location.pathname.includes('/remediations');
+
+  const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
+  useDataLoader(() => {
+    dispatch(fetchCollectors());
+  });
 
   // Filter valid collectors
   useEffect(() => {
@@ -53,7 +52,6 @@ const AtomicTestingRemediations = () => {
     }
   }, [collectors]);
 
-  // Fetch Remediations only once when on tab
   useEffect(() => {
     if (isRemediationTab && injectId && !hasFetchedRemediations) {
       fetchPayloadDetectionRemediationsByInject(injectId).then((result) => {
@@ -63,13 +61,28 @@ const AtomicTestingRemediations = () => {
     }
   }, [isRemediationTab, injectId, hasFetchedRemediations]);
 
+  useEffect(() => {
+    if (activeTab >= tabs.length) {
+      setActiveTab(0);
+    }
+  }, [tabs, activeTab]);
+
   const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const activeCollectorRemediations = detectionRemediations.filter(
-    rem => rem.detection_remediation_collector === tabs[activeTab].collector_id,
-  );
+  const activeCollectorRemediations = useMemo(() => {
+    const activeCollector = tabs[activeTab];
+    if (!activeCollector) return [];
+
+    return detectionRemediations.filter(
+      rem => rem.detection_remediation_collector === activeCollector.collector_id,
+    );
+  }, [tabs, activeTab, detectionRemediations]);
+
+  if (tabs.length === 0) {
+    return <Typography>{t('Loading collectors...')}</Typography>;
+  }
 
   return (
     <>
