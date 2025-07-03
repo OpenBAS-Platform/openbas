@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { fetchExercise } from '../../../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../../../actions/exercises/exercise-helper';
