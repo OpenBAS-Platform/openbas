@@ -59,9 +59,9 @@ public enum ContractOutputType {
               new ContractOutputField("service", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          jsonNode.get("host") != null
-              && jsonNode.get("port") != null
-              && jsonNode.get("service") != null,
+          jsonNode.hasNonNull("host")
+              && jsonNode.hasNonNull("port")
+              && jsonNode.hasNonNull("service"),
       (JsonNode jsonNode) -> {
         String host = buildString(jsonNode, "host");
         String port = buildString(jsonNode, "port");
@@ -109,7 +109,7 @@ public enum ContractOutputType {
               new ContractOutputField("username", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("password", ContractOutputTechnicalType.Text, true))),
       true,
-      (JsonNode jsonNode) -> jsonNode.get("username") != null && jsonNode.get("password") != null,
+      (JsonNode jsonNode) -> jsonNode.hasNonNull("username") && jsonNode.hasNonNull("password"),
       (JsonNode jsonNode) -> {
         String username = buildString(jsonNode, "username");
         String password = buildString(jsonNode, "password");
@@ -130,9 +130,9 @@ public enum ContractOutputType {
               new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          jsonNode.get("id") != null
-              && jsonNode.get("host") != null
-              && jsonNode.get("severity") != null,
+          jsonNode.hasNonNull("id")
+              && jsonNode.hasNonNull("host")
+              && jsonNode.hasNonNull("severity"),
       (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
         JsonNode assetIdNode = jsonNode.get("asset_id");

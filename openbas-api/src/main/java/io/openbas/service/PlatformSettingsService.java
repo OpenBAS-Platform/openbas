@@ -302,6 +302,8 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDetectionExpirationTime());
     platformSettings.setPreventionExpirationTime(
         expectationPropertiesConfig.getPreventionExpirationTime());
+    platformSettings.setVulnerabilityExpirationTime(
+        expectationPropertiesConfig.getVulnerabilityExpirationTime());
     platformSettings.setChallengeExpirationTime(
         expectationPropertiesConfig.getChallengeExpirationTime());
     platformSettings.setArticleExpirationTime(

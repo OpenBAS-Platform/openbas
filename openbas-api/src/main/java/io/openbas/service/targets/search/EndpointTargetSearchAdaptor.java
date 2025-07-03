@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final EndpointRepository endpointRepository;
   private final InjectExpectationService injectExpectationService;
   private final SearchSpecificationUtils<Endpoint> searchSpecificationUtils;
@@ -127,6 +128,7 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
       switch (result.type()) {
         case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
         case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
+        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
         case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
       }
     }
