@@ -12,7 +12,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_01__Update_injector_contracts_predefined_expectations extends BaseJavaMigration {
+public class V4_02__Update_injector_contracts_predefined_expectations extends BaseJavaMigration {
 
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();

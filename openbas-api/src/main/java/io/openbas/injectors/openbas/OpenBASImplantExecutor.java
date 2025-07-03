@@ -4,8 +4,8 @@ import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
-import static io.openbas.model.expectation.VulnerabilityExpectation.vulnerabilityExpectationForAssetGroup;
 import static io.openbas.utils.ExpectationUtils.*;
+import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAssetGroup;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;

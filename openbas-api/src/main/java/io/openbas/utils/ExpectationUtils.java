@@ -8,9 +8,9 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAgent;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
-import static io.openbas.model.expectation.VulnerabilityExpectation.vulnerabilityExpectationForAgent;
-import static io.openbas.model.expectation.VulnerabilityExpectation.vulnerabilityExpectationForAsset;
 import static io.openbas.utils.AgentUtils.getActiveAgents;
+import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAgent;
+import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAsset;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -486,6 +486,14 @@ public class ExpectationUtils {
     return returnList;
   }
 
+  /**
+   * Get the vulnerability type expectations at the le vell of the asset executing the inject
+   *
+   * @param assetToExecute
+   * @param inject
+   * @param expectation
+   * @return List<VulnerabilityExpectation>
+   */
   public static List<VulnerabilityExpectation> getVulnerabilityExpectations(
       AssetToExecute assetToExecute,
       Inject inject,

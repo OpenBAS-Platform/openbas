@@ -85,6 +85,15 @@ public class InjectExecutionService {
     }
   }
 
+  /**
+   * Checks output parsers of an agent and updates the scores of vulnerability expectations
+   * accordingly
+   *
+   * @param outputParsers
+   * @param structuredOutput
+   * @param inject
+   * @param agent
+   */
   public void checkCveExpectation(
       Set<OutputParser> outputParsers, ObjectNode structuredOutput, Inject inject, Agent agent) {
     List<InjectExpectation> injectExpectations = new ArrayList<>();
