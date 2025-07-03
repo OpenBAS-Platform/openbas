@@ -1,5 +1,6 @@
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+// eslint-disable-next-line import/no-named-as-default
 import DOMPurify from 'dompurify';
 import { type SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
