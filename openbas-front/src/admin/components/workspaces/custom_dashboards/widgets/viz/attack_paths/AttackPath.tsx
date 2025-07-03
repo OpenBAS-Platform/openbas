@@ -7,7 +7,7 @@ import {
 import * as qs from 'qs';
 import {
   type MouseEvent as ReactMouseEvent,
-  useEffect,
+  useEffect, useState,
 } from 'react';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -23,6 +23,7 @@ import {
 import { sortKillChainPhase } from '../../../../../../../utils/kill_chain_phases/kill_chain_phases';
 import ColoredPercentageRate from '../components/ColoredPercentageRate';
 import AttackPatternNode from './AttackPatternNode';
+import DraggableEdge from './DraggableEdge';
 
 interface Props {
   data: EsAttackPath[];
@@ -51,20 +52,29 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   const { classes } = useStyles();
   const { du, fldt } = useFormatter();
   const [nodes, setNodes] = useNodesState<Node>([]);
-  const [edges, setEdges] = useEdgesState<Edge>([]);
+  const [attackPathsEdges, setAttackPathsEdges] = useEdgesState<Edge>([]);
+  const [simulationDatesEdge, setSimulationDatesEdge] = useEdgesState<Edge>([]);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const navigate = useNavigate();
 
   // -- React Flow configuration
+  const arrowSize = 15;
+  const XYinitalPadding = 50;
+  const XGap = 300; // Horizontal gap between nodes
+  const YGap = 150; // Vertical gap between nodes
+
   const nodeTypes = { attackPattern: AttackPatternNode };
   enum NodeType {
     DEFAULT = 'default',
     ATTACK_PATTERN = 'attackPattern',
   }
+
+  const edgeTypes = { draggableEdge: DraggableEdge };
   const defaultEdgeOptions = {
     markerEnd: {
       type: MarkerType.ArrowClosed,
-      width: 15,
-      height: 15,
+      width: arrowSize,
+      height: arrowSize,
     },
   };
   const proOptions = {
@@ -116,8 +126,8 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
       type,
       data,
       position: {
-        x: 300 * xIndex,
-        y: yIndex === null ? 0 : 50 + 150 * yIndex,
+        x: XYinitalPadding + XGap * xIndex,
+        y: yIndex === null ? 0 : XYinitalPadding + YGap * yIndex,
       },
       targetPosition: Position.Left,
       sourcePosition: Position.Right,
@@ -146,7 +156,11 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
     return createNode(
       getNodeId(attackPath.attackPatternId, phase),
       NodeType.ATTACK_PATTERN,
-      { attackPath },
+      {
+        attackPath,
+        onHover: setHoveredNodeId,
+        onLeave: () => setHoveredNodeId(null),
+      },
       xIndex,
       yIndex,
     );
@@ -163,28 +177,32 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
 
   const createEdgesByAttackPath = (attackPath: EsAttackPath, phase: KillChainPhaseObject) => {
     return getAllChildrenNodeId(attackPath).map((nodeChildId) => {
+      const nodeId = getNodeId(attackPath.attackPatternId, phase);
       return {
         id: attackPath.attackPatternId + '-' + phase.id + '-' + nodeChildId + '-edge',
-        source: getNodeId(attackPath.attackPatternId, phase),
+        source: nodeId,
         target: nodeChildId,
+        type: 'draggableEdge',
+        style: { stroke: nodeId == hoveredNodeId ? 'red' : '#222' },
       };
     });
   };
 
-  const setNodesAndEdges = (esAttackPaths: EsAttackPath[]) => {
-    const newEdges: Edge[] = [];
+  const resolvededDataByKillChainPhase = resolveDataByKillChainPhase(data);
+  const initializeNodesAndEdges = () => {
+    const newAttackPathsEdges: Edge[] = [];
+    let newSimulationDatesEdge: Edge = {} as Edge;
     const newNodes: Node[] = [];
-    const attackPathsByKillChainPhase = resolveDataByKillChainPhase(esAttackPaths);
-    const maxXIndex = attackPathsByKillChainPhase.length - 1;
+    const maxXIndex = resolvededDataByKillChainPhase.length - 1;
     let maxYIndex = 0;
 
-    attackPathsByKillChainPhase.forEach((phase, phaseIndex) => {
+    resolvededDataByKillChainPhase.forEach((phase, phaseIndex) => {
       newNodes.push(createKillChainNode(phase, phaseIndex));
 
       (phase.attackPaths as EsAttackPath[]).forEach((attackPath, attackPathIndex) => {
         maxYIndex = maxYIndex < attackPathIndex ? attackPathIndex : maxYIndex;
         newNodes.push(createAttackPatternNode(attackPath, phase, phaseIndex, attackPathIndex));
-        newEdges.push(...createEdgesByAttackPath(attackPath, phase));
+        newAttackPathsEdges.push(...createEdgesByAttackPath(attackPath, phase));
       });
     });
 
@@ -194,7 +212,7 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
     if (simulationEndDate) {
       newNodes.push(createDefaultNode('end-date-node', fldt(simulationEndDate), maxXIndex, maxYIndex + 1));
       const duration = (new Date(simulationEndDate).getTime() - new Date(simulationStartDate!).getTime());
-      newEdges.push({
+      newSimulationDatesEdge = {
         id: 'time-edge',
         source: 'start-date-node',
         target: 'end-date-node',
@@ -204,16 +222,29 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
           fill: theme.palette.text?.primary,
           fontSize: 14,
         },
-      });
+      };
     }
-
     setNodes(newNodes);
-    setEdges(newEdges);
+    setAttackPathsEdges(newAttackPathsEdges);
+    setSimulationDatesEdge([newSimulationDatesEdge]);
   };
 
   useEffect(() => {
-    setNodesAndEdges(data);
+    initializeNodesAndEdges();
   }, []);
+
+  useEffect(() => {
+    if (attackPathsEdges.length < 1 && hoveredNodeId === null) {
+      return;
+    }
+    const newAttackPathsEdges: Edge[] = [];
+    resolvededDataByKillChainPhase.forEach((phase) => {
+      (phase.attackPaths as EsAttackPath[]).forEach((attackPath) => {
+        newAttackPathsEdges.push(...createEdgesByAttackPath(attackPath, phase));
+      });
+    });
+    setAttackPathsEdges(newAttackPathsEdges);
+  }, [hoveredNodeId]);
 
   // -- React Flow nodes actions
   const onNodeClick = (event: ReactMouseEvent, node: Node) => {
@@ -249,10 +280,12 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
       <ReactFlow
         className={classes.reactFlow}
         id={widgetId}
+        key={widgetId}
         colorMode={theme.palette.mode}
         nodes={nodes}
-        edges={edges}
+        edges={[...attackPathsEdges, ...simulationDatesEdge]}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodeClick={onNodeClick}
 
         // Interaction settings

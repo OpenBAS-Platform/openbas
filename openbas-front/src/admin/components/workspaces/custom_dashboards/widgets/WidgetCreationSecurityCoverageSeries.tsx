@@ -54,6 +54,7 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
   const { classes } = useStyles();
   const theme = useTheme();
   const [simulationId, setSimulationId] = useState<string | undefined>();
+  const [showSimulationError, setShowSimulationError] = useState<boolean>(false);
 
   useEffect(() => {
     if (isFilterableBySimulation && value.length > 0 && value[0].filter?.filters) {
@@ -63,6 +64,11 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
   }, []);
 
   const onChangeSeries = (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => {
+    if (isFilterableBySimulation && !simulationId) {
+      // If simulationId is required but not set, we cannot proceed
+      setShowSimulationError(true);
+      return;
+    }
     onChange(series);
     onSubmit();
   };
@@ -70,7 +76,8 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
   return (
     <div className={classes.container}>
       {isFilterableBySimulation && (
-        <ExerciseField value={simulationId ?? ''} className={classes.allWidth} onChange={simulationId => setSimulationId(simulationId)} />
+        // TODO update with Romuald component
+        <ExerciseField required error={showSimulationError} value={simulationId ?? ''} className={classes.allWidth} onChange={simulationId => setSimulationId(simulationId)} />
       )}
       {perspectives.map((perspective) => {
         const isSelected = value.filter(v => v.filter?.filters?.find(f => f.values?.includes(perspective.type))).length > 0;

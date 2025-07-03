@@ -12,9 +12,11 @@ interface Props {
   value: string;
   className?: string;
   onChange: (exerciseId: string) => void;
+  required?: boolean;
+  error?: boolean;
 }
 
-const ExerciseField = ({ value, className, onChange }: Props) => {
+const ExerciseField = ({ value, className, onChange, required = false, error = false }: Props) => {
   const dispatch = useAppDispatch();
   const { fldt } = useFormatter();
 
@@ -44,7 +46,7 @@ const ExerciseField = ({ value, className, onChange }: Props) => {
       }}
       value={exerciseOptions.find(n => n.id === value) ?? null}
       renderInput={params => (
-        <TextField {...params} label="Exercise" variant="standard" fullWidth />
+        <TextField error={error} required={required} {...params} label="Exercise" variant="standard" fullWidth />
       )}
     />
   );
