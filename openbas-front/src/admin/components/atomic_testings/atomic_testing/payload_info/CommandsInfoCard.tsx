@@ -1,14 +1,14 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchDocuments } from '../../../../../actions/Document';
+import type { DocumentHelper } from '../../../../../actions/helper';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemCopy from '../../../../../components/ItemCopy';
-import type {
-  PayloadArgument,
-  PayloadCommandBlock,
-  PayloadPrerequisite,
-  StatusPayloadOutput,
-} from '../../../../../utils/api-types';
+import { useHelper } from '../../../../../store';
+import type { Payload, PayloadArgument, PayloadPrerequisite, StatusPayloadOutput } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
+import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../../../utils/String';
 
 const useStyles = makeStyles()(theme => ({
@@ -16,11 +16,17 @@ const useStyles = makeStyles()(theme => ({
   tableContainer: { backgroundColor: theme.palette.background.paperInCard },
 }));
 
-interface Props { payloadOutput?: StatusPayloadOutput }
+interface Props {payloadOutput?: Payload | StatusPayloadOutput;}
 
 const CommandsInfoCard = ({ payloadOutput }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const dispatch = useAppDispatch();
+
+  const { documentMap } = useHelper((helper: DocumentHelper) => ({ documentMap: helper.getDocumentsMap() }));
+  useDataLoader(() => {
+    dispatch(fetchDocuments());
+  });
 
   if (!payloadOutput) {
     return (
@@ -35,12 +41,9 @@ const CommandsInfoCard = ({ payloadOutput }: Props) => {
       {payloadOutput.payload_type === 'Command' && (
         <>
           <Typography variant="h3" gutterBottom>{t('Command executor')}</Typography>
-          {!payloadOutput.payload_command_blocks?.length ? '-' : payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) =>
-            (
-              <Typography key={commandBlock.command_executor} variant="body2">
-                {emptyFilled(commandBlock.command_executor)}
-              </Typography>
-            ))}
+          <Typography variant="body2">
+            {emptyFilled(payloadOutput.command_executor)}
+          </Typography>
           {payloadOutput.payload_obfuscator && (
             <>
               <Typography variant="h3" gutterBottom>{t('Obfuscator')}</Typography>
@@ -48,11 +51,13 @@ const CommandsInfoCard = ({ payloadOutput }: Props) => {
             </>
           )}
           <Typography variant="h3" gutterBottom>{t('Attack command')}</Typography>
-          {!payloadOutput.payload_command_blocks?.length ? '-' : payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) => (
-            <pre key={commandBlock.command_content}>
-              <ItemCopy content={commandBlock.command_content ?? ' '} />
-            </pre>
-          ))}
+          {!payloadOutput.command_content
+            ? '-'
+            : (
+              <pre key={payloadOutput.command_content}>
+                  <ItemCopy content={payloadOutput.command_content ?? ' '} />
+                </pre>
+            )}
         </>
       )}
 
@@ -60,11 +65,11 @@ const CommandsInfoCard = ({ payloadOutput }: Props) => {
         <>
           <Typography variant="h3" gutterBottom>{t('Executable files')}</Typography>
           <Typography variant="body1">
-            {payloadOutput.executable_file?.document_name ?? '-'}
+            {payloadOutput.executable_file ? documentMap[payloadOutput.executable_file]?.document_name ?? '-' : '-'}
           </Typography>
           <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
           <Typography variant="body1">
-            {payloadOutput.executable_arch}
+            {payloadOutput.payload_execution_arch}
           </Typography>
         </>
       )}
@@ -73,7 +78,7 @@ const CommandsInfoCard = ({ payloadOutput }: Props) => {
         <>
           <Typography variant="h3" gutterBottom>{t('Executable files')}</Typography>
           <Typography variant="body1">
-            {payloadOutput.file_drop_file?.document_name ?? '-'}
+            {payloadOutput.file_drop_file ? documentMap[payloadOutput.file_drop_file]?.document_name ?? '-' : '-'}
           </Typography>
         </>
       )}
@@ -158,22 +163,16 @@ const CommandsInfoCard = ({ payloadOutput }: Props) => {
       </Typography>
 
       <Typography variant="h3" gutterBottom>{t('Cleanup command')}</Typography>
-      {payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) => (
-        !commandBlock.payload_cleanup_command?.length
-          ? '-'
-          : (
-              <pre key={commandBlock.command_content}>
-                { commandBlock.payload_cleanup_command?.map((cleanupCommand: string) => (
-                  <ItemCopy
-                    key={cleanupCommand}
-                    content={
-                      cleanupCommand
-                    }
-                  />
-                ))}
-              </pre>
-            )
-      ))}
+      {/*FIXME*/}
+      {/*{payloadOutput.payload_cleanup_command?.map((cleanupCommand: string) => (*/}
+      {/*  !cleanupCommand*/}
+      {/*    ? '-'*/}
+      {/*    : (*/}
+      {/*      <pre key={cleanupCommand}>*/}
+      {/*            <ItemCopy key={cleanupCommand} content={cleanupCommand} />*/}
+      {/*        </pre>*/}
+      {/*    )*/}
+      {/*))}*/}
     </Paper>
   );
 };

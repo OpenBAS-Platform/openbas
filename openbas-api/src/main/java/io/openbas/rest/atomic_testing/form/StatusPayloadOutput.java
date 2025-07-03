@@ -27,23 +27,19 @@ public class StatusPayloadOutput {
   private String description;
 
   @JsonProperty("payload_platforms")
-  private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
+  private Endpoint.PLATFORM_TYPE[] platforms;
 
   @JsonProperty("payload_attack_patterns")
-  private List<AttackPatternSimple> attackPatterns = new ArrayList<>();
+  private List<String> attackPatterns;
 
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
-  @JsonProperty("payload_command_blocks")
-  @Singular
-  private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
+  @JsonProperty("payload_cleanup_command")
+  private List<String> cleanupCommand;
 
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
-
-  @JsonProperty("payload_obfuscator")
-  private String obfuscator;
 
   @JsonProperty("payload_prerequisites")
   private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
@@ -54,20 +50,38 @@ public class StatusPayloadOutput {
   @JsonProperty("payload_tags")
   private Set<String> tags;
 
-  @JsonProperty("executable_file")
-  private StatusPayloadDocument executableFile;
+  @JsonProperty("payload_obfuscator")
+  private String obfuscator;
 
-  @JsonProperty("executable_arch")
+  @JsonProperty("payload_execution_arch")
   @Enumerated(EnumType.STRING)
-  private Payload.PAYLOAD_EXECUTION_ARCH executableArch =
+  private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
       Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 
-  @JsonProperty("file_drop_file")
-  private StatusPayloadDocument fileDropFile;
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParserSimple> payloadOutputParsers;
+
+  // -- COMMAND -- -> create a child class ?
+
+  @JsonProperty("command_executor")
+  private String executor;
+
+  @JsonProperty("command_content")
+  private String content;
+
+  // -- DNS -- -> create a child class ?
 
   @JsonProperty("dns_resolution_hostname")
   private String hostname;
 
-  @JsonProperty("payload_output_parsers")
-  private Set<OutputParserSimple> payloadOutputParsers;
+  // -- EXECUTABLE -- -> create a child class ?
+
+  @JsonProperty("executable_file")
+  private String executableFile;
+
+  // -- FILE DROP -- -> create a child class ?
+
+  @JsonProperty("file_drop_file")
+  private String fileDropFile;
+
 }

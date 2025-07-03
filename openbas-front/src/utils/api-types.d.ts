@@ -329,12 +329,6 @@ export interface AttackPatternCreateInput {
   attack_pattern_stix_id?: string;
 }
 
-export interface AttackPatternSimple {
-  attack_pattern_external_id: string;
-  attack_pattern_id: string;
-  attack_pattern_name: string;
-}
-
 export interface AttackPatternUpdateInput {
   attack_pattern_description?: string;
   attack_pattern_external_id: string;
@@ -4026,12 +4020,6 @@ export interface PayloadArgument {
   type: string;
 }
 
-export interface PayloadCommandBlock {
-  command_content?: string;
-  command_executor?: string;
-  payload_cleanup_command?: string[];
-}
-
 export type PayloadCreateInput = BasePayloadCreateInput &
   (
     | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
@@ -4912,9 +4900,11 @@ export interface StatisticElement {
 }
 
 export interface StatusPayload {
+  command_content?: string;
+  command_executor?: string;
   dns_resolution_hostname?: string;
-  executable_file?: StatusPayloadDocument;
-  file_drop_file?: StatusPayloadDocument;
+  executable_file?: string;
+  file_drop_file?: string;
   network_traffic_ip_dst: string;
   network_traffic_ip_src: string;
   /** @format int32 */
@@ -4923,8 +4913,8 @@ export interface StatusPayload {
   network_traffic_port_src: number;
   network_traffic_protocol: string;
   payload_arguments?: PayloadArgument[];
+  payload_cleanup_command?: string[];
   payload_cleanup_executor?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
   payload_description?: string;
   payload_external_id?: string;
   payload_name?: string;
@@ -4932,22 +4922,19 @@ export interface StatusPayload {
   payload_type?: string;
 }
 
-export interface StatusPayloadDocument {
-  document_id: string;
-  document_name: string;
-}
-
 export interface StatusPayloadOutput {
+  command_content?: string;
+  command_executor?: string;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  executable_file?: StatusPayloadDocument;
-  file_drop_file?: StatusPayloadDocument;
+  executable_file?: string;
+  file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: AttackPatternSimple[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string[];
   payload_cleanup_executor?: string;
   payload_collector_type?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
   payload_description?: string;
+  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_name?: string;
   payload_obfuscator?: string;

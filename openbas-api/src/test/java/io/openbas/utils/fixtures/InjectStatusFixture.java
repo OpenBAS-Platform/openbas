@@ -4,7 +4,6 @@ import static io.openbas.database.model.Command.COMMAND_TYPE;
 
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectStatus;
-import io.openbas.database.model.PayloadCommandBlock;
 import io.openbas.database.model.StatusPayload;
 import java.time.Instant;
 import java.util.List;

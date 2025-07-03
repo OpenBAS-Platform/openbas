@@ -1,14 +1,15 @@
-import { Box, Chip, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import PlatformIcon from '../../../../../components/PlatformIcon';
-import type { AttackPatternSimple, StatusPayloadOutput } from '../../../../../utils/api-types';
+import type { Payload, StatusPayloadOutput } from '../../../../../utils/api-types';
 import { emptyFilled } from '../../../../../utils/String';
+import AttackPatternChips from '../../../common/AttackPatternChips';
 
-interface Props { payloadOutput?: StatusPayloadOutput }
+interface Props { payloadOutput?: Payload | StatusPayloadOutput;}
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -64,16 +65,7 @@ const PayloadInfoPaper = ({ payloadOutput }: Props) => {
         <Typography variant="h3" gutterBottom>
           {t('Attack patterns')}
         </Typography>
-        {payloadOutput.payload_attack_patterns && payloadOutput.payload_attack_patterns.length === 0 ? '-' : payloadOutput.payload_attack_patterns?.map((attackPattern: AttackPatternSimple) => (
-          <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
-            <Chip
-              variant="outlined"
-              classes={{ root: classes.chip }}
-              color="primary"
-              label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
-            />
-          </Tooltip>
-        ))}
+        <AttackPatternChips attackPatternIds={payloadOutput.payload_attack_patterns ?? []} />
       </Box>
       <Box>
         <Typography variant="h3" gutterBottom>

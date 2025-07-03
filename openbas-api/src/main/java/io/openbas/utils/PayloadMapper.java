@@ -1,40 +1,43 @@
 package io.openbas.utils;
 
+import io.openbas.database.model.*;
+import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
+import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
+import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static java.util.Optional.ofNullable;
 
-import io.openbas.database.model.*;
-import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
-import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
-import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
-import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
-import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
-import java.util.*;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
-
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class PayloadMapper {
 
-  private final ApplicationContext context;
-
   public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
 
-    if (inject.isEmpty()) return null;
+    if (inject.isEmpty()) {
+      return null;
+    }
 
     Inject injectObj = inject.get();
     Optional<InjectorContract> injectorContractOpt = injectObj.getInjectorContract();
-    if (injectorContractOpt.isEmpty() || injectorContractOpt.get().getPayload() == null)
+    if (injectorContractOpt.isEmpty() || injectorContractOpt.get().getPayload() == null) {
       return null;
+    }
 
     InjectorContract injectorContract = injectorContractOpt.get();
     StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
@@ -130,8 +133,8 @@ public class PayloadMapper {
         .tags(payload.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .platforms(payload.getPlatforms())
         .payloadOutputParsers(toOutputParsersSimple(payload.getOutputParsers()))
-        .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-        .executableArch(injectorContract.getArch());
+        .attackPatterns(injectorContract.getAttackPatterns().stream().map(AttackPattern::getId).toList())
+        .executionArch(injectorContract.getArch());
   }
 
   private void processPayloadType(
@@ -160,21 +163,19 @@ public class PayloadMapper {
     if (payloadCommand.getCleanupCommand() != null) {
       cleanupCommands.add(payloadCommand.getCleanupCommand());
     }
-
-    PayloadCommandBlock commandBlock =
-        new PayloadCommandBlock(
-            payloadCommand.getExecutor(), payloadCommand.getContent(), cleanupCommands);
-    builder.payloadCommandBlocks(Collections.singletonList(commandBlock));
+    builder.executor(payloadCommand.getExecutor())
+        .content(payloadCommand.getContent())
+        .cleanupCommand(cleanupCommands);
   }
 
   private void handleExecutableType(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder, Executable payloadExecutable) {
-    builder.executableFile(new StatusPayloadDocument(payloadExecutable.getExecutableFile()));
+    builder.executableFile(payloadExecutable.getExecutableFile().getId());
   }
 
   private void handleFileDropType(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
-    builder.fileDropFile(new StatusPayloadDocument(payloadFileDrop.getFileDropFile()));
+    builder.fileDropFile(payloadFileDrop.getFileDropFile().getId());
   }
 
   private void handleDnsResolutionType(
@@ -188,15 +189,16 @@ public class PayloadMapper {
       InjectorContract injectorContract) {
     builder
         .cleanupExecutor(statusPayload.getCleanupExecutor())
-        .payloadCommandBlocks(statusPayload.getPayloadCommandBlocks())
+        .executor(statusPayload.getExecutor())
+        .content(statusPayload.getContent())
         .arguments(statusPayload.getArguments())
         .prerequisites(statusPayload.getPrerequisites())
         .externalId(statusPayload.getExternalId())
         .executableFile(statusPayload.getExecutableFile())
         .fileDropFile(statusPayload.getFileDropFile())
         .hostname(statusPayload.getHostname())
-        .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-        .executableArch(injectorContract.getArch())
+        .attackPatterns(injectorContract.getAttackPatterns().stream().map(AttackPattern::getId).toList())
+        .executionArch(injectorContract.getArch())
         .name(statusPayload.getName())
         .type(statusPayload.getType())
         .description(statusPayload.getDescription())
@@ -211,20 +213,5 @@ public class PayloadMapper {
     }
 
     return builder.build();
-  }
-
-  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .filter(Objects::nonNull)
-        .map(this::toAttackPatternSimple)
-        .toList();
-  }
-
-  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimple.builder()
-        .id(attackPattern.getId())
-        .name(attackPattern.getName())
-        .externalId(attackPattern.getExternalId())
-        .build();
   }
 }

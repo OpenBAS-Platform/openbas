@@ -1,21 +1,10 @@
 package io.openbas.utils;
 
-import static io.openbas.database.model.Command.COMMAND_TYPE;
-import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
-import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
-import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
-import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
-import static java.util.Collections.emptyList;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +15,17 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static io.openbas.database.model.Command.COMMAND_TYPE;
+import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
+import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
+import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
+import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 
 @RequiredArgsConstructor
 @Component
@@ -44,123 +44,65 @@ public class InjectUtils {
       return inject.getStatus().get().getPayloadOutput();
     } else if (inject.getInjectorContract().isPresent()) {
       InjectorContract injectorContract = inject.getInjectorContract().get();
-      if (injectorContract.getPayload() != null
-          && COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
+      if (injectorContract.getPayload() != null) {
         Payload payload = injectorContract.getPayload();
-        Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        PayloadCommandBlock payloadCommandBlock =
-            new PayloadCommandBlock(
-                payloadCommand.getExecutor(), payloadCommand.getContent(), null);
-        if (payloadCommand.getCleanupCommand() != null) {
-          payloadCommandBlock.setCleanupCommand(List.of(payloadCommand.getCleanupCommand()));
-        }
-        return new StatusPayload(
-            payloadCommand.getName(),
-            payloadCommand.getDescription(),
-            COMMAND_TYPE,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            payloadCommand.getExternalId(),
-            payloadCommand.getPrerequisites(),
-            payloadCommand.getArguments(),
-            List.of(payloadCommandBlock),
-            payloadCommand.getCleanupExecutor());
+        StatusPayload.StatusPayloadBuilder builder = StatusPayload.builder()
+            .name(payload.getName())
+            .description(payload.getDescription())
+            .platforms(payload.getPlatforms())
+            .attackPatterns(payload.getAttackPatterns().stream().map(AttackPattern::getId).toList())
+            .externalId(payload.getExternalId())
+            .prerequisites(payload.getPrerequisites())
+            .arguments(payload.getArguments())
+            .cleanupCommand(List.of(payload.getCleanupCommand()))
+            .cleanupExecutor(payload.getCleanupExecutor());
+        if (COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
+          // Inject has a command payload
+          Command payloadCommand = (Command) Hibernate.unproxy(payload);
+          return builder
+              .type(COMMAND_TYPE)
+              .collectorType(payload.getCollectorType())
+              .executor(payloadCommand.getExecutor())
+              .content(payloadCommand.getContent())
+              .build();
 
-      } else if (injectorContract.getPayload() != null
-          && EXECUTABLE_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        return new StatusPayload(
-            payloadExecutable.getName(),
-            payloadExecutable.getDescription(),
-            EXECUTABLE_TYPE,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            payloadExecutable.getExecutableFile(),
-            null,
-            null,
-            null,
-            emptyList(),
-            null);
-      } else if (injectorContract.getPayload() != null
-          && FILE_DROP_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-        return new StatusPayload(
-            payloadFileDrop.getName(),
-            payloadFileDrop.getDescription(),
-            FILE_DROP_TYPE,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            payloadFileDrop.getFileDropFile(),
-            null,
-            null,
-            null,
-            null,
-            emptyList(),
-            null);
-      } else if (injectorContract.getPayload() != null
-          && DNS_RESOLUTION_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-        return new StatusPayload(
-            payloadDnsResolution.getName(),
-            payloadDnsResolution.getDescription(),
-            DNS_RESOLUTION_TYPE,
-            null,
-            null,
-            null,
-            null,
-            null,
-            payloadDnsResolution.getHostname(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            emptyList(),
-            null);
-      } else if (injectorContract.getPayload() != null
-          && NETWORK_TRAFFIC_TYPE.equals(injectorContract.getPayload().getType())) {
-        // Inject has a command payload
-        Payload payload = injectorContract.getPayload();
-        NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
-        return new StatusPayload(
-            payloadNetworkTraffic.getName(),
-            payloadNetworkTraffic.getDescription(),
-            NETWORK_TRAFFIC_TYPE,
-            payloadNetworkTraffic.getProtocol(),
-            payloadNetworkTraffic.getPortDst(),
-            payloadNetworkTraffic.getPortSrc(),
-            payloadNetworkTraffic.getIpDst(),
-            payloadNetworkTraffic.getIpSrc(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            emptyList(),
-            null);
+        } else if (EXECUTABLE_TYPE.equals(injectorContract.getPayload().getType())) {
+          // Inject has a command payload
+          Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
+          return builder
+              .type(EXECUTABLE_TYPE)
+              .collectorType(payload.getCollectorType())
+              .executableFile(payloadExecutable.getExecutableFile().getId())
+              .build();
+        } else if (FILE_DROP_TYPE.equals(injectorContract.getPayload().getType())) {
+          // Inject has a command payload
+          FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+          return builder
+              .type(FILE_DROP_TYPE)
+              .collectorType(payload.getCollectorType())
+              .fileDropFile(payloadFileDrop.getFileDropFile().getId())
+              .build();
+        } else if (DNS_RESOLUTION_TYPE.equals(injectorContract.getPayload().getType())) {
+          // Inject has a command payload
+          DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
+          return builder
+              .type(DNS_RESOLUTION_TYPE)
+              .collectorType(payload.getCollectorType())
+              .hostname(payloadDnsResolution.getHostname())
+              .build();
+        } else if (NETWORK_TRAFFIC_TYPE.equals(injectorContract.getPayload().getType())) {
+          // Inject has a command payload
+          NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
+          return builder
+              .type(NETWORK_TRAFFIC_TYPE)
+              .collectorType(payload.getCollectorType())
+              .protocol(payloadNetworkTraffic.getProtocol())
+              .portDst(payloadNetworkTraffic.getPortDst())
+              .portSrc(payloadNetworkTraffic.getPortSrc())
+              .ipDst(payloadNetworkTraffic.getIpDst())
+              .ipSrc(payloadNetworkTraffic.getIpSrc())
+              .build();
+        }
       } else {
         try {
           // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)

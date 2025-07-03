@@ -1,20 +1,10 @@
 package io.openbas.injectors.caldera;
 
-import static io.openbas.database.model.Command.COMMAND_TYPE;
-import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
-import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
-import static io.openbas.model.expectation.DetectionExpectation.*;
-import static io.openbas.model.expectation.ManualExpectation.*;
-import static io.openbas.model.expectation.PreventionExpectation.*;
-import static io.openbas.utils.AgentUtils.isValidAgent;
-import static io.openbas.utils.ExpectationUtils.*;
-import static java.time.Instant.now;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import io.openbas.database.model.PayloadCommandBlock;
+import io.openbas.database.model.StatusPayload.StatusPayloadBuilder;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
@@ -34,13 +24,24 @@ import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
-import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static io.openbas.database.model.Command.COMMAND_TYPE;
+import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTrace.getNewInfoTrace;
+import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
+import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAssetGroup;
+import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
+import static io.openbas.utils.AgentUtils.isValidAgent;
+import static io.openbas.utils.ExpectationUtils.*;
+import static java.time.Instant.now;
 
 @Component(CalderaContract.TYPE)
 @RequiredArgsConstructor
@@ -275,34 +276,31 @@ public class CalderaExecutor extends Injector {
 
   @Override
   public StatusPayload getPayloadOutput(String externalId) {
-    StatusPayload statusPayload = new StatusPayload();
+    StatusPayloadBuilder statusPayload = StatusPayload.builder();
     Ability ability = calderaService.findAbilityById(externalId);
     if (ability != null) {
       ability
           .getExecutors()
           .forEach(
               executor -> {
-                PayloadCommandBlock payloadCommandBlock = new PayloadCommandBlock();
                 if (executor.getCommand() != null && !executor.getCommand().isBlank()) {
-                  payloadCommandBlock.setContent(executor.getCommand());
+                  statusPayload.content(executor.getCommand());
                 }
                 if (executor.getCleanup() != null && !executor.getCleanup().isEmpty()) {
-                  payloadCommandBlock.setCleanupCommand(executor.getCleanup());
+                  statusPayload.cleanupCommand(executor.getCleanup());
                 }
                 if (executor.getCommandExecutor() != null
                     && !executor.getCommandExecutor().isBlank()) {
-                  payloadCommandBlock.setExecutor(executor.getCommandExecutor());
+                  statusPayload.executor(executor.getCommandExecutor());
                 }
-                statusPayload.setPayloadCommandBlocks(
-                    Collections.singletonList(payloadCommandBlock));
               });
-      statusPayload.setName(ability.getName());
-      statusPayload.setType(COMMAND_TYPE);
-      statusPayload.setDescription(ability.getDescription());
-      statusPayload.setExternalId(externalId);
+      statusPayload.name(ability.getName());
+      statusPayload.type(COMMAND_TYPE);
+      statusPayload.description(ability.getDescription());
+      statusPayload.externalId(externalId);
     }
 
-    return statusPayload;
+    return statusPayload.build();
   }
 
   // -- PRIVATE --
@@ -329,19 +327,19 @@ public class CalderaExecutor extends Injector {
                   agentCaldera ->
                       agentCaldera.getExe_name().contains("implant")
                           && (now().toEpochMilli()
-                                  - Time.toInstant(agentCaldera.getCreated()).toEpochMilli())
-                              < io.openbas.helper.AgentHelper.ACTIVE_THRESHOLD
+                          - Time.toInstant(agentCaldera.getCreated()).toEpochMilli())
+                          < io.openbas.helper.AgentHelper.ACTIVE_THRESHOLD
                           && (agentCaldera.getHost().equalsIgnoreCase(assetEndpoint.getHostname())
-                              || agentCaldera
-                                  .getHost()
-                                  .split("\\.")[0]
-                                  .equalsIgnoreCase(assetEndpoint.getHostname().split("\\.")[0]))
+                          || agentCaldera
+                          .getHost()
+                          .split("\\.")[0]
+                          .equalsIgnoreCase(assetEndpoint.getHostname().split("\\.")[0]))
                           && Arrays.stream(assetEndpoint.getIps())
-                              .anyMatch(
-                                  s ->
-                                      Arrays.stream(agentCaldera.getHost_ip_addrs())
-                                          .toList()
-                                          .contains(s)))
+                          .anyMatch(
+                              s ->
+                                  Arrays.stream(agentCaldera.getHost_ip_addrs())
+                                      .toList()
+                                      .contains(s)))
               .toList();
       log.info("List return with {} agents", agentsCaldera.size());
 
@@ -376,7 +374,9 @@ public class CalderaExecutor extends Injector {
     return agentForExecution;
   }
 
-  /** In case of direct asset, we have an individual expectation for the asset */
+  /**
+   * In case of direct asset, we have an individual expectation for the asset
+   */
   private void computeExpectationsForAssetAndAgents(
       final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
@@ -389,15 +389,12 @@ public class CalderaExecutor extends Injector {
               .flatMap(
                   (expectation) ->
                       switch (expectation.getType()) {
-                        case PREVENTION ->
-                            getPreventionExpectations(assetToExecute, executedAgents, expectation)
-                                .stream();
-                        case DETECTION ->
-                            getDetectionExpectations(assetToExecute, executedAgents, expectation)
-                                .stream();
-                        case MANUAL ->
-                            getManualExpectations(assetToExecute, executedAgents, expectation)
-                                .stream();
+                        case PREVENTION -> getPreventionExpectations(assetToExecute, executedAgents, expectation)
+                            .stream();
+                        case DETECTION -> getDetectionExpectations(assetToExecute, executedAgents, expectation)
+                            .stream();
+                        case MANUAL -> getManualExpectations(assetToExecute, executedAgents, expectation)
+                            .stream();
                         default -> Stream.of();
                       })
               .toList());
@@ -405,8 +402,8 @@ public class CalderaExecutor extends Injector {
   }
 
   /**
-   * In case of asset group if expectation group -> we have an expectation for the group and one for
-   * each asset if not expectation group -> we have an individual expectation for each asset
+   * In case of asset group if expectation group -> we have an expectation for the group and one for each asset if not
+   * expectation group -> we have an individual expectation for each asset
    */
   private void computeExpectationsForAssetGroup(
       @NotNull final List<Expectation> expectations,
@@ -431,9 +428,9 @@ public class CalderaExecutor extends Injector {
                                               (e) ->
                                                   ((PreventionExpectation) e).getAsset() != null
                                                       && ((PreventionExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
+                                                      .getAsset()
+                                                      .getId()
+                                                      .equals(asset.getId())))) {
                             yield Stream.of(
                                 preventionExpectationForAssetGroup(
                                     expectation.getScore(),
@@ -458,9 +455,9 @@ public class CalderaExecutor extends Injector {
                                               (e) ->
                                                   ((DetectionExpectation) e).getAsset() != null
                                                       && ((DetectionExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
+                                                      .getAsset()
+                                                      .getId()
+                                                      .equals(asset.getId())))) {
                             yield Stream.of(
                                 detectionExpectationForAssetGroup(
                                     expectation.getScore(),
@@ -485,9 +482,9 @@ public class CalderaExecutor extends Injector {
                                               (e) ->
                                                   ((ManualExpectation) e).getAsset() != null
                                                       && ((ManualExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
+                                                      .getAsset()
+                                                      .getId()
+                                                      .equals(asset.getId())))) {
                             yield Stream.of(
                                 manualExpectationForAssetGroup(
                                     expectation.getScore(),

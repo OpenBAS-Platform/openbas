@@ -2,15 +2,25 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Singular;
 
-@Getter
-@Setter
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Builder
 public class StatusPayload {
+
+  // Need a big migration to remove this shit from DB and push the new one
+
+  @JsonProperty("payload_type")
+  private String type;
+
+  @JsonProperty("payload_collector_type")
+  private String collectorType;
 
   @JsonProperty("payload_name")
   private String name;
@@ -18,15 +28,17 @@ public class StatusPayload {
   @JsonProperty("payload_description")
   private String description;
 
-  @JsonProperty("payload_type")
-  private String type;
+  @JsonProperty("payload_platforms")
+  private Endpoint.PLATFORM_TYPE[] platforms;
+
+  @JsonProperty("payload_attack_patterns")
+  private List<String> attackPatterns;
 
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
-  @JsonProperty("payload_command_blocks")
-  @Singular
-  private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
+  @JsonProperty("payload_cleanup_command")
+  private List<String> cleanupCommand;
 
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
@@ -37,14 +49,30 @@ public class StatusPayload {
   @JsonProperty("payload_external_id")
   private String externalId;
 
-  @JsonProperty("executable_file")
-  private StatusPayloadDocument executableFile;
+  // -- COMMAND -- -> create a child class ?
 
-  @JsonProperty("file_drop_file")
-  private StatusPayloadDocument fileDropFile;
+  @JsonProperty("command_executor")
+  private String executor;
+
+  @JsonProperty("command_content")
+  private String content;
+
+  // -- DNS -- -> create a child class ?
 
   @JsonProperty("dns_resolution_hostname")
   private String hostname;
+
+  // -- EXECUTABLE -- -> create a child class ?
+
+  @JsonProperty("executable_file")
+  private String executableFile;
+
+  // -- FILE DROP -- -> create a child class ?
+
+  @JsonProperty("file_drop_file")
+  private String fileDropFile;
+
+  // -- NETWORK TRAFFIC -- -> create a child class ?
 
   @JsonProperty("network_traffic_ip_src")
   @NotNull
@@ -65,45 +93,4 @@ public class StatusPayload {
   @JsonProperty("network_traffic_protocol")
   @NotNull
   private String protocol;
-
-  public StatusPayload() {}
-
-  public StatusPayload(
-      String name,
-      String description,
-      String type,
-      String protocol,
-      Integer portDst,
-      Integer portSrc,
-      String ipDst,
-      String ipSrc,
-      String hostname,
-      Document fileDropFile,
-      Document executableFile,
-      String externalId,
-      List<PayloadPrerequisite> prerequisites,
-      List<PayloadArgument> arguments,
-      List<PayloadCommandBlock> payloadCommandBlocks,
-      String cleanupExecutor) {
-    this.name = name;
-    this.description = description;
-    this.type = type;
-    this.protocol = protocol;
-    this.portDst = portDst;
-    this.portSrc = portSrc;
-    this.ipDst = ipDst;
-    this.ipSrc = ipSrc;
-    this.hostname = hostname;
-    if (fileDropFile != null) {
-      this.fileDropFile = new StatusPayloadDocument(fileDropFile);
-    }
-    if (executableFile != null) {
-      this.executableFile = new StatusPayloadDocument(executableFile);
-    }
-    this.externalId = externalId;
-    this.prerequisites = prerequisites;
-    this.arguments = arguments;
-    this.payloadCommandBlocks = payloadCommandBlocks;
-    this.cleanupExecutor = cleanupExecutor;
-  }
 }
