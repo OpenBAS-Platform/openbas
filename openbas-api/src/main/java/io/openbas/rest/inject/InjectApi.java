@@ -498,7 +498,7 @@ public class InjectApi extends RestBehavior {
   }
 
   @Operation(description = "Get detection remediation by inject based on the payload definition")
-  @GetMapping("/detection-remediations/{injectId}")
+  @GetMapping(INJECT_URI + "/detection-remediations/{injectId}")
   public List<DetectionRemediationOutput> getPayloadDetectionRemediations(
       @PathVariable String injectId) {
     return payloadMapper.toDetectionRemediationOutputs(
