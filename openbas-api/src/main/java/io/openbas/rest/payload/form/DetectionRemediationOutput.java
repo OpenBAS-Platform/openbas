@@ -3,8 +3,10 @@ package io.openbas.rest.payload.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 public class DetectionRemediationOutput {
 

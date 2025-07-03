@@ -1212,8 +1212,9 @@ export interface DetectionRemediation {
   listened?: boolean;
 }
 
+/** List of detection remediation gaps for collectors */
 export interface DetectionRemediationInput {
-  /** Colelctor id */
+  /** Collector id */
   detection_remediation_collector: string;
   detection_remediation_id?: string;
   /** Value of detection remediation, for exemple: query for sentinel */
@@ -4149,6 +4150,7 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
+  /** List of detection remediation gaps for collectors */
   payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
@@ -4183,6 +4185,7 @@ export interface PayloadUpsertInput {
   payload_cleanup_executor?: string | null;
   payload_collector?: string;
   payload_description?: string;
+  /** List of detection remediation gaps for collectors */
   payload_detection_remediations?: DetectionRemediationInput[];
   payload_elevation_required?: boolean;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
