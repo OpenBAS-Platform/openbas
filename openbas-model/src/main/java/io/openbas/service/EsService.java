@@ -11,10 +11,7 @@ import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
@@ -425,18 +422,30 @@ public class EsService {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
       PropertySchema propertyField = getIndexingSchema().get(field);
       String elasticField = toElasticField(field);
-      TermsAggregation termsAggregation =
-          new TermsAggregation.Builder().field(elasticField).size(widgetConfig.getLimit()).build();
-      SearchResponse<Void> response =
-          elasticClient.search(
-              b ->
-                  b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(0)
-                      .query(query)
-                      .aggregations(
-                          aggregationKey,
-                          new Aggregation.Builder().terms(termsAggregation).build()),
-              Void.class);
+
+      SearchRequest.Builder searchBuilder =
+          new SearchRequest.Builder()
+              .index(engineConfig.getIndexPrefix() + "*")
+              .size(0)
+              .query(query);
+
+      if (widgetConfig.getLimit() > 0) {
+        TermsAggregation termsAggregation =
+            new TermsAggregation.Builder()
+                .field(elasticField)
+                .size(widgetConfig.getLimit())
+                .build();
+
+        searchBuilder.aggregations(
+            aggregationKey, new Aggregation.Builder().terms(termsAggregation).build());
+      }
+
+      SearchResponse<Void> response = elasticClient.search(searchBuilder.build(), Void.class);
+
+      if (widgetConfig.getLimit() == 0) {
+        return new EsSeries(config.getName());
+      }
+
       Aggregate aggregate = response.aggregations().get(aggregationKey);
       if (propertyField.getType() == Double.class) {
         return termHistogramDTerms(config, aggregate);
