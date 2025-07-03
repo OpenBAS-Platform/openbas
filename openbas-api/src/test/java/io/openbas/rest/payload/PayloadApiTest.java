@@ -533,7 +533,7 @@ class PayloadApiTest extends IntegrationTest {
     when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
 
     PayloadCreateInput input =
-        PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     mvc.perform(
             post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
