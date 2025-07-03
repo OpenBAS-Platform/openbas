@@ -23,7 +23,7 @@ const CustomDashboardParameters: FunctionComponent = () => {
       {(customDashboard?.custom_dashboard_parameters ?? []).map((p) => {
         if (p.custom_dashboards_parameter_type === 'simulation') {
           return (
-            <div key={p.custom_dashboards_parameter_id} style={{ width: 250 }}>
+            <div key={p.custom_dashboards_parameter_id} style={{ width: 350 }}>
               <SimulationField
                 label={p.custom_dashboards_parameter_name}
                 value={getParameterValue(p.custom_dashboards_parameter_id)}

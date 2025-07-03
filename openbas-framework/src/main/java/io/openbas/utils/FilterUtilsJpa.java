@@ -30,6 +30,9 @@ public class FilterUtilsJpa {
 
   private FilterUtilsJpa() {}
 
+  public static final int PAGE_NUMBER_OPTION = 0;
+  public static final int PAGE_SIZE_OPTION = 100;
+
   public record Option(String id, String label) {}
 
   public static final Specification<?> EMPTY_SPECIFICATION = (root, query, cb) -> cb.conjunction();
