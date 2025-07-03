@@ -50,7 +50,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   }
 
   const seriesData = seriesVizData.map(({ label, data }) => {
-    if (data) {
+    if (data && data.length > 0) {
       return ({
         name: label,
         data: data.map(n => ({

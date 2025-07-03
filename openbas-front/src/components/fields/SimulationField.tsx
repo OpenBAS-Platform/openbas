@@ -36,10 +36,6 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) =
     onChange(newValue);
   };
 
-  if (currentValue && !selectedOption) {
-    return null;
-  }
-
   return (
     <Autocomplete
       selectOnFocus

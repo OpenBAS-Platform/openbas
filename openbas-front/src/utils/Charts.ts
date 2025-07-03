@@ -96,6 +96,7 @@ export const lineChartOptions = (
   tickAmount = undefined,
   distributed = false,
   dataLabels = false,
+  emptyChartText = '',
 ): ApexOptions => ({
   chart: {
     type: 'line',
@@ -134,6 +135,7 @@ export const lineChartOptions = (
     },
   },
   tooltip: { theme: theme.palette.mode },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
     tickAmount,
@@ -315,6 +317,7 @@ export const verticalBarsChartOptions = (
     enabled: !isFakeData,
     custom: customTooltip,
   },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
     tickAmount,
@@ -445,6 +448,7 @@ export const horizontalBarsChartOptions = (
     enabled: !isFakeData,
     theme: theme.palette.mode,
   },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     categories: categories ?? [],
     labels: {
@@ -663,6 +667,7 @@ interface DonutChartOptions {
   size?: number;
   disableAnimation?: boolean;
   isFakeData?: boolean;
+  emptyChartText?: string;
 }
 
 export const donutChartOptions = ({
@@ -678,6 +683,7 @@ export const donutChartOptions = ({
   size = 70,
   disableAnimation = false,
   isFakeData = false,
+  emptyChartText = '',
 }: DonutChartOptions): ApexOptions => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
   let dataLabelsColors = labels.map(() => theme.palette.text?.primary);
@@ -727,6 +733,7 @@ export const donutChartOptions = ({
       theme: theme.palette.mode,
       custom: simpleLabelTooltip(theme),
     },
+    noData: { text: emptyChartText || 'No data to display' },
     legend: {
       show: displayLegend,
       position: legendPosition,
