@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
@@ -21,8 +19,7 @@ public class V4_02__Update_injector_contracts_predefined_expectations extends Ba
 
     select.executeUpdate(
         "INSERT INTO collectors (collector_id,collector_name,collector_type,collector_period,collector_external) "
-            + "VALUES ('acab8214-0379-448a-a575-05e9d934eadd','Expectations Vulnerability Manager','openbas_expectations_vulnerability_manager',0,false);"
-    );
+            + "VALUES ('acab8214-0379-448a-a575-05e9d934eadd','Expectations Vulnerability Manager','openbas_expectations_vulnerability_manager',0,false);");
 
     ResultSet results =
         select.executeQuery(

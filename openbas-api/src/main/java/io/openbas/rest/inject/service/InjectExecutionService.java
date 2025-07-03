@@ -14,14 +14,12 @@ import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
 import jakarta.annotation.Resource;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -39,8 +37,7 @@ public class InjectExecutionService {
   private final FindingService findingService;
   private final StructuredOutputUtils structuredOutputUtils;
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   public void handleInjectExecutionCallback(
       String injectId, String agentId, InjectExecutionInput input) {
@@ -60,9 +57,7 @@ public class InjectExecutionService {
     }
   }
 
-  /**
-   * Processes the execution of an inject by updating its status and extracting findings.
-   */
+  /** Processes the execution of an inject by updating its status and extracting findings. */
   private void processInjectExecution(
       Inject inject,
       Agent agent,
@@ -91,7 +86,8 @@ public class InjectExecutionService {
   }
 
   /**
-   * Checks output parsers of an agent and updates the scores of vulnerability expectations accordingly
+   * Checks output parsers of an agent and updates the scores of vulnerability expectations
+   * accordingly
    *
    * @param outputParsers
    * @param structuredOutput
