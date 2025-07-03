@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FormEvent, type SyntheticEvent, useState } from 'react';
+import { type FormEvent, type SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
@@ -49,7 +49,12 @@ const PayloadForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const { isValidated: isValidatedEnterpriseEdition } = useEnterpriseEdition();
+  const {
+    isValidated: isValidatedEnterpriseEdition,
+    openDialog: openEnterpriseEditionDialog,
+    setEEFeatureDetectedInfo,
+  } = useEnterpriseEdition();
+
   const tabs = [{
     key: 'General',
     label: 'General',
@@ -75,6 +80,14 @@ const PayloadForm = ({
     ),
   }];
   const [activeTab, setActiveTab] = useState(tabs[0].key);
+
+  useEffect(() => {
+    if (activeTab === 'Remediation' && !isValidatedEnterpriseEdition) {
+      setActiveTab('General');
+      setEEFeatureDetectedInfo(t('Remediation'));
+      openEnterpriseEditionDialog();
+    }
+  }, [activeTab, isValidatedEnterpriseEdition]);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
