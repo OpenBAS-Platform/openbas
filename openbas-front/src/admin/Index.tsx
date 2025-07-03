@@ -38,6 +38,7 @@ const IndexAgents = lazy(() => import('./components/agents/Agents'));
 const CustomDashboards = lazy(() => import('./components/workspaces/custom_dashboards/CustomDashboards'));
 const IndexCustomDashboard = lazy(() => import('./components/workspaces/custom_dashboards/Index'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
+const IndexPayload = lazy(() => import('./components/payloads/payload/Index'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
 const useStyles = makeStyles()(theme => ({ toolbar: theme.mixins.toolbar as CSSObject }));
@@ -110,6 +111,7 @@ const Index = () => {
               <Route path="workspaces/custom_dashboards" element={errorWrapper(CustomDashboards)()} />
               <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={errorWrapper(IndexCustomDashboard)()} />
               <Route path="payloads" element={errorWrapper(Payloads)()} />
+              <Route path="payloads/:payloadId/*" element={errorWrapper(IndexPayload)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route

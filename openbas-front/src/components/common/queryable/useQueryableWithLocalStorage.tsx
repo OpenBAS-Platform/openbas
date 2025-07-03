@@ -73,7 +73,10 @@ export const useQueryable = (initSearchPaginationInput: Partial<SearchPagination
   return buildUseQueryable(null, initSearchPaginationInput, searchPaginationInput, setSearchPaginationInput);
 };
 
-export const useQueryableWithLocalStorage = (localStorageKey: string, initSearchPaginationInput: Partial<SearchPaginationInput>) => {
+export const useQueryableWithLocalStorage = (
+  localStorageKey: string,
+  initSearchPaginationInput: Partial<SearchPaginationInput>,
+  forceSearchPaginationInput: Partial<SearchPaginationInput>) => {
   const [searchParams] = useSearchParams();
   const finalSearchPaginationInput: SearchPaginationInput = buildSearchPagination(initSearchPaginationInput);
   const searchPaginationInputFromUri = retrieveFromUri(localStorageKey, searchParams);
@@ -83,7 +86,15 @@ export const useQueryableWithLocalStorage = (localStorageKey: string, initSearch
     searchPaginationInputFromUri ?? finalSearchPaginationInput,
   );
   // add a transitional state to avoid re render because of useLocalStorage hook
-  const [searchPaginationInput, setSearchPaginationInput] = useState(searchPaginationInputFromUri ?? searchPaginationInputFromLocalStorage);
+  const initialInput = searchPaginationInputFromUri
+    ?? searchPaginationInputFromLocalStorage
+    ?? {};
+  const [searchPaginationInput, setSearchPaginationInput] = useState(
+    {
+      ...initialInput,
+      ...forceSearchPaginationInput,
+    },
+  );
 
   useEffect(() => {
     // check deep changes between state from local storage and transitional state

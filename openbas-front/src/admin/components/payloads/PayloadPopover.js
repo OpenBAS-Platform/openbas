@@ -1,15 +1,10 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import {
-  deletePayload,
-  duplicatePayload,
-  exportPayloads,
-  updatePayload,
-} from '../../../actions/payloads/payload-actions';
+import { deletePayload, duplicatePayload, exportPayloads, updatePayload } from '../../../actions/payloads/payload-actions';
+import ButtonPopover from '../../../components/common/ButtonPopover.js';
 import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
@@ -18,32 +13,25 @@ import { documentOptions } from '../../../utils/Option';
 import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
 
-const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
+const PayloadPopover = ({ inline = false, payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const handlePopoverOpen = (event) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-  const handlePopoverClose = () => setAnchorEl(null);
-  const handleOpenEdit = () => {
-    setOpenEdit(true);
-    handlePopoverClose();
-  };
+  const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
     function handleCleanupCommandValue(payload_cleanup_command) {
       return payload_cleanup_command === '' ? null : payload_cleanup_command;
     }
+
     function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
       if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
         return payload_cleanup_executor;
       }
       return null;
     }
+
     const inputValues = R.pipe(
       R.assoc('payload_platforms', data.payload_platforms),
       R.assoc('payload_tags', data.payload_tags),
@@ -73,10 +61,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
   };
 
   // Duplicate
-  const handleOpenDuplicate = () => {
-    setOpenDuplicate(true);
-    handlePopoverClose();
-  };
+  const handleOpenDuplicate = () => setOpenDuplicate(true);
   const handleCloseDuplicate = () => setOpenDuplicate(false);
   const submitDuplicate = () => {
     return dispatch(duplicatePayload(payload.payload_id)).then((result) => {
@@ -89,7 +74,6 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
   };
 
   const handleExportJsonSingle = () => {
-    handlePopoverClose();
     const exportData = {
       payloads: [
         { payload_id: payload.payload_id },
@@ -125,21 +109,31 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     R.assoc('payload_cleanup_executor', payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor),
     R.assoc('payload_cleanup_command', payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command),
   )(payload);
+
+  // Button Popover
+  const entries = [];
+  if (handleOpenDuplicate) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
+  });
+  if (handleOpenEdit) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    disabled: disableUpdate,
+  });
+  if (handleExportJsonSingle) entries.push({
+    label: 'Export',
+    action: () => handleExportJsonSingle(),
+  });
+  if (handleOpenDelete) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    disabled: disableDelete,
+  });
+
   return (
     <>
-      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
-        <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
-        <MenuItem onClick={handleExportJsonSingle}>{t('Export')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} variant={inline ? 'icon' : 'toggle'} />
       <DialogDelete
         open={deletion}
         handleClose={handleCloseDelete}

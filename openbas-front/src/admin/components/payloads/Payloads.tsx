@@ -2,6 +2,7 @@ import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
@@ -33,6 +34,7 @@ import CreatePayload from './CreatePayload';
 import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
+import { ENDPOINT_BASE_URL, PAYLOAD_BASE_URL } from '../../../constants/BaseUrls';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -105,6 +107,10 @@ const Payloads = () => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+
+  // Query param
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
   const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
@@ -221,7 +227,7 @@ const Payloads = () => {
         buildEmptyFilter('payload_platforms', 'contains'),
       ],
     },
-  }));
+  }), { textSearch: search });
 
   // Export
   const exportProps = {
@@ -289,68 +295,70 @@ const Payloads = () => {
         {loading
           ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
           : payloads.map((payload: Payload) => {
-              const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
-              return (
-                (
-                  <ListItem
-                    key={payload.payload_id}
-                    divider
-                    secondaryAction={(
-                      <PayloadPopover
-                        documentsMap={documentsMap}
-                        payload={payload}
-                        onUpdate={(result: Payload) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
-                        onDuplicate={(result: Payload) => setPayloads([result, ...payloads])}
-                        onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
-                        disableUpdate={collector !== null}
-                        disableDelete={collector !== null && payload.payload_status !== 'DEPRECATED'}
-                      />
-                    )}
-                    disablePadding
+            const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
+            return (
+              (
+                <ListItem
+                  key={payload.payload_id}
+                  divider
+                  secondaryAction={(
+                    <PayloadPopover
+                      inline
+                      documentsMap={documentsMap}
+                      payload={payload}
+                      onUpdate={(result: Payload) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
+                      onDuplicate={(result: Payload) => setPayloads([result, ...payloads])}
+                      onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
+                      disableUpdate={collector !== null}
+                      disableDelete={collector !== null && payload.payload_status !== 'DEPRECATED'}
+                    />
+                  )}
+                  disablePadding
+                >
+                  <ListItemButton
+                    component={Link}
+                    to={`${PAYLOAD_BASE_URL}/${payload.payload_id}`}
+                    classes={{ root: classes.item }}
                   >
-                    <ListItemButton
-                      classes={{ root: classes.item }}
-                      onClick={() => setSelectedPayload(payload)}
-                    >
-                      <ListItemIcon>
-                        {collector ? (
-                          <img
-                            src={`/api/images/collectors/${collector.collector_type}`}
-                            alt={collector.collector_type}
-                            style={{
-                              padding: 0,
-                              cursor: 'pointer',
-                              width: 20,
-                              height: 20,
-                              borderRadius: 4,
-                            }}
-                          />
-                        ) : (
-                          <PayloadIcon payloadType={payload.payload_type ?? ''} />
-                        )}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={(
-                          <div style={bodyItemsStyles.bodyItems}>
-                            {headers.map(header => (
-                              <div
-                                key={header.field}
-                                style={{
-                                  ...bodyItemsStyles.bodyItem,
-                                  ...inlineStyles[header.field],
-                                }}
-                              >
-                                {header.value?.(payload)}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                )
-              );
-            })}
+                    <ListItemIcon>
+                      {collector ? (
+                        <img
+                          src={`/api/images/collectors/${collector.collector_type}`}
+                          alt={collector.collector_type}
+                          style={{
+                            padding: 0,
+                            cursor: 'pointer',
+                            width: 20,
+                            height: 20,
+                            borderRadius: 4,
+                          }}
+                        />
+                      ) : (
+                        <PayloadIcon payloadType={payload.payload_type ?? ''} />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div style={bodyItemsStyles.bodyItems}>
+                          {headers.map(header => (
+                            <div
+                              key={header.field}
+                              style={{
+                                ...bodyItemsStyles.bodyItem,
+                                ...inlineStyles[header.field],
+                              }}
+                            >
+                              {header.value?.(payload)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              )
+            );
+          })}
       </List>
       <CreatePayload
         onCreate={(result: Payload) => setPayloads([result, ...payloads])}
