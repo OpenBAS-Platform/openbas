@@ -5,8 +5,10 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.raw.RawCustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
+import io.openbas.utils.CustomDashboardMapper;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomDashboardService {
 
   private final CustomDashboardRepository customDashboardRepository;
+  private final CustomDashboardMapper customDashboardMapper;
 
   // -- CRUD --
 
@@ -34,8 +37,8 @@ public class CustomDashboardService {
 
   @Transactional(readOnly = true)
   public List<CustomDashboardOutput> customDashboards() {
-    List<CustomDashboard> customDashboards = fromIterable(this.customDashboardRepository.findAll());
-    return customDashboards.stream().map(CustomDashboardOutput::toCustomDashboard).toList();
+    List<RawCustomDashboard> customDashboards = customDashboardRepository.rawAll();
+    return customDashboardMapper.getCustomDashboardOutputs(customDashboards);
   }
 
   @Transactional(readOnly = true)
