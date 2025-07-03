@@ -42,6 +42,7 @@ const PayloadForm = ({
     payload_prerequisites: [],
     payload_output_parsers: [],
     payload_execution_arch: 'ALL_ARCHITECTURES',
+    remediations: {},
   },
 }: Props) => {
   const { t } = useFormatter();
@@ -109,6 +110,7 @@ const PayloadForm = ({
     payload_arguments: z.array(payloadArgumentZodObject).optional().describe('Commands-tab'),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional().describe('Commands-tab'),
     payload_output_parsers: z.array(outputParserObject).optional().describe('Output-tab'),
+    remediations: z.any().optional(),
   };
 
   const commandSchema = z.object({
@@ -146,6 +148,7 @@ const PayloadForm = ({
   });
   const {
     handleSubmit,
+    getValues,
     formState: { errors, isDirty, isSubmitting },
   } = methods;
 

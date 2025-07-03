@@ -9,6 +9,7 @@ import { fetchPayloadDetectionRemediationsByInject } from '../../../../actions/i
 import { useHelper } from '../../../../store';
 import { type Collector, type DetectionRemediation, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import DOMPurify from 'dompurify';
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -39,7 +40,7 @@ const AtomicTestingRemediations = () => {
   }, [dispatch]);
 
   const [tabs, setTabs] = useState<Collector[]>([]);
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<number>(0);
   const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediation[]>([]);
   const [hasFetchedRemediations, setHasFetchedRemediations] = useState(false);
 
@@ -48,11 +49,8 @@ const AtomicTestingRemediations = () => {
     if (collectors.length > 0) {
       const filtered = collectors.filter((c: { collector_type: string }) =>
         acceptedCollectorRemediation.includes(c.collector_type),
-      );
+      ).sort((a: Collector, b: Collector) => a.collector_name.localeCompare(b.collector_name));
       setTabs(filtered);
-      if (filtered.length > 0) {
-        setActiveTab(filtered[0].collector_id);
-      }
     }
   }, [collectors]);
 
@@ -66,18 +64,18 @@ const AtomicTestingRemediations = () => {
     }
   }, [isRemediationTab, injectId, hasFetchedRemediations]);
 
-  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
+  const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const activeCollectorRemediations = detectionRemediations.filter(
-    rem => rem.detection_remediation_collector_id === activeTab,
+    rem => rem.detection_remediation_collector_id === tabs[activeTab].collector_id,
   );
 
   return (
     <>
       <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
-        {tabs.map(tab => (
+        {tabs.map((tab, index) => (
           <Tab
             key={tab.collector_id}
             label={(
@@ -95,7 +93,7 @@ const AtomicTestingRemediations = () => {
                 {tab.collector_name}
               </Box>
             )}
-            value={tab.collector_id}
+            value={index}
           />
         ))}
       </Tabs>
@@ -108,10 +106,14 @@ const AtomicTestingRemediations = () => {
         ) : (
           activeCollectorRemediations.map(rem => (
             <Box key={rem.detection_remediation_id}>
-              <Typography variant="body2" fontWeight="bold" gutterBottom>
+              <Typography sx={{ padding: 2 }} variant="body2" fontWeight="bold" gutterBottom>
                 Detection Rule:
               </Typography>
-              <Typography variant="body2">{rem.detection_remediation_values}</Typography>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')),
+                }}
+              ></div>
             </Box>
           ))
         )}

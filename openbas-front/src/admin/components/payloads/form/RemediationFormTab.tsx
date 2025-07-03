@@ -1,37 +1,37 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { type SyntheticEvent, useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { fetchCollectors } from '../../../../actions/Collector';
 import type { CollectorHelper } from '../../../../actions/collectors/collector-helper';
 import CKEditor from '../../../../components/CKEditor';
 import { useHelper } from '../../../../store';
-import { type Collector } from '../../../../utils/api-types';
+import { type Collector, DetectionRemediation } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 const RemediationFormTab = () => {
   const [tabs, setTabs] = useState<Collector[]>([]);
-  const [activeTab, setActiveTab] = useState('');
+  const [activeTab, setActiveTab] = useState<number>(0);
+  const { control, setValue } = useFormContext();
   const dispatch = useAppDispatch();
   const acceptedCollectorRemediation = ['openbas_crowdstrike', 'openbas_microsoft_defender', 'openbas_microsoft_sentinel'];
 
-  const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
+  const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
   useDataLoader(() => {
     dispatch(fetchCollectors());
-    window.console.log(collectors);
   });
 
   useEffect(() => {
     if (collectors.length > 0) {
       const filteredCollectors = collectors.filter((collector: Collector) =>
         acceptedCollectorRemediation.includes(collector.collector_type),
-      );
+      ).sort((a: Collector, b: Collector) => a.collector_name.localeCompare(b.collector_name));
       setTabs(filteredCollectors);
-      setActiveTab(filteredCollectors[0]);
     }
   }, [collectors]);
 
@@ -42,7 +42,7 @@ const RemediationFormTab = () => {
         onChange={handleActiveTabChange}
         aria-label="tabs for payload form"
       >
-        {tabs.map(tab => (
+        {tabs.map((tab, index) => (
           <Tab
             key={tab.collector_name}
             label={(
@@ -60,26 +60,42 @@ const RemediationFormTab = () => {
                 {tab.collector_name}
               </Box>
             )}
-            value={tab}
+            value={index}
           />
         ))}
       </Tabs>
-      <div style={{
-        height: '250px',
-        position: 'relative',
-      }}
-      >
-        <CKEditor
-          id="payload-remediation-editor"
-          data=""
-          onChange={(_, editor) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            setContent(editor.getData());
+      {tabs.map(tab => (
+        <div
+          key={tab.collector_id}
+          style={{
+            height: '250px',
+            position: 'relative',
+            display: tab.collector_id === tabs[activeTab].collector_id ? 'block' : 'none',
           }}
-          disableWatchdog={true}
-        />
-      </div>
+        >
+          <Controller
+            name={'remediations.' + tab.collector_id}
+            control={control}
+            defaultValue={{ content: '' }}
+            render={({ field: { onChange, value } }) => (
+              <CKEditor
+                id="payload-remediation-editor"
+                data={value?.content}
+                onChange={(_, editor) => {
+                  const newValue: {
+                    content: string;
+                    remediationId?: string;
+                  } = { content: editor.getData() };
+                  if (value?.remediationId) {
+                    newValue.remediationId = value?.remediationId;
+                  }
+                  onChange(newValue);
+                }}
+              />
+            )}
+          />
+        </div>
+      ))}
     </>
   );
 };

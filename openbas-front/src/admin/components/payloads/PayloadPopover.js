@@ -51,6 +51,11 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       R.assoc('executable_file', data.executable_file?.id),
       R.assoc('payload_cleanup_executor', handleCleanupExecutorValue(data.payload_cleanup_executor, data.payload_cleanup_command)),
       R.assoc('payload_cleanup_command', handleCleanupCommandValue(data.payload_cleanup_command)),
+      R.assoc('payload_detection_remediations', Object.entries(data.remediations).filter(value => value[1]).map(value => ({
+        detection_remediation_collector: value[0],
+        detection_remediation_values: value[1].content,
+        detection_remediation_id: value[1].remediationId,
+      }))),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
@@ -104,27 +109,32 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
   };
 
   const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
-  const initialValues = R.pipe(
-    R.pick([
-      'payload_name',
-      'payload_description',
-      'payload_type',
-      'command_executor',
-      'command_content',
-      'dns_resolution_hostname',
-      'payload_arguments',
-      'payload_prerequisites',
-      'file_drop_file',
-      'payload_attack_patterns',
-      'payload_tags',
-      'payload_execution_arch',
-      'payload_output_parsers',
-      'payload_platforms',
-    ]),
-    R.assoc('executable_file', R.head(payloadExecutableFiles)),
-    R.assoc('payload_cleanup_executor', payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor),
-    R.assoc('payload_cleanup_command', payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command),
-  )(payload);
+  const initialValues = {
+    payload_name: payload.payload_name,
+    payload_description: payload.payload_description,
+    payload_type: payload.payload_type,
+    command_executor: payload.command_executor,
+    command_content: payload.command_content,
+    dns_resolution_hostname: payload.dns_resolution_hostname,
+    payload_arguments: payload.payload_arguments,
+    payload_prerequisites: payload.payload_prerequisites,
+    file_drop_file: payload.file_drop_file,
+    payload_attack_patterns: payload.payload_attack_patterns,
+    payload_tags: payload.payload_tags,
+    payload_execution_arch: payload.payload_execution_arch,
+    payload_output_parsers: payload.payload_output_parsers,
+    payload_platforms: payload.payload_platforms,
+    executable_file: R.head(payloadExecutableFiles),
+    payload_cleanup_executor: payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor,
+    payload_cleanup_command: payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command,
+    remediations: {},
+  };
+  payload.payload_detection_remediations?.forEach((remediation) => {
+    initialValues.remediations[remediation.detection_remediation_collector_id] = {
+      content: remediation.detection_remediation_values,
+      remediationId: remediation.detection_remediation_id,
+    };
+  });
   return (
     <>
       <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
