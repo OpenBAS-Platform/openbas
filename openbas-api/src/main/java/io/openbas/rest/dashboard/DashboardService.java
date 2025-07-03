@@ -24,6 +24,16 @@ public class DashboardService {
   private final EsService esService;
   private final UserRepository userRepository;
 
+  /**
+   * Retrieves time series or structural histogram data from Elasticsearch for a specific widget
+   * based on its configuration.
+   *
+   * @param widget the {@link Widget} defining the type and configuration
+   * @param parameters parameters passed at runtime (e.g. filters, date ranges)
+   * @param definitionParameters dashboard-level parameters definitions
+   * @return list of {@link EsSeries} representing series data suitable for charting
+   * @throws RuntimeException if the widget type is unsupported
+   */
   public List<EsSeries> series(
       @NotNull final Widget widget,
       Map<String, String> parameters,
@@ -47,6 +57,14 @@ public class DashboardService {
     throw new UnsupportedOperationException("Unsupported widget: " + widget);
   }
 
+  /**
+   * Retrieves a list of entities from Elasticsearch for a widget configured as a list.
+   *
+   * @param widget the {@link Widget} with a list configuration
+   * @param parameters parameters passed at runtime (e.g. filters)
+   * @param definitionParameters dashboard-level parameters definitions
+   * @return list of {@link EsBase} entities matching the list widget query
+   */
   public List<EsBase> entities(
       @NotNull final Widget widget,
       Map<String, String> parameters,
@@ -58,6 +76,12 @@ public class DashboardService {
     return esService.entities(userWithAuth, runtime);
   }
 
+  /**
+   * Executes a global search query in Elasticsearch for the current user.
+   *
+   * @param search the search text
+   * @return list of {@link EsSearch} search results
+   */
   public List<EsSearch> search(final String search) {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
     return esService.search(userWithAuth, search, null);

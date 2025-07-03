@@ -30,17 +30,36 @@ public class CustomDashboardService {
 
   // -- CRUD --
 
+  /**
+   * Creates a new {@link CustomDashboard} entity in the database.
+   *
+   * @param customDashboard the {@link CustomDashboard} entity to save
+   * @return the saved {@link CustomDashboard}
+   */
   @Transactional
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
     return this.customDashboardRepository.save(customDashboard);
   }
 
+  /**
+   * Retrieves all {@link CustomDashboard} entities from the database and converts them into {@link
+   * CustomDashboardOutput} DTOs.
+   *
+   * @return list of {@link CustomDashboardOutput} DTOs
+   */
   @Transactional(readOnly = true)
   public List<CustomDashboardOutput> customDashboards() {
     List<RawCustomDashboard> customDashboards = customDashboardRepository.rawAll();
     return customDashboardMapper.getCustomDashboardOutputs(customDashboards);
   }
 
+  /**
+   * Retrieves a paginated list of {@link CustomDashboard} entities according to the provided {@link
+   * SearchPaginationInput}.
+   *
+   * @param searchPaginationInput the pagination and filtering input
+   * @return a {@link Page} of {@link CustomDashboard} entities
+   */
   @Transactional(readOnly = true)
   public Page<CustomDashboard> customDashboards(
       @NotNull final SearchPaginationInput searchPaginationInput) {
@@ -48,6 +67,13 @@ public class CustomDashboardService {
         this.customDashboardRepository::findAll, searchPaginationInput, CustomDashboard.class);
   }
 
+  /**
+   * Retrieves a single {@link CustomDashboard} entity by its ID.
+   *
+   * @param id the unique ID of the custom dashboard
+   * @return the {@link CustomDashboard} entity
+   * @throws EntityNotFoundException if no dashboard is found with the given ID
+   */
   @Transactional(readOnly = true)
   public CustomDashboard customDashboard(@NotNull final String id) {
     return this.customDashboardRepository
@@ -56,12 +82,25 @@ public class CustomDashboardService {
             () -> new EntityNotFoundException("Custom dashboard not found with id: " + id));
   }
 
+  /**
+   * Updates an existing {@link CustomDashboard} entity. The update date is set to the current
+   * timestamp.
+   *
+   * @param customDashboard the {@link CustomDashboard} entity to update
+   * @return the updated {@link CustomDashboard}
+   */
   @Transactional
   public CustomDashboard updateCustomDashboard(@NotNull final CustomDashboard customDashboard) {
     customDashboard.setUpdateDate(Instant.now());
     return this.customDashboardRepository.save(customDashboard);
   }
 
+  /**
+   * Deletes a {@link CustomDashboard} entity by its ID.
+   *
+   * @param id the unique ID of the dashboard to delete
+   * @throws EntityNotFoundException if no dashboard is found with the given ID
+   */
   @Transactional
   public void deleteCustomDashboard(@NotNull final String id) {
     if (!this.customDashboardRepository.existsById(id)) {
@@ -72,6 +111,13 @@ public class CustomDashboardService {
 
   // -- OPTION --
 
+  /**
+   * Finds all {@link CustomDashboard} entities matching a search text, and returns them as {@link
+   * FilterUtilsJpa.Option} DTOs for use in UI dropdowns.
+   *
+   * @param searchText partial or full name to filter dashboards
+   * @return list of {@link FilterUtilsJpa.Option} objects
+   */
   public List<FilterUtilsJpa.Option> findAllAsOptions(final String searchText) {
     return fromIterable(
             customDashboardRepository.findAll(
@@ -81,6 +127,13 @@ public class CustomDashboardService {
         .toList();
   }
 
+  /**
+   * Finds all {@link CustomDashboard} entities whose IDs are in the given list, and returns them as
+   * {@link FilterUtilsJpa.Option} DTOs for use in UI dropdowns.
+   *
+   * @param ids list of dashboard IDs
+   * @return list of {@link FilterUtilsJpa.Option} objects
+   */
   public List<FilterUtilsJpa.Option> findAllByIdsAsOptions(final List<String> ids) {
     return fromIterable(customDashboardRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
