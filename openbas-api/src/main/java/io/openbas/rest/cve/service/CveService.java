@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -57,8 +58,10 @@ public class CveService {
     final Cve existingCve = findById(cveId);
     if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
+      BeanUtils.copyProperties(input, existingCve, "remediation");
+    } else {
+      existingCve.setUpdateAttributes(input);
     }
-    existingCve.setUpdateAttributes(input);
     updateCweAssociations(existingCve, input.getCwes());
     return cveRepository.save(existingCve);
   }
