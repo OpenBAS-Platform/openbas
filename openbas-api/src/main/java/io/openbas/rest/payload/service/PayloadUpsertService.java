@@ -3,7 +3,6 @@ package io.openbas.rest.payload.service;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
-import static java.util.Collections.emptyList;
 
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
@@ -37,9 +36,8 @@ public class PayloadUpsertService {
   @Transactional(rollbackOn = Exception.class)
   public Payload upsertPayload(PayloadUpsertInput input) {
     Optional<Payload> payload = payloadRepository.findByExternalId(input.getExternalId());
-
     if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
-      input.setDetectionRemediations(emptyList());
+      input.setDetectionRemediations(null);
     }
 
     if (payload.isPresent()) {

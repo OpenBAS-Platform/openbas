@@ -179,7 +179,6 @@ public class PayloadUtils {
     } else {
       throw new IllegalArgumentException("Unsupported payload input type");
     }
-
     return target;
   }
 }

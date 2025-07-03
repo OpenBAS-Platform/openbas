@@ -3,7 +3,6 @@ package io.openbas.rest.payload.service;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
-import static java.util.Collections.emptyList;
 
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
@@ -38,9 +37,8 @@ public class PayloadUpdateService {
 
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(String payloadId, PayloadUpdateInput input) {
-
     if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
-      input.setDetectionRemediations(emptyList());
+      input.setDetectionRemediations(null);
     }
 
     Payload payload =
@@ -49,6 +47,7 @@ public class PayloadUpdateService {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
+
     return update(input, payload);
   }
 
