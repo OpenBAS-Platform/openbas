@@ -1,7 +1,6 @@
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-// eslint-disable-next-line import/no-named-as-default
-import DOMPurify from 'dompurify';
+import { sanitize } from 'dompurify';
 import { type SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -118,17 +117,34 @@ const AtomicTestingRemediations = () => {
             {t('No remediation detections available for this collector.')}
           </Typography>
         ) : (
-          activeCollectorRemediations.map(rem => (
-            <Box sx={{ padding: 2 }} key={rem.detection_remediation_id}>
-              <Typography sx={{ paddingBottom: 2 }} variant="body2" fontWeight="bold" gutterBottom>
-                {`${t('Detection Rule')}: `}
-              </Typography>
-              <div
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')) }}
-              >
-              </div>
-            </Box>
-          ))
+          activeCollectorRemediations.map((rem) => {
+            const content = rem.detection_remediation_values?.trim();
+
+            return (
+              <Box sx={{ padding: 2 }} key={rem.detection_remediation_id}>
+                {content ? (
+                  <>
+                    <Typography
+                      sx={{ paddingBottom: 2 }}
+                      variant="body2"
+                      fontWeight="bold"
+                      gutterBottom
+                    >
+                      {t('Detection Rule')}
+                      :
+                    </Typography>
+                    <div
+                      dangerouslySetInnerHTML={{ __html: sanitize(content.replace(/\n/g, '<br />')) }}
+                    />
+                  </>
+                ) : (
+                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                    {t('No remediation detections available for this collector.')}
+                  </Typography>
+                )}
+              </Box>
+            );
+          })
         )}
       </Paper>
     </>
