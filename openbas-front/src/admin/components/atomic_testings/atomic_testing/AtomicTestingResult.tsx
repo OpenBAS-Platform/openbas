@@ -1,4 +1,4 @@
-import { ReportProblemOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { BugReportOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -54,7 +54,7 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
           fontSize: 22,
         }}
         />
-        <ReportProblemOutlined style={{
+        <BugReportOutlined style={{
           color: getColor('PENDING'),
           marginRight: 10,
           fontSize: 22,
@@ -79,7 +79,7 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
             break;
           case 'VULNERABILITY':
             tooltipLabel = t('Vulnerability');
-            IconComponent = ReportProblemOutlined;
+            IconComponent = BugReportOutlined;
             break;
           default:
             tooltipLabel = t('Human Response');

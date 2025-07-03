@@ -1,4 +1,4 @@
-import { AssignmentTurnedIn, PublishedWithChangesOutlined, ReportProblemOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { AssignmentTurnedIn, BugReportOutlined, PublishedWithChangesOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 
 import { ExpectationType } from './Expectation';
@@ -22,7 +22,7 @@ export const typeIcon = (type: string) => {
     return <NewspaperVariantMultipleOutline />;
   }
   if (type === 'VULNERABILITY') {
-    return <ReportProblemOutlined />;
+    return <BugReportOutlined />;
   }
   return <AssignmentTurnedIn />;
 };

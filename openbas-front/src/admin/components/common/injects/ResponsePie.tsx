@@ -1,4 +1,4 @@
-import { InfoOutlined, ReportProblemOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { BugReportOutlined, InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, memo, useCallback, useMemo } from 'react';
@@ -65,7 +65,7 @@ const ResponsePie: FunctionComponent<Props> = ({
       case 'detection':
         return <TrackChangesOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       case 'vulnerability':
-        return <ReportProblemOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
+        return <BugReportOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       default:
         return <SensorOccupiedOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
     }
@@ -141,15 +141,15 @@ const ResponsePie: FunctionComponent<Props> = ({
     >
       <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
       <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
-      <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
       <Pie type="vulnerability" title={t('TYPE_VULNERABILITY')} expectationResultsByType={vulnerability} />
+      <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
 
       {hasTitles && (
         <>
           {pieTitle(t('TYPE_PREVENTION'), prevention)}
           {pieTitle(t('TYPE_DETECTION'), detection)}
-          {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
           {pieTitle(t('TYPE_VULNERABILITY'), vulnerability)}
+          {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
         </>
       )}
 
