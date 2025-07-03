@@ -1,9 +1,10 @@
 import { ShieldOutlined, type SvgIconComponent, TrackChangesOutlined } from '@mui/icons-material';
 import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import ExerciseField from '../../../../../components/fields/ExerciseField';
 import { useFormatter } from '../../../../../components/i18n';
 import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../utils/api-types';
 import { getSeries } from './WidgetUtils';
@@ -20,6 +21,7 @@ const useStyles = makeStyles()(theme => ({
     gap: theme.spacing(2),
     justifyItems: 'center',
   },
+  allWidth: { gridColumn: 'span 2' },
 }));
 
 const perspectives: {
@@ -43,13 +45,22 @@ interface Props {
   value: DateHistogramSeries[] | StructuralHistogramSeries[];
   onChange: (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => void;
   onSubmit: () => void;
+  isFilterableBySimulation?: boolean;
 }
 
-const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit }) => {
+const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit, isFilterableBySimulation = false }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
   const theme = useTheme();
+  const [simulationId, setSimulationId] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (isFilterableBySimulation && value.length > 0 && value[0].filter?.filters) {
+      const simulationId = value[0].filter.filters.find(f => f.key === 'base_simulation_side')?.values?.[0];
+      setSimulationId(simulationId);
+    }
+  }, []);
 
   const onChangeSeries = (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => {
     onChange(series);
@@ -58,6 +69,9 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
 
   return (
     <div className={classes.container}>
+      {isFilterableBySimulation && (
+        <ExerciseField value={simulationId ?? ''} className={classes.allWidth} onChange={simulationId => setSimulationId(simulationId)} />
+      )}
       {perspectives.map((perspective) => {
         const isSelected = value.filter(v => v.filter?.filters?.find(f => f.values?.includes(perspective.type))).length > 0;
         const Icon = perspective.icon();
@@ -68,7 +82,7 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
             style={{ borderColor: isSelected ? `${theme.palette.primary.main}` : undefined }}
           >
             <CardActionArea
-              onClick={() => onChangeSeries(getSeries(perspective.type))}
+              onClick={() => onChangeSeries(getSeries(perspective.type, simulationId))}
               aria-label={t(perspective.title)}
             >
               <CardContent className={classes.content}>

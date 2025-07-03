@@ -18,7 +18,7 @@ const WidgetCreationParameters: FunctionComponent<{
   const getParametersControl = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
       case 'list': return <ListWidgetParameters setValue={setValue} control={control} widgetType={widgetType} />;
-      default: return <HistogramParameters setValue={setValue} control={control} widgetType={widgetType} />;
+      default: return <HistogramParameters setValue={setValue} control={control} widgetType={widgetType} hideLimitField={widgetType == 'attack-path'} />;
     }
   };
 

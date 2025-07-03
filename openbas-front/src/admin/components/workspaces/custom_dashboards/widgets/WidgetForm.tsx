@@ -119,7 +119,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -167,7 +167,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     onClose();
   };
 
-  const handleSubmitWithoutPropagation = () => {
+  const handleSubmitWithoutPropagation = async () => {
     handleSubmit((values) => {
       onSubmit(values);
       onClose();
@@ -176,6 +176,7 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   const getSeriesComponent = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
+      case 'attack-path':
       case 'security-coverage': return (
         <Controller
           control={control}
@@ -185,6 +186,7 @@ const WidgetForm: FunctionComponent<Props> = ({
               value={value}
               onChange={onChange}
               onSubmit={nextStep}
+              isFilterableBySimulation={widgetType === 'attack-path'}
             />
           )}
         />

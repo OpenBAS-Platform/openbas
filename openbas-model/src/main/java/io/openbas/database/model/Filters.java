@@ -79,6 +79,15 @@ public class Filters {
     private FilterMode mode; // Between values: name = name1 OR name = name2
     private List<String> values;
     private FilterOperator operator;
+
+    public static Filter getNewDefaultEqualFilter(String key, List<String> values) {
+      Filter filter = new Filter();
+      filter.setKey(key);
+      filter.setMode(Filters.FilterMode.or);
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setValues(values);
+      return filter;
+    }
   }
 
   public static boolean isEmptyFilterGroup(@Nullable final FilterGroup filterGroup) {

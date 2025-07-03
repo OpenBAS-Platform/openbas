@@ -1533,6 +1533,19 @@ export interface EngineSortField {
   fieldName: string;
 }
 
+export interface EsAttackPath {
+  /** @uniqueItems true */
+  attackPatternChildrenIds?: string[];
+  attackPatternExternalId: string;
+  attackPatternId: string;
+  attackPatternName: string;
+  /** @uniqueItems true */
+  injectIds?: string[];
+  killChainPhases?: KillChainPhaseObject[];
+  /** @format int64 */
+  value?: number;
+}
+
 export interface EsAttackPattern {
   base_attack_pattern_side?: string;
   /** @format date-time */
@@ -1614,12 +1627,16 @@ export interface EsFinding {
 
 export interface EsInject {
   /** @uniqueItems true */
+  base_attack_patterns_children_side?: string[];
+  /** @uniqueItems true */
   base_attack_patterns_side?: string[];
   /** @format date-time */
   base_created_at?: string;
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_inject_children_side?: string[];
   base_inject_contract_side?: string;
   /** @uniqueItems true */
   base_kill_chain_phases_side?: string[];
@@ -3082,6 +3099,13 @@ export interface KillChainPhaseCreateInput {
   phase_order?: number;
   phase_shortname: string;
   phase_stix_id?: string;
+}
+
+export interface KillChainPhaseObject {
+  id: string;
+  name?: string;
+  /** @format int64 */
+  order?: number;
 }
 
 /** Kill chain phases */
@@ -5692,7 +5716,8 @@ export interface Widget {
     | "security-coverage"
     | "line"
     | "donut"
-    | "list";
+    | "list"
+    | "attack-path";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -5725,7 +5750,8 @@ export interface WidgetInput {
     | "security-coverage"
     | "line"
     | "donut"
-    | "list";
+    | "list"
+    | "attack-path";
 }
 
 export interface WidgetLayout {

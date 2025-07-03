@@ -971,11 +971,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
 const TargetResultsDetail: FunctionComponent<Props> = (props) => {
   return (
-    <>
-      <ReactFlowProvider>
-        <TargetResultsDetailFlow {...props} />
-      </ReactFlowProvider>
-    </>
+    <ReactFlowProvider>
+      <TargetResultsDetailFlow {...props} />
+    </ReactFlowProvider>
   );
 };
 

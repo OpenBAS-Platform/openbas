@@ -57,6 +57,13 @@ public class InjectHandler implements Handler<EsInject> {
                 dependencies.addAll(inject.getInject_attack_patterns());
                 esInject.setBase_attack_patterns_side(inject.getInject_attack_patterns());
               }
+              if (!isEmpty(inject.getInject_children())) {
+                esInject.setBase_inject_children_side(inject.getInject_children());
+              }
+              if (!isEmpty(inject.getAttack_patterns_children())) {
+                esInject.setBase_attack_patterns_children_side(
+                    inject.getAttack_patterns_children());
+              }
               if (!isEmpty(inject.getInject_kill_chain_phases())) {
                 dependencies.addAll(inject.getInject_kill_chain_phases());
                 esInject.setBase_kill_chain_phases_side(inject.getInject_kill_chain_phases());

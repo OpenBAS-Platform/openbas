@@ -188,7 +188,7 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
                       display="flex"
                       flexDirection="column"
                       minHeight={0}
-                      padding={theme.spacing(3, 2)}
+                      padding={theme.spacing(1, 2, 2, 2)}
                       overflow="auto"
                     >
                       <WidgetViz

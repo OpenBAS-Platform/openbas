@@ -19,9 +19,10 @@ type Props = {
   widgetType: Widget['widget_type'];
   control: Control<WidgetInputWithoutLayout>;
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
+  hideLimitField?: boolean;
 };
 
-const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
+const HistogramParameters = ({ widgetType, control, setValue, hideLimitField = false }: Props) => {
 // Standard hooks
   const { t } = useFormatter();
 
@@ -143,7 +144,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             }}
           />
         )}
-      {mode === 'structural' && widgetType !== 'security-coverage' && (
+      {mode === 'structural' && !hideLimitField && (
         <Controller
           control={control}
           name="widget_config.limit"

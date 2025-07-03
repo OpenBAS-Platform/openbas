@@ -1,7 +1,13 @@
-import { List, TableChart } from '@mui/icons-material';
+import { AccountTree, List, TableChart } from '@mui/icons-material';
 import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
-import { type Filter, type FilterGroup, type InjectExpectation, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import {
+  type Exercise,
+  type Filter,
+  type FilterGroup,
+  type InjectExpectation,
+  type StructuralHistogramSeries,
+} from '../../../../../utils/api-types';
 import {
   type HistogramWidget,
   type Widget,
@@ -27,6 +33,12 @@ export const widgetVisualizationTypes: {
     seriesLimit: 2,
     modes: ['structural'],
     fields: ['base_attack_patterns_side'],
+  },
+  {
+    category: 'attack-path',
+    modes: ['structural'],
+    seriesLimit: 2,
+    fields: ['base_attack_patterns_side', 'base_simulation_side'],
   },
   {
     category: 'vertical-barchart',
@@ -65,6 +77,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
       return <ChartDonut fontSize={fontSize} color="primary" />;
     case 'security-coverage':
       return <TableChart fontSize={fontSize} color="primary" />;
+    case 'attack-path':
+      return <AccountTree fontSize={fontSize} color="primary" />;
     case 'list':
       return <List fontSize={fontSize} color="primary" />;
     default:
@@ -91,8 +105,10 @@ export const getAvailableFields = (type: Widget['widget_type']) => {
 export const getWidgetTitle = (widgetTitle: Widget['widget_config']['title'], type: Widget['widget_type'], t: (key: string) => string) => {
   if (type === 'security-coverage') {
     return !widgetTitle ? t('Security Coverage') : widgetTitle;
+  } else if (type === 'attack-path') {
+    return !widgetTitle ? t('Attack Path') : widgetTitle;
   }
-  return widgetTitle || '';
+  return widgetTitle ?? '';
 };
 
 // -- FILTERS --
@@ -136,8 +152,14 @@ const typeFilter: (injectExpectationType: InjectExpectation['inject_expectation_
   operator: 'eq',
   values: [injectExpectationType],
 });
+const simulationFilter: (simulationId: Exercise['exercise_id']) => Filter = simulationId => ({
+  key: 'base_simulation_side',
+  mode: 'and',
+  operator: 'eq',
+  values: [simulationId],
+});
 
-const getSuccessSeries: (injectExpectationType: InjectExpectation['inject_expectation_type']) => StructuralHistogramSeries = (injectExpectationType) => {
+const getSuccessSeries: (injectExpectationType: InjectExpectation['inject_expectation_type'], simulationId?: Exercise['exercise_id']) => StructuralHistogramSeries = (injectExpectationType, simulationId) => {
   return {
     filter: {
       mode: 'and',
@@ -145,13 +167,14 @@ const getSuccessSeries: (injectExpectationType: InjectExpectation['inject_expect
         entityFilter,
         statusSuccessFilter,
         typeFilter(injectExpectationType),
+        ...(simulationId ? [simulationFilter(simulationId)] : []),
       ],
     },
     name: 'SUCCESS',
   };
 };
 
-const getFailedSeries: (injectExpectationType: InjectExpectation['inject_expectation_type']) => StructuralHistogramSeries = (injectExpectationType) => {
+const getFailedSeries: (injectExpectationType: InjectExpectation['inject_expectation_type'], simulationId?: Exercise['exercise_id']) => StructuralHistogramSeries = (injectExpectationType, simulationId) => {
   return {
     filter: {
       mode: 'and',
@@ -159,12 +182,13 @@ const getFailedSeries: (injectExpectationType: InjectExpectation['inject_expecta
         entityFilter,
         statusFailedFilter,
         typeFilter(injectExpectationType),
+        ...(simulationId ? [simulationFilter(simulationId)] : []),
       ],
     },
     name: 'FAILED',
   };
 };
 
-export const getSeries: (injectExpectationType: InjectExpectation['inject_expectation_type']) => StructuralHistogramSeries[] = (injectExpectationType) => {
-  return [getSuccessSeries(injectExpectationType), getFailedSeries(injectExpectationType)];
+export const getSeries: (injectExpectationType: InjectExpectation['inject_expectation_type'], simulationId?: Exercise['exercise_id']) => StructuralHistogramSeries[] = (injectExpectationType, simulationId) => {
+  return [getSuccessSeries(injectExpectationType, simulationId), getFailedSeries(injectExpectationType, simulationId)];
 };
