@@ -10,6 +10,8 @@ import { useHelper } from '../../../../store';
 import { type Collector, type DetectionRemediation, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import DOMPurify from 'dompurify';
+import {useFormatter} from "../../../../components/i18n";
+import {useTheme} from "@mui/material/styles";
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -27,6 +29,8 @@ const acceptedCollectorRemediation = [
 
 const AtomicTestingRemediations = () => {
   const dispatch = useAppDispatch();
+  const { t } = useFormatter();
+  const theme = useTheme();
   const { classes } = useStyles();
   const location = useLocation();
   const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
@@ -74,6 +78,7 @@ const AtomicTestingRemediations = () => {
 
   return (
     <>
+      <Typography variant="h5">{t('Security platform')}</Typography>
       <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
         {tabs.map((tab, index) => (
           <Tab
@@ -100,14 +105,14 @@ const AtomicTestingRemediations = () => {
 
       <Paper className={classes.paperContainer} variant="outlined">
         {activeCollectorRemediations.length === 0 ? (
-          <Typography variant="body2" color="textSecondary" gutterBottom>
-            No remediation detections available for this collector.
+          <Typography sx={{ padding: 2 }} variant="body2" color="textSecondary" gutterBottom>
+            {t('No remediation detections available for this collector.')}
           </Typography>
         ) : (
           activeCollectorRemediations.map(rem => (
-            <Box key={rem.detection_remediation_id}>
-              <Typography sx={{ padding: 2 }} variant="body2" fontWeight="bold" gutterBottom>
-                Detection Rule:
+            <Box sx={{ padding: 2 }}  key={rem.detection_remediation_id}>
+              <Typography sx={{ paddingBottom: 2 }} variant="body2" fontWeight="bold" gutterBottom>
+                {t('Detection Rule')}:
               </Typography>
               <div
                 dangerouslySetInnerHTML={{

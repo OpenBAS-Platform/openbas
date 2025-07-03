@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Tab, Tabs } from '@mui/material';
+import {Box, Button, Tab, Tabs} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { type FormEvent, type SyntheticEvent, useState } from 'react';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
@@ -11,6 +11,8 @@ import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
 import RemediationFormTab from './form/RemediationFormTab';
+import EEChip from "../common/entreprise_edition/EEChip";
+import useEnterpriseEdition from "../../../utils/hooks/useEnterpriseEdition";
 
 interface Props {
   onSubmit: SubmitHandler<PayloadCreateInput>;
@@ -47,8 +49,34 @@ const PayloadForm = ({
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const tabs = ['General', 'Commands', 'Output', 'Remediation'];
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const {
+    isValidated: isValidatedEnterpriseEdition,
+  } = useEnterpriseEdition();
+  const tabs = [{
+    key: 'General',
+    label: 'General'
+  }, {
+    key: 'Commands',
+    label: 'Commands'
+  }, {
+    key: 'Output',
+    label: 'Output',
+  }, {
+    key: 'Remediation',
+    label: (
+      <Box display="flex" alignItems="center">
+        {t('Remediation')}
+        {!isValidatedEnterpriseEdition && (
+          <EEChip
+            style={{ marginLeft: theme.spacing(1) }}
+            clickable
+            featureDetectedInfo={t('Remediation')}
+          />
+        )}
+      </Box>
+    )
+  }];
+  const [activeTab, setActiveTab] = useState(tabs[0].key);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
@@ -148,7 +176,6 @@ const PayloadForm = ({
   });
   const {
     handleSubmit,
-    getValues,
     formState: { errors, isDirty, isSubmitting },
   } = methods;
 
@@ -192,7 +219,7 @@ const PayloadForm = ({
           onChange={handleActiveTabChange}
           aria-label="tabs for payload form"
         >
-          {tabs.map(tab => <Tab key={tab} label={tab} value={tab} />)}
+          {tabs.map(tab => <Tab key={tab.key} label={tab.label} value={tab.key} />)}
         </Tabs>
 
         {activeTab === 'General' && (
