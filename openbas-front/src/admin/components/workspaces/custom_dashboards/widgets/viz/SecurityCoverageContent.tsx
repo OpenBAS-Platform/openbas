@@ -1,4 +1,4 @@
-import { Box, Checkbox, FormControlLabel, Typography } from '@mui/material';
+import { Box, Checkbox, FormControlLabel } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
