@@ -84,6 +84,8 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
             className={classes.item}
           />
           <Tab
+            component={Link}
+            to={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
             onClick={handleRemediationClick}
             value={`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`}
             label={(

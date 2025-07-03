@@ -1,4 +1,5 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -17,6 +18,7 @@ const RemediationFormTab = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const { control } = useFormContext();
   const { t } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
@@ -57,7 +59,7 @@ const RemediationFormTab = () => {
                     width: 20,
                     height: 20,
                     borderRadius: 4,
-                    marginRight: 8,
+                    marginRight: theme.spacing(2),
                   }}
                 />
                 {tab.collector_name}

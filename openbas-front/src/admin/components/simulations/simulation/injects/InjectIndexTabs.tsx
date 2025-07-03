@@ -53,7 +53,7 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
       setEEFeatureDetectedInfo(t('Remediation'));
       openEnterpriseEditionDialog();
     } else {
-      navigate(`/admin/atomic_testings/${injectResultOverview.inject_id}/remediations`);
+      navigate(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`);
     }
   };
 
@@ -94,6 +94,8 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
               className={classes.item}
             />
             <Tab
+              component={Link}
+              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
               onClick={handleRemediationClick}
               value={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverview.inject_id}/remediations`)}
               label={(
