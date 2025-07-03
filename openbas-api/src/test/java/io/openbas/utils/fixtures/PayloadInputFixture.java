@@ -54,7 +54,6 @@ public class PayloadInputFixture {
 
   public static PayloadCreateInput createDefaultPayloadCreateInputWithDetectionRemediation() {
     PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
-
     input.setDetectionRemediations(buildDetectionRemediations());
     return input;
   }

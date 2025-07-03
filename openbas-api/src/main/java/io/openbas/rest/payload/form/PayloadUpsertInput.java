@@ -72,7 +72,6 @@ public class PayloadUpsertInput {
   private List<PayloadArgument> arguments;
 
   @JsonProperty("payload_prerequisites")
-  @Schema(description = "List of detection remediation gaps for collectors")
   private List<PayloadPrerequisite> prerequisites;
 
   @JsonProperty("payload_cleanup_executor")
@@ -90,6 +89,7 @@ public class PayloadUpsertInput {
   private List<String> attackPatternsExternalIds = new ArrayList<>();
 
   @JsonProperty("payload_detection_remediations")
+  @Schema(description = "List of detection remediation gaps for collectors")
   private List<DetectionRemediationInput> detectionRemediations = new ArrayList<>();
 
   @JsonProperty("payload_elevation_required")
