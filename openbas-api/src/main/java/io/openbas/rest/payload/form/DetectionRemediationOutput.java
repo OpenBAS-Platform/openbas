@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class DetectionRemediationInput {
+public class DetectionRemediationOutput {
 
   @JsonProperty("detection_remediation_id")
   private String id;
