@@ -22,6 +22,7 @@ interface Props {
   startAdornmentLabel?: string;
   type?: 'number' | 'text';
   defaultValue?: string;
+  noHelperText?: boolean;
 }
 
 const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
@@ -41,6 +42,7 @@ const TextFieldController = ({
   startAdornmentLabel,
   type = 'text',
   defaultValue = '',
+  noHelperText = false,
 }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
@@ -58,7 +60,7 @@ const TextFieldController = ({
           label={label}
           fullWidth
           error={!!error}
-          helperText={error ? error.message : null}
+          helperText={!noHelperText && error ? error.message : null}
           multiline={multiline}
           rows={rows}
           aria-label={label}

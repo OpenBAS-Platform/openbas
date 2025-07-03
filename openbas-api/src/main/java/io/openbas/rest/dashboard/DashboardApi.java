@@ -1,28 +1,20 @@
 package io.openbas.rest.dashboard;
 
-import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
 
-import io.openbas.database.model.Filters;
+import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
-import io.openbas.database.raw.RawUserAuth;
-import io.openbas.database.repository.UserRepository;
-import io.openbas.engine.api.*;
-import io.openbas.engine.model.*;
+import io.openbas.engine.model.EsBase;
+import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.service.EsService;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Secured(ROLE_USER)
@@ -31,65 +23,37 @@ public class DashboardApi extends RestBehavior {
 
   public static final String DASHBOARD_URI = "/api/dashboards";
 
-  private final EsService esService;
-  private final UserRepository userRepository;
   private final WidgetService widgetService;
+  private final DashboardService dashboardService;
 
-  @GetMapping(DASHBOARD_URI + "/count/{type}")
-  public long count(@PathVariable String type) {
-    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
-    Filters.Filter filter = new Filters.Filter();
-    filter.setKey("base_entity");
-    filter.setOperator(Filters.FilterOperator.eq);
-    filter.setValues(List.of(type));
-    filterGroup.setFilters(List.of(filter));
-    CountConfig config = new CountConfig("Series01", filterGroup);
-    CountRuntime runtime = new CountRuntime(config);
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.count(userWithAuth, runtime);
-  }
-
-  @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
-  public List<EsSeries> series(@PathVariable final String widgetId) {
-    Widget widget = this.widgetService.widget(widgetId);
-    if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
-        widget.getWidgetConfiguration().getConfigurationType())) {
-      DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
-      Map<String, String> parameters = new HashMap<>();
-      Instant end = Instant.now();
-      Instant start = end.minus(30, ChronoUnit.DAYS);
-      // FIXME: date is hardcoded
-      parameters.put("$start", start.toString());
-      parameters.put("$end", end.toString());
-      RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-      DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
-      return esService.multiDateHistogram(userWithAuth, runtime);
-    } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
-        widget.getWidgetConfiguration().getConfigurationType())) {
-      StructuralHistogramWidget config =
-          (StructuralHistogramWidget) widget.getWidgetConfiguration();
-      Map<String, String> parameters = new HashMap<>();
-      RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-      StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
-      return esService.multiTermHistogram(userWithAuth, runtime);
+  @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
+  public List<EsSeries> series(
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
     }
-    throw new RuntimeException("Unsupported widget: " + widget);
+    Widget widget = this.widgetService.widget(widgetId);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.series(widget, parameters, definitionParameters);
   }
 
-  @GetMapping(DASHBOARD_URI + "/entities/{widgetId}")
-  public List<EsBase> entities(@PathVariable final String widgetId) {
+  @PostMapping(DASHBOARD_URI + "/entities/{widgetId}")
+  public List<EsBase> entities(
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
     Widget widget = this.widgetService.widget(widgetId);
-    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
-    Map<String, String> parameters = new HashMap<>();
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    ListRuntime runtime = new ListRuntime(config, parameters);
-
-    return esService.entities(userWithAuth, runtime);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.entities(widget, parameters, definitionParameters);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")
   public List<EsSearch> search(@PathVariable final String search) {
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.search(userWithAuth, search, null);
+    return this.dashboardService.search(search);
   }
 }

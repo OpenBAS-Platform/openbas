@@ -1,20 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Checkbox,
-  Chip, FormControlLabel,
-  MenuItem,
-  Tab,
-  Tabs,
-  TextField as MuiTextField,
-} from '@mui/material';
+import { Autocomplete, Box, Button, Checkbox, Chip, FormControlLabel, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import CustomDashboardFieldController from '../../../components/fields/CustomDashboardFieldController';
 import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
@@ -72,6 +63,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_mails_reply_to: z.array(z.string().email(t('Should be a valid email address'))).optional(),
         scenario_message_header: z.string().optional(),
         scenario_message_footer: z.string().optional(),
+        scenario_custom_dashboard: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -209,6 +201,11 @@ const ScenarioForm: FunctionComponent<Props> = ({
                   error={error}
                 />
               )}
+            />
+            <CustomDashboardFieldController
+              control={control}
+              name="scenario_custom_dashboard"
+              label={t('Dashboard')}
             />
             {isCreation && (
               <FormControlLabel

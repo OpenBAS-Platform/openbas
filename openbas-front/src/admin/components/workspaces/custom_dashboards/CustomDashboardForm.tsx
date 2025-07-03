@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button } from '@mui/material';
+import { Add, DeleteOutlined } from '@mui/icons-material';
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useMemo } from 'react';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import TextField from '../../../../components/fields/TextField';
+import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
-import type { CustomDashboardInput } from '../../../../utils/api-types';
+import { type CustomDashboardInput, type CustomDashboardParametersInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 
 interface Props {
@@ -21,77 +23,153 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
   initialValues = {
     custom_dashboard_name: '',
     custom_dashboard_description: '',
+    custom_dashboard_parameters: [],
   },
   editing = false,
   handleClose,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const theme = useTheme();
+
+  const parametersSchema = z.object({
+    custom_dashboards_parameter_id: z.string().optional(),
+    custom_dashboards_parameter_name: z.string().min(1, { message: t('Should not be empty') }),
+    custom_dashboards_parameter_type: z.literal('simulation'),
+  });
 
   const validationSchema = useMemo(
     () =>
       zodImplement<CustomDashboardInput>().with({
         custom_dashboard_name: z.string().min(1, { message: t('Should not be empty') }),
         custom_dashboard_description: z.string().optional(),
+        custom_dashboard_parameters: z.array(parametersSchema).optional(),
       }),
     [],
   );
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
-  } = useForm<CustomDashboardInput>({
+  const methods = useForm<CustomDashboardInput>({
     mode: 'onTouched',
     resolver: zodResolver(validationSchema),
     defaultValues: initialValues,
   });
 
+  const {
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+    control,
+  } = methods;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'custom_dashboard_parameters',
+  });
+
+  const items: CustomDashboardParametersInput['custom_dashboards_parameter_type'][] = ['simulation'];
+  const handleAddParameter = (type: CustomDashboardParametersInput['custom_dashboards_parameter_type']) => {
+    if (type) {
+      append({
+        custom_dashboards_parameter_name: type,
+        custom_dashboards_parameter_type: type,
+      });
+    }
+  };
+
   return (
-    <form id="customDashboardForm" onSubmit={handleSubmit(onSubmit)}>
-      <TextField
-        variant="standard"
-        fullWidth
-        label={t('Name')}
-        sx={{ mt: 1 }}
-        error={!!errors.custom_dashboard_name}
-        helperText={errors.custom_dashboard_name?.message}
-        inputProps={register('custom_dashboard_name')}
-        InputLabelProps={{ required: true }}
-      />
-      <TextField
-        variant="standard"
-        fullWidth
-        label={t('Description')}
-        sx={{ mt: 2 }}
-        error={!!errors.custom_dashboard_description}
-        helperText={errors.custom_dashboard_description?.message}
-        inputProps={register('custom_dashboard_description')}
-      />
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        mt: 2,
-      }}
+    <FormProvider {...methods}>
+      <form
+        id="customDashboardForm"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100%',
+          gap: theme.spacing(2),
+        }}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <Button
-          variant="contained"
-          onClick={handleClose}
-          sx={{ mr: 1 }}
-          disabled={isSubmitting}
+        <TextFieldController
+          variant="standard"
+          name="custom_dashboard_name"
+          label={t('Name')}
+          required
+        />
+        <TextFieldController
+          variant="standard"
+          name="custom_dashboard_description"
+          label={t('Description')}
+        />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
         >
-          {t('Cancel')}
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          type="submit"
-          disabled={!isDirty || isSubmitting}
+          <Typography variant="h3" sx={{ m: 0 }}>
+            {t('Parameters')}
+          </Typography>
+          <IconButton
+            color="secondary"
+            aria-label="Add"
+            onClick={() => handleAddParameter(items[0])} // For now, we handle just one type
+            size="small"
+          >
+            <Add fontSize="small" />
+          </IconButton>
+        </div>
+        {fields.map((field, index) => (
+          <Box
+            key={field.id}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: theme.spacing(2),
+            }}
+          >
+            <TextFieldController
+              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_name`}
+              label={t('Parameter Name')}
+              variant="standard"
+              required
+              noHelperText
+            />
+            <TextFieldController
+              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
+              label={t('Parameter Type')}
+              variant="standard"
+              required
+              disabled
+              noHelperText
+            />
+            <Tooltip title={t('Delete')}>
+              <IconButton color="error" onClick={() => remove(index)}>
+                <DeleteOutlined fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ))}
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mt: 2,
+        }}
         >
-          {editing ? t('Update') : t('Create')}
-        </Button>
-      </Box>
-    </form>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            sx={{ mr: 1 }}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={!isDirty || isSubmitting}
+          >
+            {editing ? t('Update') : t('Create')}
+          </Button>
+        </Box>
+      </form>
+    </FormProvider>
   );
 };
 

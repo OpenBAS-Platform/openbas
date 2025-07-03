@@ -1,40 +1,38 @@
 import { OpenInFullOutlined } from '@mui/icons-material';
 import { Box, IconButton, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
-import { useParams } from 'react-router';
 
 import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { ErrorBoundary } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
-import { type CustomDashboard } from '../../../../utils/api-types';
 import { type Widget } from '../../../../utils/api-types-custom';
+import { CustomDashboardContext } from './CustomDashboardContext';
 import CustomDashboardHeader from './CustomDashboardHeader';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
 import { getWidgetTitle } from './widgets/WidgetUtils';
 import WidgetViz from './widgets/WidgetViz';
 
-const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashboard }> = ({ customDashboard }) => {
+const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ readOnly }) => {
   // Standard hooks
   const theme = useTheme();
   const { t } = useFormatter();
   const ReactGridLayout = useMemo(() => WidthProvider(RGL), []);
   const [fullscreenWidgets, setFullscreenWidgets] = useState<Record<Widget['widget_id'], boolean | never>>({});
 
-  const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
-  const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>(customDashboard);
+  const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
 
   const [idToResize, setIdToResize] = useState<string | null>(null);
   const handleResize = (updatedWidget: string | null) => setIdToResize(updatedWidget);
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'));
-  }, [customDashboardValue]);
+  }, [customDashboard]);
 
   const handleWidgetCreate = (newWidget: Widget) => {
-    setCustomDashboardValue((prev) => {
+    setCustomDashboard((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -43,7 +41,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
     });
   };
   const handleWidgetUpdate = (widget: Widget) => {
-    setCustomDashboardValue((prev) => {
+    setCustomDashboard((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -58,7 +56,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
     });
   };
   const handleWidgetDelete = (widgetId: string) => {
-    setCustomDashboardValue((prev) => {
+    setCustomDashboard((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -68,9 +66,10 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
   };
 
   const onLayoutChange = async (layouts: Layout[]) => {
+    if (!customDashboard) return;
     await Promise.all(
       layouts.map(layout =>
-        updateCustomDashboardWidgetLayout(customDashboardId, layout.i, {
+        updateCustomDashboardWidgetLayout(customDashboard.custom_dashboard_id, layout.i, {
           widget_layout_h: layout.h,
           widget_layout_w: layout.w,
           widget_layout_x: layout.x,
@@ -78,7 +77,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
         }),
       ),
     );
-    setCustomDashboardValue(prev => prev && {
+    setCustomDashboard(prev => prev && {
       ...prev,
       custom_dashboard_widgets: prev.custom_dashboard_widgets?.map((widget) => {
         const existingLayout = layouts.find(x => x.i === widget.widget_id)!;
@@ -102,7 +101,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
       gap: theme.spacing(2),
     }}
     >
-      <CustomDashboardHeader customDashboard={customDashboard} />
+      {!readOnly && <CustomDashboardHeader />}
       {/* Not perfect to use negative margin here, but I don't find a better solution to align items */}
       <div id="container" style={{ margin: theme.spacing(-2.5) }}>
         <ReactGridLayout
@@ -111,13 +110,13 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
           rowHeight={50}
           cols={12}
           draggableCancel=".noDrag"
-          isDraggable={true}
-          isResizable={true}
+          isDraggable={!readOnly}
+          isResizable={!readOnly}
           onLayoutChange={onLayoutChange}
           onResizeStart={(_, { i }) => handleResize(i)}
           onResizeStop={() => handleResize(null)}
         >
-          {customDashboardValue?.custom_dashboard_widgets?.map((widget) => {
+          {customDashboard?.custom_dashboard_widgets?.map((widget) => {
             const layout = {
               i: widget.widget_id,
               x: widget.widget_layout?.widget_layout_x,
@@ -151,6 +150,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                     sx={{
                       margin: 0,
                       paddingLeft: theme.spacing(2),
+                      paddingTop: theme.spacing(2.5),
                       textTransform: 'uppercase',
                     }}
                   >
@@ -170,13 +170,15 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                         <OpenInFullOutlined fontSize="small" />
                       </IconButton>
                     )}
-                    <WidgetPopover
-                      className="noDrag"
-                      customDashboardId={customDashboardId}
-                      widget={widget}
-                      onUpdate={widget => handleWidgetUpdate(widget)}
-                      onDelete={widgetId => handleWidgetDelete(widgetId)}
-                    />
+                    {!readOnly && (
+                      <WidgetPopover
+                        className="noDrag"
+                        customDashboardId={customDashboard.custom_dashboard_id}
+                        widget={widget}
+                        onUpdate={widget => handleWidgetUpdate(widget)}
+                        onDelete={widgetId => handleWidgetDelete(widgetId)}
+                      />
+                    )}
                   </Box>
                 </Box>
                 <ErrorBoundary>
@@ -201,11 +203,13 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
             );
           })}
         </ReactGridLayout>
-        <WidgetCreation
-          customDashboardId={customDashboardId}
-          widgets={customDashboardValue?.custom_dashboard_widgets ?? []}
-          onCreate={widget => handleWidgetCreate(widget)}
-        />
+        {!readOnly && customDashboard && (
+          <WidgetCreation
+            customDashboardId={customDashboard.custom_dashboard_id}
+            widgets={customDashboard?.custom_dashboard_widgets ?? []}
+            onCreate={widget => handleWidgetCreate(widget)}
+          />
+        )}
       </div>
     </div>
   );
