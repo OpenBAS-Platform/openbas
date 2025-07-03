@@ -17,6 +17,11 @@ public class DetectionRemediationOutput {
   @NotNull
   private String collectorId;
 
+  @JsonProperty("detection_remediation_payload")
+  @Schema(description = "Payload id")
+  @NotNull
+  private String payloadId;
+
   @JsonProperty("detection_remediation_values")
   @Schema(description = "Value of detection remediation, for exemple: query for sentinel")
   @NotNull
