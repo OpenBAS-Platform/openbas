@@ -44,7 +44,7 @@ public class DashboardService {
           new StructuralHistogramRuntime(config, parameters, definitionParameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
     }
-    throw new RuntimeException("Unsupported widget: " + widget);
+    throw new UnsupportedOperationException("Unsupported widget: " + widget);
   }
 
   public List<EsBase> entities(
