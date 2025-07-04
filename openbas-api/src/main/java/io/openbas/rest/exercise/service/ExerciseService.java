@@ -61,6 +61,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RequiredArgsConstructor
 @Validated
@@ -90,6 +91,7 @@ public class ExerciseService {
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
   private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
   private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -676,6 +678,14 @@ public class ExerciseService {
     List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
     exercise.setTeams(teams);
 
+    // Enable user
+    teams.forEach(team -> {
+      List<String> playerIds = team.getUsers().stream()
+              .map(User::getId)
+              .toList();
+      this.enableTeam(exerciseId, team.getId(), playerIds);
+    });
+
     // You must return all the modified teams to ensure the frontend store updates correctly
     List<String> modifiedTeamIds =
         Stream.concat(previousTeamIds.stream(), teams.stream().map(Team::getId))
@@ -683,6 +693,54 @@ public class ExerciseService {
             .toList();
     return teamService.find(fromIds(modifiedTeamIds));
   }
+
+
+  public Exercise enableTeam(
+          @NotBlank final String exerciseId,
+          @NotBlank final String teamId,
+          @NotNull final List<String> playerIds) {
+
+    //recup la simulation
+    Exercise exercise = exerciseRepository.findById(exerciseId)
+            .orElseThrow(ElementNotFoundException::new);
+  //recup la team
+    Team team = teamRepository.findById(teamId)
+            .orElseThrow(ElementNotFoundException::new);
+
+    //recup les users sous form List<User>
+    List<User> users = fromIterable(userRepository.findAllById(playerIds));
+
+    users.forEach(user -> {
+      ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+      exerciseTeamUser.setExercise(exercise);
+      exerciseTeamUser.setTeam(team);
+      exerciseTeamUser.setUser(user);
+      exerciseTeamUserRepository.save(exerciseTeamUser);
+    });
+
+    return exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+  }
+
+  /*public Exercise enableTeams(
+          @NotBlank final String exerciseId,
+          @NotNull final String teamId,
+          @Valid final ExerciseTeamPlayersEnableInput input
+  ) {
+
+    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+
+    input.getPlayersIds().forEach(playerId -> {
+      ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+      exerciseTeamUser.setExercise(exercise);
+      exerciseTeamUser.setTeam(team);
+      exerciseTeamUser.setUser(userRepository.findById(playerId).orElseThrow(ElementNotFoundException::new));
+      exerciseTeamUserRepository.save(exerciseTeamUser);
+    });
+
+    return exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+
+  }*/
 
   /**
    * Update the simulation and each of the injects to add default asset groups
