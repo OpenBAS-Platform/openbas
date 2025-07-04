@@ -143,7 +143,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             }}
           />
         )}
-      {mode === 'structural' && (
+      {mode === 'structural' && widgetType !== 'security-coverage' && (
         <Controller
           control={control}
           name="widget_config.limit"
