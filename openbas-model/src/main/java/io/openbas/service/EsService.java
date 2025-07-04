@@ -620,7 +620,7 @@ public class EsService {
                   so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
     }
     Query query =
-        buildQuery(user, "", searchFilters, new HashMap<>(), runtime.getDefinitionParameters());
+        buildQuery(user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
       SearchResponse<?> response =
           elasticClient.search(
