@@ -2,8 +2,8 @@ package io.openbas.rest.custom_dashboard;
 
 import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
-import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.CustomDashboardFixture.createDefaultCustomDashboard;
 import static io.openbas.utils.fixtures.WidgetFixture.NAME;
 import static io.openbas.utils.fixtures.WidgetFixture.createDefaultWidget;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +18,7 @@ import io.openbas.database.model.WidgetLayout;
 import io.openbas.database.repository.WidgetRepository;
 import io.openbas.engine.api.DateHistogramWidget;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
+import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.fixtures.composers.WidgetComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.Test;
