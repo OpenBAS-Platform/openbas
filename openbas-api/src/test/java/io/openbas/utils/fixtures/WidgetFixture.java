@@ -31,6 +31,7 @@ public class WidgetFixture {
     // series
     ListConfiguration.ListSeries series = new ListConfiguration.ListSeries();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
     Filters.Filter filter = new Filters.Filter();
     filter.setValues(List.of(entityName));
     filter.setOperator(Filters.FilterOperator.eq);

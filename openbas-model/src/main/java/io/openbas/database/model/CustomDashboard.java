@@ -17,12 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "custom_dashboards")
 @EntityListeners(ModelBaseListener.class)

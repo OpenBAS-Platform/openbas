@@ -1,9 +1,9 @@
 package io.openbas.rest.custom_dashboard;
 
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
-import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.NAME;
-import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.CustomDashboardFixture.NAME;
+import static io.openbas.utils.fixtures.CustomDashboardFixture.createDefaultCustomDashboard;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,6 +13,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
