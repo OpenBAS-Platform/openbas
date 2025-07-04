@@ -40,7 +40,7 @@ export const widgetVisualizationTypes: {
     category: 'attack-path',
     modes: ['structural'],
     seriesLimit: 2,
-    fields: ['base_attack_patterns_side', 'base_simulation_side'],
+    fields: ['base_attack_patterns_side'],
   },
   {
     category: 'vertical-barchart',

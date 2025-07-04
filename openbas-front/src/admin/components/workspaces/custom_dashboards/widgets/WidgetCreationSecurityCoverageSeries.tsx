@@ -121,7 +121,7 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
       })}
       <SimulationField
         label={t('Simulation')}
-        required
+        required={isSimulationFilterMandatory}
         error={showSimulationError}
         value={simulationId ?? ''}
         className={classes.allWidth}
