@@ -1678,6 +1678,7 @@
   "You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).": "You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).",
   "You just need to try? Get right now": "You just need to try? Get right now",
   "You must be logged to access this page": "You must be logged to access this page",
+  "You must set a simulation": "You must set a simulation",
   "You probably need a public email in your github account": "You probably need a public email in your github account",
   "You should add \"Log on as a service\" policy if you are installing as a user.": "You should add \"Log on as a service\" policy if you are installing as a user.",
   "You will find here the result in JSON format.": "You will find here the result in JSON format.",
