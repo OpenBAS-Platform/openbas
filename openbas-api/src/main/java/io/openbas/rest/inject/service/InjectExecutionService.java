@@ -10,6 +10,7 @@ import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
+import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
@@ -19,14 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectExecutionService {
 
   private final InjectRepository injectRepository;
@@ -45,6 +46,20 @@ public class InjectExecutionService {
 
     try {
       inject = loadInjectOrThrow(injectId);
+
+      if (input.getAction().equals(InjectExecutionAction.complete)
+          && (inject.getStatus().isEmpty()
+              || !inject.getStatus().get().getName().equals(ExecutionStatus.EXECUTING))) {
+        // If we receive a status update with a terminal state status, we must first check that the
+        // current status
+        // is in the Executing state
+        log.warn(
+            "Received a complete action for inject {} with status {}, but current status is not EXECUTING",
+            injectId,
+            inject.getStatus().map(is -> is.getName().toString()).orElse("UNKNOWN"));
+        throw new DataIntegrityViolationException(
+            "Cannot complete inject that is not in EXECUTING state");
+      }
       Agent agent = loadAgentIfPresent(agentId);
 
       Set<OutputParser> outputParsers = structuredOutputUtils.extractOutputParsers(inject);
@@ -181,7 +196,7 @@ public class InjectExecutionService {
   }
 
   private void handleInjectExecutionError(Inject inject, Exception e) {
-    log.log(Level.SEVERE, e.getMessage());
+    log.error(e.getMessage(), e);
     if (inject != null) {
       inject
           .getStatus()
