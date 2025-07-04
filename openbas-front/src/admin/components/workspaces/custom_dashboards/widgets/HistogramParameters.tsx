@@ -11,7 +11,7 @@ import { type GroupOption } from '../../../../../utils/Option';
 import getEntityPropertiesListOptions from './EntityPropertiesListOptions';
 import {
   getAvailableModes,
-  getBaseEntities,
+  getBaseEntities, getLimit,
   type WidgetInputWithoutLayout,
 } from './WidgetUtils';
 
@@ -22,7 +22,7 @@ type Props = {
   showOnlyTitle?: boolean;
 };
 
-const HistogramParameters = ({ widgetType, control, setValue, showOnlyTitle = false }: Props) => {
+const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
 // Standard hooks
   const { t } = useFormatter();
 
@@ -38,12 +38,14 @@ const HistogramParameters = ({ widgetType, control, setValue, showOnlyTitle = fa
   const entities = series.map(v => getBaseEntities(v.filter)).flat();
 
   // -- HANDLE MODE --
-  const availableModes = showOnlyTitle ? [] : getAvailableModes(widgetType);
+  const availableModes = getAvailableModes(widgetType);
   useEffect(() => {
     if (availableModes.length === 1) {
       setValue('widget_config.mode', availableModes[0]); // If only one mode is available, hide the field and set it automatically
     }
   }, []);
+
+  const hasLimit = getLimit(widgetType);
 
   // -- HANDLE widget config type --
   useEffect(() => {
@@ -63,9 +65,6 @@ const HistogramParameters = ({ widgetType, control, setValue, showOnlyTitle = fa
   const [fieldOptions, setFieldOptions] = useState<GroupOption[]>([]);
 
   useEffect(() => {
-    if (showOnlyTitle) {
-      return;
-    }
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
       const finalOptions = getEntityPropertiesListOptions(
         response.data,
@@ -147,7 +146,7 @@ const HistogramParameters = ({ widgetType, control, setValue, showOnlyTitle = fa
             }}
           />
         )}
-      {mode === 'structural' && (
+      {hasLimit && (
         <Controller
           control={control}
           name="widget_config.limit"

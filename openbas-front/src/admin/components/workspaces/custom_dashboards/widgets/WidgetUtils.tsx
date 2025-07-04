@@ -29,18 +29,21 @@ export const widgetVisualizationTypes: {
   modes?: HistogramWidget['mode'][];
   fields?: string[];
   steps?: StepType[];
+  limit?: boolean;
 }[] = [
   {
     category: 'security-coverage',
     seriesLimit: 2,
     modes: ['structural'],
     fields: ['base_attack_patterns_side'],
+    limit: false,
   },
   {
     category: 'attack-path',
     modes: ['structural'],
     seriesLimit: 2,
     fields: ['base_attack_patterns_side'],
+    limit: false,
   },
   {
     category: 'vertical-barchart',
@@ -94,6 +97,10 @@ export const getCurrentSeriesLimit = (type: Widget['widget_type']) => {
 
 export const getAvailableModes = (type: Widget['widget_type']) => {
   return widgetVisualizationTypes.find(widget => widget.category === type)?.modes ?? defaultModes;
+};
+
+export const getLimit = (type: Widget['widget_type']) => {
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.limit ?? true;
 };
 
 export const getAvailableSteps = (type: Widget['widget_type']) => {
