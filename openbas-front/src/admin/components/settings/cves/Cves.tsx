@@ -175,7 +175,6 @@ const Cves = () => {
             />
           )}
         </Drawer>
-        )
       </div>
       <TaxonomiesMenu />
     </div>
