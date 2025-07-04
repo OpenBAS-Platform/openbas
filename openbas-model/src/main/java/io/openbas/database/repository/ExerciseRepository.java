@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.*;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -347,4 +348,16 @@ public interface ExerciseRepository
       nativeQuery = true)
   List<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
+
+  // -- INDEXING --
+
+  @Query(
+      value =
+          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at "
+              + "FROM exercises ex "
+              + "WHERE ex.exercise_updated_at > :from ORDER BY ex.exercise_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
+      nativeQuery = true)
+  List<RawSimulation> findForIndexing(@Param("from") Instant from);
 }
