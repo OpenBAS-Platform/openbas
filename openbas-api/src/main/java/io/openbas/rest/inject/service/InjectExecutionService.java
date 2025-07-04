@@ -10,6 +10,7 @@ import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
+import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
@@ -19,14 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Log
+@Slf4j
 public class InjectExecutionService {
 
   private final InjectRepository injectRepository;
@@ -45,6 +46,27 @@ public class InjectExecutionService {
 
     try {
       inject = loadInjectOrThrow(injectId);
+      // issue/3550: added this condition to ensure we only update statuses if the inject is in a
+      // coherent state.
+      // This prevents issues where the PENDING status took more time to persist than it took for
+      // the agent to send the complete action.
+      // FIXME: At the moment, this whole function is only called by our implant. These implant are
+      // launched with the async value to true, which force the implant to go from EXECUTING to
+      // PENDING, before going to EXECUTED.
+      // So if in the future, this function is called to update a synchronous inject, we will need
+      // to find a way to get the async boolean somehow and add it to this condition.
+      if (input.getAction().equals(InjectExecutionAction.complete)
+          && (inject.getStatus().isEmpty()
+              || !inject.getStatus().get().getName().equals(ExecutionStatus.PENDING))) {
+        // If we receive a status update with a terminal state status, we must first check that the
+        // current status is in the PENDING state
+        log.warn(
+            "Received a complete action for inject {} with status {}, but current status is not PENDING",
+            injectId,
+            inject.getStatus().map(is -> is.getName().toString()).orElse("unknown"));
+        throw new DataIntegrityViolationException(
+            "Cannot complete inject that is not in PENDING state");
+      }
       Agent agent = loadAgentIfPresent(agentId);
 
       Set<OutputParser> outputParsers = structuredOutputUtils.extractOutputParsers(inject);
@@ -181,7 +203,7 @@ public class InjectExecutionService {
   }
 
   private void handleInjectExecutionError(Inject inject, Exception e) {
-    log.log(Level.SEVERE, e.getMessage());
+    log.error(e.getMessage(), e);
     if (inject != null) {
       inject
           .getStatus()

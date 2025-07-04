@@ -13,6 +13,7 @@ import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.service.PayloadService;
 import jakarta.annotation.Resource;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -171,9 +172,16 @@ public class ExecutableInjectService {
 
   public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
       throws Exception {
+    // Need startTime to be defined before everything else to be the most accurate start time, as
+    // this whole process is
+    // called at the beginning of the implant execution. A better solution would be to have the
+    // implant send the start time
+    // but it would require more changes in the implant code and change this endpoint from a get to
+    // a post.
+    Instant startTime = Instant.now();
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
     this.injectStatusService.addStartImplantExecutionTraceByInject(
-        injectId, agentId, "Implant is up and starting execution");
+        injectId, agentId, "Implant is up and starting execution", startTime);
     return payloadToExecute;
   }
 
