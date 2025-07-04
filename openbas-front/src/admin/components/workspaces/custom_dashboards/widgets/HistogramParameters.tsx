@@ -156,7 +156,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
               label={t('Number of results')}
               sx={{ mt: 2 }}
               value={field.value ?? 10}
-              onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+              onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
               error={!!fieldState.error}
               helperText={fieldState.error?.message}
               required
