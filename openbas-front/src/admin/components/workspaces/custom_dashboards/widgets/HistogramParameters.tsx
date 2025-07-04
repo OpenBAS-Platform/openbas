@@ -69,7 +69,13 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
       const finalOptions = getEntityPropertiesListOptions(
         response.data,
         widgetType,
-        d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant');
+        d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
+        .map((o) => {
+          return {
+            ...o,
+            label: t(o.label),
+          };
+        });
       setFieldOptions(finalOptions);
       if (finalOptions.length === 1) {
         setValue('widget_config.field', finalOptions[0].id); // If only one option is available, hide the field and set it automatically
