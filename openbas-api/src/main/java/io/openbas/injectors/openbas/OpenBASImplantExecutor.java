@@ -5,6 +5,7 @@ import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
 import static io.openbas.utils.ExpectationUtils.*;
+import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAssetGroup;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
@@ -15,6 +16,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.model.expectation.VulnerabilityExpectation;
 import io.openbas.rest.inject.service.AssetToExecute;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
@@ -88,6 +90,9 @@ public class OpenBASImplantExecutor extends Injector {
                             getPreventionExpectations(assetToExecute, inject, expectation).stream();
                         case DETECTION ->
                             getDetectionExpectations(assetToExecute, inject, expectation).stream();
+                        case VULNERABILITY ->
+                            getVulnerabilityExpectations(assetToExecute, inject, expectation)
+                                .stream();
                         case MANUAL ->
                             getManualExpectations(assetToExecute, inject, expectation).stream();
                         default -> Stream.of();
@@ -164,6 +169,38 @@ public class OpenBASImplantExecutor extends Injector {
                                                           .equals(asset.getId())))) {
                             yield Stream.of(
                                 detectionExpectationForAssetGroup(
+                                    expectation.getScore(),
+                                    expectation.getName(),
+                                    expectation.getDescription(),
+                                    assetGroup,
+                                    expectation.isExpectationGroup(),
+                                    expectation.getExpirationTime()));
+                          }
+                          yield Stream.of();
+                        }
+                        case VULNERABILITY -> {
+                          // Verify that at least one asset in the group has been executed
+                          List<Asset> assets =
+                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                          if (assets.stream()
+                              .anyMatch(
+                                  asset ->
+                                      expectations.stream()
+                                          .filter(
+                                              vulExpectation ->
+                                                  InjectExpectation.EXPECTATION_TYPE.VULNERABILITY
+                                                      == vulExpectation.type())
+                                          .anyMatch(
+                                              vulExpectation ->
+                                                  ((VulnerabilityExpectation) vulExpectation)
+                                                              .getAsset()
+                                                          != null
+                                                      && ((VulnerabilityExpectation) vulExpectation)
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
+                            yield Stream.of(
+                                vulnerabilityExpectationForAssetGroup(
                                     expectation.getScore(),
                                     expectation.getName(),
                                     expectation.getDescription(),

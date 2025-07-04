@@ -88,6 +88,12 @@ export interface AgentTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface AggregatedFindingOutput {
@@ -295,6 +301,12 @@ export interface AssetGroupTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Full contract */
@@ -425,6 +437,12 @@ interface BaseInjectTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 type BaseInjectTargetTargetTypeMapping<Key, Type> = {
@@ -893,6 +911,7 @@ export interface ContractOutputElementSimple {
 
 export interface CreateExerciseInput {
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -938,6 +957,7 @@ export interface CustomDashboard {
   custom_dashboard_description?: string;
   custom_dashboard_id: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParameters[];
   /** @format date-time */
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
@@ -947,6 +967,25 @@ export interface CustomDashboard {
 export interface CustomDashboardInput {
   custom_dashboard_description?: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParametersInput[];
+}
+
+export interface CustomDashboardOutput {
+  custom_dashboard_id?: string;
+  custom_dashboard_name?: string;
+}
+
+export interface CustomDashboardParameters {
+  custom_dashboards_parameter_id: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+  listened?: boolean;
+}
+
+export interface CustomDashboardParametersInput {
+  custom_dashboards_parameter_id?: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
 }
 
 /** Payload to create a CVE */
@@ -1447,6 +1486,12 @@ export interface EndpointTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface EngineSortField {
@@ -1525,6 +1570,7 @@ export interface EsFinding {
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
+  base_simulation_side?: string;
   /** @format date-time */
   base_updated_at?: string;
   finding_field?: string;
@@ -1840,6 +1886,7 @@ export interface Exercise {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_documents?: string[];
   /** @format date-time */
@@ -1988,7 +2035,7 @@ export interface ExercisesGlobalScoresOutput {
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
-  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
+  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION" | "VULNERABILITY";
 }
 
 export interface ExpectationUpdateInput {
@@ -2445,7 +2492,8 @@ export interface InjectExpectation {
     | "CHALLENGE"
     | "MANUAL"
     | "PREVENTION"
-    | "DETECTION";
+    | "DETECTION"
+    | "VULNERABILITY";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: string;
@@ -4195,6 +4243,11 @@ export interface PlatformSettings {
    * @format int64
    */
   expectation_prevention_expiration_time: number;
+  /**
+   * Time to wait before vulnerability time has expired
+   * @format int64
+   */
+  expectation_vulnerability_expiration_time: number;
   /** Current version of Java */
   java_version?: string;
   /** URL of the server containing the map tile with dark theme */
@@ -4327,6 +4380,12 @@ export interface PlayerTarget {
   /** @uniqueItems true */
   target_teams?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Policies of the platform */
@@ -4684,6 +4743,7 @@ export interface Scenario {
   scenario_communications_number?: number;
   /** @format date-time */
   scenario_created_at: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_documents?: string[];
   scenario_exercises?: string[];
@@ -4738,6 +4798,7 @@ export interface ScenarioChallengesReader {
 
 export interface ScenarioInput {
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
@@ -4886,6 +4947,7 @@ export interface SimulationDetails {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   /** @format date-time */
   exercise_end_date?: string;
@@ -5246,6 +5308,12 @@ export interface TeamTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface TeamUpdateInput {
@@ -5297,6 +5365,7 @@ export interface UpdateAssetsOnAssetGroupInput {
 export interface UpdateExerciseInput {
   apply_tag_rule?: boolean;
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -5331,6 +5400,7 @@ export interface UpdateProfileInput {
 export interface UpdateScenarioInput {
   apply_tag_rule?: boolean;
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;

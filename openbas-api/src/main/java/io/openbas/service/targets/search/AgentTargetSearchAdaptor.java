@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final AgentRepository agentRepository;
   private final InjectExpectationService injectExpectationService;
   private final SearchSpecificationUtils<Agent> specificationUtils;
@@ -116,6 +117,7 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
       switch (result.type()) {
         case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
         case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
+        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
         case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
       }
     }

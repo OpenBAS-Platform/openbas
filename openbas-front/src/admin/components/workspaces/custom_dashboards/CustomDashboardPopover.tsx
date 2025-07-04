@@ -22,6 +22,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
   const initialValues = {
     custom_dashboard_name: customDashboard.custom_dashboard_name,
     custom_dashboard_description: customDashboard.custom_dashboard_description ?? '',
+    custom_dashboard_parameters: customDashboard.custom_dashboard_parameters ?? [],
   };
 
   const [modal, setModal] = useState<'edit' | 'delete' | null>(null);

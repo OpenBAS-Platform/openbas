@@ -32,11 +32,11 @@ const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({
     cursor: 'default',
   },
   exercise_global_score: {
-    width: variant === 'reduced-view' ? '16%' : '10%',
+    width: variant === 'reduced-view' ? '18%' : '12%',
     cursor: 'default',
   },
   exercise_tags: {
-    width: variant === 'reduced-view' ? '14%' : '19%',
+    width: variant === 'reduced-view' ? '12%' : '17%',
     cursor: 'default',
   },
   exercise_updated_at: { width: variant === 'reduced-view' ? '12%' : '13%' },

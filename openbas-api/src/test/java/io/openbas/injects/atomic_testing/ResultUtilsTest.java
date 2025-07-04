@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ResultUtilsTest {
+
   @Mock private InjectExpectationRepository injectExpectationRepository;
   @Mock private TeamRepository teamRepository;
   @Mock private UserRepository userRepository;
@@ -61,17 +62,23 @@ class ResultUtilsTest {
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.PREVENTION.toString(), 50.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.PREVENTION.toString(), 0.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.DETECTION.toString(), 100.0, 100.0),
+                createDefaultInjectExpectation(
+                    InjectExpectation.EXPECTATION_TYPE.VULNERABILITY.toString(), 100.0, 100.0),
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0)));
 
@@ -83,12 +90,19 @@ class ResultUtilsTest {
     ExpectationResultsByType expectedDetectionResult =
         createDefaultExpectationResultsByType(
             DETECTION, InjectExpectation.EXPECTATION_STATUS.SUCCESS, 3, 0, 0, 0);
+    ExpectationResultsByType expectedVulnerabilityResult =
+        createDefaultExpectationResultsByType(
+            VULNERABILITY, InjectExpectation.EXPECTATION_STATUS.SUCCESS, 3, 0, 0, 0);
     ExpectationResultsByType expectedHumanResponseResult =
         createDefaultExpectationResultsByType(
             HUMAN_RESPONSE, InjectExpectation.EXPECTATION_STATUS.FAILED, 0, 0, 0, 3);
 
     assertEquals(
-        List.of(expectedPreventionResult, expectedDetectionResult, expectedHumanResponseResult),
+        List.of(
+            expectedPreventionResult,
+            expectedDetectionResult,
+            expectedVulnerabilityResult,
+            expectedHumanResponseResult),
         result);
   }
 }

@@ -36,6 +36,7 @@ public class InjectExpectation implements Base {
     MANUAL,
     PREVENTION,
     DETECTION,
+    VULNERABILITY
   }
 
   public enum EXPECTATION_STATUS {
@@ -244,6 +245,16 @@ public class InjectExpectation implements Base {
       @NotNull final Asset asset,
       @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.DETECTION;
+    this.agent = agent;
+    this.asset = asset;
+    this.assetGroup = assetGroup;
+  }
+
+  public void setVulnerability(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
+    this.type = EXPECTATION_TYPE.VULNERABILITY;
     this.agent = agent;
     this.asset = asset;
     this.assetGroup = assetGroup;

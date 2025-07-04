@@ -2,7 +2,9 @@ package io.openbas.rest.custom_dashboard;
 
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,7 +36,7 @@ public class CustomDashboardApi extends RestBehavior {
   }
 
   @GetMapping
-  public ResponseEntity<List<CustomDashboard>> customDashboards() {
+  public ResponseEntity<List<CustomDashboardOutput>> customDashboards() {
     return ResponseEntity.ok(this.customDashboardService.customDashboards());
   }
 
@@ -66,5 +68,18 @@ public class CustomDashboardApi extends RestBehavior {
       @PathVariable @NotBlank final String customDashboardId) {
     this.customDashboardService.deleteCustomDashboard(customDashboardId);
     return ResponseEntity.noContent().build();
+  }
+
+  // -- OPTION --
+
+  @GetMapping("/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return this.customDashboardService.findAllAsOptions(searchText);
+  }
+
+  @PostMapping("/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return this.customDashboardService.findAllByIdsAsOptions(ids);
   }
 }

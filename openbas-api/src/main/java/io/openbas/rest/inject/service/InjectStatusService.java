@@ -80,6 +80,13 @@ public class InjectStatusService {
   public boolean isAllInjectAgentsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
+    log.info(
+        "[issue/2797] isAllInjectAgentsExecuted "
+            + inject.getId()
+            + " totalCompleteTrace: "
+            + totalCompleteTrace
+            + " agents.size(); "
+            + agents.size());
     return agents.size() == totalCompleteTrace;
   }
 
@@ -136,6 +143,14 @@ public class InjectStatusService {
       if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agent == null || isAllInjectAgentsExecuted(inject))) {
         updateFinalInjectStatus(injectStatus);
+      } else {
+        log.info(
+            "[issue/2797] updateInjectStatuselse injectId: "
+                + inject.getId()
+                + " executionTrace.getAction(): "
+                + executionTrace.getAction()
+                + " agent == null: "
+                + agent);
       }
 
       injectRepository.save(inject);

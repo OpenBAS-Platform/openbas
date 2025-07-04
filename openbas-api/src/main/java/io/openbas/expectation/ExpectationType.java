@@ -3,7 +3,8 @@ package io.openbas.expectation;
 public enum ExpectationType {
   DETECTION("Detected", "Pending", "Partially Detected", "Not Detected"),
   HUMAN_RESPONSE("Successful", "Pending", "Partial", "Failed"),
-  PREVENTION("Blocked", "Pending", "Partially Prevented", "Not Prevented");
+  PREVENTION("Blocked", "Pending", "Partially Prevented", "Not Prevented"),
+  VULNERABILITY("Not vulnerable", "Pending", "Partially vulnerable", "Vulnerable");
 
   public final String successLabel;
   public final String pendingLabel;

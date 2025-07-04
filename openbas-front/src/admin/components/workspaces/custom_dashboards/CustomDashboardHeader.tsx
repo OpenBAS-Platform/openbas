@@ -1,9 +1,12 @@
 import { Tooltip, Typography } from '@mui/material';
-import { type FunctionComponent, useCallback, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { type FunctionComponent, useCallback, useContext } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type CustomDashboard } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
+import { CustomDashboardContext } from './CustomDashboardContext';
+import CustomDashboardParameters from './CustomDashboardParameters';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -15,34 +18,45 @@ const useStyles = makeStyles()(() => ({
   rightAligned: { justifySelf: 'end' },
 }));
 
-interface Props { customDashboard: CustomDashboard }
-
-const CustomDashboardHeader: FunctionComponent<Props> = ({ customDashboard }) => {
+const CustomDashboardHeader: FunctionComponent = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const theme = useTheme();
 
-  const [currentCustomDashboard, setCustomDashboard] = useState(customDashboard);
+  const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
 
   const handleUpdate = useCallback(
-    (customDashboard: CustomDashboard) => {
+    (currentCustomDashboard: CustomDashboard) => {
       setCustomDashboard({
-        ...currentCustomDashboard,
         ...customDashboard,
+        ...currentCustomDashboard,
       });
     },
     [],
   );
 
+  if (!customDashboard) {
+    return <></>;
+  }
+
   return (
     <div className={classes.container}>
-      <Tooltip title={currentCustomDashboard.custom_dashboard_name}>
-        <Typography variant="h1" style={{ margin: 0 }}>
-          {truncate(currentCustomDashboard.custom_dashboard_name, 80)}
-        </Typography>
-      </Tooltip>
+      <div style={{
+        display: 'flex',
+        gap: theme.spacing(2),
+        alignItems: 'center',
+      }}
+      >
+        <Tooltip title={customDashboard.custom_dashboard_name}>
+          <Typography variant="h1" style={{ margin: 0 }}>
+            {truncate(customDashboard.custom_dashboard_name, 80)}
+          </Typography>
+        </Tooltip>
+        <CustomDashboardParameters />
+      </div>
       <div className={classes.rightAligned}>
         <CustomDashboardPopover
-          customDashboard={currentCustomDashboard}
+          customDashboard={customDashboard}
           onUpdate={handleUpdate}
         />
       </div>

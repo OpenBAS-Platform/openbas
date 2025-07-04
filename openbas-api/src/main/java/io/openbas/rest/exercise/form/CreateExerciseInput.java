@@ -19,6 +19,9 @@ public class CreateExerciseInput extends ExerciseInput {
   @FutureOrPresent(message = NOW_FUTURE_MESSAGE)
   private Instant start;
 
+  @JsonProperty("exercise_custom_dashboard")
+  private String customDashboard;
+
   public Instant getStart() {
     return start != null ? start.truncatedTo(ChronoUnit.MINUTES) : null;
   }

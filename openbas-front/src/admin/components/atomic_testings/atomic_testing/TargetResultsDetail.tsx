@@ -740,7 +740,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         {emptyFilled(getLabelOfValidationType(injectExpectation))}
                       </div>
                     </div>
-                    {isTechnicalExpectation(injectExpectation.inject_expectation_type) && (
+                    {isTechnicalExpectation(injectExpectation.inject_expectation_type) && injectExpectation.inject_expectation_type !== 'VULNERABILITY' && (
                       <TableContainer>
                         <Table
                           size="small"
