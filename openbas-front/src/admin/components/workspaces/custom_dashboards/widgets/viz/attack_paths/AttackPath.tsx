@@ -193,7 +193,7 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
     const newAttackPathsEdges: Edge[] = [];
     let newSimulationDatesEdge: Edge = {} as Edge;
     const newNodes: Node[] = [];
-    const maxXIndex = resolvededDataByKillChainPhase.length - 1;
+    const maxXIndex = resolvededDataByKillChainPhase ? resolvededDataByKillChainPhase.length - 1 : 1;
     let maxYIndex = 0;
 
     resolvededDataByKillChainPhase.forEach((phase, phaseIndex) => {
