@@ -452,7 +452,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
@@ -526,7 +526,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
@@ -589,7 +589,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
