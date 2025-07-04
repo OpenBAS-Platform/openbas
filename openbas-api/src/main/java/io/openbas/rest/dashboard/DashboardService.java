@@ -9,10 +9,14 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.engine.api.*;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
+import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
+import io.openbas.service.EsAttackPathService;
 import io.openbas.service.EsService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DashboardService {
 
+  private final EsAttackPathService esAttackPathService;
   private final EsService esService;
   private final UserRepository userRepository;
 
@@ -74,6 +79,16 @@ public class DashboardService {
     ListRuntime runtime = new ListRuntime(config, parameters, definitionParameters);
 
     return esService.entities(userWithAuth, runtime);
+  }
+
+  public List<EsAttackPath> attackPaths(@NotNull final Widget widget)
+      throws ExecutionException, InterruptedException {
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
+    StructuralHistogramRuntime runtime =
+        new StructuralHistogramRuntime(config, new HashMap<>(), new HashMap<>());
+
+    return esAttackPathService.attackPaths(userWithAuth, runtime);
   }
 
   /**

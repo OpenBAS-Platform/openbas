@@ -7,19 +7,10 @@ import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
-import io.openbas.database.raw.RawUserAuth;
-import io.openbas.database.repository.UserRepository;
-import io.openbas.engine.api.*;
-import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.service.EsAttackPathService;
-import io.openbas.service.EsService;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -36,8 +27,6 @@ public class DashboardApi extends RestBehavior {
 
   private final WidgetService widgetService;
   private final DashboardService dashboardService;
-  private final EsAttackPathService esAttackPathService;
-  private final UserRepository userRepository;
 
   @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(
@@ -69,12 +58,7 @@ public class DashboardApi extends RestBehavior {
   public List<EsAttackPath> attackPaths(@PathVariable final String widgetId)
       throws ExecutionException, InterruptedException {
     Widget widget = this.widgetService.widget(widgetId);
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-
-    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
-    StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config);
-
-    return esAttackPathService.attackPaths(userWithAuth, runtime);
+    return this.dashboardService.attackPaths(widget);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

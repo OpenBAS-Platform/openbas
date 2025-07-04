@@ -86,7 +86,9 @@ public class EsAttackPathService {
     Map<String, List<String>> filterMap = Map.of("base_simulation_side", List.of(simulationId));
     ListConfiguration config = esService.createListConfiguration("inject", filterMap);
 
-    return esService.entities(user, new ListRuntime(config, new HashMap<>())).stream()
+    return esService
+        .entities(user, new ListRuntime(config, new HashMap<>(), new HashMap<>()))
+        .stream()
         .filter(EsInject.class::isInstance)
         .map(EsInject.class::cast)
         .toList();
