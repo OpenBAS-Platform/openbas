@@ -154,7 +154,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     type: '',
     key: 'attack-ended',
   }];
-  const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
+  const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
