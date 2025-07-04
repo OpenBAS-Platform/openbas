@@ -4,11 +4,15 @@ import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.payload.form.DetectionRemediationOutput;
 import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
 import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
 import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
@@ -25,16 +29,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class PayloadMapper {
 
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
   private final ApplicationContext context;
 
   public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
 
-    if (inject.isEmpty()) return null;
+    if (inject.isEmpty()) {
+      return null;
+    }
 
     Inject injectObj = inject.get();
     Optional<InjectorContract> injectorContractOpt = injectObj.getInjectorContract();
-    if (injectorContractOpt.isEmpty() || injectorContractOpt.get().getPayload() == null)
+    if (injectorContractOpt.isEmpty() || injectorContractOpt.get().getPayload() == null) {
       return null;
+    }
 
     InjectorContract injectorContract = injectorContractOpt.get();
     StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
@@ -226,5 +235,29 @@ public class PayloadMapper {
         .name(attackPattern.getName())
         .externalId(attackPattern.getExternalId())
         .build();
+  }
+
+  public List<DetectionRemediationOutput> toDetectionRemediationOutputs(
+      List<DetectionRemediation> detectionRemediations) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return detectionRemediations.stream()
+          .map(detectionRemediation -> toDetectionRemediationOutput(detectionRemediation))
+          .toList();
+    } else {
+      log.debug("Enterprise Edition license inactive - omitting remediation information");
+      return emptyList();
+    }
+  }
+
+  private DetectionRemediationOutput toDetectionRemediationOutput(
+      DetectionRemediation detectionRemediation) {
+    DetectionRemediationOutput output =
+        DetectionRemediationOutput.builder()
+            .id(detectionRemediation.getId())
+            .payloadId(detectionRemediation.getPayload().getId())
+            .collectorId(detectionRemediation.getCollector().getId())
+            .values(detectionRemediation.getValues())
+            .build();
+    return output;
   }
 }

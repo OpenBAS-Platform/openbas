@@ -1,5 +1,6 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.DetectionRemediation;
 import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -35,4 +36,15 @@ public interface PayloadRepository
   void setPayloadStatusByExternalIds(
       @Param("payloadStatus") String payloadStatus,
       @Param("payloadExternalIds") List<String> payloadExternalIds);
+
+  @Query(
+      """
+    SELECT dr
+    FROM Inject inj
+    JOIN inj.injectorContract ic
+    JOIN ic.payload p
+    JOIN DetectionRemediation dr ON dr.payload = p
+    WHERE inj.id = :injectId
+""")
+  List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId);
 }
