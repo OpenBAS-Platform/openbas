@@ -52,12 +52,15 @@ const ListWidgetParameters = (props: Props) => {
         response.data,
         props.widgetType);
       setPropertySelection(finalOptions);
-      const newCols = finalOptions.map((d) => {
-        return {
-          attribute: d.id,
-          label: d.label,
-        };
-      });
+      const newCols = finalOptions
+      // we will hide all "side" columns unless it is the tags column
+        .filter(o => !o.id.endsWith('_side') || o.id === 'base_tags_side')
+        .map((d) => {
+          return {
+            attribute: d.id,
+            label: d.label,
+          };
+        });
       setEntityColumns(newCols.toSorted((a, b) => a.label.localeCompare(b.label)));
 
       if (!columns) {
@@ -125,6 +128,25 @@ const ListWidgetParameters = (props: Props) => {
           >
             {['ASC', 'DESC'].map(dir => <MenuItem key={dir} value={dir}>{t(dir)}</MenuItem>)}
           </TextField>
+        )}
+      />
+      <Controller
+        control={props.control}
+        name="widget_config.limit"
+        render={({ field, fieldState }) => (
+          <TextField
+            {...field}
+            variant="standard"
+            fullWidth
+            type="number"
+            label={t('Number of results')}
+            sx={{ mt: 2 }}
+            value={field.value ?? 100}
+            onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+            error={!!fieldState.error}
+            helperText={fieldState.error?.message}
+            required
+          />
         )}
       />
       <Controller
