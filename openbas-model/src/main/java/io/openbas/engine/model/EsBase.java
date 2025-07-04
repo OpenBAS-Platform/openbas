@@ -10,6 +10,7 @@ import io.openbas.engine.model.finding.EsFinding;
 import io.openbas.engine.model.inject.EsInject;
 import io.openbas.engine.model.injectexpectation.EsInjectExpectation;
 import io.openbas.engine.model.scenario.EsScenario;
+import io.openbas.engine.model.simulation.EsSimulation;
 import io.openbas.engine.model.tag.EsTag;
 import io.openbas.engine.model.vulnerableendpoint.EsVulnerableEndpoint;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
@@ -31,6 +32,7 @@ import lombok.Setter;
       EsInject.class,
       EsInjectExpectation.class,
       EsScenario.class,
+      EsSimulation.class,
       EsTag.class,
       EsVulnerableEndpoint.class,
     },
@@ -40,6 +42,7 @@ import lombok.Setter;
       @DiscriminatorMapping(value = "finding", schema = EsFinding.class),
       @DiscriminatorMapping(value = "inject", schema = EsInject.class),
       @DiscriminatorMapping(value = "expectation-inject", schema = EsInjectExpectation.class),
+      @DiscriminatorMapping(value = "simulation", schema = EsSimulation.class),
       @DiscriminatorMapping(value = "scenario", schema = EsScenario.class),
       @DiscriminatorMapping(value = "tag", schema = EsTag.class),
       @DiscriminatorMapping(value = "vulnerable-endpoint", schema = EsVulnerableEndpoint.class),
