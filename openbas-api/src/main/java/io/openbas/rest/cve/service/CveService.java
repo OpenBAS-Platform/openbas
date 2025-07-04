@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,7 +39,7 @@ public class CveService {
 
   public Cve createCve(final @Valid CveCreateInput input) {
     final Cve cve = new Cve();
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
     }
     cve.setUpdateAttributes(input);
@@ -55,10 +56,12 @@ public class CveService {
 
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
     final Cve existingCve = findById(cveId);
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
+      BeanUtils.copyProperties(input, existingCve, "remediation");
+    } else {
+      existingCve.setUpdateAttributes(input);
     }
-    existingCve.setUpdateAttributes(input);
     updateCweAssociations(existingCve, input.getCwes());
     return cveRepository.save(existingCve);
   }
@@ -77,10 +80,6 @@ public class CveService {
 
   public void deleteById(final String cveId) {
     cveRepository.deleteById(cveId);
-  }
-
-  private boolean isEnterpriseLicenseInactive() {
-    return !eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo());
   }
 
   private void updateCweAssociations(Cve cve, List<CweInput> cweInputs) {

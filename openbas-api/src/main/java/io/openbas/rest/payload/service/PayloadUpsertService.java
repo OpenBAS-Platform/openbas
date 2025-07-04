@@ -4,8 +4,10 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,8 @@ public class PayloadUpsertService {
   private final PayloadUtils payloadUtils;
 
   private final PayloadService payloadService;
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final TagRepository tagRepository;
   private final AttackPatternRepository attackPatternRepository;
@@ -32,6 +36,10 @@ public class PayloadUpsertService {
   @Transactional(rollbackOn = Exception.class)
   public Payload upsertPayload(PayloadUpsertInput input) {
     Optional<Payload> payload = payloadRepository.findByExternalId(input.getExternalId());
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      input.setDetectionRemediations(null);
+    }
+
     if (payload.isPresent()) {
       Payload existingPayload = payload.get();
       if (input.getCollector() != null) {

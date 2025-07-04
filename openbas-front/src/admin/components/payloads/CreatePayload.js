@@ -48,7 +48,6 @@ class CreatePayload extends Component {
       }
       return null;
     }
-
     const inputValues = R.pipe(
       R.assoc('payload_source', 'MANUAL'),
       R.assoc('payload_status', 'VERIFIED'),
@@ -58,6 +57,11 @@ class CreatePayload extends Component {
       R.assoc('executable_file', data.executable_file?.id),
       R.assoc('payload_cleanup_executor', handleCleanupExecutorValue(data.payload_cleanup_executor, data.payload_cleanup_command)),
       R.assoc('payload_cleanup_command', handleCleanupCommandValue(data.payload_cleanup_command)),
+      R.assoc('payload_detection_remediations', Object.entries(data.remediations).filter(value => value[1]).map(value => ({
+        detection_remediation_collector: value[0],
+        detection_remediation_values: value[1].content,
+        detection_remediation_id: value[1].remediationId,
+      }))),
     )(data);
     return this.props
       .addPayload(inputValues)
