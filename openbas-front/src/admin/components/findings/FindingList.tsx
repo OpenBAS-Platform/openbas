@@ -4,6 +4,7 @@ import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import Drawer from '../../../components/common/Drawer';
 import { initSorting, type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -15,7 +16,7 @@ import FindingIcon from '../../../components/FindingIcon';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type AggregatedFindingOutput, type RelatedFindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
-import FindingDrawerDetail from './FindingDrawerDetail';
+import FindingDetail from './FindingDetail';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -157,18 +158,27 @@ const FindingList = ({ searchFindings, searchDistinctFindings, filterLocalStorag
           </ListItem>
         ))}
       </List>
-      {selectedFinding?.finding_value && (
-        <FindingDrawerDetail
-          selectedFinding={selectedFinding}
-          setSelectedFinding={setSelectedFinding}
-          setCvssScore={setCvssScore}
-          cvssScore={cvssScore}
-          contextId={contextId}
-          searchFindings={searchFindings}
-          additionalHeaders={additionalHeaders}
-          additionalFilterNames={additionalFilterNames}
-        />
-      )}
+      <Drawer
+        open={!!selectedFinding}
+        handleClose={() => {
+          setSelectedFinding(null);
+          setCvssScore(null);
+        }}
+        title={selectedFinding?.finding_value || ''}
+        additionalTitle={cvssScore ? 'CVSS' : undefined}
+        additionalChipLabel={cvssScore?.toFixed(1)}
+      >
+        {selectedFinding && (
+          <FindingDetail
+            selectedFinding={selectedFinding}
+            searchFindings={searchFindings}
+            contextId={contextId}
+            additionalHeaders={additionalHeaders}
+            additionalFilterNames={additionalFilterNames}
+            onCvssScore={setCvssScore}
+          />
+        )}
+      </Drawer>
     </>
   );
 };

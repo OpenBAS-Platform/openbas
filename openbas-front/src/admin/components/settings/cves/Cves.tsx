@@ -162,21 +162,20 @@ const Cves = () => {
         <CreateCve
           onCreate={(result: CveSimple) => setCves([result, ...cves])}
         />
-        {selectedCve && (
-          <Drawer
-            open
-            handleClose={() => setSelectedCve(null)}
-            title={selectedCve.cve_external_id}
-            additionalTitle={selectedCve.cve_cvss ? 'CVSS' : undefined}
-            additionalChipLabel={selectedCve.cve_cvss.toFixed(1)}
-          >
-            {selectedCve && (
-              <CveDetail
-                selectedCve={selectedCve}
-              />
-            )}
-          </Drawer>
-        )}
+        <Drawer
+          open={!!selectedCve}
+          handleClose={() => setSelectedCve(null)}
+          title={selectedCve?.cve_external_id || ''}
+          additionalTitle={selectedCve?.cve_cvss ? 'CVSS' : undefined}
+          additionalChipLabel={selectedCve?.cve_cvss.toFixed(1)}
+        >
+          {selectedCve && (
+            <CveDetail
+              selectedCve={selectedCve}
+            />
+          )}
+        </Drawer>
+        )
       </div>
       <TaxonomiesMenu />
     </div>
