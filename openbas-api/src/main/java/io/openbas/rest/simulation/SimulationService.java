@@ -29,7 +29,8 @@ public class SimulationService {
    */
   public List<Option> findAllAsOptions(final String searchText) {
     Pageable pageable =
-        PageRequest.of(PAGE_NUMBER_OPTION, PAGE_SIZE_OPTION, Sort.by(Sort.Direction.ASC, "name", "createdAt"));
+        PageRequest.of(
+            PAGE_NUMBER_OPTION, PAGE_SIZE_OPTION, Sort.by(Sort.Direction.ASC, "name", "createdAt"));
     return fromIterable(exerciseRepository.findAll(byName(searchText), pageable)).stream()
         .map(i -> new Option(i.getId(), i.getName()))
         .toList();
