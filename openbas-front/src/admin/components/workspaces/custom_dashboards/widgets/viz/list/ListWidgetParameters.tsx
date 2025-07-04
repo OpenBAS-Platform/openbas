@@ -53,6 +53,8 @@ const ListWidgetParameters = (props: Props) => {
         props.widgetType);
       setPropertySelection(finalOptions);
       const newCols = finalOptions
+      // we will hide all "side" columns unless it is the tags column
+        .filter(o => !o.id.endsWith('_side') || o.id === 'base_tags_side')
         .map((d) => {
           return {
             attribute: d.id,
