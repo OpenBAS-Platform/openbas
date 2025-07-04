@@ -1,6 +1,7 @@
 package io.openbas.service;
 
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.engine.api.ListConfiguration;
@@ -36,12 +37,20 @@ public class EsAttackPathService {
    * @throws ExecutionException
    * @throws InterruptedException
    */
-  public List<EsAttackPath> attackPaths(RawUserAuth user, StructuralHistogramRuntime runtime)
+  public List<EsAttackPath> attackPaths(
+      RawUserAuth user,
+      StructuralHistogramRuntime runtime,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters)
       throws ExecutionException, InterruptedException {
+    //
+
     String simulationId = extractSimulationIdFromSeriesFilter(runtime);
 
     CompletableFuture<List<EsInject>> simulationEsInjectsFuture =
-        CompletableFuture.supplyAsync(() -> fetchSimulationInjectsFromES(user, simulationId));
+        CompletableFuture.supplyAsync(
+            () ->
+                fetchSimulationInjectsFromES(user, simulationId, parameters, definitionParameters));
     CompletableFuture<List<EsSeries>> simulationSeriesFuture =
         CompletableFuture.supplyAsync(() -> esService.multiTermHistogram(user, runtime));
 
@@ -82,12 +91,16 @@ public class EsAttackPathService {
    * @param simulationId the ID of the simulation for which injects are to be fetched
    * @return a list of EsInject objects associated with the simulation
    */
-  private List<EsInject> fetchSimulationInjectsFromES(RawUserAuth user, String simulationId) {
+  private List<EsInject> fetchSimulationInjectsFromES(
+      RawUserAuth user,
+      String simulationId,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
     Map<String, List<String>> filterMap = Map.of("base_simulation_side", List.of(simulationId));
     ListConfiguration config = esService.createListConfiguration("inject", filterMap);
 
     return esService
-        .entities(user, new ListRuntime(config, new HashMap<>(), new HashMap<>()))
+        .entities(user, new ListRuntime(config, parameters, definitionParameters))
         .stream()
         .filter(EsInject.class::isInstance)
         .map(EsInject.class::cast)

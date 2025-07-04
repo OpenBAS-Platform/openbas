@@ -186,7 +186,7 @@ const WidgetForm: FunctionComponent<Props> = ({
               value={value}
               onChange={onChange}
               onSubmit={nextStep}
-              isFilterableBySimulation={widgetType === 'attack-path'}
+              isSimulationFilterMandatory={widgetType === 'attack-path'}
             />
           )}
         />

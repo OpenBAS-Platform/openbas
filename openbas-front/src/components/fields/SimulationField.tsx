@@ -1,22 +1,29 @@
 import { Autocomplete, Checkbox, TextField, Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 
+import type { GroupOption, Option } from '../../utils/Option';
 import { SIMULATIONS } from '../common/queryable/filter/constants';
 import useSearchOptions from '../common/queryable/filter/useSearchOptions';
 import { useFormatter } from '../i18n';
 
 interface Props {
   label: string;
+  className?: string;
   value: string | undefined;
   onChange: (value: string | undefined) => void;
+  required?: boolean;
+  error?: boolean;
+  defaultOptions?: GroupOption[];
 }
 
-const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) => {
+const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
   const { t } = useFormatter();
+  const theme = useTheme();
 
   const { options, searchOptions } = useSearchOptions();
   useEffect(() => {
-    searchOptions(SIMULATIONS, '');
+    searchOptions(SIMULATIONS, '', '', defaultOptions);
   }, []);
 
   const [currentValue, setCurrentValue] = useState<string | undefined>(value);
@@ -39,6 +46,8 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) =
   return (
     <Autocomplete
       selectOnFocus
+      className={className}
+      groupBy={(option: GroupOption | Option) => 'group' in option ? option.group : ''}
       openOnFocus
       autoHighlight
       noOptionsText={t('No available options')}
@@ -58,9 +67,11 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) =
       renderInput={paramsInput => (
         <TextField
           {...paramsInput}
+          error={error}
           label={label}
           variant="outlined"
           size="small"
+          required={required}
         />
       )}
       renderOption={(props, option) => {
@@ -85,7 +96,7 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange }) =
               }}
             >
               <Checkbox checked={checked} />
-              <span style={{ padding: '0 4px 0 4px' }}>{option.label}</span>
+              <span style={{ padding: `0 ${theme.spacing(1)} 0 ${theme.spacing(1)}` }}>{option.label}</span>
             </li>
           </Tooltip>
         );

@@ -31,7 +31,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const { customDashboardParameters } = useContext(CustomDashboardContext);
 
   const fetchData = <T extends EsSeries | EsBase | EsAttackPath>(
-    fetchFunction: (id: string) => Promise<{ data: T[] }>,
+    fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T[] }>,
     setData: React.Dispatch<React.SetStateAction<T[]>>,
   ) => {
     fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {

@@ -54,11 +54,18 @@ public class DashboardApi extends RestBehavior {
     return this.dashboardService.entities(widget, parameters, definitionParameters);
   }
 
-  @GetMapping(DASHBOARD_URI + "/attack-paths/{widgetId}")
-  public List<EsAttackPath> attackPaths(@PathVariable final String widgetId)
+  @PostMapping(DASHBOARD_URI + "/attack-paths/{widgetId}")
+  public List<EsAttackPath> attackPaths(
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters)
       throws ExecutionException, InterruptedException {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
     Widget widget = this.widgetService.widget(widgetId);
-    return this.dashboardService.attackPaths(widget);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.attackPaths(widget, parameters, definitionParameters);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

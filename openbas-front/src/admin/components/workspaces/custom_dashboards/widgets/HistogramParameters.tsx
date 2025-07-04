@@ -19,10 +19,10 @@ type Props = {
   widgetType: Widget['widget_type'];
   control: Control<WidgetInputWithoutLayout>;
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
-  hideLimitField?: boolean;
+  showOnlyTitle?: boolean;
 };
 
-const HistogramParameters = ({ widgetType, control, setValue, hideLimitField = false }: Props) => {
+const HistogramParameters = ({ widgetType, control, setValue, showOnlyTitle = false }: Props) => {
 // Standard hooks
   const { t } = useFormatter();
 
@@ -38,7 +38,7 @@ const HistogramParameters = ({ widgetType, control, setValue, hideLimitField = f
   const entities = series.map(v => getBaseEntities(v.filter)).flat();
 
   // -- HANDLE MODE --
-  const availableModes = getAvailableModes(widgetType);
+  const availableModes = showOnlyTitle ? [] : getAvailableModes(widgetType);
   useEffect(() => {
     if (availableModes.length === 1) {
       setValue('widget_config.mode', availableModes[0]); // If only one mode is available, hide the field and set it automatically
@@ -63,6 +63,9 @@ const HistogramParameters = ({ widgetType, control, setValue, hideLimitField = f
   const [fieldOptions, setFieldOptions] = useState<GroupOption[]>([]);
 
   useEffect(() => {
+    if (showOnlyTitle) {
+      return;
+    }
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
       const finalOptions = getEntityPropertiesListOptions(
         response.data,
@@ -144,7 +147,7 @@ const HistogramParameters = ({ widgetType, control, setValue, hideLimitField = f
             }}
           />
         )}
-      {mode === 'structural' && !hideLimitField && (
+      {mode === 'structural' && (
         <Controller
           control={control}
           name="widget_config.limit"

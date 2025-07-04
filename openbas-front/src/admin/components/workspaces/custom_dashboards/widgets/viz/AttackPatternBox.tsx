@@ -69,7 +69,7 @@ const AttackPatternBox: FunctionComponent<{
         >
           {attackPatternName}
         </Typography>
-        {total && total > 0 && (
+        {successRate !=null && total && total > 0 && (
           <Typography sx={{
             textAlign: 'right',
             fontSize: theme.typography.h3.fontSize,

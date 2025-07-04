@@ -10,6 +10,6 @@ export const entities = (widgetId: string, parameters: Record<string, string | u
   return simplePostCall(`${DASHBOARD_URI}/entities/${widgetId}`, parameters);
 };
 
-export const attackPaths = (widgetId: string) => {
-  return simpleCall(`${DASHBOARD_URI}/attack-paths/${widgetId}`);
+export const attackPaths = (widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${DASHBOARD_URI}/attack-paths/${widgetId}`, parameters);
 };

@@ -1,13 +1,16 @@
 import { ShieldOutlined, type SvgIconComponent, TrackChangesOutlined } from '@mui/icons-material';
 import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useState } from 'react';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import ExerciseField from '../../../../../components/fields/ExerciseField';
+import SimulationField from '../../../../../components/fields/SimulationField';
 import { useFormatter } from '../../../../../components/i18n';
+import Loader from '../../../../../components/Loader';
 import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../utils/api-types';
-import { getSeries } from './WidgetUtils';
+import type { GroupOption } from '../../../../../utils/Option';
+import { CustomDashboardContext } from '../CustomDashboardContext';
+import { addSimulationFilterOnSeries, extractGroupOptionsFromCustomDashboardParameters, getSeries } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -45,40 +48,55 @@ interface Props {
   value: DateHistogramSeries[] | StructuralHistogramSeries[];
   onChange: (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => void;
   onSubmit: () => void;
-  isFilterableBySimulation?: boolean;
+  isSimulationFilterMandatory?: boolean;
 }
 
-const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit, isFilterableBySimulation = false }) => {
+const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit, isSimulationFilterMandatory = false }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
   const theme = useTheme();
+  const { customDashboard } = useContext(CustomDashboardContext);
+
   const [simulationId, setSimulationId] = useState<string | undefined>();
+  const [loader, setLoader] = useState<boolean>(true);
+  const [defaultSimulationOptions, setDefaultSimulationOptions] = useState<Map<string, GroupOption[]>>(new Map());
   const [showSimulationError, setShowSimulationError] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isFilterableBySimulation && value.length > 0 && value[0].filter?.filters) {
+    setDefaultSimulationOptions(extractGroupOptionsFromCustomDashboardParameters(customDashboard?.custom_dashboard_parameters ?? []));
+    if (value.length > 0 && value[0].filter?.filters) {
       const simulationId = value[0].filter.filters.find(f => f.key === 'base_simulation_side')?.values?.[0];
       setSimulationId(simulationId);
     }
+    setLoader(false);
   }, []);
 
   const onChangeSeries = (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => {
-    if (isFilterableBySimulation && !simulationId) {
-      // If simulationId is required but not set, we cannot proceed
-      setShowSimulationError(true);
-      return;
-    }
     onChange(series);
-    onSubmit();
+    if (isSimulationFilterMandatory && !simulationId) {
+      setShowSimulationError(true);
+    } else {
+      onSubmit();
+    }
   };
+
+  const onSimulationChange = (simulationId: string | undefined) => {
+    setSimulationId(simulationId);
+    setShowSimulationError(!simulationId);
+    if (simulationId && value?.length > 0) {
+      addSimulationFilterOnSeries(value, simulationId);
+      onChange(value);
+      onSubmit();
+    }
+  };
+
+  if (loader) {
+    return <Loader />;
+  }
 
   return (
     <div className={classes.container}>
-      {isFilterableBySimulation && (
-        // TODO update with Romuald component
-        <ExerciseField required error={showSimulationError} value={simulationId ?? ''} className={classes.allWidth} onChange={simulationId => setSimulationId(simulationId)} />
-      )}
       {perspectives.map((perspective) => {
         const isSelected = value.filter(v => v.filter?.filters?.find(f => f.values?.includes(perspective.type))).length > 0;
         const Icon = perspective.icon();
@@ -101,6 +119,15 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
           </Card>
         );
       })}
+      <SimulationField
+        label={t('Simulation')}
+        required
+        error={showSimulationError}
+        value={simulationId ?? ''}
+        className={classes.allWidth}
+        onChange={onSimulationChange}
+        defaultOptions={defaultSimulationOptions.get('base_simulation_side')}
+      />
     </div>
   );
 };

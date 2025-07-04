@@ -2,6 +2,7 @@ import { AccountTree, List, TableChart } from '@mui/icons-material';
 import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
 import {
+  type CustomDashboardParameters,
   type Exercise,
   type Filter,
   type FilterGroup,
@@ -13,6 +14,7 @@ import {
   type Widget,
   type WidgetInput,
 } from '../../../../../utils/api-types-custom';
+import { createGroupOption, type GroupOption } from '../../../../../utils/Option';
 
 export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;
 export type StepType = ('type' | 'series' | 'parameters');
@@ -111,6 +113,18 @@ export const getWidgetTitle = (widgetTitle: Widget['widget_config']['title'], ty
   return widgetTitle ?? '';
 };
 
+export const extractGroupOptionsFromCustomDashboardParameters = (customDashboardParameters: CustomDashboardParameters[] = []) => {
+  const groupOptionsMap = new Map<string, GroupOption[]>();
+  customDashboardParameters.forEach((p) => {
+    if (p.custom_dashboards_parameter_type === 'simulation') {
+      const items = groupOptionsMap.get('base_simulation_side') ?? [];
+      const option = createGroupOption(p.custom_dashboards_parameter_id, p.custom_dashboards_parameter_name, 'Parameters');
+      if (!items.map(i => i.id).includes(option.id)) groupOptionsMap.set('base_simulation_side', [...items, option]);
+    }
+  });
+  return groupOptionsMap;
+};
+
 // -- FILTERS --
 
 export const BASE_ENTITY_FILTER_KEY = 'base_entity';
@@ -191,4 +205,14 @@ const getFailedSeries: (injectExpectationType: InjectExpectation['inject_expecta
 
 export const getSeries: (injectExpectationType: InjectExpectation['inject_expectation_type'], simulationId?: Exercise['exercise_id']) => StructuralHistogramSeries[] = (injectExpectationType, simulationId) => {
   return [getSuccessSeries(injectExpectationType, simulationId), getFailedSeries(injectExpectationType, simulationId)];
+};
+
+export const addSimulationFilterOnSeries = (series: StructuralHistogramSeries[], simulationId?: Exercise['exercise_id']) => {
+  if (!simulationId) {
+    return series;
+  }
+  series.forEach((s) => {
+    s.filter?.filters?.push(simulationFilter(simulationId));
+  });
+  return series;
 };
