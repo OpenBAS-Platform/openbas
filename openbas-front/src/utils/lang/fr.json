@@ -979,7 +979,7 @@
   "No pending injects in this simulation.": "Aucun stimuli en attente dans cette simulation.",
   "No processed injects in this simulation.": "Aucun stimuli traité dans cette simulation.",
   "No references available.": "Aucune référence disponible.",
-  "No remediation detections available for this collector.": "Aucune détection d'assainissement disponible pour ce collecteur.",
+  "No remediation detections available for this collector.": "Aucune solution de remédiation n’est disponible pour la détection de ce collecteur.",
   "No scheduling": "Pas de planification",
   "No simulation in this platform yet": "Pas encore de simulation sur cette plateforme",
   "No simulations in this platform.": "Aucune simulations dans cette plateforme.",
