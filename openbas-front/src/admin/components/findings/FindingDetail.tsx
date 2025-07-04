@@ -41,7 +41,7 @@ const FindingDetail = ({
 
   const isCVE = selectedFinding.finding_type === 'cve';
   const tabs = isCVE
-    ? ['General', 'Vulnerable Assets', 'Remediation']
+    ? ['General', 'Related Injects', 'Remediation']
     : ['Related Injects'];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -78,51 +78,34 @@ const FindingDetail = ({
   };
 
   const renderTabPanels = () => {
-    if (isCVE) {
-      switch (activeTab) {
-        case 'General':
-          return (
-            <CveTabPanel status={cveStatus} cve={cve}>
-              <GeneralVulnerabilityInfoTab cve={cve!} />
-            </CveTabPanel>
-          );
-        case 'Vulnerable Assets':
-          return (
-            <RelatedInjectsTab
-              searchFindings={searchFindings}
-              contextId={contextId}
-              finding={selectedFinding}
-              additionalHeaders={additionalHeaders}
-              additionalFilterNames={additionalFilterNames}
-            />
-          );
-        case 'Remediation':
-          return isEE
-            ? (
-                <CveTabPanel status={cveStatus} cve={cve}>
-                  <RemediationInfoTab cve={cve!} />
-                </CveTabPanel>
-              )
-            : null;
-        default:
-          return null;
-      }
+    switch (activeTab) {
+      case 'General':
+        return (
+          <CveTabPanel status={cveStatus} cve={cve}>
+            <GeneralVulnerabilityInfoTab cve={cve!} />
+          </CveTabPanel>
+        );
+      case 'Related Injects':
+        return (
+          <RelatedInjectsTab
+            searchFindings={searchFindings}
+            contextId={contextId}
+            finding={selectedFinding}
+            additionalHeaders={additionalHeaders}
+            additionalFilterNames={additionalFilterNames}
+          />
+        );
+      case 'Remediation':
+        return isEE
+          ? (
+              <CveTabPanel status={cveStatus} cve={cve}>
+                <RemediationInfoTab cve={cve!} />
+              </CveTabPanel>
+            )
+          : null;
+      default:
+        return null;
     }
-
-    // Non-CVE
-    if (activeTab === 'Related Injects') {
-      return (
-        <RelatedInjectsTab
-          searchFindings={searchFindings}
-          contextId={contextId}
-          finding={selectedFinding}
-          additionalHeaders={additionalHeaders}
-          additionalFilterNames={additionalFilterNames}
-        />
-      );
-    }
-
-    return null;
   };
 
   return (
