@@ -460,7 +460,6 @@ interface BasePayload {
   /** @format date-time */
   payload_created_at: string;
   payload_description?: string;
-  payload_detection_remediations?: DetectionRemediation[];
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
@@ -504,8 +503,6 @@ interface BasePayloadCreateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
-  /** List of detection remediation gaps for collectors */
-  payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
@@ -1200,37 +1197,6 @@ export type DateHistogramWidget = UtilRequiredKeys<
   start: string;
 };
 
-export interface DetectionRemediation {
-  detection_remediation_collector_id: string;
-  /** @format date-time */
-  detection_remediation_created_at?: string;
-  detection_remediation_id: string;
-  detection_remediation_payload_id: Payload;
-  /** @format date-time */
-  detection_remediation_updated_at?: string;
-  detection_remediation_values: string;
-  listened?: boolean;
-}
-
-/** List of detection remediation gaps for collectors */
-export interface DetectionRemediationInput {
-  /** Collector id */
-  detection_remediation_collector: string;
-  detection_remediation_id?: string;
-  /** Value of detection remediation, for exemple: query for sentinel */
-  detection_remediation_values: string;
-}
-
-export interface DetectionRemediationOutput {
-  /** Collector id */
-  detection_remediation_collector: string;
-  detection_remediation_id?: string;
-  /** Payload id */
-  detection_remediation_payload: string;
-  /** Value of detection remediation, for exemple: query for sentinel */
-  detection_remediation_values: string;
-}
-
 export interface DirectInjectInput {
   inject_content?: object;
   inject_description?: string;
@@ -1560,6 +1526,7 @@ export type EsBase = BaseEsBase &
     | BaseEsBaseBaseEntityMapping<"finding", EsFinding>
     | BaseEsBaseBaseEntityMapping<"inject", EsInject>
     | BaseEsBaseBaseEntityMapping<"expectation-inject", EsInjectExpectation>
+    | BaseEsBaseBaseEntityMapping<"simulation", EsSimulation>
     | BaseEsBaseBaseEntityMapping<"scenario", EsScenario>
     | BaseEsBaseBaseEntityMapping<"tag", EsTag>
     | BaseEsBaseBaseEntityMapping<"vulnerable-endpoint", EsVulnerableEndpoint>
@@ -1699,6 +1666,18 @@ export interface EsSeriesData {
   label?: string;
   /** @format int64 */
   value?: number;
+}
+
+export interface EsSimulation {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
 }
 
 export interface EsTag {
@@ -3288,8 +3267,6 @@ export type ListConfiguration = UtilRequiredKeys<
   "widget_configuration_type"
 > & {
   columns?: string[];
-  /** @format int32 */
-  limit?: number;
   series: ListSeries[];
   sorts?: EngineSortField[];
 };
@@ -4162,8 +4139,6 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
-  /** List of detection remediation gaps for collectors */
-  payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
@@ -4197,8 +4172,6 @@ export interface PayloadUpsertInput {
   payload_cleanup_executor?: string | null;
   payload_collector?: string;
   payload_description?: string;
-  /** List of detection remediation gaps for collectors */
-  payload_detection_remediations?: DetectionRemediationInput[];
   payload_elevation_required?: boolean;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
