@@ -979,7 +979,7 @@
   "No pending injects in this simulation.": "No pending injects in this simulation.",
   "No processed injects in this simulation.": "No processed injects in this simulation.",
   "No references available.": "No references available.",
-  "No remediation detections available for this collector.": "No remediation detections available for this collector.",
+  "No detection rule available for this security platform yet.": "No detection rule available for this security platform yet.",
   "No scheduling": "No scheduling",
   "No simulation in this platform yet": "No simulation in this platform yet",
   "No simulations in this platform.": "No simulations in this platform.",

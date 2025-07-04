@@ -979,7 +979,7 @@
   "No pending injects in this simulation.": "该模拟没有执行中注入.",
   "No processed injects in this simulation.": "该模拟没有已执行注入.",
   "No references available.": "无参考资料。",
-  "No remediation detections available for this collector.": "该收集器无修复检测。",
+  "No detection rule available for this security platform yet.": "这个安全平台还没有可用的检测规则。",
   "No scheduling": "无计划",
   "No simulation in this platform yet": "此平台尚未提供模拟功能",
   "No simulations in this platform.": "该平台中无模拟",

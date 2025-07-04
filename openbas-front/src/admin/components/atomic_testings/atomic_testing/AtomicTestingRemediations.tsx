@@ -115,7 +115,7 @@ const AtomicTestingRemediations = () => {
       <Paper className={classes.paperContainer} variant="outlined">
         {activeCollectorRemediations.length === 0 ? (
           <Typography sx={{ padding: 2 }} variant="body2" color="textSecondary" gutterBottom>
-            {t('No remediation detections available for this collector.')}
+            {t('No detection rule available for this security platform yet.')}
           </Typography>
         ) : (
           activeCollectorRemediations.map((rem) => {
@@ -140,7 +140,7 @@ const AtomicTestingRemediations = () => {
                   </>
                 ) : (
                   <Typography variant="body2" color="textSecondary" gutterBottom>
-                    {t('No remediation detections available for this collector.')}
+                    {t('No detection rule available for this security platform yet.')}
                   </Typography>
                 )}
               </Box>
