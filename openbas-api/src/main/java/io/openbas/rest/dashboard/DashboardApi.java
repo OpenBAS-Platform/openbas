@@ -7,11 +7,13 @@ import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
+import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +52,20 @@ public class DashboardApi extends RestBehavior {
     CustomDashboard customDashboard = widget.getCustomDashboard();
     Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
     return this.dashboardService.entities(widget, parameters, definitionParameters);
+  }
+
+  @PostMapping(DASHBOARD_URI + "/attack-paths/{widgetId}")
+  public List<EsAttackPath> attackPaths(
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters)
+      throws ExecutionException, InterruptedException {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
+    Widget widget = this.widgetService.widget(widgetId);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.attackPaths(widget, parameters, definitionParameters);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

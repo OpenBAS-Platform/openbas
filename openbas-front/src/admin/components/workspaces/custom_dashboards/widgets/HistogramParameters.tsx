@@ -11,7 +11,7 @@ import { type GroupOption } from '../../../../../utils/Option';
 import getEntityPropertiesListOptions from './EntityPropertiesListOptions';
 import {
   getAvailableModes,
-  getBaseEntities,
+  getBaseEntities, getLimit,
   type WidgetInputWithoutLayout,
 } from './WidgetUtils';
 
@@ -19,6 +19,7 @@ type Props = {
   widgetType: Widget['widget_type'];
   control: Control<WidgetInputWithoutLayout>;
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
+  showOnlyTitle?: boolean;
 };
 
 const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
@@ -43,6 +44,8 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
       setValue('widget_config.mode', availableModes[0]); // If only one mode is available, hide the field and set it automatically
     }
   }, []);
+
+  const hasLimit = getLimit(widgetType);
 
   // -- HANDLE widget config type --
   useEffect(() => {
@@ -143,7 +146,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             }}
           />
         )}
-      {mode === 'structural' && widgetType !== 'security-coverage' && (
+      {hasLimit && (
         <Controller
           control={control}
           name="widget_config.limit"

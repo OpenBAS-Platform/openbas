@@ -649,6 +649,41 @@ public class EsService {
     return model.get().getModel();
   }
 
+  /**
+   * Create a list configuration for the given entity name and filter value map.
+   *
+   * @param entityName the name of the entity to filter on
+   * @param filterValueMap a map of filter
+   * @return a ListConfiguration object
+   */
+  public ListConfiguration createListConfiguration(
+      String entityName, Map<String, List<String>> filterValueMap) {
+    // Create filters
+    List<Filters.Filter> filters = new ArrayList<>();
+    filters.add(Filters.Filter.getNewDefaultEqualFilter("base_entity", List.of(entityName)));
+    filterValueMap.forEach((k, v) -> filters.add(Filters.Filter.getNewDefaultEqualFilter(k, v)));
+
+    // Create group filter
+    Filters.FilterGroup filterGroup = Filters.FilterGroup.defaultFilterGroup();
+    filterGroup.setFilters(filters);
+
+    // Create sort configuration
+    EngineSortField engineSortField = new EngineSortField();
+    engineSortField.setFieldName("base_updated_at");
+    engineSortField.setDirection(SortDirection.DESC);
+
+    // Create series
+    ListConfiguration.ListSeries listSeries = new ListConfiguration.ListSeries();
+    listSeries.setName("Attack Paths");
+    listSeries.setFilter(filterGroup);
+
+    // Create list configuration
+    ListConfiguration listConfiguration = new ListConfiguration();
+    listConfiguration.setSorts(List.of(engineSortField));
+    listConfiguration.setSeries(List.of(listSeries));
+    return listConfiguration;
+  }
+
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
     Query query = buildQuery(user, search, filter, new HashMap<>(), new HashMap<>());
     try {

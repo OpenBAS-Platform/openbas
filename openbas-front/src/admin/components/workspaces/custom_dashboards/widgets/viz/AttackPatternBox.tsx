@@ -1,9 +1,8 @@
 import { Button, type Theme, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { FunctionComponent } from 'react';
+import type { CSSProperties, FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { AttackPattern, EsSeriesData } from '../../../../../../utils/api-types';
 import { SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './securityCoverageUtils';
 
 const useStyles = makeStyles()(theme => ({
@@ -22,46 +21,40 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-const getBackgroundColor = (theme: Theme, success: number, failure: number): string | undefined => {
-  const total = success + failure;
-  if (total === 0) return undefined;
-
-  const ratio = success / total;
-
-  if (ratio === 1) return SUCCESS_100_COLOR;
-  if (ratio === 0) return SUCCESS_25_COLOR;
-  if (ratio >= 0.75) return SUCCESS_75_COLOR;
+const getBackgroundColor = (successRate: number | null): string | undefined => {
+  if (successRate == undefined) return undefined;
+  if (successRate === 1) return SUCCESS_100_COLOR;
+  if (successRate === 0) return SUCCESS_25_COLOR;
+  if (successRate >= 0.75) return SUCCESS_75_COLOR;
   return SUCCESS_50_COLOR;
 };
-const getTextColor = (theme: Theme, success: number, failure: number): string | undefined => {
-  if (success === 0 && failure === 0) return theme.typography.h3.color;
+
+const getTextColor = (theme: Theme, total: number): string | undefined => {
+  if (total === 0) return theme.typography.h3.color;
   return theme.palette.common.white;
 };
 
 const AttackPatternBox: FunctionComponent<{
-  showCoveredOnly: boolean;
-  attackPattern: AttackPattern;
-  resolvedDataSuccess: EsSeriesData[];
-  resolvedDataFailure: EsSeriesData[];
-}> = ({ showCoveredOnly, attackPattern, resolvedDataSuccess, resolvedDataFailure }) => {
+  attackPatternName: string;
+  attackPatternExerternalId: string;
+  successRate: number | null;
+  total?: number;
+  style?: CSSProperties;
+}> = ({ attackPatternName, attackPatternExerternalId, successRate = null, total, style = {} }) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
 
-  const success = resolvedDataSuccess.length;
-  const failure = resolvedDataFailure.length;
-  const total = success + failure;
-  const backgroundColor = getBackgroundColor(theme, success, failure);
-  const textColor = getTextColor(theme, success, failure);
-
-  if (resolvedDataSuccess.length === 0 && resolvedDataFailure.length === 0 && showCoveredOnly) {
-    return (<></>);
-  }
+  const backgroundColor = getBackgroundColor(successRate);
+  const textColor = getTextColor(theme, total ?? 0);
 
   return (
     <Button
       aria-haspopup="true"
-      style={{ backgroundColor }}
+      style={{
+        backgroundColor,
+        ...style,
+      }}
       className={classes.button}
       disabled
     >
@@ -71,30 +64,29 @@ const AttackPatternBox: FunctionComponent<{
           color: textColor,
           whiteSpace: 'normal',
           fontSize: theme.typography.h3.fontSize,
+          gridColumn: total && total > 0 ? 'span 1' : 'span 2',
         }}
         >
-          {attackPattern.attack_pattern_name}
+          {attackPatternName}
         </Typography>
-        <Typography sx={{
-          textAlign: 'right',
-          fontSize: theme.typography.h3.fontSize,
-        }}
-        >
-          {total > 0
-            && (
-              <>
-                {resolvedDataSuccess.length}
-                /
-                {total}
-              </>
-            )}
-        </Typography>
+        {successRate != null && total && total > 0 && (
+          <Typography sx={{
+            textAlign: 'right',
+            fontSize: theme.typography.h3.fontSize,
+          }}
+          >
+            {successRate ? successRate * total : 0}
+            /
+            {total}
+          </Typography>
+        )}
         <Typography sx={{
           textAlign: 'left',
           color: textColor,
+          gridColumn: 'span 2',
         }}
         >
-          {attackPattern.attack_pattern_external_id}
+          {attackPatternExerternalId}
         </Typography>
       </div>
     </Button>

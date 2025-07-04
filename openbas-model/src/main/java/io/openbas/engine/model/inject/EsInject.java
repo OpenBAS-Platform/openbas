@@ -27,13 +27,21 @@ public class EsInject extends EsBase {
   @EsQueryable(keyword = true)
   private String base_scenario_side; // Must finish by _side
 
-  @Queryable(label = "simulation")
+  @Queryable(label = "simulation", filterable = true)
   @EsQueryable(keyword = true)
   private String base_simulation_side; // Must finish by _side
 
   @Queryable(label = "attack patterns")
   @EsQueryable(keyword = true)
   private Set<String> base_attack_patterns_side; // Must finish by _side
+
+  @Queryable(label = "inject children")
+  @EsQueryable(keyword = true)
+  private Set<String> base_inject_children_side; // Must finish by _side
+
+  @Queryable(label = "attack patterns children")
+  @EsQueryable(keyword = true)
+  private Set<String> base_attack_patterns_children_side; // Must finish by _side
 
   @Queryable(label = "kill chain phases")
   @EsQueryable(keyword = true)
