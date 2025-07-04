@@ -50,7 +50,12 @@ const ListWidgetParameters = (props: Props) => {
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
       const finalOptions = getEntityPropertiesListOptions(
         response.data,
-        props.widgetType);
+        props.widgetType).map((o) => {
+        return {
+          ...o,
+          label: t(o.label),
+        };
+      });
       setPropertySelection(finalOptions);
       const newCols = finalOptions
       // we will hide all "side" columns unless it is the tags column
