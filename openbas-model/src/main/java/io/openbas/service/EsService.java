@@ -429,6 +429,9 @@ public class EsService {
               .size(0)
               .query(query);
 
+      // Avoid this expectation
+      // co.elastic.clients.elasticsearch._types.ElasticsearchException: [es/search] failed:
+      // [x_content_parse_exception] [1:82] [terms] failed to parse field [size]
       if (widgetConfig.getLimit() > 0) {
         TermsAggregation termsAggregation =
             new TermsAggregation.Builder()

@@ -1,5 +1,7 @@
 package io.openbas.engine.api;
 
+import static io.openbas.config.EngineConfig.Defaults.ENTITIES_CAP;
+
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -15,7 +17,7 @@ public class StructuralHistogramWidget extends HistogramWidget {
 
   public static final String STRUCTURAL_MODE = "structural";
 
-  @Positive private int limit = 100;
+  @Positive private int limit = ENTITIES_CAP;
   @NotNull List<StructuralHistogramSeries> series = new ArrayList<>();
 
   @Data
