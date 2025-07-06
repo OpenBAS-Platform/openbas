@@ -24,6 +24,10 @@ const PayloadArgumentsField = ({ argumentName, canSelectTargetAsset, onArgumentR
     value: 'text',
     label: t('Text'),
   },
+  {
+    value: 'document',
+    label: t('Document'),
+  },
   ...canSelectTargetAsset
     ? [{
         value: 'targeted-asset',
@@ -61,7 +65,7 @@ const PayloadArgumentsField = ({ argumentName, canSelectTargetAsset, onArgumentR
         required
       />
       <TextFieldController name={`${argumentName}.key` as const} label={t('Key')} required />
-      {argumentType == 'text' && (
+      {(argumentType == 'text' || argumentType == 'document') && (
         <TextFieldController
           name={`${argumentName}.default_value` as const}
           label={t('Default Value')}
