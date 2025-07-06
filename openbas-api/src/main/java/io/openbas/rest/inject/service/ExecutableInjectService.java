@@ -107,8 +107,11 @@ public class ExecutableInjectService {
                 injectContent,
                 defaultPayloadArgument != null ? defaultPayloadArgument.getDefaultValue() : "");
         // If arg is a doc, specific handling
-        // We need to resolve the doc name and add special prefix #{location} that will be resolved by the implant
-        boolean isDocArg = defaultPayloadArgument != null && defaultPayloadArgument.getType().equalsIgnoreCase("document");
+        // We need to resolve the doc name and add special prefix #{location} that will be resolved
+        // by the implant
+        boolean isDocArg =
+            defaultPayloadArgument != null
+                && defaultPayloadArgument.getType().equalsIgnoreCase("document");
         if (isDocArg && !value.isEmpty()) {
           try {
             Document doc = documentService.document(value);
