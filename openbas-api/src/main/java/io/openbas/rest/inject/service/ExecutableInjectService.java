@@ -10,6 +10,7 @@ import io.openbas.database.model.*;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.service.PayloadService;
 import jakarta.annotation.Resource;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class ExecutableInjectService {
 
   private final InjectService injectService;
+  private final DocumentService documentService;
   private final InjectStatusService injectStatusService;
   private final PayloadService payloadService;
 
@@ -82,7 +84,7 @@ public class ExecutableInjectService {
     List<String> argumentKeys = getArgumentsFromCommandLines(command);
 
     for (String argumentKey : argumentKeys) {
-      String value = "";
+      String value;
       PayloadArgument defaultPayloadArgument =
           defaultPayloadArguments.stream()
               .filter(a -> a.getKey().equals(argumentKey))
@@ -102,6 +104,12 @@ public class ExecutableInjectService {
                 argumentKey,
                 injectContent,
                 defaultPayloadArgument != null ? defaultPayloadArgument.getDefaultValue() : "");
+        // If arg is a doc, specific handling
+        boolean isDocArg = defaultPayloadArgument != null && defaultPayloadArgument.getType().equalsIgnoreCase("document");
+        if (isDocArg && !value.isEmpty()) {
+          Document doc = documentService.document(value);
+          value = "#{location}/" + doc.getName();
+        }
       }
 
       command = command.replace("#{" + argumentKey + "}", value);
