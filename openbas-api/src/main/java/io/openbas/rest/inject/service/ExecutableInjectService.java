@@ -22,10 +22,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ExecutableInjectService {
 
   private final InjectService injectService;
@@ -104,10 +106,15 @@ public class ExecutableInjectService {
                 injectContent,
                 defaultPayloadArgument != null ? defaultPayloadArgument.getDefaultValue() : "");
         // If arg is a doc, specific handling
+        // We need to resolve the doc name and add special prefix #{location} that will be resolved by the implant
         boolean isDocArg = defaultPayloadArgument != null && defaultPayloadArgument.getType().equalsIgnoreCase("document");
         if (isDocArg && !value.isEmpty()) {
-          Document doc = documentService.document(value);
-          value = "#{location}/" + doc.getName();
+          try {
+            Document doc = documentService.document(value);
+            value = "#{location}/" + doc.getName();
+          } catch (ElementNotFoundException e) {
+            log.error("Payload argument target unexisting document", e);
+          }
         }
       }
 
