@@ -83,7 +83,10 @@ const WidgetForm: FunctionComponent<Props> = ({
       field: z.string().min(1, { message: t('Should not be empty') }),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
-      limit: z.number().optional(),
+      limit: z.number()
+        .min(1, { message: t('Minimum value is 1') })
+        .max(100, { message: t('Maximum value is 100') })
+        .optional(),
       widget_configuration_type: z.literal('structural-histogram'),
       series: z.array(z.object({
         name: z.string().optional(),
@@ -98,7 +101,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         fieldName: z.string(),
       })).optional(),
       limit: z.number()
-        .min(0, { message: t('Minimum value is 0') })
+        .min(1, { message: t('Minimum value is 1') })
         .max(1000, { message: t('Maximum value is 1000') })
         .optional(),
       columns: z.array(z.string()),

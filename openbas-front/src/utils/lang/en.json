@@ -894,6 +894,7 @@
   "Matching type in the xls": "Matching type in the xls",
   "Max attempts exceeded.": "Max attempts exceeded.",
   "Max number of attempts": "Max number of attempts",
+  "Maximum value is 100": "Maximum value is 100",
   "Maximum value is 1000": "Maximum value is 1000",
   "MAYBE_PARTIAL_PREVENTED": "Maybe partial prevented",
   "MAYBE_PREVENTED": "Maybe prevented",
@@ -910,7 +911,6 @@
   "Messages header": "Messages header",
   "Metrics": "Metrics",
   "microblogging": "Microblogging",
-  "Minimum value is 0": "Minimum value is 0",
   "Minutes": "Minutes",
   "Missing content": "Missing content",
   "Missing token": "Missing token",
@@ -1693,5 +1693,6 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY"
+  "YYYY": "YYYY",
+  "Minimum value is 1": "Minimum value is 1"
 }
