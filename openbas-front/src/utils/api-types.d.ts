@@ -3288,7 +3288,10 @@ export type ListConfiguration = UtilRequiredKeys<
   "widget_configuration_type"
 > & {
   columns?: string[];
-  /** @format int32 */
+  /**
+   * @format int32
+   * @min 1
+   */
   limit?: number;
   series: ListSeries[];
   sorts?: EngineSortField[];
@@ -5125,7 +5128,10 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
 > & {
   display_legend?: boolean;
   field: string;
-  /** @format int32 */
+  /**
+   * @format int32
+   * @min 1
+   */
   limit?: number;
   mode: string;
   series: StructuralHistogramSeries[];
