@@ -42,6 +42,7 @@ declare module '@mui/material/styles' {
     chip: PaletteColorOptions;
     ee: PaletteColorOptions;
     ai: PaletteColorOptions;
+    xtmhub: PaletteColorOptions;
   }
   interface Theme {
     logo: string | undefined;

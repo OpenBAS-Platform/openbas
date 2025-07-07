@@ -51,6 +51,7 @@ const ThemeDark = (
       background: hexToRGB(EE_COLOR, 0.2),
       lightBackground: hexToRGB(EE_COLOR, 0.08),
     },
+    xtmhub: { main: '#00f1bd' },
     background: {
       default: background || THEME_DARK_DEFAULT_BACKGROUND,
       paper: paper || THEME_DARK_DEFAULT_PAPER,

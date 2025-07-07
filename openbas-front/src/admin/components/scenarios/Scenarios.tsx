@@ -1,5 +1,5 @@
 import { MovieFilterOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -29,6 +29,7 @@ import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import ScenarioCreation from './ScenarioCreation';
+import ImportFromHubButton from '../common/ImportFromHubButton';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -193,10 +194,13 @@ const Scenarios = () => {
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         topBarButtons={(
-          <ToggleButtonGroup value="fake" exclusive>
-            <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderScenario />
-          </ToggleButtonGroup>
+          <Box display="flex" gap={1}>
+            <ImportFromHubButton serviceIdentifier="obas_scenarios" />
+            <ToggleButtonGroup value="fake" exclusive>
+              <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+              <ImportUploaderScenario />
+            </ToggleButtonGroup>
+          </Box>
         )}
       />
       <List>
