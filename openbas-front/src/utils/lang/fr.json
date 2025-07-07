@@ -535,7 +535,7 @@
   "endpoint_description": "Description",
   "endpoint_hostname": "Nom d'hôte",
   "endpoint_ips": "Addresses IP",
-  "endpoint_is_eol": "Status de fin de vie",
+  "endpoint_is_eol": "Statut de fin de vie",
   "endpoint_mac_addresses": "Adresses MAC",
   "endpoint_name": "Nom",
   "endpoint_platform": "Plateforme",
