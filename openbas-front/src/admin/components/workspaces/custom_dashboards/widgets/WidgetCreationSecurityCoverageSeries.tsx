@@ -84,7 +84,7 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
   const onSimulationChange = (simulationId: string | undefined) => {
     setSimulationId(simulationId);
     setShowSimulationError(!simulationId);
-    if (simulationId && value?.length > 0) {
+    if (simulationId && value?.length > 0 && value[0].filter !== undefined) {
       addSimulationFilterOnSeries(value, simulationId);
       onChange(value);
       onSubmit();
