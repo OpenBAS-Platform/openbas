@@ -58,11 +58,11 @@ public class DetectionRemediationUtils {
       boolean copyId) {
     BeanUtils.copyProperties(input, newDetectionRemediation, "id");
 
-    Collector collector = collectorRepository.findById(input.getCollectorId()).orElseThrow();
+    Collector collector = collectorRepository.findByType(input.getCollectorType()).orElseThrow();
     newDetectionRemediation.setCollector(collector);
 
     if (copyId) {
-      newDetectionRemediation.setId(input.getId());
+      newDetectionRemediation.setId(collector.getId());
     }
   }
 

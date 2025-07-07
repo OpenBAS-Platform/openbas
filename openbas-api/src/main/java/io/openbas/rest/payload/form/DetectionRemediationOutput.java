@@ -14,9 +14,9 @@ public class DetectionRemediationOutput {
   private String id;
 
   @JsonProperty("detection_remediation_collector")
-  @Schema(description = "Collector id")
+  @Schema(description = "Collector type")
   @NotNull
-  private String collectorId;
+  private String collectorType;
 
   @JsonProperty("detection_remediation_payload")
   @Schema(description = "Payload id")

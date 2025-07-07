@@ -1214,7 +1214,7 @@ export interface DetectionRemediation {
 
 /** List of detection remediation gaps for collectors */
 export interface DetectionRemediationInput {
-  /** Collector id */
+  /** Collector type */
   detection_remediation_collector: string;
   detection_remediation_id?: string;
   /** Value of detection remediation, for exemple: query for sentinel */
@@ -1222,7 +1222,7 @@ export interface DetectionRemediationInput {
 }
 
 export interface DetectionRemediationOutput {
-  /** Collector id */
+  /** Collector type */
   detection_remediation_collector: string;
   detection_remediation_id?: string;
   /** Payload id */

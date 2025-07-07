@@ -77,7 +77,7 @@ const AtomicTestingRemediations = () => {
     if (!activeCollector) return [];
 
     return detectionRemediations.filter(
-      rem => rem.detection_remediation_collector === activeCollector.collector_id,
+      rem => rem.detection_remediation_collector === activeCollector.collector_type,
     );
   }, [tabs, activeTab, detectionRemediations]);
 

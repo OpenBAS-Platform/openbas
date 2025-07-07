@@ -71,7 +71,7 @@ const RemediationFormTab = () => {
       </Tabs>
       {tabs.map(tab => (
         <div
-          key={tab.collector_id}
+          key={tab.collector_type}
           style={{
             height: '250px',
             position: 'relative',
@@ -79,7 +79,7 @@ const RemediationFormTab = () => {
           }}
         >
           <Controller
-            name={'remediations.' + tab.collector_id}
+            name={'remediations.' + tab.collector_type}
             control={control}
             defaultValue={{ content: '' }}
             render={({ field: { onChange, value } }) => (

@@ -40,6 +40,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +74,7 @@ public class V1_DataImporter implements Importer {
   private final VariableRepository variableRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final PayloadCreationService payloadCreationService;
+  @Autowired private CollectorRepository collectorRepository;
 
   // endregion
 
@@ -1303,7 +1305,16 @@ public class V1_DataImporter implements Importer {
 
     ArrayNode detectionNodes = (ArrayNode) payloadNode.get("payload_detection_remediations");
     for (JsonNode detectionNode : detectionNodes) {
-      detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+      JsonNode valueNode = detectionNode.get("detection_remediation_values");
+      Optional<Collector> collector =
+          collectorRepository.findByType(
+              detectionNode.get("detection_remediation_collector").textValue());
+
+      if (collector.isPresent()) {
+        if (valueNode == null || valueNode.asText().trim().isEmpty()) {
+          detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+        }
+      }
     }
     return detectionRemediationInputs;
   }
@@ -1311,7 +1322,8 @@ public class V1_DataImporter implements Importer {
   private DetectionRemediationInput buildDetectionRemediationFromJsonNode(JsonNode node) {
     DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
     detectionRemediation.setValues((node.get("detection_remediation_values").textValue()));
-    detectionRemediation.setCollectorId((node.get("detection_remediation_collector").textValue()));
+    detectionRemediation.setCollectorType(
+        (node.get("detection_remediation_collector").textValue()));
     return detectionRemediation;
   }
 
