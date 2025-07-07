@@ -49,7 +49,8 @@ const WidgetCreationSeries: FunctionComponent<{
   series: DateHistogramSeries | StructuralHistogramSeries;
   onChange: (series: DateHistogramSeries | StructuralHistogramSeries) => void;
   onRemove: (index: number) => void;
-}> = ({ index, series, onChange, onRemove }) => {
+  error?: boolean;
+}> = ({ index, series, onChange, onRemove, error }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -164,7 +165,7 @@ const WidgetCreationSeries: FunctionComponent<{
           onChange={e => onChangeLabel(e.target.value)}
         />
         <div style={{ marginTop: theme.spacing(2) }}>
-          <FilterFieldBaseEntity value={entity} onChange={onChangeEntity} />
+          <FilterFieldBaseEntity error={error} value={entity} onChange={onChangeEntity} />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
           <FilterAutocomplete

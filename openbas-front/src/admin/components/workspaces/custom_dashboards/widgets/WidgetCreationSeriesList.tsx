@@ -1,6 +1,7 @@
 import { AddOutlined } from '@mui/icons-material';
 import { Box, Button } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { type FunctionComponent, useState } from 'react';
 
 import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../../components/i18n';
@@ -17,6 +18,8 @@ const WidgetCreationSeriesList: FunctionComponent<{
 }> = ({ widgetType, currentSeries = [], onChange, onSubmit }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const theme = useTheme();
+  const [error, setError] = useState<boolean>(false);
 
   const onChangeSeries = (index: number, series: DateHistogramSeries | StructuralHistogramSeries) => {
     const newDatas = currentSeries.map((data, n) => {
@@ -43,6 +46,15 @@ const WidgetCreationSeriesList: FunctionComponent<{
     ]);
   };
 
+  const handleSubmit = () => {
+    const filteredSeries = currentSeries.filter(series => series.filter !== undefined);
+    if (filteredSeries.length > 0) {
+      onSubmit();
+    } else {
+      setError(true);
+    }
+  };
+
   return (
     <Box marginTop={2}>
       <Box
@@ -57,6 +69,7 @@ const WidgetCreationSeriesList: FunctionComponent<{
               series={series}
               onChange={series => onChangeSeries(index, series)}
               onRemove={handleRemoveSeries}
+              error={error}
             />
           );
         })}
@@ -83,8 +96,8 @@ const WidgetCreationSeriesList: FunctionComponent<{
         <Button
           variant="contained"
           color="primary"
-          sx={{ marginTop: 5 }}
-          onClick={onSubmit}
+          sx={{ marginTop: theme.spacing(2) }}
+          onClick={handleSubmit}
         >
           {t('Validate')}
         </Button>

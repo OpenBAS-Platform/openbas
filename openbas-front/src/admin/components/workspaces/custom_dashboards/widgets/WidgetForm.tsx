@@ -74,7 +74,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       display_legend: z.boolean().optional(),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
     z.object({
@@ -87,7 +87,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       widget_configuration_type: z.literal('structural-histogram'),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
     z.object({
@@ -104,7 +104,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
   ]);
