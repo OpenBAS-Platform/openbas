@@ -214,12 +214,17 @@ export const getSeries: (injectExpectationType: InjectExpectation['inject_expect
   return [getSuccessSeries(injectExpectationType, simulationId), getFailedSeries(injectExpectationType, simulationId)];
 };
 
-export const addSimulationFilterOnSeries = (series: StructuralHistogramSeries[], simulationId?: Exercise['exercise_id']) => {
+export const updateSimulationFilterOnSeries = (series: StructuralHistogramSeries[], simulationId?: Exercise['exercise_id']) => {
   if (!simulationId) {
     return series;
   }
   series.forEach((s) => {
-    s.filter?.filters?.push(simulationFilter(simulationId));
+    const filter = s.filter?.filters?.find(f => f.key === 'base_simulation_side');
+    if (filter) {
+      filter.values = [simulationId];
+    } else {
+      s.filter?.filters?.push(simulationFilter(simulationId));
+    }
   });
   return series;
 };
