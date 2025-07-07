@@ -1,20 +1,16 @@
 package io.openbas.injectors.xtmhub.service;
 
 import io.openbas.injectors.xtmhub.config.XTMHubConfig;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class XTMHubService {
 
-  private XTMHubConfig config;
-
-  @Autowired
-  public void setConfig(XTMHubConfig config) {
-    this.config = config;
-  }
+  private final XTMHubConfig config;
 
   public boolean isEnabled() {
     return config.getEnable() != null && config.getEnable();
