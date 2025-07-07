@@ -10,7 +10,11 @@ import Loader from '../../../../../components/Loader';
 import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../utils/api-types';
 import type { GroupOption } from '../../../../../utils/Option';
 import { CustomDashboardContext } from '../CustomDashboardContext';
-import { addSimulationFilterOnSeries, extractGroupOptionsFromCustomDashboardParameters, getSeries } from './WidgetUtils';
+import {
+  extractGroupOptionsFromCustomDashboardParameters,
+  getSeries,
+  updateSimulationFilterOnSeries,
+} from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -85,7 +89,7 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
     setSimulationId(simulationId);
     setShowSimulationError(!simulationId);
     if (simulationId && value?.length > 0 && value[0].filter !== undefined) {
-      addSimulationFilterOnSeries(value, simulationId);
+      updateSimulationFilterOnSeries(value, simulationId);
       onChange(value);
       onSubmit();
     }
