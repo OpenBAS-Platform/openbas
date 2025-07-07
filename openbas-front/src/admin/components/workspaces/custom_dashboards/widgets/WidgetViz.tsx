@@ -71,7 +71,10 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
         })),
       });
     }
-    return { data: [] };
+    return {
+      name: label,
+      data: [],
+    };
   });
 
   switch (widget.widget_type) {
