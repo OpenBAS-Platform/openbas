@@ -1,5 +1,5 @@
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
-import { AppBar, Badge, Box, GridLegacy, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
+import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -241,8 +241,8 @@ const TopBar: FunctionComponent = () => {
               }}
               >
                 <div className={classes.subtitle}>{t('Filigran eXtended Threat Management')}</div>
-                <GridLegacy container={true} spacing={3}>
-                  <GridLegacy item={true} xs={12}>
+                <Grid container spacing={3}>
+                  <Grid size={12}>
                     <Tooltip title="XTM Hub">
                       <a
                         className={classes.xtmItem}
@@ -264,8 +264,8 @@ const TopBar: FunctionComponent = () => {
                         </Badge>
                       </a>
                     </Tooltip>
-                  </GridLegacy>
-                  <GridLegacy item={true} xs={6}>
+                  </Grid>
+                  <Grid size={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
                       <a
                         className={classes.xtmItem}
@@ -280,8 +280,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenCTI')}</div>
                       </a>
                     </Tooltip>
-                  </GridLegacy>
-                  <GridLegacy item={true} xs={6}>
+                  </Grid>
+                  <Grid size={6}>
                     <Tooltip title={t('Current platform')}>
                       <a className={classes.xtmItemCurrent}>
                         <Badge variant="dot" color="success">
@@ -290,8 +290,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenBAS')}</div>
                       </a>
                     </Tooltip>
-                  </GridLegacy>
-                </GridLegacy>
+                  </Grid>
+                </Grid>
               </Box>
             </Popover>
             <IconButton
