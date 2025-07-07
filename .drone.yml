@@ -2,8 +2,8 @@
 kind: pipeline
 name: openbas-tests
 
-node:
-  env: kubernetes
+#node:
+#  env: kubernetes
 
 steps:
   - name: Runner information
