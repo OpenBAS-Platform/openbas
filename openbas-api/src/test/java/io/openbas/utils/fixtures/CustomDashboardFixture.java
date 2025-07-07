@@ -1,4 +1,4 @@
-package io.openbas.rest.custom_dashboard;
+package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.CustomDashboard;
 

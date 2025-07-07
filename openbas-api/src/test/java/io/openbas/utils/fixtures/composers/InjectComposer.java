@@ -144,6 +144,7 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectRepository.save(inject);
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       expectationComposers.forEach(InjectExpectationComposer.Composer::persist);
+      findingComposers.forEach(FindingComposer.Composer::persist);
       injectDocumentRepository.saveAll(inject.getDocuments());
       return this;
     }
@@ -158,6 +159,7 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::delete);
       teamComposers.forEach(TeamComposer.Composer::delete);
       injectorContractComposer.ifPresent(InjectorContractComposer.Composer::delete);
+      findingComposers.forEach(FindingComposer.Composer::delete);
       expectationComposers.forEach(InjectExpectationComposer.Composer::delete);
       return this;
     }
