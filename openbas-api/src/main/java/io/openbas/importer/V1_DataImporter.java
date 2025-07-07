@@ -22,10 +22,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
-import io.openbas.rest.payload.form.ContractOutputElementInput;
-import io.openbas.rest.payload.form.OutputParserInput;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.RegexGroupInput;
+import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
@@ -216,7 +213,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeAttackPattern -> {
               JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -261,7 +260,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeKillChainPhase -> {
               JsonNode idNode = nodeKillChainPhase.get("phase_external_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -1204,7 +1205,9 @@ public class V1_DataImporter implements Importer {
   private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
       JsonNode payloadNode, Map<String, Base> baseIds) {
     Set<OutputParserInput> outputParserInputs = new HashSet<>();
-    if (!payloadNode.has("payload_output_parsers")) return outputParserInputs;
+    if (!payloadNode.has("payload_output_parsers")) {
+      return outputParserInputs;
+    }
 
     ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
     for (JsonNode outputParserNode : outputParserNodes) {
@@ -1282,12 +1285,34 @@ public class V1_DataImporter implements Importer {
             .collect(Collectors.toSet()));
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
     if (injectorContractFromPayload.isPresent()) {
       return injectorContractFromPayload.get().getId();
     } else {
       log.warn("An error has occurred when importing the payload: {}", payload.getName());
       return null;
     }
+  }
+
+  private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(JsonNode payloadNode) {
+    List<DetectionRemediationInput> detectionRemediationInputs = new ArrayList<>();
+    if (!payloadNode.has("payload_detection_remediations")) {
+      return detectionRemediationInputs;
+    }
+
+    ArrayNode detectionNodes = (ArrayNode) payloadNode.get("payload_detection_remediations");
+    for (JsonNode detectionNode : detectionNodes) {
+      detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+    }
+    return detectionRemediationInputs;
+  }
+
+  private DetectionRemediationInput buildDetectionRemediationFromJsonNode(JsonNode node) {
+    DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
+    detectionRemediation.setValues((node.get("detection_remediation_values").textValue()));
+    detectionRemediation.setCollectorId((node.get("detection_remediation_collector").textValue()));
+    return detectionRemediation;
   }
 
   private void importVariables(
