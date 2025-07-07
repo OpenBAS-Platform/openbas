@@ -1573,6 +1573,7 @@ export type EsBase = BaseEsBase &
     | BaseEsBaseBaseEntityMapping<"finding", EsFinding>
     | BaseEsBaseBaseEntityMapping<"inject", EsInject>
     | BaseEsBaseBaseEntityMapping<"expectation-inject", EsInjectExpectation>
+    | BaseEsBaseBaseEntityMapping<"simulation", EsSimulation>
     | BaseEsBaseBaseEntityMapping<"scenario", EsScenario>
     | BaseEsBaseBaseEntityMapping<"tag", EsTag>
     | BaseEsBaseBaseEntityMapping<"vulnerable-endpoint", EsVulnerableEndpoint>
@@ -1716,6 +1717,18 @@ export interface EsSeriesData {
   label?: string;
   /** @format int64 */
   value?: number;
+}
+
+export interface EsSimulation {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
 }
 
 export interface EsTag {
