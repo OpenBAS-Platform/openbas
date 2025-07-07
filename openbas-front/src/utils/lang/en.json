@@ -909,7 +909,6 @@
   "Messages header": "Messages header",
   "Metrics": "Metrics",
   "microblogging": "Microblogging",
-  "Minimum value is 0": "Minimum value is 0",
   "Minutes": "Minutes",
   "Missing content": "Missing content",
   "Missing token": "Missing token",
@@ -1690,5 +1689,6 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY"
+  "YYYY": "YYYY",
+  "Minimum value is 1": "Minimum value is 1"
 }

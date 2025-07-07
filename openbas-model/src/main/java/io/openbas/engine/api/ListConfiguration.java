@@ -3,6 +3,7 @@ package io.openbas.engine.api;
 import static io.openbas.config.EngineConfig.Defaults.ENTITIES_CAP;
 
 import io.openbas.database.model.Filters;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ public class ListConfiguration extends WidgetConfiguration {
 
   List<EngineSortField> sorts;
 
-  @Positive int limit = ENTITIES_CAP;
+  @Positive
+  @Min(1)
+  int limit = ENTITIES_CAP;
 
   @Data
   public static class ListSeries {
