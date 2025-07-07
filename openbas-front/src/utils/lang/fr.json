@@ -1320,6 +1320,7 @@
   "Severity": "Severité",
   "Sh": "Sh",
   "Shares": "Nombre de partages",
+  "Should at least select one dimension": "Il faut au moins sélectionner une dimension",
   "Should be a valid email address": "Doit être une adresse e-mail valide",
   "Should be a valid XLS file": "Doit être un fichier XLS valide",
   "Should have at least one asset or one asset group": " Doit avoir au moins un actif ou un groupe d'actifs",

@@ -1320,6 +1320,7 @@
   "Severity": "Severity",
   "Sh": "Sh",
   "Shares": "Shares",
+  "Should at least select one dimension": "Should at least select one dimension",
   "Should be a valid email address": "Should be a valid email address",
   "Should be a valid XLS file": "Should be a valid XLS file",
   "Should have at least one asset or one asset group": "Should have at least one asset or one asset group",

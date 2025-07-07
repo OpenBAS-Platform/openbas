@@ -1320,6 +1320,7 @@
   "Severity": "严重性",
   "Sh": "Sh",
   "Shares": "分享",
+  "Should at least select one dimension": "至少应选择一个维度",
   "Should be a valid email address": "应为有效邮件地址",
   "Should be a valid XLS file": "应为有效XLS文件",
   "Should have at least one asset or one asset group": " 应至少拥有一项资产或一个资产组",
