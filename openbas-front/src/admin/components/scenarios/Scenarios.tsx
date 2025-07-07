@@ -25,11 +25,11 @@ import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
 import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
+import ImportFromHubButton from '../common/ImportFromHubButton';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import ScenarioCreation from './ScenarioCreation';
-import ImportFromHubButton from '../common/ImportFromHubButton';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },

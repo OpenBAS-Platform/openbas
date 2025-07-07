@@ -14,36 +14,32 @@ import org.springframework.boot.test.context.SpringBootTest;
 @DisplayName("XTMHubConfig tests")
 public class XTMHubConfigTest {
 
-    @Nested
-    @WithMockXTMHubConfig(enable = true, url = "https://hub.filigran.io")
-    @DisplayName("When XTM Hub is enabled with URL")
-    public class withEnabledXTMHub {
+  @Nested
+  @WithMockXTMHubConfig(enable = true, url = "https://hub.filigran.io")
+  @DisplayName("When XTM Hub is enabled with URL")
+  public class withEnabledXTMHub {
 
-        @Autowired
-        private XTMHubConfig xtmHubConfig;
+    @Autowired private XTMHubConfig xtmHubConfig;
 
-        @Test
-        @DisplayName("returns enabled status and URL")
-        public void shouldReturnEnabledStatusAndUrl() {
-            assertThat(xtmHubConfig.getEnable()).isTrue();
-            assertThat(xtmHubConfig.getUrl()).isEqualTo(
-                "https://hub.filigran.io"
-            );
-        }
+    @Test
+    @DisplayName("returns enabled status and URL")
+    public void shouldReturnEnabledStatusAndUrl() {
+      assertThat(xtmHubConfig.getEnable()).isTrue();
+      assertThat(xtmHubConfig.getUrl()).isEqualTo("https://hub.filigran.io");
     }
+  }
 
-    @Nested
-    @WithMockXTMHubConfig(enable = false)
-    @DisplayName("When XTM Hub is disabled")
-    public class withDisabledXTMHub {
+  @Nested
+  @WithMockXTMHubConfig(enable = false)
+  @DisplayName("When XTM Hub is disabled")
+  public class withDisabledXTMHub {
 
-        @Autowired
-        private XTMHubConfig xtmHubConfig;
+    @Autowired private XTMHubConfig xtmHubConfig;
 
-        @Test
-        @DisplayName("returns disabled status")
-        public void shouldReturnDisabledStatus() {
-            assertThat(xtmHubConfig.getEnable()).isFalse();
-        }
+    @Test
+    @DisplayName("returns disabled status")
+    public void shouldReturnDisabledStatus() {
+      assertThat(xtmHubConfig.getEnable()).isFalse();
     }
+  }
 }

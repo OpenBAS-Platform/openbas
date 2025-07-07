@@ -10,16 +10,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class XTMHubConfig {
 
-    @NotNull
-    private Boolean enable;
+  @NotNull private Boolean enable;
 
-    private String url;
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public String getUrl() {
-        return url;
-    }
+  private String url;
 }

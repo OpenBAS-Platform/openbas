@@ -252,7 +252,15 @@ const TopBar: FunctionComponent = () => {
                         onClick={handleCloseXtm}
                       >
                         <Badge variant="dot" color="success">
-                          <img style={{ width: '100%', paddingRight: 8, paddingLeft: 8 }} src={theme.palette.mode === 'dark' ? xtmhubDark : xtmhubLight} alt="XTM Hub" />
+                          <img
+                            style={{
+                              width: '100%',
+                              paddingRight: 8,
+                              paddingLeft: 8,
+                            }}
+                            src={theme.palette.mode === 'dark' ? xtmhubDark : xtmhubLight}
+                            alt="XTM Hub"
+                          />
                         </Badge>
                       </a>
                     </Tooltip>

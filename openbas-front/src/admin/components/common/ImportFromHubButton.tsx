@@ -1,9 +1,10 @@
-import { useTheme } from "@mui/material/styles";
-import { ButtonProps, Button } from "@mui/material";
-import type { Theme } from "../../../components/Theme";
-import { useFormatter } from "../../../components/i18n";
-import useAuth from "../../../utils/hooks/useAuth";
-import { isNotEmptyField } from "../../../utils/utils";
+import type { ButtonProps } from '@mui/material';
+import { Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+
+import { useFormatter } from '../../../components/i18n';
+import useAuth from '../../../utils/hooks/useAuth';
+import { isNotEmptyField } from '../../../utils/utils';
 
 type ImportFromHubVariant = 'default';
 
@@ -19,7 +20,7 @@ const ImportFromHubButton = ({
   sx,
   ...otherProps
 }: ImportFromHubButtonProps) => {
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { t } = useFormatter();
   const { settings } = useAuth();
 
@@ -47,7 +48,10 @@ const ImportFromHubButton = ({
     return `linear-gradient(99.95deg, ${color1} 0%, ${color2} 100%)`;
   };
 
-  const bgGradientStyle = (opts?: { active?: boolean; hover?: boolean }) => {
+  const bgGradientStyle = (opts?: {
+    active?: boolean;
+    hover?: boolean;
+  }) => {
     const { active = false, hover = false } = opts ?? {};
     let shadowY = 0;
     let blur = 4;
@@ -71,11 +75,11 @@ const ImportFromHubButton = ({
 
   const textGradientStyle = (reverse = false) => {
     return {
-      background: gradient(),
+      'background': gradient(),
       '&:hover': gradient(reverse),
       '&:active': gradient(reverse),
-      color: 'transparent',
-      backgroundClip: 'text',
+      'color': 'transparent',
+      'backgroundClip': 'text',
     };
   };
 
@@ -87,7 +91,7 @@ const ImportFromHubButton = ({
       title={t('Import from Hub')}
       {...otherProps}
       sx={{
-        transition: 'all 0.3s ease-in-out',
+        'transition': 'all 0.3s ease-in-out',
         ...bgGradientStyle(),
         '.text': textGradientStyle(),
         '&:hover': bgGradientStyle({ hover: true }),
