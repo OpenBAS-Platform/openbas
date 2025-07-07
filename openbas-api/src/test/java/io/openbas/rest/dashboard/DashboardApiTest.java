@@ -181,12 +181,12 @@ class DashboardApiTest extends IntegrationTest {
                       .forInject(InjectFixture.getDefaultInject())
                       .withFinding(
                           findingComposer
-                              .forFinding(FindingFixture.createDefaultTextFindingWithRandomValue())
+                              .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
                               .withEndpoint(epWrapper1)
                               .withEndpoint(epWrapper2))
                       .withFinding(
                           findingComposer
-                              .forFinding(FindingFixture.createDefaultTextFindingWithRandomValue())
+                              .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
                               .withEndpoint(epWrapper1)
                               .withEndpoint(epWrapper2)))
               .persist();
@@ -199,7 +199,7 @@ class DashboardApiTest extends IntegrationTest {
                   .forInject(InjectFixture.getDefaultInject())
                   .withFinding(
                       findingComposer
-                          .forFinding(FindingFixture.createDefaultTextFindingWithRandomValue())
+                          .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
                           .withEndpoint(epWrapper3)))
           .persist();
 
