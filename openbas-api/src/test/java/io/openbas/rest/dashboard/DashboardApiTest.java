@@ -264,6 +264,7 @@ class DashboardApiTest extends IntegrationTest {
       assertThatJson(response)
           .node("[1].vulnerable_endpoint_id")
           .isEqualTo(epWrapper1.get().getId());
+      assertThatJson(response).isArray().size().isEqualTo(2);
     }
   }
 }
