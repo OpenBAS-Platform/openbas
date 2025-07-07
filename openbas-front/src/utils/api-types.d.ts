@@ -3764,6 +3764,10 @@ export interface PlatformSettings {
   xtm_opencti_enable?: boolean;
   /** Url of OpenCTI */
   xtm_opencti_url?: string;
+  /** True if connection with XTM Hub is enabled */
+  xtm_hub_enable?: boolean;
+  /** Url of XTM Hub */
+  xtm_hub_url?: string;
 }
 
 export interface PlatformStatistic {

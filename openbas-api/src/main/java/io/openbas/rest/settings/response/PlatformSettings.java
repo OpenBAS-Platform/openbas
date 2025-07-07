@@ -88,6 +88,14 @@ public class PlatformSettings {
   @JsonProperty("xtm_opencti_url")
   @Schema(description = "Url of OpenCTI")
   private String xtmOpenctiUrl;
+  
+  @JsonProperty("xtm_hub_enable")
+  @Schema(description = "True if connection with XTM Hub is enabled")
+  private Boolean xtmHubEnable;
+
+  @JsonProperty("xtm_hub_url")
+  @Schema(description = "Url of XTM Hub")
+  private String xtmHubUrl;
 
   @JsonProperty("telemetry_manager_enable")
   @Schema(description = "True if telemetry manager enable")
