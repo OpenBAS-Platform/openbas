@@ -36,12 +36,14 @@ declare module '@mui/material/styles' {
     chip: PaletteColor;
     ee: PaletteColor;
     ai: PaletteColor;
+    xtmhub: PaletteColor;
     card: { paper: string };
   }
   interface PaletteOptions {
     chip: PaletteColorOptions;
     ee: PaletteColorOptions;
     ai: PaletteColorOptions;
+    xtmhub: PaletteColorOptions;
   }
   interface Theme {
     logo: string | undefined;
