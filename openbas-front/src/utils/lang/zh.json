@@ -534,6 +534,7 @@
   "Endpoint is currently unavailable or you do not have sufficient permissions to access it.": "端点当前不可用，或者您没有足够的权限访问它。",
   "Endpoint Protection": "终端防护",
   "endpoint_arch": "架构",
+  "endpoint_description": "说明",
   "endpoint_hostname": "终端主机名",
   "endpoint_ips": "IP地址",
   "endpoint_is_eol": "生命的终结",
