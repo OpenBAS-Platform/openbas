@@ -5,6 +5,8 @@ import { makeStyles } from 'tss-react/mui';
 
 import AssetPlatformFragment from '../../../../../../../../../components/common/list/fragments/AssetPlatformFragment';
 import AssetTagsFragment from '../../../../../../../../../components/common/list/fragments/AssetTagsFragment';
+import ElementWithPopoverFragment
+  from '../../../../../../../../../components/common/list/fragments/ElementWithPopoverFragment';
 import EndpointArchFragment from '../../../../../../../../../components/common/list/fragments/EndpointArchFragment';
 import InverseBooleanFragment from '../../../../../../../../../components/common/list/fragments/InverseBooleanFragment';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
@@ -44,7 +46,13 @@ const EndpointListElement = (props: Props) => {
         return (endpoint: EsEndpoint) => <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
-        return endpoint[key]?.toString();
+        const text = endpoint[key]?.toString() || '';
+        const richText = Object.prototype.toString.call(endpoint[key]) === '[object Array]'
+          ? <ul>{(endpoint[key] as string[])?.map(itm => <li key={key.toString()}>{itm.toString()}</li>)}</ul>
+          : <span>{endpoint[key]?.toString()}</span>;
+        return (
+          <ElementWithPopoverFragment simpleText={text} richText={richText} />
+        );
       };
     }
   };
