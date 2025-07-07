@@ -115,7 +115,6 @@ const WidgetForm: FunctionComponent<Props> = ({
     watch,
     reset,
     setValue,
-    formState: { errors },
   } = useForm<WidgetInputWithoutLayout>({
     mode: 'onTouched',
     resolver: zodResolver(
