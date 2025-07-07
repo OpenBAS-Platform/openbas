@@ -255,8 +255,8 @@ const TopBar: FunctionComponent = () => {
                           <img
                             style={{
                               width: '100%',
-                              paddingRight: 8,
-                              paddingLeft: 8,
+                              paddingRight: theme.spacing(2),
+                              paddingLeft: theme.spacing(2),
                             }}
                             src={theme.palette.mode === 'dark' ? xtmhubDark : xtmhubLight}
                             alt="XTM Hub"
