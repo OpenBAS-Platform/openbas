@@ -1,13 +1,10 @@
 package io.openbas.database.repository;
 
-import io.openbas.database.model.ExerciseTeamUser;
-import io.openbas.database.model.ExerciseTeamUserId;
 import io.openbas.database.model.ScenarioTeamUser;
 import io.openbas.database.model.ScenarioTeamUserId;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

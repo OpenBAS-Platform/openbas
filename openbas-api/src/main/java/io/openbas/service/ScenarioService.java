@@ -578,16 +578,16 @@ public class ScenarioService {
     scenario.setTeams(teams);
 
     List<String> teamIdsAdded =
-            teamIds.stream().filter(id -> !previousTeamList.contains(id)).toList();
+        teamIds.stream().filter(id -> !previousTeamList.contains(id)).toList();
 
     List<Team> teamsAdded = fromIterable(this.teamRepository.findAllById(teamIdsAdded));
 
     // Enable user
     teamsAdded.forEach(
-            team -> {
-              List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
-              this.enablePlayers(scenarioId, team.getId(), playerIds);
-            });
+        team -> {
+          List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
+          this.enablePlayers(scenarioId, team.getId(), playerIds);
+        });
 
     // You must return all the modified teams to ensure the frontend store updates correctly
     List<String> modifiedTeamIds =

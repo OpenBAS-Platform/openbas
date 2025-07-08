@@ -1,6 +1,5 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +15,6 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.form.ExerciseUpdateTeamsInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.scenario.form.CheckScenarioRulesInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
@@ -28,13 +26,12 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -70,7 +67,7 @@ public class ScenarioApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    if(SCENARIO_ID != null) {
+    if (SCENARIO_ID != null) {
       this.scenarioRepository.deleteById(SCENARIO_ID);
     }
     this.tagRuleRepository.deleteAll();
@@ -403,11 +400,11 @@ public class ScenarioApiTest extends IntegrationTest {
     input.setTeamIds(newTeamIds);
 
     mvc.perform(
-                    put(SCENARIO_URI + "/" + scenarioSaved.getId() + "/teams/replace")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(input))
-                            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            put(SCENARIO_URI + "/" + scenarioSaved.getId() + "/teams/replace")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(input))
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
 
     // -- ASSERT --
     List<ScenarioTeamUser> links = scenarioTeamUserRepository.findAll();
