@@ -60,7 +60,7 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   // -- React Flow configuration
   const arrowSize = 15;
   const XYinitalPadding = 50;
-  const XGap = 300; // Horizontal gap between nodes
+  const XGap = 200; // Horizontal gap between nodes
   const YGap = 150; // Vertical gap between nodes
 
   const nodeTypes = { attackPattern: AttackPatternNode };
@@ -296,7 +296,6 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
         elementsSelectable={true}
 
         connectionLineType={ConnectionLineType.SmoothStep}
-        // connectionMode={ConnectionMode.Loose}
 
         // Pan and zoom
         panOnDrag={true}
