@@ -323,12 +323,12 @@ public class ExerciseApiTest {
     TEAM_IDS.addAll(Arrays.asList(teamA.getId(), teamB.getId()));
 
     Exercise exercise = ExerciseFixture.createDefaultCrisisExercise();
-    exercise.setTeams(Collections.singletonList(teamA)); // team A is already added
+    exercise.setTeams(Collections.singletonList(teamA));
     Exercise exerciseSaved = exerciseRepository.save(exercise);
     EXERCISE_IDS.add(exerciseSaved.getId());
 
     // -- ACT --
-    List<String> newTeamIds = Arrays.asList(teamA.getId(), teamB.getId()); // we add team B
+    List<String> newTeamIds = Arrays.asList(teamA.getId(), teamB.getId());
     ExerciseUpdateTeamsInput input = new ExerciseUpdateTeamsInput();
     input.setTeamIds(newTeamIds);
 
