@@ -22,6 +22,7 @@ import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.lessons.form.LessonsSendInput;
 import io.openbas.service.MailingService;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -72,7 +73,7 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
 
   @DisplayName("Send surveys for exercise lessons")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void sendExerciseLessonsTest() throws Exception {
 
     // -- PREPARE --
