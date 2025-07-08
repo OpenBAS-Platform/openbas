@@ -686,7 +686,7 @@ public class ExerciseService {
     teamsAdded.forEach(
         team -> {
           List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
-          this.enablePlayers(exerciseId, team.getId(), playerIds);
+          this.enablePlayers(exerciseId, team, playerIds);
         });
 
     // You must return all the modified teams to ensure the frontend store updates correctly
@@ -699,11 +699,10 @@ public class ExerciseService {
 
   public Exercise enablePlayers(
       @NotBlank final String exerciseId,
-      @NotBlank final String teamId,
+      @NotBlank final Team team,
       @NotNull final List<String> playerIds) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    Team team = this.teamRepository.findById(teamId).orElseThrow();
     playerIds.forEach(
         playerId -> {
           ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
