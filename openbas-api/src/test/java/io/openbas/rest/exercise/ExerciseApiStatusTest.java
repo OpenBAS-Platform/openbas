@@ -80,6 +80,8 @@ public class ExerciseApiStatusTest {
 
   @Resource protected ObjectMapper mapper;
 
+  private User savedUser;
+
   @BeforeEach
   void beforeAll() {
     REFERENCE_TIME =
@@ -115,8 +117,8 @@ public class ExerciseApiStatusTest {
     inject5.setContent(this.mapper.valueToTree(content));
     inject5.setExercise(finishedExercise);
 
-    User user = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
-    Team team = TeamFixture.getTeam(user, "TeamA", true);
+    savedUser = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
+    Team team = TeamFixture.getTeam(savedUser, "TeamA", true);
     team.setExercises(
         Arrays.asList(
             scheduledExercise,
@@ -170,7 +172,7 @@ public class ExerciseApiStatusTest {
   void afterAll() {
     this.injectRepository.deleteAll();
     this.exerciseRepository.deleteAll();
-    this.userRepository.deleteAll();
+    this.userRepository.delete(savedUser);
     this.teamRepository.deleteAll();
     this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
     this.lessonsQuestionRepository.deleteAll();
