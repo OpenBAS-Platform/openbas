@@ -51,9 +51,13 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private ExecutorFixture executorFixture;
   @Autowired private EndpointRepository endpointRepository;
 
+  @BeforeAll
+  void beforeAll() {
+    endpointRepository.deleteAll();
+  }
+
   @BeforeEach
   public void beforeEach() {
-    endpointRepository.deleteAll();
     injectComposer.reset();
     injectContractComposer.reset();
     payloadComposer.reset();
