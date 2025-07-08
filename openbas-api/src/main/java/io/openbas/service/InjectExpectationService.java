@@ -205,7 +205,9 @@ public class InjectExpectationService {
           injectExpectation.getResults().stream()
               .filter(r -> !sourceId.equals(r.getSourceId()))
               .toList());
-      if (MANUAL.equals(injectExpectation.getType())) {
+      if (MANUAL.equals(injectExpectation.getType())
+          || ARTICLE.equals(injectExpectation.getType())
+          || CHALLENGE.equals(injectExpectation.getType())) {
         injectExpectation.setScore(null);
       } else {
         List<Double> scores =
@@ -231,7 +233,10 @@ public class InjectExpectationService {
     }
 
     // If The expectation is type manual, We should update expectations for teams and players
-    if (MANUAL.equals(updated.getType()) && updated.getTeam() != null) {
+    if ((MANUAL.equals(updated.getType())
+            || CHALLENGE.equals(updated.getType())
+            || ARTICLE.equals(updated.getType()))
+        && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, null);
     }
 
