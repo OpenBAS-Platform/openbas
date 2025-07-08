@@ -1,4 +1,4 @@
-import { AddModeratorOutlined, InventoryOutlined, MoreVertOutlined, PersonAddOutlined } from '@mui/icons-material';
+import { AddModeratorOutlined, InventoryOutlined, MoreVertOutlined } from '@mui/icons-material';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, GridLegacy, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
@@ -664,9 +664,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             </GridLegacy>
                           )}
                       {
-                        isManualExpectation(injectExpectation.inject_expectation_type) && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
+                        isManualExpectation(injectExpectation.inject_expectation_type)
+                        && injectExpectation.inject_expectation_results
+                        && injectExpectation.inject_expectation_results.map((expectationResult) => {
                           return (
-                            <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
+                            <GridLegacy key={injectExpectation.inject_expectation_id} item={true} xs={1} style={{ textAlign: 'end' }}>
                               <IconButton
                                 color="primary"
                                 onClick={(ev) => {
