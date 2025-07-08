@@ -75,6 +75,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
   @AfterAll
   void afterAll() {
     assetRepository.deleteAll();
+    injectorContractRepository.delete(savedInjectorContract);
   }
 
   @AfterEach
