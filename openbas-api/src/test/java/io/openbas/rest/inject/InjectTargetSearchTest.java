@@ -60,6 +60,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     agentComposer.reset();
     executorComposer.reset();
     tagComposer.reset();
+    exerciseComposer.reset();
   }
 
   private InjectComposer.Composer getInjectWrapper() {
@@ -1334,19 +1335,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @DisplayName("With endpoint search")
   public class WithEndpointSearch {
     private final TargetType targetType = TargetType.ASSETS;
-
-    @BeforeEach
-    public void beforeEach() {
-      injectComposer.reset();
-      injectContractComposer.reset();
-      payloadComposer.reset();
-      assetGroupComposer.reset();
-      injectExpectationComposer.reset();
-      endpointComposer.reset();
-      agentComposer.reset();
-      executorComposer.reset();
-      tagComposer.reset();
-    }
 
     @Nested
     @DisplayName("When getting options for inject targets")
