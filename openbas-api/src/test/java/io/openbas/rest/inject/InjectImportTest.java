@@ -686,7 +686,6 @@ public class InjectImportTest extends IntegrationTest {
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
-
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 

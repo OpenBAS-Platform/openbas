@@ -52,7 +52,7 @@ public class PayloadFixture {
 
   public static DetectionRemediation createDetectionRemediation() {
     DetectionRemediation drCS = new DetectionRemediation();
-    drCS.setValues("Detection Remediation Gap for Crowdstrike");
+    drCS.setValues("Detection Remediation");
     return drCS;
   }
 

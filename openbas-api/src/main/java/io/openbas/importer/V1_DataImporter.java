@@ -1285,10 +1285,12 @@ public class V1_DataImporter implements Importer {
             .map(baseIds::get)
             .map(Tag.class::cast)
             .collect(Collectors.toSet()));
+
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
+
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
 
-    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
     if (injectorContractFromPayload.isPresent()) {
       return injectorContractFromPayload.get().getId();
     } else {
