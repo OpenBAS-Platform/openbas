@@ -4481,6 +4481,20 @@ export interface PropertySchemaDTO {
   schema_property_has_dynamic_value?: boolean;
   schema_property_label: string;
   schema_property_name: string;
+  schema_property_override_operators?: (
+    | "eq"
+    | "not_eq"
+    | "contains"
+    | "not_contains"
+    | "starts_with"
+    | "not_starts_with"
+    | "gt"
+    | "gte"
+    | "lt"
+    | "lte"
+    | "empty"
+    | "not_empty"
+  )[];
   schema_property_type: string;
   schema_property_type_array?: boolean;
   schema_property_values?: string[];

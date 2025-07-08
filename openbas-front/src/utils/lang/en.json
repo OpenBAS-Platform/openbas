@@ -168,6 +168,7 @@
   "base_agent_side": "Agents",
   "base_agents_side": "Agents",
   "base_asset_group_side": "Asset groups",
+  "base_asset_side": "Asset",
   "base_attack_patterns_side": "Attack patterns",
   "base_created_at": "Created at",
   "base_endpoint_side": "Endpoint",
@@ -912,6 +913,7 @@
   "Messages header": "Messages header",
   "Metrics": "Metrics",
   "microblogging": "Microblogging",
+  "Minimum value is 1": "Minimum value is 1",
   "Minutes": "Minutes",
   "Missing content": "Missing content",
   "Missing token": "Missing token",
@@ -1694,6 +1696,5 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY",
-  "Minimum value is 1": "Minimum value is 1"
+  "YYYY": "YYYY"
 }
