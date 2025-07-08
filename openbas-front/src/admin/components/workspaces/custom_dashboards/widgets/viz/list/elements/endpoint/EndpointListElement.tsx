@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -44,7 +44,12 @@ const EndpointListElement = (props: Props) => {
         return (endpoint: EsEndpoint) => <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />;
       default: return (endpoint: EsEndpoint) => {
         const key = column as keyof typeof endpoint;
-        return endpoint[key]?.toString();
+        const text = endpoint[key]?.toString() || '';
+        return (
+          <Tooltip title={text} placement="bottom-start">
+            <span>{text}</span>
+          </Tooltip>
+        );
       };
     }
   };

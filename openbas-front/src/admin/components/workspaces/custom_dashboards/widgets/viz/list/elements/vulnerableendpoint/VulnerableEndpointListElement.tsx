@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import qs from 'qs';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -15,7 +15,7 @@ import VulnerableEndpointActionFragment
 import { buildSearchPagination } from '../../../../../../../../../components/common/queryable/QueryableUtils';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { SIMULATION_BASE_URL } from '../../../../../../../../../constants/BaseUrls';
-import { type EsEndpoint, type EsVulnerableEndpoint } from '../../../../../../../../../utils/api-types';
+import { type EsVulnerableEndpoint } from '../../../../../../../../../utils/api-types';
 import EndpointListItemFragments from '../../../../../../../common/endpoints/EndpointListItemFragments';
 import buildStyles from '../ColumnStyles';
 import VulnerableEndpointElementStyles from './VulnerableEndpointElementStyles';
@@ -74,9 +74,14 @@ const VulnerableEndpointListElement = (props: Props) => {
         return (endpoint: EsVulnerableEndpoint) => <VulnerableEndpointActionFragment action={endpoint.vulnerable_endpoint_action} />;
       case EndpointListItemFragments.BASE_TAGS_SIDE:
         return (endpoint: EsVulnerableEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side ?? []} />;
-      default: return (endpoint: EsEndpoint) => {
+      default: return (endpoint: EsVulnerableEndpoint) => {
         const key = column as keyof typeof endpoint;
-        return endpoint[key]?.toString();
+        const text = endpoint[key]?.toString() || '';
+        return (
+          <Tooltip title={text} placement="bottom-start">
+            <span>{text}</span>
+          </Tooltip>
+        );
       };
     }
   };

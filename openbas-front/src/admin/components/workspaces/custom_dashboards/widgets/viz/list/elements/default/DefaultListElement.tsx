@@ -1,5 +1,5 @@
 import { Description } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
@@ -23,9 +23,16 @@ const DefaultListElement = (props: Props) => {
 
   const elementsFromColumn = (column: string) => {
     switch (column) {
+      // Cannot set a display name here
+      // eslint-disable-next-line react/display-name
       default: return (element: EsBase) => {
         const key = column as keyof typeof element;
-        return element[key]?.toString();
+        const text = element[key]?.toString() || '';
+        return (
+          <Tooltip title={text} placement="bottom-start">
+            <span>{text}</span>
+          </Tooltip>
+        );
       };
     }
   };
@@ -55,5 +62,7 @@ const DefaultListElement = (props: Props) => {
     </ListItemButton>
   );
 };
+
+DefaultListElement.displayName = 'DefaultListElement';
 
 export default DefaultListElement;
