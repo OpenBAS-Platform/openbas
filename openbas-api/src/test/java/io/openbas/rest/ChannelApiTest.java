@@ -17,7 +17,7 @@ import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.channel.form.ArticleCreateInput;
 import io.openbas.rest.channel.form.ArticleUpdateInput;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,7 +54,7 @@ class ChannelApiTest {
   @DisplayName("Create article for scenario")
   @Test
   @Order(1)
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void createArticleForScenarioTest() throws Exception {
     // -- PREPARE --
     Scenario scenario = new Scenario();
@@ -94,7 +94,7 @@ class ChannelApiTest {
   @DisplayName("Retrieve articles for scenario")
   @Test
   @Order(2)
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void retrieveArticlesForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
@@ -114,7 +114,7 @@ class ChannelApiTest {
   @DisplayName("Update article for scenario")
   @Test
   @Order(3)
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void updateArticleForScenarioTest() throws Exception {
     // -- PREPARE --
     ArticleUpdateInput articleUpdateInput = new ArticleUpdateInput();
@@ -143,7 +143,7 @@ class ChannelApiTest {
   @DisplayName("Delete article for scenario")
   @Test
   @Order(4)
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void deleteArticleForScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
     this.mvc
