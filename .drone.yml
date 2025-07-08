@@ -24,9 +24,9 @@ steps:
       - mvn clean install -q -DskipTests
       - mvn spotless:check
       - cd openbas-api
-      - mvn test -q
+      - mvn test
       - cd ../openbas-framework
-      - mvn test -q
+      - mvn test
 
   - name: frontend-tests
     image: node:22.17.1-alpine
