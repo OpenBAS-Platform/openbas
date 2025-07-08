@@ -26,11 +26,6 @@ class InjectorContratApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private InjectorContractRepository injectorContractRepository;
 
-  @BeforeAll
-  public void beforeAll() throws Exception {
-    injectorContractRepository.deleteAll();
-  }
-
   @Nested
   @WithMockAdminUser
   @DisplayName("Fetching contracts")
