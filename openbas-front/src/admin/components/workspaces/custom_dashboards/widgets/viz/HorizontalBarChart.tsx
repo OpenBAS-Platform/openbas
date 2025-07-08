@@ -1,16 +1,17 @@
 import { useTheme } from '@mui/material/styles';
 import { type ApexOptions } from 'apexcharts';
 import * as qs from 'qs';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 import Chart from 'react-apexcharts';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { buildFilter } from '../../../../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../../../components/i18n';
 import { SIMULATION_BASE_URL } from '../../../../../../constants/BaseUrls';
-import type { SearchPaginationInput, Widget } from '../../../../../../utils/api-types';
+import type { Exercise, SearchPaginationInput, Widget } from '../../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../../utils/Charts';
+import { CustomDashboardContext } from '../../CustomDashboardContext';
 
 interface Props {
   widgetConfig: Widget['widget_config'];
@@ -22,19 +23,24 @@ const HorizontalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) 
   const { t, fld } = useFormatter();
   const location = useLocation();
   const navigate = useNavigate();
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
+  const { customDashboardParameters } = useContext(CustomDashboardContext);
 
+  // On click enabled only if we are on a simulation + histogram + param field attack_patterns
+  // + dimension inject expectations with dynamic simulation or simulation id from the actual simulation screen
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   function isBarClickable(config: any): boolean {
     return location.pathname.includes(SIMULATION_BASE_URL) && series && widgetConfig.widget_configuration_type === 'structural-histogram'
       && widgetConfig.field === 'base_attack_patterns_side'
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      && widgetConfig.series[config.seriesIndex].filter.filters.some((filter: any) => filter.key === 'base_entity' && filter.values.includes('expectation-inject'));
+      && widgetConfig.series[config.seriesIndex].filter.filters.some((filter: any) => filter.key === 'base_entity' && filter.values.includes('expectation-inject')
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        && widgetConfig.series[config.seriesIndex].filter.filters.some((filter: any) => filter.key === 'base_simulation_side' && (filter.values.includes(exerciseId) || filter.values.find((value: any) => !!customDashboardParameters[value]))));
   }
 
   // TODO specific case to click on a bar chart and to be redirected => to make generic in the future
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   function onBarClickEvent(event: any, charContext: any, config: any) {
-    // On click enabled only if we are on a simulation + histogram + param field attack_patterns + dimension inject expectations
     if (isBarClickable(config)) {
       // Get attack pattern id from bar clicked and redirect to inject overview with filter for this attack pattern
       const initSearchPaginationInput: SearchPaginationInput = {
