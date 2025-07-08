@@ -171,7 +171,7 @@ public class ExerciseApiStatusTest {
   void afterAll() {
     this.injectRepository.deleteAll();
     this.exerciseRepository.deleteAll();
-    // this.userRepository.deleteById(SAVED_USER.getId());
+    this.userRepository.deleteById(SAVED_USER.getId());
     this.teamRepository.deleteAll();
     this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
     this.lessonsQuestionRepository.deleteAll();
