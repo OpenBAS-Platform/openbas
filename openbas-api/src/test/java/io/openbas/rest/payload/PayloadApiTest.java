@@ -69,6 +69,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
+    payloadRepository.deleteAll();
     collectorComposer.reset();
     collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
     collectorComposer.forCollector(CollectorFixture.createDefaultCollector("SENTINEL")).persist();
