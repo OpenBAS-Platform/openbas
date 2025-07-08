@@ -70,13 +70,6 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   }
 
   const edgeTypes = { draggableEdge: DraggableEdge };
-  const defaultEdgeOptions = {
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      width: arrowSize,
-      height: arrowSize,
-    },
-  };
   const proOptions = {
     account: 'paid-pro',
     hideAttribution: true,
@@ -176,16 +169,24 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   };
 
   const createEdgesByAttackPath = (attackPath: EsAttackPath, phase: KillChainPhaseObject) => {
-    return getAllChildrenNodeId(attackPath).map((nodeChildId) => {
-      const nodeId = getNodeId(attackPath.attackPatternId, phase);
-      return {
-        id: attackPath.attackPatternId + '-' + phase.id + '-' + nodeChildId + '-edge',
-        source: nodeId,
-        target: nodeChildId,
-        type: 'draggableEdge',
-        style: { stroke: nodeId == hoveredNodeId ? 'red' : '#222' },
-      };
-    });
+    const nodeId = getNodeId(attackPath.attackPatternId, phase);
+    return getAllChildrenNodeId(attackPath)
+      .filter(nodeChildId => nodeChildId != nodeId)
+      .map((nodeChildId) => {
+        return {
+          id: attackPath.attackPatternId + '-' + phase.id + '-' + nodeChildId + '-edge',
+          source: nodeId,
+          target: nodeChildId,
+          type: 'draggableEdge',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: arrowSize,
+            height: arrowSize,
+            color: nodeId == hoveredNodeId ? 'red' : 'none',
+          },
+          style: { stroke: nodeId == hoveredNodeId ? 'red' : 'none' },
+        };
+      });
   };
 
   const resolvededDataByKillChainPhase = resolveDataByKillChainPhase(data);
@@ -303,7 +304,6 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
         zoomOnScroll={false}
         preventScrolling={false}
 
-        defaultEdgeOptions={defaultEdgeOptions}
         proOptions={proOptions}
       >
       </ReactFlow>
