@@ -53,6 +53,7 @@ public class ExerciseApiStatusTest {
   static Inject SAVED_INJECT5;
   static LessonsAnswer LESSON_ANSWER;
   static Instant REFERENCE_TIME;
+  static User SAVED_USER;
 
   @Autowired private MockMvc mvc;
 
@@ -79,8 +80,6 @@ public class ExerciseApiStatusTest {
   @Autowired private InjectHelper injectHelper;
 
   @Resource protected ObjectMapper mapper;
-
-  private User savedUser;
 
   @BeforeEach
   void beforeAll() {
@@ -117,8 +116,8 @@ public class ExerciseApiStatusTest {
     inject5.setContent(this.mapper.valueToTree(content));
     inject5.setExercise(finishedExercise);
 
-    savedUser = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
-    Team team = TeamFixture.getTeam(savedUser, "TeamA", true);
+    SAVED_USER = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
+    Team team = TeamFixture.getTeam(SAVED_USER, "TeamA", true);
     team.setExercises(
         Arrays.asList(
             scheduledExercise,
@@ -172,7 +171,7 @@ public class ExerciseApiStatusTest {
   void afterAll() {
     this.injectRepository.deleteAll();
     this.exerciseRepository.deleteAll();
-    this.userRepository.delete(savedUser);
+    this.userRepository.deleteById(SAVED_USER.getId());
     this.teamRepository.deleteAll();
     this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
     this.lessonsQuestionRepository.deleteAll();
