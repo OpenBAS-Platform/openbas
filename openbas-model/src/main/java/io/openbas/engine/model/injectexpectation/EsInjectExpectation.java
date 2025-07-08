@@ -54,7 +54,7 @@ public class EsInjectExpectation extends EsBase {
 
   // -- SIDE --
 
-  @Queryable(label = "simulation")
+  @Queryable(label = "simulation", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
   private String base_simulation_side; // Must finish by _side
 

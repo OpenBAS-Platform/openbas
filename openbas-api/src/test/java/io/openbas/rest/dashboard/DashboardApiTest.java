@@ -2,12 +2,14 @@ package io.openbas.rest.dashboard;
 
 import static io.openbas.rest.dashboard.DashboardApi.DASHBOARD_URI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.driver.ElasticDriver;
 import io.openbas.engine.EsEngine;
@@ -16,14 +18,15 @@ import io.openbas.engine.api.EngineSortField;
 import io.openbas.engine.api.ListConfiguration;
 import io.openbas.engine.api.SortDirection;
 import io.openbas.service.EsService;
-import io.openbas.utils.fixtures.EndpointFixture;
-import io.openbas.utils.fixtures.WidgetFixture;
-import io.openbas.utils.fixtures.composers.EndpointComposer;
-import io.openbas.utils.fixtures.composers.WidgetComposer;
+import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.CustomDashboardFixture;
+import io.openbas.utils.fixtures.composers.*;
+import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +37,29 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockAdminUser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Dashboard API tests")
-public class DashboardApiTest extends IntegrationTest {
+class DashboardApiTest extends IntegrationTest {
+
   @Autowired private EsService esService;
   @Autowired private EsEngine esEngine;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private WidgetComposer widgetComposer;
+  @Autowired private CustomDashboardComposer customDashboardComposer;
   @Autowired private MockMvc mvc;
   @Autowired private EntityManager entityManager;
+  @Autowired private ObjectMapper mapper;
   @Autowired private ElasticsearchClient esClient;
   @Autowired private ElasticDriver esDriver;
+  @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private FindingComposer findingComposer;
+  @Autowired private CustomDashboardParameterComposer customDashboardParameterComposer;
 
   @BeforeEach
-  public void setup() throws IOException {
+  void setup() throws IOException {
     endpointComposer.reset();
     widgetComposer.reset();
+    exerciseComposer.reset();
+    injectComposer.reset();
 
     // force reset elastic
     for (EsModel<?> model : esEngine.getModels()) {
@@ -57,14 +69,18 @@ public class DashboardApiTest extends IntegrationTest {
 
   @Nested
   @DisplayName("When fetching entities from dimension")
-  public class WhenFetchingEntitiesFromDimension {
+  class WhenFetchingEntitiesFromDimension {
+
     @Test
     @DisplayName("When no specific filter, return all entities from dimension.")
-    public void WhenNoSpecificFilter_ReturnAllEntitiesFromDimension() throws Exception {
+    void WhenNoSpecificFilter_ReturnAllEntitiesFromDimension() throws Exception {
       Endpoint ep = endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist().get();
       Widget widget =
           widgetComposer
               .forWidget(WidgetFixture.createListWidgetWithEntity("endpoint"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createDefaultCustomDashboard()))
               .persist()
               .get();
 
@@ -78,7 +94,7 @@ public class DashboardApiTest extends IntegrationTest {
 
       String response =
           mvc.perform(
-                  get(DASHBOARD_URI + "/entities/" + widget.getId())
+                  post(DASHBOARD_URI + "/entities/" + widget.getId())
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andReturn()
@@ -90,7 +106,7 @@ public class DashboardApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("When sorting is specified, return entities sorted accordingly.")
-    public void WhenSortingIsSpecified_ReturnEntitiesSortedAccordingly() throws Exception {
+    void WhenSortingIsSpecified_ReturnEntitiesSortedAccordingly() throws Exception {
       // some endpoints
       EndpointComposer.Composer epWrapper3 =
           endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
@@ -110,7 +126,14 @@ public class DashboardApiTest extends IntegrationTest {
       sortField.setFieldName("endpoint_hostname");
       sortField.setDirection(SortDirection.ASC);
       ((ListConfiguration) listWidget.getWidgetConfiguration()).setSorts(List.of(sortField));
-      Widget widget = widgetComposer.forWidget(listWidget).persist().get();
+      Widget widget =
+          widgetComposer
+              .forWidget(listWidget)
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createDefaultCustomDashboard()))
+              .persist()
+              .get();
 
       // force persistence
       entityManager.flush();
@@ -122,7 +145,7 @@ public class DashboardApiTest extends IntegrationTest {
 
       String response =
           mvc.perform(
-                  get(DASHBOARD_URI + "/entities/" + widget.getId())
+                  post(DASHBOARD_URI + "/entities/" + widget.getId())
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andReturn()
@@ -132,6 +155,116 @@ public class DashboardApiTest extends IntegrationTest {
       assertThatJson(response).node("[0].base_id").isEqualTo(epWrapper1.get().getId());
       assertThatJson(response).node("[1].base_id").isEqualTo(epWrapper2.get().getId());
       assertThatJson(response).node("[2].base_id").isEqualTo(epWrapper3.get().getId());
+    }
+
+    @Test
+    @DisplayName("When binding with dashboard parameter, param is applied to returned collection.")
+    void WhenBindingWithDashboardParam_ParamIsAppliedToReturnedCollection() throws Exception {
+      // some endpoints
+      EndpointComposer.Composer epWrapper3 =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+      epWrapper3.get().setHostname("ep3");
+      EndpointComposer.Composer epWrapper1 =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+      epWrapper1.get().setHostname("ep1");
+      EndpointComposer.Composer epWrapper2 =
+          endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+      epWrapper2.get().setHostname("ep2");
+
+      // single simulation with two findings
+      // each referencing the same two endpoints
+      ExerciseComposer.Composer exerciseWrapper1 =
+          exerciseComposer
+              .forExercise(ExerciseFixture.createDefaultExercise())
+              .withInject(
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withFinding(
+                          findingComposer
+                              .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
+                              .withEndpoint(epWrapper1)
+                              .withEndpoint(epWrapper2))
+                      .withFinding(
+                          findingComposer
+                              .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
+                              .withEndpoint(epWrapper1)
+                              .withEndpoint(epWrapper2)))
+              .persist();
+
+      // other simulation with single finding referencing another endpoint
+      exerciseComposer
+          .forExercise(ExerciseFixture.createDefaultExercise())
+          .withInject(
+              injectComposer
+                  .forInject(InjectFixture.getDefaultInject())
+                  .withFinding(
+                      findingComposer
+                          .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
+                          .withEndpoint(epWrapper3)))
+          .persist();
+
+      CustomDashboardParameterComposer.Composer paramWrapper =
+          customDashboardParameterComposer.forCustomDashboardParameter(
+              CustomDashboardParameterFixture.createSimulationCustomDashboardParameter());
+      CustomDashboardComposer.Composer dashboardWrapper =
+          customDashboardComposer
+              .forCustomDashboard(CustomDashboardFixture.createDefaultCustomDashboard())
+              .withCustomDashboardParameter(paramWrapper)
+              .persist();
+
+      Widget listWidget = WidgetFixture.createListWidgetWithEntity("vulnerable-endpoint");
+      ListConfiguration config = (ListConfiguration) listWidget.getWidgetConfiguration();
+      // filters
+      Filters.FilterGroup filterGroup = config.getSeries().get(0).getFilter();
+      Filters.Filter simulationFilter = new Filters.Filter();
+      simulationFilter.setKey("base_simulation_side");
+      simulationFilter.setMode(Filters.FilterMode.or);
+      simulationFilter.setOperator(Filters.FilterOperator.eq);
+      simulationFilter.setValues(List.of(paramWrapper.get().getId()));
+      List<Filters.Filter> filters = new ArrayList<>(filterGroup.getFilters());
+      filters.add(simulationFilter);
+      filterGroup.setFilters(filters);
+
+      // sorts
+      EngineSortField sortField = new EngineSortField();
+      sortField.setFieldName("vulnerable_endpoint_hostname");
+      sortField.setDirection(SortDirection.DESC);
+      config.setSorts(List.of(sortField));
+      Widget widget =
+          widgetComposer
+              .forWidget(listWidget)
+              .withCustomDashboard(dashboardWrapper)
+              .persist()
+              .get();
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      esService.bulkProcessing(esEngine.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/entities/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                          "{\"%s\":\"%s\"}"
+                              .formatted(
+                                  paramWrapper.get().getId(), exerciseWrapper1.get().getId())))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response)
+          .node("[0].vulnerable_endpoint_id")
+          .isEqualTo(epWrapper2.get().getId());
+      assertThatJson(response)
+          .node("[1].vulnerable_endpoint_id")
+          .isEqualTo(epWrapper1.get().getId());
+      assertThatJson(response).isArray().size().isEqualTo(2);
     }
   }
 }

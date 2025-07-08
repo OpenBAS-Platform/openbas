@@ -96,6 +96,7 @@ export const lineChartOptions = (
   tickAmount = undefined,
   distributed = false,
   dataLabels = false,
+  emptyChartText = '',
 ): ApexOptions => ({
   chart: {
     type: 'line',
@@ -134,6 +135,7 @@ export const lineChartOptions = (
     },
   },
   tooltip: { theme: theme.palette.mode },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
     tickAmount,
@@ -265,15 +267,15 @@ export const verticalBarsChartOptions = (
   theme: Theme,
   xFormatter: NonNullable<ApexXAxis['labels']>['formatter'] | null = null,
   yFormatter: NonNullable<ApexYAxis['labels']>['formatter'] | null = null,
-  distributed = false,
-  isTimeSeries = false,
-  isStacked = false,
-  legend = false,
+  distributed: boolean = false,
+  isTimeSeries: boolean = false,
+  isStacked: boolean = false,
+  legend: boolean = false,
   tickAmount: ApexXAxis['tickAmount'] = undefined,
-  isResult = false,
-  isFakeData = false,
+  isResult: boolean = false,
+  isFakeData: boolean = false,
   max: ApexYAxis['max'] = undefined,
-  emptyChartText = '',
+  emptyChartText: string = '',
   customTooltip?: CustomTooltipFunction,
 ): ApexOptions => ({
   chart: {
@@ -315,6 +317,7 @@ export const verticalBarsChartOptions = (
     enabled: !isFakeData,
     custom: customTooltip,
   },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
     tickAmount,
@@ -361,35 +364,54 @@ export const verticalBarsChartOptions = (
   }),
 });
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type CustomClickBarFunction = (event: any, charContext?: any, config?: any) => void;
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type CustomCursorBarFunction = (event: any, charContext?: any, config?: any) => void;
+
 /**
  * @param {Theme} theme
  * @param {boolean} adjustTicks
  * @param {function} xFormatter
  * @param {function} yFormatter
  * @param {boolean} distributed
- * @param {function} navigate
- * @param {object[]} redirectionUtils
  * @param {boolean} stacked
  * @param {boolean} total
  * @param {string[]} categories
  * @param {boolean} legend
  * @param {boolean} isFakeData
  * @param {string} emptyChartText
+ * @param {function} customClickBarFunction
+ * @param {function} customCursorBarFunction
  */
 export const horizontalBarsChartOptions = (
   theme: Theme,
-  adjustTicks = false,
+  adjustTicks: boolean = false,
   xFormatter: ((val: number) => string | string[]) | null = null,
   yFormatter: ((val: string) => string) | null = null,
-  distributed = false,
-  stacked = false,
-  total = false,
+  distributed: boolean = false,
+  stacked: boolean = false,
+  total: boolean = false,
   categories: string[] | string[][] | null = null,
-  legend = false,
-  isFakeData = false,
-  emptyChartText = '',
+  legend: boolean = false,
+  isFakeData: boolean = false,
+  emptyChartText: string = '',
+  customClickBarFunction?: CustomClickBarFunction,
+  customCursorBarFunction?: CustomCursorBarFunction,
 ): ApexOptions => ({
   chart: {
+    events: {
+      dataPointSelection(event, charContext?, config?) {
+        if (customClickBarFunction) {
+          customClickBarFunction(event, charContext, config);
+        }
+      },
+      dataPointMouseEnter(event, charContext?, config?) {
+        if (customCursorBarFunction) {
+          customCursorBarFunction(event, charContext, config);
+        }
+      },
+    },
     type: 'bar',
     background: 'transparent',
     toolbar: toolbarOptions,
@@ -426,6 +448,7 @@ export const horizontalBarsChartOptions = (
     enabled: !isFakeData,
     theme: theme.palette.mode,
   },
+  noData: { text: emptyChartText || 'No data to display' },
   xaxis: {
     categories: categories ?? [],
     labels: {
@@ -644,6 +667,7 @@ interface DonutChartOptions {
   size?: number;
   disableAnimation?: boolean;
   isFakeData?: boolean;
+  emptyChartText?: string;
 }
 
 export const donutChartOptions = ({
@@ -659,6 +683,7 @@ export const donutChartOptions = ({
   size = 70,
   disableAnimation = false,
   isFakeData = false,
+  emptyChartText = '',
 }: DonutChartOptions): ApexOptions => {
   const temp = theme.palette.mode === 'dark' ? 400 : 600;
   let dataLabelsColors = labels.map(() => theme.palette.text?.primary);
@@ -708,6 +733,7 @@ export const donutChartOptions = ({
       theme: theme.palette.mode,
       custom: simpleLabelTooltip(theme),
     },
+    noData: { text: emptyChartText || 'No data to display' },
     legend: {
       show: displayLegend,
       position: legendPosition,

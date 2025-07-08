@@ -16,6 +16,11 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
+import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
+import AssetTagsFragment from '../../../../components/common/list/fragments/AssetTagsFragment';
+import EndpointActiveFragment from '../../../../components/common/list/fragments/EndpointActiveFragment';
+import EndpointAgentsPrivilegeFragment from '../../../../components/common/list/fragments/EndpointAgentsPrivilegeFragment';
+import EndpointArchFragment from '../../../../components/common/list/fragments/EndpointArchFragment';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -29,12 +34,7 @@ import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import useAuth from '../../../../utils/hooks/useAuth';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
-import AssetPlatformFragment from '../../common/endpoints/fragments/output/AssetPlatformFragment';
-import AssetTagsFragment from '../../common/endpoints/fragments/output/AssetTagsFragment';
-import EndpointActiveFragment from '../../common/endpoints/fragments/output/EndpointActiveFragment';
-import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/output/EndpointAgentsExecutorsFragment';
-import EndpointAgentsPrivilegeFragment from '../../common/endpoints/fragments/output/EndpointAgentsPrivilegeFragment';
-import EndpointArchFragment from '../../common/endpoints/fragments/output/EndpointArchFragment';
+import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import ImportUploaderEndpoints from './ImportUploaderEndpoints';
@@ -115,25 +115,25 @@ const Endpoints = () => {
       field: EndpointListItemFragments.ENDPOINT_ACTIVE,
       label: 'Status',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <EndpointActiveFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <EndpointActiveFragment activity_map={endpoint.asset_agents.map(a => a.agent_active ?? false)} />,
     },
     {
       field: EndpointListItemFragments.ENDPOINT_AGENTS_PRIVILEGE,
       label: 'Agents Privileges',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <EndpointAgentsPrivilegeFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <EndpointAgentsPrivilegeFragment privileges={endpoint.asset_agents.map(a => a.agent_privilege)} />,
     },
     {
       field: EndpointListItemFragments.ENDPOINT_PLATFORM,
       label: 'Platform',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => <AssetPlatformFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <AssetPlatformFragment platform={endpoint.endpoint_platform} />,
     },
     {
       field: EndpointListItemFragments.ENDPOINT_ARCH,
       label: 'Architecture',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => <EndpointArchFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <EndpointArchFragment arch={endpoint.endpoint_arch} />,
     },
     {
       field: 'endpoint_agents_executor',
@@ -145,7 +145,7 @@ const Endpoints = () => {
       field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <AssetTagsFragment endpoint={endpoint} />,
+      value: (endpoint: EndpointOutput) => <AssetTagsFragment tags={endpoint.asset_tags} />,
     },
   ];
 

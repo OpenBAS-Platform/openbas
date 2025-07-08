@@ -6,8 +6,10 @@ import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.DateHistogramWidget;
+import io.openbas.engine.api.HistogramInterval;
 import io.openbas.engine.api.ListConfiguration;
 import io.openbas.engine.api.WidgetType;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetFixture {
@@ -19,6 +21,11 @@ public class WidgetFixture {
     widget.setType(VERTICAL_BAR_CHART);
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     widgetConfig.setTitle(NAME);
+    widgetConfig.setField("whatever");
+    widgetConfig.setSeries(new ArrayList<>());
+    widgetConfig.setInterval(HistogramInterval.day);
+    widgetConfig.setStart("2012-12-21T10:45:23Z");
+    widgetConfig.setEnd("2012-12-22T10:45:23Z");
     widget.setWidgetConfiguration(widgetConfig);
     WidgetLayout widgetLayout = new WidgetLayout();
     widget.setLayout(widgetLayout);
@@ -31,6 +38,7 @@ public class WidgetFixture {
     // series
     ListConfiguration.ListSeries series = new ListConfiguration.ListSeries();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
     Filters.Filter filter = new Filters.Filter();
     filter.setValues(List.of(entityName));
     filter.setOperator(Filters.FilterOperator.eq);

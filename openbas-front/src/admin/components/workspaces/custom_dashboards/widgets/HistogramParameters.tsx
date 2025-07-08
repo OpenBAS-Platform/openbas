@@ -11,7 +11,7 @@ import { type GroupOption } from '../../../../../utils/Option';
 import getEntityPropertiesListOptions from './EntityPropertiesListOptions';
 import {
   getAvailableModes,
-  getBaseEntities,
+  getBaseEntities, getLimit,
   type WidgetInputWithoutLayout,
 } from './WidgetUtils';
 
@@ -19,6 +19,7 @@ type Props = {
   widgetType: Widget['widget_type'];
   control: Control<WidgetInputWithoutLayout>;
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
+  showOnlyTitle?: boolean;
 };
 
 const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
@@ -44,6 +45,8 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
     }
   }, []);
 
+  const hasLimit = getLimit(widgetType);
+
   // -- HANDLE widget config type --
   useEffect(() => {
     switch (mode) {
@@ -66,7 +69,13 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
       const finalOptions = getEntityPropertiesListOptions(
         response.data,
         widgetType,
-        d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant');
+        d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
+        .map((o) => {
+          return {
+            ...o,
+            label: t(o.label),
+          };
+        });
       setFieldOptions(finalOptions);
       if (finalOptions.length === 1) {
         setValue('widget_config.field', finalOptions[0].id); // If only one option is available, hide the field and set it automatically
@@ -143,7 +152,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             }}
           />
         )}
-      {mode === 'structural' && (
+      {hasLimit && (
         <Controller
           control={control}
           name="widget_config.limit"
@@ -156,7 +165,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
               label={t('Number of results')}
               sx={{ mt: 2 }}
               value={field.value ?? 10}
-              onChange={e => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+              onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
               error={!!fieldState.error}
               helperText={fieldState.error?.message}
               required

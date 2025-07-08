@@ -17,6 +17,10 @@ public interface RawInjectIndexing {
 
   Set<String> getInject_attack_patterns();
 
+  Set<String> getInject_children();
+
+  Set<String> getAttack_patterns_children();
+
   Set<String> getInject_kill_chain_phases();
 
   String getInject_status_name();

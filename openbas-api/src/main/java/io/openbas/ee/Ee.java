@@ -156,6 +156,10 @@ public class Ee {
         && (Instant.now().isBefore(license.getExpirationDate()) || license.isExtraExpiration());
   }
 
+  public boolean isEnterpriseLicenseInactive(License license) {
+    return !isLicenseActive(license);
+  }
+
   public String getEnterpriseEditionLicensePem() {
     Setting pemSetting =
         this.settingRepository.findByKey(PLATFORM_ENTERPRISE_LICENSE.key()).orElse(new Setting());

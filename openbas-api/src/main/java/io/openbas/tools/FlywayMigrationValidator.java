@@ -5,8 +5,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -33,7 +33,7 @@ public class FlywayMigrationValidator {
         return;
       }
 
-      List<String> versions = new ArrayList<>();
+      Map<String, String> versions = new HashMap<>();
 
       try (Stream<Path> files = Files.walk(migrationDir)) {
         files
@@ -47,11 +47,11 @@ public class FlywayMigrationValidator {
                   Matcher matcher = VERSION_PATTERN.matcher(fileName);
                   if (matcher.matches()) {
                     String version = matcher.group(1).replace('_', '.');
-                    if (versions.contains(version)) {
+                    if (versions.containsKey(version)) {
                       throw new IllegalStateException(
-                          "Duplicate Flyway migration version found: " + version);
+                          "Duplicate Flyway migration version found: " + versions.get(version));
                     } else {
-                      versions.add(version);
+                      versions.put(version, fileName);
                     }
                   }
                 });

@@ -2,8 +2,8 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.FindingFixture.TEXT_FIELD;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,9 +11,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.*;
+import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.ContractOutputType;
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Filters;
+import io.openbas.database.model.Finding;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.FindingRepository;
-import io.openbas.rest.finding.form.FindingOutput;
+import io.openbas.database.specification.FindingSpecification;
+import io.openbas.rest.finding.form.RelatedFindingOutput;
 import io.openbas.utils.FindingMapper;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -26,9 +34,11 @@ import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -207,14 +217,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -276,14 +286,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -330,14 +340,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -371,15 +381,15 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         ex.getInjects().stream()
                             .flatMap(inject -> inject.getFindings().stream().map(Finding::getId))
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
-                .sorted(Comparator.comparing(FindingOutput::getCreationDate))
+                .map(findingMapper::toRelatedFindingOutput)
+                .sorted(Comparator.comparing(RelatedFindingOutput::getCreationDate))
                 .limit(input.getSize())
                 .toList();
 
@@ -412,12 +422,12 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         inject.getFindings().stream().map(Finding::getId).toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -442,7 +452,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
@@ -486,14 +496,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -516,7 +526,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
@@ -550,14 +560,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -579,7 +589,7 @@ class FindingApiTest extends IntegrationTest {
         for (Exercise ex : scenarioWrapper.get().getExercises()) {
           for (Inject inject : ex.getInjects()) {
             for (Finding finding : inject.getFindings()) {
-              finding.setAssets(List.of(endpointWrapper.get()));
+              finding.setAssets(new ArrayList<>(List.of(endpointWrapper.get())));
             }
           }
         }
@@ -626,14 +636,14 @@ class FindingApiTest extends IntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        List<FindingOutput> expectedFindings =
+        List<RelatedFindingOutput> expectedFindings =
             fromIterable(
                     findingRepository.findAllById(
                         latestFindingWrappers.stream()
                             .map(wrapper -> wrapper.get().getId())
                             .toList()))
                 .stream()
-                .map(findingMapper::toFindingOutput)
+                .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
 
@@ -653,6 +663,7 @@ class FindingApiTest extends IntegrationTest {
     private AssetGroup savedAssetGroup;
     private Endpoint savedEndpoint;
     private InjectComposer.Composer injectWrapper;
+    private InjectComposer.Composer injectWrapper2;
 
     @BeforeEach
     void setup() {
@@ -675,6 +686,8 @@ class FindingApiTest extends IntegrationTest {
           injectComposer
               .forInject(InjectFixture.getDefaultInject())
               .withAssetGroup(assetGroupWrapper);
+
+      injectWrapper2 = injectComposer.forInject(InjectFixture.getDefaultInject());
 
       ExerciseComposer.Composer simulationWrapper =
           simulationComposer
@@ -705,7 +718,6 @@ class FindingApiTest extends IntegrationTest {
       SearchPaginationInput input =
           buildDefaultFilters(
               ContractOutputType.Text,
-              "Text",
               savedFinding,
               savedSimulation,
               savedScenario,
@@ -717,8 +729,6 @@ class FindingApiTest extends IntegrationTest {
 
       performCallbackRequest(FINDING_URI + "/search", input)
           .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
-          .andExpect(jsonPath("$.content.[0].finding_name").value("Text"))
-          .andExpect(jsonPath("$.content.[0].finding_field").value(TEXT_FIELD))
           .andExpect(jsonPath("$.content.[0].finding_value").value("text_value"))
           .andExpect(
               jsonPath("$.content.[0].finding_assets.[0].asset_id").value(savedEndpoint.getId()))
@@ -745,13 +755,7 @@ class FindingApiTest extends IntegrationTest {
               .get();
       SearchPaginationInput input =
           buildDefaultFilters(
-              ContractOutputType.IPv6,
-              "IPv6",
-              savedFinding,
-              savedSimulation,
-              null,
-              savedEndpoint,
-              null);
+              ContractOutputType.IPv6, savedFinding, savedSimulation, null, savedEndpoint, null);
 
       performCallbackRequest(
               FINDING_URI + "/exercises/" + savedSimulation.getId() + "/search", input)
@@ -776,7 +780,6 @@ class FindingApiTest extends IntegrationTest {
       SearchPaginationInput input =
           buildDefaultFilters(
               ContractOutputType.Credentials,
-              "Credentials",
               savedFinding,
               null,
               savedScenario,
@@ -806,7 +809,7 @@ class FindingApiTest extends IntegrationTest {
               .get();
       SearchPaginationInput input =
           buildDefaultFilters(
-              ContractOutputType.Text, "Text", savedFinding, null, null, savedEndpoint, null);
+              ContractOutputType.Text, savedFinding, null, null, savedEndpoint, null);
 
       performCallbackRequest(FINDING_URI + "/endpoints/" + savedEndpoint.getId() + "/search", input)
           .andExpect(
@@ -814,11 +817,58 @@ class FindingApiTest extends IntegrationTest {
           .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
           .andExpect(jsonPath("$.content.[0].finding_value").value("text_value"));
     }
+
+    @Test
+    void distinctTypeValueWithFilter_returnsDistinctFindings() {
+      // Create two findings with the same type and value (duplicates)
+      Finding f1 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+
+      Finding f2 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper2)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+
+      // Create a unique finding with different type or value
+      Finding f3 =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultIPV6Finding())
+              .withInject(injectWrapper)
+              .persist()
+              .get();
+
+      // base specification can be null (no additional filtering)
+      Specification<Finding> baseSpec = null;
+
+      Specification<Finding> distinctSpec =
+          FindingSpecification.distinctTypeValueWithFilter(baseSpec);
+
+      List<Finding> results = findingRepository.findAll(distinctSpec);
+
+      // Should return only 2 distinct findings (f1/f2 collapse to one)
+      assertThat(results).hasSize(2);
+
+      Set<String> distinctPairs =
+          results.stream()
+              .map(f -> f.getType().label + "::" + f.getValue())
+              .collect(Collectors.toSet());
+
+      assertThat(distinctPairs)
+          .containsExactlyInAnyOrder(
+              f1.getType().label + "::" + f1.getValue(), f3.getType().label + "::" + f3.getValue());
+    }
   }
 
   private SearchPaginationInput buildDefaultFilters(
       ContractOutputType type,
-      String name,
       Finding finding,
       Exercise simulation,
       Scenario scenario,
@@ -833,7 +883,6 @@ class FindingApiTest extends IntegrationTest {
     List<Filters.Filter> filters = new ArrayList<>();
 
     filters.add(buildFilter("finding_type", Filters.FilterOperator.contains, List.of(type.label)));
-    filters.add(buildFilter("finding_name", Filters.FilterOperator.contains, List.of(name)));
     filters.add(
         buildFilter("finding_created_at", Filters.FilterOperator.gt, List.of(now.toString())));
     filters.add(

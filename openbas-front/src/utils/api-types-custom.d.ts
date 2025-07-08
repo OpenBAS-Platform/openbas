@@ -21,6 +21,7 @@ export type ListConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.ListSeries[];
   columns: string[];
   sorts?: ApiTypes.EngineSortField[];
+  limit?: number;
   widget_configuration_type: 'list';
 };
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {

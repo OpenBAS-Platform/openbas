@@ -12,6 +12,7 @@ public class ExpectationBuilderService {
 
   public static final String PREVENTION_NAME = "Prevention";
   public static final String DETECTION_NAME = "Detection";
+  public static final String VULNERABILITY_NAME = "Vulnerability";
   public static final String CHALLENGE_NAME = "Expect targets to complete the challenge(s)";
   public static final String ARTICLE_NAME = "Expect targets to read the article(s)";
   private final ExpectationPropertiesConfig expectationPropertiesConfig;
@@ -36,6 +37,16 @@ public class ExpectationBuilderService {
     detectionExpectation.setExpirationTime(
         this.expectationPropertiesConfig.getDetectionExpirationTime());
     return detectionExpectation;
+  }
+
+  public Expectation buildVulnerabilityExpectation() {
+    Expectation vulnerabilityExpectation = new Expectation();
+    vulnerabilityExpectation.setType(VULNERABILITY);
+    vulnerabilityExpectation.setName(VULNERABILITY_NAME);
+    vulnerabilityExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
+    vulnerabilityExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getVulnerabilityExpirationTime());
+    return vulnerabilityExpectation;
   }
 
   public Expectation buildChallengeExpectation() {

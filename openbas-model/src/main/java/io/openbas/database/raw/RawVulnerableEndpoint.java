@@ -25,7 +25,7 @@ public interface RawVulnerableEndpoint {
 
   Set<String> getVulnerable_endpoint_agents();
 
-  Set<String> getVulnerable_endpoint_agents_privileges();
+  List<String> getVulnerable_endpoint_agents_privileges();
 
   // cannot use Instant class directly because of "Projection type must be an interface"
   List<java.sql.Timestamp> getVulnerable_endpoint_agents_last_seen();

@@ -11,14 +11,15 @@ import io.openbas.ee.Ee;
 import io.openbas.rest.cve.form.CveCreateInput;
 import io.openbas.rest.cve.form.CveUpdateInput;
 import io.openbas.rest.cve.form.CweInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,7 +39,7 @@ public class CveService {
 
   public Cve createCve(final @Valid CveCreateInput input) {
     final Cve cve = new Cve();
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
     }
     cve.setUpdateAttributes(input);
@@ -55,10 +56,12 @@ public class CveService {
 
   public Cve updateCve(final String cveId, final @Valid CveUpdateInput input) {
     final Cve existingCve = findById(cveId);
-    if (isEnterpriseLicenseInactive()) {
+    if (eeService.isEnterpriseLicenseInactive(licenseCacheManager.getEnterpriseEditionInfo())) {
       input.setRemediation(null);
+      BeanUtils.copyProperties(input, existingCve, "remediation");
+    } else {
+      existingCve.setUpdateAttributes(input);
     }
-    existingCve.setUpdateAttributes(input);
     updateCweAssociations(existingCve, input.getCwes());
     return cveRepository.save(existingCve);
   }
@@ -66,21 +69,17 @@ public class CveService {
   public Cve findById(final String cveId) {
     return cveRepository
         .findById(cveId)
-        .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + cveId));
+        .orElseThrow(() -> new ElementNotFoundException(CVE_NOT_FOUND_MSG + cveId));
   }
 
   public Cve findByExternalId(String externalId) {
     return cveRepository
         .findByExternalId(externalId)
-        .orElseThrow(() -> new EntityNotFoundException(CVE_NOT_FOUND_MSG + externalId));
+        .orElseThrow(() -> new ElementNotFoundException(CVE_NOT_FOUND_MSG + externalId));
   }
 
   public void deleteById(final String cveId) {
     cveRepository.deleteById(cveId);
-  }
-
-  private boolean isEnterpriseLicenseInactive() {
-    return !eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo());
   }
 
   private void updateCweAssociations(Cve cve, List<CweInput> cweInputs) {

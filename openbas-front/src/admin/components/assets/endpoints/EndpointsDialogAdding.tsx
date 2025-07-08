@@ -90,7 +90,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       {
         field: 'endpoint_active',
         value: (endpoint: EndpointOutput) => {
-          const status = getActiveMsgTooltip(endpoint, t('Active'), t('Inactive'), t('Agentless'));
+          const status = getActiveMsgTooltip(endpoint.asset_agents.map(a => a.agent_active ?? false), t('Active'), t('Inactive'), t('Agentless'));
           return (
             <Tooltip title={status.activeMsgTooltip}>
               <span>

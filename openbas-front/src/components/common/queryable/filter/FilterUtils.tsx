@@ -125,7 +125,7 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
   }
   // Dynamic value & not array
   if (propertySchema.schema_property_has_dynamic_value && !propertySchema.schema_property_type_array) {
-    return ['contains', 'not_contains', 'empty', 'not_empty'];
+    return ['eq', 'not_eq', 'empty', 'not_empty'];
   }
   // Array
   if (propertySchema.schema_property_type_array) {

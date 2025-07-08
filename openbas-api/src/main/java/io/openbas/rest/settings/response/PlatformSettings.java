@@ -194,6 +194,11 @@ public class PlatformSettings {
   private long preventionExpirationTime;
 
   @NotNull
+  @JsonProperty("expectation_vulnerability_expiration_time")
+  @Schema(description = "Time to wait before vulnerability time has expired")
+  private long vulnerabilityExpirationTime;
+
+  @NotNull
   @JsonProperty("expectation_challenge_expiration_time")
   @Schema(description = "Time to wait before challenge time has expired")
   private long challengeExpirationTime;

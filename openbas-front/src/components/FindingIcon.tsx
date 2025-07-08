@@ -1,5 +1,6 @@
+import { ReportProblemOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { CubeScan, FormatText, IpOutline, KeyOutline, MidiPort, Numeric, ShieldAlert, TagSearchOutline } from 'mdi-material-ui';
+import { CubeScan, FormatText, IpOutline, KeyOutline, MidiPort, Numeric, TagSearchOutline } from 'mdi-material-ui';
 import { type FunctionComponent } from 'react';
 
 interface FindingIconProps {
@@ -24,7 +25,7 @@ const renderIcon = (findingType: string) => {
     case 'credentials':
       return <KeyOutline color="primary" />;
     case 'cve':
-      return <ShieldAlert color="primary" />;
+      return <ReportProblemOutlined color="primary" />;
     default:
       return <TagSearchOutline color="primary" />;
   }

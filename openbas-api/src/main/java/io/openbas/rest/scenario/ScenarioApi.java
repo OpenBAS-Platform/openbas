@@ -8,11 +8,13 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
+import io.openbas.rest.custom_dashboard.CustomDashboardService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
@@ -54,6 +56,7 @@ public class ScenarioApi extends RestBehavior {
 
   public static final String SCENARIO_URI = "/api/scenarios";
 
+  private final CustomDashboardService customDashboardService;
   private final TagRepository tagRepository;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
@@ -71,6 +74,12 @@ public class ScenarioApi extends RestBehavior {
     Scenario scenario = new Scenario();
     scenario.setUpdateAttributes(input);
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    if (hasText(input.getCustomDashboard())) {
+      scenario.setCustomDashboard(
+          this.customDashboardService.customDashboard(input.getCustomDashboard()));
+    } else {
+      scenario.setCustomDashboard(null);
+    }
     return this.scenarioService.createScenario(scenario);
   }
 
@@ -106,6 +115,12 @@ public class ScenarioApi extends RestBehavior {
     Set<Tag> currentTagList = scenario.getTags();
     scenario.setUpdateAttributes(input);
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    if (hasText(input.getCustomDashboard())) {
+      scenario.setCustomDashboard(
+          this.customDashboardService.customDashboard(input.getCustomDashboard()));
+    } else {
+      scenario.setCustomDashboard(null);
+    }
     return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 

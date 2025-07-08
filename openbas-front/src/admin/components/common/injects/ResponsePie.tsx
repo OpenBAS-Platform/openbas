@@ -1,4 +1,4 @@
-import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { BugReportOutlined, InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, memo, useCallback, useMemo } from 'react';
@@ -24,6 +24,7 @@ const getColor = (theme: Theme, result: string | undefined): string => {
   const colorMap: Record<string, string> = {
     'Blocked': theme.palette.success.main ?? '',
     'Detected': theme.palette.success.main ?? '',
+    'Not vulnerable': theme.palette.success.main ?? '',
     'Successful': theme.palette.success.main ?? '',
     'Partial': theme.palette.warning.main ?? '',
     'Partially Prevented': theme.palette.warning.main ?? '',
@@ -54,6 +55,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
   const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');
   const humanResponse = expectationResultsByTypes?.find(e => e.type === 'HUMAN_RESPONSE');
+  const vulnerability = expectationResultsByTypes?.find(e => e.type === 'VULNERABILITY');
   const pending = useMemo(() => humanResponse?.distribution?.filter(res => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [], [humanResponse]);
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
   const renderIcon = (type: string, hasDistribution: boolean | undefined) => {
@@ -62,6 +64,8 @@ const ResponsePie: FunctionComponent<Props> = ({
         return <ShieldOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       case 'detection':
         return <TrackChangesOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
+      case 'vulnerability':
+        return <BugReportOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       default:
         return <SensorOccupiedOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
     }
@@ -131,18 +135,20 @@ const ResponsePie: FunctionComponent<Props> = ({
       id="score_details"
       style={{
         display: 'grid',
-        gridTemplateColumns: '33% 34% 33%',
+        gridTemplateColumns: '25% 25% 25% 25%',
         width: '100%',
       }}
     >
       <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
       <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
+      <Pie type="vulnerability" title={t('TYPE_VULNERABILITY')} expectationResultsByType={vulnerability} />
       <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
 
       {hasTitles && (
         <>
           {pieTitle(t('TYPE_PREVENTION'), prevention)}
           {pieTitle(t('TYPE_DETECTION'), detection)}
+          {pieTitle(t('TYPE_VULNERABILITY'), vulnerability)}
           {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
         </>
       )}

@@ -188,7 +188,8 @@ public class PayloadService {
     return expectationsField(
         List.of(
             this.expectationBuilderService.buildPreventionExpectation(),
-            this.expectationBuilderService.buildDetectionExpectation()));
+            this.expectationBuilderService.buildDetectionExpectation(),
+            this.expectationBuilderService.buildVulnerabilityExpectation()));
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {

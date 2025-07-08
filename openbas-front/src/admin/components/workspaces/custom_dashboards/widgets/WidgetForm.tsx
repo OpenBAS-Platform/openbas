@@ -74,7 +74,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       display_legend: z.boolean().optional(),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
     z.object({
@@ -83,11 +83,14 @@ const WidgetForm: FunctionComponent<Props> = ({
       field: z.string().min(1, { message: t('Should not be empty') }),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
-      limit: z.number().optional(),
+      limit: z.number()
+        .min(1, { message: t('Minimum value is 1') })
+        .max(100, { message: t('Maximum value is 100') })
+        .optional(),
       widget_configuration_type: z.literal('structural-histogram'),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
     z.object({
@@ -97,10 +100,14 @@ const WidgetForm: FunctionComponent<Props> = ({
         direction: z.literal('ASC').or(z.literal('DESC')),
         fieldName: z.string(),
       })).optional(),
+      limit: z.number()
+        .min(1, { message: t('Minimum value is 1') })
+        .max(1000, { message: t('Maximum value is 1000') })
+        .optional(),
       columns: z.array(z.string()),
       series: z.array(z.object({
         name: z.string().optional(),
-        filter: z.any().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
   ]);
@@ -115,7 +122,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -163,7 +170,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     onClose();
   };
 
-  const handleSubmitWithoutPropagation = () => {
+  const handleSubmitWithoutPropagation = async () => {
     handleSubmit((values) => {
       onSubmit(values);
       onClose();
@@ -172,6 +179,7 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   const getSeriesComponent = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
+      case 'attack-path':
       case 'security-coverage': return (
         <Controller
           control={control}
@@ -181,6 +189,7 @@ const WidgetForm: FunctionComponent<Props> = ({
               value={value}
               onChange={onChange}
               onSubmit={nextStep}
+              isSimulationFilterMandatory={widgetType === 'attack-path'}
             />
           )}
         />

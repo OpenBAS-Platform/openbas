@@ -15,7 +15,9 @@ public enum WidgetType {
   @JsonProperty("donut")
   DONUT("donut"),
   @JsonProperty("list")
-  LIST("list");
+  LIST("list"),
+  @JsonProperty("attack-path")
+  ATTACK_PATH("attack-path");
 
   public final String type;
 

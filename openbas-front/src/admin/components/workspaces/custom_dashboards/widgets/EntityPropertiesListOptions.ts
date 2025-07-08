@@ -15,7 +15,7 @@ const getEntityPropertiesListOptions = (props: PropertySchemaDTO[], widgetType: 
       }
       acc.push({
         id: d.schema_property_name,
-        label: d.schema_property_label,
+        label: d.schema_property_name,
         group,
       });
       return acc;

@@ -1,7 +1,7 @@
 import { type FunctionComponent } from 'react';
 import { useParams } from 'react-router';
 
-import { searchFindingsForInjects } from '../../../../actions/findings/finding-actions';
+import { searchDistinctFindingsForInjects, searchFindingsForInjects } from '../../../../actions/findings/finding-actions';
 import { type InjectResultOverviewOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import FindingList from '../../findings/FindingList';
 
@@ -12,8 +12,12 @@ const AtomicTestingFindings: FunctionComponent = () => {
     return searchFindingsForInjects(injectId, input);
   };
 
+  const searchDistinct = (input: SearchPaginationInput) => {
+    return searchDistinctFindingsForInjects(injectId, input);
+  };
+
   return (
-    <FindingList filterLocalStorageKey="atm-findings" searchFindings={search} contextId={injectId} />
+    <FindingList filterLocalStorageKey="atm-findings" searchDistinctFindings={searchDistinct} searchFindings={search} contextId={injectId} />
   );
 };
 

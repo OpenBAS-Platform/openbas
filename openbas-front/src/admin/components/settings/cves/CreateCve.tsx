@@ -55,7 +55,7 @@ const CreateCve: FunctionComponent<Props> = ({ onCreate }) => {
       <Drawer
         open={open}
         handleClose={() => setOpen(false)}
-        title={t('Add a CVE')}
+        title={t('Add a new CVE')}
       >
         <CveForm
           onSubmit={onSubmit}

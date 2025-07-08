@@ -1,11 +1,15 @@
-import { simpleCall } from '../../utils/Action';
+import { simplePostCall } from '../../utils/Action';
 
 export const DASHBOARD_URI = '/api/dashboards';
 
-export const series = (widgetId: string) => {
-  return simpleCall(`${DASHBOARD_URI}/series/${widgetId}`);
+export const series = (widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${DASHBOARD_URI}/series/${widgetId}`, parameters);
 };
 
-export const entities = (widgetId: string) => {
-  return simpleCall(`${DASHBOARD_URI}/entities/${widgetId}`);
+export const entities = (widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${DASHBOARD_URI}/entities/${widgetId}`, parameters);
+};
+
+export const attackPaths = (widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${DASHBOARD_URI}/attack-paths/${widgetId}`, parameters);
 };

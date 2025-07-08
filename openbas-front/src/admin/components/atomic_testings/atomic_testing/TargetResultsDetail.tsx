@@ -154,7 +154,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     type: '',
     key: 'attack-ended',
   }];
-  const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
+  const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
@@ -740,7 +740,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         {emptyFilled(getLabelOfValidationType(injectExpectation))}
                       </div>
                     </div>
-                    {isTechnicalExpectation(injectExpectation.inject_expectation_type) && (
+                    {isTechnicalExpectation(injectExpectation.inject_expectation_type) && injectExpectation.inject_expectation_type !== 'VULNERABILITY' && (
                       <TableContainer>
                         <Table
                           size="small"
@@ -971,11 +971,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
 const TargetResultsDetail: FunctionComponent<Props> = (props) => {
   return (
-    <>
-      <ReactFlowProvider>
-        <TargetResultsDetailFlow {...props} />
-      </ReactFlowProvider>
-    </>
+    <ReactFlowProvider>
+      <TargetResultsDetailFlow {...props} />
+    </ReactFlowProvider>
   );
 };
 

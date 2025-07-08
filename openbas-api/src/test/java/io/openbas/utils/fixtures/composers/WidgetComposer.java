@@ -2,7 +2,6 @@ package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.Widget;
 import io.openbas.database.repository.WidgetRepository;
-import io.openbas.rest.custom_dashboard.CustomDashboardComposer;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
