@@ -9,20 +9,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
-import io.openbas.rest.exercise.form.CheckExerciseRulesInput;
-import io.openbas.rest.exercise.form.ExerciseUpdateStartDateInput;
-import io.openbas.rest.exercise.form.ExerciseUpdateStatusInput;
-import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
+import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -37,7 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class ExerciseApiTest {
   @Autowired private MockMvc mvc;
-
+  @Autowired private ObjectMapper objectMapper;
   @Autowired private AgentComposer agentComposer;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private ExerciseComposer exerciseComposer;
@@ -302,5 +301,50 @@ public class ExerciseApiTest {
           .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
+  }
+
+  @Test
+  @Transactional
+  @DisplayName("Should enable all users of newly added teams when replacing exercise teams")
+  @WithMockAdminUser
+  void replacingTeamsShouldEnableNewTeamUsers() throws Exception {
+    // -- PREPARE --
+    User userTom = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
+    User userBen = userRepository.save(UserFixture.getUser("Ben", "TEST", "ben-test@fake.email"));
+    USER_IDS.addAll(Arrays.asList(userTom.getId(), userBen.getId()));
+
+    Team teamA = TeamFixture.getTeam(userTom, "TeamA", false);
+    teamA.setUsers(List.of(userTom));
+    teamRepository.save(teamA);
+    Team teamB = TeamFixture.getTeam(userBen, "TeamB", false);
+    teamB.setUsers(List.of(userBen));
+    teamRepository.save(teamB);
+
+    TEAM_IDS.addAll(Arrays.asList(teamA.getId(), teamB.getId()));
+
+    Exercise exercise = ExerciseFixture.createDefaultCrisisExercise();
+    exercise.setTeams(Collections.singletonList(teamA)); // team A is already added
+    Exercise exerciseSaved = exerciseRepository.save(exercise);
+    EXERCISE_IDS.add(exerciseSaved.getId());
+
+    // -- ACT --
+    List<String> newTeamIds = Arrays.asList(teamA.getId(), teamB.getId()); // we add team B
+    ExerciseUpdateTeamsInput input = new ExerciseUpdateTeamsInput();
+    input.setTeamIds(newTeamIds);
+
+    mvc.perform(
+            put(EXERCISE_URI + "/" + exerciseSaved.getId() + "/teams/replace")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(input))
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+
+    // -- ASSERT --
+    List<ExerciseTeamUser> links = exerciseTeamUserRepository.findAll();
+
+    ExerciseTeamUser link = links.getFirst();
+    assertEquals(exerciseSaved.getId(), link.getExercise().getId());
+    assertEquals(teamB.getId(), link.getTeam().getId());
+    assertEquals(userBen.getId(), link.getUser().getId());
   }
 }

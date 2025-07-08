@@ -61,7 +61,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RequiredArgsConstructor
 @Validated
@@ -678,19 +677,17 @@ public class ExerciseService {
     List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
     exercise.setTeams(teams);
 
-    List<String> teamIdsAdded = teamIds.stream()
-            .filter(id -> !previousTeamIds.contains(id))
-            .toList();
+    List<String> teamIdsAdded =
+        teamIds.stream().filter(id -> !previousTeamIds.contains(id)).toList();
 
-    List<Team> teamsAdded =fromIterable(this.teamRepository.findAllById(teamIdsAdded));
+    List<Team> teamsAdded = fromIterable(this.teamRepository.findAllById(teamIdsAdded));
 
     // Enable user
-    teamsAdded.forEach(team -> {
-      List<String> playerIds = team.getUsers().stream()
-              .map(User::getId)
-              .toList();
-      this.enablePlayers(exerciseId, team.getId(), playerIds);
-    });
+    teamsAdded.forEach(
+        team -> {
+          List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
+          this.enablePlayers(exerciseId, team.getId(), playerIds);
+        });
 
     // You must return all the modified teams to ensure the frontend store updates correctly
     List<String> modifiedTeamIds =
@@ -700,23 +697,21 @@ public class ExerciseService {
     return teamService.find(fromIds(modifiedTeamIds));
   }
 
-
-
   public Exercise enablePlayers(
-          @NotBlank final String exerciseId,
-          @NotBlank final String teamId,
-          @NotNull final List<String> playerIds) {
-    Exercise exercise = exerciseRepository.findById(exerciseId)
-            .orElseThrow(ElementNotFoundException::new);
+      @NotBlank final String exerciseId,
+      @NotBlank final String teamId,
+      @NotNull final List<String> playerIds) {
+    Exercise exercise =
+        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Team team = this.teamRepository.findById(teamId).orElseThrow();
     playerIds.forEach(
-            playerId -> {
-              ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
-              exerciseTeamUser.setExercise(exercise);
-              exerciseTeamUser.setTeam(team);
-              exerciseTeamUser.setUser(this.userRepository.findById(playerId).orElseThrow());
-              this.exerciseTeamUserRepository.save(exerciseTeamUser);
-            });
+        playerId -> {
+          ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+          exerciseTeamUser.setExercise(exercise);
+          exerciseTeamUser.setTeam(team);
+          exerciseTeamUser.setUser(this.userRepository.findById(playerId).orElseThrow());
+          this.exerciseTeamUserRepository.save(exerciseTeamUser);
+        });
     return exercise;
   }
 

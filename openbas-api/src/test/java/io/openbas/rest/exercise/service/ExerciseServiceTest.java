@@ -56,6 +56,7 @@ class ExerciseServiceTest {
   @Mock private ArticleRepository articleRepository;
   @Mock private ExerciseRepository exerciseRepository;
   @Mock private TeamRepository teamRepository;
+  @Mock private UserRepository userRepository;
   @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock private InjectRepository injectRepository;
   @Mock private LessonsCategoryRepository lessonsCategoryRepository;
@@ -85,6 +86,7 @@ class ExerciseServiceTest {
             articleRepository,
             exerciseRepository,
             teamRepository,
+            userRepository,
             exerciseTeamUserRepository,
             injectRepository,
             lessonsCategoryRepository);
