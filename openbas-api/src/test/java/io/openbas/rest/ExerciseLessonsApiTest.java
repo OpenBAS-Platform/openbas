@@ -23,7 +23,6 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.lessons.form.LessonsSendInput;
 import io.openbas.service.MailingService;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
