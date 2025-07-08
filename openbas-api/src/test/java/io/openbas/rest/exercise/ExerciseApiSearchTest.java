@@ -36,6 +36,7 @@ public class ExerciseApiSearchTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
+    exerciseRepository.deleteAll();
     Exercise exercise1 = ExerciseFixture.createDefaultCrisisExercise();
     Exercise exercise1Saved = this.exerciseRepository.save(exercise1);
     EXERCISE_IDS.add(exercise1Saved.getId());
