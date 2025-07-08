@@ -1314,7 +1314,7 @@ public class V1_DataImporter implements Importer {
           detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
         }
       } else {
-        log.warn("Import Payload: Missing Collector type: {}", type);
+        log.warn("Import Detection Remediations: Missing Collector type: {}", type);
       }
     }
     return detectionRemediationInputs;

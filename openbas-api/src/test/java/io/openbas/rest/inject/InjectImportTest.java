@@ -691,6 +691,7 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+          Assertions.assertEquals(expected.getDetectionRemediations().size(), recreated.get().getDetectionRemediations().size());
         }
       }
 
