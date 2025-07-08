@@ -104,16 +104,17 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
 
     // --EXECUTE--
-    Exception exception =
-        mvc.perform(
-                post(PLAYER_URI)
-                    .content(asJsonString(playerInput))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andReturn()
-            .getResolvedException();
-
-    assertInstanceOf(UnsupportedOperationException.class, exception);
+    try {
+      mvc.perform(
+              post(PLAYER_URI)
+                  .content(asJsonString(playerInput))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andReturn();
+    } catch (Exception exception) {
+      assertInstanceOf(ServletException.class, exception);
+      assertTrue(exception.getMessage().contains("User is restricted"));
+    }
   }
 
   @DisplayName("Given valid player input, should upsert player successfully")
@@ -204,16 +205,17 @@ class PlayerApiTest extends IntegrationTest {
     User user = userRepository.findByEmailIgnoreCase(adminEmail).orElseThrow();
 
     // -- EXECUTE --
-    Exception exception =
-        mvc.perform(
-                put(PLAYER_URI + "/" + user.getId())
-                    .content(asJsonString(playerInput))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andReturn()
-            .getResolvedException();
-
-    assertInstanceOf(UnsupportedOperationException.class, exception);
+    try {
+      mvc.perform(
+              put(PLAYER_URI + "/" + user.getId())
+                  .content(asJsonString(playerInput))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andReturn();
+    } catch (Exception exception) {
+      assertInstanceOf(ServletException.class, exception);
+      assertTrue(exception.getMessage().contains("You dont have the right to update this user"));
+    }
   }
 
   @DisplayName("Given valid player ID, should delete player successfully")
