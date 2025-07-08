@@ -1306,14 +1306,15 @@ public class V1_DataImporter implements Importer {
     ArrayNode detectionNodes = (ArrayNode) payloadNode.get("payload_detection_remediations");
     for (JsonNode detectionNode : detectionNodes) {
       JsonNode valueNode = detectionNode.get("detection_remediation_values");
-      Optional<Collector> collector =
-          collectorRepository.findByType(
-              detectionNode.get("detection_remediation_collector").textValue());
+      String type = detectionNode.get("detection_remediation_collector").textValue();
+      Optional<Collector> collector = collectorRepository.findByType(type);
 
       if (collector.isPresent()) {
         if (valueNode == null || valueNode.asText().trim().isEmpty()) {
           detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
         }
+      } else {
+        log.warn("Import Payload: Missing Collector type: {}", type);
       }
     }
     return detectionRemediationInputs;

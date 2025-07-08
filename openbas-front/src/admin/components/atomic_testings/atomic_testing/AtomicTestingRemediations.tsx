@@ -75,7 +75,7 @@ const AtomicTestingRemediations = () => {
   const activeCollectorRemediations = useMemo(() => {
     const activeCollector = tabs[activeTab];
     if (!activeCollector) return [];
-console.log(detectionRemediations);
+    console.log(detectionRemediations);
     return detectionRemediations.filter(
       rem => rem.detection_remediation_collector === activeCollector.collector_type,
     );
