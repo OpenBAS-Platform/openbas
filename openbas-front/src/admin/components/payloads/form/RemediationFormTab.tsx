@@ -75,7 +75,7 @@ const RemediationFormTab = () => {
           style={{
             height: '250px',
             position: 'relative',
-            display: tab.collector_id === tabs[activeTab].collector_id ? 'block' : 'none',
+            display: tab.collector_type === tabs[activeTab].collector_type ? 'block' : 'none',
           }}
         >
           <Controller

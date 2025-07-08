@@ -1201,7 +1201,7 @@ export type DateHistogramWidget = UtilRequiredKeys<
 };
 
 export interface DetectionRemediation {
-  detection_remediation_collector_id: string;
+  detection_remediation_collector_type: string;
   /** @format date-time */
   detection_remediation_created_at?: string;
   detection_remediation_id: string;
