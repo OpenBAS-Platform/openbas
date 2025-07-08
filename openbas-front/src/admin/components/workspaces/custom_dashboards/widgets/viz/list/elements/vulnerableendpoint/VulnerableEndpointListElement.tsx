@@ -1,13 +1,11 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import qs from 'qs';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import AssetPlatformFragment from '../../../../../../../../../components/common/list/fragments/AssetPlatformFragment';
 import AssetTagsFragment from '../../../../../../../../../components/common/list/fragments/AssetTagsFragment';
-import ElementWithPopoverFragment
-  from '../../../../../../../../../components/common/list/fragments/ElementWithPopoverFragment';
 import EndpointActiveFragment from '../../../../../../../../../components/common/list/fragments/EndpointActiveFragment';
 import EndpointAgentsPrivilegeFragment
   from '../../../../../../../../../components/common/list/fragments/EndpointAgentsPrivilegeFragment';
@@ -79,11 +77,10 @@ const VulnerableEndpointListElement = (props: Props) => {
       default: return (endpoint: EsVulnerableEndpoint) => {
         const key = column as keyof typeof endpoint;
         const text = endpoint[key]?.toString() || '';
-        const richText = Object.prototype.toString.call(endpoint[key]) === '[object Array]'
-          ? <ul>{(endpoint[key] as string[])?.map(itm => <li key={key.toString()}>{itm.toString()}</li>)}</ul>
-          : <span>{endpoint[key]?.toString()}</span>;
         return (
-          <ElementWithPopoverFragment simpleText={text} richText={richText} />
+          <Tooltip title={text} placement="bottom-start">
+            <span>{text}</span>
+          </Tooltip>
         );
       };
     }

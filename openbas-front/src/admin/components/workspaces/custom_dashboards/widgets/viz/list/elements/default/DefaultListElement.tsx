@@ -1,9 +1,7 @@
 import { Description } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
-import ElementWithPopoverFragment
-  from '../../../../../../../../../components/common/list/fragments/ElementWithPopoverFragment';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { type EsBase } from '../../../../../../../../../utils/api-types';
 import buildStyles from '../ColumnStyles';
@@ -30,11 +28,10 @@ const DefaultListElement = (props: Props) => {
       default: return (element: EsBase) => {
         const key = column as keyof typeof element;
         const text = element[key]?.toString() || '';
-        const richText = Object.prototype.toString.call(element[key]) === '[object Array]'
-          ? <ul>{(element[key] as string[])?.map(itm => <li key={key.toString()}>{itm.toString()}</li>)}</ul>
-          : <span>{element[key]?.toString()}</span>;
         return (
-          <ElementWithPopoverFragment simpleText={text} richText={richText} />
+          <Tooltip title={text} placement="bottom-start">
+            <span>{text}</span>
+          </Tooltip>
         );
       };
     }
