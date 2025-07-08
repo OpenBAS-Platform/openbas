@@ -1,9 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
-import io.openbas.database.model.Executable;
-import io.openbas.database.model.FileDrop;
-import io.openbas.database.model.Payload;
-import io.openbas.database.model.Tag;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.PayloadRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +11,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PayloadComposer extends ComposerBase<Payload> {
+
   @Autowired PayloadRepository payloadRepository;
 
   public class Composer extends InnerComposerBase<Payload> {
+
     private final Payload payload;
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private Optional<DocumentComposer.Composer> documentComposer = Optional.empty();
+    private List<DetectionRemediationComposer.Composer> detectionRemediationComposers =
+        new ArrayList<>();
 
     public Composer(Payload payload) {
       this.payload = payload;
@@ -42,6 +43,19 @@ public class PayloadComposer extends ComposerBase<Payload> {
       return this;
     }
 
+    public Composer withDetectionRemediation(
+        DetectionRemediationComposer.Composer detectionRemediationComposer) {
+      detectionRemediationComposers.add(detectionRemediationComposer);
+      List<DetectionRemediation> detectionRemediations = payload.getDetectionRemediations();
+
+      DetectionRemediation detectionRemediation = detectionRemediationComposer.get();
+      detectionRemediation.setPayload(payload);
+      detectionRemediations.add(detectionRemediation);
+
+      payload.setDetectionRemediations(detectionRemediations);
+      return this;
+    }
+
     public Composer withExecutable(DocumentComposer.Composer newDocumentComposer) {
       if (!(payload instanceof Executable)) {
         throw new IllegalArgumentException("Payload is not a Executable");
@@ -55,6 +69,7 @@ public class PayloadComposer extends ComposerBase<Payload> {
     public Composer persist() {
       documentComposer.ifPresent(DocumentComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
+      detectionRemediationComposers.forEach(DetectionRemediationComposer.Composer::persist);
       payload.setId(null);
       payloadRepository.save(payload);
       return this;
@@ -64,6 +79,7 @@ public class PayloadComposer extends ComposerBase<Payload> {
     public Composer delete() {
       documentComposer.ifPresent(DocumentComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
+      detectionRemediationComposers.forEach(DetectionRemediationComposer.Composer::delete);
       payloadRepository.delete(payload);
       return this;
     }

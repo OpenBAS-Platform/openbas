@@ -2,6 +2,7 @@ package io.openbas.rest.inject;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
+import static io.openbas.utils.fixtures.PayloadFixture.createDetectionRemediation;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -59,12 +60,14 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private ChannelComposer channelComposer;
   @Autowired private ChallengeComposer challengeComposer;
   @Autowired private DocumentComposer documentComposer;
+  @Autowired private CollectorComposer collectorComposer;
   @Autowired private FileService fileService;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamComposer teamComposer;
   @Autowired private UserComposer userComposer;
   @Autowired private OrganizationComposer organizationComposer;
   @Autowired private TagComposer tagComposer;
+  @Autowired private DetectionRemediationComposer detectionRemediationComposer;
   @Autowired private PayloadComposer payloadComposer;
   @Autowired private ChallengeService challengeService;
   @Autowired private EntityManager entityManager;
@@ -84,9 +87,11 @@ public class InjectImportTest extends IntegrationTest {
     documentComposer.reset();
     scenarioComposer.reset();
     tagComposer.reset();
+    detectionRemediationComposer.reset();
     exerciseComposer.reset();
     injectorContractComposer.reset();
     payloadComposer.reset();
+    collectorComposer.reset();
 
     staticArticleWrappers.clear();
 
@@ -121,6 +126,15 @@ public class InjectImportTest extends IntegrationTest {
     // Inject in exercise with an article attached
     ArticleComposer.Composer articleWrapper =
         getStaticArticleWrappers().get(KNOWN_ARTICLE_WRAPPER_KEY);
+
+    Collector collector =
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist()
+            .get();
+
+    clearEntityManager();
+
     return List.of(
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
@@ -167,8 +181,11 @@ public class InjectImportTest extends IntegrationTest {
                         payloadComposer
                             .forPayload(PayloadFixture.createDefaultCommand())
                             .withTag(
-                                tagComposer.forTag(
-                                    TagFixture.getTagWithText("secret payload tag")))))
+                                tagComposer.forTag(TagFixture.getTagWithText("secret payload tag")))
+                            .withDetectionRemediation(
+                                detectionRemediationComposer
+                                    .forDetectionRemediation(createDetectionRemediation())
+                                    .withCollector(collectorComposer.forCollector(collector)))))
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with payload tag"))),
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
@@ -335,6 +352,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing null input")
   public class WhenPassingNullInput {
+
     @Test
     @DisplayName("Return BAD REQUEST")
     public void returnBADREQUEST() throws Exception {
@@ -348,6 +366,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing null target")
   public class WhenPassingNullTarget {
+
     @Test
     @DisplayName("Return UNPROCESSABLE CONTENT")
     public void returnUNPROCESSABLECONTENT() throws Exception {
@@ -361,6 +380,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing invalid target type")
   public class WhenPassingInvalidTargetType {
+
     @Test
     @DisplayName("Return BAD REQUEST")
     public void returnBADREQUEST() throws Exception {
@@ -380,6 +400,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking PLANNER permissions on destination exercise")
   public class WhenLackingPLANNERPermissionsOnExercise {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -400,6 +421,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When destination exercise is not found")
   public class WhenDestinationExerciseNotFound {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNotFound() throws Exception {
@@ -416,6 +438,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking PLANNER permissions on scenario")
   public class WhenLackingPLANNERPermissionsOnScenario {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -439,6 +462,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When destination scenario is not found")
   public class WhenDestinationScenarioNotFound {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNotFound() throws Exception {
@@ -455,6 +479,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking ADMIN permissions for atomic testings")
   public class WhenLackingADMINPermissionsForAtomicTests {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -691,7 +716,9 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
-          Assertions.assertEquals(expected.getDetectionRemediations().size(), recreated.get().getDetectionRemediations().size());
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
         }
       }
 
