@@ -242,6 +242,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when launch exercise with Crowdstrike")
+    @WithMockAdminUser
     void given_crowdstrike_should_not_launchExercise() throws Exception {
       Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
       ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -258,6 +259,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when schedule exercise with Tanium")
+    @WithMockAdminUser
     void given_tanium_should_not_scheduleExercise() throws Exception {
       Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
       ExerciseUpdateStartDateInput input = new ExerciseUpdateStartDateInput();
@@ -273,6 +275,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when add Tanium on scheduled scenario")
+    @WithMockAdminUser
     void given_taniumAsset_should_not_beAddedToScheduledExercise() throws Exception {
       Exercise exercise = getExercise(null);
 
