@@ -1335,6 +1335,19 @@ public class InjectTargetSearchTest extends IntegrationTest {
   public class WithEndpointSearch {
     private final TargetType targetType = TargetType.ASSETS;
 
+    @BeforeEach
+    public void beforeEach() {
+      injectComposer.reset();
+      injectContractComposer.reset();
+      payloadComposer.reset();
+      assetGroupComposer.reset();
+      injectExpectationComposer.reset();
+      endpointComposer.reset();
+      agentComposer.reset();
+      executorComposer.reset();
+      tagComposer.reset();
+    }
+
     @Nested
     @DisplayName("When getting options for inject targets")
     public class WhenGettingOptionsForInjectTargets {
