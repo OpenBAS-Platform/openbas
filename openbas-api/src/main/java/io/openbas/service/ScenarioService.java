@@ -586,7 +586,7 @@ public class ScenarioService {
     teamsAdded.forEach(
         team -> {
           List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
-          this.enablePlayers(scenarioId, team.getId(), playerIds);
+          this.enablePlayers(scenarioId, team, playerIds);
         });
 
     // You must return all the modified teams to ensure the frontend store updates correctly
@@ -597,12 +597,30 @@ public class ScenarioService {
     return teamService.find(fromIds(modifiedTeamIds));
   }
 
-  public Scenario enablePlayers(
+  public Scenario addScenarioPlayer(
       @NotBlank final String scenarioId,
       @NotBlank final String teamId,
       @NotNull final List<String> playerIds) {
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+    Iterable<User> teamUsers = userRepository.findAllById(playerIds);
+    team.getUsers().addAll(fromIterable(teamUsers));
+    Team savedTeam = teamRepository.save(team);
+    return this.enablePlayers(scenarioId, savedTeam, playerIds);
+  }
+
+  public Scenario enableAddScenarioTeamPlayer(
+      @NotBlank final String scenarioId,
+      @NotBlank final String teamId,
+      @NotNull final List<String> playerIds) {
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+    return this.enablePlayers(scenarioId, team, playerIds);
+  }
+
+  public Scenario enablePlayers(
+      @NotBlank final String scenarioId,
+      @NotBlank final Team team,
+      @NotNull final List<String> playerIds) {
     Scenario scenario = this.scenario(scenarioId);
-    Team team = this.teamRepository.findById(teamId).orElseThrow();
     playerIds.forEach(
         playerId -> {
           ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
