@@ -325,6 +325,21 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
+  @Operation(
+      summary = "Inject execution callback for implants",
+      description =
+          "This endpoint is invoked by implants to report the result of an inject execution. "
+              + "It is used to update the inject status and execution traces based on the implant's execution result."
+              + " If the requested action is 'complete', the inject must be in the 'PENDING' state. otherwise a 409"
+              + " is returned. This can sometimes happen if the payload executed by the implant was executed too quickly. ")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Execution callback was successful"),
+        @ApiResponse(
+            responseCode = "409",
+            description =
+                "The inject to update was not in a valid state in regards to the requested action. Retry in a few seconds."),
+      })
   public void injectExecutionCallback(
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.

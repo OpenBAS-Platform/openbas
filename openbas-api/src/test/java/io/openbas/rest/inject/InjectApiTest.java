@@ -554,7 +554,7 @@ class InjectApiTest extends IntegrationTest {
       Inject injectSaved = injectRepository.save(inject);
       doNothing()
           .when(injectStatusService)
-          .addStartImplantExecutionTraceByInject(any(), any(), any());
+          .addStartImplantExecutionTraceByInject(any(), any(), any(), any());
 
       // -- EXECUTE --
       String response =
@@ -643,7 +643,7 @@ class InjectApiTest extends IntegrationTest {
       Inject injectSaved = injectRepository.save(inject);
       doNothing()
           .when(injectStatusService)
-          .addStartImplantExecutionTraceByInject(any(), any(), any());
+          .addStartImplantExecutionTraceByInject(any(), any(), any(), any());
 
       // -- EXECUTE --
       String response =
@@ -689,7 +689,7 @@ class InjectApiTest extends IntegrationTest {
       Inject injectSaved = injectRepository.save(inject);
       doNothing()
           .when(injectStatusService)
-          .addStartImplantExecutionTraceByInject(any(), any(), any());
+          .addStartImplantExecutionTraceByInject(any(), any(), any(), any());
 
       // -- EXECUTE --
       String response =
