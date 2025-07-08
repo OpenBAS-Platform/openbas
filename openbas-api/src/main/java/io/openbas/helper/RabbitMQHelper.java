@@ -44,7 +44,7 @@ public class RabbitMQHelper {
    */
   public static String getRabbitMQVersion(RabbitmqConfig rabbitmqConfig) {
     // If we already have the version, we don't need to get it again
-    if (rabbitMQVersion == null) {
+    if (rabbitMQVersion == null && rabbitmqConfig.getHostname() != null) {
       // Init the rabbit MQ management api overview url
       String uri =
           "http://"
