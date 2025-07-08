@@ -81,6 +81,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     agentRepository.deleteAll();
     injectRepository.deleteAll();
     endpointRepository.deleteAll();
+    injectorContractRepository.delete(savedInjectorContract);
   }
 
   @AfterEach

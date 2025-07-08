@@ -115,6 +115,7 @@ public class ExpectationApiTest extends IntegrationTest {
     endpointRepository.deleteAll();
     collectorRepository.deleteById(savedCollector.getId());
     collectorRepository.deleteById(savedCollector2.getId());
+    injectorContractRepository.delete(savedInjectorContract);
   }
 
   @AfterEach
