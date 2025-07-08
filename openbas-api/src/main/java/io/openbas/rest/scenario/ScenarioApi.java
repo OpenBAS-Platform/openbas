@@ -199,7 +199,8 @@ public class ScenarioApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
+    return this.scenarioService.enableAddScenarioTeamPlayer(
+        scenarioId, teamId, input.getPlayersIds());
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -219,11 +220,7 @@ public class ScenarioApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
-    Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
-    team.getUsers().addAll(fromIterable(teamUsers));
-    teamRepository.save(team);
-    return this.scenarioService.enablePlayers(scenarioId, teamId, input.getPlayersIds());
+    return this.scenarioService.addScenarioPlayer(scenarioId, teamId, input.getPlayersIds());
   }
 
   @Transactional(rollbackOn = Exception.class)
