@@ -784,7 +784,6 @@
   "Install Windows Agent": "Installer l'agent Windows",
   "Installation Instructions": "Instructions d'installation",
   "Installation path": "Chemin d'installation",
-  "Installation procedure": "Procédure d'installation",
   "Installing it as a system grants system-wide privileges.": "L'installer en tant que système accorde des privilèges système globaux.",
   "Installing the agent is requiring local administrator privileges.": "L'installation de l'agent nécessite des privilèges d'administrateur local.",
   "Instantiate a simulation": "Créer une nouvelle simulation",
