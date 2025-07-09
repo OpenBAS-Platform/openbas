@@ -168,6 +168,7 @@
   "base_agent_side": "代理商",
   "base_agents_side": "代理商",
   "base_asset_group_side": "资产组",
+  "base_asset_side": "资产",
   "base_attack_patterns_side": "攻击模式",
   "base_created_at": "创建于",
   "base_endpoint_side": "终点",
@@ -912,6 +913,7 @@
   "Messages header": "消息头",
   "Metrics": "指标",
   "microblogging": "微博",
+  "Minimum value is 1": "最小值为 1",
   "Minutes": "分钟",
   "Missing content": "缺少内容",
   "Missing token": "缺少令牌",
@@ -1694,6 +1696,5 @@
   "Your file should be a XLS": "你的文件应该为XLS",
   "Your overall evaluation about this question.": "您对此问题的总体评价。",
   "your trial license online": "在线试用许可证",
-  "YYYY": "YYYY",
-  "Minimum value is 1": "最小值为 1"
+  "YYYY": "YYYY"
 }

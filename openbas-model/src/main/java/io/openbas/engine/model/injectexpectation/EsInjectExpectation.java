@@ -3,6 +3,7 @@ package io.openbas.engine.model.injectexpectation;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.Filters;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_STATUS;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.engine.model.EsBase;
@@ -70,15 +71,24 @@ public class EsInjectExpectation extends EsBase {
   @EsQueryable(keyword = true)
   private String base_team_side; // Must finish by _side
 
-  @Queryable(label = "agent")
+  @Queryable(
+      label = "agent",
+      filterable = true,
+      overrideOperators = {Filters.FilterOperator.empty, Filters.FilterOperator.not_empty})
   @EsQueryable(keyword = true)
   private String base_agent_side; // Must finish by _side
 
-  @Queryable(label = "asset")
+  @Queryable(
+      label = "asset",
+      filterable = true,
+      overrideOperators = {Filters.FilterOperator.empty, Filters.FilterOperator.not_empty})
   @EsQueryable(keyword = true)
   private String base_asset_side; // Must finish by _side
 
-  @Queryable(label = "asset group")
+  @Queryable(
+      label = "asset group",
+      filterable = true,
+      overrideOperators = {Filters.FilterOperator.empty, Filters.FilterOperator.not_empty})
   @EsQueryable(keyword = true)
   private String base_asset_group_side; // Must finish by _side
 

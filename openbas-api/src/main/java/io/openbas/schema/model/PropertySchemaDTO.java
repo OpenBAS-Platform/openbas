@@ -1,6 +1,7 @@
 package io.openbas.schema.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Filters;
 import io.openbas.schema.PropertySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +39,9 @@ public class PropertySchemaDTO {
   @JsonProperty("schema_property_has_dynamic_value")
   private boolean dynamicValues;
 
+  @JsonProperty("schema_property_override_operators")
+  private List<Filters.FilterOperator> overrideOperators;
+
   public PropertySchemaDTO(@NotNull final PropertySchema propertySchema) {
     this.setJsonName(propertySchema.getJsonName());
     this.setEntity(propertySchema.getEntity());
@@ -51,5 +55,6 @@ public class PropertySchemaDTO {
     this.setValues(propertySchema.getAvailableValues());
     this.setDynamicValues(propertySchema.isDynamicValues());
     this.setType(propertySchema.getType().getSimpleName().toLowerCase());
+    this.setOverrideOperators(propertySchema.getOverrideOperators());
   }
 }

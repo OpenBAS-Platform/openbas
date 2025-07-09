@@ -115,6 +115,9 @@ export const OperatorKeyValues: { [key: string]: string } = {
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {
+  if (propertySchema.schema_property_override_operators && propertySchema.schema_property_override_operators.length > 0) {
+    return propertySchema.schema_property_override_operators;
+  }
   // Date
   if (propertySchema.schema_property_type.includes('instant')) {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];

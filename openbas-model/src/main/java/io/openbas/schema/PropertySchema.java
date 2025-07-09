@@ -3,6 +3,7 @@ package io.openbas.schema;
 import static lombok.AccessLevel.NONE;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -32,6 +33,7 @@ public class PropertySchema {
   private final List<String> availableValues;
   private final boolean dynamicValues;
   private final boolean sortable;
+  private final List<Filters.FilterOperator> overrideOperators;
 
   private final JoinTable joinTable;
   private final String path;
