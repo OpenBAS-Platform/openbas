@@ -67,6 +67,7 @@ const ThemeLight = (
       lightBackground: hexToRGB(EE_COLOR, 0.08),
       contrastText: '#ffffff',
     },
+    xtmhub: { main: '#00f1bd' },
     background: {
       default: background || THEME_LIGHT_DEFAULT_BACKGROUND,
       paper: paper || THEME_LIGHT_DEFAULT_PAPER,

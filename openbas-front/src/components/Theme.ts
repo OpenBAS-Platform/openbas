@@ -36,6 +36,7 @@ declare module '@mui/material/styles' {
     chip: PaletteColor;
     ee: PaletteColor;
     ai: PaletteColor;
+    xtmhub: PaletteColor;
     card: { paper: string };
     labelChipMap: Map<string, LabelColor>;
   }
@@ -44,6 +45,7 @@ declare module '@mui/material/styles' {
     ee: PaletteColorOptions;
     ai: PaletteColorOptions;
     labelChipMap: Map<string, LabelColor>;
+    xtmhub: PaletteColorOptions;
   }
   interface Theme {
     logo: string | undefined;

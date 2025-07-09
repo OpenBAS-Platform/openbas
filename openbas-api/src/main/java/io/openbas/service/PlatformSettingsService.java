@@ -20,6 +20,7 @@ import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import io.openbas.injectors.xtmhub.config.XTMHubConfig;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.*;
@@ -52,6 +53,7 @@ public class PlatformSettingsService {
   private Environment env;
   private SettingRepository settingRepository;
   private OpenCTIConfig openCTIConfig;
+  private XTMHubConfig xtmHubConfig;
   private AiConfig aiConfig;
   private CalderaExecutorConfig calderaExecutorConfig;
   private Ee eeService;
@@ -70,6 +72,11 @@ public class PlatformSettingsService {
   @Autowired
   public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
     this.openCTIConfig = openCTIConfig;
+  }
+
+  @Autowired
+  public void setXtmHubConfig(XTMHubConfig xtmHubConfig) {
+    this.xtmHubConfig = xtmHubConfig;
   }
 
   @Autowired
@@ -228,6 +235,8 @@ public class PlatformSettingsService {
       platformSettings.setPlatformAgentUrl(openBASConfig.getBaseUrlForAgent());
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
       platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
+      platformSettings.setXtmHubEnable(xtmHubConfig.getEnable());
+      platformSettings.setXtmHubUrl(xtmHubConfig.getUrl());
       platformSettings.setAiEnabled(aiConfig.isEnabled());
       platformSettings.setAiHasToken(StringUtils.hasText(aiConfig.getToken()));
       platformSettings.setAiType(aiConfig.getType());

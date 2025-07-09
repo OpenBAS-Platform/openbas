@@ -4374,6 +4374,10 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   /** True if telemetry manager enable */
   telemetry_manager_enable?: boolean;
+  /** True if connection with XTM Hub is enabled */
+  xtm_hub_enable?: boolean;
+  /** Url of XTM Hub */
+  xtm_hub_url?: string;
   /** True if connection with OpenCTI is enabled */
   xtm_opencti_enable?: boolean;
   /** Url of OpenCTI */
