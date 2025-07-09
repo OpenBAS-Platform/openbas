@@ -251,7 +251,7 @@ const InjectContentForm = ({
     {
       title: t('Inject documents'),
       render: renderDocuments,
-      show: !isAtomic,
+      show: true,
     },
   ];
 
