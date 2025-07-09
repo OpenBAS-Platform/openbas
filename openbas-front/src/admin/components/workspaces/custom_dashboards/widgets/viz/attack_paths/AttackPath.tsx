@@ -171,7 +171,7 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   const createEdgesByAttackPath = (attackPath: EsAttackPath, phase: KillChainPhaseObject) => {
     const nodeId = getNodeId(attackPath.attackPatternId, phase);
     return getAllChildrenNodeId(attackPath)
-      .filter(nodeChildId => nodeChildId != nodeId)
+      .filter(nodeChildId => nodeChildId !== nodeId && hoveredNodeId !== null && hoveredNodeId === nodeId)
       .map((nodeChildId) => {
         return {
           id: attackPath.attackPatternId + '-' + phase.id + '-' + nodeChildId + '-edge',
@@ -182,9 +182,9 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
             type: MarkerType.ArrowClosed,
             width: arrowSize,
             height: arrowSize,
-            color: nodeId == hoveredNodeId ? 'red' : 'none',
+            color: 'red',
           },
-          style: { stroke: nodeId == hoveredNodeId ? 'red' : 'none' },
+          style: { stroke: 'red' },
         };
       });
   };
