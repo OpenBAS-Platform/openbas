@@ -5,6 +5,8 @@ import static io.openbas.rest.inject.InjectApi.INJECT_URI;
 import static io.openbas.utils.fixtures.PayloadFixture.createDetectionRemediation;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +18,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.inject.form.InjectImportInput;
 import io.openbas.rest.inject.form.InjectImportTargetDefinition;
@@ -36,6 +39,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
@@ -74,6 +78,8 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private ArticleService articleService;
   @Autowired private InjectorFixture injectorFixture;
+
+  @MockBean private Ee eeService;
 
   @BeforeEach
   void before() throws Exception {
@@ -680,6 +686,10 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        //If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
@@ -715,7 +725,15 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
-          Assertions.assertEquals(expected.getDetectionRemediations().size(), 0);
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().get(0).getValues(),
+              recreated.get().getDetectionRemediations().get(0).getValues());
         }
       }
 

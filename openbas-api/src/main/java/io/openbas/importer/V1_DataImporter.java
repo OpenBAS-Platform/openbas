@@ -1279,14 +1279,13 @@ public class V1_DataImporter implements Importer {
 
     List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
     payloadCreateInput.setAttackPatternsIds(attackPatternIds);
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
     payload.setTags(
         resolveJsonIds(payloadNode, "payload_tags").stream()
             .map(baseIds::get)
             .map(Tag.class::cast)
             .collect(Collectors.toSet()));
-
-    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
 
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
@@ -1301,25 +1300,28 @@ public class V1_DataImporter implements Importer {
 
   private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(JsonNode payloadNode) {
     List<DetectionRemediationInput> detectionRemediationInputs = new ArrayList<>();
-    if (!payloadNode.has("payload_detection_remediations")) {
+
+    JsonNode remediationsNode = payloadNode.get("payload_detection_remediations");
+    if (remediationsNode == null || !remediationsNode.isArray()) {
       return detectionRemediationInputs;
     }
 
-    ArrayNode detectionNodes = (ArrayNode) payloadNode.get("payload_detection_remediations");
-    for (JsonNode detectionNode : detectionNodes) {
-      JsonNode valueNode = detectionNode.get("detection_remediation_values");
+    for (JsonNode detectionNode : remediationsNode) {
+      String valuesText = getTextValue(detectionNode, "detection_remediation_values");
+      String type = getTextValue(detectionNode, "detection_remediation_collector_type");
 
-      if (valueNode != null && !valueNode.isNull() && !valueNode.asText().trim().isEmpty()) {
-        String type = detectionNode.get("detection_remediation_collector_type").textValue();
-        Optional<Collector> collector = collectorRepository.findByType(type);
+      if (valuesText.isEmpty()) {
+        continue;
+      }
 
-        if (collector.isPresent()) {
-          detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
-        } else {
-          log.warn("Import Detection Remediations: Missing Collector type: {}", type);
-        }
+      Optional<Collector> collector = collectorRepository.findByType(type);
+      if (collector.isPresent()) {
+        detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+      } else {
+        log.warn("Import Detection Remediations: Missing Collector type: {}", type);
       }
     }
+
     return detectionRemediationInputs;
   }
 
@@ -1327,8 +1329,13 @@ public class V1_DataImporter implements Importer {
     DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
     detectionRemediation.setValues((node.get("detection_remediation_values").textValue()));
     detectionRemediation.setCollectorType(
-        (node.get("detection_remediation_collector").textValue()));
+        (node.get("detection_remediation_collector_type").textValue()));
     return detectionRemediation;
+  }
+
+  private String getTextValue(JsonNode node, String fieldName) {
+    JsonNode fieldNode = node.get(fieldName);
+    return (fieldNode != null && !fieldNode.isNull()) ? fieldNode.asText().trim() : "";
   }
 
   private void importVariables(

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.DocumentRepository;
@@ -67,8 +66,6 @@ class PayloadApiTest extends IntegrationTest {
   @Resource private ObjectMapper objectMapper;
 
   @MockBean private Ee eeService;
-
-  @MockBean private LicenseCacheManager licenseCacheManager;
 
   @BeforeAll
   void beforeAll() {
