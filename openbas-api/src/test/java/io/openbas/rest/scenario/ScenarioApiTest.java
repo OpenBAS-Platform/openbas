@@ -140,7 +140,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Update scenario")
   @Test
   @Order(4)
-  @WithMockAdminUser
+  @WithMockPlannerUser
   void updateScenarioTest() throws Exception {
     // -- PREPARE --
     String response =
@@ -178,7 +178,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Delete scenario")
   @Test
   @Order(5)
-  @WithMockAdminUser
+  @WithMockPlannerUser
   void deleteScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
     this.mvc
