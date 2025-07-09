@@ -41,6 +41,7 @@ const SimulationComponent = () => {
 
   // Fetching data
   const [searchParams] = useSearchParams();
+  // We do not use the traditional anchor (`#`) as the pagination hook overrides it
   const anchor = searchParams.get('anchor');
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));

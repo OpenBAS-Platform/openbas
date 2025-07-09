@@ -61,6 +61,7 @@ const HorizontalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) 
         key: 'simulation-injects-results',
       }, { allowEmptyArrays: true });
       const encodedParams = btoa(params);
+      // We do not use the traditional anchor (`#`) as the pagination hook overrides it
       navigate(location.pathname.split('/analysis')[0] + '?query=' + encodedParams + '&anchor=injects-results');
     }
   }
