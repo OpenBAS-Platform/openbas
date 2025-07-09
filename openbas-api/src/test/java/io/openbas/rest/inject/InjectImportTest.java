@@ -687,7 +687,7 @@ public class InjectImportTest extends IntegrationTest {
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
 
-        //If We want to include detection remediations we need to have a licence
+        // If We want to include detection remediations we need to have a licence
         when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
 
         byte[] exportData =
@@ -731,9 +731,12 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(
               expected.getDetectionRemediations().size(),
               recreated.get().getDetectionRemediations().size());
-          Assertions.assertEquals(
-              expected.getDetectionRemediations().get(0).getValues(),
-              recreated.get().getDetectionRemediations().get(0).getValues());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 
