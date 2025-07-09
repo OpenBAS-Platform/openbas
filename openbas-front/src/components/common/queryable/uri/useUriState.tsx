@@ -45,7 +45,10 @@ const useUriState = (localStorageKey: string, initSearchPaginationInput: SearchP
         key: localStorageKey,
       }, { allowEmptyArrays: true });
       const encodedParams = btoa(params);
-      setSearchParams({ query: encodedParams }, { replace: true });
+      setSearchParams((searchParams) => {
+        searchParams.set('query', encodedParams);
+        return searchParams;
+      }, { replace: true });
     },
   };
 
