@@ -697,10 +697,8 @@ public class InjectImportTest extends IntegrationTest {
             createTargetInput(
                 InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
-        //We need to save the collector to check the import
-        collectorComposer
-            .forCollector(CollectorFixture.createDefaultCollector("CS"))
-            .persist();
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1098,10 +1096,8 @@ public class InjectImportTest extends IntegrationTest {
             createTargetInput(
                 InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
 
-        //We need to save the collector to check the import
-        collectorComposer
-            .forCollector(CollectorFixture.createDefaultCollector("CS"))
-            .persist();
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1377,10 +1373,8 @@ public class InjectImportTest extends IntegrationTest {
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
-        //We need to save the collector to check the import
-        collectorComposer
-            .forCollector(CollectorFixture.createDefaultCollector("CS"))
-            .persist();
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
