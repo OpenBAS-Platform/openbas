@@ -19,7 +19,7 @@ public class PayloadComposer extends ComposerBase<Payload> {
     private final Payload payload;
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private Optional<DocumentComposer.Composer> documentComposer = Optional.empty();
-    private List<DetectionRemediationComposer.Composer> detectionRemediationComposers =
+    private final List<DetectionRemediationComposer.Composer> detectionRemediationComposers =
         new ArrayList<>();
 
     public Composer(Payload payload) {
@@ -46,13 +46,9 @@ public class PayloadComposer extends ComposerBase<Payload> {
     public Composer withDetectionRemediation(
         DetectionRemediationComposer.Composer detectionRemediationComposer) {
       detectionRemediationComposers.add(detectionRemediationComposer);
-      List<DetectionRemediation> detectionRemediations = payload.getDetectionRemediations();
-
       DetectionRemediation detectionRemediation = detectionRemediationComposer.get();
       detectionRemediation.setPayload(payload);
-      detectionRemediations.add(detectionRemediation);
-
-      payload.setDetectionRemediations(detectionRemediations);
+      payload.getDetectionRemediations().add(detectionRemediation);
       return this;
     }
 

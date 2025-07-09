@@ -1308,15 +1308,16 @@ public class V1_DataImporter implements Importer {
     ArrayNode detectionNodes = (ArrayNode) payloadNode.get("payload_detection_remediations");
     for (JsonNode detectionNode : detectionNodes) {
       JsonNode valueNode = detectionNode.get("detection_remediation_values");
-      String type = detectionNode.get("detection_remediation_collector").textValue();
-      Optional<Collector> collector = collectorRepository.findByType(type);
 
-      if (collector.isPresent()) {
-        if (valueNode == null || valueNode.asText().trim().isEmpty()) {
-          detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+      if (valueNode != null && !valueNode.isNull() && !valueNode.asText().trim().isEmpty()) {
+        String type = detectionNode.get("detection_remediation_collector_type").textValue();
+        Optional<Collector> collector = collectorRepository.findByType(type);
+
+        if (collector.isPresent()) {
+            detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+        } else {
+          log.warn("Import Detection Remediations: Missing Collector type: {}", type);
         }
-      } else {
-        log.warn("Import Detection Remediations: Missing Collector type: {}", type);
       }
     }
     return detectionRemediationInputs;
