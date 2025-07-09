@@ -1087,12 +1087,21 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        // If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        //We need to save the collector to check the import
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1131,6 +1140,16 @@ public class InjectImportTest extends IntegrationTest {
           }
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 
@@ -1350,9 +1369,18 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        // If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        //We need to save the collector to check the import
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1381,6 +1409,16 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 
