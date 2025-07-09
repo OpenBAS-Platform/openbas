@@ -696,6 +696,12 @@ public class InjectImportTest extends IntegrationTest {
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+
+        //We need to save the collector to check the import
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist();
+
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
@@ -725,9 +731,6 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
-          Assertions.assertEquals(
-              expected.getDetectionRemediations().size(),
-              recreated.get().getDetectionRemediations().size());
           Assertions.assertEquals(
               expected.getDetectionRemediations().size(),
               recreated.get().getDetectionRemediations().size());
