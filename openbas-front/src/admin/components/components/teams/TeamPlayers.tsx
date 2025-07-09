@@ -85,27 +85,30 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
   },
   user_organization: {
     float: 'left',
-    width: '20%',
+    width: '18%',
     fontSize: 12,
     fontWeight: '700',
   },
   user_tags: {
     float: 'left',
-    width: '23%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
+
   },
 };
 
 const inlineStyles: Record<string, CSSProperties> = {
   user_enabled: {
     float: 'left',
-    width: '12%',
+    width: '11%',
+    marginRight: '1%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     cursor: 'pointer',
+
   },
   user_email: {
     float: 'left',
@@ -114,6 +117,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+
   },
   user_options: {
     float: 'left',
@@ -277,6 +281,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<span> &nbsp; </span>}
         >
           <ListItemIcon>
             <span
@@ -286,7 +291,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                 fontSize: 12,
               }}
             >
-                &nbsp;
+              &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
