@@ -2,7 +2,7 @@ import { Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
@@ -39,14 +39,17 @@ const SimulationComponent = () => {
   const { t } = useFormatter();
 
   // Fetching data
+  const [searchParams] = useSearchParams();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
+
   useEffect(() => {
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
     fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPattern[] }) => setInjectResults(result.data));
   }, [exerciseId]);
+
   const goToLink = `/admin/simulations/${exerciseId}/injects`;
   let resultAttackPatternIds = [];
   if (injectResults) {
@@ -69,6 +72,25 @@ const SimulationComponent = () => {
     sorts: initSorting('inject_updated_at', 'DESC'),
     filterGroup: quickFilter,
   }));
+
+  useEffect(() => {
+    const anchor = searchParams.get('anchor');
+    if (anchor) {
+      const element = document.getElementById(anchor);
+      if (element && injectResults && resultAttackPatternIds.length > 0) {
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerHeight;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [searchParams, injectResults, resultAttackPatternIds]);
+
   return (
     <div style={{ paddingBottom: theme.spacing(5) }}>
       <div style={{
@@ -113,12 +135,14 @@ const SimulationComponent = () => {
         </div>
       )}
       {exercise.exercise_status !== 'SCHEDULED' && (
-        <div style={{
-          display: 'grid',
-          marginTop: theme.spacing(3),
-          gap: `0px ${theme.spacing(3)}`,
-          gridTemplateColumns: '1fr',
-        }}
+        <div
+          style={{
+            display: 'grid',
+            marginTop: theme.spacing(3),
+            gap: `0px ${theme.spacing(3)}`,
+            gridTemplateColumns: '1fr',
+          }}
+          id="injects-results"
         >
           <Typography variant="h4">{t('Injects results')}</Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">

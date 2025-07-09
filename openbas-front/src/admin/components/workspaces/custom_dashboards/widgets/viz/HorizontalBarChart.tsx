@@ -61,7 +61,7 @@ const HorizontalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) 
         key: 'simulation-injects-results',
       }, { allowEmptyArrays: true });
       const encodedParams = btoa(params);
-      navigate(location.pathname.split('/analysis')[0] + '?query=' + encodedParams);
+      navigate(location.pathname.split('/analysis')[0] + '?query=' + encodedParams + '&anchor=injects-results');
     }
   }
 
