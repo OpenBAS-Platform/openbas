@@ -255,7 +255,7 @@ public class PayloadMapper {
         DetectionRemediationOutput.builder()
             .id(detectionRemediation.getId())
             .payloadId(detectionRemediation.getPayload().getId())
-            .collectorId(detectionRemediation.getCollector().getId())
+            .collectorType(detectionRemediation.getCollector().getType())
             .values(detectionRemediation.getValues())
             .build();
     return output;

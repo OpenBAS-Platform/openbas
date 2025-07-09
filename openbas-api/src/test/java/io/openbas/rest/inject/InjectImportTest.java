@@ -2,8 +2,11 @@ package io.openbas.rest.inject;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
+import static io.openbas.utils.fixtures.PayloadFixture.createDetectionRemediation;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,6 +18,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.ee.Ee;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.inject.form.InjectImportInput;
 import io.openbas.rest.inject.form.InjectImportTargetDefinition;
@@ -35,6 +39,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
@@ -59,18 +64,22 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private ChannelComposer channelComposer;
   @Autowired private ChallengeComposer challengeComposer;
   @Autowired private DocumentComposer documentComposer;
+  @Autowired private CollectorComposer collectorComposer;
   @Autowired private FileService fileService;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamComposer teamComposer;
   @Autowired private UserComposer userComposer;
   @Autowired private OrganizationComposer organizationComposer;
   @Autowired private TagComposer tagComposer;
+  @Autowired private DetectionRemediationComposer detectionRemediationComposer;
   @Autowired private PayloadComposer payloadComposer;
   @Autowired private ChallengeService challengeService;
   @Autowired private EntityManager entityManager;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ArticleService articleService;
   @Autowired private InjectorFixture injectorFixture;
+
+  @MockBean private Ee eeService;
 
   @BeforeEach
   void before() throws Exception {
@@ -84,9 +93,11 @@ public class InjectImportTest extends IntegrationTest {
     documentComposer.reset();
     scenarioComposer.reset();
     tagComposer.reset();
+    detectionRemediationComposer.reset();
     exerciseComposer.reset();
     injectorContractComposer.reset();
     payloadComposer.reset();
+    collectorComposer.reset();
 
     staticArticleWrappers.clear();
 
@@ -121,6 +132,15 @@ public class InjectImportTest extends IntegrationTest {
     // Inject in exercise with an article attached
     ArticleComposer.Composer articleWrapper =
         getStaticArticleWrappers().get(KNOWN_ARTICLE_WRAPPER_KEY);
+
+    Collector collector =
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist()
+            .get();
+
+    clearEntityManager();
+
     return List.of(
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
@@ -167,8 +187,11 @@ public class InjectImportTest extends IntegrationTest {
                         payloadComposer
                             .forPayload(PayloadFixture.createDefaultCommand())
                             .withTag(
-                                tagComposer.forTag(
-                                    TagFixture.getTagWithText("secret payload tag")))))
+                                tagComposer.forTag(TagFixture.getTagWithText("secret payload tag")))
+                            .withDetectionRemediation(
+                                detectionRemediationComposer
+                                    .forDetectionRemediation(createDetectionRemediation())
+                                    .withCollector(collectorComposer.forCollector(collector)))))
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with payload tag"))),
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
@@ -335,6 +358,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing null input")
   public class WhenPassingNullInput {
+
     @Test
     @DisplayName("Return BAD REQUEST")
     public void returnBADREQUEST() throws Exception {
@@ -348,6 +372,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing null target")
   public class WhenPassingNullTarget {
+
     @Test
     @DisplayName("Return UNPROCESSABLE CONTENT")
     public void returnUNPROCESSABLECONTENT() throws Exception {
@@ -361,6 +386,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When passing invalid target type")
   public class WhenPassingInvalidTargetType {
+
     @Test
     @DisplayName("Return BAD REQUEST")
     public void returnBADREQUEST() throws Exception {
@@ -380,6 +406,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking PLANNER permissions on destination exercise")
   public class WhenLackingPLANNERPermissionsOnExercise {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -400,6 +427,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When destination exercise is not found")
   public class WhenDestinationExerciseNotFound {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNotFound() throws Exception {
@@ -416,6 +444,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking PLANNER permissions on scenario")
   public class WhenLackingPLANNERPermissionsOnScenario {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -439,6 +468,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When destination scenario is not found")
   public class WhenDestinationScenarioNotFound {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNotFound() throws Exception {
@@ -455,6 +485,7 @@ public class InjectImportTest extends IntegrationTest {
   @WithMockUnprivilegedUser
   @DisplayName("When lacking ADMIN permissions for atomic testings")
   public class WhenLackingADMINPermissionsForAtomicTests {
+
     @Test
     @DisplayName("Return NOT FOUND")
     public void returnNOTFOUND() throws Exception {
@@ -655,12 +686,19 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        // If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -691,6 +729,15 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 
@@ -1038,12 +1085,19 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        // If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1082,6 +1136,16 @@ public class InjectImportTest extends IntegrationTest {
           }
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 
@@ -1301,9 +1365,16 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
+
+        // If We want to include detection remediations we need to have a licence
+        when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        // We need to save the collector to check the import
+        collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
@@ -1332,6 +1403,16 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+
+          Assertions.assertEquals(
+              expected.getDetectionRemediations().size(),
+              recreated.get().getDetectionRemediations().size());
+
+          if (!expected.getDetectionRemediations().isEmpty()) {
+            Assertions.assertEquals(
+                expected.getDetectionRemediations().get(0).getValues(),
+                recreated.get().getDetectionRemediations().get(0).getValues());
+          }
         }
       }
 

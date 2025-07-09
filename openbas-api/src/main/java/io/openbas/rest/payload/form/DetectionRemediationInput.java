@@ -12,9 +12,9 @@ public class DetectionRemediationInput {
   private String id;
 
   @JsonProperty("detection_remediation_collector")
-  @Schema(description = "Collector id")
+  @Schema(description = "Collector type")
   @NotNull
-  private String collectorId;
+  private String collectorType;
 
   @JsonProperty("detection_remediation_values")
   @Schema(description = "Value of detection remediation, for exemple: query for sentinel")

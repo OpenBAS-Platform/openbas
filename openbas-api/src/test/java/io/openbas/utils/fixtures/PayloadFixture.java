@@ -50,6 +50,12 @@ public class PayloadFixture {
     return createCommand("PowerShell", "cd ..", null, null);
   }
 
+  public static DetectionRemediation createDetectionRemediation() {
+    DetectionRemediation drCS = new DetectionRemediation();
+    drCS.setValues("Detection Remediation");
+    return drCS;
+  }
+
   public static Payload createDefaultCommandWithPlatformsAndArchitecture(
       Endpoint.PLATFORM_TYPE[] platforms, Payload.PAYLOAD_EXECUTION_ARCH architecture) {
     Payload command = createDefaultCommand();

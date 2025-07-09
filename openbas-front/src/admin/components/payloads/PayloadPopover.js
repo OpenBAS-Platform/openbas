@@ -130,7 +130,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     remediations: {},
   };
   payload.payload_detection_remediations?.forEach((remediation) => {
-    initialValues.remediations[remediation.detection_remediation_collector_id] = {
+    initialValues.remediations[remediation.detection_remediation_collector_type] = {
       content: remediation.detection_remediation_values,
       remediationId: remediation.detection_remediation_id,
     };

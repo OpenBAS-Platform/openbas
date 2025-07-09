@@ -61,15 +61,15 @@ public class PayloadInputFixture {
   @NotNull
   private static List<DetectionRemediationInput> buildDetectionRemediations() {
     DetectionRemediationInput drInputCS = new DetectionRemediationInput();
-    drInputCS.setCollectorId("CS");
+    drInputCS.setCollectorType("CS");
     drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
 
     DetectionRemediationInput drInputSentinel = new DetectionRemediationInput();
-    drInputSentinel.setCollectorId("SENTINEL");
+    drInputSentinel.setCollectorType("SENTINEL");
     drInputSentinel.setValues("Detection Remediation Gap for Sentinel");
 
     DetectionRemediationInput srInputDefender = new DetectionRemediationInput();
-    srInputDefender.setCollectorId("DEFENDER");
+    srInputDefender.setCollectorType("DEFENDER");
     srInputDefender.setValues("Detection Remediation Gap for Defender");
     return List.of(drInputCS, drInputSentinel, srInputDefender);
   }

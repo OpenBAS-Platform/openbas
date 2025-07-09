@@ -22,10 +22,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
-import io.openbas.rest.payload.form.ContractOutputElementInput;
-import io.openbas.rest.payload.form.OutputParserInput;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.RegexGroupInput;
+import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
@@ -43,6 +40,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +74,7 @@ public class V1_DataImporter implements Importer {
   private final VariableRepository variableRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final PayloadCreationService payloadCreationService;
+  @Autowired private CollectorRepository collectorRepository;
 
   // endregion
 
@@ -216,7 +215,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeAttackPattern -> {
               JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -261,7 +262,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeKillChainPhase -> {
               JsonNode idNode = nodeKillChainPhase.get("phase_external_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -1204,7 +1207,9 @@ public class V1_DataImporter implements Importer {
   private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
       JsonNode payloadNode, Map<String, Base> baseIds) {
     Set<OutputParserInput> outputParserInputs = new HashSet<>();
-    if (!payloadNode.has("payload_output_parsers")) return outputParserInputs;
+    if (!payloadNode.has("payload_output_parsers")) {
+      return outputParserInputs;
+    }
 
     ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
     for (JsonNode outputParserNode : outputParserNodes) {
@@ -1274,20 +1279,63 @@ public class V1_DataImporter implements Importer {
 
     List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
     payloadCreateInput.setAttackPatternsIds(attackPatternIds);
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
     payload.setTags(
         resolveJsonIds(payloadNode, "payload_tags").stream()
             .map(baseIds::get)
             .map(Tag.class::cast)
             .collect(Collectors.toSet()));
+
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+
     if (injectorContractFromPayload.isPresent()) {
       return injectorContractFromPayload.get().getId();
     } else {
       log.warn("An error has occurred when importing the payload: {}", payload.getName());
       return null;
     }
+  }
+
+  private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(JsonNode payloadNode) {
+    List<DetectionRemediationInput> detectionRemediationInputs = new ArrayList<>();
+
+    JsonNode remediationsNode = payloadNode.get("payload_detection_remediations");
+    if (remediationsNode == null || !remediationsNode.isArray()) {
+      return detectionRemediationInputs;
+    }
+
+    for (JsonNode detectionNode : remediationsNode) {
+      String valuesText = getTextValue(detectionNode, "detection_remediation_values");
+      String type = getTextValue(detectionNode, "detection_remediation_collector_type");
+
+      if (valuesText.isEmpty()) {
+        continue;
+      }
+
+      Optional<Collector> collector = collectorRepository.findByType(type);
+      if (collector.isPresent()) {
+        detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+      } else {
+        log.warn("Import Detection Remediations: Missing Collector type: {}", type);
+      }
+    }
+
+    return detectionRemediationInputs;
+  }
+
+  private DetectionRemediationInput buildDetectionRemediationFromJsonNode(JsonNode node) {
+    DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
+    detectionRemediation.setValues((node.get("detection_remediation_values").textValue()));
+    detectionRemediation.setCollectorType(
+        (node.get("detection_remediation_collector_type").textValue()));
+    return detectionRemediation;
+  }
+
+  private String getTextValue(JsonNode node, String fieldName) {
+    JsonNode fieldNode = node.get(fieldName);
+    return (fieldNode != null && !fieldNode.isNull()) ? fieldNode.asText().trim() : "";
   }
 
   private void importVariables(

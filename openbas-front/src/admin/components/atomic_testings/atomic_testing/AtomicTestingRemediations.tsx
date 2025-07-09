@@ -75,9 +75,8 @@ const AtomicTestingRemediations = () => {
   const activeCollectorRemediations = useMemo(() => {
     const activeCollector = tabs[activeTab];
     if (!activeCollector) return [];
-
     return detectionRemediations.filter(
-      rem => rem.detection_remediation_collector === activeCollector.collector_id,
+      rem => rem.detection_remediation_collector === activeCollector.collector_type,
     );
   }, [tabs, activeTab, detectionRemediations]);
 
@@ -91,7 +90,7 @@ const AtomicTestingRemediations = () => {
       <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
         {tabs.map((tab, index) => (
           <Tab
-            key={tab.collector_id}
+            key={tab.collector_type}
             label={(
               <Box display="flex" alignItems="center">
                 <img

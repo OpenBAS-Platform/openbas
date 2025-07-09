@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.CollectorTypeDeserializer;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -43,9 +44,11 @@ public class DetectionRemediation implements Base {
   private Payload payload;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "detection_remediation_collector_id")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("detection_remediation_collector_id")
+  @JoinColumn(
+      name = "detection_remediation_collector_type",
+      referencedColumnName = "collector_type")
+  @JsonSerialize(using = CollectorTypeDeserializer.class)
+  @JsonProperty("detection_remediation_collector_type")
   @Schema(type = "string")
   @NotNull
   private Collector collector;
