@@ -48,7 +48,7 @@ public class PayloadComposer extends ComposerBase<Payload> {
       detectionRemediationComposers.add(detectionRemediationComposer);
       DetectionRemediation detectionRemediation = detectionRemediationComposer.get();
       detectionRemediation.setPayload(payload);
-      payload.getDetectionRemediations().add(detectionRemediation);
+      payload.addDetectionRemediation(detectionRemediation);
       return this;
     }
 
@@ -75,8 +75,8 @@ public class PayloadComposer extends ComposerBase<Payload> {
     public Composer delete() {
       documentComposer.ifPresent(DocumentComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
-      detectionRemediationComposers.forEach(DetectionRemediationComposer.Composer::delete);
       payloadRepository.delete(payload);
+      detectionRemediationComposers.forEach(DetectionRemediationComposer.Composer::delete);
       return this;
     }
 
