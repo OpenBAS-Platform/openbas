@@ -37,9 +37,11 @@ const SimulationComponent = () => {
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
+  const [scrolledToAnchor, setScrolledToAnchor] = useState<boolean>(false);
 
   // Fetching data
   const [searchParams] = useSearchParams();
+  const anchor = searchParams.get('anchor');
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
@@ -74,22 +76,25 @@ const SimulationComponent = () => {
   }));
 
   useEffect(() => {
-    const anchor = searchParams.get('anchor');
-    if (anchor) {
+    if (scrolledToAnchor) {
+      return;
+    }
+    if (anchor && injectResults && resultAttackPatternIds.length > 0) {
       const element = document.getElementById(anchor);
-      if (element && injectResults && resultAttackPatternIds.length > 0) {
+      if (element) {
         const header = document.querySelector('header');
         const headerHeight = header ? header.offsetHeight : 0;
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
         const offsetPosition = elementPosition - headerHeight;
 
+        setScrolledToAnchor(true);
         window.scrollTo({
           top: offsetPosition,
           behavior: 'smooth',
         });
       }
     }
-  }, [searchParams, injectResults, resultAttackPatternIds]);
+  }, [anchor, injectResults, resultAttackPatternIds, scrolledToAnchor, setScrolledToAnchor]);
 
   return (
     <div style={{ paddingBottom: theme.spacing(5) }}>
