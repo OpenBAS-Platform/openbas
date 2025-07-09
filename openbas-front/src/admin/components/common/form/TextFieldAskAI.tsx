@@ -181,7 +181,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
       <>
         <EETooltip
           forAi
-          title={isAvailable ? t('Ask AI') : t('Ask AI (EE)')}
+          title={`${t('Ask AI')}${!isAvailable ? ' (EE)' : ''}`}
         >
           <span>
             <IconButton
