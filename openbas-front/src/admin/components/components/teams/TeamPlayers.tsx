@@ -108,7 +108,6 @@ const inlineStyles: Record<string, CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     cursor: 'pointer',
-
   },
   user_email: {
     float: 'left',
@@ -117,7 +116,6 @@ const inlineStyles: Record<string, CSSProperties> = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-
   },
   user_options: {
     float: 'left',
@@ -291,7 +289,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                 fontSize: 12,
               }}
             >
-              &nbsp;
+                &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
