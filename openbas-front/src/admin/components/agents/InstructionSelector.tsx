@@ -201,13 +201,6 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
       </FormControl>
     );
   };
-  const stepInstallationTitle = () => {
-    return (
-      <Typography variant="h2" style={{ marginTop: theme.spacing(3) }}>
-        {t('Installation procedure')}
-      </Typography>
-    );
-  };
   const stepOneInstallationTitle = () => {
     return (
       <Typography variant="h2" style={{ marginTop: theme.spacing(3) }}>
@@ -318,7 +311,6 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
           <p>
             {`${t('Install the agent using your own user account.')} ${platform === WINDOWS ? t('It can be run as administrator or as a standard user, depending on the PowerShell elevation.') : t('This installation requires only local standard privileges.')}`}
           </p>
-          {stepInstallationTitle()}
           {buildInstallationScriptsAndActionButtons()}
         </>
       ));
@@ -339,7 +331,6 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
         <p>
           {`${t('Install the agent as a user or a system service. This installation requires local administrator privileges.')}`}
         </p>
-        {stepInstallationTitle()}
         <div>
           <RadioGroup
             value={selectedOption}
