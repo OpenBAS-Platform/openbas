@@ -51,7 +51,8 @@ public class WithMockPlannerUserSecurityContextFactory
   }
 
   private void createPlannerMockUser() {
-    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL).isPresent()) {
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
+    if (userOpt.isPresent() && userOpt.get().isPlanner()) {
       return;
     }
     // Create group
@@ -73,12 +74,14 @@ public class WithMockPlannerUserSecurityContextFactory
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_PLANNER_EMAIL);
       this.userRepository.save(user);
+    } else if (!userOpt.get().isPlanner()) {
+      userOpt.get().setGroups(List.of(group));
+      this.userRepository.save(userOpt.get());
     }
   }
 }

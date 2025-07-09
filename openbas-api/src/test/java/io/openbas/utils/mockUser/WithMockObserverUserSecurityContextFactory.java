@@ -51,7 +51,8 @@ public class WithMockObserverUserSecurityContextFactory
   }
 
   private void createObserverMockUser() {
-    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).isPresent()) {
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
+    if (userOpt.isPresent() && userOpt.get().isObserver()) {
       return;
     }
 
@@ -74,12 +75,14 @@ public class WithMockObserverUserSecurityContextFactory
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_OBSERVER_EMAIL);
       this.userRepository.save(user);
+    } else if (!userOpt.get().isObserver()) {
+      userOpt.get().setGroups(List.of(group));
+      this.userRepository.save(userOpt.get());
     }
   }
 }

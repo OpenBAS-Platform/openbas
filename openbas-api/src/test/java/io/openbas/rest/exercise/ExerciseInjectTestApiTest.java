@@ -22,7 +22,6 @@ import io.openbas.utils.fixtures.InjectTestStatusFixture;
 import io.openbas.utils.fixtures.composers.ExerciseComposer;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectTestStatusComposer;
-import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -117,7 +116,7 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should return test status when testing a specific inject")
-    @WithMockAdminUser
+    @WithMockPlannerUser
     void should_return_test_status_when_testing_specific_inject() throws Exception {
       mvc.perform(
               get(
@@ -130,7 +129,7 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should return test statuses when performing bulk test with inject IDs")
-    @WithMockAdminUser
+    @WithMockPlannerUser
     void should_return_test_statuses_when_bulk_testing_with_inject_ids() throws Exception {
       InjectBulkProcessingInput input = new InjectBulkProcessingInput();
       input.setInjectIDsToProcess(List.of(inject1.getId()));
@@ -146,7 +145,7 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should return 200 when deleting an inject test status")
-    @WithMockAdminUser
+    @WithMockPlannerUser
     void should_return_200_when_fetching_deleting_an_inject_test_status() throws Exception {
       mvc.perform(
               delete(
