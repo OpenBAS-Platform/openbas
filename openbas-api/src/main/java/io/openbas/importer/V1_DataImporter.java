@@ -1314,7 +1314,7 @@ public class V1_DataImporter implements Importer {
         Optional<Collector> collector = collectorRepository.findByType(type);
 
         if (collector.isPresent()) {
-            detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+          detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
         } else {
           log.warn("Import Detection Remediations: Missing Collector type: {}", type);
         }
