@@ -1,5 +1,5 @@
 import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { useState } from 'react';
 
@@ -112,11 +112,8 @@ const DocumentPopover = (props) => {
     return Object.entries(entities).map(([key, items]) => {
       if (!items.length) return null;
       return (
-        <div key={key} style={{ marginBottom: 8 }}>
-          <strong>
-            {t(key)}
-            :
-          </strong>
+        <div key={key} style={{ marginBottom: theme.spacing(1) }}>
+          <Typography variant="h4" gutterBottom>{t(key)}:</Typography>
           <ul>
             {items.map(item => (
               <li key={item.id}>{item.name}</li>

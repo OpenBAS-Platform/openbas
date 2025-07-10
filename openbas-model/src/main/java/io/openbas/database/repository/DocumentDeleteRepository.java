@@ -39,37 +39,37 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT e.exercise_id, e.exercise_name FROM exercises_documents ed JOIN exercises e ON ed.exercise_id = e.id WHERE ed.document_id = :documentId",
+          "SELECT e.exercise_id, e.exercise_name FROM exercises_documents ed JOIN exercises e ON ed.exercise_id = e.exercise_id WHERE ed.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findExerciseDocumentsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT i.inject_id, i.inject_title FROM injects_documents id JOIN injects i ON id.inject_id = i.id WHERE id.document_id = :documentId",
+          "SELECT i.inject_id, i.inject_title FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findInjectsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT a.article_id, a.article_title FROM articles_documents ad JOIN articles a ON ad.article_id = a.id WHERE ad.document_id = :documentId",
+          "SELECT a.article_id, a.article_title FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findArticlesByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          " SELECT t.tag_id, t.tag_name FROM document_tags dt JOIN tags t ON dt.tag_id = t.id WHERE dt.document_id = :documentId",
+          " SELECT t.tag_id, t.tag_name FROM documents_tags dt JOIN tags t ON dt.tag_id = t.tag_id WHERE dt.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findTagsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT s.scenario_id, s.scenario_name FROM scenario_documents sd JOIN scenarios s ON sd.scenario_id = s.id WHERE sd.document_id = :documentId",
+          "SELECT s.scenario_id, s.scenario_name FROM scenarios_documents sd JOIN scenarios s ON sd.scenario_id = s.scenario_id WHERE sd.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findScenariosByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT c.challenge_id, c.challenge_name FROM challenges_documents cd JOIN challenges c ON cd.challenge_id = c.id WHERE cd.document_id = :documentId",
+          "SELECT c.challenge_id, c.challenge_name FROM challenges_documents cd JOIN challenges c ON cd.challenge_id = c.challenge_id WHERE cd.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findChallengesByDocument(@Param("documentId") String documentId);
 
@@ -93,12 +93,12 @@ public interface DocumentDeleteRepository
   void deleteFromArticlesDocuments(@Param("documentId") String documentId);
 
   @Modifying
-  @Query(value = "DELETE FROM document_tags WHERE document_id = :documentId", nativeQuery = true)
+  @Query(value = "DELETE FROM documents_tags WHERE document_id = :documentId", nativeQuery = true)
   void deleteFromDocumentTags(@Param("documentId") String documentId);
 
   @Modifying
   @Query(
-      value = "DELETE FROM scenario_documents WHERE document_id = :documentId",
+      value = "DELETE FROM scenarios_documents WHERE document_id = :documentId",
       nativeQuery = true)
   void deleteFromScenarioDocuments(@Param("documentId") String documentId);
 
