@@ -1303,6 +1303,19 @@ export interface DocumentCreateInput {
   document_tags?: string[];
 }
 
+export interface DocumentRelationsOutput {
+  articles?: RelatedEntityOutput[];
+  assets?: RelatedEntityOutput[];
+  challenges?: RelatedEntityOutput[];
+  channels?: RelatedEntityOutput[];
+  exercises?: RelatedEntityOutput[];
+  exercisesDocuments?: RelatedEntityOutput[];
+  injects?: RelatedEntityOutput[];
+  payloads?: RelatedEntityOutput[];
+  scenarios?: RelatedEntityOutput[];
+  tags?: RelatedEntityOutput[];
+}
+
 export interface DocumentTagUpdateInput {
   tags?: string[];
 }
@@ -4640,6 +4653,11 @@ export interface RegexGroupSimple {
   regex_group_id: string;
   /** Represents the indexes of specific captured groups. */
   regex_group_index_values: string;
+}
+
+export interface RelatedEntityOutput {
+  id?: string;
+  name?: string;
 }
 
 export interface RelatedFindingOutput {

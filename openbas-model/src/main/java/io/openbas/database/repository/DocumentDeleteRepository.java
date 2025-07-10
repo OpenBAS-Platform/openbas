@@ -15,7 +15,7 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT e.exercise_id, e.exercise_name  FROM exercises e WHERE e.logo_dark = :documentId OR e.logo_light = :documentId",
+          "SELECT e.exercise_id, e.exercise_name  FROM exercises e WHERE e.exercise_logo_dark = :documentId OR e.exercise_logo_light = :documentId",
       nativeQuery = true)
   List<Object[]> findExercisesUsingDocument(@Param("documentId") String documentId);
 
@@ -33,7 +33,7 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT c.channel_id, c.channel_name FROM channels c WHERE c.logo_dark = :documentId OR c.logo_light = :documentId",
+          "SELECT c.channel_id, c.channel_name FROM channels c WHERE c.channel_logo_dark = :documentId OR c.channel_logo_light = :documentId",
       nativeQuery = true)
   List<Object[]> findChannelsByDocument(@Param("documentId") String documentId);
 
