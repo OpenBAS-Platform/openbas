@@ -51,7 +51,7 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT a.article_id, a.article_title FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId",
+          "SELECT a.article_id, a.article_name FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findArticlesByDocument(@Param("documentId") String documentId);
 
