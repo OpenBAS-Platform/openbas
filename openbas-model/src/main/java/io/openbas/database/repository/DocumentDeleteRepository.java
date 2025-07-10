@@ -110,13 +110,13 @@ public interface DocumentDeleteRepository
 
   @Modifying
   @Query(
-      value = "UPDATE exercises SET logo_dark = NULL WHERE logo_dark = :documentId",
+      value = "UPDATE exercises SET exercise_logo_dark = NULL WHERE exercise_logo_dark = :documentId",
       nativeQuery = true)
   void clearLogoDarkInExercises(@Param("documentId") String documentId);
 
   @Modifying
   @Query(
-      value = "UPDATE exercises SET logo_light = NULL WHERE logo_light = :documentId",
+      value = "UPDATE exercises SET exercise_logo_light = NULL WHERE exercise_logo_light = :documentId",
       nativeQuery = true)
   void clearLogoLightInExercises(@Param("documentId") String documentId);
 
@@ -127,13 +127,13 @@ public interface DocumentDeleteRepository
 
   @Modifying
   @Query(
-      value = "UPDATE channels SET logo_dark = NULL WHERE logo_dark = :documentId",
+      value = "UPDATE channels SET channel_logo_dark = NULL WHERE channel_logo_dark = :documentId",
       nativeQuery = true)
   void clearLogoDarkInChannels(@Param("documentId") String documentId);
 
   @Modifying
   @Query(
-      value = "UPDATE channels SET logo_light = NULL WHERE logo_light = :documentId",
+      value = "UPDATE channels SET channel_logo_light = NULL WHERE channel_logo_light = :documentId",
       nativeQuery = true)
   void clearLogoLightInChannels(@Param("documentId") String documentId);
 
