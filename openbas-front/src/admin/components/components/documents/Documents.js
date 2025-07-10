@@ -196,7 +196,7 @@ const Documents = () => {
           : documents.map(document => (
               <ListItem
                 key={document.document_id}
-                divider={true}
+                divider
                 secondaryAction={(
                   <DocumentPopover
                     document={document}

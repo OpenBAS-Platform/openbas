@@ -8,10 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
-import io.openbas.database.repository.ChallengeRepository;
-import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -23,10 +24,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class DocumentService {
 
+  @Resource private ObjectMapper mapper;
+
   private final DocumentRepository documentRepository;
   private final ChallengeRepository challengeRepository;
-
-  @Resource private ObjectMapper mapper;
+  private final ExerciseRepository exerciseRepository;
+  private final PayloadRepository payloadRepository;
+  private final AssetRepository assetRepository;
+  private final ChannelRepository channelRepository;
+  private final InjectDocumentRepository injectDocumentRepository;
+  private final FileService fileService;
 
   // -- CRUD --
 
@@ -68,5 +75,35 @@ public class DocumentService {
         .flatMap(documentStream -> documentStream)
         .distinct()
         .toList();
+  }
+
+  public void deleteDocument(String documentId) {
+    if (isDocumentInUse(documentId)) {
+      throw new BadRequestException("Document is still in use and cannot be deleted.");
+    }
+    List<Document> documents = documentRepository.removeById(documentId);
+    documents.forEach(
+        document -> {
+          try {
+            fileService.deleteFile(document.getTarget());
+          } catch (Exception e) {
+            // Fail no longer available in the storage.
+          }
+        });
+  }
+
+  public boolean isDocumentInUse(String documentId) {
+    // Check all FK
+    return exerciseRepository.existsByDocumentId(documentId)
+        || payloadRepository.existsByDocumentId(documentId)
+        || assetRepository.existsByDocumentId(documentId)
+        || channelRepository.existsByDocumentId(documentId)
+        || channelRepository.existsByDocumentId(documentId)
+        || exerciseDocumentRepository.existsByDocumentId(documentId)
+        || injectDocumentRepository.existsByDocumentId(documentId)
+        || articleDocumentRepository.existsByDocumentId(documentId)
+        || documentTagRepository.existsByDocumentId(documentId)
+        || scenarioDocumentRepository.existsByDocumentId(documentId)
+        || challengeDocumentRepository.existsByDocumentId(documentId);
   }
 }
