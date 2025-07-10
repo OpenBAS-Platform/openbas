@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ElasticService implements EngineService {
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
+  private final ElasticDriver driver;
   private final EngineContext searchEngine;
   private final ElasticsearchClient elasticClient;
   private final IndexingStatusRepository indexingStatusRepository;
@@ -59,6 +60,7 @@ public class ElasticService implements EngineService {
       EngineConfig engineConfig,
       CommonSearchService commonSearchService)
       throws Exception {
+    this.driver = driver;
     this.elasticClient = driver.elasticClient();
     this.searchEngine = searchEngine;
     this.indexingStatusRepository = indexingStatusRepository;
@@ -348,6 +350,11 @@ public class ElasticService implements EngineService {
             log.info("Indexing <up to date> for {}", model.getName());
           }
         });
+  }
+
+  @Override
+  public void cleanUpIndex(String model) throws IOException {
+    driver.cleanUpIndex(model, elasticClient);
   }
 
   public void bulkDelete(List<String> ids) {

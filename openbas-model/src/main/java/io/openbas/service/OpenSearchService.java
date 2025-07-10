@@ -47,8 +47,9 @@ import org.opensearch.client.opensearch.core.search.Hit;
 public class OpenSearchService implements EngineService {
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
+  private final OpenSearchDriver driver;
   private final EngineContext searchEngine;
-  private final OpenSearchClient OpenSearchClient;
+  private final OpenSearchClient openSearchClient;
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
@@ -60,7 +61,8 @@ public class OpenSearchService implements EngineService {
       EngineConfig engineConfig,
       CommonSearchService commonSearchService)
       throws Exception {
-    this.OpenSearchClient = driver.opensearchClient();
+    this.driver = driver;
+    this.openSearchClient = driver.opensearchClient();
     this.searchEngine = searchEngine;
     this.indexingStatusRepository = indexingStatusRepository;
     this.engineConfig = engineConfig;
@@ -283,7 +285,7 @@ public class OpenSearchService implements EngineService {
     Query query = buildQuery(user, null, filterGroup, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsBase> response =
-          OpenSearchClient.search(
+          openSearchClient.search(
               b -> b.index(engineConfig.getIndexPrefix() + "*").size(ids.size()).query(query),
               EsBase.class);
       List<Hit<EsBase>> hits = response.hits().hits();
@@ -320,7 +322,7 @@ public class OpenSearchService implements EngineService {
             try {
               log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
               BulkRequest bulkRequest = br.build();
-              BulkResponse result = OpenSearchClient.bulk(bulkRequest);
+              BulkResponse result = openSearchClient.bulk(bulkRequest);
               // Log errors, if any
               if (result.errors()) {
                 for (BulkResponseItem item : result.items()) {
@@ -365,7 +367,7 @@ public class OpenSearchService implements EngineService {
               .toQuery();
       Query query =
           BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1")).toQuery();
-      OpenSearchClient.deleteByQuery(
+      openSearchClient.deleteByQuery(
           new DeleteByQueryRequest.Builder()
               .index(engineConfig.getIndexPrefix() + "*")
               .query(query)
@@ -388,7 +390,8 @@ public class OpenSearchService implements EngineService {
               config.getFilter(),
               runtime.getParameters(),
               runtime.getDefinitionParameters());
-      return OpenSearchClient.count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+      return openSearchClient
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -429,7 +432,7 @@ public class OpenSearchService implements EngineService {
             aggregationKey, new Aggregation.Builder().terms(termsAggregation).build());
       }
 
-      SearchResponse<Void> response = OpenSearchClient.search(searchBuilder.build(), Void.class);
+      SearchResponse<Void> response = openSearchClient.search(searchBuilder.build(), Void.class);
 
       if (widgetConfig.getLimit() == 0) {
         return new EsSeries(config.getName());
@@ -541,7 +544,7 @@ public class OpenSearchService implements EngineService {
     try {
       String aggregationKey = "date_histogram";
       SearchResponse<Void> response =
-          OpenSearchClient.search(
+          openSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(0)
@@ -622,7 +625,7 @@ public class OpenSearchService implements EngineService {
             user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
       SearchResponse<?> response =
-          OpenSearchClient.search(
+          openSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(runtime.getWidget().getLimit())
@@ -686,7 +689,7 @@ public class OpenSearchService implements EngineService {
     Query query = buildQuery(user, search, filter, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsSearch> response =
-          OpenSearchClient.search(
+          openSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(engineConfig.getSearchCap())
@@ -710,6 +713,11 @@ public class OpenSearchService implements EngineService {
       log.error(String.format("query exception: %s", e.getMessage()), e);
     }
     return List.of();
+  }
+
+  @Override
+  public void cleanUpIndex(String model) throws IOException {
+    driver.cleanUpIndex(model, openSearchClient);
   }
 
   // endregion

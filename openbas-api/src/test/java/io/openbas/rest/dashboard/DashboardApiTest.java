@@ -5,13 +5,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
-import io.openbas.driver.ElasticDriver;
 import io.openbas.engine.EngineContext;
 import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
@@ -40,15 +37,12 @@ import org.springframework.test.web.servlet.MockMvc;
 class DashboardApiTest extends IntegrationTest {
 
   @Autowired private EngineService engineService;
-  @Autowired private EngineContext searchEngine;
+  @Autowired private EngineContext engineContext;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private WidgetComposer widgetComposer;
   @Autowired private CustomDashboardComposer customDashboardComposer;
   @Autowired private MockMvc mvc;
   @Autowired private EntityManager entityManager;
-  @Autowired private ObjectMapper mapper;
-  @Autowired private ElasticsearchClient esClient;
-  @Autowired private ElasticDriver esDriver;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private FindingComposer findingComposer;
@@ -62,8 +56,8 @@ class DashboardApiTest extends IntegrationTest {
     injectComposer.reset();
 
     // force reset elastic
-    for (EsModel<?> model : searchEngine.getModels()) {
-      esDriver.cleanUpIndex(model.getName(), esClient);
+    for (EsModel<?> model : engineContext.getModels()) {
+      engineService.cleanUpIndex(model.getName());
     }
   }
 
@@ -87,7 +81,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(searchEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -138,7 +132,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(searchEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -240,7 +234,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(searchEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);

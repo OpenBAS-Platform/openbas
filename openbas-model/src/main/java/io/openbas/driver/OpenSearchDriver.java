@@ -47,9 +47,14 @@ import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.*;
 import org.opensearch.client.opensearch.indices.put_index_template.IndexTemplateMapping;
 import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.aws.AwsSdk2Transport;
+import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.http.SdkHttpClient;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.regions.Region;
 
 @Component
 @RequiredArgsConstructor
@@ -68,7 +73,7 @@ public class OpenSearchDriver {
     this.searchEngine = searchEngine;
   }
 
-  private OpenSearchClient getOpensearchClient() throws URISyntaxException {
+  private OpenSearchClient standardClient() throws URISyntaxException {
     final HttpHost host = HttpHost.create(config.getUrl());
     final ApacheHttpClient5TransportBuilder builder =
         ApacheHttpClient5TransportBuilder.builder(host);
@@ -123,6 +128,22 @@ public class OpenSearchDriver {
     builder.setMapper(jsonpMapper);
     final OpenSearchTransport transport = builder.build();
     return new OpenSearchClient(transport);
+  }
+
+  private OpenSearchClient getOpensearchClient() throws URISyntaxException {
+    // If client is not AWS specific
+    if (config.getEngineAwsMode().equalsIgnoreCase("no")) {
+      return standardClient();
+    }
+    // If client is directly to AWS opensearch service
+    SdkHttpClient httpClient = ApacheHttpClient.builder().build();
+    return new OpenSearchClient(
+        new AwsSdk2Transport(
+            httpClient,
+            config.getEngineAwsHost(),
+            config.getEngineAwsMode(),
+            Region.of(config.getEngineAwsRegion()),
+            AwsSdk2TransportOptions.builder().build()));
   }
 
   private void createRolloverPolicy(OpenSearchClient client) throws IOException {

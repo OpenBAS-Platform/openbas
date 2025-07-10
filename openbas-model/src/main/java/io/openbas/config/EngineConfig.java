@@ -12,6 +12,9 @@ public class EngineConfig {
 
   public static class Defaults {
     public static final String ENGINE_SELECTOR = "elk";
+    public static final String ENGINE_AWS_MODE = "no";
+    public static final String ENGINE_AWS_HOST = "search-...us-west-2.es.amazonaws.com";
+    public static final String ENGINE_AWS_REGION = "us-west-2";
     public static final String INDEX_PREFIX = "openbas";
     public static final String INDEX_SUFFIX = "-000001";
     public static final String NUMBER_OF_SHARDS = "1";
@@ -26,6 +29,12 @@ public class EngineConfig {
   }
 
   private String engineSelector = Defaults.ENGINE_SELECTOR;
+
+  private String engineAwsMode = Defaults.ENGINE_AWS_MODE;
+
+  private String engineAwsHost = Defaults.ENGINE_AWS_HOST;
+
+  private String engineAwsRegion = Defaults.ENGINE_AWS_REGION;
 
   private String indexPrefix = Defaults.INDEX_PREFIX;
 
