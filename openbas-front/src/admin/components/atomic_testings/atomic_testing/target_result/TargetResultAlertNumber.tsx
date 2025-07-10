@@ -1,7 +1,7 @@
 import { type FunctionComponent, useEffect, useState } from 'react';
 
-import { getAlertLinksCount } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import { type InjectExpectationResult } from '../../../../utils/api-types';
+import { getAlertLinksCount } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { type InjectExpectationResult } from '../../../../../utils/api-types';
 
 interface Props {
   injectExpectationId: string;
