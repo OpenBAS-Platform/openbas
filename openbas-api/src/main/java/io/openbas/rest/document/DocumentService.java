@@ -88,7 +88,7 @@ public class DocumentService {
   }
 
   public boolean isDocumentInUse(String documentId) {
-    // Check all FK
+    // Check all FKs
     return documentRepository.isUsedInExercise(documentId)
         || documentRepository.isUsedInPayload(documentId)
         || documentRepository.isUsedInAsset(documentId)
