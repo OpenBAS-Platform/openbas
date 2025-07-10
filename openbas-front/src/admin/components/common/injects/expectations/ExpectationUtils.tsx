@@ -30,3 +30,6 @@ export const typeIcon = (type: string) => {
 export const isTechnicalExpectation = (type: string) => {
   return [ExpectationType.PREVENTION.toString(), ExpectationType.DETECTION.toString(), ExpectationType.VULNERABILITY.toString()].includes(type);
 };
+export const isManualExpectation = (type: string) => {
+  return [ExpectationType.MANUAL.toString(), ExpectationType.ARTICLE.toString(), ExpectationType.CHALLENGE.toString()].includes(type);
+};
