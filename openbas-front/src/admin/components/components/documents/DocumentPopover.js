@@ -1,5 +1,6 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 
@@ -8,16 +9,32 @@ import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
+import ContextLink from '../../../../components/ContextLink.js';
 import { useFormatter } from '../../../../components/i18n';
+import { ARTICLE_BASE_URL, ASSET_BASE_URL, ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SIMULATION_BASE_URL, TAG_BASE_URL } from '../../../../constants/BaseUrls.js';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 import DocumentForm from './DocumentForm';
 
+const entityPaths = {
+  exercises: SIMULATION_BASE_URL,
+  payloads: PAYLOAD_BASE_URL,
+  assets: ASSET_BASE_URL,
+  channels: CHANNEL_BASE_URL,
+  exerciseDocuments: SIMULATION_BASE_URL,
+  injects: ATOMIC_BASE_URL,
+  articles: ARTICLE_BASE_URL,
+  tags: TAG_BASE_URL,
+  scenarios: SCENARIO_BASE_URL,
+  challenges: CHALLENGE_BASE_URL,
+};
+
 const DocumentPopover = (props) => {
   // Standard hooks
   const { t } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
@@ -109,14 +126,20 @@ const DocumentPopover = (props) => {
   };
 
   const renderRelations = (entities) => {
-    return Object.entries(entities).map(([key, items]) => {
+    return Object.entries(entities).map(([type, items]) => {
       if (!items.length) return null;
+
       return (
-        <div key={key} style={{ marginBottom: theme.spacing(1) }}>
-          <Typography variant="h4" gutterBottom>{t(key)}:</Typography>
-          <ul>
+        <div key={type}>
+          <Typography variant="h4">
+            {t(type)}
+            :
+          </Typography>
+          <ul style={{ paddingLeft: theme.spacing(2) }}>
             {items.map(item => (
-              <li key={item.id}>{item.name}</li>
+              <li key={item.id}>
+                <ContextLink title={item.name} url={`${entityPaths[type]}/${item.id}`} />
+              </li>
             ))}
           </ul>
         </div>
@@ -209,24 +232,24 @@ const DocumentPopover = (props) => {
         PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
-          <DialogContentText>
-            {t('Do you want to delete this document?')}
-          </DialogContentText>
-
           {loadingRelations && <div>{t('Loading relations...')}</div>}
 
           {!loadingRelations && relations && (
-            <div style={{ marginTop: 10 }}>
+            <>
               <DialogContentText>
                 {t('The document is used in the following entities:')}
               </DialogContentText>
               {renderRelations(relations)}
-            </div>
+            </>
           )}
 
           {!loadingRelations && relations && Object.values(relations).every(v => v.length === 0) && (
             <DialogContentText>{t('This document has no related entities.')}</DialogContentText>
           )}
+
+          <DialogContentText>
+            {t('Do you want to delete this document?')}
+          </DialogContentText>
         </DialogContent>
 
         <DialogActions>
