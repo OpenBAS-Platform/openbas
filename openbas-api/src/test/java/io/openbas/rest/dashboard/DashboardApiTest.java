@@ -12,12 +12,12 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.driver.ElasticDriver;
-import io.openbas.engine.EsEngine;
+import io.openbas.engine.EngineContext;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.api.EngineSortField;
 import io.openbas.engine.api.ListConfiguration;
 import io.openbas.engine.api.SortDirection;
-import io.openbas.service.EsService;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.CustomDashboardFixture;
 import io.openbas.utils.fixtures.composers.*;
@@ -39,8 +39,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("Dashboard API tests")
 class DashboardApiTest extends IntegrationTest {
 
-  @Autowired private EsService esService;
-  @Autowired private EsEngine esEngine;
+  @Autowired private EngineService engineService;
+  @Autowired private EngineContext searchEngine;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private WidgetComposer widgetComposer;
   @Autowired private CustomDashboardComposer customDashboardComposer;
@@ -62,7 +62,7 @@ class DashboardApiTest extends IntegrationTest {
     injectComposer.reset();
 
     // force reset elastic
-    for (EsModel<?> model : esEngine.getModels()) {
+    for (EsModel<?> model : searchEngine.getModels()) {
       esDriver.cleanUpIndex(model.getName(), esClient);
     }
   }
@@ -87,7 +87,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(searchEngine.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -138,7 +138,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(searchEngine.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -240,7 +240,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(searchEngine.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);

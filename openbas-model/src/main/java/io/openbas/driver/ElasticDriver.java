@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.repository.IndexingStatusRepository;
-import io.openbas.engine.EsEngine;
+import io.openbas.engine.EngineContext;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.model.EsBase;
 import java.io.IOException;
@@ -42,14 +42,9 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableRetry
 @RequiredArgsConstructor
 @Slf4j
 public class ElasticDriver {
@@ -57,16 +52,16 @@ public class ElasticDriver {
   public static final String ES_ILM_POLICY = "-ilm-policy";
   public static final String ES_CORE_SETTINGS = "-core-settings";
 
-  private EsEngine esEngine;
+  private EngineContext searchEngine;
   private final EngineConfig config;
   private final IndexingStatusRepository indexingStatusRepository;
 
   @Autowired
-  public void setEsEngine(EsEngine esEngine) {
-    this.esEngine = esEngine;
+  public void setSearchEngine(EngineContext searchEngine) {
+    this.searchEngine = searchEngine;
   }
 
-  public ElasticsearchClient getElasticClient() {
+  private ElasticsearchClient getElasticClient() {
     RestClientBuilder restClientBuilder = RestClient.builder(HttpHost.create(config.getUrl()));
     HttpAsyncClientBuilder clientBuilder = HttpAsyncClientBuilder.create();
     if (config.getUsername() != null) {
@@ -269,11 +264,6 @@ public class ElasticDriver {
     return mappings;
   }
 
-  @Retryable(
-      retryFor = {IllegalStateException.class},
-      maxAttempts = 5,
-      backoff = @Backoff(delay = 30000))
-  @Bean
   public <T extends EsBase> ElasticsearchClient elasticClient() throws Exception {
     log.info("Creating ElasticClient");
     ElasticsearchClient elasticClient = getElasticClient();
@@ -296,7 +286,7 @@ public class ElasticDriver {
     // If version of the model stored in elastic is different from the db version
     // Index + template must be removed and recreated
     // last_updated_at for the type must be reset to reindex the full data.
-    List<EsModel<T>> models = this.esEngine.getModels();
+    List<EsModel<T>> models = this.searchEngine.getModels();
     models.stream()
         .parallel()
         .forEach(

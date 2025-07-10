@@ -2,7 +2,7 @@ package io.openbas.schema;
 
 import static io.openbas.schema.SchemaUtils.isValidClassName;
 
-import io.openbas.engine.EsEngine;
+import io.openbas.engine.EngineContext;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 public class SchemaApi extends RestBehavior {
 
-  private final EsEngine esEngine;
+  private final EngineContext engineContext;
 
   @PostMapping("/api/schemas/{className}")
   public List<PropertySchemaDTO> schemas(
@@ -46,7 +46,7 @@ public class SchemaApi extends RestBehavior {
   @GetMapping("/api/engine/schemas")
   public Set<PropertySchemaDTO> engineSchemas(
       @RequestParam(name = "classNames", required = false) List<String> classNames) {
-    return esEngine.getModels().stream()
+    return engineContext.getModels().stream()
         .filter(
             model ->
                 classNames == null || classNames.isEmpty() || classNames.contains(model.getName()))

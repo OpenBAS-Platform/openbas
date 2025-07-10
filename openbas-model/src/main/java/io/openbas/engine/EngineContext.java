@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EsEngine {
+public class EngineContext {
 
   private ApplicationContext context;
 

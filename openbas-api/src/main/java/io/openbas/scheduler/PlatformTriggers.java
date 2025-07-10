@@ -52,8 +52,8 @@ public class PlatformTriggers {
   public Trigger elasticSyncExecutionTrigger() {
     SimpleScheduleBuilder _15_seconds = simpleSchedule().withIntervalInSeconds(15).repeatForever();
     return newTrigger()
-        .forJob(this.platformJobs.getElasticSyncExecution())
-        .withIdentity("elasticSyncExecutionTrigger")
+        .forJob(this.platformJobs.getEngineSyncExecution())
+        .withIdentity("engineSyncExecutionTrigger")
         .withSchedule(_15_seconds)
         .build();
   }
