@@ -37,6 +37,8 @@ const DocumentPopover = (props) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
+  const [relations, setRelations] = useState(null);
+  const [loadingRelations, setLoadingRelations] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
 
@@ -77,6 +79,18 @@ const DocumentPopover = (props) => {
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
+    setLoadingRelations(true);
+    fetch(`/api/documents/${document.document_id}/relations`)
+      .then(res => res.json())
+      .then((data) => {
+        setRelations(data);
+      })
+      .catch(() => {
+        setRelations(null);
+      })
+      .finally(() => {
+        setLoadingRelations(false);
+      });
   };
 
   const handleCloseDelete = () => {
@@ -92,6 +106,25 @@ const DocumentPopover = (props) => {
       },
     );
     handleCloseDelete();
+  };
+
+  const renderRelations = (entities) => {
+    return Object.entries(entities).map(([key, items]) => {
+      if (!items.length) return null;
+      return (
+        <div key={key} style={{ marginBottom: 8 }}>
+          <strong>
+            {t(key)}
+            :
+          </strong>
+          <ul>
+            {items.map(item => (
+              <li key={item.id}>{item.name}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    });
   };
 
   const handleOpenRemove = () => {
@@ -182,7 +215,23 @@ const DocumentPopover = (props) => {
           <DialogContentText>
             {t('Do you want to delete this document?')}
           </DialogContentText>
+
+          {loadingRelations && <div>{t('Loading relations...')}</div>}
+
+          {!loadingRelations && relations && (
+            <div style={{ marginTop: 10 }}>
+              <DialogContentText>
+                {t('The document is used in the following entities:')}
+              </DialogContentText>
+              {renderRelations(relations)}
+            </div>
+          )}
+
+          {!loadingRelations && relations && Object.values(relations).every(v => v.length === 0) && (
+            <DialogContentText>{t('This document has no related entities.')}</DialogContentText>
+          )}
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleCloseDelete}>
             {t('Cancel')}

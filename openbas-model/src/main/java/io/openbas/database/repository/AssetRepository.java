@@ -61,6 +61,4 @@ public interface AssetRepository
               + "WHERE ia.inject_id in :injectIds",
       nativeQuery = true)
   List<Object[]> assetsByInjectIds(Set<String> injectIds);
-
-  boolean existsByDocumentId(String documentId);
 }
