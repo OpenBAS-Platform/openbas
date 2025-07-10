@@ -7,6 +7,7 @@ import io.openbas.engine.api.*;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -14,6 +15,8 @@ import java.util.stream.Stream;
 public interface EngineService {
 
   <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models);
+
+  void cleanUpIndex(String model) throws IOException;
 
   void bulkDelete(List<String> ids);
 
