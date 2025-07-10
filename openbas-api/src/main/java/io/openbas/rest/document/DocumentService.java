@@ -28,11 +28,6 @@ public class DocumentService {
 
   private final DocumentRepository documentRepository;
   private final ChallengeRepository challengeRepository;
-  private final ExerciseRepository exerciseRepository;
-  private final PayloadRepository payloadRepository;
-  private final AssetRepository assetRepository;
-  private final ChannelRepository channelRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final FileService fileService;
 
   // -- CRUD --
@@ -94,16 +89,15 @@ public class DocumentService {
 
   public boolean isDocumentInUse(String documentId) {
     // Check all FK
-    return exerciseRepository.existsByDocumentId(documentId)
-        || payloadRepository.existsByDocumentId(documentId)
-        || assetRepository.existsByDocumentId(documentId)
-        || channelRepository.existsByDocumentId(documentId)
-        || channelRepository.existsByDocumentId(documentId)
-        || exerciseDocumentRepository.existsByDocumentId(documentId)
-        || injectDocumentRepository.existsByDocumentId(documentId)
-        || articleDocumentRepository.existsByDocumentId(documentId)
-        || documentTagRepository.existsByDocumentId(documentId)
-        || scenarioDocumentRepository.existsByDocumentId(documentId)
-        || challengeDocumentRepository.existsByDocumentId(documentId);
+    return documentRepository.isUsedInExercise(documentId)
+        || documentRepository.isUsedInPayload(documentId)
+        || documentRepository.isUsedInAsset(documentId)
+        || documentRepository.isUsedInChannel(documentId)
+        || documentRepository.isUsedInExerciseDocument(documentId)
+        || documentRepository.isUsedInInjectDocument(documentId)
+        || documentRepository.isUsedInArticleDocument(documentId)
+        || documentRepository.isUsedInDocumentTag(documentId)
+        || documentRepository.isUsedInScenarioDocument(documentId)
+        || documentRepository.isUsedInChallengeDocument(documentId);
   }
 }
