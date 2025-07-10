@@ -23,7 +23,7 @@ const entityPaths = {
   payloads: PAYLOAD_BASE_URL,
   assets: ASSET_BASE_URL,
   channels: CHANNEL_BASE_URL,
-  exerciseDocuments: SIMULATION_BASE_URL,
+  exercisesDocuments: SIMULATION_BASE_URL,
   injects: ATOMIC_BASE_URL,
   articles: ARTICLE_BASE_URL,
   tags: TAG_BASE_URL,
@@ -232,23 +232,29 @@ const DocumentPopover = (props) => {
         PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
-          {loadingRelations && <div>{t('Loading relations...')}</div>}
-
-          {!loadingRelations && relations && (
-            <>
-              <DialogContentText>
-                {t('The document is used in the following entities:')}
-              </DialogContentText>
-              {renderRelations(relations)}
-            </>
-          )}
-
-          {!loadingRelations && relations && Object.values(relations).every(v => v.length === 0) && (
-            <DialogContentText>{t('This document has no related entities.')}</DialogContentText>
-          )}
-
           <DialogContentText>
-            {t('Do you want to delete this document?')}
+            {loadingRelations ? (
+              <div>
+                {t('Loading relations...')}
+              </div>
+            ) : relations ? (
+                <>
+                  {Object.values(relations).some(list => list.length > 0) ? (
+                    <>
+                      {t('The document is used in the following entities:')}
+                      {renderRelations(relations)}
+                      {t('Do you want to delete this document?')}
+                    </>
+                  ) : (
+                    <>
+                      {t('This document has no related entities.')}
+                      {t('Do you want to delete this document?')}
+                    </>
+                  )}
+                </>
+              ) :
+              t('Unable to load relations.')
+            }
           </DialogContentText>
         </DialogContent>
 
