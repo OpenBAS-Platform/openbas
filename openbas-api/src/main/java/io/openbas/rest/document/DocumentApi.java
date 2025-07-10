@@ -25,7 +25,10 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +53,6 @@ public class DocumentApi extends RestBehavior {
   private final DocumentRepository documentRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioRepository scenarioRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final UserRepository userRepository;
   private final InjectorRepository injectorRepository;
   private final CollectorRepository collectorRepository;
@@ -487,16 +489,7 @@ public class DocumentApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @DeleteMapping("/api/documents/{documentId}")
   public void deleteDocument(@PathVariable String documentId) {
-    injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
-    List<Document> documents = documentRepository.removeById(documentId);
-    documents.forEach(
-        document -> {
-          try {
-            fileService.deleteFile(document.getTarget());
-          } catch (Exception e) {
-            // Fail no longer available in the storage.
-          }
-        });
+    documentService.deleteDocument(documentId);
   }
 
   // -- EXERCISE & SENARIO--
