@@ -1,5 +1,9 @@
 package io.openbas.rest;
 
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.repository.DocumentRepository;
@@ -13,24 +17,16 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @TestInstance(PER_CLASS)
 class DocumentApiTest extends IntegrationTest {
 
   private static final String DOCUMENT_URI = "/api/documents";
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  DocumentComposer documentComposer;
-  @Autowired
-  PayloadComposer payloadComposer;
-  @Autowired
-  private DocumentRepository documentRepository;
+  @Autowired DocumentComposer documentComposer;
+  @Autowired PayloadComposer payloadComposer;
+  @Autowired private DocumentRepository documentRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -48,7 +44,7 @@ class DocumentApiTest extends IntegrationTest {
   class CRUD {
 
     @Test
-    @DisplayName("Should delete a document when there is none references")
+    @DisplayName("Should delete a document")
     void shouldDeleteDocument() throws Exception {
       Document document = new Document();
       document.setName("ToDelete");
@@ -61,26 +57,13 @@ class DocumentApiTest extends IntegrationTest {
           .forPayload(PayloadFixture.createDefaultFileDrop())
           .withFileDrop(
               documentComposer
-                  .forDocument(
-                      DocumentFixture.getDocument(
-                          FileFixture.getBadCoffeeFileContent()))
+                  .forDocument(DocumentFixture.getDocument(FileFixture.getBadCoffeeFileContent()))
                   .withInMemoryFile(FileFixture.getBadCoffeeFileContent()))
-              .persist();
-
-      mvc.perform(delete(DOCUMENT_URI + "/" + document.getId())).andExpect(status().isBadRequest());
-
-      Assertions.assertFalse(documentRepository.findById(document.getId()).isPresent());
-    }
-
-    @Test
-    @DisplayName("Should not delete a document")
-    void shouldDeleteCve() throws Exception {
-      Document document = new Document();
-      documentComposer.forDocument(document).persist();
+          .persist();
 
       mvc.perform(delete(DOCUMENT_URI + "/" + document.getId())).andExpect(status().isOk());
 
-      Assertions.assertTrue(documentRepository.findById(document.getId()).isPresent());
+      Assertions.assertFalse(documentRepository.findById(document.getId()).isPresent());
     }
   }
 }

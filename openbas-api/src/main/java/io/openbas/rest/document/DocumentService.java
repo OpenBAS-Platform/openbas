@@ -8,9 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.ChallengeRepository;
+import io.openbas.database.repository.DocumentDeleteRepository;
+import io.openbas.database.repository.DocumentRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
-import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
@@ -18,15 +19,18 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class DocumentService {
 
   @Resource private ObjectMapper mapper;
 
   private final DocumentRepository documentRepository;
+  private final DocumentDeleteRepository documentDeleteRepository;
   private final ChallengeRepository challengeRepository;
   private final FileService fileService;
 
@@ -73,31 +77,30 @@ public class DocumentService {
   }
 
   public void deleteDocument(String documentId) {
-    if (isDocumentInUse(documentId)) {
-      throw new BadRequestException("Document is still in use and cannot be deleted.");
-    }
+    // 1. Delete references in join tables
+    documentDeleteRepository.deleteFromExerciseDocuments(documentId);
+    documentDeleteRepository.deleteFromInjectsDocuments(documentId);
+    documentDeleteRepository.deleteFromArticlesDocuments(documentId);
+    documentDeleteRepository.deleteFromDocumentTags(documentId);
+    documentDeleteRepository.deleteFromScenarioDocuments(documentId);
+    documentDeleteRepository.deleteFromChallengesDocuments(documentId);
+
+    // 2. Nullify FK references (on owning entities)
+    documentDeleteRepository.clearLogoInExercises(documentId);
+    documentDeleteRepository.clearLogoInChannels(documentId);
+    documentDeleteRepository.clearFileInPayloads(documentId);
+    documentDeleteRepository.clearLogoInAssets(documentId);
+
+    // 3. Remove document
     List<Document> documents = documentRepository.removeById(documentId);
     documents.forEach(
         document -> {
           try {
             fileService.deleteFile(document.getTarget());
           } catch (Exception e) {
-            // Fail no longer available in the storage.
+            // Log only, file may already be gone
+            log.warn("File already removed or not found: {}", document.getTarget(), e);
           }
         });
-  }
-
-  public boolean isDocumentInUse(String documentId) {
-    // Check all FKs
-    return documentRepository.isUsedInExercise(documentId)
-        || documentRepository.isUsedInPayload(documentId)
-        || documentRepository.isUsedInAsset(documentId)
-        || documentRepository.isUsedInChannel(documentId)
-        || documentRepository.isUsedInExerciseDocument(documentId)
-        || documentRepository.isUsedInInjectDocument(documentId)
-        || documentRepository.isUsedInArticleDocument(documentId)
-        || documentRepository.isUsedInDocumentTag(documentId)
-        || documentRepository.isUsedInScenarioDocument(documentId)
-        || documentRepository.isUsedInChallengeDocument(documentId);
   }
 }
