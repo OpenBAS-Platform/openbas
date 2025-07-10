@@ -1,26 +1,18 @@
 package io.openbas.service;
 
-import static io.openbas.utils.EsUtils.*;
+import static io.openbas.utils.OpenSearchUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.aggregations.*;
-import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.IndexingStatusRepository;
-import io.openbas.engine.EsEngine;
+import io.openbas.driver.OpenSearchDriver;
+import io.openbas.engine.EngineContext;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
@@ -31,58 +23,54 @@ import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
-import io.openbas.schema.SchemaUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.FieldSort;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.SortOptions;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.*;
+import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
+import org.opensearch.client.opensearch.core.search.Hit;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-public class EsService {
+public class OpenSearchService implements EngineService {
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
-  private final EsEngine esEngine;
-  private final ElasticsearchClient elasticClient;
+  private final EngineContext searchEngine;
+  private final OpenSearchClient OpenSearchClient;
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
+  private final CommonSearchService commonSearchService;
 
-  private static final ConcurrentHashMap<String, PropertySchema> cacheMap =
-      new ConcurrentHashMap<>();
-
-  // TODO Test cache
-  private Map<String, PropertySchema> getIndexingSchema() {
-    if (!cacheMap.isEmpty()) {
-      return cacheMap;
-    }
-    Set<PropertySchema> properties =
-        esEngine.getModels().stream()
-            .flatMap(
-                model -> {
-                  try {
-                    return SchemaUtils.schemaWithSubtypes(model.getModel()).stream();
-                  } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .filter(PropertySchema::isFilterable)
-            .collect(Collectors.toSet());
-    properties.forEach(p -> cacheMap.putIfAbsent(p.getName(), p));
-    return cacheMap;
+  public OpenSearchService(
+      EngineContext searchEngine,
+      OpenSearchDriver driver,
+      IndexingStatusRepository indexingStatusRepository,
+      EngineConfig engineConfig,
+      CommonSearchService commonSearchService)
+      throws Exception {
+    this.OpenSearchClient = driver.opensearchClient();
+    this.searchEngine = searchEngine;
+    this.indexingStatusRepository = indexingStatusRepository;
+    this.engineConfig = engineConfig;
+    this.commonSearchService = commonSearchService;
   }
 
   private FieldValue toVal(String field, String value, Map<String, String> parameters) {
     FieldValue.Builder builder = new FieldValue.Builder();
     String target = ofNullable(parameters.getOrDefault(value, value)).orElse("");
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     if (propertyField == null) {
       throw new RuntimeException("Unknown field: " + field);
     }
@@ -108,7 +96,7 @@ public class EsService {
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
     String elasticField = toElasticField(field);
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     boolean hasFilteringValues =
         filter.getValues().stream()
             .anyMatch(
@@ -128,7 +116,7 @@ public class EsService {
                       v ->
                           TermQuery.of(
                                   t -> t.field(elasticField).value(toVal(field, v, parameters)))
-                              ._toQuery())
+                              .toQuery())
                   .toList();
           if (filterMode == Filters.FilterMode.and) {
             boolQuery.must(queryList);
@@ -145,7 +133,7 @@ public class EsService {
                       v ->
                           TermQuery.of(
                                   t -> t.field(elasticField).value(toVal(field, v, parameters)))
-                              ._toQuery())
+                              .toQuery())
                   .toList();
           boolQuery.mustNot(queryNotList);
         }
@@ -162,11 +150,11 @@ public class EsService {
                                 w ->
                                     w.field(toElasticField(field))
                                         .value("*" + val.stringValue() + "*"))
-                            ._toQuery();
+                            .toQuery();
                       } else {
                         // Champ text : match
                         return MatchQuery.of(m -> m.field(toElasticField(field)).query(val))
-                            ._toQuery();
+                            .toQuery();
                       }
                     })
                 .toList();
@@ -186,9 +174,9 @@ public class EsService {
                       if (propertyField.isKeyword()) {
                         return WildcardQuery.of(
                                 w -> w.field(elasticField).value("*" + val.stringValue() + "*"))
-                            ._toQuery();
+                            .toQuery();
                       } else {
-                        return MatchQuery.of(m -> m.field(elasticField).query(val))._toQuery();
+                        return MatchQuery.of(m -> m.field(elasticField).query(val)).toQuery();
                       }
                     })
                 .toList();
@@ -205,7 +193,7 @@ public class EsService {
       default:
         throw new UnsupportedOperationException("Filter operator " + operator + " not supported");
     }
-    return boolQuery.build()._toQuery();
+    return boolQuery.build().toQuery();
   }
 
   private Query buildQueryRestrictions(RawUserAuth user) {
@@ -223,17 +211,17 @@ public class EsService {
                 t ->
                     t.field("base_restrictions.keyword")
                         .terms(TermsQueryField.of(tq -> tq.value(values))))
-            ._toQuery();
+            .toQuery();
     BoolQuery.Builder emptyRestrictBuilder = new BoolQuery.Builder();
-    Query existField = ExistsQuery.of(b -> b.field("base_restrictions.keyword"))._toQuery();
-    Query emptyRestrictQuery = emptyRestrictBuilder.mustNot(existField).build()._toQuery();
-    return authQuery.should(compliantField, emptyRestrictQuery).build()._toQuery();
+    Query existField = ExistsQuery.of(b -> b.field("base_restrictions.keyword")).toQuery();
+    Query emptyRestrictQuery = emptyRestrictBuilder.mustNot(existField).build().toQuery();
+    return authQuery.should(compliantField, emptyRestrictQuery).build().toQuery();
   }
 
   private Query queryFromSearch(String search) {
     QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
     queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
-    return queryStringQuery.build()._toQuery();
+    return queryStringQuery.build().toQuery();
   }
 
   private Query queryFromFilter(
@@ -252,7 +240,7 @@ public class EsService {
       filterQuery.should(filterQueries);
       filterQuery.minimumShouldMatch("1");
     }
-    return filterQuery.build()._toQuery();
+    return filterQuery.build().toQuery();
   }
 
   private Query buildQuery(
@@ -280,10 +268,9 @@ public class EsService {
     if (shouldList.isEmpty()) {
       throw new IllegalArgumentException("One of search or filter must not be null");
     }
-    Query dataQuery =
-        dataQueryBuilder.should(shouldList).minimumShouldMatch("1").build()._toQuery();
+    Query dataQuery = dataQueryBuilder.should(shouldList).minimumShouldMatch("1").build().toQuery();
     mainMust.add(dataQuery);
-    return mainQuery.must(mainMust).build()._toQuery();
+    return mainQuery.must(mainMust).build().toQuery();
   }
 
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
@@ -296,7 +283,7 @@ public class EsService {
     Query query = buildQuery(user, null, filterGroup, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsBase> response =
-          elasticClient.search(
+          OpenSearchClient.search(
               b -> b.index(engineConfig.getIndexPrefix() + "*").size(ids.size()).query(query),
               EsBase.class);
       List<Hit<EsBase>> hits = response.hits().hits();
@@ -333,7 +320,7 @@ public class EsService {
             try {
               log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
               BulkRequest bulkRequest = br.build();
-              BulkResponse result = elasticClient.bulk(bulkRequest);
+              BulkResponse result = OpenSearchClient.bulk(bulkRequest);
               // Log errors, if any
               if (result.errors()) {
                 for (BulkResponseItem item : result.items()) {
@@ -369,16 +356,16 @@ public class EsService {
       Query directId =
           TermsQuery.of(
                   t -> t.field("base_id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
-              ._toQuery();
+              .toQuery();
       Query dependenciesId =
           TermsQuery.of(
                   t ->
                       t.field("base_dependencies.keyword")
                           .terms(TermsQueryField.of(tq -> tq.value(values))))
-              ._toQuery();
+              .toQuery();
       Query query =
-          BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1"))._toQuery();
-      elasticClient.deleteByQuery(
+          BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1")).toQuery();
+      OpenSearchClient.deleteByQuery(
           new DeleteByQueryRequest.Builder()
               .index(engineConfig.getIndexPrefix() + "*")
               .query(query)
@@ -401,8 +388,7 @@ public class EsService {
               config.getFilter(),
               runtime.getParameters(),
               runtime.getDefinitionParameters());
-      return elasticClient
-          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+      return OpenSearchClient.count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -420,7 +406,7 @@ public class EsService {
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
-      PropertySchema propertyField = getIndexingSchema().get(field);
+      PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
       String elasticField = toElasticField(field);
 
       SearchRequest.Builder searchBuilder =
@@ -443,7 +429,7 @@ public class EsService {
             aggregationKey, new Aggregation.Builder().terms(termsAggregation).build());
       }
 
-      SearchResponse<Void> response = elasticClient.search(searchBuilder.build(), Void.class);
+      SearchResponse<Void> response = OpenSearchClient.search(searchBuilder.build(), Void.class);
 
       if (widgetConfig.getLimit() == 0) {
         return new EsSeries(config.getName());
@@ -475,7 +461,7 @@ public class EsService {
     if (isSideAggregation) {
       List<String> ids =
           buckets.array().stream()
-              .flatMap(s -> Arrays.stream(s.key().stringValue().split(",")))
+              .flatMap(s -> Arrays.stream(s.key().split(",")))
               .distinct()
               .toList();
       resolutions.putAll(resolveIdsRepresentative(user, ids));
@@ -484,7 +470,7 @@ public class EsService {
         buckets.array().stream()
             .map(
                 b -> {
-                  String key = b.key().stringValue();
+                  String key = b.key();
                   String label = isSideAggregation ? resolutions.get(key) : key;
                   String seriesKey = label != null ? label : "deleted";
                   return new EsSeriesData(key, seriesKey, b.docCount());
@@ -542,12 +528,12 @@ public class EsService {
     String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
     Instant endInstant = Instant.parse(end);
     Query dateRangeQuery =
-        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
-            ._toRangeQuery()
-            ._toQuery();
+        RangeQuery.of(
+                d -> d.field(widgetConfig.getField()).gt(JsonData.of(start)).lt(JsonData.of(end)))
+            .toQuery();
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
-    Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
+    Query query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
     bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
     bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
@@ -555,7 +541,7 @@ public class EsService {
     try {
       String aggregationKey = "date_histogram";
       SearchResponse<Void> response =
-          elasticClient.search(
+          OpenSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(0)
@@ -568,7 +554,7 @@ public class EsService {
                                       h.field(widgetConfig.getField())
                                           .minDocCount(0)
                                           .format(widgetConfig.getInterval().format)
-                                          .calendarInterval(widgetConfig.getInterval().type)
+                                          .calendarInterval(widgetConfig.getInterval().openType)
                                           .extendedBounds(extendedBounds)
                                           .keyed(false))),
               Void.class);
@@ -598,7 +584,7 @@ public class EsService {
   }
 
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
-    Filters.FilterGroup searchFilters = runtime.getWidget().getPerspective().getFilter();
+    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
     String entityName =
         searchFilters.getFilters().stream()
             .filter(filter -> "base_entity".equals(filter.getKey()))
@@ -636,7 +622,7 @@ public class EsService {
             user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
       SearchResponse<?> response =
-          elasticClient.search(
+          OpenSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(runtime.getWidget().getLimit())
@@ -655,7 +641,7 @@ public class EsService {
 
   private Class<?> getClassForEntity(String entity_name) {
     Optional<EsModel<EsBase>> model =
-        esEngine.getModels().stream()
+        searchEngine.getModels().stream()
             .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
             .findAny();
     return model.get().getModel();
@@ -685,14 +671,14 @@ public class EsService {
     engineSortField.setDirection(SortDirection.DESC);
 
     // Create series
-    ListConfiguration.ListPerspective listPerspective = new ListConfiguration.ListPerspective();
-    listPerspective.setName("Attack Paths");
-    listPerspective.setFilter(filterGroup);
+    ListConfiguration.ListSeries listSeries = new ListConfiguration.ListSeries();
+    listSeries.setName("Attack Paths");
+    listSeries.setFilter(filterGroup);
 
     // Create list configuration
     ListConfiguration listConfiguration = new ListConfiguration();
     listConfiguration.setSorts(List.of(engineSortField));
-    listConfiguration.setPerspective(listPerspective);
+    listConfiguration.setSeries(List.of(listSeries));
     return listConfiguration;
   }
 
@@ -700,7 +686,7 @@ public class EsService {
     Query query = buildQuery(user, search, filter, new HashMap<>(), new HashMap<>());
     try {
       SearchResponse<EsSearch> response =
-          elasticClient.search(
+          OpenSearchClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(engineConfig.getSearchCap())
@@ -729,7 +715,7 @@ public class EsService {
   // endregion
 
   private String toElasticField(@NotBlank final String field) {
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     return propertyField.isKeyword() ? (field + ".keyword") : field;
   }
 }
