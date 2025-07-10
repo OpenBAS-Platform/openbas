@@ -12,9 +12,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
-import io.openbas.rest.document.form.DocumentCreateInput;
-import io.openbas.rest.document.form.DocumentTagUpdateInput;
-import io.openbas.rest.document.form.DocumentUpdateInput;
+import io.openbas.rest.document.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
@@ -57,6 +55,7 @@ public class DocumentApi extends RestBehavior {
   private final InjectorRepository injectorRepository;
   private final CollectorRepository collectorRepository;
   private final SecurityPlatformRepository securityPlatformRepository;
+  private final DocumentDeleteRepository documentDeleteRepository;
 
   private final DocumentService documentService;
   private final FileService fileService;
@@ -484,6 +483,27 @@ public class DocumentApi extends RestBehavior {
     List<Article> articles = scenario.getArticles();
     List<Inject> injects = scenario.getInjects();
     return documentService.getPlayerDocuments(articles, injects);
+  }
+
+  @GetMapping("/api/documents/{documentId}/relations")
+  public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
+    return DocumentRelationsOutput.builder()
+        .exercises(toOutput(documentDeleteRepository.findExercisesUsingDocument(documentId)))
+        .exercisesDocuments(
+            toOutput(documentDeleteRepository.findExerciseDocumentsByDocument(documentId)))
+        .tags(toOutput(documentDeleteRepository.findTagsByDocument(documentId)))
+        .scenarios(toOutput(documentDeleteRepository.findScenariosByDocument(documentId)))
+        .assets(toOutput(documentDeleteRepository.findAssetsByDocument(documentId)))
+        .channels(toOutput(documentDeleteRepository.findChannelsByDocument(documentId)))
+        .payloads(toOutput(documentDeleteRepository.findPayloadsByDocument(documentId)))
+        .articles(toOutput(documentDeleteRepository.findArticlesByDocument(documentId)))
+        .injects(toOutput(documentDeleteRepository.findInjectsByDocument(documentId)))
+        .challenges(toOutput(documentDeleteRepository.findChallengesByDocument(documentId)))
+        .build();
+  }
+
+  private List<RelatedEntityOutput> toOutput(List<Object[]> rows) {
+    return rows.stream().map(r -> new RelatedEntityOutput((String) r[0], (String) r[1])).toList();
   }
 
   @Transactional(rollbackOn = Exception.class)

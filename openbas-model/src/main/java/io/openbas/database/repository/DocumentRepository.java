@@ -85,53 +85,8 @@ public interface DocumentRepository
   @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
   Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
 
+  // -- List entities related with document
   @Query(
-      "SELECT COUNT(e) > 0 FROM Exercise e WHERE e.logoDark.id = :documentId OR e.logoLight.id = :documentId")
-  boolean isUsedInExercise(String documentId);
-
-  @Query(
-      value =
-          "SELECT COUNT(p) > 0 FROM payloads p WHERE p.file_drop_file = :documentId OR p.executable_file = :documentId",
-      nativeQuery = true)
-  boolean isUsedInPayload(String documentId);
-
-  @Query(
-      value =
-          "SELECT COUNT(a) > 0 FROM assets a WHERE a.security_platform_logo_light = :documentId OR p.security_platform_logo_dark = :documentId",
-      nativeQuery = true)
-  boolean isUsedInAsset(String documentId);
-
-  @Query(
-      "SELECT COUNT(c) > 0 FROM Channel c WHERE c.logoDark.id = :documentId OR c.logoLight.id = :documentId")
-  boolean isUsedInChannel(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM exercises_documents WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInExerciseDocument(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM injects_documents WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInInjectDocument(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM articles_documents WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInArticleDocument(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM document_tags WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInDocumentTag(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM scenario_documents WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInScenarioDocument(String documentId);
-
-  @Query(
-      value = "SELECT EXISTS (SELECT 1 FROM challenges_documents WHERE document_id = :documentId)",
-      nativeQuery = true)
-  boolean isUsedInChallengeDocument(String documentId);
+      "SELECT e.id, e.name FROM Exercise e WHERE e.logoDark.id = :documentId OR e.logoLight.id = :documentId")
+  List<Object[]> findExercisesUsingDocument(@Param("documentId") String documentId);
 }
