@@ -84,9 +84,4 @@ public interface DocumentRepository
   @NotNull
   @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
   Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
-
-  // -- List entities related with document
-  @Query(
-      "SELECT e.id, e.name FROM Exercise e WHERE e.logoDark.id = :documentId OR e.logoLight.id = :documentId")
-  List<Object[]> findExercisesUsingDocument(@Param("documentId") String documentId);
 }
