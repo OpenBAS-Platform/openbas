@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 
@@ -15,6 +16,7 @@ import UserForm from './UserForm';
 
 const Index = () => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const dispatch = useDispatch();
   useDataLoader(() => {
     dispatch(fetchOrganizations());
@@ -76,6 +78,8 @@ const Index = () => {
     <div style={{
       width: 800,
       margin: '0 auto',
+      display: 'grid',
+      gap: theme.spacing(3),
     }}
     >
       <Paper>
