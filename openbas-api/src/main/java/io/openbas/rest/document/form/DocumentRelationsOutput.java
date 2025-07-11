@@ -25,7 +25,11 @@ public class DocumentRelationsOutput {
 
   private List<RelatedEntityOutput> articles = new ArrayList();
 
-  private List<RelatedEntityOutput> injects = new ArrayList();
+  private List<RelatedEntityOutput> atomicTestings = new ArrayList();
+
+  private List<RelatedEntityOutput> scenarioInjects = new ArrayList();
+
+  private List<RelatedEntityOutput> simulationInjects = new ArrayList();
 
   private List<RelatedEntityOutput> challenges = new ArrayList();
 }
