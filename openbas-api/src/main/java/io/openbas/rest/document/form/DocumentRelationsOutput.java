@@ -11,19 +11,15 @@ public class DocumentRelationsOutput {
 
   private List<RelatedEntityOutput> simulations = new ArrayList();
 
-  private List<RelatedEntityOutput> simulationsDocuments = new ArrayList();
-
-  private List<RelatedEntityOutput> tags = new ArrayList();
-
-  private List<RelatedEntityOutput> scenarios = new ArrayList();
-
-  private List<RelatedEntityOutput> assets = new ArrayList();
+  private List<RelatedEntityOutput> securityPlatforms = new ArrayList(); // Security Platforms
 
   private List<RelatedEntityOutput> channels = new ArrayList();
 
   private List<RelatedEntityOutput> payloads = new ArrayList();
 
-  private List<RelatedEntityOutput> articles = new ArrayList();
+  private List<RelatedEntityOutput> scenarioArticles = new ArrayList();
+
+  private List<RelatedEntityOutput> simulationArticles = new ArrayList();
 
   private List<RelatedEntityOutput> atomicTestings = new ArrayList();
 

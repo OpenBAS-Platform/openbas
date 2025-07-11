@@ -57,15 +57,21 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT i.inject_id, i.inject_title, i.inject_exercise FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId ANd i.inject_exercise IS NOT NULL",
+          "SELECT i.inject_id, i.inject_title, i.inject_exercise FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId AND i.inject_exercise IS NOT NULL",
       nativeQuery = true)
   List<Object[]> findSimulationInjectsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT a.article_id, a.article_name FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId",
+          "SELECT a.article_id, a.article_name, a.article_scenario FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId AND a.article_scenario IS NOT NULL",
       nativeQuery = true)
-  List<Object[]> findArticlesByDocument(@Param("documentId") String documentId);
+  List<Object[]> findScenarioArticlesByDocument(@Param("documentId") String documentId);
+
+  @Query(
+      value =
+          "SELECT a.article_id, a.article_name,a.article_exercise  FROM articles_documents ad JOIN articles a ON ad.article_id = a.article_id WHERE ad.document_id = :documentId AND a.article_exercise IS NOT NULL",
+      nativeQuery = true)
+  List<Object[]> findSimulationArticlesByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
@@ -77,7 +83,7 @@ public interface DocumentDeleteRepository
       value =
           "SELECT s.scenario_id, s.scenario_name FROM scenarios_documents sd JOIN scenarios s ON sd.scenario_id = s.scenario_id WHERE sd.document_id = :documentId",
       nativeQuery = true)
-  List<Object[]> findScenariosByDocument(@Param("documentId") String documentId);
+  List<Object[]> findScenarioDocumentsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
