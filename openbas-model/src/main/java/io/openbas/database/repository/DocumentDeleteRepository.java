@@ -194,7 +194,7 @@ public interface DocumentDeleteRepository
       nativeQuery = true)
   void clearLogoDarkInAssets(@Param("documentId") String documentId);
 
-  default void clearLogoInAssets(String documentId) {
+  default void clearLogoInSecurityPlatforms(String documentId) {
     clearLogoLightInAssets(documentId);
     clearLogoDarkInAssets(documentId);
   }

@@ -77,7 +77,6 @@ public class DocumentService {
   }
 
   public void deleteDocument(String documentId) {
-    // 1. Delete references in join tables
     documentDeleteRepository.deleteFromExerciseDocuments(documentId);
     documentDeleteRepository.deleteFromInjectsDocuments(documentId);
     documentDeleteRepository.deleteFromArticlesDocuments(documentId);
@@ -85,11 +84,10 @@ public class DocumentService {
     documentDeleteRepository.deleteFromScenarioDocuments(documentId);
     documentDeleteRepository.deleteFromChallengesDocuments(documentId);
 
-    // 2. Nullify FK references (on owning entities)
     documentDeleteRepository.clearLogoInExercises(documentId);
     documentDeleteRepository.clearLogoInChannels(documentId);
     documentDeleteRepository.clearFileInPayloads(documentId);
-    documentDeleteRepository.clearLogoInAssets(documentId);
+    documentDeleteRepository.clearLogoInSecurityPlatforms(documentId);
 
     // 3. Remove document
     List<Document> documents = documentRepository.removeById(documentId);
@@ -98,8 +96,7 @@ public class DocumentService {
           try {
             fileService.deleteFile(document.getTarget());
           } catch (Exception e) {
-            // Log only, file may already be gone
-            log.warn("File already removed or not found: {}", document.getTarget(), e);
+            log.warn("File already removed or not found in minio: {}", document.getTarget(), e);
           }
         });
   }
