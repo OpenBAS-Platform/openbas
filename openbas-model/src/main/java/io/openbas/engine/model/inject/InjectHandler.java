@@ -37,7 +37,15 @@ public class InjectHandler implements Handler<EsInject> {
               esInject.setBase_id(inject.getInject_id());
               esInject.setBase_representative(inject.getInject_title());
               esInject.setBase_created_at(inject.getInject_created_at());
-              esInject.setBase_updated_at(inject.getInject_updated_at());
+
+              if (inject.getInjector_contract_updated_at() != null
+                  && inject
+                      .getInjector_contract_updated_at()
+                      .isAfter(inject.getInject_updated_at())) {
+                esInject.setBase_updated_at(inject.getInjector_contract_updated_at());
+              } else {
+                esInject.setBase_updated_at(inject.getInject_updated_at());
+              }
               esInject.setBase_restrictions(
                   buildRestrictions(inject.getInject_scenario(), inject.getInject_Exercise()));
               // Specific
