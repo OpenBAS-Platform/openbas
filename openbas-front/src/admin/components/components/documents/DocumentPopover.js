@@ -153,13 +153,13 @@ const DocumentPopover = (props) => {
 
       return (
         <div key={type}>
-          <Typography variant={"h6"} gutterBottom>
+          <Typography variant={"body2"} gutterBottom>
             {t(type)}
             :
           </Typography>
           <ul style={{
             margin: 0,
-            paddingLeft: theme.spacing(2),
+            padding: theme.spacing(0,2,1),
           }}
           >
             {items.map(item => (
