@@ -10,11 +10,11 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type Widget } from '../../../../../utils/api-types-custom';
 import { zodImplement } from '../../../../../utils/Zod';
 import WidgetCreationParameters from './WidgetCreationParameters';
+import WidgetCreationPerspective from './WidgetCreationPerspective';
 import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
 import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
-import WidgetCreationPerspective from "./WidgetCreationPerspective";
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -197,18 +197,17 @@ const WidgetForm: FunctionComponent<Props> = ({
       );
       case 'list': return (
         <Controller
-            control={control}
-            name="widget_config.perspective"
-            render={({ field: { value, onChange } }) => (
-                        <WidgetCreationPerspective
-                            index={0}
-                            perspective={value}
-                            onChange={onChange}
-                            onSubmit={nextStep}
-                        />
+          control={control}
+          name="widget_config.perspective"
+          render={({ field: { value, onChange } }) => (
+            <WidgetCreationPerspective
+              perspective={value}
+              onChange={onChange}
+              onSubmit={nextStep}
+            />
 
-                    )}
-                    />
+          )}
+        />
       );
       default: return (
         <Controller

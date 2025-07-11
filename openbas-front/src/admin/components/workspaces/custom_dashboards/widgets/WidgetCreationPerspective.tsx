@@ -1,5 +1,4 @@
-import { CancelOutlined } from '@mui/icons-material';
-import {Box, Button, IconButton, TextField} from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -13,10 +12,8 @@ import { buildSearchPagination } from '../../../../../components/common/queryabl
 import { useQueryable } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../components/i18n';
 import {
-  type DateHistogramSeries,
-  ListPerspective,
+  type ListPerspective,
   type PropertySchemaDTO,
-  type StructuralHistogramSeries
 } from '../../../../../utils/api-types';
 import { createGroupOption, type GroupOption } from '../../../../../utils/Option';
 import { capitalize } from '../../../../../utils/String';
@@ -50,11 +47,10 @@ const availableFilters = new Map([
 ]);
 
 const WidgetCreationPerspective: FunctionComponent<{
-  index: number;
   perspective?: ListPerspective;
   onChange: (perspective: ListPerspective) => void;
-  onSubmit: () => void,
-}> = ({ index, perspective, onChange, onSubmit }) => {
+  onSubmit: () => void;
+}> = ({ perspective, onChange, onSubmit }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -145,7 +141,7 @@ const WidgetCreationPerspective: FunctionComponent<{
   };
 
   return (
-      <>
+    <>
       <div className={classes.step_entity}>
         <Box padding={2}>
           <TextField
@@ -177,21 +173,21 @@ const WidgetCreationPerspective: FunctionComponent<{
         </Box>
       </div>
 
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ marginTop: theme.spacing(2) }}
+          onClick={handleSubmit}
         >
-          <Button
-              variant="contained"
-              color="primary"
-              sx={{ marginTop: theme.spacing(2) }}
-              onClick={handleSubmit}
-          >
-            {t('Validate')}
-          </Button>
-        </div>
-  </>
+          {t('Validate')}
+        </Button>
+      </div>
+    </>
   );
 };
 
