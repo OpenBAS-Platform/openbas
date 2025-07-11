@@ -77,14 +77,9 @@ public class DocumentService {
   }
 
   public void deleteDocument(String documentId) {
-    // Remove reference in postgres
-    documentDeleteRepository.clearLogoInExercises(documentId);
-    documentDeleteRepository.clearLogoInChannels(documentId);
-    documentDeleteRepository.clearFileInPayloads(documentId);
-    documentDeleteRepository.clearLogoInSecurityPlatforms(documentId);
+    List<Document> documents = documentRepository.removeById(documentId);
 
     // Remove document from minio
-    List<Document> documents = documentRepository.removeById(documentId);
     documents.forEach(
         document -> {
           try {
