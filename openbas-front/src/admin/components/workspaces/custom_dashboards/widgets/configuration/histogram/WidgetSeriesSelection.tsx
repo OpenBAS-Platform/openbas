@@ -4,21 +4,21 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { engineSchemas } from '../../../../../actions/schema/schema-action';
-import { FilterContext } from '../../../../../components/common/queryable/filter/context';
-import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../components/common/queryable/filter/FilterAutocomplete';
-import FilterChips from '../../../../../components/common/queryable/filter/FilterChips';
-import { availableOperators, buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
-import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
-import { useQueryable } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
-import { createGroupOption, type GroupOption } from '../../../../../utils/Option';
-import { capitalize } from '../../../../../utils/String';
-import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
-import { CustomDashboardContext } from '../CustomDashboardContext';
-import FilterFieldBaseEntity from './FilterFieldBaseEntity';
-import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from './WidgetUtils';
+import { engineSchemas } from '../../../../../../../actions/schema/schema-action';
+import { FilterContext } from '../../../../../../../components/common/queryable/filter/context';
+import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../../../components/common/queryable/filter/FilterAutocomplete';
+import FilterChips from '../../../../../../../components/common/queryable/filter/FilterChips';
+import { availableOperators, buildFilter } from '../../../../../../../components/common/queryable/filter/FilterUtils';
+import { buildSearchPagination } from '../../../../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { useFormatter } from '../../../../../../../components/i18n';
+import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../../../utils/api-types';
+import { createGroupOption, type GroupOption } from '../../../../../../../utils/Option';
+import { capitalize } from '../../../../../../../utils/String';
+import { MITRE_FILTER_KEY } from '../../../../../common/filters/MitreFilter';
+import { CustomDashboardContext } from '../../../CustomDashboardContext';
+import FilterFieldBaseEntity from '../FilterFieldBaseEntity';
+import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from '../../WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
@@ -44,7 +44,7 @@ const availableFilters = new Map([
   ['vulnerable-endpoint', ['vulnerable_endpoint_architecture', 'vulnerable_endpoint_agents_active_status', 'vulnerable_endpoint_agents_privileges', 'vulnerable_endpoint_platform', 'base_simulation_side']],
 ]);
 
-const WidgetCreationSeries: FunctionComponent<{
+const WidgetSeriesSelection: FunctionComponent<{
   index: number;
   series: DateHistogramSeries | StructuralHistogramSeries;
   onChange: (series: DateHistogramSeries | StructuralHistogramSeries) => void;
@@ -188,4 +188,4 @@ const WidgetCreationSeries: FunctionComponent<{
   );
 };
 
-export default WidgetCreationSeries;
+export default WidgetSeriesSelection;

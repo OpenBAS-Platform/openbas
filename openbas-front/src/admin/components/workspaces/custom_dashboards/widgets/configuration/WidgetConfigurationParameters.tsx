@@ -2,13 +2,13 @@ import { TextField } from '@mui/material';
 import { type FunctionComponent } from 'react';
 import { type Control, Controller, type UseFormSetValue } from 'react-hook-form';
 
-import { useFormatter } from '../../../../../components/i18n';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import HistogramParameters from './HistogramParameters';
-import ListWidgetParameters from './viz/list/ListWidgetParameters';
-import { type WidgetInputWithoutLayout } from './WidgetUtils';
+import { useFormatter } from '../../../../../../components/i18n';
+import { type Widget } from '../../../../../../utils/api-types-custom';
+import HistogramParameters from './histogram/HistogramParameters';
+import ListWidgetParameters from './list/ListWidgetParameters';
+import { type WidgetInputWithoutLayout } from '../WidgetUtils';
 
-const WidgetCreationParameters: FunctionComponent<{
+const WidgetConfigurationParameters: FunctionComponent<{
   widgetType: Widget['widget_type'];
   control: Control<WidgetInputWithoutLayout>;
   setValue: UseFormSetValue<WidgetInputWithoutLayout>;
@@ -43,4 +43,4 @@ const WidgetCreationParameters: FunctionComponent<{
   );
 };
 
-export default WidgetCreationParameters;
+export default WidgetConfigurationParameters;

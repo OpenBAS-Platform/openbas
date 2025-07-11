@@ -3,14 +3,14 @@ import { Box, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 
-import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
-import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../utils/api-types';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import WidgetCreationSeries from './WidgetCreationSeries';
-import { getCurrentSeriesLimit } from './WidgetUtils';
+import { emptyFilterGroup } from '../../../../../../../components/common/queryable/filter/FilterUtils';
+import { useFormatter } from '../../../../../../../components/i18n';
+import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../../../utils/api-types';
+import { type Widget } from '../../../../../../../utils/api-types-custom';
+import WidgetSeriesSelection from './WidgetSeriesSelection';
+import { getCurrentSeriesLimit } from '../../WidgetUtils';
 
-const WidgetCreationSeriesList: FunctionComponent<{
+const WidgetMultiSeriesSelection: FunctionComponent<{
   widgetType: Widget['widget_type'];
   currentSeries: DateHistogramSeries[] | StructuralHistogramSeries[];
   onChange: (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => void;
@@ -63,7 +63,7 @@ const WidgetCreationSeriesList: FunctionComponent<{
       >
         {currentSeries.map((series, index) => {
           return (
-            <WidgetCreationSeries
+            <WidgetSeriesSelection
               key={index}
               index={index}
               series={series}
@@ -106,4 +106,4 @@ const WidgetCreationSeriesList: FunctionComponent<{
   );
 };
 
-export default WidgetCreationSeriesList;
+export default WidgetMultiSeriesSelection;

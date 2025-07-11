@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../../../../components/i18n';
 import type { PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import type { Widget } from '../../../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../../../utils/Option';
-import getEntityPropertiesListOptions from '../../EntityPropertiesListOptions';
+import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 import { getBaseEntities, type WidgetInputWithoutLayout } from '../../WidgetUtils';
 import WidgetColumnsCustomizationInput from './WidgetColumnsCustomizationInput';
 
