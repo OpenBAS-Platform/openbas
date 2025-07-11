@@ -1454,7 +1454,7 @@
   "The agent will never execute directly any payload.": "代理永遠唔會直接執行任何有效負載。",
   "The animation team can validate the team reaction": "动作团队可以验证团队反应",
   "The country code and mobile phone number provided is invalid. Please provide a valid number": "所提供的国家代码和手机号码无效。请提供有效号码",
-  "The document is used in the following entities:": "该文件用于以下实体：",
+  "The document is used in the following sections:": "本文件在以下章节中使用：",
   "The element already exists": "元素已存在.",
   "The element has been successfully deleted": "元素已成功删除",
   "The element has been successfully updated": "元素已成功更新",
