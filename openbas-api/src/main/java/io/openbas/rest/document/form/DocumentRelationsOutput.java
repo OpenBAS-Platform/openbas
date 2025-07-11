@@ -1,6 +1,5 @@
 package io.openbas.rest.document.form;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -9,23 +8,23 @@ import lombok.Data;
 @Data
 public class DocumentRelationsOutput {
 
-  private List<RelatedEntityOutput> simulations = new ArrayList();
+  private List<RelatedEntityOutput> simulations;
 
-  private List<RelatedEntityOutput> securityPlatforms = new ArrayList(); // Security Platforms
+  private List<RelatedEntityOutput> securityPlatforms;
 
-  private List<RelatedEntityOutput> channels = new ArrayList();
+  private List<RelatedEntityOutput> channels;
 
-  private List<RelatedEntityOutput> payloads = new ArrayList();
+  private List<RelatedEntityOutput> payloads;
 
-  private List<RelatedEntityOutput> scenarioArticles = new ArrayList();
+  private List<RelatedEntityOutput> scenarioArticles;
 
-  private List<RelatedEntityOutput> simulationArticles = new ArrayList();
+  private List<RelatedEntityOutput> simulationArticles;
 
-  private List<RelatedEntityOutput> atomicTestings = new ArrayList();
+  private List<RelatedEntityOutput> atomicTestings;
 
-  private List<RelatedEntityOutput> scenarioInjects = new ArrayList();
+  private List<RelatedEntityOutput> scenarioInjects;
 
-  private List<RelatedEntityOutput> simulationInjects = new ArrayList();
+  private List<RelatedEntityOutput> simulationInjects;
 
-  private List<RelatedEntityOutput> challenges = new ArrayList();
+  private List<RelatedEntityOutput> challenges;
 }
