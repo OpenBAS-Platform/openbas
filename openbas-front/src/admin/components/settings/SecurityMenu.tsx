@@ -1,10 +1,15 @@
-import { GroupsOutlined, LocalPoliceOutlined, PermIdentityOutlined } from '@mui/icons-material';
+import { GroupsOutlined, LocalPoliceOutlined, PermIdentityOutlined, SecurityOutlined } from '@mui/icons-material';
 import { type FunctionComponent, memo } from 'react';
 
 import RightMenu, { type RightMenuEntry } from '../../../components/common/menu/RightMenu';
 
 const SecurityMenuComponent: FunctionComponent = () => {
   const entries: RightMenuEntry[] = [
+    {
+      path: '/admin/settings/security/roles',
+      icon: () => (<SecurityOutlined />),
+      label: 'Roles',
+    },
     {
       path: '/admin/settings/security/groups',
       icon: () => (<GroupsOutlined />),
