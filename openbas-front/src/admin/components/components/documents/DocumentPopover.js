@@ -176,6 +176,34 @@ const DocumentPopover = (props) => {
     });
   };
 
+  const renderDialogText = () => {
+    if (loadingRelations) {
+      return <div>{t('Loading relations...')}</div>;
+    }
+
+    if (!relations) {
+      return t('Unable to load relations.');
+    }
+
+    const hasRelations = Object.values(relations).some(list => list.length > 0);
+
+    return (
+      <>
+        {hasRelations && (
+          <>
+            <Typography gutterBottom>
+              {t('The document is used in the following entities:')}
+            </Typography>
+            {renderRelations(relations)}
+          </>
+        )}
+        <Typography sx={{ paddingTop: theme.spacing(2) }}>
+          {t('Do you want to delete this document?')}
+        </Typography>
+      </>
+    );
+  };
+
   const handleOpenRemove = () => {
     setOpenRemove(true);
     handlePopoverClose();
@@ -259,27 +287,7 @@ const DocumentPopover = (props) => {
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={submitDelete}
-        text={loadingRelations ? (
-          <div>
-            {t('Loading relations...')}
-          </div>
-        ) : relations
-          ? (
-              <>
-                {Object.values(relations).some(list => list.length > 0) && (
-                  <>
-                    <Typography gutterBottom>
-                      {t('The document is used in the following entities:')}
-                    </Typography>
-                    {renderRelations(relations)}
-                  </>
-                )}
-                <Typography sx={{ paddingTop: theme.spacing(2) }}>
-                  {t('Do you want to delete this document?')}
-                </Typography>
-              </>
-            )
-          : t('Unable to load relations.')}
+        text={renderDialogText()}
       />
 
       {inline ? (
