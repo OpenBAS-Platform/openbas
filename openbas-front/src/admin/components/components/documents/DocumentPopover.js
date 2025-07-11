@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
+import DialogDelete from '../../../../components/common/DialogDelete.js';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import ContextLink from '../../../../components/ContextLink.js';
@@ -152,7 +153,7 @@ const DocumentPopover = (props) => {
 
       return (
         <div key={type}>
-          <Typography gutterBottom>
+          <Typography variant={"h6"} gutterBottom>
             {t(type)}
             :
           </Typography>
@@ -253,47 +254,33 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
       </Menu>
-      <Dialog
-        open={openDelete}
-        slots={{ transition: Transition }}
-        onClose={handleCloseDelete}
-        slotProps={{ paper: { elevation: 1 } }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {loadingRelations ? (
-              <div>
-                {t('Loading relations...')}
-              </div>
-            ) : relations
-              ? (
-                  <>
-                    {Object.values(relations).some(list => list.length > 0) && (
-                      <>
-                        <Typography gutterBottom>
-                          {t('The document is used in the following entities:')}
-                        </Typography>
-                        {renderRelations(relations)}
-                      </>
-                    )}
-                    <Typography sx={{ paddingTop: theme.spacing(2) }}>
-                      {t('Do you want to delete this document?')}
-                    </Typography>
-                  </>
-                )
-              : t('Unable to load relations.')}
-          </DialogContentText>
-        </DialogContent>
 
-        <DialogActions>
-          <Button onClick={handleCloseDelete}>
-            {t('Cancel')}
-          </Button>
-          <Button color="secondary" onClick={submitDelete}>
-            {t('Delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogDelete
+        open={openDelete}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={loadingRelations ? (
+          <div>
+            {t('Loading relations...')}
+          </div>
+        ) : relations
+          ? (
+              <>
+                {Object.values(relations).some(list => list.length > 0) && (
+                  <>
+                    <Typography gutterBottom>
+                      {t('The document is used in the following entities:')}
+                    </Typography>
+                    {renderRelations(relations)}
+                  </>
+                )}
+                <Typography sx={{ paddingTop: theme.spacing(2) }}>
+                  {t('Do you want to delete this document?')}
+                </Typography>
+              </>
+            )
+          : t('Unable to load relations.')}
+      />
 
       {inline ? (
         <Dialog
