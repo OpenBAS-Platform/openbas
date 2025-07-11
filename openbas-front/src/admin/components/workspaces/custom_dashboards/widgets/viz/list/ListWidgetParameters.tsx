@@ -24,15 +24,15 @@ const ListWidgetParameters = (props: Props) => {
     attribute: string;
     label: string;
   }[]>([]);
-  const series = useWatch({
+  const perspective = useWatch({
     control: props.control,
-    name: 'widget_config.series',
+    name: 'widget_config.perspective',
   });
   const columns = useWatch({
     control: props.control,
     name: 'widget_config.columns',
   });
-  const entities = series.map(v => getBaseEntities(v.filter)).flat();
+  const entities = [perspective].map(v => getBaseEntities(v.filter)).flat();
 
   const onColumnSelectionChange = (new_cols: {
     attribute: string;
@@ -72,7 +72,7 @@ const ListWidgetParameters = (props: Props) => {
         onColumnSelectionChange(newCols);
       }
     });
-  }, [series]);
+  }, [perspective]);
 
   return (
     <>

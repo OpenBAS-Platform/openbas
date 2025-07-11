@@ -14,6 +14,7 @@ import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCovera
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
 import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import WidgetCreationPerspective from "./WidgetCreationPerspective";
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -105,10 +106,10 @@ const WidgetForm: FunctionComponent<Props> = ({
         .max(1000, { message: t('Maximum value is 1000') })
         .optional(),
       columns: z.array(z.string()),
-      series: z.array(z.object({
+      perspective: z.object({
         name: z.string().optional(),
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
-      })),
+      }),
     }),
   ]);
 
@@ -193,6 +194,21 @@ const WidgetForm: FunctionComponent<Props> = ({
             />
           )}
         />
+      );
+      case 'list': return (
+        <Controller
+            control={control}
+            name="widget_config.perspective"
+            render={({ field: { value, onChange } }) => (
+                        <WidgetCreationPerspective
+                            index={0}
+                            perspective={value}
+                            onChange={onChange}
+                            onSubmit={nextStep}
+                        />
+
+                    )}
+                    />
       );
       default: return (
         <Controller
