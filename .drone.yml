@@ -2,11 +2,15 @@
 kind: pipeline
 name: openbas-tests
 
+node:
+  env: kubernetes
+
 steps:
   - name: Runner information
     image: alpine:3.19
     commands:
     - echo DRONE_STAGE_MACHINE ${DRONE_STAGE_MACHINE}
+    - echo "Run VM no cache 1"
 
   - name: api-tests
     image: maven:3.9.9-eclipse-temurin-22
@@ -16,15 +20,19 @@ steps:
       MINIO_PORT: 9000
       ENGINE_URL: http://elastic:9200
     commands:
+      - sleep 60
       - mvn clean install -q -DskipTests
       - mvn spotless:check
       - cd openbas-api
-      - mvn test -q
+      - mvn test
       - cd ../openbas-framework
-      - mvn test -q
+      - mvn test
 
   - name: frontend-tests
     image: node:22.16.0-alpine
+    volumes:
+      - name: cache-node-frontend
+        path: /drone/src/openbas-front/node_modules
     commands:
       - cd openbas-front
       - yarn install
@@ -71,6 +79,9 @@ steps:
 
   - name: frontend-e2e-tests
     image: node:22.16.0
+    volumes:
+      - name: cache-node-frontend-e2e
+        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -84,6 +95,9 @@ steps:
 
   - name: frontend-api-types
     image: node:22.16.0
+    volumes:
+      - name: cache-node-frontend-api-types
+        path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
       - apt -y install netcat-traditional
@@ -144,19 +158,19 @@ steps:
       - frontend-tests
       - frontend-e2e-tests
 
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-      username: drone
-      channel: notifications
-    when:
-      status: [ success, failure ]
-    depends_on:
-      - api-tests
-      - frontend-tests
-      - frontend-e2e-tests
+#  - name: slack
+#    image: plugins/slack
+#    settings:
+#      webhook:
+#        from_secret: slack_webhook
+#      username: drone
+#      channel: notifications
+#    when:
+#      status: [ success, failure ]
+#    depends_on:
+#      - api-tests
+#      - frontend-tests
+#      - frontend-e2e-tests
 
 services:
   - name: minio
@@ -188,4 +202,4 @@ services:
     environment:
       discovery.type: single-node
       xpack.security.enabled: false
-      ES_JAVA_OPTS: -Xms2g -Xmx2g
+      ES_JAVA_OPTS: -Xms4g -Xmx4g
