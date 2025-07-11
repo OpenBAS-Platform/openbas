@@ -155,7 +155,6 @@ const DocumentPopover = (props) => {
         <div key={type}>
           <Typography variant="body2" gutterBottom>
             {t(type)}
-            :
           </Typography>
           <ul style={{
             margin: 0,
