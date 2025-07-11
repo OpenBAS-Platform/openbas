@@ -9,6 +9,7 @@ import static io.openbas.utils.DocumentMapper.toOutput;
 import static io.openbas.utils.DocumentMapper.toOutputWithContext;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
@@ -23,6 +24,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.FileService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -490,6 +492,8 @@ public class DocumentApi extends RestBehavior {
     return documentService.getPlayerDocuments(articles, injects);
   }
 
+  @LogExecutionTime
+  @Operation(summary = "Fetch the entities related to this document id")
   @GetMapping("/api/documents/{documentId}/relations")
   public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
     return DocumentRelationsOutput.builder()
