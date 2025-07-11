@@ -31,6 +31,20 @@ const entityPaths = {
   securityPlatforms: () => SECURITY_PLATFORM_BASE_URL,
 };
 
+// Ordered entity types
+const renderOrder = [
+  'atomicTestings',
+  'scenarioInjects',
+  'simulationInjects',
+  'simulations',
+  'payloads',
+  'channels',
+  'scenarioArticles',
+  'simulationArticles',
+  'challenges',
+  'securityPlatforms',
+];
+
 const DocumentPopover = (props) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -138,11 +152,15 @@ const DocumentPopover = (props) => {
 
       return (
         <div key={type}>
-          <Typography variant="h4" gutterBottom>
-            {displayNames[type] || t(type)}
+          <Typography gutterBottom>
+            {t(type)}
             :
           </Typography>
-          <ul style={{ paddingLeft: theme.spacing(2) }}>
+          <ul style={{
+            margin: 0,
+            paddingLeft: theme.spacing(2),
+          }}
+          >
             {items.map(item => (
               <li key={item.id}>
                 <ContextLink
@@ -237,9 +255,9 @@ const DocumentPopover = (props) => {
       </Menu>
       <Dialog
         open={openDelete}
-        TransitionComponent={Transition}
+        slots={{ transition: Transition }}
         onClose={handleCloseDelete}
-        PaperProps={{ elevation: 1 }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>
@@ -250,18 +268,17 @@ const DocumentPopover = (props) => {
             ) : relations
               ? (
                   <>
-                    {Object.values(relations).some(list => list.length > 0) ? (
+                    {Object.values(relations).some(list => list.length > 0) && (
                       <>
-                        {t('The document is used in the following entities:')}
+                        <Typography gutterBottom>
+                          {t('The document is used in the following entities:')}
+                        </Typography>
                         {renderRelations(relations)}
-                        {t('Do you want to delete this document?')}
-                      </>
-                    ) : (
-                      <>
-                        {t('This document has no related entities.')}
-                        {t('Do you want to delete this document?')}
                       </>
                     )}
+                    <Typography sx={{ paddingTop: theme.spacing(2) }}>
+                      {t('Do you want to delete this document?')}
+                    </Typography>
                   </>
                 )
               : t('Unable to load relations.')}
