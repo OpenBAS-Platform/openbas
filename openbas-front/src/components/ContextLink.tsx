@@ -18,7 +18,7 @@ const ContextLink: FunctionComponent<Props> = ({
       <MUILink
         component={Link}
         to={url}
-        underline={'none'}
+        underline="none"
       >
         <Typography
           overflow="hidden"
