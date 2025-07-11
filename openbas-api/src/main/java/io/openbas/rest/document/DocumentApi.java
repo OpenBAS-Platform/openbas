@@ -497,7 +497,11 @@ public class DocumentApi extends RestBehavior {
         .channels(toOutput(documentDeleteRepository.findChannelsByDocument(documentId)))
         .payloads(toOutput(documentDeleteRepository.findPayloadsByDocument(documentId)))
         .articles(toOutput(documentDeleteRepository.findArticlesByDocument(documentId)))
-        .injects(toOutput(documentDeleteRepository.findInjectsByDocument(documentId)))
+        .atomicTestings(toOutput(documentDeleteRepository.findAtomicTestingsByDocument(documentId)))
+        .scenarioInjects(
+            toOutput(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))
+        .simulationInjects(
+            toOutput(documentDeleteRepository.findSimulationInjectsByDocument(documentId)))
         .challenges(toOutput(documentDeleteRepository.findChallengesByDocument(documentId)))
         .build();
   }
