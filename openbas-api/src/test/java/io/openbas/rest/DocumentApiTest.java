@@ -16,8 +16,11 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @TestInstance(PER_CLASS)
+@Transactional
+@DisplayName("Document API Integration Tests")
 class DocumentApiTest extends IntegrationTest {
 
   private static final String DOCUMENT_URI = "/api/documents";
