@@ -5835,3 +5835,9 @@ export interface WidgetLayout {
   /** @format int32 */
   widget_layout_y: number;
 }
+
+export interface Role {
+  role_id: string;
+  role_name: string;
+  role_capabilities: string[];
+}
