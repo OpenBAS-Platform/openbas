@@ -192,7 +192,7 @@ const DocumentPopover = (props) => {
         {hasRelations && (
           <>
             <Typography gutterBottom>
-              {t('The document is used in the following entities:')}
+              {t('The document is used in the following sections:')}
             </Typography>
             {renderRelations(relations)}
           </>
