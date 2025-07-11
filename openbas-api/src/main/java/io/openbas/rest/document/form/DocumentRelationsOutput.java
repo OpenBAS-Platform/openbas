@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class DocumentRelationsOutput {
 
-  private List<RelatedEntityOutput> exercises = new ArrayList();
+  private List<RelatedEntityOutput> simulations = new ArrayList();
 
-  private List<RelatedEntityOutput> exercisesDocuments = new ArrayList();
+  private List<RelatedEntityOutput> simulationsDocuments = new ArrayList();
 
   private List<RelatedEntityOutput> tags = new ArrayList();
 
