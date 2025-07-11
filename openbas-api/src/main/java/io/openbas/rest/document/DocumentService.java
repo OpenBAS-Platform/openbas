@@ -77,13 +77,6 @@ public class DocumentService {
   }
 
   public void deleteDocument(String documentId) {
-    documentDeleteRepository.deleteFromExerciseDocuments(documentId);
-    documentDeleteRepository.deleteFromInjectsDocuments(documentId);
-    documentDeleteRepository.deleteFromArticlesDocuments(documentId);
-    documentDeleteRepository.deleteFromDocumentTags(documentId);
-    documentDeleteRepository.deleteFromScenarioDocuments(documentId);
-    documentDeleteRepository.deleteFromChallengesDocuments(documentId);
-
     documentDeleteRepository.clearLogoInExercises(documentId);
     documentDeleteRepository.clearLogoInChannels(documentId);
     documentDeleteRepository.clearFileInPayloads(documentId);

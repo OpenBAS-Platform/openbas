@@ -39,12 +39,6 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT e.exercise_id, e.exercise_name FROM exercises_documents ed JOIN exercises e ON ed.exercise_id = e.exercise_id WHERE ed.document_id = :documentId",
-      nativeQuery = true)
-  List<Object[]> findExerciseDocumentsByDocument(@Param("documentId") String documentId);
-
-  @Query(
-      value =
           "SELECT i.inject_id, i.inject_title FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId AND i.inject_scenario IS NULL AND i.inject_exercise IS NULL",
       nativeQuery = true)
   List<Object[]> findAtomicTestingsByDocument(@Param("documentId") String documentId);
@@ -75,56 +69,11 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          " SELECT t.tag_id, t.tag_name FROM documents_tags dt JOIN tags t ON dt.tag_id = t.tag_id WHERE dt.document_id = :documentId",
-      nativeQuery = true)
-  List<Object[]> findTagsByDocument(@Param("documentId") String documentId);
-
-  @Query(
-      value =
-          "SELECT s.scenario_id, s.scenario_name FROM scenarios_documents sd JOIN scenarios s ON sd.scenario_id = s.scenario_id WHERE sd.document_id = :documentId",
-      nativeQuery = true)
-  List<Object[]> findScenarioDocumentsByDocument(@Param("documentId") String documentId);
-
-  @Query(
-      value =
           "SELECT c.challenge_id, c.challenge_name FROM challenges_documents cd JOIN challenges c ON cd.challenge_id = c.challenge_id WHERE cd.document_id = :documentId",
       nativeQuery = true)
   List<Object[]> findChallengesByDocument(@Param("documentId") String documentId);
 
-  // Delete
-  @Modifying
-  @Query(
-      value = "DELETE FROM exercises_documents WHERE document_id = :documentId",
-      nativeQuery = true)
-  void deleteFromExerciseDocuments(@Param("documentId") String documentId);
-
-  @Modifying
-  @Query(
-      value = "DELETE FROM injects_documents WHERE document_id = :documentId",
-      nativeQuery = true)
-  void deleteFromInjectsDocuments(@Param("documentId") String documentId);
-
-  @Modifying
-  @Query(
-      value = "DELETE FROM articles_documents WHERE document_id = :documentId",
-      nativeQuery = true)
-  void deleteFromArticlesDocuments(@Param("documentId") String documentId);
-
-  @Modifying
-  @Query(value = "DELETE FROM documents_tags WHERE document_id = :documentId", nativeQuery = true)
-  void deleteFromDocumentTags(@Param("documentId") String documentId);
-
-  @Modifying
-  @Query(
-      value = "DELETE FROM scenarios_documents WHERE document_id = :documentId",
-      nativeQuery = true)
-  void deleteFromScenarioDocuments(@Param("documentId") String documentId);
-
-  @Modifying
-  @Query(
-      value = "DELETE FROM challenges_documents WHERE document_id = :documentId",
-      nativeQuery = true)
-  void deleteFromChallengesDocuments(@Param("documentId") String documentId);
+  // CLEAN
 
   @Modifying
   @Query(
