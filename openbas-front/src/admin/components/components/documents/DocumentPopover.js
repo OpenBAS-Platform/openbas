@@ -1,23 +1,55 @@
 import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
+import DialogDelete from '../../../../components/common/DialogDelete.js';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
+import ContextLink from '../../../../components/ContextLink.js';
 import { useFormatter } from '../../../../components/i18n';
+import { ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SECURITY_PLATFORM_BASE_URL, SIMULATION_BASE_URL } from '../../../../constants/BaseUrls.js';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 import DocumentForm from './DocumentForm';
 
+const entityPaths = {
+  atomicTestings: item => `${ATOMIC_BASE_URL}/${item.id}`,
+  simulations: item => `${SIMULATION_BASE_URL}/${item.id}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects`,
+  scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
+  simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
+  payloads: () => PAYLOAD_BASE_URL,
+  channels: () => CHANNEL_BASE_URL,
+  challenges: () => CHALLENGE_BASE_URL,
+  securityPlatforms: () => SECURITY_PLATFORM_BASE_URL,
+};
+
+// Ordered entity types
+const renderOrder = [
+  'atomicTestings',
+  'scenarioInjects',
+  'simulationInjects',
+  'simulations',
+  'payloads',
+  'channels',
+  'scenarioArticles',
+  'simulationArticles',
+  'challenges',
+  'securityPlatforms',
+];
+
 const DocumentPopover = (props) => {
   // Standard hooks
   const { t } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
@@ -37,6 +69,8 @@ const DocumentPopover = (props) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
+  const [relations, setRelations] = useState(null);
+  const [loadingRelations, setLoadingRelations] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
 
@@ -77,6 +111,18 @@ const DocumentPopover = (props) => {
   const handleOpenDelete = () => {
     setOpenDelete(true);
     handlePopoverClose();
+    setLoadingRelations(true);
+    fetch(`/api/documents/${document.document_id}/relations`)
+      .then(res => res.json())
+      .then((data) => {
+        setRelations(data);
+      })
+      .catch(() => {
+        setRelations(null);
+      })
+      .finally(() => {
+        setLoadingRelations(false);
+      });
   };
 
   const handleCloseDelete = () => {
@@ -92,6 +138,69 @@ const DocumentPopover = (props) => {
       },
     );
     handleCloseDelete();
+  };
+
+  const buildEntityPath = (type, item) => {
+    const pathFn = entityPaths[type];
+    if (!pathFn) return '#';
+    return pathFn.length > 0 ? pathFn(item) : pathFn();
+  };
+
+  const renderRelations = (entities) => {
+    return renderOrder.map((type) => {
+      const items = entities[type];
+      if (!items?.length) return null;
+
+      return (
+        <div key={type}>
+          <Typography variant="body2" gutterBottom>
+            {t(type)}
+          </Typography>
+          <ul style={{
+            margin: 0,
+            padding: theme.spacing(0, 2, 1),
+          }}
+          >
+            {items.map(item => (
+              <li key={item.id}>
+                <ContextLink
+                  title={item.name}
+                  url={buildEntityPath(type, item)}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    });
+  };
+
+  const renderDialogText = () => {
+    if (loadingRelations) {
+      return <div>{t('Loading relations...')}</div>;
+    }
+
+    if (!relations) {
+      return t('Unable to load relations.');
+    }
+
+    const hasRelations = Object.values(relations).some(list => list.length > 0);
+
+    return (
+      <>
+        {hasRelations && (
+          <>
+            <Typography gutterBottom>
+              {t('The document is used in the following sections:')}
+            </Typography>
+            {renderRelations(relations)}
+          </>
+        )}
+        <Typography sx={{ paddingTop: theme.spacing(2) }}>
+          {t('Do you want to delete this document?')}
+        </Typography>
+      </>
+    );
   };
 
   const handleOpenRemove = () => {
@@ -172,26 +281,13 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
       </Menu>
-      <Dialog
+
+      <DialogDelete
         open={openDelete}
-        TransitionComponent={Transition}
-        onClose={handleCloseDelete}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {t('Do you want to delete this document?')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDelete}>
-            {t('Cancel')}
-          </Button>
-          <Button color="secondary" onClick={submitDelete}>
-            {t('Delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={renderDialogText()}
+      />
 
       {inline ? (
         <Dialog

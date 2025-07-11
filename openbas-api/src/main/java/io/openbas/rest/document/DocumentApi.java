@@ -5,14 +5,18 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.DocumentMapper.toOutput;
+import static io.openbas.utils.DocumentMapper.toOutputWithContext;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.document.form.DocumentCreateInput;
+import io.openbas.rest.document.form.DocumentRelationsOutput;
 import io.openbas.rest.document.form.DocumentTagUpdateInput;
 import io.openbas.rest.document.form.DocumentUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -20,12 +24,16 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.FileService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +58,11 @@ public class DocumentApi extends RestBehavior {
   private final DocumentRepository documentRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioRepository scenarioRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final UserRepository userRepository;
   private final InjectorRepository injectorRepository;
   private final CollectorRepository collectorRepository;
   private final SecurityPlatformRepository securityPlatformRepository;
+  private final DocumentDeleteRepository documentDeleteRepository;
 
   private final DocumentService documentService;
   private final FileService fileService;
@@ -484,19 +492,35 @@ public class DocumentApi extends RestBehavior {
     return documentService.getPlayerDocuments(articles, injects);
   }
 
+  @LogExecutionTime
+  @Operation(summary = "Fetch the entities related to this document id")
+  @GetMapping("/api/documents/{documentId}/relations")
+  public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
+    return DocumentRelationsOutput.builder()
+        .simulations(toOutput(documentDeleteRepository.findExercisesUsingDocument(documentId)))
+        .securityPlatforms(toOutput(documentDeleteRepository.findAssetsByDocument(documentId)))
+        .channels(toOutput(documentDeleteRepository.findChannelsByDocument(documentId)))
+        .payloads(toOutput(documentDeleteRepository.findPayloadsByDocument(documentId)))
+        .scenarioArticles(
+            toOutputWithContext(
+                documentDeleteRepository.findScenarioArticlesByDocument(documentId)))
+        .simulationArticles(
+            toOutputWithContext(
+                documentDeleteRepository.findSimulationArticlesByDocument(documentId)))
+        .atomicTestings(toOutput(documentDeleteRepository.findAtomicTestingsByDocument(documentId)))
+        .scenarioInjects(
+            toOutputWithContext(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))
+        .simulationInjects(
+            toOutputWithContext(
+                documentDeleteRepository.findSimulationInjectsByDocument(documentId)))
+        .challenges(toOutput(documentDeleteRepository.findChallengesByDocument(documentId)))
+        .build();
+  }
+
   @Transactional(rollbackOn = Exception.class)
   @DeleteMapping("/api/documents/{documentId}")
   public void deleteDocument(@PathVariable String documentId) {
-    injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
-    List<Document> documents = documentRepository.removeById(documentId);
-    documents.forEach(
-        document -> {
-          try {
-            fileService.deleteFile(document.getTarget());
-          } catch (Exception e) {
-            // Fail no longer available in the storage.
-          }
-        });
+    documentService.deleteDocument(documentId);
   }
 
   // -- EXERCISE & SENARIO--
