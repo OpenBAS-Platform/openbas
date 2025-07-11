@@ -10,7 +10,7 @@ import { useFormatter } from '../../../../../../components/i18n';
 import { type Widget } from '../../../../../../utils/api-types-custom';
 import { zodImplement } from '../../../../../../utils/Zod';
 import WidgetConfigurationParameters from './WidgetConfigurationParameters';
-import WidgetPerspectiveSelection from './histogram/WidgetPerspectiveSelection';
+import WidgetPerspectiveSelection from './list/WidgetPerspectiveSelection';
 import WidgetSecurityCoverageSeriesSelection from './histogram/WidgetSecurityCoverageSeriesSelection';
 import WidgetMultiSeriesSelection from './histogram/WidgetMultiSeriesSelection';
 import WidgetTypeSelection from './WidgetTypeSelection';
