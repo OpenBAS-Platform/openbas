@@ -11,7 +11,7 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import ContextLink from '../../../../components/ContextLink.js';
 import { useFormatter } from '../../../../components/i18n';
-import { ARTICLE_BASE_URL, ASSET_BASE_URL, ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SIMULATION_BASE_URL, TAG_BASE_URL } from '../../../../constants/BaseUrls.js';
+import { ARTICLE_BASE_URL, ASSET_BASE_URL, ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SCENARIO_INJECT_BASE_URL, SIMULATION_BASE_URL, SIMULATION_INJECT_BASE_URL, TAG_BASE_URL } from '../../../../constants/BaseUrls.js';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';

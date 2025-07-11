@@ -51,13 +51,13 @@ public interface DocumentDeleteRepository
 
   @Query(
       value =
-          "SELECT i.inject_id, i.inject_title FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId AND i.inject_scenario IS NOT NULL",
+          "SELECT i.inject_id, i.inject_title, i.inject_scenario FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId AND i.inject_scenario IS NOT NULL",
       nativeQuery = true)
   List<Object[]> findScenarioInjectsByDocument(@Param("documentId") String documentId);
 
   @Query(
       value =
-          "SELECT i.inject_id, i.inject_title FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId ANd i.inject_exercise IS NOT NULL",
+          "SELECT i.inject_id, i.inject_title, i.inject_exercise FROM injects_documents id JOIN injects i ON id.inject_id = i.inject_id WHERE id.document_id = :documentId ANd i.inject_exercise IS NOT NULL",
       nativeQuery = true)
   List<Object[]> findSimulationInjectsByDocument(@Param("documentId") String documentId);
 

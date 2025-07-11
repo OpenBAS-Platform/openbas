@@ -5,6 +5,8 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.DocumentMapper.toOutput;
+import static io.openbas.utils.DocumentMapper.toOutputWithContext;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.config.OpenBASPrincipal;
@@ -12,7 +14,10 @@ import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
-import io.openbas.rest.document.form.*;
+import io.openbas.rest.document.form.DocumentCreateInput;
+import io.openbas.rest.document.form.DocumentRelationsOutput;
+import io.openbas.rest.document.form.DocumentTagUpdateInput;
+import io.openbas.rest.document.form.DocumentUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
@@ -499,15 +504,12 @@ public class DocumentApi extends RestBehavior {
         .articles(toOutput(documentDeleteRepository.findArticlesByDocument(documentId)))
         .atomicTestings(toOutput(documentDeleteRepository.findAtomicTestingsByDocument(documentId)))
         .scenarioInjects(
-            toOutput(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))
+            toOutputWithContext(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))
         .simulationInjects(
-            toOutput(documentDeleteRepository.findSimulationInjectsByDocument(documentId)))
+            toOutputWithContext(
+                documentDeleteRepository.findSimulationInjectsByDocument(documentId)))
         .challenges(toOutput(documentDeleteRepository.findChallengesByDocument(documentId)))
         .build();
-  }
-
-  private List<RelatedEntityOutput> toOutput(List<Object[]> rows) {
-    return rows.stream().map(r -> new RelatedEntityOutput((String) r[0], (String) r[1])).toList();
   }
 
   @Transactional(rollbackOn = Exception.class)
