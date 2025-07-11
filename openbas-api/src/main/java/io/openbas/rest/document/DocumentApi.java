@@ -493,15 +493,16 @@ public class DocumentApi extends RestBehavior {
   @GetMapping("/api/documents/{documentId}/relations")
   public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
     return DocumentRelationsOutput.builder()
-        .exercises(toOutput(documentDeleteRepository.findExercisesUsingDocument(documentId)))
-        .exercisesDocuments(
-            toOutput(documentDeleteRepository.findExerciseDocumentsByDocument(documentId)))
-        .tags(toOutput(documentDeleteRepository.findTagsByDocument(documentId)))
-        .scenarios(toOutput(documentDeleteRepository.findScenariosByDocument(documentId)))
-        .assets(toOutput(documentDeleteRepository.findAssetsByDocument(documentId)))
+        .simulations(toOutput(documentDeleteRepository.findExercisesUsingDocument(documentId)))
+        .securityPlatforms(toOutput(documentDeleteRepository.findAssetsByDocument(documentId)))
         .channels(toOutput(documentDeleteRepository.findChannelsByDocument(documentId)))
         .payloads(toOutput(documentDeleteRepository.findPayloadsByDocument(documentId)))
-        .articles(toOutput(documentDeleteRepository.findArticlesByDocument(documentId)))
+        .scenarioArticles(
+            toOutputWithContext(
+                documentDeleteRepository.findScenarioArticlesByDocument(documentId)))
+        .simulationArticles(
+            toOutputWithContext(
+                documentDeleteRepository.findSimulationArticlesByDocument(documentId)))
         .atomicTestings(toOutput(documentDeleteRepository.findAtomicTestingsByDocument(documentId)))
         .scenarioInjects(
             toOutputWithContext(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))

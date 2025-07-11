@@ -11,7 +11,7 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import ContextLink from '../../../../components/ContextLink.js';
 import { useFormatter } from '../../../../components/i18n';
-import { ARTICLE_BASE_URL, ASSET_BASE_URL, ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SCENARIO_INJECT_BASE_URL, SIMULATION_BASE_URL, SIMULATION_INJECT_BASE_URL, TAG_BASE_URL } from '../../../../constants/BaseUrls.js';
+import { ATOMIC_BASE_URL, CHALLENGE_BASE_URL, CHANNEL_BASE_URL, PAYLOAD_BASE_URL, SCENARIO_BASE_URL, SECURITY_PLATFORM_BASE_URL, SIMULATION_BASE_URL } from '../../../../constants/BaseUrls.js';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -19,18 +19,16 @@ import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/
 import DocumentForm from './DocumentForm';
 
 const entityPaths = {
-  exercises: SIMULATION_BASE_URL,
-  payloads: PAYLOAD_BASE_URL,
-  assets: ASSET_BASE_URL,
-  channels: CHANNEL_BASE_URL,
-  exercisesDocuments: SIMULATION_BASE_URL,
-  atomicTestings: ATOMIC_BASE_URL,
-  scenarioInjects: SCENARIO_INJECT_BASE_URL,
-  simulationInjects: SIMULATION_INJECT_BASE_URL,
-  articles: ARTICLE_BASE_URL,
-  tags: TAG_BASE_URL,
-  scenarios: SCENARIO_BASE_URL,
-  challenges: CHALLENGE_BASE_URL,
+  atomicTestings: item => `${ATOMIC_BASE_URL}/${item.id}`,
+  simulations: item => `${SIMULATION_BASE_URL}/${item.id}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects`,
+  scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
+  simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
+  payloads: () => PAYLOAD_BASE_URL,
+  channels: () => CHANNEL_BASE_URL,
+  challenges: () => CHALLENGE_BASE_URL,
+  securityPlatforms: () => SECURITY_PLATFORM_BASE_URL,
 };
 
 const DocumentPopover = (props) => {
@@ -127,20 +125,30 @@ const DocumentPopover = (props) => {
     handleCloseDelete();
   };
 
+  const buildEntityPath = (type, item) => {
+    const pathFn = entityPaths[type];
+    if (!pathFn) return '#';
+    return pathFn.length > 0 ? pathFn(item) : pathFn();
+  };
+
   const renderRelations = (entities) => {
-    return Object.entries(entities).map(([type, items]) => {
-      if (!items.length) return null;
+    return renderOrder.map((type) => {
+      const items = entities[type];
+      if (!items?.length) return null;
 
       return (
         <div key={type}>
-          <Typography variant="h4">
-            {t(type)}
+          <Typography variant="h4" gutterBottom>
+            {displayNames[type] || t(type)}
             :
           </Typography>
           <ul style={{ paddingLeft: theme.spacing(2) }}>
             {items.map(item => (
               <li key={item.id}>
-                <ContextLink title={item.name} url={`${entityPaths[type]}/${item.id}`} />
+                <ContextLink
+                  title={item.name}
+                  url={buildEntityPath(type, item)}
+                />
               </li>
             ))}
           </ul>
@@ -239,24 +247,24 @@ const DocumentPopover = (props) => {
               <div>
                 {t('Loading relations...')}
               </div>
-            ) : relations ? (
-                <>
-                  {Object.values(relations).some(list => list.length > 0) ? (
-                    <>
-                      {t('The document is used in the following entities:')}
-                      {renderRelations(relations)}
-                      {t('Do you want to delete this document?')}
-                    </>
-                  ) : (
-                    <>
-                      {t('This document has no related entities.')}
-                      {t('Do you want to delete this document?')}
-                    </>
-                  )}
-                </>
-              ) :
-              t('Unable to load relations.')
-            }
+            ) : relations
+              ? (
+                  <>
+                    {Object.values(relations).some(list => list.length > 0) ? (
+                      <>
+                        {t('The document is used in the following entities:')}
+                        {renderRelations(relations)}
+                        {t('Do you want to delete this document?')}
+                      </>
+                    ) : (
+                      <>
+                        {t('This document has no related entities.')}
+                        {t('Do you want to delete this document?')}
+                      </>
+                    )}
+                  </>
+                )
+              : t('Unable to load relations.')}
           </DialogContentText>
         </DialogContent>
 

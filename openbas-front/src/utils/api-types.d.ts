@@ -1304,16 +1304,16 @@ export interface DocumentCreateInput {
 }
 
 export interface DocumentRelationsOutput {
-  articles?: RelatedEntityOutput[];
-  assets?: RelatedEntityOutput[];
+  atomicTestings?: RelatedEntityOutput[];
   challenges?: RelatedEntityOutput[];
   channels?: RelatedEntityOutput[];
-  exercises?: RelatedEntityOutput[];
-  exercisesDocuments?: RelatedEntityOutput[];
-  injects?: RelatedEntityOutput[];
   payloads?: RelatedEntityOutput[];
-  scenarios?: RelatedEntityOutput[];
-  tags?: RelatedEntityOutput[];
+  scenarioArticles?: RelatedEntityOutput[];
+  scenarioInjects?: RelatedEntityOutput[];
+  securityPlatforms?: RelatedEntityOutput[];
+  simulationArticles?: RelatedEntityOutput[];
+  simulationInjects?: RelatedEntityOutput[];
+  simulations?: RelatedEntityOutput[];
 }
 
 export interface DocumentTagUpdateInput {
@@ -4656,6 +4656,7 @@ export interface RegexGroupSimple {
 }
 
 export interface RelatedEntityOutput {
+  context?: string;
   id?: string;
   name?: string;
 }
