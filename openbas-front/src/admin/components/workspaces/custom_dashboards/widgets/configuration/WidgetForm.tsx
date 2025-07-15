@@ -58,6 +58,7 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   // Form
   const widgetConfigSchema = z.discriminatedUnion('widget_configuration_type', [
+    // DateHistogramConfiguration
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
@@ -73,6 +74,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
+    // StructuralHistogramConfiguration
     z.object({
       mode: z.literal('structural'),
       title: z.string().optional(),
@@ -89,6 +91,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
+    // ListConfiguration
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
