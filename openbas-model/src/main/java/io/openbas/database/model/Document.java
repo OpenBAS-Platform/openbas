@@ -91,6 +91,16 @@ public class Document implements Base {
   @JsonProperty("document_scenarios")
   private Set<Scenario> scenarios = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "articles_documents",
+      joinColumns = @JoinColumn(name = "document_id"),
+      inverseJoinColumns = @JoinColumn(name = "article_id"))
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
+  @JsonProperty("document_scenarios")
+  private Set<Article> articles = new HashSet<>();
+
   @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<InjectDocument> injectDocuments = new ArrayList<>();
