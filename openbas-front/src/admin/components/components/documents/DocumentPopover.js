@@ -22,12 +22,7 @@ import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/
 import DocumentForm from './DocumentForm';
 
 const paginationQuery = name => buildSearchPagination({
-  filterGroup: {
-    mode: 'and',
-    filters: [
-      buildFilter('payload_name', [name], 'contains'),
-    ],
-  },
+  textSearch: name,
 });
 
 const entityPaths = {
@@ -36,9 +31,9 @@ const entityPaths = {
   channels: item => `${CHANNEL_BASE_URL}/${item.id}`,
   scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
   simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
-  payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.id)))}`,
-  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?textSearch=${item.name}`,
-  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?textSearch=${item.name}`,
+  payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
   challenges: item => `${CHALLENGE_BASE_URL}?search=${item.name}`,
   securityPlatforms: item => `${SECURITY_PLATFORM_BASE_URL}?search=${item.name}`,
 };
@@ -287,7 +282,7 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
         {!onRemoveDocument && (
-          <MenuItem onClick={handleOpenDelete}>
+          <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
             {t('Delete')}
           </MenuItem>
         )}
