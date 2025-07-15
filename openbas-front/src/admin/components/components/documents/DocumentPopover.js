@@ -33,7 +33,7 @@ const paginationQuery = name => buildSearchPagination({
 const entityPaths = {
   atomicTestings: item => `${ATOMIC_BASE_URL}/${item.id}`,
   simulations: item => `${SIMULATION_BASE_URL}/${item.id}`,
-  channels: () => `${CHANNEL_BASE_URL}/${item.id}`,
+  channels: item => `${CHANNEL_BASE_URL}/${item.id}`,
   scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
   simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
   payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.id)))}`,
