@@ -495,22 +495,7 @@ public class DocumentApi extends RestBehavior {
   @Operation(summary = "Fetch the entities related to this document id")
   @GetMapping("/api/documents/{documentId}/relations")
   public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
-    return DocumentRelationsOutput.builder()
-        .simulations(toOutput(documentService.findExercisesUsingDocument(documentId)))
-        .securityPlatforms(toOutput(documentService.findAssetsByDocument(documentId)))
-        .channels(toOutput(documentService.findChannelsByDocument(documentId)))
-        .payloads(toOutput(documentService.findPayloadsByDocument(documentId)))
-        .scenarioArticles(
-            toOutputWithContext(documentService.findScenarioArticlesByDocument(documentId)))
-        .simulationArticles(
-            toOutputWithContext(documentService.findSimulationArticlesByDocument(documentId)))
-        .atomicTestings(toOutput(documentService.findAtomicTestingsByDocument(documentId)))
-        .scenarioInjects(
-            toOutputWithContext(documentService.findScenarioInjectsByDocument(documentId)))
-        .simulationInjects(
-            toOutputWithContext(documentService.findSimulationInjectsByDocument(documentId)))
-        .challenges(toOutput(documentService.findChallengesByDocument(documentId)))
-        .build();
+    return toDocumentRelationsOutput(documentService.document(documentId));
   }
 
   @Transactional(rollbackOn = Exception.class)
