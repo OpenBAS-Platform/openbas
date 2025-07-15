@@ -37,8 +37,8 @@ const entityPaths = {
   scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
   simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
   payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.id)))}`,
-  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?inject_name=${item.name}`,
-  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?inject_name=${item.name}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?textSearch=${item.name}`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?textSearch=${item.name}`,
   challenges: item => `${CHALLENGE_BASE_URL}?search=${item.name}`,
   securityPlatforms: item => `${SECURITY_PLATFORM_BASE_URL}?search=${item.name}`,
 };
