@@ -83,7 +83,7 @@ const PaginationComponentV2 = <T extends object>({
   const [options, setOptions] = useState<OptionPropertySchema[]>([]);
 
   useEffect(() => {
-    if (entityPrefix && !disableFilters) {
+    if (entityPrefix) {
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
         const newOptions = propertySchemas.filter(property => property.schema_property_name !== MITRE_FILTER_KEY)
           .map(property => (

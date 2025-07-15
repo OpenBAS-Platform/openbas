@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +25,7 @@ public class Role implements Base {
   @NotBlank
   private String id;
 
+  @Queryable(searchable = true, sortable = true)
   @JsonProperty("role_name")
   @Column(name = "role_name")
   @NotBlank
