@@ -62,7 +62,6 @@ public class DocumentApi extends RestBehavior {
   private final InjectorRepository injectorRepository;
   private final CollectorRepository collectorRepository;
   private final SecurityPlatformRepository securityPlatformRepository;
-  private final DocumentDeleteRepository documentDeleteRepository;
 
   private final DocumentService documentService;
   private final FileService fileService;
@@ -497,23 +496,20 @@ public class DocumentApi extends RestBehavior {
   @GetMapping("/api/documents/{documentId}/relations")
   public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
     return DocumentRelationsOutput.builder()
-        .simulations(toOutput(documentDeleteRepository.findExercisesUsingDocument(documentId)))
-        .securityPlatforms(toOutput(documentDeleteRepository.findAssetsByDocument(documentId)))
-        .channels(toOutput(documentDeleteRepository.findChannelsByDocument(documentId)))
-        .payloads(toOutput(documentDeleteRepository.findPayloadsByDocument(documentId)))
+        .simulations(toOutput(documentService.findExercisesUsingDocument(documentId)))
+        .securityPlatforms(toOutput(documentService.findAssetsByDocument(documentId)))
+        .channels(toOutput(documentService.findChannelsByDocument(documentId)))
+        .payloads(toOutput(documentService.findPayloadsByDocument(documentId)))
         .scenarioArticles(
-            toOutputWithContext(
-                documentDeleteRepository.findScenarioArticlesByDocument(documentId)))
+            toOutputWithContext(documentService.findScenarioArticlesByDocument(documentId)))
         .simulationArticles(
-            toOutputWithContext(
-                documentDeleteRepository.findSimulationArticlesByDocument(documentId)))
-        .atomicTestings(toOutput(documentDeleteRepository.findAtomicTestingsByDocument(documentId)))
+            toOutputWithContext(documentService.findSimulationArticlesByDocument(documentId)))
+        .atomicTestings(toOutput(documentService.findAtomicTestingsByDocument(documentId)))
         .scenarioInjects(
-            toOutputWithContext(documentDeleteRepository.findScenarioInjectsByDocument(documentId)))
+            toOutputWithContext(documentService.findScenarioInjectsByDocument(documentId)))
         .simulationInjects(
-            toOutputWithContext(
-                documentDeleteRepository.findSimulationInjectsByDocument(documentId)))
-        .challenges(toOutput(documentDeleteRepository.findChallengesByDocument(documentId)))
+            toOutputWithContext(documentService.findSimulationInjectsByDocument(documentId)))
+        .challenges(toOutput(documentService.findChallengesByDocument(documentId)))
         .build();
   }
 
