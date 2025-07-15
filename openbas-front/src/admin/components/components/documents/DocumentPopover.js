@@ -9,6 +9,8 @@ import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import DialogDelete from '../../../../components/common/DialogDelete.js';
 import Drawer from '../../../../components/common/Drawer';
+import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils.js';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils.js';
 import Transition from '../../../../components/common/Transition';
 import ContextLink from '../../../../components/ContextLink.js';
 import { useFormatter } from '../../../../components/i18n';
@@ -19,17 +21,26 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 import DocumentForm from './DocumentForm';
 
+const paginationQuery = name => buildSearchPagination({
+  filterGroup: {
+    mode: 'and',
+    filters: [
+      buildFilter('payload_name', [name], 'contains'),
+    ],
+  },
+});
+
 const entityPaths = {
   atomicTestings: item => `${ATOMIC_BASE_URL}/${item.id}`,
   simulations: item => `${SIMULATION_BASE_URL}/${item.id}`,
-  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects`,
-  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects`,
+  channels: () => `${CHANNEL_BASE_URL}/${item.id}`,
   scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
   simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
-  payloads: () => PAYLOAD_BASE_URL,
-  channels: () => CHANNEL_BASE_URL,
-  challenges: () => CHALLENGE_BASE_URL,
-  securityPlatforms: () => SECURITY_PLATFORM_BASE_URL,
+  payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.id)))}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?inject_name=${item.name}`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?inject_name=${item.name}`,
+  challenges: item => `${CHALLENGE_BASE_URL}?search=${item.name}`,
+  securityPlatforms: item => `${SECURITY_PLATFORM_BASE_URL}?search=${item.name}`,
 };
 
 // Ordered entity types
@@ -276,7 +287,7 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
         {!onRemoveDocument && (
-          <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
+          <MenuItem onClick={handleOpenDelete}>
             {t('Delete')}
           </MenuItem>
         )}
