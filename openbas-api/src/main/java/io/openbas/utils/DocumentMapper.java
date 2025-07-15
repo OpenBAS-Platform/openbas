@@ -3,15 +3,16 @@ package io.openbas.utils;
 import io.openbas.database.model.Document;
 import io.openbas.rest.document.form.DocumentRelationsOutput;
 import io.openbas.rest.document.form.RelatedEntityOutput;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
 public class DocumentMapper {
 
-  private DocumentRelationsOutput toDocumentRelationsOutput(Document document) {
+  public static DocumentRelationsOutput toDocumentRelationsOutput(Document document) {
     return DocumentRelationsOutput.builder()
         .simulations(toOutput(document.getSimulations()))
         .securityPlatforms(toOutput(document.getSecurityPlatforms()))
