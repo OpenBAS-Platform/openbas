@@ -48,7 +48,7 @@ public class WidgetFixture {
     series.setFilter(filterGroup);
     // basic configuration
     ListConfiguration listConfiguration = new ListConfiguration();
-    listConfiguration.setSeries(List.of(series));
+    listConfiguration.setPerspective(series);
     widget.setWidgetConfiguration(listConfiguration);
     // basic layout
     widget.setLayout(new WidgetLayout());
