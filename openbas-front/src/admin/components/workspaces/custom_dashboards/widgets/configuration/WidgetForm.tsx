@@ -9,12 +9,12 @@ import StepperComponent from '../../../../../../components/common/StepperCompone
 import { useFormatter } from '../../../../../../components/i18n';
 import { type Widget } from '../../../../../../utils/api-types-custom';
 import { zodImplement } from '../../../../../../utils/Zod';
-import WidgetConfigurationParameters from './WidgetConfigurationParameters';
-import WidgetPerspectiveSelection from './list/WidgetPerspectiveSelection';
-import WidgetSecurityCoverageSeriesSelection from './histogram/WidgetSecurityCoverageSeriesSelection';
-import WidgetMultiSeriesSelection from './histogram/WidgetMultiSeriesSelection';
-import WidgetTypeSelection from './WidgetTypeSelection';
 import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from '../WidgetUtils';
+import WidgetMultiSeriesSelection from './histogram/WidgetMultiSeriesSelection';
+import WidgetSecurityCoverageSeriesSelection from './histogram/WidgetSecurityCoverageSeriesSelection';
+import WidgetPerspectiveSelection from './list/WidgetPerspectiveSelection';
+import WidgetConfigurationParameters from './WidgetConfigurationParameters';
+import WidgetTypeSelection from './WidgetTypeSelection';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -48,12 +48,7 @@ const WidgetForm: FunctionComponent<Props> = ({
   toggleDialog,
   initialValues = {
     widget_type: undefined,
-    widget_config: {
-      mode: undefined,
-      title: '',
-      field: '',
-      series: [{ name: '' }],
-    },
+    widget_config: { title: '' },
   },
   onSubmit,
   editing = false,
@@ -187,7 +182,7 @@ const WidgetForm: FunctionComponent<Props> = ({
           name="widget_config.series"
           render={({ field: { value, onChange } }) => (
             <WidgetSecurityCoverageSeriesSelection
-              value={value}
+              value={value ?? [{ name: '' }]}
               onChange={onChange}
               onSubmit={nextStep}
               isSimulationFilterMandatory={widgetType === 'attack-path'}
@@ -201,7 +196,7 @@ const WidgetForm: FunctionComponent<Props> = ({
           name="widget_config.perspective"
           render={({ field: { value, onChange } }) => (
             <WidgetPerspectiveSelection
-              perspective={value}
+              perspective={value ?? { name: '' }}
               onChange={onChange}
               onSubmit={nextStep}
             />
@@ -216,7 +211,7 @@ const WidgetForm: FunctionComponent<Props> = ({
           render={({ field: { value, onChange } }) => (
             <WidgetMultiSeriesSelection
               widgetType={widgetType}
-              currentSeries={value}
+              currentSeries={value ?? [{ name: '' }]}
               onChange={onChange}
               onSubmit={nextStep}
             />

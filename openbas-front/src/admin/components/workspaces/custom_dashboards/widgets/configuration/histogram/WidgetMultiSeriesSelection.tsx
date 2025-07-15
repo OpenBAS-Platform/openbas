@@ -7,8 +7,8 @@ import { emptyFilterGroup } from '../../../../../../../components/common/queryab
 import { useFormatter } from '../../../../../../../components/i18n';
 import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../../../utils/api-types';
 import { type Widget } from '../../../../../../../utils/api-types-custom';
-import WidgetSeriesSelection from './WidgetSeriesSelection';
 import { getCurrentSeriesLimit } from '../../WidgetUtils';
+import WidgetSeriesSelection from './WidgetSeriesSelection';
 
 const WidgetMultiSeriesSelection: FunctionComponent<{
   widgetType: Widget['widget_type'];

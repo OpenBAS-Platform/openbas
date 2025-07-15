@@ -8,12 +8,12 @@ import { useFormatter } from '../../../../../../../components/i18n';
 import { type PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import { type Widget } from '../../../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../../../utils/Option';
-import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 import {
   getAvailableModes,
   getBaseEntities, getLimit,
   type WidgetInputWithoutLayout,
 } from '../../WidgetUtils';
+import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 
 type Props = {
   widgetType: Widget['widget_type'];

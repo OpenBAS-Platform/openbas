@@ -19,8 +19,8 @@ import { createGroupOption, type GroupOption } from '../../../../../../../utils/
 import { capitalize } from '../../../../../../../utils/String';
 import { MITRE_FILTER_KEY } from '../../../../../common/filters/MitreFilter';
 import { CustomDashboardContext } from '../../../CustomDashboardContext';
-import FilterFieldBaseEntity from '../FilterFieldBaseEntity';
 import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from '../../WidgetUtils';
+import FilterFieldBaseEntity from '../FilterFieldBaseEntity';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
