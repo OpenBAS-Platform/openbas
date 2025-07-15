@@ -1,6 +1,8 @@
+import qs from 'qs';
 import * as R from 'ramda';
 
-import { type Filter, type FilterGroup, type PropertySchemaDTO } from '../../../../utils/api-types';
+import { type Filter, type FilterGroup, type PropertySchemaDTO, type RelatedEntityOutput } from '../../../../utils/api-types';
+import { buildSearchPagination } from '../QueryableUtils';
 
 export const emptyFilterGroup: FilterGroup = {
   mode: 'or',
@@ -36,6 +38,24 @@ export const isEmptyFilter = (filterGroup: FilterGroup, key: string) => {
   return !filterGroup.filters?.find(f => f.key === key) || R.isEmpty(filterGroup.filters?.find(f => f.key === key)?.values);
 };
 
+export const craftedDocumentFilter = (item: RelatedEntityOutput, keyFilter: string, key: string) => {
+  return btoa(qs.stringify({
+    ...buildSearchPagination({
+      filterGroup: {
+        mode: 'and',
+        filters: [
+          {
+            key: keyFilter,
+            operator: 'contains',
+            values: [item.name ?? ''],
+          },
+        ],
+      },
+    }),
+    key: key,
+  }, { allowEmptyArrays: true }));
+};
+
 // -- OPERATOR --
 
 export const convertOperatorToIcon = (t: (text: string) => string, operator: Filter['operator']) => {
@@ -47,28 +67,28 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
     case 'not_contains':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('not contains')}
         </>
       );
     case 'contains':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('contains')}
         </>
       );
     case 'starts_with':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('starts with')}
         </>
       );
     case 'not_starts_with':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('not starts with')}
         </>
       );
@@ -83,14 +103,14 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
     case 'empty':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('is empty')}
         </>
       );
     case 'not_empty':
       return (
         <>
-&nbsp;
+          &nbsp;
           {t('is not empty')}
         </>
       );
