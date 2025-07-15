@@ -2,7 +2,6 @@ import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
@@ -13,7 +12,7 @@ import { searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
-import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
