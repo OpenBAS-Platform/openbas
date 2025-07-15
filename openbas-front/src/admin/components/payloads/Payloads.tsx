@@ -106,9 +106,6 @@ const Payloads = () => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const initialKeyword = params.get('payload_name') || '';
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
   const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
@@ -221,7 +218,6 @@ const Payloads = () => {
     filterGroup: {
       mode: 'and',
       filters: [
-        buildFilter('payload_name', [initialKeyword], 'contains'),
         buildEmptyFilter('payload_attack_patterns', 'contains'),
         buildEmptyFilter('payload_platforms', 'contains'),
       ],
