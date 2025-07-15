@@ -1,6 +1,6 @@
 import { HelpOutlineOutlined, SecurityOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -16,6 +16,7 @@ import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import type { Role, SearchPaginationInput } from '../../../../utils/api-types';
 import SecurityMenu from '../SecurityMenu';
+import RolePopover from './RolePopover';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -33,6 +34,7 @@ const inlineStyles = {
 const Roles = () => {
   const { classes } = useStyles();
   const { t } = useFormatter();
+
   const bodyItemsStyles = useBodyItemsStyles();
 
   // Headers
@@ -57,19 +59,27 @@ const Roles = () => {
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-  const searchPaginationInput = useMemo(() => (
-    buildSearchPagination({
-      sorts: initSorting('', 'ASC'),
-      textSearch: search,
-    })
-  ), [search]);
-  const { queryableHelpers } = useQueryableWithLocalStorage('role', searchPaginationInput);
+  // const searchPaginationInput = useMemo(() => (
+  //   buildSearchPagination({
+  //     sorts: initSorting('', 'ASC'),
+  //     textSearch: search,
+  //   })
+  // ), [search]);
+  // const { queryableHelpers } = useQueryableWithLocalStorage('Role', searchPaginationInput);
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('roles-v2', buildSearchPagination({
+    sorts: initSorting('role_name', 'ASC'),
+    textSearch: search,
+  }));
+
   const searchRolesToLoad = (input: SearchPaginationInput) => {
     setLoading(true);
-    return searchRoles({ paginationInput: input }).finally(() => setLoading(false));
+    return searchRoles(input).finally(() => {
+      setLoading(false);
+    });
   };
 
   return (
@@ -88,6 +98,7 @@ const Roles = () => {
           setContent={setRoles}
           entityPrefix="role"
           queryableHelpers={queryableHelpers}
+          disablePagination
           disableFilters
         />
         <List>
@@ -138,6 +149,10 @@ const Roles = () => {
                         </div>
 
                       )}
+                      />
+                      <RolePopover
+                        onDelete={result => setRoles(roles.filter(r => (r.role_id !== result)))}
+                        role={{ ...role }}
                       />
                     </ListItem>
                   ),
