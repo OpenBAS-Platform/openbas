@@ -1,6 +1,7 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import qs from 'qs';
 import * as R from 'ramda';
 import { useState } from 'react';
 
@@ -9,7 +10,6 @@ import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
 import DialogDelete from '../../../../components/common/DialogDelete.js';
 import Drawer from '../../../../components/common/Drawer';
-import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils.js';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils.js';
 import Transition from '../../../../components/common/Transition';
 import ContextLink from '../../../../components/ContextLink.js';
@@ -21,9 +21,37 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
 import DocumentForm from './DocumentForm';
 
-const paginationQuery = name => buildSearchPagination({
-  textSearch: name,
-});
+const craftedFilter = item => btoa(qs.stringify({
+  ...buildSearchPagination({
+    filterGroup: {
+      mode: 'and',
+      filters: [
+        {
+          key: 'inject_title',
+          operator: 'contains',
+          values: [item.name ?? ''],
+        },
+      ],
+    },
+  }),
+  key: `${item.context}-injects`,
+}, { allowEmptyArrays: true }));
+
+const craftedFilterPayload = item => btoa(qs.stringify({
+  ...buildSearchPagination({
+    filterGroup: {
+      mode: 'and',
+      filters: [
+        {
+          key: 'payload_name',
+          operator: 'contains',
+          values: [item.name ?? ''],
+        },
+      ],
+    },
+  }),
+  key: `payloads`,
+}, { allowEmptyArrays: true }));
 
 const entityPaths = {
   atomicTestings: item => `${ATOMIC_BASE_URL}/${item.id}`,
@@ -31,9 +59,9 @@ const entityPaths = {
   channels: item => `${CHANNEL_BASE_URL}/${item.id}`,
   scenarioArticles: item => `${SCENARIO_BASE_URL}/${item.context}/definition`,
   simulationArticles: item => `${SIMULATION_BASE_URL}/${item.context}/definition`,
-  payloads: item => `${PAYLOAD_BASE_URL}?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
-  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
-  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?query=${btoa(JSON.stringify(paginationQuery(item.name)))}`,
+  payloads: item => `${PAYLOAD_BASE_URL}?query=${craftedFilterPayload(item)}`,
+  scenarioInjects: item => `${SCENARIO_BASE_URL}/${item.context}/injects?query=${craftedFilter(item)}`,
+  simulationInjects: item => `${SIMULATION_BASE_URL}/${item.context}/injects?query=${craftedFilter(item)}`,
   challenges: item => `${CHALLENGE_BASE_URL}?search=${item.name}`,
   securityPlatforms: item => `${SECURITY_PLATFORM_BASE_URL}?search=${item.name}`,
 };
