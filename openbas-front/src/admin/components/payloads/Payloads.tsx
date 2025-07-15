@@ -2,6 +2,7 @@ import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
@@ -12,7 +13,7 @@ import { searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -105,6 +106,9 @@ const Payloads = () => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const initialKeyword = params.get('payload_name') || '';
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
   const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
@@ -217,6 +221,7 @@ const Payloads = () => {
     filterGroup: {
       mode: 'and',
       filters: [
+        buildFilter('payload_name', [initialKeyword], 'contains'),
         buildEmptyFilter('payload_attack_patterns', 'contains'),
         buildEmptyFilter('payload_platforms', 'contains'),
       ],

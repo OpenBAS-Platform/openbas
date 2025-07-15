@@ -2,7 +2,7 @@ import { RowingOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
@@ -98,10 +98,13 @@ const Challenges = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const initialKeyword = params.get('search') || '';
 
   // Filter and sort hook
   const searchColumns = ['name', 'content', 'category'];
-  const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
+  const filtering = useSearchAnFilter('challenge', 'name', searchColumns, { defaultKeyword: initialKeyword });
   // Fetching data
   const { challenges, documentsMap, exercisesMap } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
