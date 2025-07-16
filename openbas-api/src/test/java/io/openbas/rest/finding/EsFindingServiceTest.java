@@ -13,7 +13,6 @@ import io.openbas.utils.fixtures.composers.InjectComposer;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.apache.commons.validator.routines.InetAddressValidator;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
