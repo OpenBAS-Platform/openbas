@@ -59,9 +59,8 @@ public class OpenBASImplantExecutor extends Injector {
     List<Expectation> expectations = new ArrayList<>();
 
     assetToExecutes.forEach(
-        (assetToExecute) -> {
-          computeExpectationsForAssetAndAgents(expectations, content, assetToExecute, inject);
-        });
+        assetToExecute ->
+            computeExpectationsForAssetAndAgents(expectations, content, assetToExecute, inject));
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
     assetGroups.forEach(
@@ -80,18 +79,36 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final OpenBASImplantInjectContent content,
       @NotNull final AssetToExecute assetToExecute,
       final Inject inject) {
+
     if (!content.getExpectations().isEmpty()) {
+
+      Map<String, Endpoint> valueTargetedAssetsMap = injectService.getValueTargetedAssetMap(inject);
+
       expectations.addAll(
           content.getExpectations().stream()
               .flatMap(
                   expectation ->
                       switch (expectation.getType()) {
                         case PREVENTION ->
-                            getPreventionExpectations(assetToExecute, inject, expectation).stream();
+                            getPreventionExpectations(
+                                assetToExecute,
+                                inject,
+                                expectation,
+                                valueTargetedAssetsMap.keySet().stream().toList())
+                                .stream();
                         case DETECTION ->
-                            getDetectionExpectations(assetToExecute, inject, expectation).stream();
+                            getDetectionExpectations(
+                                assetToExecute,
+                                inject,
+                                expectation,
+                                valueTargetedAssetsMap.keySet().stream().toList())
+                                .stream();
                         case VULNERABILITY ->
-                            getVulnerabilityExpectations(assetToExecute, inject, expectation)
+                            getVulnerabilityExpectations(
+                                assetToExecute,
+                                inject,
+                                expectation,
+                                valueTargetedAssetsMap.keySet().stream().toList())
                                 .stream();
                         case MANUAL ->
                             getManualExpectations(assetToExecute, inject, expectation).stream();

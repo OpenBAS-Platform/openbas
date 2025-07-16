@@ -35,10 +35,10 @@ class ExpectationUtilsTest {
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationList(endpoint, null, inject, preventionExpectation);
+        getPreventionExpectationList(endpoint, null, inject, preventionExpectation, List.of());
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationList(endpoint, null, inject, detectionExpectation);
+        getDetectionExpectationList(endpoint, null, inject, detectionExpectation, List.of());
 
     // -- ASSERT --
     InjectExpectationSignature signature =
