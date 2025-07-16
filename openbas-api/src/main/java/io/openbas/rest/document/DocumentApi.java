@@ -1,5 +1,13 @@
 package io.openbas.rest.document;
 
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.DocumentMapper.toDocumentRelationsOutput;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
@@ -19,6 +27,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -32,22 +48,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RestController
 @RequiredArgsConstructor
@@ -231,10 +231,10 @@ public class DocumentApi extends RestBehavior {
     List<Document> securityPlatformLogos = securityPlatformRepository.securityPlatformLogo();
     if (user.isAdmin()) {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) ->
-              this.documentRepository.findAll(specification, pageable),
-          searchPaginationInput,
-          Document.class)
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(specification, pageable),
+              searchPaginationInput,
+              Document.class)
           .map(
               (document) -> {
                 var rawPaginationDocument = new RawPaginationDocument(document);
@@ -244,11 +244,11 @@ public class DocumentApi extends RestBehavior {
               });
     } else {
       return buildPaginationJPA(
-          (Specification<Document> specification, Pageable pageable) ->
-              this.documentRepository.findAll(
-                  findGrantedFor(user.getId()).and(specification), pageable),
-          searchPaginationInput,
-          Document.class)
+              (Specification<Document> specification, Pageable pageable) ->
+                  this.documentRepository.findAll(
+                      findGrantedFor(user.getId()).and(specification), pageable),
+              searchPaginationInput,
+              Document.class)
           .map(
               (document) -> {
                 var rawPaginationDocument = new RawPaginationDocument(document);

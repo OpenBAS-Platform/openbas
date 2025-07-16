@@ -1,12 +1,14 @@
 package io.openbas.utils;
 
+import io.openbas.database.model.Base;
 import io.openbas.database.model.Document;
 import io.openbas.rest.document.form.DocumentRelationsOutput;
 import io.openbas.rest.document.form.RelatedEntityOutput;
+import java.util.List;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -14,24 +16,20 @@ public class DocumentMapper {
 
   public static DocumentRelationsOutput toDocumentRelationsOutput(Document document) {
     return DocumentRelationsOutput.builder()
-        .simulations(toOutput(document.getSimulations()))
+        .simulations(toOutput(document.getSimulationsByLogo()))
         .securityPlatforms(toOutput(document.getSecurityPlatforms()))
         .channels(toOutput(document.getChannels()))
         .payloads(toOutput(document.getPayloads()))
-        .scenarioArticles(
-            toOutputWithContext(document.getArticles()))
-        .simulationArticles(
-            toOutputWithContext(document.getArticles()))
+        .scenarioArticles(toOutputWithContext(document.getArticles()))
+        .simulationArticles(toOutputWithContext(document.getArticles()))
         .atomicTestings(toOutput(document.getAtomicTestings()))
-        .scenarioInjects(
-            toOutputWithContext(document.getInjects()))
-        .simulationInjects(
-            toOutputWithContext(document.getInjects()))
+        .scenarioInjects(toOutputWithContext(document.getInjects()))
+        .simulationInjects(toOutputWithContext(document.getInjects()))
         .challenges(toOutput(document.getChallenges()))
         .build();
   }
 
-  public static List<RelatedEntityOutput> toOutput(List<Object[]> rows) {
+  public static List<RelatedEntityOutput> toOutput(Set<Base> rows) {
     return rows.stream()
         .map(r -> new RelatedEntityOutput((String) r[0], (String) r[1], null))
         .toList();
