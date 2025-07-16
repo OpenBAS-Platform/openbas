@@ -95,7 +95,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    attackPatternRepository.delete(ATTACKPATTERN);
+    globalTeardown();
   }
 
   @DisplayName("Add an inject for scenario")

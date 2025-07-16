@@ -110,6 +110,10 @@ public class InjectImportTest extends IntegrationTest {
     clearEntityManager();
   }
 
+  public final String INJECT_IMPORT_URI = INJECT_URI + "/import";
+  private final Map<String, ArticleComposer.Composer> staticArticleWrappers = new HashMap<>();
+  private final String KNOWN_ARTICLE_WRAPPER_KEY = "known article key";
+
   private Map<String, ArticleComposer.Composer> getStaticArticleWrappers() {
     if (!staticArticleWrappers.containsKey(KNOWN_ARTICLE_WRAPPER_KEY)) {
       staticArticleWrappers.put(

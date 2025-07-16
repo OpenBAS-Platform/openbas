@@ -24,7 +24,9 @@ import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
+import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -46,6 +48,14 @@ class PlayerApiTest extends IntegrationTest {
   @Autowired private OrganizationRepository organizationRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private UserRepository userRepository;
+
+  List<User> savedUsers = new ArrayList<>();
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+    userRepository.deleteAll(savedUsers);
+  }
 
   @DisplayName("Given valid player input, should create a player successfully")
   @Test
@@ -125,7 +135,7 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    userRepository.save(user);
+    savedUsers.add(userRepository.save(user));
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -176,7 +186,7 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    userRepository.save(user);
+    savedUsers.add(userRepository.save(user));
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -227,6 +237,7 @@ class PlayerApiTest extends IntegrationTest {
     User user = new User();
     user.setUpdateAttributes(playerInput);
     user = userRepository.save(user);
+    savedUsers.add(user);
 
     // -- EXECUTE --
     mvc.perform(

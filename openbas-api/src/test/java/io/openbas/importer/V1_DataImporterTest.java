@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.utils.Constants;
 import java.io.IOException;
@@ -16,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,6 +57,11 @@ class V1_DataImporterTest extends IntegrationTest {
   public static final String ATTACK_PATTERN_EXTERNAL_ID = "ATTACK_PATTERN_EXTERNAL_ID";
   public static final String KILLCHAIN_EXTERNAL_ID = "KILLCHAIN_EXTERNAL_ID";
   public static final String PAYLOAD_EXTERNAL_ID = "PAYLOAD_EXTERNAL_ID";
+
+  @AfterEach
+  void afterAll() {
+    globalTeardown();
+  }
 
   @BeforeEach
   void cleanBefore() throws IOException {

@@ -81,6 +81,11 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
             .get();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   @Nested
   @DisplayName("As SimulationPlanner")
   class SimulationPlannerAccess {

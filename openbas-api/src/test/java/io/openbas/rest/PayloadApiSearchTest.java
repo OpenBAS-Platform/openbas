@@ -58,7 +58,7 @@ public class PayloadApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.payloadRepository.deleteAllById(PAYLOAD_COMMAND_IDS);
+    globalTeardown();
   }
 
   @Nested

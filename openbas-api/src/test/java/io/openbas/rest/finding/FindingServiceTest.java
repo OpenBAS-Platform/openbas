@@ -22,9 +22,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -49,6 +48,11 @@ class FindingServiceTest extends IntegrationTest {
     findingService =
         new FindingService(
             injectService, findingRepository, assetRepository, teamRepository, userRepository);
+  }
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
   }
 
   @Test
