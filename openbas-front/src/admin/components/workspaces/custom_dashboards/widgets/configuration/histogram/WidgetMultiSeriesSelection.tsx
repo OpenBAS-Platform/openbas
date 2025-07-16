@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../../../../components/i18n';
 import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../../../utils/api-types';
 import { type Widget } from '../../../../../../../utils/api-types-custom';
 import { getCurrentSeriesLimit } from '../../WidgetUtils';
-import WidgetSeriesSelection from './WidgetSeriesSelection';
+import WidgetSeriesSelection from '../WidgetSeriesSelection';
 
 const WidgetMultiSeriesSelection: FunctionComponent<{
   widgetType: Widget['widget_type'];
@@ -66,7 +66,7 @@ const WidgetMultiSeriesSelection: FunctionComponent<{
             <WidgetSeriesSelection
               key={index}
               index={index}
-              series={series}
+              perspective={series}
               onChange={series => onChangeSeries(index, series)}
               onRemove={handleRemoveSeries}
               error={error}
