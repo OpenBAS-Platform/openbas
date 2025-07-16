@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.InjectImporter;
 import io.openbas.database.repository.EndpointRepository;
@@ -17,6 +18,7 @@ import io.openbas.rest.mapper.form.*;
 import io.openbas.rest.tag.TagService;
 import io.openbas.utils.mockMapper.MockMapperUtils;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class MapperServiceTest {
+public class MapperServiceTest extends IntegrationTest {
 
   @Mock private ImportMapperRepository importMapperRepository;
   @Mock private InjectorContractRepository injectorContractRepository;
@@ -50,6 +52,11 @@ public class MapperServiceTest {
             endpointService,
             tagService,
             objectMapper);
+  }
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
   }
 
   // -- SCENARIOS --
