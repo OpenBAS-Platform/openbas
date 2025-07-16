@@ -9,7 +9,6 @@ import io.openbas.notification.handler.ScenarioNotificationEventHandler;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
 import java.time.Instant;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
