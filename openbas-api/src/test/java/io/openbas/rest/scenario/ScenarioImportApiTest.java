@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.inject.service.InjectService;
@@ -15,6 +16,7 @@ import io.openbas.service.InjectImportService;
 import io.openbas.service.ScenarioService;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class ScenarioImportApiTest {
+public class ScenarioImportApiTest extends IntegrationTest {
 
   private MockMvc mvc;
 
@@ -52,6 +54,11 @@ public class ScenarioImportApiTest {
     SCENARIO_ID = UUID.randomUUID().toString();
 
     mvc = MockMvcBuilders.standaloneSetup(scenarioImportApi).build();
+  }
+
+  @AfterEach
+  public void afterEach() {
+    globalTeardown();
   }
 
   @DisplayName("Test dry run import xls")

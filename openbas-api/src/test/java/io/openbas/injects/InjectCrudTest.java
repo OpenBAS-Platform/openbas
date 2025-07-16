@@ -3,25 +3,32 @@ package io.openbas.injects;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InjectCrudTest {
+class InjectCrudTest extends IntegrationTest {
 
   @Autowired private InjectRepository injectRepository;
 
   @Autowired private ExerciseRepository exerciseRepository;
 
   @Autowired private InjectorContractRepository injectorContractRepository;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @DisplayName("Test inject creation with non null depends duration")
   @Test

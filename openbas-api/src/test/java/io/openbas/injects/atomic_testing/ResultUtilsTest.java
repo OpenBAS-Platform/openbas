@@ -9,6 +9,7 @@ import static io.openbas.utils.fixtures.RawInjectExpectationFixture.createDefaul
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
@@ -19,6 +20,7 @@ import io.openbas.utils.ResultUtils;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ResultUtilsTest {
+class ResultUtilsTest extends IntegrationTest {
 
   @Mock private InjectExpectationRepository injectExpectationRepository;
   @Mock private InjectRepository injectRepository;
@@ -35,6 +37,11 @@ class ResultUtilsTest {
 
   private InjectExpectationMapper injectExpectationMapper;
   private ResultUtils resultUtils;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @BeforeEach
   void before() {

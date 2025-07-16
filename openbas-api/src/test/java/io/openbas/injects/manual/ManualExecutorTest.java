@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -16,6 +17,7 @@ import io.openbas.model.inject.form.Expectation;
 import io.openbas.service.InjectExpectationService;
 import java.time.Instant;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,13 +26,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
-public class ManualExecutorTest {
+public class ManualExecutorTest extends IntegrationTest {
 
   @Mock InjectExpectationService injectExpectationService;
 
   @Mock ObjectMapper mapper;
 
   @InjectMocks private ManualExecutor manualExecutor;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @BeforeEach
   void setUp() {
