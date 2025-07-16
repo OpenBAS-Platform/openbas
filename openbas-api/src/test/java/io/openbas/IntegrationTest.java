@@ -21,6 +21,7 @@ public abstract class IntegrationTest {
   @Value("${openbas.admin.email:#{null}}")
   private String adminEmail;
 
+  /** List of classes we don't auto delete all to prevent the platform from breaking */
   public List<Class<?>> exclusionList =
       List.of(
           UserRepository.class,
@@ -29,17 +30,27 @@ public abstract class IntegrationTest {
           InjectorContractRepository.class,
           InjectorRepository.class);
 
+  /**
+   * Utilitarian method that use reflection to list all the CrudRepository implementation in the
+   * test and do a deleteAll on all of them except the excluded ones (see exclusionList).
+   */
   public void globalTeardown() {
     log.info("Global teardown");
 
+    // List all the declared fields
     Field[] fields = this.getClass().getDeclaredFields();
+
+    // Using multiple pass as it can happen that we try to delete data with foreign keys
     int numberOfPass = 0;
     boolean needAnotherPass = false;
     do {
+      // For each of the fields
       for (Field repository : fields) {
         try {
           repository.setAccessible(true);
+          // If we are an instance of CrudRepository
           if (repository.get(this) instanceof CrudRepository) {
+            // Checking if the field is part of the excluded list
             boolean isExcluded =
                 exclusionList.stream()
                     .anyMatch(
@@ -51,16 +62,18 @@ public abstract class IntegrationTest {
                             throw new RuntimeException(e);
                           }
                         });
+            // If it isn't excluded, we do a deleteAll
             if (!isExcluded) {
               try {
                 ((CrudRepository) repository.get(this)).deleteAll();
                 log.info("Deleted all records on {}", repository.getName());
               } catch (DataIntegrityViolationException e) {
+                // If there is an issue with foreign keys, we'll do another pass
                 needAnotherPass = true;
               }
             } else if (Arrays.asList(repository.get(this).getClass().getInterfaces())
                 .contains(UserRepository.class)) {
-
+              // For userRepository, we still delete all the users but the admin one
               List<User> users = ((UserRepository) repository.get(this)).findAll();
               for (User user : users) {
                 if (!user.getEmail().equals(adminEmail)) {
@@ -75,5 +88,9 @@ public abstract class IntegrationTest {
       }
       numberOfPass += 1;
     } while (numberOfPass < 5 && needAnotherPass);
+
+    if (numberOfPass == 5) {
+      log.error("There was an issue with foreign keys");
+    }
   }
 }
