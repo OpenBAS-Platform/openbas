@@ -5,12 +5,14 @@ import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class InjectHelperTest {
+public class InjectHelperTest extends IntegrationTest {
 
   public static final String USER_EMAIL = "test@gmail.com";
   @Autowired private InjectHelper injectHelper;
@@ -34,6 +36,11 @@ public class InjectHelperTest {
   @Autowired private UserRepository userRepository;
 
   @Autowired private InjectorContractRepository injectorContractRepository;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @Disabled
   @DisplayName("Retrieve simple inject to run")

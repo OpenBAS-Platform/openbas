@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import io.openbas.IntegrationTest;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.InjectFixture;
 import io.openbas.utils.fixtures.PauseFixture;
@@ -17,11 +18,16 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @TestInstance(PER_CLASS)
 @Transactional
-public class InjectTest {
+public class InjectTest extends IntegrationTest {
 
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private PauseComposer pauseComposer;
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
 
   @Nested
   @DisplayName("Given valid exercise")

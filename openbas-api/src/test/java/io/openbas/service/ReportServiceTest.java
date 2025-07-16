@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.rest.report.form.ReportInformationInput;
 import io.openbas.rest.report.form.ReportInjectCommentInput;
@@ -18,10 +19,7 @@ import io.openbas.rest.report.service.ReportService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -30,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class ReportServiceTest {
+public class ReportServiceTest extends IntegrationTest {
 
   @Mock private ReportRepository reportRepository;
 
@@ -40,6 +38,11 @@ public class ReportServiceTest {
   void before() {
     // Injecting mocks into the controller
     reportService = new ReportService(reportRepository);
+  }
+
+  @AfterEach
+  void teardown() {
+    globalTeardown();
   }
 
   @DisplayName("Test create a report")

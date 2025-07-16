@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import io.openbas.IntegrationTest;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.rest.settings.PreviewFeature;
@@ -11,6 +12,7 @@ import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @TestInstance(PER_CLASS)
-public class PlatformServiceSettingsTest {
+public class PlatformServiceSettingsTest extends IntegrationTest {
 
   @Autowired private PlatformSettingsService platformSettingsService;
   @Resource private RabbitmqConfig rabbitmqConfig;
@@ -35,6 +37,11 @@ public class PlatformServiceSettingsTest {
     // some repetitive setup necessary to mock config
     rabbitmqConfig.setUser("admin");
     rabbitmqConfig.setPass("pass");
+  }
+
+  @AfterEach
+  void teardown() {
+    globalTeardown();
   }
 
   @Test
