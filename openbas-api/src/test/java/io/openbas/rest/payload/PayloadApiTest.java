@@ -70,7 +70,6 @@ class PayloadApiTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    payloadRepository.deleteAll();
     collectorComposer.reset();
     collectorComposer.forCollector(CollectorFixture.createDefaultCollector("CS")).persist();
     collectorComposer.forCollector(CollectorFixture.createDefaultCollector("SENTINEL")).persist();
@@ -80,9 +79,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.documentRepository.deleteAll(List.of(EXECUTABLE_FILE));
-    this.payloadRepository.deleteAll();
-    this.collectorRepository.deleteAll();
+    globalTeardown();
   }
 
   @Nested

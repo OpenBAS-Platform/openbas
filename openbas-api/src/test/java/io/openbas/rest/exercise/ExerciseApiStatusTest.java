@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -43,7 +44,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
-public class ExerciseApiStatusTest {
+public class ExerciseApiStatusTest extends IntegrationTest {
 
   static Exercise SCHEDULED_EXERCISE;
   static Exercise RUNNING_EXERCISE;
@@ -169,13 +170,8 @@ public class ExerciseApiStatusTest {
 
   @AfterEach
   void afterAll() {
-    this.injectRepository.deleteAll();
-    this.exerciseRepository.deleteAll();
+    globalTeardown();
     this.userRepository.deleteById(SAVED_USER.getId());
-    this.teamRepository.deleteAll();
-    this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
-    this.lessonsQuestionRepository.deleteAll();
-    this.lessonsCategoryRepository.deleteAll();
   }
 
   @DisplayName("Start an exercise manually")
