@@ -91,19 +91,41 @@ public class Document implements Base {
   @JsonProperty("document_scenarios")
   private Set<Scenario> scenarios = new HashSet<>();
 
-  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "articles_documents",
       joinColumns = @JoinColumn(name = "document_id"),
       inverseJoinColumns = @JoinColumn(name = "article_id"))
-  @JsonSerialize(using = MultiIdSetDeserializer.class)
-  @JsonProperty("document_scenarios")
+  @JsonIgnore
   private Set<Article> articles = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "challenges_documents",
+      joinColumns = @JoinColumn(name = "document_id"),
+      inverseJoinColumns = @JoinColumn(name = "challenge_id"))
+  @JsonIgnore
+  private Set<Challenge> challenges = new HashSet<>();
 
   @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<InjectDocument> injectDocuments = new ArrayList<>();
+
+  @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<Payload> payloads = new HashSet<>();
+
+  @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<Channel> channels = new HashSet<>();
+
+  @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<SecurityPlatform> securityPlatforms = new HashSet<>();
+
+  @OneToMany(mappedBy = "document", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<Exercise> simulationsByLogo = new HashSet<>();
 
   @Override
   public boolean isUserHasAccess(User user) {
