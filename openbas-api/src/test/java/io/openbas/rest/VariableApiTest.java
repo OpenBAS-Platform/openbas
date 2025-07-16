@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.ScenarioRepository;
@@ -28,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class VariableApiTest {
+public class VariableApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
 
@@ -41,8 +42,7 @@ public class VariableApiTest {
 
   @AfterAll
   void afterAll() {
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.variableRepository.deleteById(SCENARIO_ID);
+    globalTeardown();
   }
 
   // -- SCENARIOS --

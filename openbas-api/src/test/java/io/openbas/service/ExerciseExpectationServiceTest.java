@@ -5,6 +5,7 @@ import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -20,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ExerciseExpectationServiceTest {
+public class ExerciseExpectationServiceTest extends IntegrationTest {
 
   public static final String EXPECTATION_NAME =
       "The animation team can validate the audience reaction";
@@ -51,7 +52,7 @@ public class ExerciseExpectationServiceTest {
 
   @AfterAll
   void afterAll() {
-    this.exerciseRepository.deleteById(EXERCISE_ID);
+    globalTeardown();
   }
 
   @DisplayName("Retrieve inject expectations")
