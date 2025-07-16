@@ -14,7 +14,10 @@ public class V4_10__List_Widget_config_update extends BaseJavaMigration {
     Connection connection = context.getConnection();
     try (Statement statement = connection.createStatement()) {
 
-      // 1. Add new column for collector_type
+      // migrate the JSON configuration for config type 'list
+      // transform the 'series' array into a 'perspective' object
+      // the value of 'perspective' is the first item in the 'series' array
+      // then drop the 'series' array
       statement.execute(
           """
             UPDATE widgets
