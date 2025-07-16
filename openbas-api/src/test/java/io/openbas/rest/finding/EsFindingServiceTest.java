@@ -13,6 +13,8 @@ import io.openbas.utils.fixtures.composers.InjectComposer;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,11 @@ class EsFindingServiceTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private FindingService findingService;
   @Autowired private InjectRepository injectRepository;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   FindingComposer.Composer createFindingComposer() {
     return this.findingComposer

@@ -55,6 +55,11 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
   private InjectExpectationTrace savedInjectExpectationTrace2;
   private InjectExpectationTrace savedInjectExpectationTrace3Dupe;
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   @BeforeEach
   void beforeEach() {
     savedAsset = assetRepository.save(AssetFixture.createDefaultAsset("test"));

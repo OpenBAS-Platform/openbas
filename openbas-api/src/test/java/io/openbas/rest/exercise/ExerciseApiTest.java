@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
@@ -34,7 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
-public class ExerciseApiTest {
+public class ExerciseApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private AgentComposer agentComposer;
@@ -59,13 +60,7 @@ public class ExerciseApiTest {
 
   @AfterAll
   void afterAll() {
-    exerciseWrapperComposers.forEach(ExerciseComposer.Composer::delete);
-    this.exerciseRepository.deleteAllById(EXERCISE_IDS);
-    this.userRepository.deleteAllById(USER_IDS);
-    this.teamRepository.deleteAllById(TEAM_IDS);
-    this.tagRuleRepository.deleteAll();
-    this.assetGroupRepository.deleteAll();
-    this.tagRepository.deleteAll();
+    globalTeardown();
   }
 
   @Nested

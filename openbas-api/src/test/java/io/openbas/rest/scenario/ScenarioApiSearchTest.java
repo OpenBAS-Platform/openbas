@@ -36,7 +36,6 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    scenarioRepository.deleteAll();
     Scenario scenario1 = ScenarioFixture.createDefaultCrisisScenario();
     Scenario scenario1Saved = this.scenarioRepository.save(scenario1);
     SCENARIO_IDS.add(scenario1Saved.getId());
@@ -48,7 +47,7 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.scenarioRepository.deleteAllById(SCENARIO_IDS);
+    globalTeardown();
   }
 
   @Nested

@@ -67,12 +67,7 @@ public class ScenarioApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    if (SCENARIO_ID != null) {
-      this.scenarioRepository.deleteById(SCENARIO_ID);
-    }
-    this.tagRuleRepository.deleteAll();
-    this.tagRepository.deleteAll();
-    this.assetGroupRepository.deleteAll();
+    globalTeardown();
   }
 
   @DisplayName("Create scenario succeed")

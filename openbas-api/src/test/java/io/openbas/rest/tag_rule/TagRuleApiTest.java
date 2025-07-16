@@ -18,6 +18,8 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -43,6 +45,11 @@ public class TagRuleApiTest extends IntegrationTest {
     tagRuleRepository.deleteAll();
     tagRepository.deleteAll();
     assetGroupRepository.deleteAll();
+  }
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
   }
 
   @Test

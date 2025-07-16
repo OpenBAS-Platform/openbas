@@ -81,6 +81,11 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
             .get();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   @Nested
   @DisplayName("As ScenarioPlanner")
   class ScenarioPlannerAccess {

@@ -76,8 +76,7 @@ public class KillChainPhaseApiTest extends IntegrationTest {
 
   @AfterAll
   public void afterAll() {
-    this.killChainPhaseRepository.deleteAllById(
-        List.of(KILL_CHAIN_PHASE_ID_1, KILL_CHAIN_PHASE_ID_2, KILL_CHAIN_PHASE_ID_3));
+    this.globalTeardown();
   }
 
   @Nested

@@ -16,6 +16,9 @@ import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
 import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.Optional;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,6 +36,11 @@ class CustomDashboardApiTest extends IntegrationTest {
     return this.customDashboardComposer
         .forCustomDashboard(createDefaultCustomDashboard())
         .persist();
+  }
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
   }
 
   @Test

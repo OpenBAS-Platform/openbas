@@ -23,6 +23,9 @@ import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.fixtures.composers.WidgetComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.ArrayList;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,6 +39,11 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
   @Autowired private WidgetRepository repository;
   @Autowired private WidgetComposer widgetComposer;
   @Autowired private CustomDashboardComposer customDashboardComposer;
+
+  @AfterEach
+  void afterAll() {
+    globalTeardown();
+  }
 
   WidgetComposer.Composer createWidgetComposer() {
     return this.widgetComposer

@@ -16,6 +16,7 @@ import io.openbas.rest.notification_rule.form.UpdateNotificationRuleInput;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -40,6 +41,11 @@ public class NotificationRuleApiTest extends IntegrationTest {
   void afterEach() {
     notificationRuleRepository.deleteAll();
     scenarioRepository.deleteAll();
+  }
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
   }
 
   @Test

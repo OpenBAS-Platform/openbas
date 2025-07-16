@@ -87,6 +87,11 @@ public class InjectExportTest extends IntegrationTest {
     knownArticlesToExport.clear();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   private final List<Article> knownArticlesToExport = new ArrayList<>();
 
   private List<InjectComposer.Composer> createDefaultInjectWrappers() {
