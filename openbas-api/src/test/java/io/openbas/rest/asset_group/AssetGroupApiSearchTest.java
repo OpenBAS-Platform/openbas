@@ -36,7 +36,6 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    assetGroupRepository.deleteAll();
     AssetGroup assetGroup1 = AssetGroupFixture.createDefaultAssetGroup("Asset Group 1");
     AssetGroup assetGroup1Saved = this.assetGroupRepository.save(assetGroup1);
     ASSET_GROUP_IDS.add(assetGroup1Saved.getId());
@@ -48,7 +47,7 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.assetGroupRepository.deleteAllById(ASSET_GROUP_IDS);
+    globalTeardown();
   }
 
   @Nested

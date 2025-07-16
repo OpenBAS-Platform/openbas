@@ -67,6 +67,11 @@ class DashboardApiTest extends IntegrationTest {
     }
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   @Nested
   @DisplayName("When fetching entities from dimension")
   class WhenFetchingEntitiesFromDimension {

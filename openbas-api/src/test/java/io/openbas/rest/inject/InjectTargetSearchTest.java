@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
-import io.openbas.database.repository.EndpointRepository;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
@@ -49,11 +48,11 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private ExecutorComposer executorComposer;
   @Autowired private TagComposer tagComposer;
   @Autowired private ExecutorFixture executorFixture;
-  @Autowired private EndpointRepository endpointRepository;
 
-  @BeforeAll
-  void beforeAll() {
-    endpointRepository.deleteAll();
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+    userComposer.reset();
   }
 
   @BeforeEach
