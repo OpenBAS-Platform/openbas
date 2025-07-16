@@ -9,7 +9,7 @@
     "@ckeditor/ckeditor5-react": "9.5.0",
     "@dagrejs/dagre": "1.1.5",
     "@emotion/react": "11.14.0",
-    "@emotion/styled": "11.14.0",
+    "@emotion/styled": "11.14.1",
     "@fontsource/geologica": "5.2.6",
     "@fontsource/ibm-plex-sans": "5.2.6",
     "@hello-pangea/dnd": "18.0.1",
