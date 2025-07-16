@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.TagRule;
@@ -19,13 +20,14 @@ import io.openbas.utils.fixtures.TagRuleFixture;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class TagRuleServiceTest {
+public class TagRuleServiceTest extends IntegrationTest {
   private static final String TAG_RULE_ID = "tagruleid";
   private static final String TAG_RULE_ID_2 = "tagruleid2";
 
@@ -36,6 +38,11 @@ public class TagRuleServiceTest {
   @Mock private TagRepository tagRepository;
 
   @InjectMocks private TagRuleService tagRuleService;
+
+  @AfterEach
+  void teardown() {
+    globalTeardown();
+  }
 
   @Test
   void testFindById() {

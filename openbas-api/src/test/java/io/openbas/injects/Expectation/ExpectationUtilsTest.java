@@ -4,10 +4,12 @@ import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_S
 import static io.openbas.utils.ExpectationUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.utils.fixtures.*;
+import org.junit.jupiter.api.AfterEach;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ExpectationUtilsTest {
+class ExpectationUtilsTest extends IntegrationTest {
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @Test
   @DisplayName("Build expectations with the signature parent process name for obas implant")

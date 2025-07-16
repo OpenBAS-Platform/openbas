@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injectors.email.service.EmailService;
@@ -11,6 +12,7 @@ import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,10 +22,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 @ExtendWith(MockitoExtension.class)
-class EmailServiceTest {
+class EmailServiceTest extends IntegrationTest {
 
   @Mock private JavaMailSender emailSender;
   @InjectMocks private EmailService emailService;
+
+  @AfterEach
+  public void afterEach() {
+    globalTeardown();
+  }
 
   @Test
   void shouldSetReplyToInHeaderEqualsToFrom() throws Exception {

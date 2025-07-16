@@ -2,6 +2,7 @@ package io.openbas.scheduler.jobs;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -23,7 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class InjectsExecutionJobTest {
+class InjectsExecutionJobTest extends IntegrationTest {
 
   @Autowired private InjectsExecutionJob job;
 
@@ -40,7 +41,7 @@ class InjectsExecutionJobTest {
 
   @AfterAll
   public void teardown() {
-    this.exerciseRepository.deleteById(EXERCISE_ID);
+    globalTeardown();
   }
 
   @DisplayName("Not start children injects at the same time as parent injects")

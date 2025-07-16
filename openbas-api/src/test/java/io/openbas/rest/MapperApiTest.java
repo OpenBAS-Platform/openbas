@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.inject.service.InjectService;
@@ -28,6 +29,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +50,7 @@ import org.springframework.util.ResourceUtils;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class MapperApiTest {
+public class MapperApiTest extends IntegrationTest {
 
   private MockMvc mvc;
 
@@ -72,6 +74,11 @@ public class MapperApiTest {
     sessionContextField.set(mapperApi, objectMapper);
 
     mvc = MockMvcBuilders.standaloneSetup(mapperApi).build();
+  }
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
   }
 
   // -- SCENARIOS --

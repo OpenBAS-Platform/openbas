@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.RuleAttribute;
 import io.openbas.service.utils.InjectImportUtils;
 import io.openbas.utils.mockMapper.MockMapperUtils;
@@ -19,7 +20,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.*;
 
-public class InjectImportServiceTest {
+public class InjectImportServiceTest extends IntegrationTest {
   private Row row;
   private Cell cell;
   private ObjectNode json;
@@ -46,6 +47,7 @@ public class InjectImportServiceTest {
 
   @AfterEach
   void after() throws Exception {
+    globalTeardown();
     workbook.close();
   }
 

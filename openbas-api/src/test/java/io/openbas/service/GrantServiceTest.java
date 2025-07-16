@@ -4,19 +4,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawGrant;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class GrantServiceTest {
+public class GrantServiceTest extends IntegrationTest {
 
   private static final String USER_ID = "userid";
   private static final String RESOURCE_ID = "resourceid";
@@ -24,6 +26,11 @@ public class GrantServiceTest {
   @Mock private GrantRepository grantRepository;
 
   @InjectMocks private GrantService grantService;
+
+  @AfterEach
+  public void teardown() {
+    globalTeardown();
+  }
 
   @Test
   public void test_hasReadGrant_WHEN_has_read_grant() {

@@ -3,11 +3,14 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.NotificationRuleResourceType;
 import io.openbas.notification.handler.ScenarioNotificationEventHandler;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
 import java.time.Instant;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -16,7 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @SpringBootTest
-public class NotificationEvenServiceTest {
+public class NotificationEvenServiceTest extends IntegrationTest {
 
   @Mock private ApplicationEventPublisher appPublisher;
   @Mock private ScenarioNotificationEventHandler scenarioNotificationEventHandler;
@@ -28,6 +31,11 @@ public class NotificationEvenServiceTest {
   public void setUp() {
     notificationEventService =
         new NotificationEventService(appPublisher, scenarioNotificationEventHandler, taskScheduler);
+  }
+
+  @AfterEach
+  void teardown() {
+    globalTeardown();
   }
 
   @Test

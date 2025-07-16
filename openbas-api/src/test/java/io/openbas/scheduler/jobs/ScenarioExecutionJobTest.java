@@ -4,6 +4,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
@@ -22,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ScenarioExecutionJobTest {
+class ScenarioExecutionJobTest extends IntegrationTest {
 
   @Autowired private ScenarioExecutionJob job;
 
@@ -36,10 +37,7 @@ class ScenarioExecutionJobTest {
 
   @AfterAll
   public void teardown() {
-    this.scenarioService.deleteScenario(SCENARIO_ID_1);
-    this.scenarioService.deleteScenario(SCENARIO_ID_2);
-    this.scenarioService.deleteScenario(SCENARIO_ID_3);
-    this.exerciseRepository.deleteById(EXERCISE_ID);
+    globalTeardown();
   }
 
   @DisplayName("Not create simulation based on recurring scenario in one hour")

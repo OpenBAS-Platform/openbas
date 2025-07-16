@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
 import io.openbas.opencti.OpenCTIApi;
 import io.openbas.rest.attack_pattern.AttackPatternApi;
 import io.openbas.rest.inject.InjectApi;
@@ -11,6 +12,7 @@ import io.openbas.rest.inject.ScenarioInjectApi;
 import io.openbas.rest.injector_contract.InjectorContractApi;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
 import io.openbas.rest.scenario.ScenarioApi;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * endpoints.
  */
 @ExtendWith(MockitoExtension.class)
-class OpenCTIApiTest {
+class OpenCTIApiTest extends IntegrationTest {
 
   @Mock InjectApi injectApi;
   @Mock ScenarioInjectApi scenarioInjectApi;
@@ -56,6 +58,11 @@ class OpenCTIApiTest {
   @Mock OpenCTIApi openCTIApi;
 
   private MockMvc mockMvc;
+
+  @AfterEach
+  void afterEach() {
+    globalTeardown();
+  }
 
   @BeforeEach
   public void setUp() {
