@@ -32,17 +32,13 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
   @Autowired private ScenarioRepository scenarioRepository;
 
-  private static final List<String> SCENARIO_IDS = new ArrayList<>();
-
   @BeforeAll
   void beforeAll() {
     Scenario scenario1 = ScenarioFixture.createDefaultCrisisScenario();
-    Scenario scenario1Saved = this.scenarioRepository.save(scenario1);
-    SCENARIO_IDS.add(scenario1Saved.getId());
+    this.scenarioRepository.save(scenario1);
 
     Scenario scenario2 = ScenarioFixture.createDefaultIncidentResponseScenario();
-    Scenario scenario2Saved = this.scenarioRepository.save(scenario2);
-    SCENARIO_IDS.add(scenario2Saved.getId());
+    this.scenarioRepository.save(scenario2);
   }
 
   @AfterAll
