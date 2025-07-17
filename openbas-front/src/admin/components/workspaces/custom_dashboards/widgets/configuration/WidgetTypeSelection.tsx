@@ -2,11 +2,11 @@ import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 
-import { useFormatter } from '../../../../../components/i18n';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import { renderWidgetIcon, widgetVisualizationTypes } from './WidgetUtils';
+import { useFormatter } from '../../../../../../components/i18n';
+import { type Widget } from '../../../../../../utils/api-types-custom';
+import { renderWidgetIcon, widgetVisualizationTypes } from '../WidgetUtils';
 
-const WidgetCreationTypes: FunctionComponent<{
+const WidgetTypeSelection: FunctionComponent<{
   value: Widget['widget_type'];
   onChange: (type: Widget['widget_type']) => void;
 }> = ({ value, onChange }) => {
@@ -56,4 +56,4 @@ const WidgetCreationTypes: FunctionComponent<{
   );
 };
 
-export default WidgetCreationTypes;
+export default WidgetTypeSelection;

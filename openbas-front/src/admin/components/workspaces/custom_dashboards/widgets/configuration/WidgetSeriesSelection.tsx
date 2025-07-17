@@ -4,21 +4,25 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { engineSchemas } from '../../../../../actions/schema/schema-action';
-import { FilterContext } from '../../../../../components/common/queryable/filter/context';
-import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../components/common/queryable/filter/FilterAutocomplete';
-import FilterChips from '../../../../../components/common/queryable/filter/FilterChips';
-import { availableOperators, buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
-import { buildSearchPagination } from '../../../../../components/common/queryable/QueryableUtils';
-import { useQueryable } from '../../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
-import { createGroupOption, type GroupOption } from '../../../../../utils/Option';
-import { capitalize } from '../../../../../utils/String';
-import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
-import { CustomDashboardContext } from '../CustomDashboardContext';
+import { engineSchemas } from '../../../../../../actions/schema/schema-action';
+import { FilterContext } from '../../../../../../components/common/queryable/filter/context';
+import FilterAutocomplete, { type OptionPropertySchema } from '../../../../../../components/common/queryable/filter/FilterAutocomplete';
+import FilterChips from '../../../../../../components/common/queryable/filter/FilterChips';
+import { availableOperators, buildFilter } from '../../../../../../components/common/queryable/filter/FilterUtils';
+import { buildSearchPagination } from '../../../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { useFormatter } from '../../../../../../components/i18n';
+import {
+  type FilterGroup,
+  type PropertySchemaDTO,
+} from '../../../../../../utils/api-types';
+import { createGroupOption, type GroupOption } from '../../../../../../utils/Option';
+import { capitalize } from '../../../../../../utils/String';
+import { MITRE_FILTER_KEY } from '../../../../common/filters/MitreFilter';
+import { CustomDashboardContext } from '../../CustomDashboardContext';
+import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from '../WidgetUtils';
+import getAuthorizedPerspectives from './AuthorizedPerspectives';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
-import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
@@ -37,40 +41,39 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-const availableFilters = new Map([
-  ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at', 'base_simulation_side', 'base_agent_side', 'base_asset_side', 'base_asset_group_side']],
-  ['finding', ['base_created_at', 'finding_type', 'base_updated_at', 'base_endpoint_side', 'base_simulation_side']],
-  ['endpoint', ['endpoint_arch', 'endpoint_platform', 'endpoint_ips', 'endpoint_hostname']],
-  ['vulnerable-endpoint', ['vulnerable_endpoint_architecture', 'vulnerable_endpoint_agents_active_status', 'vulnerable_endpoint_agents_privileges', 'vulnerable_endpoint_platform', 'base_simulation_side']],
-]);
-
-const WidgetCreationSeries: FunctionComponent<{
+const WidgetSeriesSelection: FunctionComponent<{
   index: number;
-  series: DateHistogramSeries | StructuralHistogramSeries;
-  onChange: (series: DateHistogramSeries | StructuralHistogramSeries) => void;
-  onRemove: (index: number) => void;
+  perspective?: {
+    name?: string;
+    filter?: FilterGroup;
+  };
+  onChange: (perspective: {
+    name?: string;
+    filter?: FilterGroup;
+  }) => void;
+  onRemove?: (index: number) => void;
   error?: boolean;
-}> = ({ index, series, onChange, onRemove, error }) => {
+}> = ({ index, perspective, onChange, onRemove, error }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
   const { customDashboard } = useContext(CustomDashboardContext);
 
-  const [label, setLabel] = useState<string>(series.name ?? '');
+  const [label, setLabel] = useState<string>(perspective?.name ?? '');
   const onChangeLabel = (label: string) => {
     setLabel(label);
     onChange({
-      ...series,
+      ...perspective,
       name: label,
     });
   };
 
-  const [entity, setEntity] = useState<string | null>(series.filter?.filters?.find(f => f.key === BASE_ENTITY_FILTER_KEY)?.values?.[0] ?? null);
+  const [entity, setEntity] = useState<string | null>(perspective?.filter?.filters?.find(f => f.key === BASE_ENTITY_FILTER_KEY)?.values?.[0] ?? null);
   const onChangeEntity = (entity: string | null) => {
     setEntity(entity);
     onChange({
-      ...series,
+      ...perspective,
       filter: entity === null
         ? undefined
         : {
@@ -83,14 +86,16 @@ const WidgetCreationSeries: FunctionComponent<{
   };
 
   const handleRemoveSeries = () => {
-    onRemove(index);
+    if (onRemove) {
+      onRemove(index);
+    }
   };
 
   // Filters
-  const { queryableHelpers, searchPaginationInput } = useQueryable({}, buildSearchPagination({ filterGroup: excludeBaseEntities(series.filter) }));
+  const { queryableHelpers, searchPaginationInput } = useQueryable({}, buildSearchPagination({ filterGroup: excludeBaseEntities(perspective?.filter) }));
   useEffect(() => {
     onChange({
-      ...series,
+      ...perspective,
       filter: entity === null
         ? undefined
         : {
@@ -110,7 +115,7 @@ const WidgetCreationSeries: FunctionComponent<{
   useEffect(() => {
     if (entity) {
       engineSchemas([entity]).then((response: { data: PropertySchemaDTO[] }) => {
-        const available = availableFilters.get(entity) ?? [];
+        const available = getAuthorizedPerspectives().get(entity) ?? [];
         const newOptions = response.data.filter(property => property.schema_property_name !== MITRE_FILTER_KEY)
           .filter(property => available.includes(property.schema_property_name))
           .map(property => (
@@ -138,24 +143,27 @@ const WidgetCreationSeries: FunctionComponent<{
 
   return (
     <div className={classes.step_entity}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        zIndex: 10,
-      }}
-      >
-        <IconButton
-          disabled={index === 0}
-          aria-label="Delete"
-          onClick={handleRemoveSeries}
-          size="small"
-        >
-          <CancelOutlined fontSize="small" />
-        </IconButton>
-      </div>
+      { onRemove
+        && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            zIndex: 10,
+          }}
+          >
+            <IconButton
+              disabled={index === 0}
+              aria-label="Delete"
+              onClick={handleRemoveSeries}
+              size="small"
+            >
+              <CancelOutlined fontSize="small" />
+            </IconButton>
+          </div>
+        )}
       <Box padding={2}>
         <TextField
           variant="standard"
@@ -188,4 +196,4 @@ const WidgetCreationSeries: FunctionComponent<{
   );
 };
 
-export default WidgetCreationSeries;
+export default WidgetSeriesSelection;

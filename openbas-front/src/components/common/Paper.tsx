@@ -1,22 +1,24 @@
 import { Paper as PaperMui } from '@mui/material';
-import { type FunctionComponent, type ReactElement } from 'react';
+import { type FunctionComponent, type ReactNode } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-interface PaperProps { children: ReactElement }
+interface PaperProps {
+  children: ReactNode;
+  className?: string;
+}
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   paper: {
-    padding: 20,
-    marginBottom: 30,
+    padding: theme.spacing(2),
     borderRadius: 6,
   },
 }));
 
-const Paper: FunctionComponent<PaperProps> = ({ children }) => {
+const Paper: FunctionComponent<PaperProps> = ({ children, className = '' }) => {
   const { classes } = useStyles();
 
   return (
-    <PaperMui variant="outlined" className={classes.paper}>
+    <PaperMui variant="outlined" className={classes.paper + ' ' + className}>
       {children}
     </PaperMui>
   );
