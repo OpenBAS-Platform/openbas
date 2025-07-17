@@ -16,6 +16,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.inject.form.InjectAssistantInput;
 import io.openbas.rest.inject.form.InjectInput;
@@ -64,6 +65,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @Autowired private EndpointService endpointService;
   @Autowired private ScenarioService scenarioService;
   @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   List<InjectorContractComposer.Composer> injectorContractWrapperComposers = new ArrayList<>();
 
