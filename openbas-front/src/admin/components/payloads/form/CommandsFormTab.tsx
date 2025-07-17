@@ -9,22 +9,16 @@ import PlatformFieldController from '../../../../components/fields/PlatformField
 import SelectFieldController from '../../../../components/fields/SelectFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
+import { type PayloadArgument } from '../../../../utils/api-types';
+import PayloadArgumentsField from './PayloadArgumentsField';
 
 interface Props { disabledPayloadType?: boolean }
 
 const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const { control, setValue, watch } = useFormContext();
-  const type = watch('payload_type');
-
-  useEffect(() => {
-    if (!(type == 'Command' || type == 'Executable')) {
-      setValue('payload_execution_arch', 'ALL_ARCHITECTURES'); // Automatically set arch to 'all' if type is 'a'
-    } else if (!disabledPayloadType && type === 'Executable') {
-      setValue('payload_execution_arch', '');
-    }
-  }, [type]);
+  const { control, setValue, getValues, watch } = useFormContext();
+  const payloadType = watch('payload_type');
 
   const { fields: argumentsFields, append: argumentsAppend, remove: argumentsRemove } = useFieldArray({
     control,
@@ -34,6 +28,25 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
     control,
     name: 'payload_prerequisites',
   });
+
+  useEffect(() => {
+    if (payloadType != 'Command') {
+      const args = getValues('payload_arguments') ?? [];
+      const argToRemoveIndex: number[] = [];
+      (args as unknown as PayloadArgument[]).forEach((arg, index) => {
+        if (arg.type == 'targeted-asset') {
+          argToRemoveIndex.push(index);
+        }
+      });
+
+      argumentsRemove(argToRemoveIndex);
+    }
+    if (!(payloadType == 'Command' || payloadType == 'Executable')) {
+      setValue('payload_execution_arch', 'ALL_ARCHITECTURES'); // Automatically set arch to 'all'
+    } else if (!disabledPayloadType && payloadType === 'Executable') {
+      setValue('payload_execution_arch', '');
+    }
+  }, [payloadType]);
 
   const payloadTypesItems = [
     {
@@ -63,7 +76,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
       value: 'arm64',
       label: t('arm64'),
     },
-    ...(type !== 'Executable'
+    ...(payloadType !== 'Executable'
       ? [{
           value: 'ALL_ARCHITECTURES',
           label: t('ALL_ARCHITECTURES'),
@@ -86,27 +99,23 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
       label: t('Sh'),
     },
   ];
-  const argumentTypeItems = [{
-    value: 'text',
-    label: t('Text'),
-  }];
 
   return (
     <>
       <SelectFieldController name="payload_type" label={t('Type')} items={payloadTypesItems} required disabled={disabledPayloadType} />
-      {type && type != '' && (
+      {payloadType && payloadType != '' && (
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: theme.spacing(2),
         }}
         >
-          <SelectFieldController disabled={!(type == 'Command' || type == 'Executable')} name="payload_execution_arch" label={t('Architecture')} items={architecturesItems} required />
+          <SelectFieldController disabled={!(payloadType == 'Command' || payloadType == 'Executable')} name="payload_execution_arch" label={t('Architecture')} items={architecturesItems} required />
           <PlatformFieldController name="payload_platforms" label={t('Platforms')} required />
         </div>
       )}
 
-      {type === 'Command' && (
+      {payloadType === 'Command' && (
         <>
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Attack command')}</Typography>
           <SelectFieldController name="command_executor" label={t('Executor')} items={executorsItems} required />
@@ -114,7 +123,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         </>
       )}
 
-      {type === 'Executable' && (
+      {payloadType === 'Executable' && (
         <Controller
           control={control}
           name="executable_file"
@@ -133,7 +142,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         />
       )}
 
-      {type === 'FileDrop' && (
+      {payloadType === 'FileDrop' && (
         <Controller
           control={control}
           name="file_drop_file"
@@ -152,33 +161,21 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         />
       )}
 
-      {type === 'DnsResolution' && (
+      {payloadType === 'DnsResolution' && (
         <TextFieldController name="dns_resolution_hostname" label={t('Hostname')} required />
       )}
 
-      {type && type != '' && (
+      {payloadType && payloadType != '' && (
         <>
           {/* ARGUMENTS */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Arguments')}</Typography>
           {argumentsFields.map((argsField, argIndex) => (
-            <div
-              style={{
-                display: 'flex',
-                gap: theme.spacing(1),
-              }}
+            <PayloadArgumentsField
               key={argsField.id}
-            >
-              <SelectFieldController name={`payload_arguments.${argIndex}.type` as const} label={t('Type')} items={argumentTypeItems} required />
-              <TextFieldController name={`payload_arguments.${argIndex}.key` as const} label={t('Key')} required />
-              <TextFieldController name={`payload_arguments.${argIndex}.default_value` as const} label={t('Default Value')} required />
-              <IconButton
-                onClick={() => argumentsRemove(argIndex)}
-                size="small"
-                color="primary"
-              >
-                <DeleteOutlined />
-              </IconButton>
-            </div>
+              canSelectTargetAsset={payloadType == 'Command'}
+              argumentName={`payload_arguments.${argIndex}`}
+              onArgumentRemoveClick={() => argumentsRemove(argIndex)}
+            />
           ))}
           <Button
             variant="outlined"

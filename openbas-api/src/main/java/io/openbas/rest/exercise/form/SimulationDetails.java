@@ -119,6 +119,9 @@ public class SimulationDetails {
   @JsonProperty("exercise_communications_number")
   public long communicationsNumber;
 
+  @JsonProperty("exercise_custom_dashboard")
+  private String customDashboard;
+
   // -- PLATFORMS --
 
   @JsonProperty("exercise_platforms")
@@ -156,7 +159,8 @@ public class SimulationDetails {
             .status(valueOf(exercise.getExercise_status()))
             .subtitle(exercise.getExercise_subtitle())
             .category(exercise.getExercise_category())
-            .mainFocus(exercise.getExercise_main_focus());
+            .mainFocus(exercise.getExercise_main_focus())
+            .customDashboard(exercise.getExercise_custom_dashboard());
 
     if (exercise.getExercise_severity() != null) {
       details.severity(SEVERITY.valueOf(exercise.getExercise_severity()));

@@ -12,10 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
-import io.openbas.helper.InjectStatisticsHelper;
-import io.openbas.helper.MultiIdListDeserializer;
-import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
+import io.openbas.helper.*;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -147,6 +144,14 @@ public class Scenario implements Base {
   private Instant updatedAt = now();
 
   // -- RELATION --
+
+  @Getter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "scenario_custom_dashboard")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("scenario_custom_dashboard")
+  @Schema(type = "string")
+  private CustomDashboard customDashboard;
 
   @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
   @JsonIgnore

@@ -1,6 +1,9 @@
 package io.openbas.database.repository;
 
+import io.openbas.database.model.AssetType;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.raw.RawEndpoint;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -98,4 +101,25 @@ public interface EndpointRepository
       nativeQuery = true)
   List<Object[]> findAllByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT a.asset_id, a.asset_type, a.asset_name, a.asset_external_reference, "
+              + "a.endpoint_ips, a.endpoint_hostname, a.endpoint_platform, a.endpoint_arch, "
+              + "a.endpoint_mac_addresses, a.endpoint_seen_ip, a.asset_created_at, a.asset_updated_at, "
+              + "a.endpoint_is_eol, a.asset_description, "
+              + "array_agg(fa.finding_id) FILTER ( WHERE fa.finding_id IS NOT NULL ) as asset_findings, "
+              + "array_agg(at.tag_id) FILTER ( WHERE at.tag_id IS NOT NULL ) as asset_tags "
+              + "FROM assets a "
+              + "LEFT JOIN findings_assets fa ON a.asset_id = fa.asset_id "
+              + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
+              + "WHERE a.asset_updated_at > :from AND a.asset_type = '"
+              + AssetType.Values.ENDPOINT_TYPE
+              + "' "
+              + "GROUP BY a.asset_id, a.asset_updated_at "
+              + "ORDER BY a.asset_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
+      nativeQuery = true)
+  List<RawEndpoint> findForIndexing(@Param("from") Instant from);
 }

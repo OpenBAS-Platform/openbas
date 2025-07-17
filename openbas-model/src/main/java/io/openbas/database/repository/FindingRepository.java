@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.Finding;
 import io.openbas.database.raw.RawFinding;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
@@ -34,11 +35,14 @@ public interface FindingRepository
   @Query(
       value =
           "SELECT f.finding_id, f.finding_value, f.finding_type, f.finding_field,"
-              + " f.finding_inject_id, se.scenario_id, f.finding_created_at, f.finding_updated_at "
+              + " f.finding_inject_id, i.inject_exercise, se.scenario_id, fa.asset_id, f.finding_created_at, f.finding_updated_at "
               + "FROM findings f "
               + "LEFT JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "LEFT JOIN scenarios_exercises se ON i.inject_exercise = se.exercise_id "
-              + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT 500;",
+              + "LEFT JOIN findings_assets fa ON f.finding_id = fa.finding_id "
+              + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawFinding> findForIndexing(@Param("from") Instant from);
 }

@@ -77,7 +77,7 @@ public class OpenCTIContract extends Contractor {
         contractBuilder()
             .mandatory(textField("name", "Name"))
             .mandatory(richTextareaField("description", "Description"))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(attachmentField(Multiple))
             .optional(expectationsField)
             .build();
     Contract createCase =
@@ -93,7 +93,7 @@ public class OpenCTIContract extends Contractor {
         contractBuilder()
             .mandatory(textField("name", "Name"))
             .mandatory(richTextareaField("description", "Description"))
-            .optional(attachmentField("attachments", "Attachments", Multiple))
+            .optional(attachmentField(Multiple))
             .optional(expectationsField)
             .build();
     Contract createReport =

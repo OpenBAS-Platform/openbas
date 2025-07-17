@@ -60,7 +60,7 @@ public class OvhSmsContract extends Contractor {
     ContractExpectations expectationsField = expectationsField();
     List<ContractElement> instance =
         contractBuilder()
-            .mandatory(teamField("teams", "Teams", Multiple))
+            .mandatory(teamField(Multiple))
             .mandatory(textareaField("message", "Message"))
             .optional(expectationsField)
             .build();

@@ -61,6 +61,9 @@ public class ScenarioToExerciseService {
     // Tags
     exercise.setTags(CopyObjectListUtils.copy(scenario.getTags(), Tag.class));
 
+    // Custom Dashboard
+    exercise.setCustomDashboard(scenario.getCustomDashboard());
+
     Exercise exerciseSaved = this.exerciseRepository.save(exercise);
 
     // Grants

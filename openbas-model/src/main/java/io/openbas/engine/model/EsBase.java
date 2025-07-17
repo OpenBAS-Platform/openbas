@@ -3,6 +3,18 @@ package io.openbas.engine.model;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.*;
+import io.openbas.engine.model.attackpattern.EsAttackPattern;
+import io.openbas.engine.model.endpoint.EsEndpoint;
+import io.openbas.engine.model.finding.EsFinding;
+import io.openbas.engine.model.inject.EsInject;
+import io.openbas.engine.model.injectexpectation.EsInjectExpectation;
+import io.openbas.engine.model.scenario.EsScenario;
+import io.openbas.engine.model.simulation.EsSimulation;
+import io.openbas.engine.model.tag.EsTag;
+import io.openbas.engine.model.vulnerableendpoint.EsVulnerableEndpoint;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +23,30 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(
+    discriminatorProperty = "base_entity",
+    oneOf = {
+      EsAttackPattern.class,
+      EsEndpoint.class,
+      EsFinding.class,
+      EsInject.class,
+      EsInjectExpectation.class,
+      EsScenario.class,
+      EsSimulation.class,
+      EsTag.class,
+      EsVulnerableEndpoint.class,
+    },
+    discriminatorMapping = {
+      @DiscriminatorMapping(value = "attack-pattern", schema = EsAttackPattern.class),
+      @DiscriminatorMapping(value = "endpoint", schema = EsEndpoint.class),
+      @DiscriminatorMapping(value = "finding", schema = EsFinding.class),
+      @DiscriminatorMapping(value = "inject", schema = EsInject.class),
+      @DiscriminatorMapping(value = "expectation-inject", schema = EsInjectExpectation.class),
+      @DiscriminatorMapping(value = "simulation", schema = EsSimulation.class),
+      @DiscriminatorMapping(value = "scenario", schema = EsScenario.class),
+      @DiscriminatorMapping(value = "tag", schema = EsTag.class),
+      @DiscriminatorMapping(value = "vulnerable-endpoint", schema = EsVulnerableEndpoint.class),
+    })
 public class EsBase {
 
   @Queryable(label = "id", filterable = true, sortable = true)

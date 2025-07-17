@@ -26,6 +26,19 @@ public class FindingFixture {
     return finding;
   }
 
+  public static Finding createDefaultCveFindingWithRandomTitle() {
+    String cveName =
+        "CVE-%d-%d"
+            .formatted(Math.round(Math.random() * 1000), Math.round(Math.random() * 1000000));
+    Finding finding = new Finding();
+    finding.setType(ContractOutputType.CVE);
+    finding.setName("cve");
+    finding.setField(TEXT_FIELD);
+    finding.setValue(cveName);
+    finding.setLabels(new String[] {"reconnaissance phase"});
+    return finding;
+  }
+
   public static Finding createDefaultIPV6Finding() {
     Finding finding = new Finding();
     finding.setType(ContractOutputType.IPv6);

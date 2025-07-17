@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawScenario;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,9 @@ public interface ScenarioRepository
       value =
           "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at "
               + "FROM scenarios s "
-              + "WHERE s.scenario_updated_at > :from ORDER BY s.scenario_updated_at LIMIT 500;",
+              + "WHERE s.scenario_updated_at > :from ORDER BY s.scenario_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawScenario> findForIndexing(@Param("from") Instant from);
 

@@ -6,6 +6,7 @@ import io.openbas.database.raw.RawExerciseTeamUser;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface ExerciseTeamUserRepository
-    extends CrudRepository<ExerciseTeamUser, ExerciseTeamUserId>,
+    extends JpaRepository<ExerciseTeamUser, ExerciseTeamUserId>,
+        CrudRepository<ExerciseTeamUser, ExerciseTeamUserId>,
         JpaSpecificationExecutor<ExerciseTeamUser> {
 
   @NotNull

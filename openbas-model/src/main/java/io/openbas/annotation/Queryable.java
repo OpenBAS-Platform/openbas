@@ -1,5 +1,6 @@
 package io.openbas.annotation;
 
+import io.openbas.database.model.Filters;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,4 +26,6 @@ public @interface Queryable {
   Class clazz() default Void.class;
 
   Class refEnumClazz() default Void.class;
+
+  Filters.FilterOperator[] overrideOperators() default {};
 }

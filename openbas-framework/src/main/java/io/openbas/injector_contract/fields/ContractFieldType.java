@@ -32,7 +32,9 @@ public enum ContractFieldType {
   @JsonProperty("asset-group")
   AssetGroup("asset-group"),
   @JsonProperty("payload")
-  Payload("payload");
+  Payload("payload"),
+  @JsonProperty("targeted-asset")
+  TargetedAsset("targeted-asset");
 
   public final String label;
 

@@ -6,7 +6,7 @@ import Transition from './Transition';
 interface DialogProps {
   open: boolean;
   handleClose: () => void;
-  title: ReactNode;
+  title?: ReactNode;
   children: (() => ReactElement) | ReactElement | null;
   maxWidth?: Breakpoint;
   className?: string;
@@ -42,7 +42,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
       slots={{ transition: Transition }}
       slotProps={{ paper: { elevation: 1 } }}
     >
-      <DialogTitle>{title}</DialogTitle>
+      {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent>{component}</DialogContent>
       {actions && <DialogActions>{actions}</DialogActions>}
     </DialogMUI>

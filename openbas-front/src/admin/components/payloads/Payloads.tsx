@@ -1,5 +1,5 @@
 import { HelpOutlineOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -30,6 +30,7 @@ import { type Payload, type SearchPaginationInput } from '../../../utils/api-typ
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
+import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
@@ -260,9 +261,12 @@ const Payloads = () => {
         entityPrefix="payload"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
-        topBarButtons={
-          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-        }
+        topBarButtons={(
+          <ToggleButtonGroup value="fake" exclusive>
+            <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+            <ImportUploaderPayloads />
+          </ToggleButtonGroup>
+        )}
       />
       <List>
         <ListItem

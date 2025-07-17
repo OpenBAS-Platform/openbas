@@ -25,7 +25,8 @@ public interface AssetRepository
    */
   @Query(
       value =
-          "SELECT asset_id, asset_name, asset_type, endpoint_platform "
+          "SELECT asset_id, asset_name, asset_type, endpoint_platform, "
+              + "asset_created_at, asset_updated_at "
               + "FROM assets "
               + "WHERE asset_id IN :ids ;",
       nativeQuery = true)
@@ -33,7 +34,8 @@ public interface AssetRepository
 
   @Query(
       value =
-          "SELECT DISTINCT a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform "
+          "SELECT DISTINCT a.asset_id, a.asset_name, a.asset_type, a.endpoint_platform, "
+              + "a.asset_created_at, a.asset_updated_at "
               + "FROM assets a "
               + "LEFT JOIN injects_assets ia ON a.asset_id = ia.asset_id "
               + "WHERE a.asset_id IN (:assetIds) OR ia.inject_id IN (:injectIds) ;",

@@ -92,8 +92,8 @@ public class CalderaContract extends Contractor {
   private List<Contract> abilityContracts(@NotNull final ContractConfig contractConfig) {
     // Fields
     ContractSelect obfuscatorField = obfuscatorField();
-    ContractAsset assetField = assetField("assets", "Assets", Multiple);
-    ContractAssetGroup assetGroupField = assetGroupField("assetgroups", "Asset groups", Multiple);
+    ContractAsset assetField = assetField(Multiple);
+    ContractAssetGroup assetGroupField = assetGroupField(Multiple);
     ContractExpectations expectationsField = expectations();
 
     List<Ability> abilities =

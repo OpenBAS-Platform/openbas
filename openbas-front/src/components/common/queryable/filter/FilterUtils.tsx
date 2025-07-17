@@ -115,6 +115,9 @@ export const OperatorKeyValues: { [key: string]: string } = {
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {
+  if (propertySchema.schema_property_override_operators && propertySchema.schema_property_override_operators.length > 0) {
+    return propertySchema.schema_property_override_operators;
+  }
   // Date
   if (propertySchema.schema_property_type.includes('instant')) {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
@@ -125,7 +128,7 @@ export const availableOperators = (propertySchema: PropertySchemaDTO) => {
   }
   // Dynamic value & not array
   if (propertySchema.schema_property_has_dynamic_value && !propertySchema.schema_property_type_array) {
-    return ['contains', 'not_contains', 'empty', 'not_empty'];
+    return ['eq', 'not_eq', 'empty', 'not_empty'];
   }
   // Array
   if (propertySchema.schema_property_type_array) {

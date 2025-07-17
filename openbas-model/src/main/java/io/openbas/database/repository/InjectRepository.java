@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectIndexing;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -34,16 +35,39 @@ public interface InjectRepository
 
   @Query(
       value =
-          "SELECT f.inject_id, f.inject_title, f.inject_scenario, f.inject_exercise, f.inject_created_at, f.inject_updated_at, f.inject_injector_contract, "
+          "SELECT f.inject_id, f.inject_title, f.inject_scenario, f.inject_exercise, f.inject_created_at, f.inject_updated_at, f.inject_injector_contract, ic.injector_contract_updated_at, "
               + "array_agg(icap.attack_pattern_id) FILTER ( WHERE icap.attack_pattern_id IS NOT NULL ) as inject_attack_patterns, "
               + "array_agg(ap.phase_id) FILTER ( WHERE ap.phase_id IS NOT NULL ) as inject_kill_chain_phases, "
+              + "array_agg(idp.inject_children_id) FILTER ( WHERE idp.inject_children_id IS NOT NULL ) as inject_children, "
+              + "array_agg(idp.inject_children_id) FILTER ( WHERE idp.inject_children_id IS NOT NULL ) as attack_pattern_children, "
+              + "array_agg(icap_children.attack_pattern_id) FILTER (WHERE icap_children.attack_pattern_id IS NOT NULL) AS attack_patterns_children,"
               + "coalesce(array_agg(ins.status_name) FILTER ( WHERE ins.status_name IS NOT NULL ), '{}') as inject_status_name "
               + "FROM injects f "
               + "LEFT JOIN injects_statuses ins ON ins.status_inject = f.inject_id "
               + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
               + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
               + "LEFT JOIN attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
-              + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT 500 ",
+              + "LEFT JOIN injects_dependencies idp ON idp.inject_parent_id = f.inject_id "
+              + "LEFT JOIN injects inject_children ON inject_children.inject_id = idp.inject_children_id "
+              + "LEFT JOIN injectors_contracts ic_children ON ic_children.injector_contract_id = inject_children.inject_injector_contract "
+              + "LEFT JOIN injectors_contracts_attack_patterns icap_children ON icap_children.injector_contract_id = ic_children.injector_contract_id "
+              + "WHERE f.inject_updated_at > :from "
+              + "OR ic.injector_contract_updated_at > :from  "
+              + "OR EXISTS ("
+              + "    SELECT 1 "
+              + "    FROM injects_dependencies sub_idp "
+              + "    WHERE sub_idp.inject_parent_id = f.inject_id "
+              + "      AND sub_idp.dependency_updated_at > :from"
+              + ")"
+              + "OR EXISTS ("
+              + "    SELECT 1 "
+              + "    FROM injectors_contracts sub_ic "
+              + "    WHERE sub_ic.injector_contract_id = inject_children.inject_injector_contract "
+              + "      AND sub_ic.injector_contract_updated_at > :from "
+              + ")"
+              + "GROUP BY f.inject_id, f.inject_updated_at, ic.injector_contract_updated_at ORDER BY GREATEST(f.inject_updated_at, ic.injector_contract_updated_at) ASC LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
       nativeQuery = true)
   List<RawInjectIndexing> findForIndexing(@Param("from") Instant from);
 

@@ -1,5 +1,6 @@
 package io.openbas.database.raw;
 
+import java.time.Instant;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -10,9 +11,9 @@ public interface RawOrganization {
 
   String getOrganization_description();
 
-  String getOrganization_created_at();
+  Instant getOrganization_created_at();
 
-  String getOrganization_updated_at();
+  Instant getOrganization_updated_at();
 
   List<String> getOrganization_tags();
 

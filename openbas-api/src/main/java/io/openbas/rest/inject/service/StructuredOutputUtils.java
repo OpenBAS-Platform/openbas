@@ -148,8 +148,10 @@ public class StructuredOutputUtils {
       if (pattern == null) {
         continue;
       }
+      String ansiPattern = "\\u001b\\[[0-9;]*m";
+      String cleanOutput = rawOutputByMode.replaceAll(ansiPattern, "");
 
-      Matcher matcher = pattern.matcher(rawOutputByMode);
+      Matcher matcher = pattern.matcher(cleanOutput);
       ArrayNode matchesArray = mapper.createArrayNode();
 
       while (matcher.find()) {
@@ -157,9 +159,7 @@ public class StructuredOutputUtils {
             .filter(structured -> contractOutputElement.getType().validate.apply(structured))
             .ifPresent(matchesArray::add);
       }
-      if (!matchesArray.isEmpty()) {
-        resultRoot.set(contractOutputElement.getKey(), matchesArray);
-      }
+      resultRoot.set(contractOutputElement.getKey(), matchesArray);
     }
 
     return Optional.of(resultRoot);

@@ -27,6 +27,7 @@ import lombok.Data;
       @DiscriminatorMapping(value = "AGENT", schema = AgentTarget.class),
     })
 public abstract class InjectTarget {
+
   @Id
   @NotBlank
   @JsonProperty("target_id")
@@ -49,6 +50,10 @@ public abstract class InjectTarget {
 
   @JsonProperty("target_prevention_status")
   private InjectExpectation.EXPECTATION_STATUS targetPreventionStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+
+  @JsonProperty("target_vulnerability_status")
+  private InjectExpectation.EXPECTATION_STATUS targetVulnerabilityStatus =
       InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 
   @JsonProperty("target_human_response_status")

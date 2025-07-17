@@ -192,3 +192,8 @@ export const checkExerciseTagRules = (exerciseId: string, newTagIds: string[]) =
   const input = { new_tags: newTagIds };
   return simplePostCall(uri, input);
 };
+
+export const updateCustomDashboard = (exerciseId: string, customDashboardId: string | null) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/custom-dashboards/${customDashboardId}`;
+  return putReferential(schema.lessonsQuestion, uri, {})(dispatch);
+};

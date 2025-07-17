@@ -50,25 +50,25 @@ public class InjectModelHelper {
           (ArrayNode)
               mapper
                   .readValue(injectorContract.getContent(), ObjectNode.class)
-                  .get(CONTACT_CONTENT_FIELDS);
+                  .get(CONTRACT_CONTENT_FIELDS);
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error parsing injector contract content", e);
     }
 
     ObjectNode contractContent = injectorContract.getConvertedContent();
     List<JsonNode> contractFields =
-        StreamSupport.stream(contractContent.get(CONTACT_CONTENT_FIELDS).spliterator(), false)
+        StreamSupport.stream(contractContent.get(CONTRACT_CONTENT_FIELDS).spliterator(), false)
             .toList();
 
     boolean isReady = true;
     for (JsonNode jsonField : contractFields) {
 
       // if field is mandatory or if field is asset, check if the field is set
-      String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-      if (jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean()
-          || (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
-                  && jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean()
-              || CONTACT_ELEMENT_CONTENT_KEY_ASSETS.equals(key))) {
+      String key = jsonField.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
+      if (jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY).asBoolean()
+          || (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
+                  && jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean()
+              || CONTRACT_ELEMENT_CONTENT_KEY_ASSETS.equals(key))) {
         isReady =
             isFieldSet(
                 allTeams, teams, assets, assetGroups, jsonField, content, injectContractFields);
@@ -76,24 +76,24 @@ public class InjectModelHelper {
 
       // if field is mandatory conditional, if the conditional field is set check if the current
       // field is set
-      if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)) {
+      if (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)) {
         String mandatoryOnConditionFieldKey =
-            jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
+            jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
         Optional<JsonNode> mandatoryOnConditionField =
             contractFields.stream()
                 .filter(
                     jsonNode ->
                         mandatoryOnConditionFieldKey.equals(
-                            jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
+                            jsonNode.get(CONTRACT_ELEMENT_CONTENT_KEY).asText()))
                 .findFirst();
         // if field is mandatory conditional on a specific value and this value is equals, check the
         // field is set
-        if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE)) {
+        if (jsonField.hasNonNull(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE)) {
           if (mandatoryOnConditionField.isEmpty()
               || content == null
               || Objects.equals(
                   getFieldValue(mandatoryOnConditionField.get(), content),
-                  jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE).asText())) {
+                  jsonField.get(CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE).asText())) {
             if (isFieldSet(
                     allTeams,
                     teams,
@@ -148,7 +148,7 @@ public class InjectModelHelper {
     JsonNode fieldValue = content.get(key);
     if (fieldValue == null || fieldValue.asText().isEmpty()) {
       for (JsonNode contractField : injectContractFields) {
-        if (key.equals(contractField.get(CONTACT_ELEMENT_CONTENT_KEY).asText())) {
+        if (key.equals(contractField.get(CONTRACT_ELEMENT_CONTENT_KEY).asText())) {
           JsonNode defaultValue = contractField.get(DEFAULT_VALUE_FIELD);
           if (defaultValue == null || defaultValue.isNull()) {
             return false;
@@ -242,15 +242,15 @@ public class InjectModelHelper {
       @NotNull final ObjectNode content,
       @NotNull final ArrayNode injectContractFields) {
     boolean isSet = true;
-    String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-    String type = jsonField.get(CONTACT_ELEMENT_CONTENT_TYPE).asText();
+    String key = jsonField.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
+    String type = jsonField.get(CONTRACT_ELEMENT_CONTENT_TYPE).asText();
     switch (type) {
-      case CONTACT_ELEMENT_CONTENT_TYPE_TEAM -> {
+      case CONTRACT_ELEMENT_CONTENT_TYPE_TEAM -> {
         if (teams.isEmpty() && !allTeams) {
           isSet = false;
         }
       }
-      case CONTACT_ELEMENT_CONTENT_TYPE_ASSET -> {
+      case CONTRACT_ELEMENT_CONTENT_TYPE_ASSET -> {
         if (assets.isEmpty() && assetGroups.isEmpty()) {
           isSet = false;
         }
@@ -275,7 +275,7 @@ public class InjectModelHelper {
 
   public static String getFieldValue(
       @NotNull final JsonNode jsonField, @NotNull final ObjectNode content) {
-    String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+    String key = jsonField.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
     return content.get(key).asText();
   }
 }

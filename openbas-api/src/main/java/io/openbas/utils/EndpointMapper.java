@@ -58,6 +58,7 @@ public class EndpointMapper {
                 : emptySet())
         .agents(agentMapper.toAgentOutputs(getPrimaryAgents(endpoint)))
         .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
+        .isEol(endpoint.isEoL())
         .build();
   }
 

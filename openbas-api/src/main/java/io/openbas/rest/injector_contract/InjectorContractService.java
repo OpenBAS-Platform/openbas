@@ -2,15 +2,10 @@ package io.openbas.rest.injector_contract;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.model.InjectorContract.*;
-import static io.openbas.database.model.InjectorContract.DEFAULT_VALUE_FIELD;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
@@ -198,27 +193,5 @@ public class InjectorContractService {
                     tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
         .toList();
-  }
-
-  public ObjectNode getDynamicInjectorContractFieldsForInject(InjectorContract injectorContract) {
-    ObjectNode convertedContent = injectorContract.getConvertedContent();
-
-    if (convertedContent.has("fields") && convertedContent.get("fields").isArray()) {
-      ArrayNode fieldsArray = (ArrayNode) convertedContent.get("fields");
-      ArrayNode fieldsNode = fieldsArray.deepCopy();
-      ObjectNode injectContent = new ObjectMapper().createObjectNode();
-
-      for (JsonNode field : fieldsNode) {
-        String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-        if (!CONTACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
-            && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
-          injectContent.set(key, field.get(DEFAULT_VALUE_FIELD));
-        }
-      }
-
-      return injectContent;
-    }
-
-    return null;
   }
 }

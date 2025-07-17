@@ -52,7 +52,7 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
           <ControlPointOutlined color={errorLabel ? 'error' : 'primary'} />
         </ListItemIcon>
         <ListItemText
-          primary={t('Modify target asset groups')}
+          primary={t('Modify asset groups')}
           classes={{ primary: errorLabel ? classes.textError : classes.text }}
         />
       </ListItemButton>

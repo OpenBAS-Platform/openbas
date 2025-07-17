@@ -92,6 +92,7 @@ class ExerciseServiceIntegrationTest {
             articleRepository,
             exerciseRepository,
             teamRepository,
+            userRepository,
             exerciseTeamUserRepository,
             injectRepository,
             lessonsCategoryRepository);

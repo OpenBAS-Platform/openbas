@@ -1,5 +1,5 @@
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
-import { AppBar, Badge, Box, GridLegacy, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
+import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -14,10 +14,8 @@ import obasDark from '../../../static/images/xtm/obas_dark.png';
 import obasLight from '../../../static/images/xtm/obas_light.png';
 import octiDark from '../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../static/images/xtm/octi_light.png';
-import oermDark from '../../../static/images/xtm/oerm_dark.png';
-import oermLight from '../../../static/images/xtm/oerm_light.png';
-import omtdDark from '../../../static/images/xtm/omtd_dark.png';
-import omtdLight from '../../../static/images/xtm/omtd_light.png';
+import xtmhubDark from '../../../static/images/xtm/xtm_hub_dark.png';
+import xtmhubLight from '../../../static/images/xtm/xtm_hub_light.png';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
@@ -243,8 +241,31 @@ const TopBar: FunctionComponent = () => {
               }}
               >
                 <div className={classes.subtitle}>{t('Filigran eXtended Threat Management')}</div>
-                <GridLegacy container={true} spacing={3}>
-                  <GridLegacy item={true} xs={6}>
+                <Grid container spacing={3}>
+                  <Grid size={12}>
+                    <Tooltip title="XTM Hub">
+                      <a
+                        className={classes.xtmItem}
+                        href={settings.xtm_hub_enable && settings.xtm_hub_url ? settings.xtm_hub_url : 'https://hub.filigran.io'}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={handleCloseXtm}
+                      >
+                        <Badge variant="dot" color="success">
+                          <img
+                            style={{
+                              width: '100%',
+                              paddingRight: theme.spacing(2),
+                              paddingLeft: theme.spacing(2),
+                            }}
+                            src={theme.palette.mode === 'dark' ? xtmhubDark : xtmhubLight}
+                            alt="XTM Hub"
+                          />
+                        </Badge>
+                      </a>
+                    </Tooltip>
+                  </Grid>
+                  <Grid size={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
                       <a
                         className={classes.xtmItem}
@@ -259,8 +280,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenCTI')}</div>
                       </a>
                     </Tooltip>
-                  </GridLegacy>
-                  <GridLegacy item={true} xs={6}>
+                  </Grid>
+                  <Grid size={6}>
                     <Tooltip title={t('Current platform')}>
                       <a className={classes.xtmItemCurrent}>
                         <Badge variant="dot" color="success">
@@ -269,28 +290,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenBAS')}</div>
                       </a>
                     </Tooltip>
-                  </GridLegacy>
-                  <GridLegacy item={true} xs={6}>
-                    <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
-                        <Badge variant="dot" color="info">
-                          <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? oermDark : oermLight} alt="OERM" />
-                        </Badge>
-                        <div className={classes.product}>{t('OpenERM')}</div>
-                      </a>
-                    </Tooltip>
-                  </GridLegacy>
-                  <GridLegacy item={true} xs={6}>
-                    <Tooltip title={t('Platform under construction, subscribe to update!')}>
-                      <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
-                        <Badge variant="dot" color="info">
-                          <img style={{ width: 40 }} src={theme.palette.mode === 'dark' ? omtdDark : omtdLight} alt="OMTD" />
-                        </Badge>
-                        <div className={classes.product}>{t('OpenMTD')}</div>
-                      </a>
-                    </Tooltip>
-                  </GridLegacy>
-                </GridLegacy>
+                  </Grid>
+                </Grid>
               </Box>
             </Popover>
             <IconButton

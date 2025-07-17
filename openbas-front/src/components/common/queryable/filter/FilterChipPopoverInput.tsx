@@ -1,9 +1,11 @@
 import { Autocomplete, Checkbox, TextField } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { type FunctionComponent, useEffect } from 'react';
+import { type FunctionComponent, useContext, useEffect } from 'react';
 
 import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
+import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
+import { FilterContext } from './context';
 import { type FilterHelpers } from './FilterHelpers';
 import useSearchOptions from './useSearchOptions';
 import wordsToExcludeFromTranslation from './WordsToExcludeFromTranslation';
@@ -56,6 +58,10 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   // Standard hooks
   const { t } = useFormatter();
   const { options, setOptions, searchOptions } = useSearchOptions();
+  const { defaultValues } = useContext(FilterContext);
+  const handleSearchOptions = (search: string) => {
+    searchOptions(filter.key, search, contextId, defaultValues?.get(filter.key));
+  };
   useEffect(() => {
     if (propertySchema.schema_property_values && propertySchema.schema_property_values?.length > 0) {
       setOptions(propertySchema.schema_property_values.map((value) => {
@@ -66,7 +72,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
         });
       }));
     } else {
-      searchOptions(filter.key, '', contextId);
+      handleSearchOptions('');
     }
   }, []);
 
@@ -86,8 +92,9 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
       multiple
       noOptionsText={t('No available options')}
       options={options}
+      groupBy={(option: GroupOption | Option) => 'group' in option ? option.group : ''}
       getOptionLabel={option => option.label ?? ''}
-      onInputChange={(_, search) => searchOptions(filter.key, search, contextId)}
+      onInputChange={(_, search) => handleSearchOptions(search)}
       renderInput={paramsInput => (
         <TextField
           {...paramsInput}

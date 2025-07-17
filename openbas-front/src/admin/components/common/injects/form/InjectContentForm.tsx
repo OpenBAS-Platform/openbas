@@ -1,26 +1,23 @@
 import { HelpOutlineOutlined, RotateLeftOutlined } from '@mui/icons-material';
 import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-import { findEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Article, EndpointOutput, Variable } from '../../../../../utils/api-types';
+import type { Article, Variable } from '../../../../../utils/api-types';
 import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
-import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
-import EndpointsList from '../../../assets/endpoints/EndpointsList';
 import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
-import InjectAddEndpoints from '../../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
 import AvailableVariablesDialog from '../../../simulations/simulation/variables/AvailableVariablesDialog';
 import type { ExpectationInput } from '../expectations/Expectation';
 import InjectExpectations from '../expectations/InjectExpectations';
 import InjectArticlesList from './articles/InjectArticlesList';
 import InjectChallengesList from './challenges/InjectChallengesList';
 import InjectDocumentsList from './documents/InjectDocumentsList';
+import InjectEndpointsList from './endpoints/InjectEndpointsList';
 import InjectContentFieldComponent from './InjectContentFieldComponent';
 import InjectTeamsList from './teams/InjectTeamsList';
 
@@ -60,46 +57,13 @@ const InjectContentForm = ({
   );
 
   // -- ASSETS --
-  const injectAssetIds = useWatch({
-    control,
-    name: 'inject_assets',
-  }) as string[];
-  const [injectAsset, setInjectAsset] = useState<EndpointOutput[]>([]);
-  useEffect(() => {
-    if (fieldsMap.has('asset') && injectAssetIds.length > 0) {
-      findEndpoints(injectAssetIds).then(result => setInjectAsset(result.data));
-    } else {
-      setInjectAsset([]);
-    }
-  }, [injectAssetIds]);
-
-  const onAssetChange = (assetIds: string[]) => setValue('inject_assets', assetIds);
-  const removeAsset = (assetId: string) => setValue('inject_assets', injectAssetIds.filter(id => id !== assetId));
-
   const renderTargetedAssets = (
-    <>
-      <EndpointsList
-        endpoints={injectAsset}
-        renderActions={endpoint => (
-          <EndpointPopover
-            inline
-            agentless={endpoint.asset_agents.length === 0}
-            endpoint={endpoint}
-            onRemoveFromContext={removeAsset}
-            removeFromContextLabel="Remove from the inject"
-            onDelete={removeAsset}
-            disabled={fieldsMap.get('asset')?.readOnly || readOnly}
-          />
-        )}
-      />
-      <InjectAddEndpoints
-        endpointIds={injectAssetIds}
-        onSubmit={onAssetChange}
-        platforms={getValues('inject_injector_contract.injector_contract_platforms')}
-        payloadArch={getValues('inject_injector_contract.injector_contract_arch')}
-        disabled={fieldsMap.get('asset')?.readOnly || readOnly}
-      />
-    </>
+    <InjectEndpointsList
+      name="inject_assets"
+      disabled={fieldsMap.get('asset')?.readOnly || readOnly}
+      platforms={getValues('inject_injector_contract.injector_contract_platforms')}
+      architectures={getValues('inject_injector_contract.injector_contract_arch')}
+    />
   );
 
   // -- ASSETS GROUPS --
@@ -232,12 +196,12 @@ const InjectContentForm = ({
       show: fieldsMap.has('team'),
     },
     {
-      title: t('Targeted assets'),
+      title: t('Source assets'),
       render: renderTargetedAssets,
       show: fieldsMap.has('asset'),
     },
     {
-      title: t('Targeted asset groups'),
+      title: t('Source asset groups'),
       render: renderTargetedAssetGroups,
       show: fieldsMap.has('asset-group'),
     },
@@ -287,7 +251,7 @@ const InjectContentForm = ({
     {
       title: t('Inject documents'),
       render: renderDocuments,
-      show: !isAtomic,
+      show: true,
     },
   ];
 

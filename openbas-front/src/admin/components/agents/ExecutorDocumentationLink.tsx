@@ -16,12 +16,12 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor, showEEC
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
-  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
+  const { openDialog, setEEFeatureDetectedInfo } = useEnterpriseEdition();
 
   useEffect(() => {
   }, []);
   const onAlertClick = () => {
-    setFeatureDetectedInfo(executor.executor_name);
+    setEEFeatureDetectedInfo(executor.executor_name);
     openDialog();
   };
   return (

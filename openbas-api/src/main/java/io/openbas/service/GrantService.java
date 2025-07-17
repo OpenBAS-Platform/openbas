@@ -6,9 +6,12 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
 import io.openbas.database.model.Scenario;
+import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.database.repository.GroupRepository;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.EnumSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +20,10 @@ import reactor.util.function.Tuples;
 @Service
 @RequiredArgsConstructor
 public class GrantService {
-
+  private static final EnumSet<Grant.GRANT_TYPE> READ_AUTHORIZED_GRANTS =
+      EnumSet.of(Grant.GRANT_TYPE.OBSERVER, Grant.GRANT_TYPE.PLANNER, Grant.GRANT_TYPE.LAUNCHER);
+  private static final EnumSet<Grant.GRANT_TYPE> WRITE_AUTHORIZED_GRANTS =
+      EnumSet.of(Grant.GRANT_TYPE.PLANNER, Grant.GRANT_TYPE.LAUNCHER);
   private final GroupRepository groupRepository;
   private final GrantRepository grantRepository;
 
@@ -71,5 +77,25 @@ public class GrantService {
       Iterable<Grant> scenarioGrants = this.grantRepository.saveAll(grants);
       scenario.setGrants(fromIterable(scenarioGrants));
     }
+  }
+
+  public boolean hasReadGrant(@NotBlank final String resourceId, @NotNull final User user) {
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.OBSERVER);
+  }
+
+  public boolean hasWriteGrant(@NotBlank final String resourceId, @NotNull final User user) {
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.PLANNER);
+  }
+
+  public boolean hasLaunchGrant(@NotBlank final String resourceId, @NotNull final User user) {
+    return hasGrant(resourceId, user, Grant.GRANT_TYPE.LAUNCHER);
+  }
+
+  private boolean hasGrant(
+      @NotBlank final String resourceId,
+      @NotNull final User user,
+      @NotNull final Grant.GRANT_TYPE grantType) {
+    return this.grantRepository.rawByResourceIdAndUserId(resourceId, user.getId()).stream()
+        .anyMatch(rawGrant -> grantType.name().equals(rawGrant.getGrant_name()));
   }
 }

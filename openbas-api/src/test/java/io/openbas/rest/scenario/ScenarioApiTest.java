@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -18,13 +19,18 @@ import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.scenario.form.CheckScenarioRulesInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
 import io.openbas.rest.scenario.form.ScenarioRecurrenceInput;
+import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +49,27 @@ public class ScenarioApiTest extends IntegrationTest {
   @Autowired private ExecutorFixture executorFixture;
 
   @Autowired private MockMvc mvc;
+  @Autowired private ObjectMapper objectMapper;
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private TagRuleRepository tagRuleRepository;
   @Autowired private AssetGroupRepository assetGroupRepository;
   @Autowired private EndpointRepository endpointRepository;
+  @Autowired private UserRepository userRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private ScenarioTeamUserRepository scenarioTeamUserRepository;
 
   static String SCENARIO_ID;
 
+  private static final List<String> SCENARIO_IDS = new ArrayList<>();
+  private static final List<String> USER_IDS = new ArrayList<>();
+  private static final List<String> TEAM_IDS = new ArrayList<>();
+
   @AfterAll
   void afterAll() {
-    this.scenarioRepository.deleteById(SCENARIO_ID);
+    if (SCENARIO_ID != null) {
+      this.scenarioRepository.deleteById(SCENARIO_ID);
+    }
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();
     this.assetGroupRepository.deleteAll();
@@ -352,5 +368,50 @@ public class ScenarioApiTest extends IntegrationTest {
           .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
+  }
+
+  @Test
+  @Transactional
+  @DisplayName("Should enable all users of newly added teams when replacing scenario teams")
+  @WithMockAdminUser
+  void replacingTeamsShouldEnableNewTeamUsers() throws Exception {
+    // -- PREPARE --
+    User userTom = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
+    User userBen = userRepository.save(UserFixture.getUser("Ben", "TEST", "ben-test@fake.email"));
+    USER_IDS.addAll(Arrays.asList(userTom.getId(), userBen.getId()));
+
+    Team teamA = TeamFixture.getTeam(userTom, "TeamA", false);
+    teamA.setUsers(List.of(userTom));
+    teamRepository.save(teamA);
+    Team teamB = TeamFixture.getTeam(userBen, "TeamB", false);
+    teamB.setUsers(List.of(userBen));
+    teamRepository.save(teamB);
+
+    TEAM_IDS.addAll(Arrays.asList(teamA.getId(), teamB.getId()));
+
+    Scenario scenario = ScenarioFixture.createDefaultCrisisScenario();
+    scenario.setTeams(Collections.singletonList(teamA));
+    Scenario scenarioSaved = scenarioRepository.save(scenario);
+    SCENARIO_IDS.add(scenarioSaved.getId());
+
+    // -- ACT --
+    List<String> newTeamIds = Arrays.asList(teamA.getId(), teamB.getId());
+    ScenarioUpdateTeamsInput input = new ScenarioUpdateTeamsInput();
+    input.setTeamIds(newTeamIds);
+
+    mvc.perform(
+            put(SCENARIO_URI + "/" + scenarioSaved.getId() + "/teams/replace")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(input))
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+
+    // -- ASSERT --
+    List<ScenarioTeamUser> links = scenarioTeamUserRepository.findAll();
+
+    ScenarioTeamUser link = links.getFirst();
+    assertEquals(scenarioSaved.getId(), link.getScenario().getId());
+    assertEquals(teamB.getId(), link.getTeam().getId());
+    assertEquals(userBen.getId(), link.getUser().getId());
   }
 }

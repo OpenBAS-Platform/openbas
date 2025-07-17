@@ -3,7 +3,7 @@ import { type FunctionComponent, useState } from 'react';
 import { createCustomDashboardWidget } from '../../../../../actions/custom_dashboards/customdashboardwidget-action';
 import ButtonCreate from '../../../../../components/common/ButtonCreate';
 import { type Widget } from '../../../../../utils/api-types-custom';
-import WidgetForm from './WidgetForm';
+import WidgetForm from './configuration/WidgetForm';
 import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const COL_WIDTH = 30;

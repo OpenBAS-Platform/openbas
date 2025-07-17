@@ -46,9 +46,17 @@ public class FindingHandler implements Handler<EsFinding> {
                 dependencies.add(finding.getFinding_inject_id());
                 esFinding.setBase_inject_side(finding.getFinding_inject_id());
               }
+              if (hasText(finding.getInject_exercise())) {
+                dependencies.add(finding.getInject_exercise());
+                esFinding.setBase_simulation_side(finding.getInject_exercise());
+              }
               if (hasText(finding.getScenario_id())) {
                 dependencies.add(finding.getScenario_id());
                 esFinding.setBase_scenario_side(finding.getScenario_id());
+              }
+              if (hasText(finding.getAsset_id())) {
+                dependencies.add(finding.getAsset_id());
+                esFinding.setBase_endpoint_side(finding.getAsset_id());
               }
               esFinding.setBase_dependencies(dependencies);
               return esFinding;

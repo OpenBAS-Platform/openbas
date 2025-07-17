@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -58,9 +59,9 @@ public enum ContractOutputType {
               new ContractOutputField("service", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          jsonNode.get("host") != null
-              && jsonNode.get("port") != null
-              && jsonNode.get("service") != null,
+          jsonNode.hasNonNull("host")
+              && jsonNode.hasNonNull("port")
+              && jsonNode.hasNonNull("service"),
       (JsonNode jsonNode) -> {
         String host = buildString(jsonNode, "host");
         String port = buildString(jsonNode, "port");
@@ -108,7 +109,7 @@ public enum ContractOutputType {
               new ContractOutputField("username", ContractOutputTechnicalType.Text, true),
               new ContractOutputField("password", ContractOutputTechnicalType.Text, true))),
       true,
-      (JsonNode jsonNode) -> jsonNode.get("username") != null && jsonNode.get("password") != null,
+      (JsonNode jsonNode) -> jsonNode.hasNonNull("username") && jsonNode.hasNonNull("password"),
       (JsonNode jsonNode) -> {
         String username = buildString(jsonNode, "username");
         String password = buildString(jsonNode, "password");
@@ -129,20 +130,24 @@ public enum ContractOutputType {
               new ContractOutputField("severity", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) ->
-          jsonNode.get("id") != null
-              && jsonNode.get("host") != null
-              && jsonNode.get("severity") != null,
+          jsonNode.hasNonNull("id")
+              && jsonNode.hasNonNull("host")
+              && jsonNode.hasNonNull("severity"),
+      (JsonNode jsonNode) -> buildString(jsonNode, "id"),
       (JsonNode jsonNode) -> {
-        String id = buildString(jsonNode, "id");
-        String host = buildString(jsonNode, "host");
-        String severity = buildString(jsonNode, "severity");
-        return host + ":" + id + " (" + severity + ")";
-      },
-      (JsonNode jsonNode) -> {
-        if (jsonNode.get("asset_id") != null) {
-          return List.of(jsonNode.get("asset_id").asText());
+        JsonNode assetIdNode = jsonNode.get("asset_id");
+        if (assetIdNode == null) {
+          return Collections.emptyList();
         }
-        return new ArrayList<>();
+        if (assetIdNode.isArray()) {
+          List<String> result = new ArrayList<>();
+          for (JsonNode idNode : assetIdNode) {
+            result.add(idNode.asText());
+          }
+          return result;
+        } else {
+          return List.of(assetIdNode.asText());
+        }
       },
       null,
       null);

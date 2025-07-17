@@ -1,4 +1,4 @@
-import { Alert } from '@mui/material';
+import { Alert, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import {
@@ -8,10 +8,12 @@ import {
 
 import RichTextField from '../../../../../components/fields/RichTextField';
 import SelectFieldController from '../../../../../components/fields/SelectFieldController';
+import SeparatorFieldController from '../../../../../components/fields/SeparatorFieldController';
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';
 import TagFieldController from '../../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
+import InjectEndpointsList from './endpoints/InjectEndpointsList';
 
 type ChoiceItem = {
   label: string;
@@ -30,7 +32,11 @@ export type InjectField = {
     key: string;
     label: string;
   }[];
-  type: 'textarea' | 'text' | 'select' | 'number' | 'checkbox' | 'dependency-select' | 'choice' | 'tags';
+  type: 'textarea' | 'text' | 'select' | 'number' | 'checkbox' | 'dependency-select' | 'choice' | 'tags' | 'targeted-asset';
+  linkedFields?: {
+    key: string;
+    type: string;
+  }[];
   dependencyField?: string;
   settings?: {
     rows: number;
@@ -72,14 +78,17 @@ const InjectContentFieldComponent = ({
     }
   }, [selectedValue]);
 
-  // TODO check for the mandatory
+  const label = field.linkedFields?.length && field.linkedFields?.length > 0
+    ? `${t(field.label)} - ${field.linkedFields.map(f => f.key).join(', ')}`
+    : t(field.label);
+
   const fieldComponent = () => {
     switch (fieldType) {
       case 'tags':
         return (
           <TagFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={`${label}${field.mandatory ? '*' : ''}`}
             disabled={readOnly}
           />
         );
@@ -88,7 +97,7 @@ const InjectContentFieldComponent = ({
           <RichTextField
             key={field.key}
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={`${label}${field.mandatory ? '*' : ''}`}
             style={{ height: 250 }}
             disabled={readOnly}
             askAi={true}
@@ -100,7 +109,7 @@ const InjectContentFieldComponent = ({
         return (
           <SwitchFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={`${label}${field.mandatory ? '*' : ''}`}
             disabled={readOnly}
             required={field.settings?.required}
           />
@@ -129,7 +138,7 @@ const InjectContentFieldComponent = ({
         return (
           <SelectFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={`${label} ${field.mandatory ? '*' : ''}`}
             items={choices as ChoiceItem[]}
             multiple={field.cardinality === 'n'}
             disabled={readOnly}
@@ -137,11 +146,32 @@ const InjectContentFieldComponent = ({
           />
         );
       }
-      default:
+      case 'targeted-asset':
+        return (
+          < >
+            <Typography variant="h5">
+              {`${t('Targeted assets')} - ${field.key.split('.').at(-1)} ${field.mandatory ? '*' : ''}`}
+            </Typography>
+            <InjectEndpointsList
+              name={field.key}
+            />
+          </>
+        );
+      default:{
+        if (field.key.includes('targeted-asset-separator')) {
+          return (
+            <SeparatorFieldController
+              name={field.key}
+              label={`${label}${field.mandatory ? ' *' : ''}`}
+              disabled={readOnly}
+              defaultValue={field.defaultValue as string}
+            />
+          );
+        }
         return (
           <TextFieldController
             name={field.key}
-            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            label={`${label}${field.mandatory ? ' *' : ''}`}
             disabled={readOnly}
             multiline={field.type == 'textarea'}
             rows={field.type == 'textarea' ? (field.settings?.rows ?? 10) : 1}
@@ -149,13 +179,14 @@ const InjectContentFieldComponent = ({
             type={field.type === 'number' ? 'number' : 'text'}
           />
         );
+      }
     }
   };
 
   return (
     <div>
-      { fieldComponent() }
-      { informationToDisplay && <Alert sx={{ marginTop: theme.spacing(1) }} severity="warning">{informationToDisplay}</Alert>}
+      {fieldComponent()}
+      {informationToDisplay && <Alert sx={{ marginTop: theme.spacing(1) }} severity="warning">{informationToDisplay}</Alert>}
     </div>
   );
 };

@@ -28,10 +28,9 @@ const EEChip = ({ clickable = false, featureDetectedInfo = null, style = {} }: {
 }) => {
   const { classes } = useStyles({ isClickable: clickable });
   const { t } = useFormatter();
-  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
-  const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
+  const { isValidated: isEnterpriseEdition, openDialog, setEEFeatureDetectedInfo } = useEnterpriseEdition();
   if (featureDetectedInfo) {
-    setFeatureDetectedInfo(featureDetectedInfo);
+    setEEFeatureDetectedInfo(featureDetectedInfo);
   }
 
   return (

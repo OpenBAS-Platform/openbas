@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.service.StructuredOutputUtils;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,13 @@ class StructuredOutputUtilsTest {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Empty output");
     regexGroup.setIndexValues("$2");
-    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "Text", "^(\\S+)", null);
+    testRegexExtraction(
+        "",
+        Set.of(regexGroup),
+        ContractOutputType.Text,
+        "Text",
+        "^(\\S+)",
+        Arrays.toString(Arrays.copyOf(new String[0], 0)));
   }
 
   @Test
@@ -62,7 +69,7 @@ class StructuredOutputUtilsTest {
         ContractOutputType.Text,
         "Text",
         "^(\\S+)",
-        null);
+        Arrays.toString(Arrays.copyOf(new String[0], 0)));
   }
 
   @Test
@@ -77,7 +84,7 @@ class StructuredOutputUtilsTest {
         ContractOutputType.Text,
         "Text",
         "^(\\S+)",
-        null);
+        Arrays.toString(Arrays.copyOf(new String[0], 0)));
   }
 
   @Test
@@ -120,8 +127,8 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get username:password from raw output command")
-  void given_raw_output_tasklist_should_return_credentials() {
+  @DisplayName("Should get cve from raw output command")
+  void given_raw_output_tasklist_should_return_cve() {
     // username:RID:LM_Hash:NTLM_Hash:::
     String rawOutput =
         "{\n"
@@ -163,7 +170,7 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:port (service) from raw output of netstat command")
+  @DisplayName("Should get hosts, ports, service from raw output of netstat command")
   void given_raw_output_netstat_should_return_portscans() {
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("host");
@@ -250,8 +257,8 @@ class StructuredOutputUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:cve (severity) from raw output command")
-  void given_raw_output_cve_should_return_cve() {
+  @DisplayName("Should get username:password from raw output command")
+  void given_raw_output_credentials_should_return_credentials() {
     String rawOutput =
         "SMB                      192.168.11.23   415    CASSANOVAS          [+] workgroup\\\\savacano:savacano (Pwn3d!)\\n";
 

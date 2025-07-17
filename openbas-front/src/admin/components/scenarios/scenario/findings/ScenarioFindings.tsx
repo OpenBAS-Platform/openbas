@@ -1,8 +1,8 @@
 import { useParams } from 'react-router';
 
-import { searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
+import { searchDistinctFindingsForScenarios, searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
 import { SIMULATION } from '../../../../../constants/Entities';
-import type { FindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { RelatedFindingOutput, Scenario, SearchPaginationInput } from '../../../../../utils/api-types';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
 
@@ -17,13 +17,16 @@ const ScenarioFindings = () => {
   const search = (input: SearchPaginationInput) => {
     return searchFindingsForScenarios(scenarioId, input);
   };
+  const searchDistinct = (input: SearchPaginationInput) => {
+    return searchDistinctFindingsForScenarios(scenarioId, input);
+  };
 
   const additionalHeaders = [
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
   ];
 
@@ -31,6 +34,7 @@ const ScenarioFindings = () => {
     <FindingList
       filterLocalStorageKey="scenario-findings"
       searchFindings={search}
+      searchDistinctFindings={searchDistinct}
       additionalHeaders={additionalHeaders}
       additionalFilterNames={additionalFilterNames}
       contextId={scenarioId}

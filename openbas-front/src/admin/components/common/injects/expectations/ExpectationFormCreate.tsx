@@ -1,5 +1,5 @@
 import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
-import { type FunctionComponent, type SyntheticEvent, useEffect } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useEffect, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
@@ -55,8 +55,17 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
+  const [expectationType, setExpectationType] = useState<string>('MANUAL');
 
   const manualExpectationExpirationTime = useExpectationExpirationTime('MANUAL');
+
+  const getExpectationDefaultScoreByType = (expectationType: string): number => {
+    if (expectationType === 'MANUAL') {
+      return settings.expectation_manual_default_score_value;
+    } else {
+      return 100;
+    }
+  };
 
   const computeValuesFromType = (type: string): ExpectationInputForm => {
     const predefinedExpectation = predefinedExpectations.filter(pe => pe.expectation_type === type)[0];
@@ -66,7 +75,8 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         expectation_type: predefinedExpectation.expectation_type ?? '',
         expectation_name: predefinedExpectation.expectation_name ?? '',
         expectation_description: predefinedExpectation.expectation_description ?? '',
-        expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : settings.expectation_manual_default_score_value,
+        // eslint-disable-next-line max-len
+        expectation_score: predefinedExpectation.expectation_score > 0 ? predefinedExpectation.expectation_score : getExpectationDefaultScoreByType(predefinedExpectation.expectation_type),
         expectation_expectation_group: predefinedExpectation.expectation_expectation_group ?? false,
         expiration_time_days: parseInt(expirationTime.days, 10),
         expiration_time_hours: parseInt(expirationTime.hours, 10),
@@ -75,10 +85,10 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
     }
     const expirationTime = splitDuration(manualExpectationExpirationTime || 0);
     return {
-      expectation_type: 'MANUAL',
+      expectation_type: expectationType,
       expectation_name: '',
       expectation_description: '',
-      expectation_score: settings.expectation_manual_default_score_value,
+      expectation_score: getExpectationDefaultScoreByType(expectationType),
       expectation_expectation_group: false,
       expiration_time_days: parseInt(expirationTime.days, 10),
       expiration_time_hours: parseInt(expirationTime.hours, 10),
@@ -116,7 +126,8 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         <InputLabel id="input-type">{t('Type')}</InputLabel>
         <MUISelect
           labelId="input-type"
-          value={getValues().expectation_type}
+          value={expectationType}
+          onChange={event => setExpectationType(event.target.value)}
           variant="standard"
           fullWidth
           error={!!errors.expectation_type}
@@ -159,35 +170,38 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         }
         inputProps={register('expectation_description')}
       />
-      <div className={classes.duration}>
-        <div className={classes.trigger}>
-          {t('Expiration time')}
+      {(watchType !== 'VULNERABILITY') && (
+        <div className={classes.duration}>
+          <div className={classes.trigger}>
+            {t('Expiration time')}
+          </div>
+          <TextField
+            variant="standard"
+            type="number"
+            label={t('Days')}
+            style={{ width: '20%' }}
+            inputProps={register('expiration_time_days')}
+          />
+          <TextField
+            variant="standard"
+            inputProps={register('expiration_time_hours')}
+            type="number"
+            label={t('Hours')}
+            style={{ width: '20%' }}
+          />
+          <TextField
+            variant="standard"
+            inputProps={register('expiration_time_minutes')}
+            type="number"
+            label={t('Minutes')}
+            style={{ width: '20%' }}
+          />
         </div>
-        <TextField
-          variant="standard"
-          type="number"
-          label={t('Days')}
-          style={{ width: '20%' }}
-          inputProps={register('expiration_time_days')}
-        />
-        <TextField
-          variant="standard"
-          inputProps={register('expiration_time_hours')}
-          type="number"
-          label={t('Hours')}
-          style={{ width: '20%' }}
-        />
-        <TextField
-          variant="standard"
-          inputProps={register('expiration_time_minutes')}
-          type="number"
-          label={t('Minutes')}
-          style={{ width: '20%' }}
-        />
-      </div>
+      )}
+
       <div style={{ marginTop: 20 }}>
         <Typography variant="h4">{t('Scores')}</Typography>
-        <ScaleBar expectationExpectedScore={watch('expectation_score')} />
+        <ScaleBar expectationType={watchType} expectationExpectedScore={watch('expectation_score')} />
       </div>
       <MuiTextField
         variant="standard"
@@ -207,7 +221,9 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
           },
         }}
       />
-      <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(watchType)} control={control} />
+      {(watchType !== 'VULNERABILITY') && (
+        <ExpectationGroupField isTechnicalExpectation={isTechnicalExpectation(watchType)} control={control} />
+      )}
       <div className={classes.buttons}>
         <Button
           onClick={handleClose}

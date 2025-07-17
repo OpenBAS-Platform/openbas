@@ -18,11 +18,10 @@ import org.hibernate.annotations.Type;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@DiscriminatorValue(Endpoint.ENDPOINT_TYPE)
+@DiscriminatorValue(AssetType.Values.ENDPOINT_TYPE)
 @EntityListeners(ModelBaseListener.class)
 public class Endpoint extends Asset {
 
-  public static final String ENDPOINT_TYPE = "Endpoint";
   public static final Set<String> BAD_MAC_ADDRESS =
       new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180c2000000"));
   public static final Set<String> BAD_IP_ADDRESSES =
@@ -93,6 +92,10 @@ public class Endpoint extends Asset {
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
+
+  @Column(name = "endpoint_is_eol")
+  @JsonProperty("endpoint_is_eol")
+  private boolean isEoL;
 
   @OneToMany(
       mappedBy = "asset",
