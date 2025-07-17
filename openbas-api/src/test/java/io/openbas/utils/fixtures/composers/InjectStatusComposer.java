@@ -52,7 +52,9 @@ public class InjectStatusComposer extends ComposerBase<InjectStatus> {
   }
 
   public InjectStatusComposer.Composer forInjectStatus(InjectStatus injectStatus) {
+    Composer composer = new Composer(injectStatus);
     generatedItems.add(injectStatus);
-    return new InjectStatusComposer.Composer(injectStatus);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

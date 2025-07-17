@@ -87,7 +87,9 @@ public class PayloadComposer extends ComposerBase<Payload> {
   }
 
   public Composer forPayload(Payload payload) {
+    Composer composer = new Composer(payload);
     this.generatedItems.add(payload);
-    return new Composer(payload);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

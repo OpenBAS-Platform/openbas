@@ -63,7 +63,9 @@ public class ArticleComposer extends ComposerBase<Article> {
   }
 
   public Composer forArticle(Article article) {
+    Composer composer = new Composer(article);
     generatedItems.add(article);
-    return new Composer(article);
+    generatedComposer.add(composer);
+    return composer;
   }
 }
