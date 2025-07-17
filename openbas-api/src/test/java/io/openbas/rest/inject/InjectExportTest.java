@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.ExportOptionsInput;
@@ -63,6 +64,7 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private GrantHelper grantHelper;
   @Autowired private EntityManager entityManager;
   @Autowired private InjectRepository injectRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
   @BeforeEach
   public void setup() throws Exception {

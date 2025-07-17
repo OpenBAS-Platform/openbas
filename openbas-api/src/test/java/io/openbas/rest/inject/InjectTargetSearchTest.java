@@ -12,6 +12,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.AssetGroupRepository;
+import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
@@ -50,6 +51,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private TagComposer tagComposer;
   @Autowired private ExecutorFixture executorFixture;
   @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
   @AfterAll
   void afterAll() {
