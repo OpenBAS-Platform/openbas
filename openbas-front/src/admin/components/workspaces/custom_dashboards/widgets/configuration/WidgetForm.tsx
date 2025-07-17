@@ -4,16 +4,17 @@ import { type FunctionComponent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import Dialog from '../../../../../components/common/Dialog';
-import StepperComponent from '../../../../../components/common/StepperComponent';
-import { useFormatter } from '../../../../../components/i18n';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import { zodImplement } from '../../../../../utils/Zod';
-import WidgetCreationParameters from './WidgetCreationParameters';
-import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
-import WidgetCreationSeriesList from './WidgetCreationSeriesList';
-import WidgetCreationTypes from './WidgetCreationTypes';
-import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
+import Dialog from '../../../../../../components/common/Dialog';
+import StepperComponent from '../../../../../../components/common/StepperComponent';
+import { useFormatter } from '../../../../../../components/i18n';
+import { type Widget } from '../../../../../../utils/api-types-custom';
+import { zodImplement } from '../../../../../../utils/Zod';
+import { getAvailableSteps, lastStepIndex, steps, type WidgetInputWithoutLayout } from '../WidgetUtils';
+import WidgetMultiSeriesSelection from './histogram/WidgetMultiSeriesSelection';
+import WidgetSecurityCoverageSeriesSelection from './histogram/WidgetSecurityCoverageSeriesSelection';
+import WidgetPerspectiveSelection from './list/WidgetPerspectiveSelection';
+import WidgetConfigurationParameters from './WidgetConfigurationParameters';
+import WidgetTypeSelection from './WidgetTypeSelection';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -47,12 +48,7 @@ const WidgetForm: FunctionComponent<Props> = ({
   toggleDialog,
   initialValues = {
     widget_type: undefined,
-    widget_config: {
-      mode: undefined,
-      title: '',
-      field: '',
-      series: [{ name: '' }],
-    },
+    widget_config: { title: '' },
   },
   onSubmit,
   editing = false,
@@ -62,6 +58,7 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   // Form
   const widgetConfigSchema = z.discriminatedUnion('widget_configuration_type', [
+    // DateHistogramConfiguration
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
@@ -77,6 +74,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
+    // StructuralHistogramConfiguration
     z.object({
       mode: z.literal('structural'),
       title: z.string().optional(),
@@ -93,6 +91,7 @@ const WidgetForm: FunctionComponent<Props> = ({
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
     }),
+    // ListConfiguration
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
@@ -105,10 +104,10 @@ const WidgetForm: FunctionComponent<Props> = ({
         .max(1000, { message: t('Maximum value is 1000') })
         .optional(),
       columns: z.array(z.string()),
-      series: z.array(z.object({
+      perspective: z.object({
         name: z.string().optional(),
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
-      })),
+      }),
     }),
   ]);
 
@@ -185,12 +184,26 @@ const WidgetForm: FunctionComponent<Props> = ({
           control={control}
           name="widget_config.series"
           render={({ field: { value, onChange } }) => (
-            <WidgetCreationSecurityCoverageSeries
-              value={value}
+            <WidgetSecurityCoverageSeriesSelection
+              value={value ?? [{ name: '' }]}
               onChange={onChange}
               onSubmit={nextStep}
               isSimulationFilterMandatory={widgetType === 'attack-path'}
             />
+          )}
+        />
+      );
+      case 'list': return (
+        <Controller
+          control={control}
+          name="widget_config.perspective"
+          render={({ field: { value, onChange } }) => (
+            <WidgetPerspectiveSelection
+              perspective={value ?? { name: '' }}
+              onChange={onChange}
+              onSubmit={nextStep}
+            />
+
           )}
         />
       );
@@ -199,9 +212,9 @@ const WidgetForm: FunctionComponent<Props> = ({
           control={control}
           name="widget_config.series"
           render={({ field: { value, onChange } }) => (
-            <WidgetCreationSeriesList
+            <WidgetMultiSeriesSelection
               widgetType={widgetType}
-              currentSeries={value}
+              currentSeries={value ?? [{ name: '' }]}
               onChange={onChange}
               onSubmit={nextStep}
             />
@@ -233,7 +246,7 @@ const WidgetForm: FunctionComponent<Props> = ({
               control={control}
               name="widget_type"
               render={({ field: { value, onChange } }) => (
-                <WidgetCreationTypes
+                <WidgetTypeSelection
                   value={value}
                   onChange={(type) => {
                     onChange(type);
@@ -246,7 +259,7 @@ const WidgetForm: FunctionComponent<Props> = ({
           {activeStep === 1
             && getSeriesComponent(widgetType)}
           {activeStep === 2 && (
-            <WidgetCreationParameters
+            <WidgetConfigurationParameters
               widgetType={widgetType}
               control={control}
               setValue={setValue}
