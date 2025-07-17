@@ -47,6 +47,7 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
   @Mock Ee eeService;
   @Mock GrantService grantService;

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.BadRequestException;
@@ -30,9 +31,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,7 +41,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class InjectServiceTest {
+class InjectServiceTest extends IntegrationTest {
 
   private static final String INJECT_ID = "injectid";
 
@@ -78,6 +77,8 @@ class InjectServiceTest {
   @InjectMocks private InjectService injectService;
   @InjectMocks private InjectStatusService injectStatusService;
 
+  @Mock private AssetGroupRepository assetGroupRepository;
+
   @BeforeEach
   void setUp() {
 
@@ -86,6 +87,11 @@ class InjectServiceTest {
 
     mapper = new ObjectMapper();
     ReflectionTestUtils.setField(injectService, "mapper", mapper);
+  }
+
+  @AfterEach
+  void afterAll() {
+    globalTeardown();
   }
 
   @Test

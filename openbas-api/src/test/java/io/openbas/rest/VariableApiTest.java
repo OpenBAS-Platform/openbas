@@ -52,7 +52,6 @@ public class VariableApiTest extends IntegrationTest {
   @Order(1)
   @WithMockPlannerUser
   void createVariableForScenarioTest() throws Exception {
-    System.out.println("Order 1");
     // -- PREPARE --
     Scenario scenario = new Scenario();
     scenario.setName("Scenario name");
@@ -98,7 +97,6 @@ public class VariableApiTest extends IntegrationTest {
   @Order(2)
   @WithMockObserverUser
   void retrieveVariableForScenarioTest() throws Exception {
-    System.out.println("Order 2");
     // -- EXECUTE --
     String response =
         this.mvc
@@ -119,7 +117,6 @@ public class VariableApiTest extends IntegrationTest {
   @Order(3)
   @WithMockPlannerUser
   void updateVariableForScenarioTest() throws Exception {
-    System.out.println("Order 3");
     // -- PREPARE --
     String response =
         this.mvc
@@ -159,7 +156,6 @@ public class VariableApiTest extends IntegrationTest {
   @Order(4)
   @WithMockPlannerUser
   void deleteVariableForScenarioTest() throws Exception {
-    System.out.println("Order 4");
     // -- EXECUTE 1 ASSERT --
     this.mvc
         .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/variables/" + VARIABLE_ID))
