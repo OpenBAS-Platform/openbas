@@ -68,7 +68,9 @@ public class UserComposer extends ComposerBase<User> {
   }
 
   public Composer forUser(User user) {
+    Composer composer = new Composer(user);
     generatedItems.add(user);
-    return new Composer(user);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

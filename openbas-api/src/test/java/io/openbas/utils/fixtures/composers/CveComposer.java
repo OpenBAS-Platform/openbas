@@ -37,7 +37,9 @@ public class CveComposer extends ComposerBase<Cve> {
   }
 
   public CveComposer.Composer forCve(Cve cve) {
+    Composer composer = new Composer(cve);
     generatedItems.add(cve);
-    return new CveComposer.Composer(cve);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

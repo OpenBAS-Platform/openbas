@@ -176,7 +176,9 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
   }
 
   public Composer forExercise(Exercise exercise) {
+    Composer composer = new Composer(exercise);
     generatedItems.add(exercise);
-    return new Composer(exercise);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

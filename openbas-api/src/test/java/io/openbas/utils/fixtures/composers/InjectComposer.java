@@ -171,7 +171,9 @@ public class InjectComposer extends ComposerBase<Inject> {
   }
 
   public Composer forInject(Inject inject) {
+    Composer composer = new Composer(inject);
     generatedItems.add(inject);
-    return new Composer(inject);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

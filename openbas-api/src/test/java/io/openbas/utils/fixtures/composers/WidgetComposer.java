@@ -47,7 +47,9 @@ public class WidgetComposer extends ComposerBase<Widget> {
   }
 
   public WidgetComposer.Composer forWidget(Widget widget) {
+    Composer composer = new Composer(widget);
     generatedItems.add(widget);
-    return new WidgetComposer.Composer(widget);
+    generatedComposer.add(composer);
+    return composer;
   }
 }
