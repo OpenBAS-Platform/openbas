@@ -80,6 +80,9 @@ public class OpenBASConfig {
   @JsonProperty("with_proxy")
   private boolean withProxy;
 
+  @JsonProperty("extra_trusted_certs_dir")
+  private String extraTrustedCertsDir;
+
   public String getBaseUrlForAgent() {
     return hasText(agentUrl) ? url(agentUrl) : url(baseUrl);
   }

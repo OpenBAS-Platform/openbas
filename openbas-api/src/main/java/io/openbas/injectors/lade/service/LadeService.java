@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.ExecutionTrace;
 import io.openbas.database.model.ExecutionTraceAction;
@@ -34,7 +35,6 @@ import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +45,24 @@ import org.springframework.stereotype.Component;
 public class LadeService {
 
   @Resource private io.openbas.injectors.lade.config.LadeConfig config;
-
   @Resource private ObjectMapper mapper;
+  private HttpClientFactory httpClientFactory;
 
   @Autowired
   public void setConfig(LadeConfig config) {
     this.config = config;
   }
 
+  @Autowired
+  public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = httpClientFactory;
+  }
+
   // Authentication cache
   private final LadeAuth ladeAuth = new LadeAuth();
 
   private String ladeAuthentication() throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       // Renew token before access token expiration.
       // Timeout is configurable, 30 minutes by default, renew 50% before timeout
       switch (ladeAuth.getTokenStatus(config.getSession())) {
@@ -101,7 +106,7 @@ public class LadeService {
   }
 
   private JsonNode executeGet(String uri, boolean retry) throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpGet actionsGet = new HttpGet(config.getUrl() + uri);
       actionsGet.setHeader("lade-authorization", "Bearer " + ladeAuthentication());
       return httpClient.execute(
@@ -129,7 +134,7 @@ public class LadeService {
 
   private JsonNode executePost(String uri, ObjectNode postContent, boolean retry)
       throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPost runPost = new HttpPost(config.getUrl() + uri);
       runPost.setHeader("lade-authorization", "Bearer " + ladeAuthentication());
       runPost.setHeader("Accept", "application/json");
