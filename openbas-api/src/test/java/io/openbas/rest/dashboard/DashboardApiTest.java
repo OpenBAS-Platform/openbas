@@ -215,7 +215,7 @@ class DashboardApiTest extends IntegrationTest {
       Widget listWidget = WidgetFixture.createListWidgetWithEntity("vulnerable-endpoint");
       ListConfiguration config = (ListConfiguration) listWidget.getWidgetConfiguration();
       // filters
-      Filters.FilterGroup filterGroup = config.getSeries().get(0).getFilter();
+      Filters.FilterGroup filterGroup = config.getPerspective().getFilter();
       Filters.Filter simulationFilter = new Filters.Filter();
       simulationFilter.setKey("base_simulation_side");
       simulationFilter.setMode(Filters.FilterMode.or);

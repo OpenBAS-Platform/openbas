@@ -23,8 +23,8 @@ const DialogDelete: FunctionComponent<DialogDeleteProps> = ({
     <DialogMUI
       open={open}
       onClose={handleClose}
-      PaperProps={{ elevation: 1 }}
-      TransitionComponent={Transition}
+      slotProps={{ paper: { elevation: 1 } }}
+      slots={{ transition: Transition }}
     >
       <DialogContent>
         <DialogContentText>

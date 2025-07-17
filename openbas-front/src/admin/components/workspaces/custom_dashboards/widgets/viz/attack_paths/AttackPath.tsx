@@ -171,7 +171,7 @@ const AttackPath = ({ data, widgetId, simulationId, simulationStartDate = null, 
   const createEdgesByAttackPath = (attackPath: EsAttackPath, phase: KillChainPhaseObject) => {
     const nodeId = getNodeId(attackPath.attackPatternId, phase);
     return getAllChildrenNodeId(attackPath)
-      .filter(nodeChildId => nodeChildId !== nodeId && hoveredNodeId !== null && hoveredNodeId === nodeId)
+      .filter(nodeChildId => nodeChildId != nodeId || (hoveredNodeId != null && hoveredNodeId != nodeId))
       .map((nodeChildId) => {
         return {
           id: attackPath.attackPatternId + '-' + phase.id + '-' + nodeChildId + '-edge',

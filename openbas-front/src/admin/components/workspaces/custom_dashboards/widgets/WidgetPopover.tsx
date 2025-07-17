@@ -5,7 +5,7 @@ import ButtonPopover, { type PopoverEntry } from '../../../../../components/comm
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
 import { type Widget } from '../../../../../utils/api-types-custom';
-import WidgetForm from './WidgetForm';
+import WidgetForm from './configuration/WidgetForm';
 import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
 interface Props {

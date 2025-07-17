@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 public class ListConfiguration extends WidgetConfiguration {
 
-  @NotNull List<ListSeries> series = new ArrayList<>();
+  @NotNull ListPerspective perspective;
 
   List<String> columns = new ArrayList<>();
 
@@ -27,7 +27,7 @@ public class ListConfiguration extends WidgetConfiguration {
   int limit = ENTITIES_CAP;
 
   @Data
-  public static class ListSeries {
+  public static class ListPerspective {
     private String name;
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }

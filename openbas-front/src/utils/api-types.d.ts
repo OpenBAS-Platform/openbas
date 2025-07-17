@@ -3330,11 +3330,11 @@ export type ListConfiguration = UtilRequiredKeys<
    * @min 1
    */
   limit?: number;
-  series: ListSeries[];
+  perspective: ListPerspective;
   sorts?: EngineSortField[];
 };
 
-export interface ListSeries {
+export interface ListPerspective {
   /** Filter object to search within filterable attributes */
   filter?: FilterGroup;
   name?: string;

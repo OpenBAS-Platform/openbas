@@ -3,17 +3,17 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { useEffect, useState } from 'react';
 import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
 
-import { engineSchemas } from '../../../../../actions/schema/schema-action';
-import { useFormatter } from '../../../../../components/i18n';
-import { type PropertySchemaDTO } from '../../../../../utils/api-types';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import { type GroupOption } from '../../../../../utils/Option';
-import getEntityPropertiesListOptions from './EntityPropertiesListOptions';
+import { engineSchemas } from '../../../../../../../actions/schema/schema-action';
+import { useFormatter } from '../../../../../../../components/i18n';
+import { type PropertySchemaDTO } from '../../../../../../../utils/api-types';
+import { type Widget } from '../../../../../../../utils/api-types-custom';
+import { type GroupOption } from '../../../../../../../utils/Option';
 import {
   getAvailableModes,
   getBaseEntities, getLimit,
   type WidgetInputWithoutLayout,
-} from './WidgetUtils';
+} from '../../WidgetUtils';
+import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 
 type Props = {
   widgetType: Widget['widget_type'];

@@ -10,7 +10,7 @@ import Loader from '../../../../components/Loader';
 import { type InjectTarget, type SearchPaginationInput } from '../../../../utils/api-types';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import PaginatedTargetTab from './PaginatedTargetTab';
-import TargetResultsDetail from './TargetResultsDetail';
+import TargetResultsDetail from './target_result/TargetResultsDetail';
 
 const useStyles = makeStyles()({
   chip: {
@@ -272,19 +272,14 @@ const AtomicTesting = () => {
         <Typography variant="h4" gutterBottom sx={{ mb: theme.spacing(1) }}>
           {t('Results by target')}
         </Typography>
-        <Paper classes={{ root: classes.paper }} variant="outlined">
-          {selectedTarget && !!injectResultOverviewOutput.inject_type && (
-            <TargetResultsDetail
-              inject={injectResultOverviewOutput}
-              target={selectedTarget}
-              lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
-              lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
-            />
-          )}
-          {!selectedTarget && (
+        {selectedTarget && !!injectResultOverviewOutput.inject_type && (
+          <TargetResultsDetail inject={injectResultOverviewOutput} target={selectedTarget} />
+        )}
+        {!selectedTarget && (
+          <Paper classes={{ root: classes.paper }} variant="outlined">
             <Empty message={t('No target data available.')} />
-          )}
-        </Paper>
+          </Paper>
+        )}
       </Grid>
     </Grid>
   );

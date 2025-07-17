@@ -2,11 +2,11 @@ import { Card, CardActionArea, CardContent, Checkbox, FormHelperText, Typography
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useState } from 'react';
 
-import { engineSchemas } from '../../../../../actions/schema/schema-action';
-import { useFormatter } from '../../../../../components/i18n';
-import Loader from '../../../../../components/Loader';
-import { type PropertySchemaDTO } from '../../../../../utils/api-types';
-import { type Option } from '../../../../../utils/Option';
+import { engineSchemas } from '../../../../../../actions/schema/schema-action';
+import { useFormatter } from '../../../../../../components/i18n';
+import Loader from '../../../../../../components/Loader';
+import { type PropertySchemaDTO } from '../../../../../../utils/api-types';
+import { type Option } from '../../../../../../utils/Option';
 
 interface Props {
   value: string | null;
