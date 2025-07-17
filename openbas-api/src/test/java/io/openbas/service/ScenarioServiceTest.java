@@ -121,9 +121,7 @@ class ScenarioServiceTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    this.userRepository.deleteById(USER_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-    this.injectRepository.deleteById(INJECT_ID);
+    globalTeardown();
   }
 
   @DisplayName("Should create new contextual teams during scenario duplication")
