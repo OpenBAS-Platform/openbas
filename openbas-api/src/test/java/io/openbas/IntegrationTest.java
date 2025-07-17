@@ -1,10 +1,18 @@
 package io.openbas;
 
+import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.injectors.email.EmailContract.EMAIL_GLOBAL;
+import static io.openbas.injectors.manual.ManualContract.MANUAL_DEFAULT;
+
+import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,6 +28,9 @@ public abstract class IntegrationTest {
 
   @Value("${openbas.admin.email:#{null}}")
   private String adminEmail;
+
+  private final List<String> WELL_KNOWN_CONTRACT_IDS =
+      List.of(CHALLENGE_PUBLISH, CHANNEL_PUBLISH, EMAIL_DEFAULT, EMAIL_GLOBAL, MANUAL_DEFAULT);
 
   /** List of classes we don't auto delete all to prevent the platform from breaking */
   public List<Class<?>> exclusionList =
@@ -78,6 +89,22 @@ public abstract class IntegrationTest {
               for (User user : users) {
                 if (!user.getEmail().equals(adminEmail)) {
                   ((UserRepository) repository.get(this)).delete(user);
+                }
+              }
+            } else if (Arrays.asList(repository.get(this).getClass().getInterfaces())
+                .contains(InjectorContractRepository.class)) {
+              // For InjectorContractRepository, we still delete all the injector contract but the
+              // known ones
+              List<InjectorContract> injectorContracts =
+                  StreamSupport.stream(
+                          ((InjectorContractRepository) repository.get(this))
+                              .findAll()
+                              .spliterator(),
+                          false)
+                      .toList();
+              for (InjectorContract injectorContract : injectorContracts) {
+                if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+                  ((InjectorContractRepository) repository.get(this)).delete(injectorContract);
                 }
               }
             }
