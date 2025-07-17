@@ -64,7 +64,9 @@ public class EndpointComposer extends ComposerBase<Endpoint> {
   }
 
   public EndpointComposer.Composer forEndpoint(Endpoint endpoint) {
+    Composer composer = new Composer(endpoint);
     generatedItems.add(endpoint);
-    return new EndpointComposer.Composer(endpoint);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

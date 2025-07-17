@@ -55,7 +55,9 @@ public class OrganizationComposer extends ComposerBase<Organization> {
   }
 
   public Composer forOrganization(Organization organization) {
+    Composer composer = new Composer(organization);
     generatedItems.add(organization);
-    return new Composer(organization);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

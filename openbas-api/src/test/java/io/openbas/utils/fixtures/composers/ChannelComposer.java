@@ -40,7 +40,9 @@ public class ChannelComposer extends ComposerBase<Channel> {
   }
 
   public Composer forChannel(Channel channel) {
+    Composer composer = new Composer(channel);
     generatedItems.add(channel);
-    return new Composer(channel);
+    generatedComposer.add(composer);
+    return composer;
   }
 }
