@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.BadRequestException;
@@ -41,7 +40,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class InjectServiceTest extends IntegrationTest {
+class InjectServiceTest {
 
   private static final String INJECT_ID = "injectid";
 
@@ -77,8 +76,6 @@ class InjectServiceTest extends IntegrationTest {
   @InjectMocks private InjectService injectService;
   @InjectMocks private InjectStatusService injectStatusService;
 
-  @Mock private AssetGroupRepository assetGroupRepository;
-
   @BeforeEach
   void setUp() {
 
@@ -87,11 +84,6 @@ class InjectServiceTest extends IntegrationTest {
 
     mapper = new ObjectMapper();
     ReflectionTestUtils.setField(injectService, "mapper", mapper);
-  }
-
-  @AfterEach
-  void afterAll() {
-    globalTeardown();
   }
 
   @Test
