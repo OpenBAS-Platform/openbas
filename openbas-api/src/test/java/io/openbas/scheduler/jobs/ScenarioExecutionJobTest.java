@@ -8,6 +8,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.ScenarioFixture;
 import java.time.Instant;
@@ -29,6 +30,7 @@ class ScenarioExecutionJobTest extends IntegrationTest {
 
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   static String SCENARIO_ID_1;
   static String SCENARIO_ID_2;
