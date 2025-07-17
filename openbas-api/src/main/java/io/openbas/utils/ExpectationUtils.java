@@ -249,7 +249,7 @@ public class ExpectationUtils {
                         executedAgent.getInject().getId(),
                         getIpsFromAsset(asset),
                         executedAgent.getParent().getId(),
-                        List.of())))
+                        new HashMap<>())))
         .toList();
   }
 
@@ -274,7 +274,7 @@ public class ExpectationUtils {
                         executedAgent.getInject().getId(),
                         getIpsFromAsset(asset),
                         executedAgent.getParent().getId(),
-                        List.of())))
+                        new HashMap<>())))
         .toList();
   }
 
@@ -303,7 +303,7 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       Inject inject,
       io.openbas.model.inject.form.Expectation expectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getExpectations(
         assetToExecute,
         (AssetGroup assetGroup) ->
@@ -320,14 +320,14 @@ public class ExpectationUtils {
                 assetGroup,
                 inject,
                 preventionExpectation,
-                targetedAssetValues));
+                valueTargetedAssetsMap));
   }
 
   public static List<DetectionExpectation> getDetectionExpectations(
       AssetToExecute assetToExecute,
       Inject inject,
       io.openbas.model.inject.form.Expectation expectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getExpectations(
         assetToExecute,
         (AssetGroup assetGroup) ->
@@ -344,7 +344,7 @@ public class ExpectationUtils {
                 assetGroup,
                 inject,
                 detectionExpectation,
-                targetedAssetValues));
+                valueTargetedAssetsMap));
   }
 
   /**
@@ -359,7 +359,7 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       Inject inject,
       io.openbas.model.inject.form.Expectation expectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getExpectations(
         assetToExecute,
         (AssetGroup assetGroup) ->
@@ -376,7 +376,7 @@ public class ExpectationUtils {
                 assetGroup,
                 inject,
                 vulnerabilityExpectation,
-                targetedAssetValues));
+                valueTargetedAssetsMap));
   }
 
   public static List<ManualExpectation> getManualExpectations(
@@ -403,7 +403,7 @@ public class ExpectationUtils {
       AssetGroup assetGroup,
       Inject inject,
       PreventionExpectation preventionExpectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -420,7 +420,7 @@ public class ExpectationUtils {
                         inject.getId(),
                         getIpsFromAsset(asset),
                         agent.getId(),
-                        targetedAssetValues)))
+                        valueTargetedAssetsMap)))
         .toList();
   }
 
@@ -429,7 +429,7 @@ public class ExpectationUtils {
       AssetGroup assetGroup,
       Inject inject,
       DetectionExpectation detectionExpectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -446,7 +446,7 @@ public class ExpectationUtils {
                         inject.getId(),
                         getIpsFromAsset(asset),
                         agent.getId(),
-                        targetedAssetValues)))
+                        valueTargetedAssetsMap)))
         .toList();
   }
 
@@ -455,7 +455,7 @@ public class ExpectationUtils {
       AssetGroup assetGroup,
       Inject inject,
       VulnerabilityExpectation vulnerabilityExpectation,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -472,7 +472,7 @@ public class ExpectationUtils {
                         inject.getId(),
                         getIpsFromAsset(asset),
                         agent.getId(),
-                        targetedAssetValues)))
+                        valueTargetedAssetsMap)))
         .toList();
   }
 
@@ -499,7 +499,7 @@ public class ExpectationUtils {
       String injectId,
       List<String> sourceIps,
       String agentId,
-      List<String> targetedAssetValues) {
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(
@@ -508,15 +508,24 @@ public class ExpectationUtils {
             prefixSignature + injectId + "-agent-" + agentId));
 
     sourceIps.forEach(
-        ip -> signatures.add(createSignature(EXPECTATION_SIGNATURE_TYPE_SOURCE_IP_ADDRESS, ip)));
+        ip ->
+            signatures.add(
+                createIPSignature(
+                    ip,
+                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS,
+                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV6_ADDRESS)));
 
-    targetedAssetValues.forEach(
-        value -> {
-          if (value.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")) {
-            signatures.add(createSignature(EXPECTATION_SIGNATURE_TYPE_TARGET_IP_ADDRESS, value));
-          } else {
+    valueTargetedAssetsMap.forEach(
+        (value, endpoint) -> {
+          if (value.equals(endpoint.getHostname())) {
             signatures.add(
                 createSignature(EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS, value));
+          } else {
+            signatures.add(
+                createIPSignature(
+                    value,
+                    EXPECTATION_SIGNATURE_TYPE_TARGET_IPV4_ADDRESS,
+                    EXPECTATION_SIGNATURE_TYPE_TARGET_IPV6_ADDRESS));
           }
         });
 
@@ -526,6 +535,19 @@ public class ExpectationUtils {
   private static InjectExpectationSignature createSignature(
       String signatureType, String signatureValue) {
     return builder().type(signatureType).value(signatureValue).build();
+  }
+
+  private static InjectExpectationSignature createIPSignature(
+      String ip, String ipv4Signature, String ipv6Signature) {
+    String ipv4Pattern =
+        "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])"
+            + "(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}"
+            + "(?::([0-9]{1,5}))?$";
+    if (ip.matches(ipv4Pattern)) {
+      return createSignature(ipv4Signature, ip);
+    } else {
+      return createSignature(ipv6Signature, ip);
+    }
   }
 
   // --

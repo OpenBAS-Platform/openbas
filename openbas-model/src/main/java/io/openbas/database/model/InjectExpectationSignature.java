@@ -9,8 +9,10 @@ import lombok.Setter;
 @Builder
 public class InjectExpectationSignature {
   public static final String EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME = "parent_process_name";
-  public static final String EXPECTATION_SIGNATURE_TYPE_SOURCE_IP_ADDRESS = "source_ip_address";
-  public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_IP_ADDRESS = "target_ip_address";
+  public static final String EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS = "source_ipv4_address";
+  public static final String EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV6_ADDRESS = "source_ipv6_address";
+  public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_IPV4_ADDRESS = "target_ipv4_address";
+  public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_IPV6_ADDRESS = "target_ipv6_address";
   public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS =
       "target_hostname_address";
 

@@ -91,24 +91,15 @@ public class OpenBASImplantExecutor extends Injector {
                       switch (expectation.getType()) {
                         case PREVENTION ->
                             getPreventionExpectations(
-                                assetToExecute,
-                                inject,
-                                expectation,
-                                valueTargetedAssetsMap.keySet().stream().toList())
+                                assetToExecute, inject, expectation, valueTargetedAssetsMap)
                                 .stream();
                         case DETECTION ->
                             getDetectionExpectations(
-                                assetToExecute,
-                                inject,
-                                expectation,
-                                valueTargetedAssetsMap.keySet().stream().toList())
+                                assetToExecute, inject, expectation, valueTargetedAssetsMap)
                                 .stream();
                         case VULNERABILITY ->
                             getVulnerabilityExpectations(
-                                assetToExecute,
-                                inject,
-                                expectation,
-                                valueTargetedAssetsMap.keySet().stream().toList())
+                                assetToExecute, inject, expectation, valueTargetedAssetsMap)
                                 .stream();
                         case MANUAL ->
                             getManualExpectations(assetToExecute, inject, expectation).stream();
