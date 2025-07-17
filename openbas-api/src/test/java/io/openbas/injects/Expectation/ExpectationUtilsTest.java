@@ -1,13 +1,16 @@
 package io.openbas.injects.Expectation;
 
-import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
+import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.utils.ExpectationUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.utils.fixtures.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -122,5 +125,58 @@ class ExpectationUtilsTest {
             .flatMap(det -> det.getInjectExpectationSignatures().stream())
             .toList()
             .getFirst());
+  }
+
+  @Test
+  @DisplayName("Should build expectations with the source ip signature and target ip signature")
+  void given_assetSource_should_buildSourceIPSignature() {
+    String[] fakeIPs = {"192.168.1.1", "192.168.1.2"};
+    String fakeSeenIP = "200.90.200.90";
+    Endpoint endpoint = EndpointFixture.createEndpoint();
+    endpoint.setIps(fakeIPs);
+    endpoint.setSeenIp(fakeSeenIP);
+    Agent agent = AgentFixture.createAgent(endpoint, "ext");
+    agent.setId("agentId");
+    endpoint.setAgents(List.of(agent));
+    InjectorContract injectorContract = InjectorContractFixture.createDefaultInjectorContract();
+    Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
+    inject.setId("injectId");
+    PreventionExpectation preventionExpectation =
+        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
+
+    List<String> targetValues = List.of("http://target", "100.90.200.90");
+
+    // -- EXECUTE --
+    List<PreventionExpectation> preventionExpectations =
+        getPreventionExpectationList(endpoint, null, inject, preventionExpectation, targetValues);
+
+    List<String> preventionSourceSignatureValues = new ArrayList<>();
+    List<String> preventionTargetIpsSignatureValues = new ArrayList<>();
+    List<String> preventionTargetHostnamesSignatureValues = new ArrayList<>();
+
+    preventionExpectations
+        .getFirst()
+        .getInjectExpectationSignatures()
+        .forEach(
+            signature -> {
+              if (signature.getType().equals(EXPECTATION_SIGNATURE_TYPE_SOURCE_IP_ADDRESS)) {
+                preventionSourceSignatureValues.add(signature.getValue());
+              } else if (signature.getType().equals(EXPECTATION_SIGNATURE_TYPE_TARGET_IP_ADDRESS)) {
+                preventionTargetIpsSignatureValues.add(signature.getValue());
+              } else if (signature
+                  .getType()
+                  .equals(EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS)) {
+                preventionTargetHostnamesSignatureValues.add(signature.getValue());
+              }
+            });
+
+    assertEquals(3, preventionSourceSignatureValues.size());
+    assertEquals(1, preventionTargetIpsSignatureValues.size());
+    assertEquals(1, preventionTargetHostnamesSignatureValues.size());
+    List<String> expectedSourceIPs = new ArrayList<>(Arrays.asList(fakeIPs));
+    expectedSourceIPs.add(fakeSeenIP);
+    assertTrue(expectedSourceIPs.containsAll(preventionSourceSignatureValues));
+    assertEquals("http://target", preventionTargetHostnamesSignatureValues.getFirst());
+    assertEquals("100.90.200.90", preventionTargetIpsSignatureValues.getFirst());
   }
 }

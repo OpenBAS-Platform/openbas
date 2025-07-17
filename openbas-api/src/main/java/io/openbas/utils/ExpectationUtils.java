@@ -248,7 +248,8 @@ public class ExpectationUtils {
                         OBAS_IMPLANT_CALDERA,
                         executedAgent.getInject().getId(),
                         getIpsFromAsset(asset),
-                        executedAgent.getParent().getId(), List.of())))
+                        executedAgent.getParent().getId(),
+                        List.of())))
         .toList();
   }
 
@@ -273,7 +274,7 @@ public class ExpectationUtils {
                         executedAgent.getInject().getId(),
                         getIpsFromAsset(asset),
                         executedAgent.getParent().getId(),
-                            List.of())))
+                        List.of())))
         .toList();
   }
 
@@ -302,7 +303,7 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       Inject inject,
       io.openbas.model.inject.form.Expectation expectation,
-  List<String> targetedAssetValues) {
+      List<String> targetedAssetValues) {
     return getExpectations(
         assetToExecute,
         (AssetGroup assetGroup) ->
@@ -315,7 +316,11 @@ public class ExpectationUtils {
                 expectation.getExpirationTime()),
         (AssetGroup assetGroup, PreventionExpectation preventionExpectation) ->
             getPreventionExpectationList(
-                assetToExecute.asset(), assetGroup, inject, preventionExpectation, targetedAssetValues));
+                assetToExecute.asset(),
+                assetGroup,
+                inject,
+                preventionExpectation,
+                targetedAssetValues));
   }
 
   public static List<DetectionExpectation> getDetectionExpectations(
@@ -335,7 +340,11 @@ public class ExpectationUtils {
                 expectation.getExpirationTime()),
         (AssetGroup assetGroup, DetectionExpectation detectionExpectation) ->
             getDetectionExpectationList(
-                assetToExecute.asset(), assetGroup, inject, detectionExpectation, targetedAssetValues));
+                assetToExecute.asset(),
+                assetGroup,
+                inject,
+                detectionExpectation,
+                targetedAssetValues));
   }
 
   /**
@@ -363,7 +372,11 @@ public class ExpectationUtils {
                 expectation.getExpirationTime()),
         (AssetGroup assetGroup, VulnerabilityExpectation vulnerabilityExpectation) ->
             getVulnerabilityExpectationList(
-                assetToExecute.asset(), assetGroup, inject, vulnerabilityExpectation, targetedAssetValues));
+                assetToExecute.asset(),
+                assetGroup,
+                inject,
+                vulnerabilityExpectation,
+                targetedAssetValues));
   }
 
   public static List<ManualExpectation> getManualExpectations(
@@ -403,7 +416,11 @@ public class ExpectationUtils {
                     assetGroup,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(
-                        OBAS_IMPLANT, inject.getId(), getIpsFromAsset(asset), agent.getId(), targetedAssetValues)))
+                        OBAS_IMPLANT,
+                        inject.getId(),
+                        getIpsFromAsset(asset),
+                        agent.getId(),
+                        targetedAssetValues)))
         .toList();
   }
 
@@ -425,7 +442,11 @@ public class ExpectationUtils {
                     assetGroup,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(
-                        OBAS_IMPLANT, inject.getId(), getIpsFromAsset(asset), agent.getId(), targetedAssetValues)))
+                        OBAS_IMPLANT,
+                        inject.getId(),
+                        getIpsFromAsset(asset),
+                        agent.getId(),
+                        targetedAssetValues)))
         .toList();
   }
 
@@ -447,7 +468,11 @@ public class ExpectationUtils {
                     assetGroup,
                     vulnerabilityExpectation.getExpirationTime(),
                     computeSignatures(
-                        OBAS_IMPLANT, inject.getId(), getIpsFromAsset(asset), agent.getId(), targetedAssetValues)))
+                        OBAS_IMPLANT,
+                        inject.getId(),
+                        getIpsFromAsset(asset),
+                        agent.getId(),
+                        targetedAssetValues)))
         .toList();
   }
 
@@ -488,7 +513,7 @@ public class ExpectationUtils {
     targetedAssetValues.forEach(
         value -> {
           if (value.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")) {
-            signatures.add(createSignature(EXPECTATION_SIGNATURE_TYPE_SOURCE_IP_ADDRESS, value));
+            signatures.add(createSignature(EXPECTATION_SIGNATURE_TYPE_TARGET_IP_ADDRESS, value));
           } else {
             signatures.add(
                 createSignature(EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS, value));
