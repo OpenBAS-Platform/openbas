@@ -38,6 +38,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
 
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private TeamRepository teamRepository;

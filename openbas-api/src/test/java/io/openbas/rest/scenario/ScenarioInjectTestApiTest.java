@@ -15,6 +15,7 @@ import io.openbas.database.model.InjectTestStatus;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.utils.fixtures.InjectFixture;
 import io.openbas.utils.fixtures.InjectTestStatusFixture;
@@ -39,6 +40,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectTestStatusComposer injectTestStatusComposer;
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   private Scenario scenario;
   private Inject inject1, inject2;
