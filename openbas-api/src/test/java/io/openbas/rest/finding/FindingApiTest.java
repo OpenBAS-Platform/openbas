@@ -22,6 +22,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.FindingRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.RelatedFindingOutput;
 import io.openbas.utils.fixtures.*;
@@ -71,6 +72,7 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private EntityManager entityManager;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   @BeforeEach
   void setUp() {
