@@ -7,14 +7,14 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_10__Update_TagRule_Table extends BaseJavaMigration {
+public class V4_11__Update_TagRule_Table extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     try (Statement statement = connection.createStatement()) {
 
-      // 1. Add new column for collector_type
+      // 1. Set on delete cascade on the tag rules
       statement.execute(
           """
                 ALTER TABLE tag_rules
