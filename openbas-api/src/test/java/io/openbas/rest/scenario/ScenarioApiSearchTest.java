@@ -18,7 +18,6 @@ import io.openbas.utils.fixtures.ScenarioFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
