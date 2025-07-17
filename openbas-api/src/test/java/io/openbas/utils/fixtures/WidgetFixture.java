@@ -36,7 +36,7 @@ public class WidgetFixture {
     Widget widget = new Widget();
     widget.setType(WidgetType.LIST);
     // series
-    ListConfiguration.ListSeries series = new ListConfiguration.ListSeries();
+    ListConfiguration.ListPerspective series = new ListConfiguration.ListPerspective();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.and);
     Filters.Filter filter = new Filters.Filter();
@@ -48,7 +48,7 @@ public class WidgetFixture {
     series.setFilter(filterGroup);
     // basic configuration
     ListConfiguration listConfiguration = new ListConfiguration();
-    listConfiguration.setSeries(List.of(series));
+    listConfiguration.setPerspective(series);
     widget.setWidgetConfiguration(listConfiguration);
     // basic layout
     widget.setLayout(new WidgetLayout());

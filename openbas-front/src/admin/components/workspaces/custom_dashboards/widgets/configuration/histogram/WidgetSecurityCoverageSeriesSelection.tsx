@@ -4,17 +4,17 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import SimulationField from '../../../../../components/fields/SimulationField';
-import { useFormatter } from '../../../../../components/i18n';
-import Loader from '../../../../../components/Loader';
-import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../utils/api-types';
-import type { GroupOption } from '../../../../../utils/Option';
-import { CustomDashboardContext } from '../CustomDashboardContext';
+import SimulationField from '../../../../../../../components/fields/SimulationField';
+import { useFormatter } from '../../../../../../../components/i18n';
+import Loader from '../../../../../../../components/Loader';
+import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../../../utils/api-types';
+import type { GroupOption } from '../../../../../../../utils/Option';
+import { CustomDashboardContext } from '../../../CustomDashboardContext';
 import {
   extractGroupOptionsFromCustomDashboardParameters,
   getSeries,
   updateSimulationFilterOnSeries,
-} from './WidgetUtils';
+} from '../../WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -55,7 +55,7 @@ interface Props {
   isSimulationFilterMandatory?: boolean;
 }
 
-const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit, isSimulationFilterMandatory = false }) => {
+const WidgetSecurityCoverageSeriesSelection: FunctionComponent<Props> = ({ value, onChange, onSubmit, isSimulationFilterMandatory = false }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
@@ -136,4 +136,4 @@ const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value,
   );
 };
 
-export default WidgetCreationSecurityCoverageSeries;
+export default WidgetSecurityCoverageSeriesSelection;
