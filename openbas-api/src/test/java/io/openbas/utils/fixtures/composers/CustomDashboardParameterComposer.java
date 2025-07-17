@@ -38,7 +38,9 @@ public class CustomDashboardParameterComposer extends ComposerBase<CustomDashboa
 
   public CustomDashboardParameterComposer.Composer forCustomDashboardParameter(
       CustomDashboardParameters customDashboardParameters) {
+    Composer composer = new Composer(customDashboardParameters);
     generatedItems.add(customDashboardParameters);
-    return new CustomDashboardParameterComposer.Composer(customDashboardParameters);
+    generatedComposer.add(composer);
+    return composer;
   }
 }
