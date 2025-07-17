@@ -12,6 +12,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.ExportOptionsInput;
 import io.openbas.rest.inject.form.InjectExportFromSearchRequestInput;
@@ -65,6 +66,7 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private EntityManager entityManager;
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   @BeforeEach
   public void setup() throws Exception {
