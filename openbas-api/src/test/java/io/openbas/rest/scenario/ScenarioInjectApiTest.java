@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.manual.ManualContract;
@@ -62,6 +63,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @Autowired private AssetGroupService assetGroupService;
   @Autowired private EndpointService endpointService;
   @Autowired private ScenarioService scenarioService;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
   List<InjectorContractComposer.Composer> injectorContractWrapperComposers = new ArrayList<>();
 
