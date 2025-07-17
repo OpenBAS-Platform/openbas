@@ -1,6 +1,6 @@
 import { HelpOutlineOutlined, SecurityOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -16,6 +16,7 @@ import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import type { Role, SearchPaginationInput } from '../../../../utils/api-types';
 import SecurityMenu from '../SecurityMenu';
+import CreateRole from './CreateRole';
 import RolePopover from './RolePopover';
 
 const useStyles = makeStyles()(() => ({
@@ -41,17 +42,17 @@ const Roles = () => {
   const headers = useMemo(() => [
     {
       field: 'role_name',
-      label: 'Name',
+      label: t('Name'),
       isSortable: true,
     },
     {
       field: 'role_creation_date',
-      label: 'Platform creation date',
+      label: t('Platform creation date'),
       isSortable: true,
     },
     {
       field: 'role_modification_date',
-      label: 'Modification date',
+      label: t('Modification date'),
       isSortable: true,
     },
   ], []);
@@ -59,13 +60,6 @@ const Roles = () => {
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-  // const searchPaginationInput = useMemo(() => (
-  //   buildSearchPagination({
-  //     sorts: initSorting('', 'ASC'),
-  //     textSearch: search,
-  //   })
-  // ), [search]);
-  // const { queryableHelpers } = useQueryableWithLocalStorage('Role', searchPaginationInput);
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -152,6 +146,7 @@ const Roles = () => {
                       />
                       <RolePopover
                         onDelete={result => setRoles(roles.filter(r => (r.role_id !== result)))}
+                        onUpdate={result => setRoles(roles.map(r => (r.role_id !== result.role_id ? r : result)))}
                         role={{ ...role }}
                       />
                     </ListItem>
@@ -160,6 +155,8 @@ const Roles = () => {
                 </div>
               )}
         </List>
+        <CreateRole onCreate={(result: Role) => setRoles([...roles, result])} />
+
       </div>
       <SecurityMenu />
 
