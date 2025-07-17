@@ -18,6 +18,7 @@ import io.openbas.database.repository.VariableRepository;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
+@Slf4j
 public class VariableApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
@@ -52,6 +54,7 @@ public class VariableApiTest extends IntegrationTest {
   @Order(1)
   @WithMockPlannerUser
   void createVariableForScenarioTest() throws Exception {
+    log.info("Order 1");
     // -- PREPARE --
     Scenario scenario = new Scenario();
     scenario.setName("Scenario name");
@@ -97,6 +100,7 @@ public class VariableApiTest extends IntegrationTest {
   @Order(2)
   @WithMockObserverUser
   void retrieveVariableForScenarioTest() throws Exception {
+    log.info("Order 2");
     // -- EXECUTE --
     String response =
         this.mvc
@@ -117,6 +121,7 @@ public class VariableApiTest extends IntegrationTest {
   @Order(3)
   @WithMockPlannerUser
   void updateVariableForScenarioTest() throws Exception {
+    log.info("Order 3");
     // -- PREPARE --
     String response =
         this.mvc
@@ -156,6 +161,7 @@ public class VariableApiTest extends IntegrationTest {
   @Order(4)
   @WithMockPlannerUser
   void deleteVariableForScenarioTest() throws Exception {
+    log.info("Order 4");
     // -- EXECUTE 1 ASSERT --
     this.mvc
         .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID + "/variables/" + VARIABLE_ID))
