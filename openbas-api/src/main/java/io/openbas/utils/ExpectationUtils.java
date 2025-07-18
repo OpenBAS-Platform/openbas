@@ -247,7 +247,7 @@ public class ExpectationUtils {
                     computeSignatures(
                         OBAS_IMPLANT_CALDERA,
                         executedAgent.getInject().getId(),
-                        getIpsFromAsset(asset),
+                        asset,
                         executedAgent.getParent().getId(),
                         new HashMap<>())))
         .toList();
@@ -272,7 +272,7 @@ public class ExpectationUtils {
                     computeSignatures(
                         OBAS_IMPLANT_CALDERA,
                         executedAgent.getInject().getId(),
-                        getIpsFromAsset(asset),
+                        asset,
                         executedAgent.getParent().getId(),
                         new HashMap<>())))
         .toList();
@@ -418,7 +418,7 @@ public class ExpectationUtils {
                     computeSignatures(
                         OBAS_IMPLANT,
                         inject.getId(),
-                        getIpsFromAsset(asset),
+                        asset,
                         agent.getId(),
                         valueTargetedAssetsMap)))
         .toList();
@@ -444,7 +444,7 @@ public class ExpectationUtils {
                     computeSignatures(
                         OBAS_IMPLANT,
                         inject.getId(),
-                        getIpsFromAsset(asset),
+                        asset,
                         agent.getId(),
                         valueTargetedAssetsMap)))
         .toList();
@@ -470,7 +470,7 @@ public class ExpectationUtils {
                     computeSignatures(
                         OBAS_IMPLANT,
                         inject.getId(),
-                        getIpsFromAsset(asset),
+                        asset,
                         agent.getId(),
                         valueTargetedAssetsMap)))
         .toList();
@@ -497,57 +497,29 @@ public class ExpectationUtils {
   private static List<InjectExpectationSignature> computeSignatures(
       String prefixSignature,
       String injectId,
-      List<String> sourceIps,
+      Asset sourceAsset,
       String agentId,
       Map<String, Endpoint> valueTargetedAssetsMap) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(
-        createSignature(
+        new InjectExpectationSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
             prefixSignature + injectId + "-agent-" + agentId));
 
-    sourceIps.forEach(
-        ip ->
-            signatures.add(
-                createIPSignature(
-                    ip,
-                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS,
-                    EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV6_ADDRESS)));
+    getIpsFromAsset(sourceAsset)
+        .forEach(ip -> signatures.add(InjectExpectationSignature.createIpSignature(ip, false)));
 
     valueTargetedAssetsMap.forEach(
         (value, endpoint) -> {
           if (value.equals(endpoint.getHostname())) {
-            signatures.add(
-                createSignature(EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS, value));
+            signatures.add(InjectExpectationSignature.createHostnameSignature(value));
           } else {
-            signatures.add(
-                createIPSignature(
-                    value,
-                    EXPECTATION_SIGNATURE_TYPE_TARGET_IPV4_ADDRESS,
-                    EXPECTATION_SIGNATURE_TYPE_TARGET_IPV6_ADDRESS));
+            signatures.add(InjectExpectationSignature.createIpSignature(value, true));
           }
         });
 
     return signatures;
-  }
-
-  private static InjectExpectationSignature createSignature(
-      String signatureType, String signatureValue) {
-    return builder().type(signatureType).value(signatureValue).build();
-  }
-
-  private static InjectExpectationSignature createIPSignature(
-      String ip, String ipv4Signature, String ipv6Signature) {
-    String ipv4Pattern =
-        "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])"
-            + "(\\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}"
-            + "(?::([0-9]{1,5}))?$";
-    if (ip.matches(ipv4Pattern)) {
-      return createSignature(ipv4Signature, ip);
-    } else {
-      return createSignature(ipv6Signature, ip);
-    }
   }
 
   // --
