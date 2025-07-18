@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -36,7 +37,7 @@ public class TlsConfig {
           .filter(file -> !Files.isDirectory(file))
           .map(path -> path.toAbsolutePath().normalize())
           .map(Path::toString)
-          .filter(path -> path.endsWith(".p12"))
+          .filter(path -> path.endsWith(".pem"))
           .collect(Collectors.toSet());
     } catch (Exception e) {
       log.info("No extra trusted certificate found in " + dir);
@@ -60,27 +61,24 @@ public class TlsConfig {
 
     Set<String> certNames = getFileNames(openBASConfig.getExtraTrustedCertsDir());
 
-    List<X509TrustManager> finalMyTms = new ArrayList<>();
+    List<X509Certificate> extraCerts = new ArrayList<>();
     for (String certName : certNames) {
       try (FileInputStream myKey = new FileInputStream(certName)) {
-        KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        myTrustStore.load(myKey, "".toCharArray());
-        trustManagerFactory =
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init(myTrustStore);
-
-        for (TrustManager tm : trustManagerFactory.getTrustManagers()) {
-          if (tm instanceof X509TrustManager x509TrustManager) {
-            for (X509Certificate cert : x509TrustManager.getAcceptedIssuers()) {
-              Pattern pattern = Pattern.compile("CN=([^,]+)");
-              Matcher matcher = pattern.matcher(cert.getSubjectX500Principal().getName());
-              if (matcher.find()) {
-                log.info("Found extra trusted certificate with CN " + matcher.group(1));
-              }
-            }
-            finalMyTms.add(x509TrustManager);
-            break;
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        try {
+          X509Certificate cert = (X509Certificate) certFactory.generateCertificate(myKey);
+          Pattern pattern = Pattern.compile("CN=([^,]+)");
+          Matcher matcher = pattern.matcher(cert.getSubjectX500Principal().getName());
+          String name = matcher.find() ? matcher.group(1) : certName;
+          if (!extraCerts.contains(cert)) {
+            cert.checkValidity();
+            extraCerts.add(cert);
+            log.info("Added extra trusted certificate: {}", name);
+          } else {
+            log.info("Extra trusted certificate duplicated: {}", name);
           }
+        } catch (CertificateException e) {
+          log.error("Extra trusted certificate {} is not a valid PEM certificate", certName, e);
         }
       }
     }
@@ -92,9 +90,7 @@ public class TlsConfig {
           private X509Certificate[] mergeCertificates() {
             ArrayList<X509Certificate> resultingCerts = new ArrayList<>();
             resultingCerts.addAll(Arrays.asList(finalDefaultTm.getAcceptedIssuers()));
-            for (X509TrustManager tm : finalMyTms) {
-              resultingCerts.addAll(Arrays.asList(tm.getAcceptedIssuers()));
-            }
+            resultingCerts.addAll(extraCerts);
             return resultingCerts.toArray(new X509Certificate[resultingCerts.size()]);
           }
 
@@ -104,14 +100,11 @@ public class TlsConfig {
           }
 
           @Override
-          public void checkServerTrusted(X509Certificate[] chain, String authType)
-              throws CertificateException {
+          public void checkServerTrusted(X509Certificate[] chain, String authType) {
             try {
-              for (X509TrustManager tm : finalMyTms) {
-                tm.checkServerTrusted(chain, authType);
-              }
-            } catch (CertificateException e) {
               finalDefaultTm.checkServerTrusted(chain, authType);
+            } catch (CertificateException e) {
+              log.error("Error occurred during checkServerTrusted", e);
             }
           }
 
