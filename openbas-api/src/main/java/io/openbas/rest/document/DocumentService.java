@@ -9,24 +9,30 @@ import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ChallengeRepository;
+import io.openbas.database.repository.DocumentDeleteRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class DocumentService {
 
-  private final DocumentRepository documentRepository;
-  private final ChallengeRepository challengeRepository;
-
   @Resource private ObjectMapper mapper;
+
+  private final DocumentRepository documentRepository;
+  private final DocumentDeleteRepository documentDeleteRepository;
+  private final ChallengeRepository challengeRepository;
+  private final FileService fileService;
 
   // -- CRUD --
 
@@ -68,5 +74,59 @@ public class DocumentService {
         .flatMap(documentStream -> documentStream)
         .distinct()
         .toList();
+  }
+
+  public void deleteDocument(String documentId) {
+    List<Document> documents = documentRepository.removeById(documentId);
+
+    // Remove document from minio
+    documents.forEach(
+        document -> {
+          try {
+            fileService.deleteFile(document.getTarget());
+          } catch (Exception e) {
+            log.warn("File already removed or not found in minio: {}", document.getTarget(), e);
+          }
+        });
+  }
+
+  public List<Object[]> findExercisesUsingDocument(String documentId) {
+    return documentDeleteRepository.findExercisesUsingDocument(documentId);
+  }
+
+  public List<Object[]> findAssetsByDocument(String documentId) {
+    return documentDeleteRepository.findAssetsByDocument(documentId);
+  }
+
+  public List<Object[]> findChannelsByDocument(String documentId) {
+    return documentDeleteRepository.findChannelsByDocument(documentId);
+  }
+
+  public List<Object[]> findPayloadsByDocument(String documentId) {
+    return documentDeleteRepository.findPayloadsByDocument(documentId);
+  }
+
+  public List<Object[]> findScenarioArticlesByDocument(String documentId) {
+    return documentDeleteRepository.findScenarioArticlesByDocument(documentId);
+  }
+
+  public List<Object[]> findSimulationArticlesByDocument(String documentId) {
+    return documentDeleteRepository.findSimulationArticlesByDocument(documentId);
+  }
+
+  public List<Object[]> findAtomicTestingsByDocument(String documentId) {
+    return documentDeleteRepository.findAtomicTestingsByDocument(documentId);
+  }
+
+  public List<Object[]> findScenarioInjectsByDocument(String documentId) {
+    return documentDeleteRepository.findScenarioInjectsByDocument(documentId);
+  }
+
+  public List<Object[]> findSimulationInjectsByDocument(String documentId) {
+    return documentDeleteRepository.findSimulationInjectsByDocument(documentId);
+  }
+
+  public List<Object[]> findChallengesByDocument(String documentId) {
+    return documentDeleteRepository.findChallengesByDocument(documentId);
   }
 }
