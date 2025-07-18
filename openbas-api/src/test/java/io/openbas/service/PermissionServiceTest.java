@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Action;
 import io.openbas.database.model.Capability;
 import io.openbas.database.model.Group;
@@ -15,19 +16,25 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class PermissionServiceTest {
+public class PermissionServiceTest extends IntegrationTest {
   private static final String RESOURCE_ID = "resourceid";
   private static final String USER_ID = "userid";
 
   @Mock private GrantService grantService;
 
   @InjectMocks private PermissionService permissionService;
+
+  @AfterEach
+  void teardown() {
+    globalTeardown();
+  }
 
   @Test
   public void test_hasPermission_WHEN_admin() {

@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.manual.ManualContract;
@@ -25,7 +26,6 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
 import jakarta.transaction.Transactional;
@@ -62,6 +62,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @Autowired private AssetGroupService assetGroupService;
   @Autowired private EndpointService endpointService;
   @Autowired private ScenarioService scenarioService;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
   List<InjectorContractComposer.Composer> injectorContractWrapperComposers = new ArrayList<>();
 
@@ -95,7 +96,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    attackPatternRepository.delete(ATTACKPATTERN);
+    globalTeardown();
   }
 
   @DisplayName("Add an inject for scenario")
@@ -136,7 +137,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @DisplayName("Retrieve injects for scenario")
   @Test
   @Order(2)
-  @WithMockObserverUser
+  @WithMockPlannerUser
   void retrieveInjectsForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
@@ -156,7 +157,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @DisplayName("Retrieve inject for scenario")
   @Test
   @Order(3)
-  @WithMockObserverUser
+  @WithMockPlannerUser
   void retrieveInjectForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =

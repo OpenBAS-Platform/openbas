@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -52,6 +53,12 @@ class ScenarioTeamApiTest extends IntegrationTest {
   @Autowired private ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Autowired private TeamRepository teamRepository;
   @Autowired private UserRepository userRepository;
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+    userRepository.delete(UserFixture.getUser());
+  }
 
   @DisplayName("Given a valid scenario and team input, should add team to scenario successfully")
   @Test

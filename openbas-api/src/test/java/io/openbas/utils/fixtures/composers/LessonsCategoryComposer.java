@@ -61,7 +61,9 @@ public class LessonsCategoryComposer extends ComposerBase<LessonsCategory> {
   }
 
   public Composer forLessonsCategory(LessonsCategory lessonsCategory) {
+    Composer composer = new Composer(lessonsCategory);
     generatedItems.add(lessonsCategory);
-    return new Composer(lessonsCategory);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

@@ -139,10 +139,7 @@ class InjectApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.scenarioRepository.delete(SCENARIO);
-    this.exerciseRepository.delete(EXERCISE);
-    this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
-    this.teamRepository.delete(TEAM);
+    globalTeardown();
   }
 
   // BULK DELETE

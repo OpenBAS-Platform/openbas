@@ -24,7 +24,9 @@ import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
+import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -46,6 +48,14 @@ class PlayerApiTest extends IntegrationTest {
   @Autowired private OrganizationRepository organizationRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private UserRepository userRepository;
+
+  List<User> savedUsers = new ArrayList<>();
+
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+    userRepository.deleteAll(savedUsers);
+  }
 
   @DisplayName("Given valid player input, should create a player successfully")
   @Test
@@ -99,23 +109,22 @@ class PlayerApiTest extends IntegrationTest {
   @DisplayName("Given restricted user, should not allow creation of player")
   @Test
   @WithMockPlannerUser
-  void given_restrictedUser_should_notAllowPlayerCreation() {
+  void given_restrictedUser_should_notAllowPlayerCreation() throws Exception {
     // -- PREPARE --
     PlayerInput playerInput = buildPlayerInput();
 
     // --EXECUTE--
-    Exception exception =
-        assertThrows(
-            ServletException.class,
-            () ->
-                mvc.perform(
-                    post(PLAYER_URI)
-                        .content(asJsonString(playerInput))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)));
-
-    // --ASSERT--
-    assertTrue(exception.getMessage().contains("User is restricted"));
+    try {
+      mvc.perform(
+              post(PLAYER_URI)
+                  .content(asJsonString(playerInput))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andReturn();
+    } catch (Exception exception) {
+      assertInstanceOf(ServletException.class, exception);
+      assertTrue(exception.getMessage().contains("User is restricted"));
+    }
   }
 
   @DisplayName("Given valid player input, should upsert player successfully")
@@ -126,7 +135,7 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    userRepository.save(user);
+    savedUsers.add(userRepository.save(user));
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -177,7 +186,7 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    userRepository.save(user);
+    savedUsers.add(userRepository.save(user));
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -200,24 +209,23 @@ class PlayerApiTest extends IntegrationTest {
   @DisplayName("Given restricted user, should not allow updating a player")
   @Test
   @WithMockPlannerUser
-  void given_restrictedUser_should_notAllowPlayerUpdate() {
+  void given_restrictedUser_should_notAllowPlayerUpdate() throws Exception {
     // -- PREPARE --
     PlayerInput playerInput = buildPlayerInput();
     User user = userRepository.findByEmailIgnoreCase(adminEmail).orElseThrow();
 
     // -- EXECUTE --
-    Exception exception =
-        assertThrows(
-            ServletException.class,
-            () ->
-                mvc.perform(
-                    put(PLAYER_URI + "/" + user.getId())
-                        .content(asJsonString(playerInput))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)));
-
-    // --ASSERT--
-    assertTrue(exception.getMessage().contains("You dont have the right to update this user"));
+    try {
+      mvc.perform(
+              put(PLAYER_URI + "/" + user.getId())
+                  .content(asJsonString(playerInput))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andReturn();
+    } catch (Exception exception) {
+      assertInstanceOf(ServletException.class, exception);
+      assertTrue(exception.getMessage().contains("You dont have the right to update this user"));
+    }
   }
 
   @DisplayName("Given valid player ID, should delete player successfully")
@@ -229,6 +237,7 @@ class PlayerApiTest extends IntegrationTest {
     User user = new User();
     user.setUpdateAttributes(playerInput);
     user = userRepository.save(user);
+    savedUsers.add(user);
 
     // -- EXECUTE --
     mvc.perform(

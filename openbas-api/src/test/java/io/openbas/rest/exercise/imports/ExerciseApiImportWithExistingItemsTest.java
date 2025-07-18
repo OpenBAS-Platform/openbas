@@ -88,6 +88,11 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     exerciseComposer.reset();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   // this is part of the "Arrange" part of the AAA pattern for the following tests
   // it runs out most tests use this exact structure as test data, therefore it's in its own
   // function up here

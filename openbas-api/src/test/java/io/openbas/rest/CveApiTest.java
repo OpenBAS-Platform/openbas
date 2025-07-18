@@ -42,6 +42,11 @@ class CveApiTest extends IntegrationTest {
     cveComposer.reset();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   @Nested
   @DisplayName("When working with CVEs")
   @WithMockAdminUser

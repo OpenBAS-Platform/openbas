@@ -78,9 +78,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    this.documentRepository.deleteAll(List.of(EXECUTABLE_FILE));
-    this.payloadRepository.deleteAll();
-    this.collectorRepository.deleteAll();
+    globalTeardown();
   }
 
   @Nested

@@ -54,7 +54,9 @@ public class CustomDashboardComposer extends ComposerBase<CustomDashboard> {
   }
 
   public CustomDashboardComposer.Composer forCustomDashboard(CustomDashboard customDashboard) {
+    Composer composer = new Composer(customDashboard);
     generatedItems.add(customDashboard);
-    return new CustomDashboardComposer.Composer(customDashboard);
+    generatedComposer.add(composer);
+    return composer;
   }
 }

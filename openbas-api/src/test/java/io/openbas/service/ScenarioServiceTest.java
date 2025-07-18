@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ScenarioServiceTest {
+class ScenarioServiceTest extends IntegrationTest {
 
   @Autowired ScenarioRepository scenarioRepository;
   @Autowired private TeamRepository teamRepository;
@@ -46,6 +47,7 @@ class ScenarioServiceTest {
   @Autowired InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
   @Mock Ee eeService;
   @Mock GrantService grantService;
@@ -119,9 +121,7 @@ class ScenarioServiceTest {
 
   @AfterAll
   public void teardown() {
-    this.userRepository.deleteById(USER_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-    this.injectRepository.deleteById(INJECT_ID);
+    globalTeardown();
   }
 
   @DisplayName("Should create new contextual teams during scenario duplication")

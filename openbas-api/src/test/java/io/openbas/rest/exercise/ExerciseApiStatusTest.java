@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -43,7 +44,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
-public class ExerciseApiStatusTest {
+public class ExerciseApiStatusTest extends IntegrationTest {
 
   static Exercise SCHEDULED_EXERCISE;
   static Exercise RUNNING_EXERCISE;
@@ -53,6 +54,7 @@ public class ExerciseApiStatusTest {
   static Inject SAVED_INJECT5;
   static LessonsAnswer LESSON_ANSWER;
   static Instant REFERENCE_TIME;
+  static User SAVED_USER;
 
   @Autowired private MockMvc mvc;
 
@@ -115,8 +117,8 @@ public class ExerciseApiStatusTest {
     inject5.setContent(this.mapper.valueToTree(content));
     inject5.setExercise(finishedExercise);
 
-    User user = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
-    Team team = TeamFixture.getTeam(user, "TeamA", true);
+    SAVED_USER = userRepository.save(UserFixture.getUser("Tom", "TEST", "tom-test@fake.email"));
+    Team team = TeamFixture.getTeam(SAVED_USER, "TeamA", true);
     team.setExercises(
         Arrays.asList(
             scheduledExercise,
@@ -168,13 +170,8 @@ public class ExerciseApiStatusTest {
 
   @AfterEach
   void afterAll() {
-    this.injectRepository.deleteAll();
-    this.exerciseRepository.deleteAll();
-    this.userRepository.deleteAll();
-    this.teamRepository.deleteAll();
-    this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
-    this.lessonsQuestionRepository.deleteAll();
-    this.lessonsCategoryRepository.deleteAll();
+    globalTeardown();
+    this.userRepository.deleteById(SAVED_USER.getId());
   }
 
   @DisplayName("Start an exercise manually")

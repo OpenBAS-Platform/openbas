@@ -10,12 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.VariableRepository;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class VariableApiTest {
+public class VariableApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
 
@@ -41,8 +41,7 @@ public class VariableApiTest {
 
   @AfterAll
   void afterAll() {
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.variableRepository.deleteById(SCENARIO_ID);
+    globalTeardown();
   }
 
   // -- SCENARIOS --
@@ -95,7 +94,7 @@ public class VariableApiTest {
   @DisplayName("Retrieve variables for scenario")
   @Test
   @Order(2)
-  @WithMockObserverUser
+  @WithMockPlannerUser
   void retrieveVariableForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =

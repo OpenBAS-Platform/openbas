@@ -108,6 +108,11 @@ public class InjectImportTest extends IntegrationTest {
     clearEntityManager();
   }
 
+  @AfterAll
+  void afterAll() {
+    globalTeardown();
+  }
+
   public final String INJECT_IMPORT_URI = INJECT_URI + "/import";
   private final Map<String, ArticleComposer.Composer> staticArticleWrappers = new HashMap<>();
   private final String KNOWN_ARTICLE_WRAPPER_KEY = "known article key";
