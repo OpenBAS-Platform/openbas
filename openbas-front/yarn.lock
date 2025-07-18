@@ -7721,6 +7721,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-to-image@patch:html-to-image@npm%3A1.11.13#~/.yarn/patches/html-to-image-npm-1.11.13-86e990604f.patch":
+  version: 1.11.13
+  resolution: "html-to-image@patch:html-to-image@npm%3A1.11.13#~/.yarn/patches/html-to-image-npm-1.11.13-86e990604f.patch::version=1.11.13&hash=76d05f"
+  checksum: 10c0/fb9d1e16a7630f74500d2194270849aa73629dde61fbb6b30b62a5da44c5e5b1a96fd1df3c8a151313e7f557489b3d1b82018d8d25465b03a0a6505919784e17
+  languageName: node
+  linkType: hard
+
 "html-url-attributes@npm:^3.0.0":
   version: 3.0.1
   resolution: "html-url-attributes@npm:3.0.1"
@@ -10128,7 +10135,7 @@ __metadata:
     fs-extra: "npm:11.3.0"
     globals: "npm:16.2.0"
     html-react-parser: "npm:5.2.5"
-    html-to-image: "npm:1.11.13"
+    html-to-image: "patch:html-to-image@npm%3A1.11.13#~/.yarn/patches/html-to-image-npm-1.11.13-86e990604f.patch"
     http-proxy-middleware: "npm:3.0.5"
     i18n-auto-translation: "npm:2.2.1"
     immutable: "npm:5.1.3"
