@@ -8,7 +8,6 @@ import { Link } from 'react-router';
 import { useFormatter } from '../../../../components/i18n';
 import { type ExpectationResultsByType, type ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
-import { capitalize } from '../../../../utils/String';
 
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
@@ -60,11 +59,11 @@ const ResponsePie: FunctionComponent<Props> = ({
 
   const definedTypes = useMemo(() => {
     const resultTypes = new Set(
-      (expectationResultsByTypes ?? []).map((r) => r?.type).filter(Boolean)
+      (expectationResultsByTypes ?? []).map(r => r?.type).filter(Boolean),
     );
 
     const declaredTypes = new Set(
-      (injectExpectations ?? []).map((e) => e?.expectation_type).filter(Boolean)
+      (injectExpectations ?? []).map(e => e?.expectation_type).filter(Boolean),
     );
 
     // Combine both: if a type appears in either, we want to include it
@@ -74,7 +73,6 @@ const ResponsePie: FunctionComponent<Props> = ({
 
     return Array.from(merged);
   }, [expectationResultsByTypes, injectExpectations]);
-
 
   const expectationResultsMap = useMemo(() => {
     const result = expectationResultsByTypes || [];
@@ -175,19 +173,19 @@ const ResponsePie: FunctionComponent<Props> = ({
         width: '100%',
       }}
     >
-      {definedTypes.map((type) => (
+      {definedTypes.map(type => (
         <Pie
           key={type}
           type={type.toLowerCase()}
-          title={expectationLabels[type] ?? capitalize(type.toLowerCase())}
+          title={expectationLabels[type]}
           expectationResultsByType={expectationResultsMap[type]}
         />
       ))}
 
-      {hasTitles &&
-        definedTypes.map((type) => (
+      {hasTitles
+        && definedTypes.map(type => (
           <React.Fragment key={`${type}_title`}>
-            {pieTitle(expectationLabels[type] ?? capitalize(type.toLowerCase()), expectationResultsMap[type])}
+            {pieTitle(expectationLabels[type])}
           </React.Fragment>
         ))}
 
