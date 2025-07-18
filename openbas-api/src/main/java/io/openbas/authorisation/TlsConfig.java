@@ -3,6 +3,7 @@ package io.openbas.authorisation;
 import io.openbas.config.OpenBASConfig;
 import jakarta.annotation.Resource;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +32,8 @@ public class TlsConfig {
 
   @Resource private OpenBASConfig openBASConfig;
 
-  private Set<String> getFileNames(String dir) {
+  /** Get files paths ".pem" from directory */
+  public Set<String> getFilesPaths(String dir) {
     try (Stream<Path> stream = Files.list(Paths.get(dir))) {
       return stream
           .filter(file -> !Files.isDirectory(file))
@@ -45,6 +47,39 @@ public class TlsConfig {
     }
   }
 
+  /** Get extra trusted certs from files */
+  public List<X509Certificate> getExtraCerts(Set<String> filesPaths)
+      throws IOException, CertificateException {
+    List<X509Certificate> extraCerts = new ArrayList<>();
+    for (String filePath : filesPaths) {
+      try (FileInputStream myKey = new FileInputStream(filePath)) {
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        try {
+          X509Certificate cert = (X509Certificate) certFactory.generateCertificate(myKey);
+          Pattern pattern = Pattern.compile("CN=([^,]+)");
+          Matcher matcher = pattern.matcher(cert.getSubjectX500Principal().getName());
+          String name = matcher.find() ? matcher.group(1) : filePath;
+          if (!extraCerts.contains(cert)) {
+            cert.checkValidity();
+            extraCerts.add(cert);
+            log.info("Added extra trusted certificate: {}", name);
+          } else {
+            log.info("Extra trusted certificate duplicated: {}", name);
+          }
+        } catch (CertificateException e) {
+          log.error("Extra trusted certificate {} is not a valid PEM certificate", filePath, e);
+        }
+      }
+    }
+    return extraCerts;
+  }
+
+  /**
+   * Get and set extra trusted certificates to the java trust manager
+   *
+   * @return tls context with our extra trusted certificates
+   * @throws Exception exception
+   */
   @Bean
   public SSLContext tlsContextCustom() throws Exception {
     TrustManagerFactory trustManagerFactory =
@@ -59,29 +94,9 @@ public class TlsConfig {
       }
     }
 
-    Set<String> certNames = getFileNames(openBASConfig.getExtraTrustedCertsDir());
+    Set<String> filesPaths = getFilesPaths(openBASConfig.getExtraTrustedCertsDir());
 
-    List<X509Certificate> extraCerts = new ArrayList<>();
-    for (String certName : certNames) {
-      try (FileInputStream myKey = new FileInputStream(certName)) {
-        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-        try {
-          X509Certificate cert = (X509Certificate) certFactory.generateCertificate(myKey);
-          Pattern pattern = Pattern.compile("CN=([^,]+)");
-          Matcher matcher = pattern.matcher(cert.getSubjectX500Principal().getName());
-          String name = matcher.find() ? matcher.group(1) : certName;
-          if (!extraCerts.contains(cert)) {
-            cert.checkValidity();
-            extraCerts.add(cert);
-            log.info("Added extra trusted certificate: {}", name);
-          } else {
-            log.info("Extra trusted certificate duplicated: {}", name);
-          }
-        } catch (CertificateException e) {
-          log.error("Extra trusted certificate {} is not a valid PEM certificate", certName, e);
-        }
-      }
-    }
+    List<X509Certificate> extraCerts = getExtraCerts(filesPaths);
 
     X509TrustManager finalDefaultTm = defaultX509CertificateTrustManager;
 

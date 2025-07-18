@@ -18,6 +18,7 @@ public class HttpClientFactory {
 
   private final SSLContext tlsContext;
 
+  /** Create default httpClient for all the app with extra trusted certs */
   public CloseableHttpClient httpClientCustom() {
     try {
       SSLConnectionSocketFactory sslConFactory =
