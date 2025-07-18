@@ -342,9 +342,7 @@ public class InjectExportTest extends IntegrationTest {
                           .map(wrapper -> wrapper.get().getId())
                           .toList()
                           .contains(id))
-              .sorted(String::compareTo)
-              .toList()
-              .reversed();
+              .toList();
 
       assertThatJson(not_found_response)
           .node("message")
@@ -384,9 +382,7 @@ public class InjectExportTest extends IntegrationTest {
           injectWrappers.stream()
               .map(wrapper -> wrapper.get().getId())
               .filter(id -> !id.equals(injectWithScenario.get().getId()))
-              .sorted(String::compareTo)
-              .toList()
-              .reversed();
+              .toList();
 
       assertThatJson(not_found_response)
           .node("message")
