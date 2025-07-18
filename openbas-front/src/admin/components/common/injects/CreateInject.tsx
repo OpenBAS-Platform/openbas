@@ -145,7 +145,7 @@ const CreateInject: FunctionComponent<Props> = ({
                 key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
                 variant="outlined"
                 classes={{ root: classes.chipInList }}
-                color="secondary"
+                color="primary"
                 label={contractAttackPattern.attack_pattern_external_id}
               />
             ))}
