@@ -41,8 +41,7 @@ public abstract class IntegrationTest {
           SettingRepository.class,
           GroupRepository.class,
           InjectorContractRepository.class,
-          InjectorRepository.class,
-          GrantRepository.class);
+          InjectorRepository.class);
 
   /**
    * Utilitarian method that use reflection to list all the CrudRepository implementation in the
