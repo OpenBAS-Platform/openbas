@@ -38,7 +38,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ selectedExecutor, s
             key={platform}
             variant="outlined"
             style={{
-              height: '300px',
+              height: '200px',
               margin: theme.spacing(2),
             }}
           >
