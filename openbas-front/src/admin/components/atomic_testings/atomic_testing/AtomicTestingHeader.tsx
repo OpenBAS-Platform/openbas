@@ -8,6 +8,7 @@ import ResponsePie from '../../common/injects/ResponsePie';
 import AtomicTestingHeaderActions from './AtomicTestingHeaderActions';
 import AtomicTestingTabs from './AtomicTestingTabs';
 import AtomicTestingTitle from './AtomicTestingTitle';
+import type { Content } from '../../../../actions/injects/Inject';
 
 interface Props {
   injectResultOverview: InjectResultOverviewOutput;
@@ -52,7 +53,8 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
           <AtomicTestingTitle injectResultOverview={injectResultOverview} />
           <AtomicTestingTabs injectResultOverview={injectResultOverview} />
         </Box>
-        <ResponsePie hasTitles={false} forceSize={112} inject={injectResultOverview} />
+        <ResponsePie hasTitles={false} forceSize={112} expectationResultsByTypes={injectResultOverview?.inject_expectation_results}
+                     injectExpectations={(injectResultOverview.inject_content as Content).expectations} />
         <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
       </div>
     </Box>

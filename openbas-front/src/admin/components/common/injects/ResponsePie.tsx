@@ -170,7 +170,8 @@ const ResponsePie: FunctionComponent<Props> = ({
     <div
       id="score_details"
       style={{
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: `repeat(${definedTypes.length}, minmax(25%, 1fr))`,
         width: '100%',
       }}
     >

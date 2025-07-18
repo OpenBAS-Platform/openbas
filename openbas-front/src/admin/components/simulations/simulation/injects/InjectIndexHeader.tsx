@@ -64,7 +64,7 @@ const InjectIndexHeader = ({ injectResultOverview, exercise }: Props) => {
           <AtomicTestingTitle injectResultOverview={injectResultOverview} />
           <InjectIndexTabs injectResultOverview={injectResultOverview} exercise={exercise} backlabel={backlabel} backuri={backuri} />
         </Box>
-        <ResponsePie hasTitles={false} forceSize={112} expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+        <ResponsePie hasTitles={false} forceSize={112} inject={injectResultOverview} />
       </div>
     </Box>
   );
