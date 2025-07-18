@@ -52,10 +52,10 @@ const ResponsePie: FunctionComponent<Props> = ({
     fontSize: forceSize ? forceSize * 0.3 : 35,
   };
 
-  const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
-  const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');
-  const humanResponse = expectationResultsByTypes?.find(e => e.type === 'HUMAN_RESPONSE');
-  const vulnerability = expectationResultsByTypes?.find(e => e.type === 'VULNERABILITY');
+  const prevention = inject?.inject_expectation_results?.find(e => e.type === 'PREVENTION');
+  const detection = inject?.inject_expectation_results?.find(e => e.type === 'DETECTION');
+  const humanResponse = inject?.inject_expectation_results?.find(e => e.type === 'HUMAN_RESPONSE');
+  const vulnerability = inject?.inject_expectation_results?.find(e => e.type === 'VULNERABILITY');
   const pending = useMemo(() => humanResponse?.distribution?.filter(res => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [], [humanResponse]);
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
   const renderIcon = (type: string, hasDistribution: boolean | undefined) => {
