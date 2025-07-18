@@ -13,6 +13,7 @@ import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
 import GroupForm from './GroupForm';
 import GroupManageUsers from './GroupManageUsers';
+import GroupManageRoles from "./GroupManageRoles.js";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -117,6 +118,15 @@ class GroupPopover extends Component {
 
   handleCloseGrants() {
     this.setState({ openGrants: false });
+  }
+
+  handleOpenRoles() {
+    this.setState({ openRoles: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseRoles() {
+    this.setState({ openRoles: false });
   }
 
   handleTabChange(_event, tabKey) {
@@ -239,6 +249,9 @@ class GroupPopover extends Component {
           <MenuItem onClick={this.handleOpenGrants.bind(this)}>
             {t('Manage grants')}
           </MenuItem>
+          <MenuItem onClick={this.handleOpenRoles.bind(this)}>
+            {t('Manage roles')}
+          </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
@@ -281,6 +294,7 @@ class GroupPopover extends Component {
           onClose={this.handleCloseUsers.bind(this)}
           onSubmit={this.submitUpdateUsers.bind(this)}
         />
+        <GroupManageRoles open={this.state.openRoles} onClose={this.handleCloseRoles.bind(this)} />
         <Drawer
           open={this.state.openGrants}
           handleClose={this.handleCloseGrants.bind(this)}
@@ -565,6 +579,8 @@ class GroupPopover extends Component {
             </div>
           </>
         </Drawer>
+
+
       </>
     );
   }
