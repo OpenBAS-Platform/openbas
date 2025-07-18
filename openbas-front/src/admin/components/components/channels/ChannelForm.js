@@ -72,6 +72,7 @@ class ChannelForm extends Component {
             }}
             >
               <Button
+                variant="contained"
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}
                 disabled={submitting}
@@ -79,6 +80,7 @@ class ChannelForm extends Component {
                 {t('Cancel')}
               </Button>
               <Button
+                variant="contained"
                 color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
