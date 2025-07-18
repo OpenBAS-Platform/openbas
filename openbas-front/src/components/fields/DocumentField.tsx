@@ -1,7 +1,7 @@
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
 import { FileOutline } from 'mdi-material-ui';
 import { type CSSProperties, type FunctionComponent } from 'react';
-import { type FieldError, type FieldErrors } from 'react-hook-form';
+import { type FieldError } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
