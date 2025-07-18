@@ -1,8 +1,9 @@
 import { DeleteOutlined } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
+import DocumentField from '../../../../components/fields/DocumentField';
 import SelectFieldController from '../../../../components/fields/SelectFieldController';
 import SeparatorFieldController from '../../../../components/fields/SeparatorFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
@@ -17,7 +18,7 @@ interface Props {
 const PayloadArgumentsField = ({ argumentName, canSelectTargetAsset, onArgumentRemoveClick }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const { watch } = useFormContext();
+  const { watch, control } = useFormContext();
   const argumentType = watch(`${argumentName}.type`);
 
   const argumentTypeItems = [{
@@ -65,11 +66,26 @@ const PayloadArgumentsField = ({ argumentName, canSelectTargetAsset, onArgumentR
         required
       />
       <TextFieldController name={`${argumentName}.key` as const} label={t('Key')} required />
-      {(argumentType == 'text' || argumentType == 'document') && (
+      {argumentType == 'text' && (
         <TextFieldController
           name={`${argumentName}.default_value` as const}
           label={t('Default Value')}
           required
+        />
+      )}
+      {argumentType == 'document' && (
+        <Controller
+          control={control}
+          name={`${argumentName}.default_value` as const}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <DocumentField
+              fieldValue={value ?? []}
+              fieldOnChange={onChange}
+              label={t('Default Value')}
+              error={error}
+              style={{ marginTop: 3 }}
+            />
+          )}
         />
       )}
       {argumentType == 'targeted-asset' && (

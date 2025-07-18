@@ -48,7 +48,8 @@ public class PayloadExportService {
           ZipEntry payloadJsonEntry = new ZipEntry("payload.json");
           payloadJsonEntry.setComment(EXPORT_ENTRY_PAYLOAD);
           payloadZip.putNextEntry(payloadJsonEntry);
-          PayloadFileExport payloadExport = PayloadFileExport.fromPayload(payload, mapper.copy());
+          PayloadFileExport payloadExport =
+              PayloadFileExport.fromPayload(payload, mapper.copy(), this.documentRepository);
           byte[] payloadJsonBytes =
               payloadExport
                   .getObjectMapper()
@@ -87,7 +88,43 @@ public class PayloadExportService {
               payloadZip.closeEntry();
             }
           }
+
+          // 3. Add arguments_attachments.zip
+          List<String> argumentsAttachmentsIds = payload.getArgumentsDocumentsIds();
+          List<Document> argumentsAttachments =
+              argumentsAttachmentsIds.stream()
+                  .map(
+                      s ->
+                          documentRepository.findById(s).orElseThrow(ElementNotFoundException::new))
+                  .toList();
+
+          if (!argumentsAttachments.isEmpty()) {
+            ByteArrayOutputStream encryptedZipStream = new ByteArrayOutputStream();
+            try (ZipOutputStream encryptedZip =
+                new ZipOutputStream(encryptedZipStream, ZIP_PASSWORD.toCharArray())) {
+              for (Document doc : argumentsAttachments) {
+                Optional<InputStream> docStream = fileService.getFile(doc);
+                if (docStream.isPresent()) {
+                  ZipParameters params = new ZipParameters();
+                  params.setEncryptFiles(true);
+                  params.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
+                  params.setFileNameInZip(doc.getTarget());
+                  encryptedZip.putNextEntry(params);
+                  byte[] fileBytes = docStream.get().readAllBytes();
+                  encryptedZip.write(fileBytes);
+                  encryptedZip.closeEntry();
+                }
+              }
+            }
+            byte[] argumentsAttachmentsZipBytes = encryptedZipStream.toByteArray();
+            ZipEntry argumentsAttachmentsEntry = new ZipEntry("arguments_attachments.zip");
+            argumentsAttachmentsEntry.setComment(EXPORT_ENTRY_ENCRYPTED_ARGUMENT_ATTACHMENT);
+            payloadZip.putNextEntry(argumentsAttachmentsEntry);
+            payloadZip.write(argumentsAttachmentsZipBytes);
+            payloadZip.closeEntry();
+          }
         }
+
         // Add payload zip to parent zip
         String entryName = payload.getName() + ".zip";
         ZipEntry payloadZipEntry = new ZipEntry(entryName);

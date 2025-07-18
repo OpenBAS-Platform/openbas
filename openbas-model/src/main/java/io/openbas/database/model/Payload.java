@@ -240,6 +240,14 @@ public class Payload implements Base {
     return Optional.empty();
   }
 
+  @JsonIgnore
+  public List<String> getArgumentsDocumentsIds() {
+    return this.getArguments().stream()
+        .filter(payloadArgument -> payloadArgument.getType().equals("document"))
+        .map(PayloadArgument::getDefaultValue)
+        .toList();
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
