@@ -96,6 +96,7 @@ const DocumentForm = (props) => {
           }}
           >
             <Button
+              variant="contained"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -103,6 +104,7 @@ const DocumentForm = (props) => {
               {t('Cancel')}
             </Button>
             <Button
+              variant="contained"
               color="secondary"
               type="submit"
               disabled={pristine || submitting}
