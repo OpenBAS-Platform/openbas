@@ -54,7 +54,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     CustomDashboard customDashboard = composer.get().getCustomDashboard();
     WidgetInput input = new WidgetInput();
     input.setType(VERTICAL_BAR_CHART);
-    String name = "My new widget";
+    String name = "My new widgetConfiguration";
     DateHistogramConfiguration widgetConfig = new DateHistogramConfiguration();
     widgetConfig.setTitle(name);
     widgetConfig.setField("whatever");

@@ -602,15 +602,10 @@ public class EsService {
   }
 
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
-    Filters.FilterGroup searchFilters = runtime.getWidget().getPerspective().getFilter();
-    String entityName =
-        searchFilters.getFilters().stream()
-            .filter(filter -> "base_entity".equals(filter.getKey()))
-            .findAny()
-            .orElseThrow()
-            .getValues()
-            .getFirst();
-    List<EngineSortField> sorts = runtime.getWidget().getSorts();
+    Filters.FilterGroup searchFilters = runtime.getWidgetConfiguration().getPerspective().getFilter();
+    String entityName = runtime.getWidgetConfiguration().getPerspective().getEntityName();
+
+    List<EngineSortField> sorts = runtime.getWidgetConfiguration().getSorts();
 
     List<SortOptions> engineSorts;
     if (sorts != null && !sorts.isEmpty()) {
@@ -643,7 +638,7 @@ public class EsService {
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(runtime.getWidget().getLimit())
+                      .size(runtime.getWidgetConfiguration().getLimit())
                       .query(query)
                       .sort(engineSorts),
               getClassForEntity(entityName));
@@ -662,7 +657,10 @@ public class EsService {
         esEngine.getModels().stream()
             .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
             .findAny();
-    return model.get().getModel();
+    if (model.isPresent()) {
+      return model.get().getModel();
+    }
+    throw new IllegalArgumentException("Can not find model for entity: " + entity_name);
   }
 
   /**

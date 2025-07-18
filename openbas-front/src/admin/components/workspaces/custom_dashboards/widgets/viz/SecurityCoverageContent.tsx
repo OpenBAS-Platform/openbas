@@ -47,7 +47,7 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) =
   const resolvedDataSuccess = resolvedData(attackPatternMap, killChainPhaseMap, data.at(0)?.data ?? []);
   const resolvedDataFailure = resolvedData(attackPatternMap, killChainPhaseMap, data.at(1)?.data ?? []);
 
-  const [showCoveredOnly, setShowCoveredOnly] = useLocalStorage<boolean>('widget-' + widgetId, false);
+  const [showCoveredOnly, setShowCoveredOnly] = useLocalStorage<boolean>('widgetConfiguration-' + widgetId, false);
 
   return (
     <Box

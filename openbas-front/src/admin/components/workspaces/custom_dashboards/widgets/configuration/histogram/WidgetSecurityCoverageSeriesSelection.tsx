@@ -39,12 +39,12 @@ const perspectives: {
 }[] = [{
   icon: () => TrackChangesOutlined,
   title: 'Detection',
-  description: 'Focus your widget on injects detected by your security system',
+  description: 'Focus your widgetConfiguration on injects detected by your security system',
   type: 'DETECTION',
 }, {
   icon: () => ShieldOutlined,
   title: 'Prevention',
-  description: 'Focus your widget on injects prevented by your security system',
+  description: 'Focus your widgetConfiguration on injects prevented by your security system',
   type: 'PREVENTION',
 }];
 

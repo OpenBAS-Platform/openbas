@@ -47,7 +47,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
 
   const hasLimit = getLimit(widgetType);
 
-  // -- HANDLE widget config type --
+  // -- HANDLE widgetConfiguration config type --
   useEffect(() => {
     switch (mode) {
       case 'structural':

@@ -11,13 +11,13 @@ import lombok.Setter;
 @Setter
 public class ListRuntime extends Runtime {
 
-  private ListConfiguration widget;
+  private ListConfiguration widgetConfiguration;
 
   public ListRuntime(
-      ListConfiguration widget,
+      ListConfiguration widgetConfiguration,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    this.widget = widget;
+    this.widgetConfiguration = widgetConfiguration;
     this.parameters = parameters;
     this.definitionParameters = definitionParameters;
   }

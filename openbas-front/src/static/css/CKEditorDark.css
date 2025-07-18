@@ -110,7 +110,7 @@ body[data-theme="dark"] {
   --ck-color-image-caption-background: hsl(0, 0%, 97%) !important;
   --ck-color-image-caption-text: hsl(0, 0%, 20%) !important;
 
-  /* -- Overrides the default colors used by the ckeditor5-widget package. -------------------- */
+  /* -- Overrides the default colors used by the ckeditor5-widgetConfiguration package. -------------------- */
 
   --ck-color-widget-blurred-border: hsl(0, 0%, 87%) !important;
   --ck-color-widget-hover-border: #00b1ff !important;

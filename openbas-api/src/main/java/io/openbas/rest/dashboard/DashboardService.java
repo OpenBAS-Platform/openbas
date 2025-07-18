@@ -33,14 +33,14 @@ public class DashboardService {
   private final UserRepository userRepository;
 
   /**
-   * Retrieves time series or structural histogram data from Elasticsearch for a specific widget
+   * Retrieves time series or structural histogram data from Elasticsearch for a specific widgetConfiguration
    * based on its configuration.
    *
    * @param widget the {@link Widget} defining the type and configuration
    * @param parameters parameters passed at runtime (e.g. filters, date ranges)
    * @param definitionParameters dashboard-level parameters definitions
    * @return list of {@link EsSeries} representing series data suitable for charting
-   * @throws RuntimeException if the widget type is unsupported
+   * @throws RuntimeException if the widgetConfiguration type is unsupported
    */
   public List<EsSeries> series(
       @NotNull final Widget widget,
@@ -62,16 +62,16 @@ public class DashboardService {
           new StructuralHistogramRuntime(config, parameters, definitionParameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
     }
-    throw new UnsupportedOperationException("Unsupported widget: " + widget);
+    throw new UnsupportedOperationException("Unsupported widgetConfiguration: " + widget);
   }
 
   /**
-   * Retrieves a list of entities from Elasticsearch for a widget configured as a list.
+   * Retrieves a list of entities from Elasticsearch for a widgetConfiguration configured as a list.
    *
    * @param widget the {@link Widget} with a list configuration
    * @param parameters parameters passed at runtime (e.g. filters)
    * @param definitionParameters dashboard-level parameters definitions
-   * @return list of {@link EsBase} entities matching the list widget query
+   * @return list of {@link EsBase} entities matching the list widgetConfiguration query
    */
   public List<EsBase> entities(
       @NotNull final Widget widget,
