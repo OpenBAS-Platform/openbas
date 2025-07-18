@@ -134,7 +134,9 @@ public abstract class IntegrationTest {
                         false)
                     .toList();
             for (InjectorContract injectorContract : injectorContracts) {
-              if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId()) && !Objects.equals(injectorContract.getInjector().getType(), OpenBASImplantContract.TYPE)) {
+              if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())
+                  && !Objects.equals(
+                      injectorContract.getInjector().getType(), OpenBASImplantContract.TYPE)) {
                 ((InjectorContractRepository) repository.get(this)).delete(injectorContract);
               }
             }
