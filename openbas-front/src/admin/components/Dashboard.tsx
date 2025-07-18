@@ -63,7 +63,7 @@ const Dashboard = () => {
   // Standard hooks
   const theme = useTheme();
   const { classes } = useStyles();
-  const { t, fld, n } = useFormatter();
+  const { t, fd, n } = useFormatter();
   const dispatch = useAppDispatch();
 
   // Exercises
@@ -206,7 +206,7 @@ const Dashboard = () => {
                 <Chart
                   options={verticalBarsChartOptions(
                     theme,
-                    fld,
+                    fd,
                     undefined,
                     false,
                     true,

@@ -333,10 +333,6 @@ export const verticalBarsChartOptions = (
     axisBorder: { show: false },
   },
   fill: { opacity: isFakeData ? 0.1 : 1 },
-  stroke: {
-    colors: isResult ? ['transparent'] : undefined,
-    width: isResult ? 5 : 2,
-  },
   yaxis: {
     labels: {
       formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
