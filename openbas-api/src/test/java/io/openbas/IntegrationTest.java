@@ -12,12 +12,14 @@ import io.openbas.database.model.Grant;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
+import io.openbas.injectors.openbas.OpenBASImplantContract;
 import io.openbas.utils.fixtures.composers.ComposerBase;
 import io.openbas.utils.fixtures.composers.InnerComposerBase;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -132,7 +134,7 @@ public abstract class IntegrationTest {
                         false)
                     .toList();
             for (InjectorContract injectorContract : injectorContracts) {
-              if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+              if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId()) && !Objects.equals(injectorContract.getInjector().getType(), OpenBASImplantContract.TYPE)) {
                 ((InjectorContractRepository) repository.get(this)).delete(injectorContract);
               }
             }
