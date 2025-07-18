@@ -5,7 +5,10 @@ import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.injectors.email.EmailContract.EMAIL_GLOBAL;
 import static io.openbas.injectors.manual.ManualContract.MANUAL_DEFAULT;
+import static io.openbas.utils.mockUser.WithMockObserverUserSecurityContextFactory.MOCK_OBSERVER_GROUP;
+import static io.openbas.utils.mockUser.WithMockPlannerUserSecurityContextFactory.MOCK_PLANNER_GROUP;
 
+import io.openbas.database.model.Grant;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
@@ -34,6 +37,9 @@ public abstract class IntegrationTest {
   private final List<String> WELL_KNOWN_CONTRACT_IDS =
       List.of(CHALLENGE_PUBLISH, CHANNEL_PUBLISH, EMAIL_DEFAULT, EMAIL_GLOBAL, MANUAL_DEFAULT);
 
+  private final List<String> WELL_KNOWN_GRANT_GROUP =
+      List.of(MOCK_OBSERVER_GROUP, MOCK_PLANNER_GROUP);
+
   /** List of classes we don't auto delete all to prevent the platform from breaking */
   public List<Class<?>> exclusionList =
       List.of(
@@ -41,7 +47,8 @@ public abstract class IntegrationTest {
           SettingRepository.class,
           GroupRepository.class,
           InjectorContractRepository.class,
-          InjectorRepository.class);
+          InjectorRepository.class,
+          GrantRepository.class);
 
   /**
    * Utilitarian method that use reflection to list all the CrudRepository implementation in the
@@ -127,6 +134,19 @@ public abstract class IntegrationTest {
             for (InjectorContract injectorContract : injectorContracts) {
               if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
                 ((InjectorContractRepository) repository.get(this)).delete(injectorContract);
+              }
+            }
+          } else if (Arrays.asList(repository.get(this).getClass().getInterfaces())
+              .contains(GrantRepository.class)) {
+            // For InjectorContractRepository, we still delete all the injector contract but the
+            // known ones
+            List<Grant> grants =
+                StreamSupport.stream(
+                        ((GrantRepository) repository.get(this)).findAll().spliterator(), false)
+                    .toList();
+            for (Grant grant : grants) {
+              if (!WELL_KNOWN_GRANT_GROUP.contains(grant.getGroup().getName())) {
+                ((GrantRepository) repository.get(this)).delete(grant);
               }
             }
           }

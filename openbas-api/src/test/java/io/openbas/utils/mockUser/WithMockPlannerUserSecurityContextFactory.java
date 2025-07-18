@@ -26,6 +26,7 @@ public class WithMockPlannerUserSecurityContextFactory
     implements WithSecurityContextFactory<WithMockPlannerUser> {
 
   public static final String MOCK_USER_PLANNER_EMAIL = "planner@openbas.io";
+  public static final String MOCK_PLANNER_GROUP = "Mock Planner group";
   @Autowired private GrantRepository grantRepository;
   @Autowired private GroupRepository groupRepository;
   @Autowired private UserRepository userRepository;
@@ -56,12 +57,12 @@ public class WithMockPlannerUserSecurityContextFactory
       return;
     }
     // Create group
-    String groupName = "Planner group";
-    Optional<Group> groupOpt = this.groupRepository.findOne(GroupSpecification.fromName(groupName));
+    Optional<Group> groupOpt =
+        this.groupRepository.findOne(GroupSpecification.fromName(MOCK_PLANNER_GROUP));
     Group group;
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
-      newGroup.setName(groupName);
+      newGroup.setName(MOCK_PLANNER_GROUP);
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
       group = this.groupRepository.save(newGroup);
