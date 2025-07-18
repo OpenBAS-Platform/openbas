@@ -2,6 +2,8 @@ package io.openbas.engine.api;
 
 import io.openbas.database.model.CustomDashboardParameters;
 import java.util.Map;
+
+import io.openbas.engine.api.configuration.list.ListConfiguration;
 import lombok.Getter;
 import lombok.Setter;
 

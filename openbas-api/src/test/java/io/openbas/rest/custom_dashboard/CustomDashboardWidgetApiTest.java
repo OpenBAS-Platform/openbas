@@ -16,7 +16,7 @@ import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.database.repository.WidgetRepository;
-import io.openbas.engine.api.DateHistogramWidget;
+import io.openbas.engine.api.configuration.DateHistogramConfiguration;
 import io.openbas.engine.api.HistogramInterval;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
 import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
@@ -55,7 +55,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     WidgetInput input = new WidgetInput();
     input.setType(VERTICAL_BAR_CHART);
     String name = "My new widget";
-    DateHistogramWidget widgetConfig = new DateHistogramWidget();
+    DateHistogramConfiguration widgetConfig = new DateHistogramConfiguration();
     widgetConfig.setTitle(name);
     widgetConfig.setField("whatever");
     widgetConfig.setSeries(new ArrayList<>());

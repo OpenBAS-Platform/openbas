@@ -7,6 +7,10 @@ import io.openbas.database.model.Widget;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.engine.api.*;
+import io.openbas.engine.api.configuration.DateHistogramConfiguration;
+import io.openbas.engine.api.configuration.list.ListConfiguration;
+import io.openbas.engine.api.configuration.StructuralHistogramConfiguration;
+import io.openbas.engine.api.configuration.WidgetConfigurationType;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsAttackPath;
@@ -44,15 +48,15 @@ public class DashboardService {
       Map<String, CustomDashboardParameters> definitionParameters) {
     if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
-      DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
+      DateHistogramConfiguration config = (DateHistogramConfiguration) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime =
           new DateHistogramRuntime(config, parameters, definitionParameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
-      StructuralHistogramWidget config =
-          (StructuralHistogramWidget) widget.getWidgetConfiguration();
+      StructuralHistogramConfiguration config =
+          (StructuralHistogramConfiguration) widget.getWidgetConfiguration();
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime =
           new StructuralHistogramRuntime(config, parameters, definitionParameters);
@@ -86,7 +90,7 @@ public class DashboardService {
       Map<String, CustomDashboardParameters> definitionParameters)
       throws ExecutionException, InterruptedException {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
+    StructuralHistogramConfiguration config = (StructuralHistogramConfiguration) widget.getWidgetConfiguration();
 
     StructuralHistogramRuntime runtime =
         new StructuralHistogramRuntime(config, parameters, definitionParameters);

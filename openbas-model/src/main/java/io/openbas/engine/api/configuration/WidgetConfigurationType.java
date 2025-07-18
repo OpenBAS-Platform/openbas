@@ -1,4 +1,4 @@
-package io.openbas.engine.api;
+package io.openbas.engine.api.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;

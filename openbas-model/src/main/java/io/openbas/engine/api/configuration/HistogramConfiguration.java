@@ -1,4 +1,4 @@
-package io.openbas.engine.api;
+package io.openbas.engine.api.configuration;
 
 import static lombok.AccessLevel.NONE;
 
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class HistogramWidget extends WidgetConfiguration {
+public abstract class HistogramConfiguration extends WidgetConfiguration {
   @Setter(NONE)
   @NotNull
   private final String mode;
@@ -21,7 +21,7 @@ public abstract class HistogramWidget extends WidgetConfiguration {
   @JsonProperty("display_legend")
   private boolean displayLegend;
 
-  HistogramWidget(String mode) {
+  HistogramConfiguration(String mode) {
     super(
         "temporal".equals(mode)
             ? WidgetConfigurationType.TEMPORAL_HISTOGRAM

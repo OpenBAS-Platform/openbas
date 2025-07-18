@@ -1,4 +1,4 @@
-package io.openbas.engine.api;
+package io.openbas.engine.api.configuration;
 
 import static io.openbas.config.EngineConfig.Defaults.ENTITIES_CAP;
 
@@ -14,7 +14,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class StructuralHistogramWidget extends HistogramWidget {
+public class StructuralHistogramConfiguration extends HistogramConfiguration {
 
   public static final String STRUCTURAL_MODE = "structural";
 
@@ -30,7 +30,7 @@ public class StructuralHistogramWidget extends HistogramWidget {
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
 
-  public StructuralHistogramWidget() {
+  public StructuralHistogramConfiguration() {
     super(STRUCTURAL_MODE);
   }
 }

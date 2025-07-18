@@ -5,10 +5,12 @@ import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
-import io.openbas.engine.api.DateHistogramWidget;
+import io.openbas.engine.api.configuration.DateHistogramConfiguration;
 import io.openbas.engine.api.HistogramInterval;
-import io.openbas.engine.api.ListConfiguration;
+import io.openbas.engine.api.configuration.list.ListConfiguration;
 import io.openbas.engine.api.WidgetType;
+import io.openbas.engine.api.configuration.list.ListPerspective;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class WidgetFixture {
   public static Widget createDefaultWidget() {
     Widget widget = new Widget();
     widget.setType(VERTICAL_BAR_CHART);
-    DateHistogramWidget widgetConfig = new DateHistogramWidget();
+    DateHistogramConfiguration widgetConfig = new DateHistogramConfiguration();
     widgetConfig.setTitle(NAME);
     widgetConfig.setField("whatever");
     widgetConfig.setSeries(new ArrayList<>());
@@ -36,7 +38,7 @@ public class WidgetFixture {
     Widget widget = new Widget();
     widget.setType(WidgetType.LIST);
     // series
-    ListConfiguration.ListPerspective series = new ListConfiguration.ListPerspective();
+    ListPerspective series = new ListPerspective();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.and);
     Filters.Filter filter = new Filters.Filter();

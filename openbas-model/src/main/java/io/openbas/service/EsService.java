@@ -24,8 +24,12 @@ import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
-import io.openbas.engine.api.DateHistogramWidget.DateHistogramSeries;
-import io.openbas.engine.api.StructuralHistogramWidget.StructuralHistogramSeries;
+import io.openbas.engine.api.configuration.DateHistogramConfiguration;
+import io.openbas.engine.api.configuration.DateHistogramConfiguration.DateHistogramSeries;
+import io.openbas.engine.api.configuration.list.ListConfiguration;
+import io.openbas.engine.api.configuration.StructuralHistogramConfiguration;
+import io.openbas.engine.api.configuration.StructuralHistogramConfiguration.StructuralHistogramSeries;
+import io.openbas.engine.api.configuration.list.ListPerspective;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
@@ -412,7 +416,7 @@ public class EsService {
 
   public EsSeries termHistogram(
       RawUserAuth user,
-      StructuralHistogramWidget widgetConfig,
+      StructuralHistogramConfiguration widgetConfig,
       StructuralHistogramSeries config,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
@@ -532,7 +536,7 @@ public class EsService {
 
   public EsSeries dateHistogram(
       RawUserAuth user,
-      DateHistogramWidget widgetConfig,
+      DateHistogramConfiguration widgetConfig,
       DateHistogramSeries config,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
@@ -685,7 +689,7 @@ public class EsService {
     engineSortField.setDirection(SortDirection.DESC);
 
     // Create series
-    ListConfiguration.ListPerspective listPerspective = new ListConfiguration.ListPerspective();
+    ListPerspective listPerspective = new ListPerspective();
     listPerspective.setName("Attack Paths");
     listPerspective.setFilter(filterGroup);
 

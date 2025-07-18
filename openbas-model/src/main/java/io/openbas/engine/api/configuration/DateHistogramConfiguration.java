@@ -1,6 +1,7 @@
-package io.openbas.engine.api;
+package io.openbas.engine.api.configuration;
 
 import io.openbas.database.model.Filters;
+import io.openbas.engine.api.HistogramInterval;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DateHistogramWidget extends HistogramWidget {
+public class DateHistogramConfiguration extends HistogramConfiguration {
 
   public static final String TEMPORAL_MODE = "temporal";
 
@@ -25,7 +26,7 @@ public class DateHistogramWidget extends HistogramWidget {
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
 
-  public DateHistogramWidget() {
+  public DateHistogramConfiguration() {
     super(TEMPORAL_MODE);
   }
 }

@@ -15,7 +15,7 @@ import io.openbas.driver.ElasticDriver;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.api.EngineSortField;
-import io.openbas.engine.api.ListConfiguration;
+import io.openbas.engine.api.configuration.list.ListConfiguration;
 import io.openbas.engine.api.SortDirection;
 import io.openbas.service.EsService;
 import io.openbas.utils.fixtures.*;

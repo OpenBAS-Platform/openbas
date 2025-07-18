@@ -1,14 +1,15 @@
-package io.openbas.engine.api;
+package io.openbas.engine.api.configuration.list;
 
 import static io.openbas.config.EngineConfig.Defaults.ENTITIES_CAP;
 
-import io.openbas.database.model.Filters;
+import io.openbas.engine.api.EngineSortField;
+import io.openbas.engine.api.configuration.WidgetConfiguration;
+import io.openbas.engine.api.configuration.WidgetConfigurationType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,12 +26,6 @@ public class ListConfiguration extends WidgetConfiguration {
   @Positive
   @Min(1)
   int limit = ENTITIES_CAP;
-
-  @Data
-  public static class ListPerspective {
-    private String name;
-    private Filters.FilterGroup filter = new Filters.FilterGroup();
-  }
 
   public ListConfiguration() {
     super(WidgetConfigurationType.LIST);

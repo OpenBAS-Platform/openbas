@@ -1180,13 +1180,7 @@ export interface CweOutput {
   cwe_source?: string;
 }
 
-export interface DateHistogramSeries {
-  /** Filter object to search within filterable attributes */
-  filter?: FilterGroup;
-  name?: string;
-}
-
-export type DateHistogramWidget = UtilRequiredKeys<
+export type DateHistogramConfiguration = UtilRequiredKeys<
   WidgetConfiguration,
   "widget_configuration_type"
 > & {
@@ -1199,6 +1193,12 @@ export type DateHistogramWidget = UtilRequiredKeys<
   stacked?: boolean;
   start: string;
 };
+
+export interface DateHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
 
 export interface DetectionRemediation {
   detection_remediation_collector_type: string;
@@ -2317,7 +2317,7 @@ export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
-export interface HistogramWidget {
+export interface HistogramConfiguration {
   display_legend?: boolean;
   field: string;
   mode: string;
@@ -3084,6 +3084,12 @@ export interface InjectsImportTestInput {
   timezone_offset: number;
 }
 
+export interface JoinListPerspective {
+  grouped?: boolean;
+  joinedPerspective?: ListPerspective;
+  sourcePropertyName?: string;
+}
+
 export type JsonNode = object;
 
 export interface KillChainPhase {
@@ -3337,6 +3343,7 @@ export type ListConfiguration = UtilRequiredKeys<
 export interface ListPerspective {
   /** Filter object to search within filterable attributes */
   filter?: FilterGroup;
+  joins?: JoinListPerspective[];
   name?: string;
 }
 
@@ -5171,13 +5178,7 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
-export interface StructuralHistogramSeries {
-  /** Filter object to search within filterable attributes */
-  filter?: FilterGroup;
-  name?: string;
-}
-
-export type StructuralHistogramWidget = UtilRequiredKeys<
+export type StructuralHistogramConfiguration = UtilRequiredKeys<
   WidgetConfiguration,
   "widget_configuration_type"
 > & {
@@ -5192,6 +5193,12 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
   series: StructuralHistogramSeries[];
   stacked?: boolean;
 };
+
+export interface StructuralHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
 
 export interface Tag {
   listened?: boolean;
@@ -5739,9 +5746,9 @@ export interface ViolationErrorBag {
 export interface Widget {
   listened?: boolean;
   widget_config:
-    | DateHistogramWidget
+    | DateHistogramConfiguration
     | ListConfiguration
-    | StructuralHistogramWidget;
+    | StructuralHistogramConfiguration;
   /** @format date-time */
   widget_created_at: string;
   widget_custom_dashboard?: string;
@@ -5767,19 +5774,19 @@ export type WidgetConfiguration = BaseWidgetConfiguration &
       >
     | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
         "temporal-histogram",
-        DateHistogramWidget
+        DateHistogramConfiguration
       >
     | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
         "structural-histogram",
-        StructuralHistogramWidget
+        StructuralHistogramConfiguration
       >
   );
 
 export interface WidgetInput {
   widget_config:
-    | DateHistogramWidget
+    | DateHistogramConfiguration
     | ListConfiguration
-    | StructuralHistogramWidget;
+    | StructuralHistogramConfiguration;
   widget_layout: WidgetLayout;
   widget_type:
     | "vertical-barchart"

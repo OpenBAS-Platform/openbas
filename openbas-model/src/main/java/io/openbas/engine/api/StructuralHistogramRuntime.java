@@ -2,16 +2,18 @@ package io.openbas.engine.api;
 
 import io.openbas.database.model.CustomDashboardParameters;
 import java.util.Map;
+
+import io.openbas.engine.api.configuration.StructuralHistogramConfiguration;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class StructuralHistogramRuntime extends Runtime {
-  private StructuralHistogramWidget widget;
+  private StructuralHistogramConfiguration widget;
 
   public StructuralHistogramRuntime(
-      StructuralHistogramWidget widget,
+      StructuralHistogramConfiguration widget,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     this.widget = widget;

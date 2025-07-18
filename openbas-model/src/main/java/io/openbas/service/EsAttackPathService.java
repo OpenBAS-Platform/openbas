@@ -4,7 +4,7 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.AttackPatternRepository;
-import io.openbas.engine.api.ListConfiguration;
+import io.openbas.engine.api.configuration.list.ListConfiguration;
 import io.openbas.engine.api.ListRuntime;
 import io.openbas.engine.api.StructuralHistogramRuntime;
 import io.openbas.engine.model.inject.EsInject;
