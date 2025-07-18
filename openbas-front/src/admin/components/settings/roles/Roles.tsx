@@ -64,7 +64,7 @@ const Roles = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('roles-v2', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('role', buildSearchPagination({
     sorts: initSorting('role_name', 'ASC'),
     textSearch: search,
   }));

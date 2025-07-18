@@ -1,7 +1,7 @@
 import type { Dispatch } from 'redux';
 
 import type { RoleCreateInput } from '../../admin/components/settings/roles/RoleForm';
-import { delReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../../utils/Action';
 import { type Role, type SearchPaginationInput } from '../../utils/api-types';
 import * as schema from '../Schema';
 
@@ -10,6 +10,11 @@ export const searchRoles = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
   const uri = `${ROLES_URI}/search`;
   return simplePostCall(uri, data);
+};
+
+export const fetchRoles = () => (dispatch: Dispatch): Promise<Role[]> => {
+  const uri = `${ROLES_URI}`;
+  return getReferential(schema.arrayOfRoles, uri)(dispatch);
 };
 
 export const deleteRole = (roleId: Role['role_id']) => (dispatch: Dispatch) => {
