@@ -39,7 +39,7 @@ public class ResultUtils {
   public static List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
       @NotNull final List<Inject> injects) {
 
-    Map<AttackPattern, List<Inject>> groupedByAttackPattern =
+    Map<AttackPattern, List<Inject>> groupedByAttackPattern = //TODO filter type inexistents
         injects.stream()
             .flatMap(
                 inject ->

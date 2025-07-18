@@ -52,7 +52,7 @@ const AtomicTestingHeader = ({ injectResultOverview, setInjectResultOverview }: 
           <AtomicTestingTitle injectResultOverview={injectResultOverview} />
           <AtomicTestingTabs injectResultOverview={injectResultOverview} />
         </Box>
-        <ResponsePie hasTitles={false} forceSize={112} expectationResultsByTypes={injectResultOverview.inject_expectation_results} />
+        <ResponsePie hasTitles={false} forceSize={112} inject={injectResultOverview} />
         <AtomicTestingHeaderActions injectResultOverview={injectResultOverview} setInjectResultOverview={setInjectResultOverview} />
       </div>
     </Box>

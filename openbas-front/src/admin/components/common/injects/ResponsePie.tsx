@@ -6,11 +6,11 @@ import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
-import { type ExpectationResultsByType, type ResultDistribution } from '../../../../utils/api-types';
+import { type ExpectationResultsByType, type InjectResultOverviewOutput, type ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
 
 interface Props {
-  expectationResultsByTypes?: ExpectationResultsByType[] | null;
+  inject?: InjectResultOverviewOutput;
   humanValidationLink?: string;
   disableChartAnimation?: boolean;
   hasTitles?: boolean;
@@ -35,7 +35,7 @@ const getColor = (theme: Theme, result: string | undefined): string => {
 };
 
 const ResponsePie: FunctionComponent<Props> = ({
-  expectationResultsByTypes,
+  inject,
   humanValidationLink,
   disableChartAnimation,
   forceSize,

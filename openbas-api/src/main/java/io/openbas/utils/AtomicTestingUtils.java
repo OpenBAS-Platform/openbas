@@ -43,25 +43,21 @@ public class AtomicTestingUtils {
   @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypes(
       final List<InjectExpectation> expectations) {
-    List<Double> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-    List<Double> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-    List<Double> humanScores =
-        getScores(
-            List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
-            expectations);
-    List<Double> vulnerabilityScores =
-        getScores(List.of(EXPECTATION_TYPE.VULNERABILITY), expectations);
 
     List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
 
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.DETECTION, detectionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.VULNERABILITY, vulnerabilityScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores)
-        .map(resultAvgOfExpectations::add);
+    addIfScoresPresent(resultAvgOfExpectations,
+        List.of(EXPECTATION_TYPE.PREVENTION), ExpectationType.PREVENTION, expectations);
+
+    addIfScoresPresent(resultAvgOfExpectations,
+        List.of(EXPECTATION_TYPE.DETECTION), ExpectationType.DETECTION, expectations);
+
+    addIfScoresPresent(resultAvgOfExpectations,
+        List.of(EXPECTATION_TYPE.VULNERABILITY), ExpectationType.VULNERABILITY, expectations);
+
+    addIfScoresPresent(resultAvgOfExpectations,
+        List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
+        ExpectationType.HUMAN_RESPONSE, expectations);
 
     return resultAvgOfExpectations;
   }
@@ -171,6 +167,16 @@ public class AtomicTestingUtils {
         new ResultDistribution(ExpectationType.PENDING_ID, type.pendingLabel, (int) pendingCount),
         new ResultDistribution(ExpectationType.PARTIAL_ID, type.partialLabel, (int) partialCount),
         new ResultDistribution(ExpectationType.FAILED_ID, type.failureLabel, (int) failureCount));
+  }
+
+  private static void addIfScoresPresent(List<ExpectationResultsByType> resultList,
+      List<EXPECTATION_TYPE> types,
+      ExpectationType resultType,
+      List<InjectExpectation> expectations) {
+    List<Double> scores = getScores(types, expectations);
+    if (!scores.isEmpty()) {
+      getExpectationByType(resultType, scores).ifPresent(resultList::add);
+    }
   }
 
   // -- RECORDS --
