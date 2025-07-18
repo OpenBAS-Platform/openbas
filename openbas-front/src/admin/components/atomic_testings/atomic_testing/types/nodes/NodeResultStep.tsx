@@ -60,7 +60,7 @@ export type NodeResultStep = Node<{
   background?: string;
   color?: string;
   key: string;
-  label: string;
+  label: string | React.JSX.Element;
   description?: string;
   end: boolean;
   middle: boolean;

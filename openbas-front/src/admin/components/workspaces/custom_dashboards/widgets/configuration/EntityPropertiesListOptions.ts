@@ -1,7 +1,7 @@
-import { type PropertySchemaDTO } from '../../../../../utils/api-types';
-import { type Widget } from '../../../../../utils/api-types-custom';
-import { type GroupOption } from '../../../../../utils/Option';
-import { getAvailableFields } from './WidgetUtils';
+import { type PropertySchemaDTO } from '../../../../../../utils/api-types';
+import { type Widget } from '../../../../../../utils/api-types-custom';
+import { type GroupOption } from '../../../../../../utils/Option';
+import { getAvailableFields } from '../WidgetUtils';
 
 const getEntityPropertiesListOptions = (props: PropertySchemaDTO[], widgetType: Widget['widget_type'], preFilter: ((prop: PropertySchemaDTO) => boolean) | undefined = undefined): GroupOption[] => {
   const filteredProps = preFilter ? props.filter(preFilter) : props;

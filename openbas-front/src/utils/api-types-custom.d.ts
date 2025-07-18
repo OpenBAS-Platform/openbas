@@ -18,7 +18,7 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
   start: string;
 };
 export type ListConfiguration = BaseWidgetConfiguration & {
-  series: ApiTypes.ListSeries[];
+  perspective: ApiTypes.ListPerspective;
   columns: string[];
   sorts?: ApiTypes.EngineSortField[];
   limit?: number;
