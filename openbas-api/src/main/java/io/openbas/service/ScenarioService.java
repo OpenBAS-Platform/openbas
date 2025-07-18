@@ -456,8 +456,20 @@ public class ScenarioService {
     // Add Injects
     objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
     scenarioFileExport.setInjects(scenario.getInjects());
-    scenarioTags.addAll(
-        scenario.getInjects().stream().flatMap(inject -> inject.getTags().stream()).toList());
+    scenario
+        .getInjects()
+        .forEach(
+            inject -> {
+              scenarioTags.addAll(inject.getTags());
+              inject
+                  .getInjectorContract()
+                  .ifPresent(
+                      injectorContract -> {
+                        if (injectorContract.getPayload() != null) {
+                          scenarioTags.addAll(injectorContract.getPayload().getTags());
+                        }
+                      });
+            });
 
     // Add Articles
     objectMapper.addMixIn(Article.class, Mixins.Article.class);
