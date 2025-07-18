@@ -48,6 +48,13 @@
     },
     {
       "matchPackageNames": [
+        "html-to-image"
+      ],
+      "commitMessagePrefix": "[DANGER]",
+      "commitMessageSuffix": "(html-to-image has a yarn patch)"
+    },
+    {
+      "matchPackageNames": [
         "cronstrue"
       ],
       "commitMessagePrefix": "[DANGER]",
