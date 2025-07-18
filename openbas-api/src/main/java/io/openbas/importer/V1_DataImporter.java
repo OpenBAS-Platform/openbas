@@ -383,6 +383,18 @@ public class V1_DataImporter implements Importer {
             handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
           }
         });
+    // Handle argument documents
+    Stream<JsonNode> argumentDcumentsStream =
+        resolveJsonElements(importNode, prefix + "arguments_documents");
+    argumentDcumentsStream.forEach(
+        nodeDoc -> {
+          String target = nodeDoc.get("document_target").textValue();
+          ImportEntry entry = docReferences.get(target);
+
+          if (entry != null) {
+            handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+          }
+        });
   }
 
   private void importDocument(
@@ -457,7 +469,7 @@ public class V1_DataImporter implements Importer {
       Map<String, Base> baseIds) {
     try {
       this.documentService.uploadFile(
-          target, entry.getData(), entry.getEntry().getSize(), contentType);
+          target, entry.getData(), entry.getContentLength(), contentType);
     } catch (Exception e) {
       throw new ImportException(e);
     }
@@ -1235,6 +1247,20 @@ public class V1_DataImporter implements Importer {
       ((ObjectNode) payloadNode)
           .put(
               "file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
+    }
+
+    if (payloadNode.has("payload_arguments")) {
+      for (JsonNode argNode : payloadNode.get("payload_arguments")) {
+        if (argNode.has("type") && "document".equals(argNode.get("type").asText())) {
+          JsonNode defaultValueNode = argNode.get("default_value");
+          if (defaultValueNode != null
+              && !defaultValueNode.asText().isBlank()
+              && baseIds.containsKey(defaultValueNode.asText())) {
+            ((ObjectNode) argNode)
+                .put("default_value", baseIds.get(defaultValueNode.asText()).getId());
+          }
+        }
+      }
     }
 
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
