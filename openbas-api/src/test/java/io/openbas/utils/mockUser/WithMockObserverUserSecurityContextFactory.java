@@ -26,6 +26,7 @@ public class WithMockObserverUserSecurityContextFactory
     implements WithSecurityContextFactory<WithMockObserverUser> {
 
   public static final String MOCK_USER_OBSERVER_EMAIL = "observer@openbas.io";
+  public static final String MOCK_OBSERVER_GROUP = "Mock Observer group";
   @Autowired private GrantRepository grantRepository;
   @Autowired private GroupRepository groupRepository;
   @Autowired private UserRepository userRepository;
@@ -57,12 +58,12 @@ public class WithMockObserverUserSecurityContextFactory
     }
 
     // Create group
-    String groupName = "Observer group";
-    Optional<Group> groupOpt = this.groupRepository.findOne(GroupSpecification.fromName(groupName));
+    Optional<Group> groupOpt =
+        this.groupRepository.findOne(GroupSpecification.fromName(MOCK_OBSERVER_GROUP));
     Group group;
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
-      newGroup.setName(groupName);
+      newGroup.setName(MOCK_OBSERVER_GROUP);
       newGroup.setScenariosDefaultGrants(List.of(OBSERVER));
       newGroup.setExercisesDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
