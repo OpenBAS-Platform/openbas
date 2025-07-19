@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,11 +29,6 @@ public class PermissionServiceTest extends IntegrationTest {
   @Mock private GrantService grantService;
 
   @InjectMocks private PermissionService permissionService;
-
-  @AfterEach
-  void teardown() {
-    globalTeardown();
-  }
 
   @Test
   public void test_hasPermission_WHEN_admin() {

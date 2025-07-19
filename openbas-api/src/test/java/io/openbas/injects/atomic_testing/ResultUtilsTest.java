@@ -35,11 +35,6 @@ class ResultUtilsTest extends IntegrationTest {
 
   private ResultUtils resultUtils;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @BeforeEach
   void before() {
     resultUtils =

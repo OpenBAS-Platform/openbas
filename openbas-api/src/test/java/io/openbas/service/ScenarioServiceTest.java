@@ -47,7 +47,6 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
-  @Autowired private AssetGroupRepository assetGroupRepository;
 
   @Mock Ee eeService;
   @Mock GrantService grantService;
@@ -121,7 +120,9 @@ class ScenarioServiceTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    globalTeardown();
+    this.userRepository.deleteById(USER_ID);
+    this.teamRepository.deleteById(TEAM_ID);
+    this.injectRepository.deleteById(INJECT_ID);
   }
 
   @DisplayName("Should create new contextual teams during scenario duplication")

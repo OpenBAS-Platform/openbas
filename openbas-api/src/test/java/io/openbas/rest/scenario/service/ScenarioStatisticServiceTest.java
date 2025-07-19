@@ -38,11 +38,6 @@ class ScenarioStatisticServiceTest extends IntegrationTest {
     scenarioStatisticService = new ScenarioStatisticService(exerciseRepository, resultUtils);
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Should get scenario statistics")
   void getScenarioStatistics() {

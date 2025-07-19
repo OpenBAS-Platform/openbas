@@ -20,7 +20,6 @@ import io.openbas.utils.fixtures.TagRuleFixture;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -38,11 +37,6 @@ public class TagRuleServiceTest extends IntegrationTest {
   @Mock private TagRepository tagRepository;
 
   @InjectMocks private TagRuleService tagRuleService;
-
-  @AfterEach
-  void teardown() {
-    globalTeardown();
-  }
 
   @Test
   void testFindById() {

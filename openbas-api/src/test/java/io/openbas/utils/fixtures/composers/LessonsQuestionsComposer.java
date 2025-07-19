@@ -41,9 +41,7 @@ public class LessonsQuestionsComposer extends ComposerBase<LessonsQuestion> {
   }
 
   public Composer forLessonsQuestion(LessonsQuestion lessonsQuestion) {
-    Composer composer = new Composer(lessonsQuestion);
     generatedItems.add(lessonsQuestion);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(lessonsQuestion);
   }
 }

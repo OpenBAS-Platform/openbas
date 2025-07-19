@@ -37,7 +37,7 @@ public class VariableServiceTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.exerciseRepository.deleteById(EXERCISE.getId());
   }
 
   @DisplayName("Create variable")

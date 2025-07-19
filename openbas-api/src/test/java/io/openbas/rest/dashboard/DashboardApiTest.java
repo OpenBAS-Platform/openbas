@@ -11,7 +11,6 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
-import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.driver.ElasticDriver;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
@@ -54,7 +53,6 @@ class DashboardApiTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private FindingComposer findingComposer;
   @Autowired private CustomDashboardParameterComposer customDashboardParameterComposer;
-  @Autowired private ExerciseRepository exerciseRepository;
 
   @BeforeEach
   void setup() throws IOException {
@@ -67,12 +65,6 @@ class DashboardApiTest extends IntegrationTest {
     for (EsModel<?> model : esEngine.getModels()) {
       esDriver.cleanUpIndex(model.getName(), esClient);
     }
-  }
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-    exerciseRepository.deleteAll();
   }
 
   @Nested

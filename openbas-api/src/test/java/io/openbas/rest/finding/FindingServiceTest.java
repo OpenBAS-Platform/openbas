@@ -49,11 +49,6 @@ class FindingServiceTest extends IntegrationTest {
             injectService, findingRepository, assetRepository, teamRepository, userRepository);
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Should have two assets for a finding")
   void given_a_finding_already_existent_with_one_asset_should_have_two_assets() {

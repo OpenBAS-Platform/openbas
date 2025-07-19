@@ -14,7 +14,6 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.database.model.InjectorContract;
-import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.utils.fixtures.ExerciseFixture;
@@ -40,7 +39,6 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private InjectTestStatusComposer injectTestStatusComposer;
   @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private ExerciseRepository exerciseRepository;
 
   private Exercise simulation;
   private Inject inject1, inject2;
@@ -81,11 +79,6 @@ public class ExerciseInjectTestApiTest extends IntegrationTest {
             .withInjects(List.of(injectComposer1, injectComposer2))
             .persist()
             .get();
-  }
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
   }
 
   @Nested

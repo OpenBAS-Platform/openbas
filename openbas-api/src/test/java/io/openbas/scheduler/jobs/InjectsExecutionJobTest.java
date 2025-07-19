@@ -41,7 +41,7 @@ class InjectsExecutionJobTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    globalTeardown();
+    this.exerciseRepository.deleteById(EXERCISE_ID);
   }
 
   @DisplayName("Not start children injects at the same time as parent injects")

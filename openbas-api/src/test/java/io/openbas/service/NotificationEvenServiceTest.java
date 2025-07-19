@@ -9,7 +9,6 @@ import io.openbas.notification.handler.ScenarioNotificationEventHandler;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
 import java.time.Instant;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -30,11 +29,6 @@ public class NotificationEvenServiceTest extends IntegrationTest {
   public void setUp() {
     notificationEventService =
         new NotificationEventService(appPublisher, scenarioNotificationEventHandler, taskScheduler);
-  }
-
-  @AfterEach
-  void teardown() {
-    globalTeardown();
   }
 
   @Test

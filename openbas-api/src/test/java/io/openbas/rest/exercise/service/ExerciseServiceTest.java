@@ -93,11 +93,6 @@ class ExerciseServiceTest extends IntegrationTest {
             lessonsCategoryRepository);
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Should get exercises global scores")
   void getExercisesGlobalScores() {

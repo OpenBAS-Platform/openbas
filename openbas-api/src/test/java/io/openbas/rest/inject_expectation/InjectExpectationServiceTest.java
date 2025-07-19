@@ -20,6 +20,7 @@ import io.openbas.utils.fixtures.composers.AgentComposer;
 import io.openbas.utils.fixtures.composers.EndpointComposer;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectExpectationComposer;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.*;
@@ -41,6 +42,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
   @Autowired private InjectExpectationComposer injectExpectationComposer;
   @Autowired private AgentComposer agentComposer;
   @Autowired private EndpointComposer endpointComposer;
+  @Autowired private EntityManager entityManager;
 
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
@@ -72,8 +74,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
-    injectorContractRepository.delete(savedInjectorContract);
+    assetRepository.deleteAll();
   }
 
   @AfterEach
@@ -412,6 +413,9 @@ class InjectExpectationServiceTest extends IntegrationTest {
                   injectExpectationComposer.forExpectation(assetExpectation).withEndpoint(endpoint))
               .persist()
               .get();
+
+      entityManager.flush();
+      entityManager.clear();
 
       injectExpectationService.computeExpectationAsset(
           assetExpectation, List.of(agentExpectation), "sourceId", "sourceType", "sourceName");

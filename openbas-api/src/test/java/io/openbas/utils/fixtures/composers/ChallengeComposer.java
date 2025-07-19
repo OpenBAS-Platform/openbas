@@ -67,9 +67,7 @@ public class ChallengeComposer extends ComposerBase<Challenge> {
   }
 
   public Composer forChallenge(Challenge challenge) {
-    Composer composer = new Composer(challenge);
     generatedItems.add(challenge);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(challenge);
   }
 }

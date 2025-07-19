@@ -34,11 +34,6 @@ public class ManualExecutorTest extends IntegrationTest {
 
   @InjectMocks private ManualExecutor manualExecutor;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @BeforeEach
   void setUp() {
     ReflectionTestUtils.setField(manualExecutor, "mapper", mapper);

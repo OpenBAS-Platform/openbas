@@ -12,7 +12,6 @@ import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,11 +36,6 @@ public class PlatformServiceSettingsTest extends IntegrationTest {
     // some repetitive setup necessary to mock config
     rabbitmqConfig.setUser("admin");
     rabbitmqConfig.setPass("pass");
-  }
-
-  @AfterEach
-  void teardown() {
-    globalTeardown();
   }
 
   @Test

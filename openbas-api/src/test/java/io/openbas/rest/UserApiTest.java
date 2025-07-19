@@ -55,7 +55,6 @@ class UserApiTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    globalTeardown();
     this.userRepository.deleteById(savedUser.getId());
   }
 

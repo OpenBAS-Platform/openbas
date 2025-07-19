@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.json.JSONArray;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,11 +52,6 @@ class TeamApiTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private TeamRepository teamRepository;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @DisplayName("Given valid team input, should create a team successfully")
   @Test
