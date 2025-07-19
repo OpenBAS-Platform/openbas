@@ -77,9 +77,7 @@ public class TeamComposer extends ComposerBase<Team> {
   }
 
   public Composer forTeam(Team team) {
-    Composer composer = new Composer(team);
     generatedItems.add(team);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(team);
   }
 }

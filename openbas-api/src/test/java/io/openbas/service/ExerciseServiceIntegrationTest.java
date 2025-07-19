@@ -104,8 +104,9 @@ class ExerciseServiceIntegrationTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    globalTeardown();
     this.userRepository.deleteById(USER_ID);
+    this.teamRepository.deleteById(TEAM_ID);
+    this.injectRepository.deleteById(INJECT_ID);
   }
 
   @DisplayName("Should create new contextual teams while exercise duplication")

@@ -38,11 +38,6 @@ class ResultUtilsTest extends IntegrationTest {
   private InjectExpectationMapper injectExpectationMapper;
   private ResultUtils resultUtils;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @BeforeEach
   void before() {
     injectExpectationMapper = new InjectExpectationMapper(injectRepository, injectUtils);

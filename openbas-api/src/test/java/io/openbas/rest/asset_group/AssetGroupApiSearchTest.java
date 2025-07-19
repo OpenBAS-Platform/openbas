@@ -47,7 +47,7 @@ public class AssetGroupApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.assetGroupRepository.deleteAllById(ASSET_GROUP_IDS);
   }
 
   @Nested

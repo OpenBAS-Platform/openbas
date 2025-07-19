@@ -33,11 +33,6 @@ public class HealthCheckApiTest extends IntegrationTest {
     healthCheckApi.setHealthCheckKey(KEY);
   }
 
-  @AfterEach
-  public void afterEach() {
-    globalTeardown();
-  }
-
   @DisplayName("Test healthCheck")
   @Test
   void test_healthCheck() throws Exception {

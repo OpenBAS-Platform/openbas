@@ -7,7 +7,6 @@ import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,6 @@ class MapperServiceExportTest extends IntegrationTest {
   @Autowired private ImportMapperRepository importMapperRepository;
 
   @Autowired private MapperService mapperService;
-
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
 
   @DisplayName("Test exporting a mapper")
   @Test

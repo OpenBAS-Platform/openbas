@@ -47,7 +47,7 @@ public class ExerciseApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.exerciseRepository.deleteAllById(EXERCISE_IDS);
   }
 
   @Nested

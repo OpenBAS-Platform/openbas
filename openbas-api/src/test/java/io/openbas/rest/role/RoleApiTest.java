@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -41,11 +40,6 @@ public class RoleApiTest extends IntegrationTest {
   @AfterEach
   void afterEach() {
     roleRepository.deleteAll();
-  }
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
   }
 
   @Test

@@ -40,11 +40,6 @@ public class ReportServiceTest extends IntegrationTest {
     reportService = new ReportService(reportRepository);
   }
 
-  @AfterEach
-  void teardown() {
-    globalTeardown();
-  }
-
   @DisplayName("Test create a report")
   @Test
   void createReport() throws Exception {

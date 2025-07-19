@@ -36,11 +36,6 @@ class StructuredOutputUtilsTest extends IntegrationTest {
 
   private StructuredOutputUtils structuredOutputUtils;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @BeforeEach
   void setup() {
     structuredOutputUtils = new StructuredOutputUtils(mapper);

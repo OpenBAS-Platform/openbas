@@ -35,11 +35,6 @@ public class TagApiTest extends IntegrationTest {
     tagComposer.reset();
   }
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @Test
   @WithMockAdminUser
   @DisplayName("When tag already exists, update tag changes properties and returns modified tag")

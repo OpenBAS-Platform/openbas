@@ -11,7 +11,6 @@ import io.openbas.database.raw.RawGrant;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,11 +25,6 @@ public class GrantServiceTest extends IntegrationTest {
   @Mock private GrantRepository grantRepository;
 
   @InjectMocks private GrantService grantService;
-
-  @AfterEach
-  public void teardown() {
-    globalTeardown();
-  }
 
   @Test
   public void test_hasReadGrant_WHEN_has_read_grant() {

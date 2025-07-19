@@ -68,7 +68,8 @@ public class ScenarioInjectApiSearchTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.injectRepository.deleteAllById(INJECT_IDS);
+    this.scenarioRepository.deleteById(SCENARIO_ID);
   }
 
   @Nested

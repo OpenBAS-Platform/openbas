@@ -82,9 +82,7 @@ public class InjectExpectationComposer extends ComposerBase<InjectExpectation> {
   }
 
   public Composer forExpectation(InjectExpectation injectExpectation) {
-    Composer composer = new Composer(injectExpectation);
     generatedItems.add(injectExpectation);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(injectExpectation);
   }
 }

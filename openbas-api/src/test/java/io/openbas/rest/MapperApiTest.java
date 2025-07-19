@@ -76,11 +76,6 @@ public class MapperApiTest extends IntegrationTest {
     mvc = MockMvcBuilders.standaloneSetup(mapperApi).build();
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   // -- SCENARIOS --
 
   @DisplayName("Test search of mappers")
