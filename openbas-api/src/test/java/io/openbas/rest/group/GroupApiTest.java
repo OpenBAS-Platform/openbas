@@ -40,7 +40,7 @@ public class GroupApiTest extends IntegrationTest {
   @AfterEach
   void afterEach() {
     groupRepository.deleteAll();
-    globalTeardown();
+    roleRepository.deleteAll();
   }
 
   @Test

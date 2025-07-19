@@ -74,9 +74,7 @@ public class FindingComposer extends ComposerBase<Finding> {
   }
 
   public FindingComposer.Composer forFinding(Finding finding) {
-    Composer composer = new Composer(finding);
     generatedItems.add(finding);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(finding);
   }
 }

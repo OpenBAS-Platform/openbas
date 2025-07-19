@@ -47,7 +47,6 @@ public class InjectImportServiceTest extends IntegrationTest {
 
   @AfterEach
   void after() throws Exception {
-    globalTeardown();
     workbook.close();
   }
 

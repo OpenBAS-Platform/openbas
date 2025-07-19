@@ -70,11 +70,6 @@ public class ReportApiTest extends IntegrationTest {
     reportInput.setName("Report name");
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Nested
   @WithMockPlannerUser
   @DisplayName("Reports for exercise")

@@ -19,11 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpectationUtilsTest extends IntegrationTest {
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Build expectations with the signature parent process name for obas implant")
   void shouldBuildExpectationsWithSignatureParentProcessNameForObasImplant_Prevention() {

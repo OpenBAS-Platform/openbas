@@ -40,9 +40,7 @@ public class VariableComposer extends ComposerBase<Variable> {
   }
 
   public Composer forVariable(Variable variable) {
-    Composer composer = new Composer(variable);
     generatedItems.add(variable);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(variable);
   }
 }

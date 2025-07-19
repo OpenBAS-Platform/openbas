@@ -12,7 +12,6 @@ import io.openbas.execution.ExecutableInject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,11 +35,6 @@ public class InjectHelperTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
 
   @Autowired private InjectorContractRepository injectorContractRepository;
-
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
 
   @Disabled
   @DisplayName("Retrieve simple inject to run")

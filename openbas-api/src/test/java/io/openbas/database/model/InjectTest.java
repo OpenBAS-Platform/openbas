@@ -24,11 +24,6 @@ public class InjectTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private PauseComposer pauseComposer;
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @Nested
   @DisplayName("Given valid exercise")
   public class GivenValidExerciseWithTwoPauses {

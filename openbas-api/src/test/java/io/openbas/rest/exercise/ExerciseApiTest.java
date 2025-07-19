@@ -60,7 +60,13 @@ public class ExerciseApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    exerciseWrapperComposers.forEach(ExerciseComposer.Composer::delete);
+    this.exerciseRepository.deleteAllById(EXERCISE_IDS);
+    this.userRepository.deleteAllById(USER_IDS);
+    this.teamRepository.deleteAllById(TEAM_IDS);
+    this.tagRuleRepository.deleteAll();
+    this.assetGroupRepository.deleteAll();
+    this.tagRepository.deleteAll();
   }
 
   @Nested

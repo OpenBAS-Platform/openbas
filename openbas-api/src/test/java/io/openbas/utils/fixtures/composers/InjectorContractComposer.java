@@ -157,9 +157,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
   }
 
   public Composer forInjectorContract(InjectorContract injectorContract) {
-    Composer composer = new Composer(injectorContract);
     this.generatedItems.add(injectorContract);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(injectorContract);
   }
 }

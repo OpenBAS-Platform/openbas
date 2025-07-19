@@ -40,9 +40,7 @@ public class TagComposer extends ComposerBase<Tag> {
   }
 
   public Composer forTag(Tag tag) {
-    Composer composer = new Composer(tag);
     generatedItems.add(tag);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(tag);
   }
 }

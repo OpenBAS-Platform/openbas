@@ -39,11 +39,6 @@ public class AttackPatternApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private AttackPatternRepository attackPatternRepository;
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @Nested
   @DisplayName("Search Attack Patterns with AI Webservice")
   @WithMockAdminUser

@@ -45,9 +45,7 @@ public class AgentComposer extends ComposerBase<Agent> {
   }
 
   public AgentComposer.Composer forAgent(Agent agent) {
-    Composer composer = new AgentComposer.Composer(agent);
     generatedItems.add(agent);
-    generatedComposer.add(composer);
-    return composer;
+    return new AgentComposer.Composer(agent);
   }
 }

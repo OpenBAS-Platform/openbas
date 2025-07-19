@@ -40,9 +40,7 @@ public class ObjectiveComposer extends ComposerBase<Objective> {
   }
 
   public Composer forObjective(Objective objective) {
-    Composer composer = new Composer(objective);
     generatedItems.add(objective);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(objective);
   }
 }

@@ -18,7 +18,6 @@ import io.openbas.rest.mapper.form.*;
 import io.openbas.rest.tag.TagService;
 import io.openbas.utils.mockMapper.MockMapperUtils;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,11 +51,6 @@ public class MapperServiceTest extends IntegrationTest {
             endpointService,
             tagService,
             objectMapper);
-  }
-
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
   }
 
   // -- SCENARIOS --

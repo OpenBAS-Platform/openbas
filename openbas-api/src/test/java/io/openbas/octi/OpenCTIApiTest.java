@@ -12,7 +12,6 @@ import io.openbas.rest.inject.ScenarioInjectApi;
 import io.openbas.rest.injector_contract.InjectorContractApi;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
 import io.openbas.rest.scenario.ScenarioApi;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,11 +57,6 @@ class OpenCTIApiTest extends IntegrationTest {
   @Mock OpenCTIApi openCTIApi;
 
   private MockMvc mockMvc;
-
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
 
   @BeforeEach
   public void setUp() {

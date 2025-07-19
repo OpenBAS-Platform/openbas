@@ -25,11 +25,6 @@ class InjectCrudTest extends IntegrationTest {
 
   @Autowired private InjectorContractRepository injectorContractRepository;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @DisplayName("Test inject creation with non null depends duration")
   @Test
   void createInjectSuccess() {

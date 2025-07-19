@@ -38,11 +38,6 @@ class HealthCheckServiceTest extends IntegrationTest {
 
   @InjectMocks private HealthCheckService healthCheckService;
 
-  @AfterAll
-  public void teardown() {
-    globalTeardown();
-  }
-
   @DisplayName("Test runDatabaseCheck")
   @Test
   void test_runDatabaseCheck() {

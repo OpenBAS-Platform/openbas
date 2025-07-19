@@ -110,7 +110,11 @@ public class ExpectationApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    agentRepository.deleteAll();
+    injectRepository.deleteAll();
+    endpointRepository.deleteAll();
+    collectorRepository.deleteById(savedCollector.getId());
+    collectorRepository.deleteById(savedCollector2.getId());
   }
 
   @AfterEach

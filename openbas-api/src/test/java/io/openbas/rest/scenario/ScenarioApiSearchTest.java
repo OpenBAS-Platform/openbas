@@ -18,6 +18,7 @@ import io.openbas.utils.fixtures.ScenarioFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +32,22 @@ public class ScenarioApiSearchTest extends IntegrationTest {
 
   @Autowired private ScenarioRepository scenarioRepository;
 
+  private static final List<String> SCENARIO_IDS = new ArrayList<>();
+
   @BeforeAll
   void beforeAll() {
     Scenario scenario1 = ScenarioFixture.createDefaultCrisisScenario();
-    this.scenarioRepository.save(scenario1);
+    Scenario scenario1Saved = this.scenarioRepository.save(scenario1);
+    SCENARIO_IDS.add(scenario1Saved.getId());
 
     Scenario scenario2 = ScenarioFixture.createDefaultIncidentResponseScenario();
-    this.scenarioRepository.save(scenario2);
+    Scenario scenario2Saved = this.scenarioRepository.save(scenario2);
+    SCENARIO_IDS.add(scenario2Saved.getId());
   }
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.scenarioRepository.deleteAllById(SCENARIO_IDS);
   }
 
   @Nested

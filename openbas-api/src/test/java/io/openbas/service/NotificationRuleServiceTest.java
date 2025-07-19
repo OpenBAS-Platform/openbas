@@ -12,7 +12,6 @@ import io.openbas.database.repository.NotificationRuleRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,11 +31,6 @@ public class NotificationRuleServiceTest extends IntegrationTest {
   @Mock private PlatformSettingsService platformSettingsService;
 
   @InjectMocks private NotificationRuleService notificationRuleService;
-
-  @AfterEach
-  void teardown() {
-    globalTeardown();
-  }
 
   @Test
   public void test_activateNotificationRules() {

@@ -93,9 +93,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
   }
 
   public Composer forScenario(Scenario scenario) {
-    Composer composer = new Composer(scenario);
     this.generatedItems.add(scenario);
-    this.generatedComposer.add(composer);
-    return composer;
+    return new Composer(scenario);
   }
 }

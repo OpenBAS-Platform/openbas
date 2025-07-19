@@ -24,12 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 class InjectorContratApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @Nested
   @WithMockAdminUser

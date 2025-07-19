@@ -23,11 +23,6 @@ class SimulationTest extends IntegrationTest {
 
   private final Instant exerciseStartTime = Instant.parse("2012-11-21T04:00:00Z");
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Given a persisted exercise, current pause from raw query is correctly persisted.")
   void GivenAnExercise_CurrentPauseFromRawQueryIsCorrectlyPersisted() {

@@ -104,9 +104,7 @@ public class DocumentComposer extends ComposerBase<Document> {
   }
 
   public Composer forDocument(Document document) {
-    Composer composer = new Composer(document);
     generatedItems.add(document);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(document);
   }
 }

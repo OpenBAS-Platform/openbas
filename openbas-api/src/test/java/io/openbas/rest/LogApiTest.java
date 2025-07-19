@@ -24,11 +24,6 @@ public class LogApiTest extends IntegrationTest {
   private static final String LOG_URI = "/api/logs";
   @Autowired private MockMvc mvc;
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @Test
   @WithMockUser
   @DisplayName("Should return 200 when input is valid")

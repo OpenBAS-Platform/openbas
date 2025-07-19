@@ -38,7 +38,6 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
 
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private UserRepository userRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private TeamRepository teamRepository;
@@ -50,13 +49,35 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
   @Autowired private VariableRepository variableRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
 
+  private static String SCENARIO_ID;
   private static String EXERCISE_ID;
   private static String USER_ID;
+  private static String TEAM_ID;
+  private static String TEAM_CONTEXTUAL_ID;
+  private static String TAG_ID;
+  private static String DOCUMENT_ARTICLE_ID;
+  private static String CHANNEL_ID;
+  private static String LESSON_CATEGORY_ID;
+  private static String LESSON_QUESTION_ID;
+  private static String INJECT_ID;
+  private static String DOCUMENT_ID;
+  private static String VARIABLE_ID;
 
   @AfterAll
   public void teardown() {
-    globalTeardown();
+    this.scenarioService.deleteScenario(SCENARIO_ID);
+    this.exerciseRepository.deleteById(EXERCISE_ID);
     this.userRepository.deleteById(USER_ID);
+    this.teamRepository.deleteById(TEAM_ID);
+    this.teamRepository.deleteById(TEAM_CONTEXTUAL_ID);
+    this.tagRepository.deleteById(TAG_ID);
+    this.documentRepository.deleteById(DOCUMENT_ARTICLE_ID);
+    this.channelRepository.deleteById(CHANNEL_ID);
+    this.lessonsCategoryRepository.deleteById(LESSON_CATEGORY_ID);
+    this.lessonsQuestionRepository.deleteById(LESSON_QUESTION_ID);
+    this.injectRepository.deleteById(INJECT_ID);
+    this.documentRepository.deleteById(DOCUMENT_ID);
+    this.variableRepository.deleteById(VARIABLE_ID);
   }
 
   @DisplayName("Scenario to Exercise test")
@@ -72,10 +93,12 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     USER_ID = userSaved.getId();
     Team team = getTeam(user);
     Team teamSaved = this.teamRepository.save(team);
+    TEAM_ID = teamSaved.getId();
     Team contextualTeam = getTeam(user);
     contextualTeam.setName("Contextual team");
     contextualTeam.setContextual(true);
     Team contextualTeamSaved = this.teamRepository.save(contextualTeam);
+    TEAM_CONTEXTUAL_ID = contextualTeamSaved.getId();
     scenario.setTeams(
         new ArrayList<>() {
           {
@@ -87,6 +110,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     // Tag
     Tag tag = getTag();
     Tag tagSaved = this.tagRepository.save(tag);
+    TAG_ID = tagSaved.getId();
     scenario.setTags(
         new HashSet<>() {
           {
@@ -95,6 +119,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
         });
 
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
+    SCENARIO_ID = scenarioSaved.getId();
 
     // Team Users
     ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();
@@ -120,6 +145,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     // Document
     Document document = getDocumentJpeg();
     Document documentSaved = this.documentRepository.save(document);
+    DOCUMENT_ID = documentSaved.getId();
     scenario.setDocuments(
         new ArrayList<>() {
           {
@@ -133,9 +159,11 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     documentArticle.setName(documentArticleName);
     documentArticle.setType("image/jpeg");
     Document documentArticleSaved = this.documentRepository.save(documentArticle);
+    DOCUMENT_ARTICLE_ID = documentArticleSaved.getId();
     Channel channel = new Channel();
     channel.setName("A channel");
     Channel channelSaved = this.channelRepository.save(channel);
+    CHANNEL_ID = channelSaved.getId();
     Article article = getArticle(channelSaved);
     article.setDocuments(
         new ArrayList<>() {
@@ -162,10 +190,12 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
           }
         });
     LessonsCategory lessonsCategorySaved = this.lessonsCategoryRepository.save(lessonsCategory);
+    LESSON_CATEGORY_ID = lessonsCategorySaved.getId();
     LessonsQuestion lessonsQuestion = new LessonsQuestion();
     lessonsQuestion.setContent("Content of my question");
     lessonsQuestion.setCategory(lessonsCategory);
     LessonsQuestion lessonsQuestionSaved = this.lessonsQuestionRepository.save(lessonsQuestion);
+    LESSON_QUESTION_ID = lessonsQuestionSaved.getId();
 
     lessonsCategory.setQuestions(
         new ArrayList<>() {
@@ -193,6 +223,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
         });
     inject.setScenario(scenarioSaved);
     Inject injectSaved = this.injectRepository.save(inject);
+    INJECT_ID = injectSaved.getId();
     scenario.setInjects(
         new HashSet<>() {
           {
@@ -206,6 +237,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     variable.setValue("keyvalue");
     variable.setScenario(scenarioSaved);
     Variable variableSaved = this.variableRepository.save(variable);
+    VARIABLE_ID = variableSaved.getId();
 
     // -- EXECUTE --
     Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, null, false);

@@ -109,11 +109,6 @@ class ExerciseServiceTest extends IntegrationTest {
             injectExpectationMapper);
   }
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   @DisplayName("Should get exercises global scores")
   void getExercisesGlobalScores() {

@@ -35,9 +35,7 @@ public class ExecutorComposer extends ComposerBase<Executor> {
   }
 
   public Composer forExecutor(Executor executor) {
-    Composer composer = new Composer(executor);
     generatedItems.add(executor);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(executor);
   }
 }

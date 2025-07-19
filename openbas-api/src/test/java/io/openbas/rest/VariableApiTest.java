@@ -41,7 +41,8 @@ public class VariableApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.scenarioRepository.deleteById(SCENARIO_ID);
+    this.variableRepository.deleteById(VARIABLE_ID);
   }
 
   // -- SCENARIOS --

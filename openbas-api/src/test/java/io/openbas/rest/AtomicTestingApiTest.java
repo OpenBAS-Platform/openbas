@@ -69,11 +69,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   private InjectComposer.Composer getAtomicTestingWrapper(
       @Nullable InjectStatus injectStatus, @Nullable Executor executor) {
     InjectStatus injectStatusToSet =

@@ -58,11 +58,6 @@ class V1_DataImporterTest extends IntegrationTest {
   public static final String KILLCHAIN_EXTERNAL_ID = "KILLCHAIN_EXTERNAL_ID";
   public static final String PAYLOAD_EXTERNAL_ID = "PAYLOAD_EXTERNAL_ID";
 
-  @AfterEach
-  void afterAll() {
-    globalTeardown();
-  }
-
   @BeforeEach
   void cleanBefore() throws IOException {
     killChainPhaseRepository.deleteAll();

@@ -45,7 +45,9 @@ class ChannelApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.scenarioRepository.deleteById(SCENARIO_ID);
+    this.channelRepository.deleteById(CHANNEL_ID);
+    this.articleRepository.deleteById(ARTICLE_ID);
   }
 
   // -- SCENARIOS --

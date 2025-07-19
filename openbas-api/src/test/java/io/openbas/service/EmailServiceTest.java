@@ -12,7 +12,6 @@ import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,11 +25,6 @@ class EmailServiceTest extends IntegrationTest {
 
   @Mock private JavaMailSender emailSender;
   @InjectMocks private EmailService emailService;
-
-  @AfterEach
-  public void afterEach() {
-    globalTeardown();
-  }
 
   @Test
   void shouldSetReplyToInHeaderEqualsToFrom() throws Exception {

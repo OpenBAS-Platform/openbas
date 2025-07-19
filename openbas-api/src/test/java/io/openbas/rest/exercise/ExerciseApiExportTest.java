@@ -84,11 +84,6 @@ public class ExerciseApiExportTest extends IntegrationTest {
     }
   }
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   private Exercise getExercise() {
     return exerciseComposer
         .forExercise(ExerciseFixture.createDefaultCrisisExercise())

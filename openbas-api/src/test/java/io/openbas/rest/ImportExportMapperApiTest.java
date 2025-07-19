@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,11 +36,6 @@ public class ImportExportMapperApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private TagRepository tagRepository;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @DisplayName("Test testing an export csv with endpoints target")
   @Test

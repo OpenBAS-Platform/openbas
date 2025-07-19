@@ -52,7 +52,7 @@ public class ExerciseExpectationServiceTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.exerciseRepository.deleteById(EXERCISE_ID);
   }
 
   @DisplayName("Retrieve inject expectations")

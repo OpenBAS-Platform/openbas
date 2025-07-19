@@ -57,7 +57,9 @@ public class ExerciseLessonsApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
-    globalTeardown();
+    this.exerciseRepository.delete(EXERCISE);
+    this.lessonsCategoryRepository.delete(LESSONCATEGORY);
+    this.teamRepository.delete(TEAM);
     this.userRepository.delete(USER);
   }
 

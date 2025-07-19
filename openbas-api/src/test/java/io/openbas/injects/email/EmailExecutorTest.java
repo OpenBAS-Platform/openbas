@@ -37,11 +37,6 @@ public class EmailExecutorTest extends IntegrationTest {
   @Autowired private ExecutionContextService executionContextService;
   @Resource protected ObjectMapper mapper;
 
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
-
   @Test
   void process() throws Exception {
     // -- PREPARE --

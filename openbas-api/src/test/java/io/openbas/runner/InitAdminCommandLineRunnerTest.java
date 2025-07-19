@@ -10,7 +10,6 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.TokenRepository;
 import io.openbas.database.repository.UserRepository;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,11 +23,6 @@ public class InitAdminCommandLineRunnerTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
 
   @Autowired private TokenRepository tokenRepository;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @DisplayName("Test if admin user is created")
   @Test

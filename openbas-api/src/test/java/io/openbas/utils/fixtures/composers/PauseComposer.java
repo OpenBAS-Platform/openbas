@@ -35,9 +35,7 @@ public class PauseComposer extends ComposerBase<Pause> {
   }
 
   public Composer forPause(Pause pause) {
-    Composer composer = new Composer(pause);
     this.generatedItems.add(pause);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(pause);
   }
 }

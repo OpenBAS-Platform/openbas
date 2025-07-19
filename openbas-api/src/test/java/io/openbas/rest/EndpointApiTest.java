@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.json.JSONArray;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,11 +52,6 @@ class EndpointApiTest extends IntegrationTest {
   @Autowired private ExerciseService exerciseService;
 
   @SpyBean private EndpointService endpointService;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @DisplayName("Given valid input, should create an endpoint agentless successfully")
   @Test

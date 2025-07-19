@@ -8,11 +8,6 @@ import org.junit.jupiter.api.*;
 @TestInstance(PER_CLASS)
 public class ExportOptionsTest extends IntegrationTest {
 
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
-
   @DisplayName("Given three boolean options, the resulting mask equals the correct decimal value")
   @Test
   public void given_three_boolean_options_the_resulting_mask_equals_correct_decimal_value() {

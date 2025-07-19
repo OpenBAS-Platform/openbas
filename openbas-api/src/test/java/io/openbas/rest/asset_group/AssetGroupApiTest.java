@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.json.JSONArray;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -51,11 +50,6 @@ class AssetGroupApiTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseService exerciseService;
   @Autowired private EntityManager entityManager;
-
-  @AfterAll
-  void afterAll() {
-    globalTeardown();
-  }
 
   @DisplayName(
       "Given valid AssetGroupInput, should create and get assetGroup without dynamic filter successfully")

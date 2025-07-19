@@ -40,9 +40,7 @@ public class AttackPatternComposer extends ComposerBase<AttackPattern> {
   }
 
   public AttackPatternComposer.Composer forAttackPattern(AttackPattern attackPattern) {
-    Composer composer = new AttackPatternComposer.Composer(attackPattern);
     generatedItems.add(attackPattern);
-    generatedComposer.add(composer);
-    return composer;
+    return new AttackPatternComposer.Composer(attackPattern);
   }
 }

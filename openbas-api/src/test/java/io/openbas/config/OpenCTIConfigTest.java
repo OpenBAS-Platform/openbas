@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.openbas.IntegrationTest;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.utils.mockConfig.WithMockOpenCTIConfig;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,11 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @DisplayName("OpenCTIConfig tests")
 public class OpenCTIConfigTest extends IntegrationTest {
-
-  @AfterEach
-  void afterEach() {
-    globalTeardown();
-  }
 
   @Nested
   @WithMockOpenCTIConfig(url = "public_url")

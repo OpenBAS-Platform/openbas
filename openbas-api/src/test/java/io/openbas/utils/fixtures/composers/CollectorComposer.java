@@ -37,9 +37,7 @@ public class CollectorComposer extends ComposerBase<Collector> {
   }
 
   public CollectorComposer.Composer forCollector(Collector collector) {
-    Composer composer = new Composer(collector);
     generatedItems.add(collector);
-    generatedComposer.add(composer);
-    return composer;
+    return new Composer(collector);
   }
 }
