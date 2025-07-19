@@ -5,7 +5,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.DocumentMapper.toDocumentRelationsOutput;
+import static io.openbas.utils.mapper.DocumentMapper.toDocumentRelationsOutput;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.LogExecutionTime;

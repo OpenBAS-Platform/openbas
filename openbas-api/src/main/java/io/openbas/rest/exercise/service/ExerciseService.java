@@ -37,6 +37,8 @@ import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

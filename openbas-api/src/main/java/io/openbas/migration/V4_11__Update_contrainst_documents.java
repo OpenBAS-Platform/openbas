@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_10__Update_contrainst_documents extends BaseJavaMigration {
+public class V4_11__Update_contrainst_documents extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

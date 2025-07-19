@@ -46,7 +46,7 @@ export const craftedDocumentFilter = (item: RelatedEntityOutput, keyFilter: stri
         filters: [
           {
             key: keyFilter,
-            operator: 'contains',
+            operator: 'eq',
             values: [item.name ?? ''],
           },
         ],

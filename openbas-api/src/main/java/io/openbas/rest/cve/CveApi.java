@@ -10,7 +10,7 @@ import io.openbas.rest.cve.form.CveSimple;
 import io.openbas.rest.cve.form.CveUpdateInput;
 import io.openbas.rest.cve.service.CveService;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.utils.CveMapper;
+import io.openbas.utils.mapper.CveMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
