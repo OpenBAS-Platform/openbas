@@ -9,7 +9,6 @@ import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.utils.fixtures.*;
-import org.junit.jupiter.api.AfterEach;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
