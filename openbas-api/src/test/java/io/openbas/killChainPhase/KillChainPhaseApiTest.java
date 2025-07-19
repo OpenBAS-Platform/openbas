@@ -55,19 +55,29 @@ public class KillChainPhaseApiTest extends IntegrationTest {
   private static final String SEARCH_INPUT = "search input";
   private static final Specification<KillChainPhase> spec = byName(SEARCH_INPUT);
 
+  private static String KILL_CHAIN_PHASE_ID_1;
+  private static String KILL_CHAIN_PHASE_ID_2;
+  private static String KILL_CHAIN_PHASE_ID_3;
+
   private static List<KillChainPhase> killChainPhaseList = new ArrayList<>();
 
   @BeforeAll
-  void beforeAll() {
+  public void beforeAll() {
 
-    this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_1);
-    this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_2);
-    this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_3);
+    KILL_CHAIN_PHASE_ID_1 = this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_1).getId();
+    KILL_CHAIN_PHASE_ID_2 = this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_2).getId();
+    KILL_CHAIN_PHASE_ID_3 = this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_3).getId();
 
     killChainPhaseList = Arrays.asList(KILL_CHAIN_PHASE_1, KILL_CHAIN_PHASE_2, KILL_CHAIN_PHASE_3);
 
     when(mockKillChainPhaseRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "order")))
         .thenReturn(killChainPhaseList);
+  }
+
+  @AfterAll
+  public void afterAll() {
+    this.killChainPhaseRepository.deleteAllById(
+        List.of(KILL_CHAIN_PHASE_ID_1, KILL_CHAIN_PHASE_ID_2, KILL_CHAIN_PHASE_ID_3));
   }
 
   @Nested

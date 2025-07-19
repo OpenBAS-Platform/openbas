@@ -38,6 +38,6 @@ public class CollectorComposer extends ComposerBase<Collector> {
 
   public CollectorComposer.Composer forCollector(Collector collector) {
     generatedItems.add(collector);
-    return new Composer(collector);
+    return new CollectorComposer.Composer(collector);
   }
 }

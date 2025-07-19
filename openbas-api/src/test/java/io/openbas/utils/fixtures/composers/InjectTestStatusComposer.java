@@ -55,6 +55,6 @@ public class InjectTestStatusComposer extends ComposerBase<InjectTestStatus> {
 
   public InjectTestStatusComposer.Composer forInjectTestStatus(InjectTestStatus InjectTestStatus) {
     generatedItems.add(InjectTestStatus);
-    return new Composer(InjectTestStatus);
+    return new InjectTestStatusComposer.Composer(InjectTestStatus);
   }
 }
