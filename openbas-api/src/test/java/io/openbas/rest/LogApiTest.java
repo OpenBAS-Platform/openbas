@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.openbas.IntegrationTest;
 import io.openbas.rest.log.form.LogDetailsInput;
 import io.openbas.utils.fixtures.LogFixture;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

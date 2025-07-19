@@ -20,7 +20,6 @@ import io.openbas.utils.ResultUtils;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

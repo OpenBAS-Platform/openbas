@@ -11,7 +11,6 @@ import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.inject.service.AssetToExecute;
 import io.openbas.utils.fixtures.*;
-import org.junit.jupiter.api.AfterEach;
 import java.util.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
