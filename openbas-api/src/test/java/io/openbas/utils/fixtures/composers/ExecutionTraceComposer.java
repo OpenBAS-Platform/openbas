@@ -45,6 +45,6 @@ public class ExecutionTraceComposer extends ComposerBase<ExecutionTrace> {
 
   public ExecutionTraceComposer.Composer forExecutionTrace(ExecutionTrace executionTrace) {
     generatedItems.add(executionTrace);
-    return new Composer(executionTrace);
+    return new ExecutionTraceComposer.Composer(executionTrace);
   }
 }

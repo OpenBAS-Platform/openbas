@@ -47,8 +47,8 @@ class ChallengeApiTest extends IntegrationTest {
 
   @AfterAll
   void afterAll() {
+    this.scenarioService.deleteScenario(SCENARIO_ID);
     this.challengeRepository.deleteById(CHALLENGE_ID);
-    this.injectRepository.deleteById(INJECT_ID);
     this.injectRepository.deleteById(INJECT_ID);
   }
 

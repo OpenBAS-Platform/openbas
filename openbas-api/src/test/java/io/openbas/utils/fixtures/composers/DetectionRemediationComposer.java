@@ -49,6 +49,6 @@ public class DetectionRemediationComposer extends ComposerBase<DetectionRemediat
   public DetectionRemediationComposer.Composer forDetectionRemediation(
       DetectionRemediation detectionRemediation) {
     generatedItems.add(detectionRemediation);
-    return new Composer(detectionRemediation);
+    return new DetectionRemediationComposer.Composer(detectionRemediation);
   }
 }
