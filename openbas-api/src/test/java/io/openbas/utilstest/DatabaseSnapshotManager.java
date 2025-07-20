@@ -18,6 +18,7 @@ public class DatabaseSnapshotManager {
   private final JdbcTemplate jdbcTemplate;
   private static Map<String, List<Map<String, Object>>> startupData = new HashMap<>();
   private static boolean snapshotCreated = false;
+  private static List<String> TABLE_WITHOUT_RESTORATION = List.of("indexing_status");
   @Autowired private ElasticsearchClient esClient;
   @Autowired private EngineConfig config;
 
@@ -78,7 +79,9 @@ public class DatabaseSnapshotManager {
 
       // Restore tables in the correct order
       for (String table : tablesInOrder) {
-        restoreTableData(table);
+        if (!TABLE_WITHOUT_RESTORATION.contains(table)) {
+          restoreTableData(table);
+        }
       }
 
       // Activate FK back
