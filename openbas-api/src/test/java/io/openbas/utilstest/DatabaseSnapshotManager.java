@@ -67,6 +67,8 @@ public class DatabaseSnapshotManager {
       // Deactivate FK for now
       jdbcTemplate.execute("SET session_replication_role = replica");
 
+      cleanElasticsearchIndices();
+
       // Empty tables
       List<String> reverseOrder = new ArrayList<>(tablesInOrder);
       Collections.reverse(reverseOrder);
@@ -83,8 +85,6 @@ public class DatabaseSnapshotManager {
       jdbcTemplate.execute("SET session_replication_role = DEFAULT");
 
       log.info("Database restored to startup state via JDBC");
-
-      cleanElasticsearchIndices();
 
     } catch (Exception e) {
       throw new RuntimeException("Error restoring startup state", e);
