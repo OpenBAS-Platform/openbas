@@ -1,8 +1,11 @@
 package io.openbas.utilstest;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import io.openbas.config.EngineConfig;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +18,8 @@ public class DatabaseSnapshotManager {
   private final JdbcTemplate jdbcTemplate;
   private static Map<String, List<Map<String, Object>>> startupData = new HashMap<>();
   private static boolean snapshotCreated = false;
+  @Autowired private ElasticsearchClient esClient;
+  @Autowired private EngineConfig config;
 
   public DatabaseSnapshotManager(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
@@ -79,8 +84,29 @@ public class DatabaseSnapshotManager {
 
       log.info("Database restored to startup state via JDBC");
 
+      cleanElasticsearchIndices();
+
     } catch (Exception e) {
       throw new RuntimeException("Error restoring startup state", e);
+    }
+  }
+
+  private void cleanElasticsearchIndices() {
+    if (esClient == null) {
+      return;
+    }
+
+    try {
+      esClient
+          .indices()
+          .delete(
+              d ->
+                  d.index(config.getIndexPrefix() + "_*")
+                      .ignoreUnavailable(true)
+                      .allowNoIndices(true));
+      log.info("Deleted all openbas_* Elasticsearch indices");
+    } catch (Exception e) {
+      log.warn("Could not clean Elasticsearch: {}", e.getMessage());
     }
   }
 
