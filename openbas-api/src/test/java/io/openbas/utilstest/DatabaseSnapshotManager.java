@@ -64,10 +64,10 @@ public class DatabaseSnapshotManager {
       // Get tables order
       List<String> tablesInOrder = getTablesInDependencyOrder();
 
-      // Deactivate FK for now
-      jdbcTemplate.execute("SET session_replication_role = replica");
-
       cleanElasticsearchIndices();
+
+      // Deactivate FK for now
+      jdbcTemplate.execute("SET session_replication_role = 'replica';");
 
       // Empty tables
       List<String> reverseOrder = new ArrayList<>(tablesInOrder);
@@ -82,7 +82,7 @@ public class DatabaseSnapshotManager {
       }
 
       // Activate FK back
-      jdbcTemplate.execute("SET session_replication_role = DEFAULT");
+      jdbcTemplate.execute("SET session_replication_role = 'origin';");
 
       log.info("Database restored to startup state via JDBC");
 
