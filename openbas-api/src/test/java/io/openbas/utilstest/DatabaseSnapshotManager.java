@@ -63,8 +63,10 @@ public class DatabaseSnapshotManager {
       jdbcTemplate.execute("SET session_replication_role = replica");
 
       // Empty tables
-      for (String table : tablesInOrder) {
-        jdbcTemplate.execute("DELETE FROM " + table);
+      List<String> reverseOrder = new ArrayList<>(tablesInOrder);
+      Collections.reverse(reverseOrder);
+      for (String table : reverseOrder) {
+        jdbcTemplate.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE");
       }
 
       // Restore tables in the correct order
