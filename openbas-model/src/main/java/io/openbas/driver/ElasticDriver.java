@@ -199,7 +199,9 @@ public class ElasticDriver {
     }
     // Create index
     try {
-      client.indices().get(new GetIndexRequest.Builder().index(indexName).build());
+      client
+          .indices()
+          .get(new GetIndexRequest.Builder().index(indexName + config.getIndexSuffix()).build());
     } catch (ElasticsearchException e) {
       client
           .indices()
