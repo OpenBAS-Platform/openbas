@@ -66,7 +66,7 @@ public class DatabaseSnapshotManager {
       List<String> reverseOrder = new ArrayList<>(tablesInOrder);
       Collections.reverse(reverseOrder);
       for (String table : reverseOrder) {
-        jdbcTemplate.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE");
+        jdbcTemplate.execute("DELETE FROM " + table);
       }
 
       // Restore tables in the correct order
