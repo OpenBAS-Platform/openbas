@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.AssetToExecute;
 import io.openbas.utils.fixtures.*;
 import java.util.*;
 import org.junit.jupiter.api.DisplayName;
@@ -23,24 +24,33 @@ class ExpectationUtilsTest {
   void shouldBuildExpectationsWithSignatureParentProcessNameForObasImplant_Prevention() {
     // -- PREPARE --
     Endpoint endpoint = EndpointFixture.createEndpoint();
-    Agent agent = AgentFixture.createAgent(endpoint, "ext");
-    agent.setId("agentId");
-    endpoint.setAgents(List.of(agent));
     InjectorContract injectorContract = InjectorContractFixture.createDefaultInjectorContract();
     Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
     inject.setId("injectId");
-    PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
-    DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
+
+    Agent agent = AgentFixture.createAgent(endpoint, "ext");
+    agent.setId("agentId");
+    endpoint.setAgents(List.of(agent));
+    agent.setInject(inject);
+
+    AssetToExecute assetToExecute = new AssetToExecute(endpoint, true, List.of());
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationList(
-            endpoint, null, inject, preventionExpectation, new HashMap<>());
+        getPreventionExpectationsByAsset(
+            OBAS_IMPLANT,
+            assetToExecute,
+            List.of(agent),
+            ExpectationFixture.createExpectation(),
+            new HashMap<>());
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationList(endpoint, null, inject, detectionExpectation, new HashMap<>());
+        getDetectionExpectationsByAsset(
+            OBAS_IMPLANT,
+            assetToExecute,
+            List.of(agent),
+            ExpectationFixture.createExpectation(),
+            new HashMap<>());
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -49,8 +59,8 @@ class ExpectationUtilsTest {
             .value("obas-implant-injectId-agent-agentId")
             .build();
 
-    assertEquals(1, preventionExpectations.size());
-    assertEquals(1, detectionExpectations.size());
+    assertEquals(2, preventionExpectations.size());
+    assertEquals(2, detectionExpectations.size());
 
     assertEquals(PreventionExpectation.class, preventionExpectations.getFirst().getClass());
     assertEquals(DetectionExpectation.class, detectionExpectations.getFirst().getClass());
@@ -58,6 +68,7 @@ class ExpectationUtilsTest {
     assertEquals(
         signature,
         preventionExpectations.stream()
+            .filter(expectation -> expectation.getAgent() != null)
             .flatMap(prev -> prev.getInjectExpectationSignatures().stream())
             .toList()
             .getFirst());
@@ -65,6 +76,7 @@ class ExpectationUtilsTest {
     assertEquals(
         signature,
         detectionExpectations.stream()
+            .filter(expectation -> expectation.getAgent() != null)
             .flatMap(det -> det.getInjectExpectationSignatures().stream())
             .toList()
             .getFirst());
@@ -78,25 +90,34 @@ class ExpectationUtilsTest {
     InjectorContract injectorContract = InjectorContractFixture.createDefaultInjectorContract();
     Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
     inject.setId("injectId");
+
     Agent agentParent = AgentFixture.createAgent(endpoint, "ext-parent");
     agentParent.setId("agentParentId");
+    agentParent.setInject(inject);
     Agent agent = AgentFixture.createAgent(endpoint, "ext");
     agent.setId("agentId");
     agent.setInject(inject);
     agent.setParent(agentParent);
 
-    PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
-    DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
+    AssetToExecute assetToExecute = new AssetToExecute(endpoint, true, List.of());
 
     // -- EXECUTE --
+
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationListForCaldera(
-            endpoint, null, List.of(agent), preventionExpectation);
+        getPreventionExpectationsByAsset(
+            OBAS_IMPLANT_CALDERA,
+            assetToExecute,
+            List.of(agent),
+            ExpectationFixture.createExpectation(),
+            new HashMap<>());
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationListForCaldera(endpoint, null, List.of(agent), detectionExpectation);
+        getDetectionExpectationsByAsset(
+            OBAS_IMPLANT_CALDERA,
+            assetToExecute,
+            List.of(agent),
+            ExpectationFixture.createExpectation(),
+            new HashMap<>());
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -105,8 +126,8 @@ class ExpectationUtilsTest {
             .value("obas-implant-caldera-injectId-agent-agentParentId")
             .build();
 
-    assertEquals(1, preventionExpectations.size());
-    assertEquals(1, detectionExpectations.size());
+    assertEquals(2, preventionExpectations.size());
+    assertEquals(2, detectionExpectations.size());
 
     assertEquals(PreventionExpectation.class, preventionExpectations.getFirst().getClass());
     assertEquals(DetectionExpectation.class, detectionExpectations.getFirst().getClass());
@@ -114,6 +135,7 @@ class ExpectationUtilsTest {
     assertEquals(
         signature,
         preventionExpectations.stream()
+            .filter(expectation -> expectation.getAgent() != null)
             .flatMap(prev -> prev.getInjectExpectationSignatures().stream())
             .toList()
             .getFirst());
@@ -121,6 +143,7 @@ class ExpectationUtilsTest {
     assertEquals(
         signature,
         detectionExpectations.stream()
+            .filter(expectation -> expectation.getAgent() != null)
             .flatMap(det -> det.getInjectExpectationSignatures().stream())
             .toList()
             .getFirst());
@@ -134,14 +157,15 @@ class ExpectationUtilsTest {
     Endpoint endpoint = EndpointFixture.createEndpoint();
     endpoint.setIps(fakeIPs);
     endpoint.setSeenIp(fakeSeenIPV6);
-    Agent agent = AgentFixture.createAgent(endpoint, "ext");
-    agent.setId("agentId");
-    endpoint.setAgents(List.of(agent));
+
     InjectorContract injectorContract = InjectorContractFixture.createDefaultInjectorContract();
     Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
     inject.setId("injectId");
-    PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
+
+    Agent agent = AgentFixture.createAgent(endpoint, "ext");
+    agent.setId("agentId");
+    endpoint.setAgents(List.of(agent));
+    agent.setInject(inject);
 
     String targetHostname = "http://target";
     String target2Ip = "100.90.200.90";
@@ -153,9 +177,16 @@ class ExpectationUtilsTest {
     targetValues.put(targetHostname, targetEndpoint);
     targetValues.put(target2Ip, targetEndpoint2);
 
+    AssetToExecute assetToExecute = new AssetToExecute(endpoint, true, List.of());
+
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationList(endpoint, null, inject, preventionExpectation, targetValues);
+        getPreventionExpectationsByAsset(
+            OBAS_IMPLANT,
+            assetToExecute,
+            List.of(agent),
+            ExpectationFixture.createExpectation(),
+            targetValues);
 
     List<String> preventionSourceIpv4SignatureValues = new ArrayList<>();
     List<String> preventionSourceIpv6SignatureValues = new ArrayList<>();
@@ -163,7 +194,9 @@ class ExpectationUtilsTest {
     List<String> preventionTargetIpv4SignatureValues = new ArrayList<>();
     List<String> preventionTargetHostnamesSignatureValues = new ArrayList<>();
 
-    preventionExpectations
+    preventionExpectations.stream()
+        .filter(expectation -> expectation.getAgent() != null)
+        .toList()
         .getFirst()
         .getInjectExpectationSignatures()
         .forEach(
