@@ -1304,15 +1304,25 @@ export interface DocumentCreateInput {
 }
 
 export interface DocumentRelationsOutput {
+  /** @uniqueItems true */
   atomicTestings?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   challenges?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   channels?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   payloads?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   scenarioArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   scenarioInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   securityPlatforms?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   simulationArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   simulationInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
   simulations?: RelatedEntityOutput[];
 }
 
