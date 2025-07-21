@@ -2,6 +2,8 @@ package io.openbas.rest;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -12,17 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Challenge;
 import io.openbas.database.model.Document;
-import io.openbas.database.model.Payload;
+import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.rest.document.form.DocumentRelationsOutput;
 import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.utils.fixtures.ChallengeFixture;
 import io.openbas.utils.fixtures.DocumentFixture;
 import io.openbas.utils.fixtures.FileFixture;
-import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.composers.ChallengeComposer;
 import io.openbas.utils.fixtures.composers.DocumentComposer;
-import io.openbas.utils.fixtures.composers.PayloadComposer;
 import io.openbas.utils.fixtures.files.BinaryFile;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -45,17 +45,19 @@ class DocumentApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired DocumentComposer documentComposer;
-  @Autowired PayloadComposer payloadComposer;
   @Autowired ChallengeComposer challengeComposer;
   @Autowired private DocumentRepository documentRepository;
+  @Autowired private ChallengeRepository challengeRepository;
 
   @BeforeAll
   void beforeAll() {
+    challengeComposer.reset();
     documentComposer.reset();
   }
 
   @AfterAll
   void afterAll() {
+    challengeComposer.reset();
     documentComposer.reset();
   }
 
@@ -74,39 +76,31 @@ class DocumentApiTest extends IntegrationTest {
       document.setType("image");
       documentComposer.forDocument(document).persist();
 
-      payloadComposer
-          .forPayload(PayloadFixture.createDefaultFileDrop())
-          .withFileDrop(documentComposer.forDocument(document))
-          .persist();
-
-      challengeComposer
-          .forChallenge(ChallengeFixture.createDefaultChallenge())
-          .withDocument(documentComposer.forDocument(document));
+      Challenge challenge =
+          challengeComposer
+              .forChallenge(ChallengeFixture.createDefaultChallenge())
+              .withDocument(documentComposer.forDocument(document))
+              .persist()
+              .get();
 
       mvc.perform(delete(DOCUMENT_URI + "/" + document.getId())).andExpect(status().isOk());
 
-      Assertions.assertFalse(documentRepository.findById(document.getId()).isPresent());
+      assertFalse(documentRepository.findById(document.getId()).isPresent());
+      assertTrue(challengeRepository.findById(challenge.getId()).isPresent());
     }
 
     @Test
     @DisplayName("Should fetch related entities for a document")
     void shouldFetchRelatedEntities() throws Exception {
+      ChallengeComposer.Composer challenge =
+          challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge());
+
       BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
-      Document document1 = DocumentFixture.getDocument(badCoffeeFileContent);
-
-      Payload payload =
-          payloadComposer
-              .forPayload(PayloadFixture.createDefaultFileDrop())
-              .withFileDrop(
-                  documentComposer.forDocument(document1).withInMemoryFile(badCoffeeFileContent))
-              .persist()
-              .get();
-
-      Challenge challenge =
-          challengeComposer
-              .forChallenge(ChallengeFixture.createDefaultChallenge())
-              .withDocument(
-                  documentComposer.forDocument(document1).withInMemoryFile(badCoffeeFileContent))
+      Document document1 =
+          documentComposer
+              .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+              .withInMemoryFile(badCoffeeFileContent)
+              .withChallenge(challenge)
               .persist()
               .get();
 
@@ -121,9 +115,11 @@ class DocumentApiTest extends IntegrationTest {
 
       DocumentRelationsOutput output =
           DocumentRelationsOutput.builder()
-              .payloads(Set.of(new RelatedEntityOutput(payload.getId(), payload.getName(), null)))
               .challenges(
-                  Set.of(new RelatedEntityOutput(challenge.getId(), challenge.getName(), null)))
+                  Set.of(
+                      new RelatedEntityOutput(
+                          challenge.get().getId(), challenge.get().getName(), null)))
+              .payloads(Collections.emptySet())
               .scenarioArticles(Collections.emptySet())
               .simulationArticles(Collections.emptySet())
               .simulations(Collections.emptySet())

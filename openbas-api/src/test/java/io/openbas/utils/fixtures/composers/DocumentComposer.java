@@ -1,5 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
+import io.openbas.database.model.Challenge;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.DocumentRepository;
@@ -17,13 +18,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class DocumentComposer extends ComposerBase<Document> {
+
   @Autowired private DocumentRepository documentRepository;
   @Autowired private FileService fileService;
 
   public class Composer extends InnerComposerBase<Document> {
+
     private final Document document;
     private BaseFile<?> companionFile = null;
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
+    private final List<ChallengeComposer.Composer> challengeComposers = new ArrayList<>();
 
     public Composer(Document document) {
       this.document = document;
@@ -34,6 +38,14 @@ public class DocumentComposer extends ComposerBase<Document> {
       Set<Tag> tempTags = this.document.getTags();
       tempTags.add(tagComposer.get());
       this.document.setTags(tempTags);
+      return this;
+    }
+
+    public Composer withChallenge(ChallengeComposer.Composer challengeComposer) {
+      challengeComposers.add(challengeComposer);
+      Set<Challenge> tempChallenges = this.document.getChallenges();
+      tempChallenges.add(challengeComposer.get());
+      this.document.setChallenges(tempChallenges);
       return this;
     }
 
