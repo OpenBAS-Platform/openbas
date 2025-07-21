@@ -27,7 +27,7 @@ import io.openbas.utils.fixtures.files.BinaryFile;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -121,17 +121,17 @@ class DocumentApiTest extends IntegrationTest {
 
       DocumentRelationsOutput output =
           DocumentRelationsOutput.builder()
-              .payloads(List.of(new RelatedEntityOutput(payload.getId(), payload.getName(), null)))
+              .payloads(Set.of(new RelatedEntityOutput(payload.getId(), payload.getName(), null)))
               .challenges(
-                  List.of(new RelatedEntityOutput(challenge.getId(), challenge.getName(), null)))
-              .scenarioArticles(Collections.emptyList())
-              .simulationArticles(Collections.emptyList())
-              .simulations(Collections.emptyList())
-              .simulationInjects(Collections.emptyList())
-              .scenarioInjects(Collections.emptyList())
-              .channels(Collections.emptyList())
-              .securityPlatforms(Collections.emptyList())
-              .atomicTestings(Collections.emptyList())
+                  Set.of(new RelatedEntityOutput(challenge.getId(), challenge.getName(), null)))
+              .scenarioArticles(Collections.emptySet())
+              .simulationArticles(Collections.emptySet())
+              .simulations(Collections.emptySet())
+              .simulationInjects(Collections.emptySet())
+              .scenarioInjects(Collections.emptySet())
+              .channels(Collections.emptySet())
+              .securityPlatforms(Collections.emptySet())
+              .atomicTestings(Collections.emptySet())
               .build();
 
       String relationJson = mapper.writeValueAsString(output);
