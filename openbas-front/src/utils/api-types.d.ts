@@ -5788,7 +5788,8 @@ export interface Widget {
     | "line"
     | "donut"
     | "list"
-    | "attack-path";
+    | "attack-path"
+    | "number";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -5822,7 +5823,8 @@ export interface WidgetInput {
     | "line"
     | "donut"
     | "list"
-    | "attack-path";
+    | "attack-path"
+    | "number";
 }
 
 export interface WidgetLayout {
