@@ -27,7 +27,6 @@ import io.openbas.utils.fixtures.composers.DocumentComposer;
 import io.openbas.utils.fixtures.files.BinaryFile;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
-import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,15 +95,6 @@ class DocumentApiTest extends IntegrationTest {
           DocumentRelationsOutput.builder()
               .challenges(
                   Set.of(new RelatedEntityOutput(challenge.getId(), challenge.getName(), null)))
-              .payloads(Collections.emptySet())
-              .scenarioArticles(Collections.emptySet())
-              .simulationArticles(Collections.emptySet())
-              .simulations(Collections.emptySet())
-              .simulationInjects(Collections.emptySet())
-              .scenarioInjects(Collections.emptySet())
-              .channels(Collections.emptySet())
-              .securityPlatforms(Collections.emptySet())
-              .atomicTestings(Collections.emptySet())
               .build();
 
       String relationJson = mapper.writeValueAsString(output);
