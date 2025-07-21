@@ -64,6 +64,7 @@ public class DocumentComposer extends ComposerBase<Document> {
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
+      this.challengeComposers.forEach(ChallengeComposer.Composer::persist);
       if (companionFile != null) {
         try (ByteArrayInputStream bais =
             new ByteArrayInputStream(companionFile.getContentBytes())) {
@@ -80,6 +81,7 @@ public class DocumentComposer extends ComposerBase<Document> {
     public Composer delete() {
       documentRepository.delete(document);
       this.tagComposers.forEach(TagComposer.Composer::delete);
+      this.challengeComposers.forEach(ChallengeComposer.Composer::delete);
       return this;
     }
 
