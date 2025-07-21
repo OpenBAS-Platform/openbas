@@ -1,5 +1,5 @@
 import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -157,20 +157,16 @@ const DocumentPopover = (props) => {
           <Typography variant="body2" gutterBottom>
             {t(type)}
           </Typography>
-          <ul style={{
-            margin: 0,
-            padding: theme.spacing(0, 2, 1),
-          }}
-          >
+          <List>
             {items.map(item => (
-              <li key={item.id}>
+              <ListItem key={item.id}>
                 <ContextLink
                   title={item.name}
                   url={buildEntityPath(type, item)}
                 />
-              </li>
+              </ListItem>
             ))}
-          </ul>
+          </List>
         </div>
       );
     });
@@ -287,7 +283,7 @@ const DocumentPopover = (props) => {
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={submitDelete}
-        text={renderDialogText()}
+        richContent={renderDialogText()}
       />
 
       {inline ? (
