@@ -1,5 +1,5 @@
 import { FiberManualRecord, MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -143,9 +143,11 @@ const DocumentPopover = (props) => {
           <List dense>
             {items.map(item => (
               <ListItem key={item.id}>
-                <ListItemIcon>
-                  <FiberManualRecord sx={{ fontSize: 8 }} />
-                </ListItemIcon>
+                <FiberManualRecord sx={{
+                  fontSize: 8,
+                  marginRight: 1,
+                }}
+                />
                 <ContextLink
                   title={item.name}
                   url={buildEntityPath(type, item)}
