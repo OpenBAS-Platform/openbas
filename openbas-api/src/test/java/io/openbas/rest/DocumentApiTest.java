@@ -1,5 +1,6 @@
 package io.openbas.rest;
 
+import static io.openbas.rest.document.DocumentApi.DOCUMENT_API;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.junit.Assert.assertFalse;
@@ -38,8 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("Document API Integration Tests")
 class DocumentApiTest extends IntegrationTest {
 
-  private static final String DOCUMENT_URI = "/api/documents";
-
   @Resource protected ObjectMapper mapper;
 
   @Autowired private MockMvc mvc;
@@ -69,21 +68,10 @@ class DocumentApiTest extends IntegrationTest {
     @Test
     @DisplayName("Should delete a document")
     void shouldDeleteDocument() throws Exception {
-      Document document = new Document();
-      document.setName("ToDelete");
-      document.setName("ToDelete");
-      document.setTarget("TargetDelete");
-      document.setType("image");
-      documentComposer.forDocument(document).persist();
+      Document document = getDocumentWithChallenge();
+      Challenge challenge = document.getChallenges().stream().findFirst().get();
 
-      Challenge challenge =
-          challengeComposer
-              .forChallenge(ChallengeFixture.createDefaultChallenge())
-              .withDocument(documentComposer.forDocument(document))
-              .persist()
-              .get();
-
-      mvc.perform(delete(DOCUMENT_URI + "/" + document.getId())).andExpect(status().isOk());
+      mvc.perform(delete(DOCUMENT_API + "/" + document.getId())).andExpect(status().isOk());
 
       assertFalse(documentRepository.findById(document.getId()).isPresent());
       assertTrue(challengeRepository.findById(challenge.getId()).isPresent());
@@ -92,20 +80,11 @@ class DocumentApiTest extends IntegrationTest {
     @Test
     @DisplayName("Should fetch related entities for a document")
     void shouldFetchRelatedEntities() throws Exception {
-      ChallengeComposer.Composer challenge =
-          challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge());
-
-      BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
-      Document document1 =
-          documentComposer
-              .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
-              .withInMemoryFile(badCoffeeFileContent)
-              .withChallenge(challenge)
-              .persist()
-              .get();
+      Document document = getDocumentWithChallenge();
+      Challenge challenge = document.getChallenges().stream().findFirst().get();
 
       String response =
-          mvc.perform(get(DOCUMENT_URI + "/" + document1.getId() + "/relations"))
+          mvc.perform(get(DOCUMENT_API + "/" + document.getId() + "/relations"))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -116,9 +95,7 @@ class DocumentApiTest extends IntegrationTest {
       DocumentRelationsOutput output =
           DocumentRelationsOutput.builder()
               .challenges(
-                  Set.of(
-                      new RelatedEntityOutput(
-                          challenge.get().getId(), challenge.get().getName(), null)))
+                  Set.of(new RelatedEntityOutput(challenge.getId(), challenge.getName(), null)))
               .payloads(Collections.emptySet())
               .scenarioArticles(Collections.emptySet())
               .simulationArticles(Collections.emptySet())
@@ -134,5 +111,19 @@ class DocumentApiTest extends IntegrationTest {
 
       assertThatJson(response).when(IGNORING_ARRAY_ORDER).isEqualTo(relationJson);
     }
+  }
+
+  private Document getDocumentWithChallenge() {
+
+    ChallengeComposer.Composer challenge =
+        challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge());
+
+    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
+    return documentComposer
+        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+        .withInMemoryFile(badCoffeeFileContent)
+        .withChallenge(challenge)
+        .persist()
+        .get();
   }
 }

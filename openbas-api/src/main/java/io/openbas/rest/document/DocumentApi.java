@@ -53,6 +53,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class DocumentApi extends RestBehavior {
 
+  public static final String DOCUMENT_API = "/api/documents";
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final ExerciseRepository exerciseRepository;
@@ -75,7 +76,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents")
+  @PostMapping(DOCUMENT_API)
   @Transactional(rollbackOn = Exception.class)
   public Document uploadDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -128,7 +129,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents/upsert")
+  @PostMapping(DOCUMENT_API + "/upsert")
   @Transactional(rollbackOn = Exception.class)
   public Document upsertDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -224,7 +225,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents/search")
+  @PostMapping(DOCUMENT_API + "/search")
   public Page<RawPaginationDocument> searchDocuments(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     OpenBASPrincipal user = currentUser();
@@ -259,13 +260,13 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @GetMapping("/api/documents/{documentId}")
+  @GetMapping(DOCUMENT_API + "/{documentId}")
   public Document document(@PathVariable String documentId) {
     return resolveDocument(documentId)
         .orElseThrow(() -> new ElementNotFoundException("Document not found"));
   }
 
-  @GetMapping("/api/documents/{documentId}/tags")
+  @GetMapping(DOCUMENT_API + "/{documentId}/tags")
   public Set<Tag> documentTags(@PathVariable String documentId) {
     Document document =
         resolveDocument(documentId)
@@ -273,7 +274,7 @@ public class DocumentApi extends RestBehavior {
     return document.getTags();
   }
 
-  @PutMapping("/api/documents/{documentId}/tags")
+  @PutMapping(DOCUMENT_API + "/{documentId}/tags")
   public Document documentTags(
       @PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
     Document document =
@@ -284,7 +285,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/documents/{documentId}")
+  @PutMapping(DOCUMENT_API + "/{documentId}")
   public Document updateDocumentInformation(
       @PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
     Document document =
@@ -341,7 +342,7 @@ public class DocumentApi extends RestBehavior {
     return documentRepository.save(document);
   }
 
-  @GetMapping("/api/documents/{documentId}/file")
+  @GetMapping(DOCUMENT_API + "/{documentId}/file")
   public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
       throws IOException {
     Document document =
@@ -492,13 +493,13 @@ public class DocumentApi extends RestBehavior {
 
   @LogExecutionTime
   @Operation(summary = "Fetch the entities related to this document id")
-  @GetMapping("/api/documents/{documentId}/relations")
+  @GetMapping(DOCUMENT_API + "/{documentId}/relations")
   public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
     return toDocumentRelationsOutput(documentService.document(documentId));
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @DeleteMapping("/api/documents/{documentId}")
+  @DeleteMapping(DOCUMENT_API + "/{documentId}")
   public void deleteDocument(@PathVariable String documentId) {
     documentService.deleteDocument(documentId);
   }
