@@ -96,7 +96,8 @@ public class OpenBASImplantExecutor extends Injector {
                                 assetToExecute,
                                 getActiveAgents(assetToExecute.asset(), inject),
                                 expectation,
-                                valueTargetedAssetsMap)
+                                valueTargetedAssetsMap,
+                                inject.getId())
                                 .stream();
                         case DETECTION ->
                             getDetectionExpectationsByAsset(
@@ -104,7 +105,8 @@ public class OpenBASImplantExecutor extends Injector {
                                 assetToExecute,
                                 getActiveAgents(assetToExecute.asset(), inject),
                                 expectation,
-                                valueTargetedAssetsMap)
+                                valueTargetedAssetsMap,
+                                inject.getId())
                                 .stream();
                         case VULNERABILITY ->
                             getVulnerabilityExpectationsByAsset(
@@ -112,7 +114,8 @@ public class OpenBASImplantExecutor extends Injector {
                                 assetToExecute,
                                 getActiveAgents(assetToExecute.asset(), inject),
                                 expectation,
-                                valueTargetedAssetsMap)
+                                valueTargetedAssetsMap,
+                                inject.getId())
                                 .stream();
                         case MANUAL ->
                             getManualExpectationsByAsset(

@@ -31,7 +31,6 @@ class ExpectationUtilsTest {
     Agent agent = AgentFixture.createAgent(endpoint, "ext");
     agent.setId("agentId");
     endpoint.setAgents(List.of(agent));
-    agent.setInject(inject);
 
     AssetToExecute assetToExecute = new AssetToExecute(endpoint, true, List.of());
 
@@ -42,7 +41,8 @@ class ExpectationUtilsTest {
             assetToExecute,
             List.of(agent),
             ExpectationFixture.createExpectation(),
-            new HashMap<>());
+            new HashMap<>(),
+            inject.getId());
 
     List<DetectionExpectation> detectionExpectations =
         getDetectionExpectationsByAsset(
@@ -50,7 +50,8 @@ class ExpectationUtilsTest {
             assetToExecute,
             List.of(agent),
             ExpectationFixture.createExpectation(),
-            new HashMap<>());
+            new HashMap<>(),
+            inject.getId());
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -109,7 +110,8 @@ class ExpectationUtilsTest {
             assetToExecute,
             List.of(agent),
             ExpectationFixture.createExpectation(),
-            new HashMap<>());
+            new HashMap<>(),
+            null);
 
     List<DetectionExpectation> detectionExpectations =
         getDetectionExpectationsByAsset(
@@ -117,7 +119,8 @@ class ExpectationUtilsTest {
             assetToExecute,
             List.of(agent),
             ExpectationFixture.createExpectation(),
-            new HashMap<>());
+            new HashMap<>(),
+            null);
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -165,7 +168,6 @@ class ExpectationUtilsTest {
     Agent agent = AgentFixture.createAgent(endpoint, "ext");
     agent.setId("agentId");
     endpoint.setAgents(List.of(agent));
-    agent.setInject(inject);
 
     String targetHostname = "http://target";
     String target2Ip = "100.90.200.90";
@@ -186,7 +188,8 @@ class ExpectationUtilsTest {
             assetToExecute,
             List.of(agent),
             ExpectationFixture.createExpectation(),
-            targetValues);
+            targetValues,
+            inject.getId());
 
     List<String> preventionSourceIpv4SignatureValues = new ArrayList<>();
     List<String> preventionSourceIpv6SignatureValues = new ArrayList<>();

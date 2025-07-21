@@ -395,7 +395,8 @@ public class CalderaExecutor extends Injector {
                                 assetToExecute,
                                 executedAgents,
                                 expectation,
-                                new HashMap<>())
+                                new HashMap<>(),
+                                null)
                                 .stream();
                         case DETECTION ->
                             getDetectionExpectationsByAsset(
@@ -403,7 +404,8 @@ public class CalderaExecutor extends Injector {
                                 assetToExecute,
                                 executedAgents,
                                 expectation,
-                                new HashMap<>())
+                                new HashMap<>(),
+                                null)
                                 .stream();
                         case MANUAL ->
                             getManualExpectationsByAsset(

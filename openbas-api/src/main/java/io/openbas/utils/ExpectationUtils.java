@@ -19,6 +19,7 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.model.expectation.VulnerabilityExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.AssetToExecute;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -174,6 +175,7 @@ public class ExpectationUtils {
    * @param executedAgents the list of executed agents
    * @param expectation the expectation details
    * @param valueTargetedAssetsMap a map of value targeted assets
+   * @param injectId the ID of the inject
    * @return a list of prevention expectations
    */
   public static List<PreventionExpectation> getPreventionExpectationsByAsset(
@@ -181,7 +183,8 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       List<io.openbas.database.model.Agent> executedAgents,
       io.openbas.model.inject.form.Expectation expectation,
-      Map<String, Endpoint> valueTargetedAssetsMap) {
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      String injectId) {
     return getExpectations(
         assetToExecute,
         executedAgents,
@@ -204,7 +207,7 @@ public class ExpectationUtils {
                 expectation.getExpirationTime(),
                 computeSignatures(
                     implantType,
-                    agent.getInject().getId(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
                     assetToExecute.asset(),
                     OBAS_IMPLANT_CALDERA.equals(implantType)
                         ? agent.getParent().getId()
@@ -220,6 +223,7 @@ public class ExpectationUtils {
    * @param executedAgents the list of executed agents
    * @param expectation the expectation details
    * @param valueTargetedAssetsMap a map of value targeted assets
+   * @param injectId the ID of the inject
    * @return a list of detection expectations
    */
   public static List<DetectionExpectation> getDetectionExpectationsByAsset(
@@ -227,7 +231,8 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       List<io.openbas.database.model.Agent> executedAgents,
       io.openbas.model.inject.form.Expectation expectation,
-      Map<String, Endpoint> valueTargetedAssetsMap) {
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      String injectId) {
     return getExpectations(
         assetToExecute,
         executedAgents,
@@ -250,7 +255,7 @@ public class ExpectationUtils {
                 expectation.getExpirationTime(),
                 computeSignatures(
                     implantType,
-                    agent.getInject().getId(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
                     assetToExecute.asset(),
                     OBAS_IMPLANT_CALDERA.equals(implantType)
                         ? agent.getParent().getId()
@@ -272,7 +277,6 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       List<io.openbas.database.model.Agent> executedAgents,
       io.openbas.model.inject.form.Expectation expectation) {
-
     return getExpectations(
         assetToExecute,
         executedAgents,
@@ -310,7 +314,8 @@ public class ExpectationUtils {
       AssetToExecute assetToExecute,
       List<io.openbas.database.model.Agent> executedAgents,
       io.openbas.model.inject.form.Expectation expectation,
-      Map<String, Endpoint> valueTargetedAssetsMap) {
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      @Nullable String injectId) {
     return getExpectations(
         assetToExecute,
         executedAgents,
@@ -327,15 +332,17 @@ public class ExpectationUtils {
                 expectation.getScore(),
                 expectation.getName(),
                 expectation.getDescription(),
-                agent,
+                OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getParent() : agent,
                 assetToExecute.asset(),
                 assetGroup,
                 expectation.getExpirationTime(),
                 computeSignatures(
                     implantType,
-                    agent.getInject().getId(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
                     assetToExecute.asset(),
-                    agent.getId(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType)
+                        ? agent.getParent().getId()
+                        : agent.getId(),
                     valueTargetedAssetsMap)));
   }
 
