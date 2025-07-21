@@ -1,5 +1,5 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
+import { FiberManualRecord, MoreVert } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -34,18 +34,7 @@ const entityPaths = {
 };
 
 // Ordered entity types
-const renderOrder = [
-  'atomicTestings',
-  'scenarioInjects',
-  'simulationInjects',
-  'simulations',
-  'payloads',
-  'channels',
-  'scenarioArticles',
-  'simulationArticles',
-  'challenges',
-  'securityPlatforms',
-];
+const renderOrder = ['atomicTestings', 'scenarioInjects', 'simulationInjects', 'simulations', 'payloads', 'channels', 'scenarioArticles', 'simulationArticles', 'challenges', 'securityPlatforms'];
 
 const DocumentPopover = (props) => {
   // Standard hooks
@@ -94,11 +83,7 @@ const DocumentPopover = (props) => {
   };
 
   const onSubmitEdit = (data) => {
-    const inputValues = R.pipe(
-      R.assoc('document_tags', R.pluck('id', data.document_tags)),
-      R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
-      R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)),
-    )(data);
+    const inputValues = R.pipe(R.assoc('document_tags', R.pluck('id', data.document_tags)), R.assoc('document_exercises', R.pluck('id', data.document_exercises)), R.assoc('document_scenarios', R.pluck('id', data.document_scenarios)))(data);
     return dispatch(updateDocument(document.document_id, inputValues))
       .then((result) => {
         if (onUpdate) {
@@ -131,13 +116,11 @@ const DocumentPopover = (props) => {
   };
 
   const submitDelete = () => {
-    dispatch(deleteDocument(document.document_id)).then(
-      () => {
-        if (onDelete) {
-          onDelete(document.document_id);
-        }
-      },
-    );
+    dispatch(deleteDocument(document.document_id)).then(() => {
+      if (onDelete) {
+        onDelete(document.document_id);
+      }
+    });
     handleCloseDelete();
   };
 
@@ -154,12 +137,15 @@ const DocumentPopover = (props) => {
 
       return (
         <div key={type}>
-          <Typography variant="body2" gutterBottom>
+          <Typography gutterBottom>
             {t(type)}
           </Typography>
-          <List>
+          <List dense>
             {items.map(item => (
               <ListItem key={item.id}>
+                <ListItemIcon>
+                  <FiberManualRecord sx={{ fontSize: 8 }} />
+                </ListItemIcon>
                 <ContextLink
                   title={item.name}
                   url={buildEntityPath(type, item)}
@@ -220,27 +206,9 @@ const DocumentPopover = (props) => {
   };
 
   const documentTags = tagOptions(document.document_tags, tagsMap);
-  const documentExercises = exerciseOptions(
-    document.document_exercises,
-    exercisesMap,
-  );
-  const documentScenarios = scenarioOptions(
-    document.document_scenarios,
-    scenariosMap,
-  );
-  const initialValues = R.pipe(
-    R.assoc('document_tags', documentTags),
-    R.assoc('document_exercises', documentExercises),
-    R.assoc('document_scenarios', documentScenarios),
-    R.pick([
-      'document_name',
-      'document_description',
-      'document_type',
-      'document_tags',
-      'document_exercises',
-      'document_scenarios',
-    ]),
-  )(document);
+  const documentExercises = exerciseOptions(document.document_exercises, exercisesMap);
+  const documentScenarios = scenarioOptions(document.document_scenarios, scenariosMap);
+  const initialValues = R.pipe(R.assoc('document_tags', documentTags), R.assoc('document_exercises', documentExercises), R.assoc('document_scenarios', documentScenarios), R.pick(['document_name', 'document_description', 'document_type', 'document_tags', 'document_exercises', 'document_scenarios']))(document);
   return (
     <div>
       <IconButton
