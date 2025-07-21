@@ -3,12 +3,28 @@ import { useParams } from 'react-router';
 
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import { addLessonsCategory, addLessonsQuestion, applyLessonsTemplate, deleteLessonsCategory, deleteLessonsQuestion, emptyLessonsCategories, fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayersByExercise, resetLessonsAnswers, sendLessons, updateLessonsCategory, updateLessonsCategoryTeams, updateLessonsQuestion } from '../../../../../actions/exercises/exercise-action';
+import {
+  addLessonsCategory,
+  addLessonsQuestion,
+  applyLessonsTemplate,
+  deleteLessonsCategory,
+  deleteLessonsQuestion,
+  emptyLessonsCategories,
+  fetchLessonsAnswers,
+  fetchLessonsCategories,
+  fetchLessonsQuestions,
+  fetchLessonsTemplates,
+  fetchPlayersByExercise,
+  resetLessonsAnswers,
+  sendLessons,
+  updateLessonsCategory,
+  updateLessonsCategoryTeams,
+  updateLessonsQuestion,
+} from '../../../../../actions/exercises/exercise-action';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
@@ -64,7 +80,7 @@ const SimulationLessons = () => {
       lessonsCategories: helper.getExerciseLessonsCategories(exerciseId),
       lessonsQuestions: helper.getExerciseLessonsQuestions(exerciseId),
       lessonsAnswers: helper.getExerciseLessonsAnswers(exerciseId),
-      lessonsTemplates: helper.getLessonsTemplates(),
+      lessonsTemplates: helper.getExerciseLessonsTemplates(exerciseId),
       teamsMap: helper.getTeamsMap(),
       teams: helper.getExerciseTeams(exerciseId),
       usersMap: helper.getUsersMap(),
@@ -77,7 +93,7 @@ const SimulationLessons = () => {
   );
 
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
+    dispatch(fetchLessonsTemplates(exerciseId));
     dispatch(fetchPlayersByExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
@@ -124,7 +140,7 @@ const SimulationLessons = () => {
     onDeleteObjective: (objectiveId: string) => dispatch(deleteExerciseObjective(exerciseId, objectiveId)),
     // Evaluation
     onAddEvaluation: (objectiveId: string, data: EvaluationInput) => dispatch(addExerciseEvaluation(exerciseId, objectiveId, data)),
-    onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => dispatch(updateExerciseEvaluation(objectiveId, evaluationId, data)),
+    onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => dispatch(updateExerciseEvaluation(exerciseId, objectiveId, evaluationId, data)),
     onFetchEvaluation: (objectiveId: string) => dispatch(fetchExerciseEvaluations(exerciseId, objectiveId)),
   };
 

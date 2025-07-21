@@ -6,6 +6,8 @@ import * as schema from './Schema';
 
 export const fetchDocuments = () => (dispatch: Dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
 
+export const fetchDocumentsForSimulation = (simulationId: string) => (dispatch: Dispatch) => getReferential(schema.arrayOfDocuments, `/api/exercises/${simulationId}/documents`)(dispatch);
+
 export const fetchDocument = (documentId: string) => (dispatch: Dispatch) => getReferential(schema.document, `/api/documents/${documentId}`)(dispatch);
 
 export const searchDocuments = (paginationInput: SearchPaginationInput) => {

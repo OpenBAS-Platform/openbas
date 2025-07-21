@@ -1,4 +1,14 @@
-import { type Exercise, type ExerciseSimple, type InjectExpectation, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type Objective, type Team } from '../../utils/api-types';
+import {
+  type Exercise,
+  type ExerciseSimple,
+  type InjectExpectation,
+  type LessonsAnswer,
+  type LessonsCategory,
+  type LessonsQuestion,
+  type LessonsTemplate,
+  type Objective,
+  type Team,
+} from '../../utils/api-types';
 
 export interface ExercisesHelper {
   isExercise: (exerciseId: string) => boolean;
@@ -12,4 +22,5 @@ export interface ExercisesHelper {
   getExerciseLessonsQuestions: (exerciseId: string) => LessonsQuestion[];
   getExerciseLessonsAnswers: (exerciseId: string) => LessonsAnswer[];
   getExerciseUserLessonsAnswers: (exerciseId: string, userId: string) => LessonsAnswer[];
+  getExerciseLessonsTemplates: (exerciseId: string) => LessonsTemplate[];
 }

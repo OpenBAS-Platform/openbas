@@ -85,6 +85,11 @@ export const searchExerciseByIdAsOption = (ids: string[]) => {
 
 // -- LESSONS --
 
+export const fetchLessonsTemplates = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/lessons_templates`;
+  return getReferential(schema.arrayOfLessonsTemplates, uri)(dispatch);
+};
+
 export const fetchLessonsCategories = (exerciseId: string) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/lessons_categories`;
   return getReferential(schema.arrayOfLessonsCategories, uri)(dispatch);

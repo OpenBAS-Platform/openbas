@@ -41,6 +41,12 @@ export const deleteAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => 
 export const fetchAssetGroups = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfAssetGroups, ASSET_GROUP_URI)(dispatch);
 };
+
+export const fetchExerciseAssetGroups = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/asset_groups`;
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
+};
+
 export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = `${ASSET_GROUP_URI}/search`;

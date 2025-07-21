@@ -28,6 +28,11 @@ export const fetchEndpoints = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfEndpoints, ENDPOINT_URI)(dispatch);
 };
 
+export const fetchExerciseEndpoints = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/endpoints`;
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
+};
+
 export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = `${ENDPOINT_URI}/search`;

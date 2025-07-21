@@ -6,6 +6,12 @@ export const fetchChannels = () => (dispatch) => {
   const uri = '/api/channels';
   return getReferential(arrayOfChannels, uri)(dispatch);
 };
+
+export const fetchExerciseChannels = exerciseId => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/channels`;
+  return getReferential(arrayOfChannels, uri)(dispatch);
+};
+
 export const fetchChannel = channelId => (dispatch) => {
   const uri = `/api/channels/${channelId}`;
   return getReferential(channelAction, uri)(dispatch);
