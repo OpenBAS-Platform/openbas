@@ -16,7 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -33,7 +32,7 @@ public class TlsConfig {
   @Resource private OpenBASConfig openBASConfig;
 
   /** Get files paths ".pem" from directory */
-  public Set<String> getFilesPaths(String dir) {
+  private Set<String> getFilesPaths(String dir) {
     try (Stream<Path> stream = Files.list(Paths.get(dir))) {
       return stream
           .filter(file -> !Files.isDirectory(file))
@@ -48,7 +47,7 @@ public class TlsConfig {
   }
 
   /** Get extra trusted certs from files */
-  public List<X509Certificate> getExtraCerts(Set<String> filesPaths)
+  private List<X509Certificate> getExtraCerts(Set<String> filesPaths)
       throws IOException, CertificateException {
     List<X509Certificate> extraCerts = new ArrayList<>();
     for (String filePath : filesPaths) {
@@ -81,7 +80,7 @@ public class TlsConfig {
    * @throws Exception exception
    */
   @Bean
-  public SSLContext tlsContextCustom() throws Exception {
+  public X509TrustManager tlsContextCustom() throws Exception {
     TrustManagerFactory trustManagerFactory =
         TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     trustManagerFactory.init((KeyStore) null);
@@ -130,8 +129,6 @@ public class TlsConfig {
           }
         };
 
-    SSLContext context = SSLContext.getInstance("TLS");
-    context.init(null, new TrustManager[] {wrapper}, null);
-    return context;
+    return wrapper;
   }
 }
