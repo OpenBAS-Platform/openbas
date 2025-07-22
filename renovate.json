@@ -69,6 +69,10 @@
       "matchJsonata": ["$not($exists(isVulnerabilityAlert))"],
       "matchBaseBranches": ["master"],
       "enabled": false
+    },
+    {
+      "matchPackageNames": ["final-form"],
+      "enabled": false
     }
   ],
   "schedule": [
