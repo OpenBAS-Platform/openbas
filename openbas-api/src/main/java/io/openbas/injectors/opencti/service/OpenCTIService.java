@@ -3,6 +3,7 @@ package io.openbas.injectors.opencti.service;
 import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.database.model.ExecutionTrace.getNewSuccessTrace;
 
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.ExecutionTraceAction;
@@ -13,7 +14,6 @@ import java.util.List;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -23,16 +23,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenCTIService {
   private OpenCTIConfig config;
+  private HttpClientFactory httpClientFactory;
 
   @Autowired
   public void setConfig(OpenCTIConfig config) {
     this.config = config;
   }
 
+  @Autowired
+  public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = httpClientFactory;
+  }
+
   public void createCase(
       Execution execution, String name, String description, List<DataAttachment> attachments)
       throws Exception {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       // Prepare the query
       HttpPost httpPost = new HttpPost(config.getApiUrl());
       httpPost.addHeader("Authorization", "Bearer " + config.getToken());
@@ -70,7 +76,7 @@ public class OpenCTIService {
   public void createReport(
       Execution execution, String name, String description, List<DataAttachment> attachments)
       throws Exception {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       // Prepare the query
       HttpPost httpPost = new HttpPost(config.getApiUrl());
       httpPost.addHeader("Authorization", "Bearer " + config.getToken());
