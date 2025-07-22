@@ -4,6 +4,7 @@ import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
+import static io.openbas.utils.AgentUtils.getActiveAgents;
 import static io.openbas.utils.ExpectationUtils.*;
 import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAssetGroup;
 
@@ -59,9 +60,8 @@ public class OpenBASImplantExecutor extends Injector {
     List<Expectation> expectations = new ArrayList<>();
 
     assetToExecutes.forEach(
-        (assetToExecute) -> {
-          computeExpectationsForAssetAndAgents(expectations, content, assetToExecute, inject);
-        });
+        assetToExecute ->
+            computeExpectationsForAssetAndAgents(expectations, content, assetToExecute, inject));
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
     assetGroups.forEach(
@@ -80,21 +80,50 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final OpenBASImplantInjectContent content,
       @NotNull final AssetToExecute assetToExecute,
       final Inject inject) {
+
     if (!content.getExpectations().isEmpty()) {
+
+      Map<String, Endpoint> valueTargetedAssetsMap = injectService.getValueTargetedAssetMap(inject);
+
       expectations.addAll(
           content.getExpectations().stream()
               .flatMap(
                   expectation ->
                       switch (expectation.getType()) {
                         case PREVENTION ->
-                            getPreventionExpectations(assetToExecute, inject, expectation).stream();
+                            getPreventionExpectationsByAsset(
+                                OBAS_IMPLANT,
+                                assetToExecute,
+                                getActiveAgents(assetToExecute.asset(), inject),
+                                expectation,
+                                valueTargetedAssetsMap,
+                                inject.getId())
+                                .stream();
                         case DETECTION ->
-                            getDetectionExpectations(assetToExecute, inject, expectation).stream();
+                            getDetectionExpectationsByAsset(
+                                OBAS_IMPLANT,
+                                assetToExecute,
+                                getActiveAgents(assetToExecute.asset(), inject),
+                                expectation,
+                                valueTargetedAssetsMap,
+                                inject.getId())
+                                .stream();
                         case VULNERABILITY ->
-                            getVulnerabilityExpectations(assetToExecute, inject, expectation)
+                            getVulnerabilityExpectationsByAsset(
+                                OBAS_IMPLANT,
+                                assetToExecute,
+                                getActiveAgents(assetToExecute.asset(), inject),
+                                expectation,
+                                valueTargetedAssetsMap,
+                                inject.getId())
                                 .stream();
                         case MANUAL ->
-                            getManualExpectations(assetToExecute, inject, expectation).stream();
+                            getManualExpectationsByAsset(
+                                OBAS_IMPLANT,
+                                assetToExecute,
+                                getActiveAgents(assetToExecute.asset(), inject),
+                                expectation)
+                                .stream();
                         default -> Stream.of();
                       })
               .toList());
