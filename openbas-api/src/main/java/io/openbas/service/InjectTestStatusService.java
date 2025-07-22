@@ -14,7 +14,7 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Injector;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
-import io.openbas.utils.InjectStatusMapper;
+import io.openbas.utils.mapper.InjectStatusMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;

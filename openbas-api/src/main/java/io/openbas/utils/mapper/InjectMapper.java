@@ -1,10 +1,18 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.payload.output.PayloadSimple;
-import java.util.*;
+import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectUtils;
+import io.openbas.utils.ResultUtils;
+import io.openbas.utils.TargetType;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -123,5 +131,15 @@ public class InjectMapper {
 
   public InjectSimple toInjectSimple(Inject inject) {
     return InjectSimple.builder().id(inject.getId()).title(inject.getTitle()).build();
+  }
+
+  public static Set<RelatedEntityOutput> toRelatedEntityOutputs(Set<Inject> injects) {
+    return injects.stream()
+        .map(inject -> toRelatedEntityOutput(inject))
+        .collect(Collectors.toSet());
+  }
+
+  private static RelatedEntityOutput toRelatedEntityOutput(Inject inject) {
+    return RelatedEntityOutput.builder().id(inject.getId()).name(inject.getTitle()).build();
   }
 }
