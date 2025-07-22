@@ -79,6 +79,7 @@ class InjectApiTest extends IntegrationTest {
   static Document DOCUMENT1;
   static Document DOCUMENT2;
   static Team TEAM;
+  static Agent AGENT;
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
@@ -139,6 +140,12 @@ class InjectApiTest extends IntegrationTest {
     Team team = new Team();
     team.setName("team");
     TEAM = teamRepository.save(team);
+
+    Endpoint endpoint = EndpointFixture.createEndpoint();
+    Endpoint endpointSaved = endpointRepository.save(endpoint);
+    Agent agent = AgentFixture.createDefaultAgentService();
+    agent.setAsset(endpointSaved);
+    AGENT = agentRepository.save(agent);
   }
 
   @AfterAll
@@ -147,6 +154,7 @@ class InjectApiTest extends IntegrationTest {
     this.exerciseRepository.delete(EXERCISE);
     this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
     this.teamRepository.delete(TEAM);
+    this.agentRepository.delete(AGENT);
   }
 
   // BULK DELETE
@@ -465,9 +473,9 @@ class InjectApiTest extends IntegrationTest {
     Communication createdCommunication = communicationRepository.save(communication);
 
     injectExpectationRepository.save(
-        InjectExpectationFixture.createPreventionInjectExpectation(TEAM, createdInject1));
+        InjectExpectationFixture.createPreventionInjectExpectation(createdInject1, AGENT));
     injectExpectationRepository.save(
-        InjectExpectationFixture.createDetectionInjectExpectation(createdInject1));
+        InjectExpectationFixture.createDetectionInjectExpectation(createdInject1, AGENT));
     injectExpectationRepository.save(
         InjectExpectationFixture.createManualInjectExpectation(TEAM, createdInject2));
 
@@ -482,7 +490,7 @@ class InjectApiTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
+            .findAllByInjectAndAgent(createdInject1.getId(), AGENT.getId())
             .size());
     assertEquals(
         1,
@@ -697,8 +705,7 @@ class InjectApiTest extends IntegrationTest {
       agent.setAsset(endpointSaved);
       Agent agentSaved = agentRepository.save(agent);
       InjectExpectation detectionExpectation =
-          InjectExpectationFixture.createDetectionInjectExpectation(injectSaved);
-      detectionExpectation.setAgent(agentSaved);
+          InjectExpectationFixture.createDetectionInjectExpectation(injectSaved, agentSaved);
       injectExpectationRepository.save(detectionExpectation);
 
       doNothing()
@@ -922,8 +929,7 @@ class InjectApiTest extends IntegrationTest {
 
         // create expectation
         InjectExpectation detectionExpectation =
-            InjectExpectationFixture.createDetectionInjectExpectation(inject);
-        detectionExpectation.setAgent(agent);
+            InjectExpectationFixture.createDetectionInjectExpectation(inject, agent);
         injectExpectationRepository.save(detectionExpectation);
 
         InjectExecutionInput input = new InjectExecutionInput();
