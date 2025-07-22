@@ -40,9 +40,11 @@ const DialogDelete: FunctionComponent<DialogDeleteProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
-        <Button color="secondary" onClick={handleSubmit}>
-          {t('Delete')}
-        </Button>
+        {handleSubmit && (
+          <Button color="secondary" onClick={handleSubmit}>
+            {t('Delete')}
+          </Button>
+        )}
       </DialogActions>
     </DialogMUI>
   );

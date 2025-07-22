@@ -22,8 +22,10 @@ import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.utils.fixtures.ChallengeFixture;
 import io.openbas.utils.fixtures.DocumentFixture;
 import io.openbas.utils.fixtures.FileFixture;
+import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.composers.ChallengeComposer;
 import io.openbas.utils.fixtures.composers.DocumentComposer;
+import io.openbas.utils.fixtures.composers.PayloadComposer;
 import io.openbas.utils.fixtures.files.BinaryFile;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -44,6 +46,7 @@ class DocumentApiTest extends IntegrationTest {
 
   @Autowired DocumentComposer documentComposer;
   @Autowired ChallengeComposer challengeComposer;
+  @Autowired PayloadComposer payloadComposer;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private ChallengeRepository challengeRepository;
 
@@ -65,7 +68,17 @@ class DocumentApiTest extends IntegrationTest {
   class CRUD {
 
     @Test
-    @DisplayName("Should delete a document")
+    @DisplayName("Should delete a document when there is none references")
+    void shouldNoDeleteDocumentWhenIsRelatedToAPayload() throws Exception {
+      Document document = getDocumentWithPayload();
+
+      mvc.perform(delete(DOCUMENT_API + "/" + document.getId())).andExpect(status().isBadRequest());
+
+      Assertions.assertFalse(documentRepository.findById(document.getId()).isPresent());
+    }
+
+    @Test
+    @DisplayName("Should delete a document and its relations")
     void shouldDeleteDocument() throws Exception {
       Document document = getDocumentWithChallenge();
       Challenge challenge = document.getChallenges().stream().findFirst().get();
@@ -113,6 +126,20 @@ class DocumentApiTest extends IntegrationTest {
         .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
         .withInMemoryFile(badCoffeeFileContent)
         .withChallenge(challenge)
+        .persist()
+        .get();
+  }
+
+  private Document getDocumentWithPayload() {
+
+    PayloadComposer.Composer payload =
+        payloadComposer.forPayload(PayloadFixture.createDefaultExecutable());
+
+    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
+    return documentComposer
+        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+        .withInMemoryFile(badCoffeeFileContent)
+        .withPayloadExecutable(payload)
         .persist()
         .get();
   }
