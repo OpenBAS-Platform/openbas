@@ -16,6 +16,7 @@ import io.openbas.database.model.Variable;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.VariableRepository;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class VariableApiTest extends IntegrationTest {
   @DisplayName("Retrieve variables for scenario")
   @Test
   @Order(2)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void retrieveVariableForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =

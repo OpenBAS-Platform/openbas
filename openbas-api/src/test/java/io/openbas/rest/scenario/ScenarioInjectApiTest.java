@@ -25,6 +25,7 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
 import jakarta.transaction.Transactional;
@@ -135,7 +136,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @DisplayName("Retrieve injects for scenario")
   @Test
   @Order(2)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void retrieveInjectsForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
@@ -155,7 +156,7 @@ class ScenarioInjectApiTest extends IntegrationTest {
   @DisplayName("Retrieve inject for scenario")
   @Test
   @Order(3)
-  @WithMockPlannerUser
+  @WithMockObserverUser
   void retrieveInjectForScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
