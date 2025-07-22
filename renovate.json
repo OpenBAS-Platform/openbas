@@ -70,6 +70,7 @@
       "matchBaseBranches": ["master"],
       "enabled": false
     },
+    // Final Form should be removed from our project and replace by react-hook-form,
     {
       "matchPackageNames": ["final-form"],
       "enabled": false
