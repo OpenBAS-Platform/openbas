@@ -17,7 +17,7 @@ import io.openbas.integrations.InjectorService;
 import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
-import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.mapper.EndpointMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

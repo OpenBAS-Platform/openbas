@@ -3,7 +3,7 @@ package io.openbas.executors.model;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
 import io.openbas.helper.AgentHelper;
-import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.mapper.EndpointMapper;
 import java.time.Instant;
 import lombok.Data;
 

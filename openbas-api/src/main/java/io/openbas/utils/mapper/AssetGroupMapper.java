@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import io.openbas.database.model.AssetGroup;
 import io.openbas.rest.asset_group.form.AssetGroupSimple;

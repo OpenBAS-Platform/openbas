@@ -37,6 +37,8 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.*;
 import io.openbas.utils.*;
+import io.openbas.utils.mapper.InjectMapper;
+import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

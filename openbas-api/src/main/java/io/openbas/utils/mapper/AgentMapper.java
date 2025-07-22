@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import static java.util.Collections.emptyList;
 

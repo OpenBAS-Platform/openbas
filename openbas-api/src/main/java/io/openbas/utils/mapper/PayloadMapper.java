@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
@@ -12,6 +12,7 @@ import io.openbas.database.model.*;
 import io.openbas.ee.Ee;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.payload.form.DetectionRemediationOutput;
 import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
 import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
@@ -259,5 +260,15 @@ public class PayloadMapper {
             .values(detectionRemediation.getValues())
             .build();
     return output;
+  }
+
+  public static Set<RelatedEntityOutput> toRelatedEntityOutputs(Set<Payload> payloads) {
+    return payloads.stream()
+        .map(payload -> toRelatedEntityOutput(payload))
+        .collect(Collectors.toSet());
+  }
+
+  private static RelatedEntityOutput toRelatedEntityOutput(Payload payload) {
+    return RelatedEntityOutput.builder().id(payload.getId()).name(payload.getName()).build();
   }
 }

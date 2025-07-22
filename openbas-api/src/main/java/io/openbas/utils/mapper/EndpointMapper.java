@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import static io.openbas.database.model.Endpoint.*;
 import static io.openbas.utils.AgentUtils.getPrimaryAgents;

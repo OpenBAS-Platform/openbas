@@ -1,9 +1,11 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import static java.util.Collections.emptyList;
 
+import io.openbas.database.model.Article;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
+import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.AssetGroupRepository;
@@ -11,7 +13,11 @@ import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
+import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.ResultUtils;
+import io.openbas.utils.TargetType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -158,5 +164,41 @@ public class ExerciseMapper {
     simple.setUpdatedAt(exercise.getUpdatedAt());
 
     return simple;
+  }
+
+  public static Set<RelatedEntityOutput> toRelatedEntityOutputs(Set<Exercise> exercises) {
+    return exercises.stream()
+        .map(exercise -> toRelatedEntityOutput(exercise))
+        .collect(Collectors.toSet());
+  }
+
+  private static RelatedEntityOutput toRelatedEntityOutput(Exercise exercise) {
+    return RelatedEntityOutput.builder().id(exercise.getId()).name(exercise.getName()).build();
+  }
+
+  public static Set<RelatedEntityOutput> toSimulationArticles(Set<Article> articles) {
+    return articles.stream()
+        .map(article -> toSimulationArticle(article))
+        .collect(Collectors.toSet());
+  }
+
+  private static RelatedEntityOutput toSimulationArticle(Article article) {
+    return RelatedEntityOutput.builder()
+        .id(article.getId())
+        .name(article.getName())
+        .context(article.getExercise().getId())
+        .build();
+  }
+
+  public static Set<RelatedEntityOutput> toSimulationInjects(Set<Inject> injects) {
+    return injects.stream().map(inject -> toSimulationInject(inject)).collect(Collectors.toSet());
+  }
+
+  private static RelatedEntityOutput toSimulationInject(Inject inject) {
+    return RelatedEntityOutput.builder()
+        .id(inject.getId())
+        .name(inject.getTitle())
+        .context(inject.getExercise().getId())
+        .build();
   }
 }

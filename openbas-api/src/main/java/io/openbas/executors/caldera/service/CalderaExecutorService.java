@@ -16,7 +16,7 @@ import io.openbas.integrations.InjectorService;
 import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
-import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.mapper.EndpointMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
