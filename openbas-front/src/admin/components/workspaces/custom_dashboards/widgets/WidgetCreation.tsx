@@ -44,11 +44,17 @@ const WidgetCreation: FunctionComponent<{
       maxX = 0;
       maxY += 2;
     }
+    let width = 10;
+    let height = 10;
+    if ('number' === input.widget_type) {
+      width = 3;
+      height = 2;
+    }
     const layout = {
       widget_layout_x: maxX,
       widget_layout_y: maxY,
-      widget_layout_w: 10,
-      widget_layout_h: 10,
+      widget_layout_w: width,
+      widget_layout_h: height,
     };
     const finalInput = {
       ...input,

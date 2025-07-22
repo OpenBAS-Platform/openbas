@@ -14,6 +14,7 @@ import ListWidget from './viz/list/ListWidget';
 import SecurityCoverage from './viz/SecurityCoverage';
 import VerticalBarChart from './viz/VerticalBarChart';
 import { getWidgetTitle } from './WidgetUtils';
+import NumberWidget from './viz/NumberWidget';
 
 interface WidgetTemporalVizProps {
   widget: Widget;
@@ -124,6 +125,13 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     }
     case 'list':
       return (<ListWidget elements={entitiesVizData} config={widget.widget_config} />);
+    case 'number':
+      return (
+        <NumberWidget
+          widgetId={widget.widget_id}
+          data={seriesVizData}
+        />
+      );
     default:
       return 'Not implemented yet';
   }
