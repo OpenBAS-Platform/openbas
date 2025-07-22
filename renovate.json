@@ -72,7 +72,7 @@
     },
     // Final Form should be removed from our project and replace by react-hook-form,
     {
-      "matchPackageNames": ["final-form"],
+      "matchPackageNames": ["final-form","final-form-arrays", "react-final-form", "react-final-form-arrays"],
       "enabled": false
     }
   ],
