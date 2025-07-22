@@ -203,7 +203,7 @@ public class ExecutableInjectService {
     this.injectStatusService.addStartImplantExecutionTraceByInject(
         injectId, agentId, "Implant is up and starting execution", startTime);
     this.injectExpectationService.addStartDateSignatureToInjectExpectationsByAgent(
-        injectId, agentId, startTime.toString());
+        injectId, agentId, startTime);
     return payloadToExecute;
   }
 

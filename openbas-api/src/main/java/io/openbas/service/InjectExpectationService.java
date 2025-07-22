@@ -864,7 +864,7 @@ public class InjectExpectationService {
   private void addDateSignatureToInjectExpectationsByAgent(
       @NotBlank final String injectId,
       @NotBlank final String agentId,
-      @NotBlank final String date,
+      @NotBlank final Instant date,
       @NotBlank final String signatureType) {
     List<InjectExpectation> injectExpectations =
         this.injectExpectationRepository.findAllByInjectAndAgent(injectId, agentId);
@@ -872,7 +872,7 @@ public class InjectExpectationService {
     injectExpectations.forEach(
         expectation -> {
           List<InjectExpectationSignature> signatures = expectation.getSignatures();
-          signatures.add(new InjectExpectationSignature(signatureType, date));
+          signatures.add(new InjectExpectationSignature(signatureType, date.toString()));
         });
 
     injectExpectationRepository.saveAll(injectExpectations);
@@ -888,7 +888,7 @@ public class InjectExpectationService {
   public void addEndDateSignatureToInjectExpectationsByAgent(
       @NotBlank final String injectId,
       @NotBlank final String agentId,
-      @NotBlank final String date) {
+      @NotBlank final Instant date) {
     addDateSignatureToInjectExpectationsByAgent(
         injectId, agentId, date, EXPECTATION_SIGNATURE_TYPE_END_DATE);
   }
@@ -903,7 +903,7 @@ public class InjectExpectationService {
   public void addStartDateSignatureToInjectExpectationsByAgent(
       @NotBlank final String injectId,
       @NotBlank final String agentId,
-      @NotBlank final String date) {
+      @NotBlank final Instant date) {
     addDateSignatureToInjectExpectationsByAgent(
         injectId, agentId, date, EXPECTATION_SIGNATURE_TYPE_START_DATE);
   }

@@ -122,20 +122,11 @@ public class InjectExecutionService {
     if (agent != null
         && ExecutionTraceAction.COMPLETE.equals(convertExecutionAction(input.getAction()))) {
       InjectStatus injectStatus = inject.getStatus().orElseThrow();
-
-      Instant startTime =
-          injectStatus.getTraces().stream()
-              .filter(
-                  trace ->
-                      trace.getAction() == ExecutionTraceAction.START
-                          && agent.getId().equals(trace.getAgent().getId()))
-              .map(ExecutionTrace::getTime)
-              .findFirst()
-              .orElse(Instant.now());
-
-      Instant endDate = startTime.plusMillis(input.getDuration());
+      Instant endDate =
+          injectStatusService.getExecutionTimeFromStartTraceTimeAndDurationByAgentId(
+              injectStatus, agent.getId(), input.getDuration());
       injectExpectationService.addEndDateSignatureToInjectExpectationsByAgent(
-          inject.getId(), agent.getId(), endDate.toString());
+          inject.getId(), agent.getId(), endDate);
     }
   }
 
