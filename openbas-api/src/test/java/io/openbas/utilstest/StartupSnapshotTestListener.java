@@ -22,7 +22,7 @@ public class StartupSnapshotTestListener implements TestExecutionListener {
     // Restoring data to startup state
     ApplicationContext context = testContext.getApplicationContext();
     DatabaseSnapshotManager snapshotManager = context.getBean(DatabaseSnapshotManager.class);
-    snapshotManager.restoreToStartupState();
+    snapshotManager.restoreToSnapshotState();
 
     log.info("Restore completed after main test class: {}", testClass.getSimpleName());
   }

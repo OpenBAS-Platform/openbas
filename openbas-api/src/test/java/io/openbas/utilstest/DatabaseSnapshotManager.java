@@ -4,8 +4,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import io.openbas.config.EngineConfig;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,25 +13,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DatabaseSnapshotManager {
 
   private final JdbcTemplate jdbcTemplate;
-  private static Map<String, List<Map<String, Object>>> startupData = new HashMap<>();
+  private final ElasticsearchClient esClient;
+  private final EngineConfig config;
+
+  private static final Map<String, List<Map<String, Object>>> startupData = new HashMap<>();
+  private static final List<String> TABLE_WITHOUT_RESTORATION = List.of("indexing_status");
+
   private static boolean snapshotCreated = false;
-  private static List<String> TABLE_WITHOUT_RESTORATION = List.of("indexing_status");
-  @Autowired private ElasticsearchClient esClient;
-  @Autowired private EngineConfig config;
 
-  public DatabaseSnapshotManager(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
-  }
-
+  /** Create a snapshot of the database at startup */
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationReady() {
-    createStartupSnapshot();
+    createSnapshot();
   }
 
-  public void createStartupSnapshot() {
+  /** Create a snapshot of the database */
+  public void createSnapshot() {
     synchronized (DatabaseSnapshotManager.class) {
       if (snapshotCreated) return;
 
@@ -55,7 +56,8 @@ public class DatabaseSnapshotManager {
     }
   }
 
-  public void restoreToStartupState() {
+  /** Restore database to the snapshot */
+  public void restoreToSnapshotState() {
     if (!snapshotCreated) {
       log.error("Snapshot not created yet, cannot restore!");
       return;
@@ -94,6 +96,7 @@ public class DatabaseSnapshotManager {
     }
   }
 
+  /** Delete ES indices */
   private void cleanElasticsearchIndices() {
     if (esClient == null) {
       return;
@@ -113,6 +116,11 @@ public class DatabaseSnapshotManager {
     }
   }
 
+  /**
+   * Get the list of tables in dependency order
+   *
+   * @return the list of tables in dependency order
+   */
   private List<String> getTablesInDependencyOrder() {
     return jdbcTemplate.queryForList(
         """
@@ -135,6 +143,11 @@ public class DatabaseSnapshotManager {
         String.class);
   }
 
+  /**
+   * Restore the data of a specific table
+   *
+   * @param table the table to restore
+   */
   private void restoreTableData(String table) {
     List<Map<String, Object>> data = startupData.get(table);
     if (data == null || data.isEmpty()) return;
