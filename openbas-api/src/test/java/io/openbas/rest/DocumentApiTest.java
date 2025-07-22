@@ -68,8 +68,8 @@ class DocumentApiTest extends IntegrationTest {
   class CRUD {
 
     @Test
-    @DisplayName("Should not delete a document when it is related to a payload")
-    void shouldNoDeleteDocumentWhenIsRelatedToAPayload() throws Exception {
+    @DisplayName("Given a document related to a payload should no delete the payload")
+    void givenADocumentRelatedToAPayload_ShouldNoDeleteDocument() throws Exception {
       Document document = getDocumentWithPayload();
 
       mvc.perform(delete(DOCUMENT_API + "/" + document.getId())).andExpect(status().isBadRequest());
@@ -78,8 +78,8 @@ class DocumentApiTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Should delete a document and its relations")
-    void shouldDeleteDocument() throws Exception {
+    @DisplayName("Given a document without related entities should be deleted")
+    void givenADocumentWithRelationsShouldBeDeleted() throws Exception {
       Document document = getDocumentWithChallenge();
       Challenge challenge = document.getChallenges().stream().findFirst().get();
 
@@ -90,8 +90,8 @@ class DocumentApiTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Should fetch related entities for a document")
-    void shouldFetchRelatedEntities() throws Exception {
+    @DisplayName("Given a document id Should fetch related entities to this document")
+    void givenDocumentShouldFetchRelatedEntities() throws Exception {
       Document document = getDocumentWithChallenge();
       Challenge challenge = document.getChallenges().stream().findFirst().get();
 
