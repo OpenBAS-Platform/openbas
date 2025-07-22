@@ -908,6 +908,50 @@ public class InjectService {
   }
 
   /**
+   * Get a map of value (e.g., hostname, seen_ip ) for targeted assets of inject
+   *
+   * @param inject inject to extract the targeted assets from
+   * @return a map where the key is the value of the targeted asset (e.g., hostname, seen_ip) and
+   *     the value is the Endpoint object representing the targeted asset
+   */
+  public Map<String, Endpoint> getValueTargetedAssetMap(Inject inject) {
+    Map<String, Endpoint> valueTargetedAssetsMap = new HashMap<>();
+    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+
+    JsonNode injectorContractFieldsNode = injectorContract.getConvertedContent().get("fields");
+    if (injectorContractFieldsNode == null || !injectorContractFieldsNode.isArray()) {
+      return valueTargetedAssetsMap;
+    }
+
+    List<ObjectNode> injectorContractFields =
+        StreamSupport.stream(injectorContractFieldsNode.spliterator(), false)
+            .map(ObjectNode.class::cast)
+            .toList();
+
+    // Get all fields of type TargetedAsset
+    List<ObjectNode> targetedAssetFields =
+        injectorContractFields.stream()
+            .filter(
+                node ->
+                    node.has("type")
+                        && ContractFieldType.TargetedAsset.label.equals(node.get("type").asText()))
+            .toList();
+
+    targetedAssetFields.forEach(
+        f -> {
+          // For each targeted asset field, retrieve the values of the targeted assets based on the
+          // targeted property
+          String keyField = f.get("key").asText();
+          Map<String, Endpoint> valuesAssetsMap =
+              this.retrieveValuesOfTargetedAssetFromInject(
+                  injectorContractFields, inject.getContent(), keyField);
+          valueTargetedAssetsMap.putAll(valuesAssetsMap);
+        });
+
+    return valueTargetedAssetsMap;
+  }
+
+  /**
    * Function used to retrieve the targetedAsset value from an Inject.
    *
    * @param injectorContractContentFields InjectorContract Content fields from which to retrieve all
