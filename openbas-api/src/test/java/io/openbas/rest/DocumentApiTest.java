@@ -74,7 +74,7 @@ class DocumentApiTest extends IntegrationTest {
 
       mvc.perform(delete(DOCUMENT_API + "/" + document.getId())).andExpect(status().isBadRequest());
 
-      Assertions.assertFalse(documentRepository.findById(document.getId()).isPresent());
+      Assertions.assertTrue(documentRepository.findById(document.getId()).isPresent());
     }
 
     @Test
