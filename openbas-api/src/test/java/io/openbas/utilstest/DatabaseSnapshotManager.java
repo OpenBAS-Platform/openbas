@@ -22,6 +22,7 @@ public class DatabaseSnapshotManager {
 
   private static final Map<String, List<Map<String, Object>>> startupData = new HashMap<>();
   private static final List<String> TABLE_WITHOUT_RESTORATION = List.of("indexing_status");
+  private static List<String> tablesInOrder;
 
   private static boolean snapshotCreated = false;
 
@@ -65,7 +66,9 @@ public class DatabaseSnapshotManager {
 
     try {
       // Get tables order
-      List<String> tablesInOrder = getTablesInDependencyOrder();
+      if (tablesInOrder == null) {
+        tablesInOrder = getTablesInDependencyOrder();
+      }
 
       cleanElasticsearchIndices();
 
@@ -122,25 +125,58 @@ public class DatabaseSnapshotManager {
    * @return the list of tables in dependency order
    */
   private List<String> getTablesInDependencyOrder() {
-    return jdbcTemplate.queryForList(
-        """
-        WITH table_deps AS (
-            SELECT
-                t.table_name,
-                COUNT(rc.constraint_name) as fk_count
-            FROM information_schema.tables t
-            LEFT JOIN information_schema.key_column_usage kcu
-                ON t.table_name = kcu.table_name AND t.table_schema = kcu.table_schema
-            LEFT JOIN information_schema.referential_constraints rc
-                ON kcu.constraint_name = rc.constraint_name
-            WHERE t.table_schema = 'public'
-            GROUP BY t.table_name
-        )
-        SELECT table_name
-        FROM table_deps
-        ORDER BY fk_count, table_name
-        """,
-        String.class);
+    // Get all the dependencies
+    List<Map<String, Object>> dependencies =
+        jdbcTemplate.queryForList(
+            """
+                    SELECT
+                        tc.table_name as dependent_table,
+                        ccu.table_name as referenced_table
+                    FROM information_schema.table_constraints tc
+                    JOIN information_schema.key_column_usage kcu
+                        ON tc.constraint_name = kcu.constraint_name
+                    JOIN information_schema.constraint_column_usage ccu
+                        ON ccu.constraint_name = tc.constraint_name
+                    WHERE tc.constraint_type = 'FOREIGN KEY'
+                        AND tc.table_schema = 'public'
+                        AND tc.table_name != ccu.table_name
+                    """);
+
+    // Get all tables
+    Set<String> allTables =
+        new HashSet<>(
+            jdbcTemplate.queryForList(
+                "SELECT tablename FROM pg_tables WHERE schemaname = 'public'", String.class));
+
+    // Build dependency graph
+    Map<String, Set<String>> deps = new HashMap<>();
+    for (String table : allTables) {
+      deps.put(table, new HashSet<>());
+    }
+
+    for (Map<String, Object> dep : dependencies) {
+      String dependent = (String) dep.get("dependent_table");
+      String referenced = (String) dep.get("referenced_table");
+      deps.get(dependent).add(referenced);
+    }
+
+    // Topological sort
+    List<String> result = new ArrayList<>();
+    Set<String> processed = new HashSet<>();
+
+    while (processed.size() < allTables.size()) {
+      for (String table : allTables) {
+        if (!processed.contains(table)) {
+          // Check if the table has already been added
+          if (processed.containsAll(deps.get(table))) {
+            result.add(table);
+            processed.add(table);
+          }
+        }
+      }
+    }
+
+    return result;
   }
 
   /**
