@@ -37,6 +37,7 @@ public class TaniumExecutorClient {
   // -- ENDPOINTS --
 
   public DataEndpoints endpoints() {
+    String jsonResponse = null;
     try {
       final String formattedDateTime =
           DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -66,14 +67,17 @@ public class TaniumExecutorClient {
               + "}";
       Map<String, Object> body = new HashMap<>();
       body.put("query", query);
-      String jsonResponse = this.post(body);
+      jsonResponse = this.post(body);
       if (jsonResponse == null || jsonResponse.isEmpty()) {
         log.error("Received empty response from API for query: {}", query);
         throw new RuntimeException("API returned an empty response");
       }
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (JsonProcessingException e) {
-      log.error(String.format("Failed to parse JSON response. Error: %s", e.getMessage()), e);
+      log.error(
+          String.format(
+              "Failed to parse JSON response %s. Error: %s", jsonResponse, e.getMessage()),
+          e);
       throw new RuntimeException(e);
     } catch (IOException e) {
       log.error(
