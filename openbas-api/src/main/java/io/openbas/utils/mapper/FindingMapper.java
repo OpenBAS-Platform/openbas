@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;

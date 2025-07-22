@@ -21,12 +21,6 @@ public interface InjectDocumentRepository
 
   @Modifying
   @Query(
-      value = "delete from injects_documents i where i.document_id = :documentId",
-      nativeQuery = true)
-  void deleteDocumentFromAllReferences(@Param("documentId") String docId);
-
-  @Modifying
-  @Query(
       value = "delete from injects_documents i where i.inject_id = :injectId",
       nativeQuery = true)
   void deleteDocumentsFromInject(@Param("injectId") String injectId);
