@@ -2602,9 +2602,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:8.8.0":
-  version: 8.8.0
-  resolution: "@mui/x-date-pickers@npm:8.8.0"
+"@mui/x-date-pickers@npm:8.9.0":
+  version: 8.9.0
+  resolution: "@mui/x-date-pickers@npm:8.9.0"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
     "@mui/utils": "npm:^7.2.0"
@@ -2646,7 +2646,7 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/5b3e27c30b07baabbbd7f93074b699d64507547fcc3bccd61e4a209ecb8fe64b0c9619514205fabc56dab96935b297b808a9a129eb62289b3f2b11b2955e43f8
+  checksum: 10c0/84d538ba01b46004a3b3336f3cf8246bb4cae05821ca6dfdb96cec8fe07a349200a282dea73cf00b23c8d9a3be5f25d2e5f83e92e2597573f36fb685827cfd80
   languageName: node
   linkType: hard
 
@@ -10090,7 +10090,7 @@ __metadata:
     "@mui/lab": "npm:7.0.0-beta.14"
     "@mui/material": "npm:7.2.0"
     "@mui/system": "npm:7.2.0"
-    "@mui/x-date-pickers": "npm:8.8.0"
+    "@mui/x-date-pickers": "npm:8.9.0"
     "@playwright/test": "npm:1.53.0"
     "@redux-devtools/extension": "npm:3.3.0"
     "@stylistic/eslint-plugin": "npm:4.4.1"
