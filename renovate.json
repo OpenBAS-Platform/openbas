@@ -75,6 +75,13 @@
       "matchUpdateTypes": ["patch"],
       "commitMessagePrefix": "[LEGACY]",
       "commitMessageSuffix": "(we are migrating to react-hook-form, only allowing patch updates for now)"
+    },
+    {
+      "matchPackageNames": ["final-form","final-form-arrays", "react-final-form", "react-final-form-arrays"],
+      "matchUpdateTypes": ["major", "minor"],
+      "commitMessagePrefix": "[LEGACY]",
+      "commitMessageSuffix": "(we are migrating to react-hook-form, only allowing patch updates for now)",
+      "enabled": false
     }
   ],
   "schedule": [
