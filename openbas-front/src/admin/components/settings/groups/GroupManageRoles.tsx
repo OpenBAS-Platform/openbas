@@ -7,26 +7,29 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { Role } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import {useTheme} from "@mui/material/styles";
 
 interface GroupManageRolesProps {
-  // initialState: string[];
+  initialState: string[];
   open: boolean;
   onClose: () => void;
-  // onSubmit: (userIds: string[]) => void;
+  onSubmit: (roleIds: string[]) => void;
 }
 
 const GroupManageRoles: FC<GroupManageRolesProps> = (
   {
+    initialState,
     open,
     onClose,
+    onSubmit,
   },
 ) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(initialState);
 
   const handleToggleRole = (roleId: string) => {
     setSelectedRoleIds(prev =>
@@ -37,13 +40,11 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
   };
 
   const fetchRolesToLoad = () => {
-    setLoading(true);
     return dispatch(fetchRoles())
       .then((result: { entities: { roles: Record<string, Role> } }) => {
         const rolesArray = Object.values(result.entities.roles);
         setRoles(rolesArray);
-      })
-      .finally(() => setLoading(false));
+      });
   };
 
   useEffect(() => {
@@ -51,6 +52,17 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
       fetchRolesToLoad();
     }
   }, [open]);
+
+  const handleClose = () => {
+    setRoles([]);
+    onClose();
+  };
+
+  const handleSubmit = () => {
+    onSubmit(selectedRoleIds);
+    handleClose();
+  };
+
   return (
     <Drawer
       open={open}
@@ -60,11 +72,11 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
       <Box>
         {roles.map(role => (
           <div key={role.role_id}>
-            <Box display="flex" alignItems="center" gap={1} justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={theme.spacing(2)} justifyContent="space-between">
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: theme.spacing(1),
               }}
               >
                 <SecurityOutlined />
@@ -81,13 +93,13 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
 
         <div style={{
           float: 'right',
-          marginTop: 20,
+          marginTop: theme.spacing(2),
         }}
         >
-          <Button variant="contained" style={{ marginRight: 10 }} onClick={onClose}>
+          <Button variant="contained" style={{ marginRight: theme.spacing(1) }} onClick={onClose}>
             {t('Cancel')}
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => { console.log('ok'); }}>
+          <Button variant="contained" color="secondary" onClick={handleSubmit}>
             {t('Update')}
           </Button>
         </div>
