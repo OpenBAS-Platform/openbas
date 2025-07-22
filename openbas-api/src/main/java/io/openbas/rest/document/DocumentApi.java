@@ -5,14 +5,17 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.specification.DocumentSpecification.findGrantedFor;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.mapper.DocumentMapper.toDocumentRelationsOutput;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.raw.RawPaginationDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.document.form.DocumentCreateInput;
+import io.openbas.rest.document.form.DocumentRelationsOutput;
 import io.openbas.rest.document.form.DocumentTagUpdateInput;
 import io.openbas.rest.document.form.DocumentUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -20,12 +23,16 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.FileService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +53,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class DocumentApi extends RestBehavior {
 
+  public static final String DOCUMENT_API = "/api/documents";
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioRepository scenarioRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final UserRepository userRepository;
   private final InjectorRepository injectorRepository;
   private final CollectorRepository collectorRepository;
@@ -69,7 +76,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents")
+  @PostMapping(DOCUMENT_API)
   @Transactional(rollbackOn = Exception.class)
   public Document uploadDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -122,7 +129,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents/upsert")
+  @PostMapping(DOCUMENT_API + "/upsert")
   @Transactional(rollbackOn = Exception.class)
   public Document upsertDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -218,7 +225,7 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @PostMapping("/api/documents/search")
+  @PostMapping(DOCUMENT_API + "/search")
   public Page<RawPaginationDocument> searchDocuments(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     OpenBASPrincipal user = currentUser();
@@ -253,13 +260,13 @@ public class DocumentApi extends RestBehavior {
     }
   }
 
-  @GetMapping("/api/documents/{documentId}")
+  @GetMapping(DOCUMENT_API + "/{documentId}")
   public Document document(@PathVariable String documentId) {
     return resolveDocument(documentId)
         .orElseThrow(() -> new ElementNotFoundException("Document not found"));
   }
 
-  @GetMapping("/api/documents/{documentId}/tags")
+  @GetMapping(DOCUMENT_API + "/{documentId}/tags")
   public Set<Tag> documentTags(@PathVariable String documentId) {
     Document document =
         resolveDocument(documentId)
@@ -267,7 +274,7 @@ public class DocumentApi extends RestBehavior {
     return document.getTags();
   }
 
-  @PutMapping("/api/documents/{documentId}/tags")
+  @PutMapping(DOCUMENT_API + "/{documentId}/tags")
   public Document documentTags(
       @PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
     Document document =
@@ -278,7 +285,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/documents/{documentId}")
+  @PutMapping(DOCUMENT_API + "/{documentId}")
   public Document updateDocumentInformation(
       @PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
     Document document =
@@ -335,7 +342,7 @@ public class DocumentApi extends RestBehavior {
     return documentRepository.save(document);
   }
 
-  @GetMapping("/api/documents/{documentId}/file")
+  @GetMapping(DOCUMENT_API + "/{documentId}/file")
   public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
       throws IOException {
     Document document =
@@ -484,19 +491,17 @@ public class DocumentApi extends RestBehavior {
     return documentService.getPlayerDocuments(articles, injects);
   }
 
+  @LogExecutionTime
+  @Operation(summary = "Fetch the entities related to this document id")
+  @GetMapping(DOCUMENT_API + "/{documentId}/relations")
+  public DocumentRelationsOutput getDocumentRelations(@PathVariable String documentId) {
+    return toDocumentRelationsOutput(documentService.document(documentId));
+  }
+
   @Transactional(rollbackOn = Exception.class)
-  @DeleteMapping("/api/documents/{documentId}")
+  @DeleteMapping(DOCUMENT_API + "/{documentId}")
   public void deleteDocument(@PathVariable String documentId) {
-    injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
-    List<Document> documents = documentRepository.removeById(documentId);
-    documents.forEach(
-        document -> {
-          try {
-            fileService.deleteFile(document.getTarget());
-          } catch (Exception e) {
-            // Fail no longer available in the storage.
-          }
-        });
+    documentService.deleteDocument(documentId);
   }
 
   // -- EXERCISE & SENARIO--
