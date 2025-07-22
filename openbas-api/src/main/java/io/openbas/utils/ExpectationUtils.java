@@ -8,7 +8,6 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAgent;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
-import static io.openbas.utils.AgentUtils.getActiveAgents;
 import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAgent;
 import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAsset;
 
@@ -20,8 +19,12 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.model.expectation.VulnerabilityExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.AssetToExecute;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class ExpectationUtils {
 
@@ -116,598 +119,271 @@ public class ExpectationUtils {
     return updatedExpectations;
   }
 
-  // -- CALDERA EXPECTATIONS --
+  private static <T> List<T> getExpectationForAsset(
+      final AssetGroup assetGroup,
+      final List<Agent> executedAgents,
+      final Function<AssetGroup, T> createExpectationForAsset,
+      final BiFunction<Agent, AssetGroup, T> createExpectationForAgent) {
+    List<T> returnList = new ArrayList<>();
 
-  public static List<PreventionExpectation> getPreventionExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<PreventionExpectation> preventionExpectationList = new ArrayList<>();
-    List<PreventionExpectation> returnList = new ArrayList<>();
+    T expectation = createExpectationForAsset.apply(assetGroup);
+    List<T> expectationList =
+        executedAgents.stream()
+            .map(agent -> createExpectationForAgent.apply(agent, assetGroup))
+            .toList();
 
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      PreventionExpectation preventionExpectation =
-          preventionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the asset expectation to agents
-      preventionExpectationList.addAll(
-          getPreventionExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, preventionExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!preventionExpectationList.isEmpty()) {
-        returnList.add(preventionExpectation);
-        returnList.addAll(preventionExpectationList);
-      }
+    if (!expectationList.isEmpty()) {
+      returnList.add(expectation);
+      returnList.addAll(expectationList);
     }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<PreventionExpectation> finalPreventionExpectationList = new ArrayList<>();
-
-              PreventionExpectation preventionExpectation =
-                  preventionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalPreventionExpectationList.addAll(
-                  getPreventionExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, preventionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalPreventionExpectationList.isEmpty()) {
-                returnList.add(preventionExpectation);
-                returnList.addAll(finalPreventionExpectationList);
-              }
-            });
-    return returnList;
-  }
-
-  public static List<DetectionExpectation> getDetectionExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<DetectionExpectation> detectionExpectationList = new ArrayList<>();
-    List<DetectionExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      DetectionExpectation preventionExpectation =
-          detectionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the asset expectation to agents
-      detectionExpectationList.addAll(
-          getDetectionExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, preventionExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!detectionExpectationList.isEmpty()) {
-        returnList.add(preventionExpectation);
-        returnList.addAll(detectionExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<DetectionExpectation> finalDetectionExpectationList = new ArrayList<>();
-
-              DetectionExpectation detectionExpectation =
-                  detectionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalDetectionExpectationList.addAll(
-                  getDetectionExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, detectionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalDetectionExpectationList.isEmpty()) {
-                returnList.add(detectionExpectation);
-                returnList.addAll(finalDetectionExpectationList);
-              }
-            });
-    return returnList;
-  }
-
-  public static List<ManualExpectation> getManualExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<ManualExpectation> manualExpectationList = new ArrayList<>();
-    List<ManualExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      ManualExpectation manualExpectation =
-          manualExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the asset expectation to agents
-      manualExpectationList.addAll(
-          getManualExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, manualExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!manualExpectationList.isEmpty()) {
-        returnList.add(manualExpectation);
-        returnList.addAll(manualExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<ManualExpectation> finalManualExpectationList = new ArrayList<>();
-
-              ManualExpectation manualExpectation =
-                  manualExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalManualExpectationList.addAll(
-                  getManualExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, manualExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalManualExpectationList.isEmpty()) {
-                returnList.add(manualExpectation);
-                returnList.addAll(finalManualExpectationList);
-              }
-            });
-    return returnList;
-  }
-
-  public static List<PreventionExpectation> getPreventionExpectationListForCaldera(
-      Asset asset,
-      AssetGroup assetGroup,
-      List<Agent> executedAgents,
-      PreventionExpectation preventionExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                preventionExpectationForAgent(
-                    preventionExpectation.getScore(),
-                    preventionExpectation.getName(),
-                    preventionExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    assetGroup,
-                    preventionExpectation.getExpirationTime(),
-                    computeSignatures(
-                        OBAS_IMPLANT_CALDERA,
-                        executedAgent.getInject().getId(),
-                        executedAgent.getParent().getId())))
-        .toList();
-  }
-
-  public static List<DetectionExpectation> getDetectionExpectationListForCaldera(
-      Asset asset,
-      AssetGroup assetGroup,
-      List<Agent> executedAgents,
-      DetectionExpectation detectionExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                detectionExpectationForAgent(
-                    detectionExpectation.getScore(),
-                    detectionExpectation.getName(),
-                    detectionExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    assetGroup,
-                    detectionExpectation.getExpirationTime(),
-                    computeSignatures(
-                        OBAS_IMPLANT_CALDERA,
-                        executedAgent.getInject().getId(),
-                        executedAgent.getParent().getId())))
-        .toList();
-  }
-
-  public static List<ManualExpectation> getManualExpectationListForCaldera(
-      Asset asset,
-      AssetGroup assetGroup,
-      List<Agent> executedAgents,
-      ManualExpectation manualExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                manualExpectationForAgent(
-                    manualExpectation.getScore(),
-                    manualExpectation.getName(),
-                    manualExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    assetGroup,
-                    manualExpectation.getExpirationTime()))
-        .toList();
-  }
-
-  // OBAS IMPLANT EXPECTATIONS
-
-  public static List<PreventionExpectation> getPreventionExpectations(
-      AssetToExecute assetToExecute,
-      Inject inject,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<PreventionExpectation> preventionExpectationList = new ArrayList<>();
-    List<PreventionExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      PreventionExpectation preventionExpectation =
-          preventionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the assetToExecute expectation to agents
-      preventionExpectationList.addAll(
-          getPreventionExpectationList(
-              assetToExecute.asset(), null, inject, preventionExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!preventionExpectationList.isEmpty()) {
-        returnList.add(preventionExpectation);
-        returnList.addAll(preventionExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            (assetGroup) -> {
-              List<PreventionExpectation> finalPreventionExpectationList = new ArrayList<>();
-
-              PreventionExpectation preventionExpectation =
-                  preventionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the assetToExecute expectation to agents
-              finalPreventionExpectationList.addAll(
-                  getPreventionExpectationList(
-                      assetToExecute.asset(), assetGroup, inject, preventionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalPreventionExpectationList.isEmpty()) {
-                returnList.add(preventionExpectation);
-                returnList.addAll(finalPreventionExpectationList);
-              }
-            });
 
     return returnList;
   }
 
-  public static List<DetectionExpectation> getDetectionExpectations(
+  private static <T> List<T> getExpectations(
       AssetToExecute assetToExecute,
-      Inject inject,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<DetectionExpectation> detectionExpectationList = new ArrayList<>();
-    List<DetectionExpectation> returnList = new ArrayList<>();
+      final List<Agent> executedAgents,
+      final Function<AssetGroup, T> createExpectationForAsset,
+      final BiFunction<Agent, AssetGroup, T> createExpectationForAgent) {
+    List<T> returnList = new ArrayList<>();
 
     if (assetToExecute.isDirectlyLinkedToInject()) {
-      DetectionExpectation detectionExpectation =
-          detectionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the assetToExecute expectation to agents
-      detectionExpectationList.addAll(
-          getDetectionExpectationList(assetToExecute.asset(), null, inject, detectionExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!detectionExpectationList.isEmpty()) {
-        returnList.add(detectionExpectation);
-        returnList.addAll(detectionExpectationList);
-      }
+      returnList.addAll(
+          getExpectationForAsset(
+              null, executedAgents, createExpectationForAsset, createExpectationForAgent));
     }
 
     assetToExecute
         .assetGroups()
         .forEach(
-            (assetGroup) -> {
-              List<DetectionExpectation> finalDetectionExpectationList = new ArrayList<>();
-
-              DetectionExpectation detectionExpectation =
-                  detectionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the assetToExecute expectation to agents
-              finalDetectionExpectationList.addAll(
-                  getDetectionExpectationList(
-                      assetToExecute.asset(), assetGroup, inject, detectionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalDetectionExpectationList.isEmpty()) {
-                returnList.add(detectionExpectation);
-                returnList.addAll(finalDetectionExpectationList);
-              }
-            });
+            assetGroup ->
+                returnList.addAll(
+                    getExpectationForAsset(
+                        assetGroup,
+                        executedAgents,
+                        createExpectationForAsset,
+                        createExpectationForAgent)));
 
     return returnList;
   }
 
   /**
-   * Get the vulnerability type expectations at the le vell of the asset executing the inject
+   * Get prevention expectations by asset
    *
-   * @param assetToExecute
-   * @param inject
-   * @param expectation
-   * @return List<VulnerabilityExpectation>
+   * @param implantType the type of implant (e.g., OBAS_IMPLANT_CALDERA)
+   * @param assetToExecute the asset to execute the expectation on
+   * @param executedAgents the list of executed agents
+   * @param expectation the expectation details
+   * @param valueTargetedAssetsMap a map of value targeted assets
+   * @param injectId the ID of the inject
+   * @return a list of prevention expectations
    */
-  public static List<VulnerabilityExpectation> getVulnerabilityExpectations(
+  public static List<PreventionExpectation> getPreventionExpectationsByAsset(
+      String implantType,
       AssetToExecute assetToExecute,
-      Inject inject,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<VulnerabilityExpectation> vulnerabilityExpectationList = new ArrayList<>();
-    List<VulnerabilityExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      VulnerabilityExpectation vulnerabilityExpectation =
-          vulnerabilityExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-
-      // We propagate the assetToExecute expectation to agents
-      vulnerabilityExpectationList.addAll(
-          getVulnerabilityExpectationList(
-              assetToExecute.asset(), null, inject, vulnerabilityExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!vulnerabilityExpectationList.isEmpty()) {
-        returnList.add(vulnerabilityExpectation);
-        returnList.addAll(vulnerabilityExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            (assetGroup) -> {
-              List<VulnerabilityExpectation> finalVulnerabilityExpectationList = new ArrayList<>();
-
-              VulnerabilityExpectation vulnerabilityExpectation =
-                  vulnerabilityExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the assetToExecute expectation to agents
-              finalVulnerabilityExpectationList.addAll(
-                  getVulnerabilityExpectationList(
-                      assetToExecute.asset(), assetGroup, inject, vulnerabilityExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalVulnerabilityExpectationList.isEmpty()) {
-                returnList.add(vulnerabilityExpectation);
-                returnList.addAll(finalVulnerabilityExpectationList);
-              }
-            });
-
-    return returnList;
+      List<io.openbas.database.model.Agent> executedAgents,
+      io.openbas.model.inject.form.Expectation expectation,
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      String injectId) {
+    return getExpectations(
+        assetToExecute,
+        executedAgents,
+        (AssetGroup assetGroup) ->
+            preventionExpectationForAsset(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime()),
+        (Agent agent, AssetGroup assetGroup) ->
+            preventionExpectationForAgent(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getParent() : agent,
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime(),
+                computeSignatures(
+                    implantType,
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
+                    assetToExecute.asset(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType)
+                        ? agent.getParent().getId()
+                        : agent.getId(),
+                    valueTargetedAssetsMap)));
   }
 
-  public static List<ManualExpectation> getManualExpectations(
+  /**
+   * Get detection expectations by asset
+   *
+   * @param implantType the type of implant (e.g., OBAS_IMPLANT_CALDERA)
+   * @param assetToExecute the asset to execute the expectation on
+   * @param executedAgents the list of executed agents
+   * @param expectation the expectation details
+   * @param valueTargetedAssetsMap a map of value targeted assets
+   * @param injectId the ID of the inject
+   * @return a list of detection expectations
+   */
+  public static List<DetectionExpectation> getDetectionExpectationsByAsset(
+      String implantType,
       AssetToExecute assetToExecute,
-      Inject inject,
+      List<io.openbas.database.model.Agent> executedAgents,
+      io.openbas.model.inject.form.Expectation expectation,
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      String injectId) {
+    return getExpectations(
+        assetToExecute,
+        executedAgents,
+        (AssetGroup assetGroup) ->
+            detectionExpectationForAsset(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime()),
+        (Agent agent, AssetGroup assetGroup) ->
+            detectionExpectationForAgent(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getParent() : agent,
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime(),
+                computeSignatures(
+                    implantType,
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
+                    assetToExecute.asset(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType)
+                        ? agent.getParent().getId()
+                        : agent.getId(),
+                    valueTargetedAssetsMap)));
+  }
+
+  /**
+   * Get manual expectations by asset
+   *
+   * @param implantType the type of implant (e.g., OBAS_IMPLANT_CALDERA)
+   * @param assetToExecute the asset to execute the expectation on
+   * @param executedAgents the list of executed agents
+   * @param expectation the expectation details
+   * @return a list of manual expectations
+   */
+  public static List<ManualExpectation> getManualExpectationsByAsset(
+      String implantType,
+      AssetToExecute assetToExecute,
+      List<io.openbas.database.model.Agent> executedAgents,
       io.openbas.model.inject.form.Expectation expectation) {
-    List<ManualExpectation> manualExpectationList = new ArrayList<>();
-    List<ManualExpectation> returnList = new ArrayList<>();
+    return getExpectations(
+        assetToExecute,
+        executedAgents,
+        (AssetGroup assetGroup) ->
+            manualExpectationForAsset(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime()),
+        (Agent agent, AssetGroup assetGroup) ->
+            manualExpectationForAgent(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getParent() : agent,
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime()));
+  }
 
-    if (assetToExecute.isDirectlyLinkedToInject()) {
-      ManualExpectation manualExpectation =
-          manualExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
+  /**
+   * Get vulnerability expectations by asset
+   *
+   * @param implantType the type of implant (e.g., OBAS_IMPLANT_CALDERA)
+   * @param assetToExecute the asset to execute the expectation on
+   * @param executedAgents the list of executed agents
+   * @param expectation the expectation details
+   * @param valueTargetedAssetsMap a map of value targeted assets
+   * @return a list of vulnerability expectations
+   */
+  public static List<VulnerabilityExpectation> getVulnerabilityExpectationsByAsset(
+      String implantType,
+      AssetToExecute assetToExecute,
+      List<io.openbas.database.model.Agent> executedAgents,
+      io.openbas.model.inject.form.Expectation expectation,
+      Map<String, Endpoint> valueTargetedAssetsMap,
+      @Nullable String injectId) {
+    return getExpectations(
+        assetToExecute,
+        executedAgents,
+        (AssetGroup assetGroup) ->
+            vulnerabilityExpectationForAsset(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime()),
+        (Agent agent, AssetGroup assetGroup) ->
+            vulnerabilityExpectationForAgent(
+                expectation.getScore(),
+                expectation.getName(),
+                expectation.getDescription(),
+                OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getParent() : agent,
+                assetToExecute.asset(),
+                assetGroup,
+                expectation.getExpirationTime(),
+                computeSignatures(
+                    implantType,
+                    OBAS_IMPLANT_CALDERA.equals(implantType) ? agent.getInject().getId() : injectId,
+                    assetToExecute.asset(),
+                    OBAS_IMPLANT_CALDERA.equals(implantType)
+                        ? agent.getParent().getId()
+                        : agent.getId(),
+                    valueTargetedAssetsMap)));
+  }
 
-      // We propagate the assetToExecute expectation to agents
-      manualExpectationList.addAll(
-          getManualExpectationList(assetToExecute.asset(), null, inject, manualExpectation));
-
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!manualExpectationList.isEmpty()) {
-        returnList.add(manualExpectation);
-        returnList.addAll(manualExpectationList);
-      }
+  private static List<String> getIpsFromAsset(Asset asset) {
+    if (asset instanceof Endpoint endpoint) {
+      return Stream.concat(
+              endpoint.getIps() != null ? Stream.of(endpoint.getIps()) : Stream.empty(),
+              endpoint.getSeenIp() != null ? Stream.of(endpoint.getSeenIp()) : Stream.empty())
+          .toList();
     }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            (assetGroup) -> {
-              List<ManualExpectation> finalManualExpectationList = new ArrayList<>();
-
-              ManualExpectation manualExpectation =
-                  manualExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the assetToExecute expectation to agents
-              finalManualExpectationList.addAll(
-                  getManualExpectationList(
-                      assetToExecute.asset(), assetGroup, inject, manualExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalManualExpectationList.isEmpty()) {
-                returnList.add(manualExpectation);
-                returnList.addAll(finalManualExpectationList);
-              }
-            });
-
-    return returnList;
-  }
-
-  public static List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset,
-      AssetGroup assetGroup,
-      Inject inject,
-      PreventionExpectation preventionExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                preventionExpectationForAgent(
-                    preventionExpectation.getScore(),
-                    preventionExpectation.getName(),
-                    preventionExpectation.getDescription(),
-                    agent,
-                    asset,
-                    assetGroup,
-                    preventionExpectation.getExpirationTime(),
-                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
-        .toList();
-  }
-
-  public static List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset,
-      AssetGroup assetGroup,
-      Inject inject,
-      DetectionExpectation detectionExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                detectionExpectationForAgent(
-                    detectionExpectation.getScore(),
-                    detectionExpectation.getName(),
-                    detectionExpectation.getDescription(),
-                    agent,
-                    asset,
-                    assetGroup,
-                    detectionExpectation.getExpirationTime(),
-                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
-        .toList();
-  }
-
-  public static List<VulnerabilityExpectation> getVulnerabilityExpectationList(
-      Asset asset,
-      AssetGroup assetGroup,
-      Inject inject,
-      VulnerabilityExpectation vulnerabilityExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                vulnerabilityExpectationForAgent(
-                    vulnerabilityExpectation.getScore(),
-                    vulnerabilityExpectation.getName(),
-                    vulnerabilityExpectation.getDescription(),
-                    agent,
-                    asset,
-                    assetGroup,
-                    vulnerabilityExpectation.getExpirationTime(),
-                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
-        .toList();
-  }
-
-  public static List<ManualExpectation> getManualExpectationList(
-      Asset asset, AssetGroup assetGroup, Inject inject, ManualExpectation manualExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                manualExpectationForAgent(
-                    manualExpectation.getScore(),
-                    manualExpectation.getName(),
-                    manualExpectation.getDescription(),
-                    agent,
-                    asset,
-                    assetGroup,
-                    manualExpectation.getExpirationTime()))
-        .toList();
+    return Collections.emptyList();
   }
 
   // COMPUTE SIGNATURES
 
   private static List<InjectExpectationSignature> computeSignatures(
-      String prefixSignature, String injectId, String agentId) {
+      String prefixSignature,
+      String injectId,
+      Asset sourceAsset,
+      String agentId,
+      Map<String, Endpoint> valueTargetedAssetsMap) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(
-        createSignature(
+        new InjectExpectationSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
             prefixSignature + injectId + "-agent-" + agentId));
 
-    return signatures;
-  }
+    getIpsFromAsset(sourceAsset)
+        .forEach(ip -> signatures.add(InjectExpectationSignature.createIpSignature(ip, false)));
 
-  private static InjectExpectationSignature createSignature(
-      String signatureType, String signatureValue) {
-    return builder().type(signatureType).value(signatureValue).build();
+    valueTargetedAssetsMap.forEach(
+        (value, endpoint) -> {
+          if (value.equals(endpoint.getHostname())) {
+            signatures.add(InjectExpectationSignature.createHostnameSignature(value));
+          } else {
+            signatures.add(InjectExpectationSignature.createIpSignature(value, true));
+          }
+        });
+
+    return signatures;
   }
 
   // --

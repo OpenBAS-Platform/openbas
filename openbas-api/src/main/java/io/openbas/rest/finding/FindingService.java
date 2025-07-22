@@ -11,14 +11,12 @@ import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.injector_contract.outputs.InjectorContractContentOutputElement;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
-import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -249,50 +247,6 @@ public class FindingService {
   }
 
   /**
-   * Get a map of value (e.g., hostname, seen_ip ) for targeted assets of inject
-   *
-   * @param inject inject to extract the targeted assets from
-   * @return a map where the key is the value of the targeted asset (e.g., hostname, seen_ip) and
-   *     the value is the Endpoint object representing the targeted asset
-   */
-  private Map<String, Endpoint> getValueTargetedAssetMap(Inject inject) {
-    Map<String, Endpoint> valueTargetedAssetsMap = new HashMap<>();
-    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-
-    JsonNode injectorContractFieldsNode = injectorContract.getConvertedContent().get("fields");
-    if (injectorContractFieldsNode == null || !injectorContractFieldsNode.isArray()) {
-      return valueTargetedAssetsMap;
-    }
-
-    List<ObjectNode> injectorContractFields =
-        StreamSupport.stream(injectorContractFieldsNode.spliterator(), false)
-            .map(ObjectNode.class::cast)
-            .toList();
-
-    // Get all fields of type TargetedAsset
-    List<ObjectNode> targetedAssetFields =
-        injectorContractFields.stream()
-            .filter(
-                node ->
-                    node.has("type")
-                        && ContractFieldType.TargetedAsset.label.equals(node.get("type").asText()))
-            .toList();
-
-    targetedAssetFields.forEach(
-        f -> {
-          // For each targeted asset field, retrieve the values of the targeted assets based on the
-          // targeted property
-          String keyField = f.get("key").asText();
-          Map<String, Endpoint> valuesAssetsMap =
-              injectService.retrieveValuesOfTargetedAssetFromInject(
-                  injectorContractFields, inject.getContent(), keyField);
-          valueTargetedAssetsMap.putAll(valuesAssetsMap);
-        });
-
-    return valueTargetedAssetsMap;
-  }
-
-  /**
    * Function used to get the asset associated with a given structured output.
    *
    * @param struturedOutput The structured output to analyze.
@@ -322,7 +276,7 @@ public class FindingService {
     List<ContractOutputElement> contractOutputElements =
         this.getAllIsFindingContractOutputElementsOfOutputParser(outputParsers);
 
-    Map<String, Endpoint> valueTargetedAssetsMap = this.getValueTargetedAssetMap(inject);
+    Map<String, Endpoint> valueTargetedAssetsMap = injectService.getValueTargetedAssetMap(inject);
 
     contractOutputElements.forEach(
         contractOutputElement -> {
