@@ -68,7 +68,7 @@ class DocumentApiTest extends IntegrationTest {
   class CRUD {
 
     @Test
-    @DisplayName("Should delete a document when there is none references")
+    @DisplayName("Should not delete a document when it is related to a payload")
     void shouldNoDeleteDocumentWhenIsRelatedToAPayload() throws Exception {
       Document document = getDocumentWithPayload();
 
