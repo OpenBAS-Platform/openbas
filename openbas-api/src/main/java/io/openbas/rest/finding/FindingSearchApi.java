@@ -10,7 +10,7 @@ import io.openbas.rest.finding.form.AggregatedFindingOutput;
 import io.openbas.rest.finding.form.PageAggregatedFindingOutput;
 import io.openbas.rest.finding.form.PageRelatedFindingOutput;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.utils.FindingMapper;
+import io.openbas.utils.mapper.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
