@@ -2,7 +2,7 @@ import { FiberManualRecord, MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -61,6 +61,7 @@ const DocumentPopover = (props) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [relations, setRelations] = useState(null);
   const [loadingRelations, setLoadingRelations] = useState(false);
+  const [isUsedInPayloads, setIsUsedInPayloads] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
 
@@ -124,6 +125,12 @@ const DocumentPopover = (props) => {
     handleCloseDelete();
   };
 
+  useEffect(() => {
+    if (relations) {
+      setIsUsedInPayloads(!!relations.payloads?.length);
+    }
+  }, [relations]);
+
   const buildEntityPath = (type, item) => {
     const pathFn = entityPaths[type];
     if (!pathFn) return '#';
@@ -181,8 +188,9 @@ const DocumentPopover = (props) => {
             {renderRelations(relations)}
           </>
         )}
+
         <Typography sx={{ paddingTop: theme.spacing(2) }}>
-          {t('Do you want to delete this document?')}
+          {isUsedInPayloads ? t('A document used in a payload can\'t be deleted.') : t('Do you want to delete this document?')}
         </Typography>
       </>
     );
@@ -252,7 +260,7 @@ const DocumentPopover = (props) => {
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}
-        handleSubmit={submitDelete}
+        handleSubmit={!isUsedInPayloads ? submitDelete : null}
         richContent={renderDialogText()}
       />
 
