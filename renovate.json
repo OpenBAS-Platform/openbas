@@ -70,10 +70,11 @@
       "matchBaseBranches": ["master"],
       "enabled": false
     },
-    // Final Form should be removed from our project and replace by react-hook-form,
     {
       "matchPackageNames": ["final-form","final-form-arrays", "react-final-form", "react-final-form-arrays"],
-      "enabled": false
+      "matchUpdateTypes": ["patch"],
+      "commitMessagePrefix": "[LEGACY]",
+      "commitMessageSuffix": "(we are migrating to react-hook-form, only allowing patch updates for now)"
     }
   ],
   "schedule": [
