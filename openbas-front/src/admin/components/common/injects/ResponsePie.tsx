@@ -1,7 +1,7 @@
 import { BugReportOutlined, InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, memo, useCallback, useMemo } from 'react';
+import React, { type FunctionComponent, memo, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
@@ -52,10 +52,33 @@ const ResponsePie: FunctionComponent<Props> = ({
     fontSize: forceSize ? forceSize * 0.3 : 35,
   };
 
-  const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
-  const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');
-  const humanResponse = expectationResultsByTypes?.find(e => e.type === 'HUMAN_RESPONSE');
-  const vulnerability = expectationResultsByTypes?.find(e => e.type === 'VULNERABILITY');
+  const definedTypes = useMemo(() => {
+    const resultTypes = new Set(
+      (expectationResultsByTypes ?? []).map(r => r?.type).filter(Boolean),
+    );
+
+    const merged = new Set<string>();
+    resultTypes.forEach(type => merged.add(type));
+
+    return Array.from(merged);
+  }, [expectationResultsByTypes]);
+
+  const expectationResultsMap = useMemo(() => {
+    const result = expectationResultsByTypes || [];
+    return result.reduce((acc, curr) => {
+      acc[curr.type] = curr;
+      return acc;
+    }, {} as Record<string, ExpectationResultsByType>);
+  }, [expectationResultsByTypes]);
+
+  const expectationLabels: Record<string, string> = {
+    PREVENTION: t('TYPE_PREVENTION'),
+    DETECTION: t('TYPE_DETECTION'),
+    VULNERABILITY: t('TYPE_VULNERABILITY'),
+    HUMAN_RESPONSE: t('TYPE_HUMAN_RESPONSE'),
+  };
+
+  const humanResponse = expectationResultsMap['HUMAN_RESPONSE'];
   const pending = useMemo(() => humanResponse?.distribution?.filter(res => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [], [humanResponse]);
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
   const renderIcon = (type: string, hasDistribution: boolean | undefined) => {
@@ -135,23 +158,25 @@ const ResponsePie: FunctionComponent<Props> = ({
       id="score_details"
       style={{
         display: 'grid',
-        gridTemplateColumns: '25% 25% 25% 25%',
+        gridTemplateColumns: `repeat(${definedTypes.length}, minmax(25%, 1fr))`,
         width: '100%',
       }}
     >
-      <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
-      <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
-      <Pie type="vulnerability" title={t('TYPE_VULNERABILITY')} expectationResultsByType={vulnerability} />
-      <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
+      {definedTypes.map(type => (
+        <Pie
+          key={type}
+          type={type.toLowerCase()}
+          title={expectationLabels[type]}
+          expectationResultsByType={expectationResultsMap[type]}
+        />
+      ))}
 
-      {hasTitles && (
-        <>
-          {pieTitle(t('TYPE_PREVENTION'), prevention)}
-          {pieTitle(t('TYPE_DETECTION'), detection)}
-          {pieTitle(t('TYPE_VULNERABILITY'), vulnerability)}
-          {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
-        </>
-      )}
+      {hasTitles
+        && definedTypes.map(type => (
+          <React.Fragment key={`${type}_title`}>
+            {pieTitle(expectationLabels[type])}
+          </React.Fragment>
+        ))}
 
       {displayHumanValidationBtn && (
         <Button
