@@ -1,6 +1,10 @@
 package io.openbas.utils.mapper;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import io.openbas.database.model.*;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.inject.output.InjectSimple;
@@ -9,10 +13,7 @@ import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -48,12 +49,45 @@ public class InjectMapper {
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                injectUtils.getPrimaryExpectations(inject)))
+        .expectationResultByTypes(extractExpectationResults(inject))
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
         .build();
+  }
+
+  private List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
+      Inject inject) {
+    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
+        AtomicTestingUtils.getExpectationResultByTypes(injectUtils.getPrimaryExpectations(inject));
+
+    if (!expectationResultByTypes.isEmpty()) {
+      return expectationResultByTypes;
+    }
+
+    JsonNode contentNode = inject.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
+    if (contentNode == null || !contentNode.isArray()) {
+      return Collections.emptyList();
+    }
+
+    Set<ExpectationType> uniqueTypes = new HashSet<>();
+    for (JsonNode expectationNode : contentNode) {
+      JsonNode typeNode = expectationNode.get("expectation_type");
+      if (typeNode != null && typeNode.isTextual()) {
+        try {
+          ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
+          uniqueTypes.add(type);
+        } catch (IllegalArgumentException e) {
+        }
+      }
+    }
+
+    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
+    for (ExpectationType type : uniqueTypes) {
+      AtomicTestingUtils.getExpectationByType(type, Collections.emptyList())
+          .ifPresent(fallbackResults::add);
+    }
+
+    return fallbackResults;
   }
 
   // -- OBJECT[] to TARGETSIMPLE --
