@@ -2,6 +2,7 @@ package io.openbas.executors.crowdstrike.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.*;
 import io.openbas.executors.crowdstrike.model.Authentication;
@@ -24,7 +25,6 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -47,6 +47,7 @@ public class CrowdStrikeExecutorClient {
 
   private final CrowdStrikeExecutorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private final HttpClientFactory httpClientFactory;
 
   private Instant lastAuthentication = Instant.now().minusSeconds(AUTH_TIMEOUT);
   private String token;
@@ -183,7 +184,7 @@ public class CrowdStrikeExecutorClient {
     if (this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
       this.authenticate();
     }
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpGet httpGet = new HttpGet(this.config.getApiUrl() + uri);
       // Headers
       httpGet.addHeader("Authorization", "Bearer " + this.token);
@@ -198,7 +199,7 @@ public class CrowdStrikeExecutorClient {
     if (this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
       this.authenticate();
     }
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPost httpPost = new HttpPost(this.config.getApiUrl() + uri);
       // Headers
       httpPost.addHeader("Authorization", "Bearer " + this.token);
@@ -224,7 +225,7 @@ public class CrowdStrikeExecutorClient {
   }
 
   private void authenticate() throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPost httpPost = new HttpPost(this.config.getApiUrl() + OAUTH_URI);
       // Headers
       httpPost.addHeader("content-type", "application/x-www-form-urlencoded");
