@@ -4826,8 +4826,10 @@ export interface RoleInput {
 export interface RoleOutput {
   /** @uniqueItems true */
   role_capabilities?: string[];
+  role_created_at?: string;
   role_id: string;
   role_name: string;
+  role_updated_at?: string;
 }
 
 export interface RuleAttribute {
