@@ -190,7 +190,7 @@ const DocumentPopover = (props) => {
         )}
 
         <Typography sx={{ paddingTop: theme.spacing(2) }}>
-          {isUsedInPayloads ? (t('A document used in a payload can\'t be deleted.')) : (t('Do you want to delete this document?'))}
+          {isUsedInPayloads ? t('A document used in a payload can\'t be deleted.') : t('Do you want to delete this document?')}
         </Typography>
       </>
     );
