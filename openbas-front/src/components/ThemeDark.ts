@@ -4,6 +4,7 @@ import LogoCollapsed from '../static/images/logo_dark.png';
 import LogoText from '../static/images/logo_text_dark.png';
 import { hexToRGB } from '../utils/Colors';
 import { fileUri } from '../utils/Environment';
+import { type LabelColor, LabelColorDict } from './Theme';
 
 const EE_COLOR = '#00f1bd';
 
@@ -41,6 +42,21 @@ const ThemeDark = (
     primary: { main: primary || THEME_DARK_DEFAULT_PRIMARY },
     secondary: { main: secondary || THEME_DARK_DEFAULT_SECONDARY },
     chip: { main: '#ffffff' },
+    labelChipMap: new Map<string, LabelColor>([
+      [
+        LabelColorDict.Red, {
+          backgroundColor: 'rgba(244, 67, 54, 0.08)',
+          color: '#f44336',
+        }], [
+        LabelColorDict.Green, {
+          backgroundColor: 'rgba(76, 175, 80, 0.08)',
+          color: '#4caf50',
+        }], [
+        LabelColorDict.Orange, {
+          backgroundColor: 'rgba(246,177,27,0.08)',
+          color: '#f19710',
+        }],
+    ]),
     ai: {
       main: '#9575cd',
       light: '#d1c4e9',
@@ -53,6 +69,7 @@ const ThemeDark = (
       background: hexToRGB(EE_COLOR, 0.2),
       lightBackground: hexToRGB(EE_COLOR, 0.08),
     },
+    xtmhub: { main: '#00f1bd' },
     background: {
       default: background || THEME_DARK_DEFAULT_BACKGROUND,
       paper: paper || THEME_DARK_DEFAULT_PAPER,

@@ -21,9 +21,9 @@ import io.openbas.rest.tag.TagService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.service.UserService;
-import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.fixtures.AssetGroupFixture;
+import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -626,8 +626,7 @@ class InjectServiceTest {
   }
 
   @Test
-  void givent_given_inject_without_injectcontent_SHOULD_take_default()
-      throws JsonProcessingException {
+  void given_inject_without_injectcontent_SHOULD_take_default() throws JsonProcessingException {
     InjectInput injectInput = new InjectInput();
     Scenario scenario = new Scenario();
     String injectorContractId = "injectorContractId";
@@ -637,24 +636,15 @@ class InjectServiceTest {
     "fields": [
       {
       "type": "defaultValue1",
-      "name": "value1",
-      "defaultValue": "defaultValue1"
+      "key": "value1",
+      "defaultValue": ["defaultValue1"],
+       "cardinality":"1"
       },
       {
       "type": "asset",
-      "name": "value2",
-      "defaultValue": "defaultValue2"
-      }
-    ]
-  }
-""";
-    String injectorContentString =
-        """
-  {
-    "fields": [
-      {
-      "value1": "defaultValue1",
-      "value2": "defaultValue2"
+      "key": "value2",
+      "defaultValue": ["defaultValue2"],
+      "cardinality":"1"
       }
     ]
   }
@@ -664,14 +654,11 @@ class InjectServiceTest {
     injectorContract.setContent(injectorContractString);
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode injectorContractJson = (ObjectNode) mapper.readTree(injectorContractString);
-    ObjectNode injectorContentJson = (ObjectNode) mapper.readTree(injectorContentString);
 
     injectorContract.setConvertedContent(injectorContractJson);
 
     injectInput.setInjectorContract(injectorContractId);
     when(injectorContractService.injectorContract(injectorContractId)).thenReturn(injectorContract);
-    when(injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract))
-        .thenReturn(injectorContentJson);
 
     injectService.createInject(null, scenario, injectInput);
 
@@ -679,6 +666,7 @@ class InjectServiceTest {
     verify(injectRepository).save(injectCaptor.capture());
     Inject capturedInject = injectCaptor.getValue();
 
-    assertEquals(injectorContentJson, capturedInject.getContent());
+    assertEquals("defaultValue1", capturedInject.getContent().get("value1").asText());
+    assertEquals("defaultValue2", capturedInject.getContent().get("value2").asText());
   }
 }

@@ -330,7 +330,7 @@ public class CalderaExecutor extends Injector {
                       agentCaldera.getExe_name().contains("implant")
                           && (now().toEpochMilli()
                                   - Time.toInstant(agentCaldera.getCreated()).toEpochMilli())
-                              < io.openbas.database.model.Agent.ACTIVE_THRESHOLD
+                              < io.openbas.helper.AgentHelper.ACTIVE_THRESHOLD
                           && (agentCaldera.getHost().equalsIgnoreCase(assetEndpoint.getHostname())
                               || agentCaldera
                                   .getHost()
@@ -390,13 +390,26 @@ public class CalderaExecutor extends Injector {
                   (expectation) ->
                       switch (expectation.getType()) {
                         case PREVENTION ->
-                            getPreventionExpectations(assetToExecute, executedAgents, expectation)
+                            getPreventionExpectationsByAsset(
+                                OBAS_IMPLANT_CALDERA,
+                                assetToExecute,
+                                executedAgents,
+                                expectation,
+                                new HashMap<>(),
+                                null)
                                 .stream();
                         case DETECTION ->
-                            getDetectionExpectations(assetToExecute, executedAgents, expectation)
+                            getDetectionExpectationsByAsset(
+                                OBAS_IMPLANT_CALDERA,
+                                assetToExecute,
+                                executedAgents,
+                                expectation,
+                                new HashMap<>(),
+                                null)
                                 .stream();
                         case MANUAL ->
-                            getManualExpectations(assetToExecute, executedAgents, expectation)
+                            getManualExpectationsByAsset(
+                                OBAS_IMPLANT_CALDERA, assetToExecute, executedAgents, expectation)
                                 .stream();
                         default -> Stream.of();
                       })

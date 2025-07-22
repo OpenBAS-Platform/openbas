@@ -18,6 +18,8 @@ public interface RawFinding {
 
   String getFinding_inject_id();
 
+  String getInject_exercise();
+
   String getScenario_id();
 
   String getAsset_id();

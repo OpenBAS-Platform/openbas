@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 
 import { type UserHelper } from '../actions/helper';
 import { useHelper } from '../store';
+import { sendErrorToBackend } from '../utils/Action';
 import { MESSAGING$ } from '../utils/Environment';
 import { useFormatter } from './i18n';
 import Loader from './Loader';
@@ -53,7 +54,8 @@ const ExportPdfButton: FunctionComponent<Props> = ({ getPdfDocDefinition, pdfNam
       .then((pdfDocDefinition: TDocumentDefinitions) => {
         pdfMake.createPdf(pdfDocDefinition).download(`${pdfName}.pdf`);
       })
-      .catch(() => {
+      .catch((e) => {
+        sendErrorToBackend(e, { componentStack: 'ExportPdfButton' });
         MESSAGING$.notifyError(t('An error occurred during PDF generation.'));
       })
       .finally(() => {

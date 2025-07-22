@@ -124,7 +124,8 @@ public class AttackPatternApi extends RestBehavior {
     return attackPatternRepository.save(attackPattern);
   }
 
-  private List<AttackPattern> upsertAttackPatterns(List<AttackPatternCreateInput> attackPatterns) {
+  private List<AttackPattern> internalUpsertAttackPatterns(
+      List<AttackPatternCreateInput> attackPatterns, Boolean ignoreDependencies) {
     List<AttackPattern> upserted = new ArrayList<>();
     attackPatterns.forEach(
         attackPatternInput -> {
@@ -132,7 +133,8 @@ public class AttackPatternApi extends RestBehavior {
           Optional<AttackPattern> optionalAttackPattern =
               attackPatternRepository.findByExternalId(attackPatternExternalId);
           List<KillChainPhase> killChainPhases =
-              !attackPatternInput.getKillChainPhasesIds().isEmpty()
+              attackPatternInput.getKillChainPhasesIds() != null
+                      && !attackPatternInput.getKillChainPhasesIds().isEmpty()
                   ? fromIterable(
                       killChainPhaseRepository.findAllById(
                           attackPatternInput.getKillChainPhasesIds()))
@@ -156,6 +158,16 @@ public class AttackPatternApi extends RestBehavior {
             upserted.add(newAttackPattern);
           } else {
             AttackPattern attackPattern = optionalAttackPattern.get();
+            // In this case, the input may not contain kill chain phases or parent, we keep the
+            // original
+            if (ignoreDependencies) {
+              if (killChainPhases.isEmpty() && !attackPattern.getKillChainPhases().isEmpty()) {
+                killChainPhases = attackPattern.getKillChainPhases();
+              }
+              if (attackPatternParent == null && attackPattern.getParent() != null) {
+                attackPatternParent = attackPattern.getParent();
+              }
+            }
             attackPattern.setStixId(attackPatternInput.getStixId());
             attackPattern.setKillChainPhases(killChainPhases);
             attackPattern.setName(attackPatternInput.getName());
@@ -172,7 +184,7 @@ public class AttackPatternApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/attack_patterns/upsert")
   @Transactional(rollbackOn = Exception.class)
-  public Iterable<AttackPattern> upsertKillChainPhases(
+  public Iterable<AttackPattern> upsertAttackPatterns(
       @Valid @RequestBody AttackPatternUpsertInput input) {
     List<AttackPattern> upserted = new ArrayList<>();
     List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();
@@ -180,8 +192,10 @@ public class AttackPatternApi extends RestBehavior {
         attackPatterns.stream().filter(a -> a.getParentId() == null).toList();
     List<AttackPatternCreateInput> patternsWithParent =
         attackPatterns.stream().filter(a -> a.getParentId() != null).toList();
-    upserted.addAll(upsertAttackPatterns(patternsWithoutParent));
-    upserted.addAll(upsertAttackPatterns(patternsWithParent));
+    upserted.addAll(
+        internalUpsertAttackPatterns(patternsWithoutParent, input.getIgnoreDependencies()));
+    upserted.addAll(
+        internalUpsertAttackPatterns(patternsWithParent, input.getIgnoreDependencies()));
     return upserted;
   }
 

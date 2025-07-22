@@ -1,13 +1,14 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import ItemTags from '../../../../components/ItemTags';
+import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
+import AssetTagsFragment from '../../../../components/common/list/fragments/AssetTagsFragment';
+import AssetTypeFragment from '../../../../components/common/list/fragments/AssetTypeFragment';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import PlatformIcon from '../../../../components/PlatformIcon';
 import { type EndpointOutput } from '../../../../utils/api-types';
+import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
 import { type EndpointPopoverProps } from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -52,7 +53,6 @@ const EndpointsList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const theme = useTheme();
 
   const component = (endpoint: EndpointOutput) => {
     return renderActions(endpoint);
@@ -66,37 +66,22 @@ const EndpointsList: FunctionComponent<Props> = ({
       value: (endpoint: EndpointOutput) => endpoint.asset_name,
     },
     {
-      field: 'asset_platform',
+      field: EndpointListItemFragments.ASSET_PLATFORM,
       label: 'Platform',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => (
-        <>
-          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
-          {endpoint.endpoint_platform}
-        </>
-      ),
+      value: (endpoint: EndpointOutput) => <AssetPlatformFragment platform={endpoint.endpoint_platform} />,
     },
     {
-      field: 'asset_tags',
+      field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => (
-        <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
-      ),
+      value: (endpoint: EndpointOutput) => <AssetTagsFragment tags={endpoint.asset_tags} />,
     },
     {
-      field: 'asset_type',
+      field: EndpointListItemFragments.ASSET_TYPE,
       label: 'Type',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => (
-        <Tooltip title={endpoint.asset_type}>
-          <Chip
-            variant="outlined"
-            className={classes.typeChip}
-            label={endpoint.asset_type}
-          />
-        </Tooltip>
-      ),
+      value: (endpoint: EndpointOutput) => <AssetTypeFragment type={endpoint.asset_type} />,
     },
   ];
 

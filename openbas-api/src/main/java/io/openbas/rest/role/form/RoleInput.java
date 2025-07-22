@@ -1,6 +1,7 @@
 package io.openbas.rest.role.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.Capability;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Set;
 import lombok.Builder;
@@ -18,5 +19,5 @@ public class RoleInput {
   private String name;
 
   @JsonProperty("role_capabilities")
-  private Set<String> capabilities;
+  private Set<Capability> capabilities;
 }

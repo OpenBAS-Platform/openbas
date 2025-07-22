@@ -106,3 +106,9 @@ export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') 
   const params = { injectId };
   return simpleCall(`${INJECT_URI}/status`, { params });
 };
+
+// Detection Remediation
+export const fetchPayloadDetectionRemediationsByInject = (injectId: string) => {
+  const uri = `${INJECT_URI}/detection-remediations/${injectId}`;
+  return simpleCall(uri);
+};

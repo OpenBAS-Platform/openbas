@@ -89,6 +89,14 @@ public class PlatformSettings {
   @Schema(description = "Url of OpenCTI")
   private String xtmOpenctiUrl;
 
+  @JsonProperty("xtm_hub_enable")
+  @Schema(description = "True if connection with XTM Hub is enabled")
+  private Boolean xtmHubEnable;
+
+  @JsonProperty("xtm_hub_url")
+  @Schema(description = "Url of XTM Hub")
+  private String xtmHubUrl;
+
   @JsonProperty("telemetry_manager_enable")
   @Schema(description = "True if telemetry manager enable")
   private Boolean telemetryManagerEnable;
@@ -192,6 +200,11 @@ public class PlatformSettings {
   @JsonProperty("expectation_prevention_expiration_time")
   @Schema(description = "Time to wait before prevention time has expired")
   private long preventionExpirationTime;
+
+  @NotNull
+  @JsonProperty("expectation_vulnerability_expiration_time")
+  @Schema(description = "Time to wait before vulnerability time has expired")
+  private long vulnerabilityExpirationTime;
 
   @NotNull
   @JsonProperty("expectation_challenge_expiration_time")

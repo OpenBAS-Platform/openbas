@@ -12,10 +12,15 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.group.form.GroupCreateInput;
 import io.openbas.rest.group.form.GroupGrantInput;
+import io.openbas.rest.group.form.GroupUpdateRolesInput;
 import io.openbas.rest.group.form.GroupUpdateUsersInput;
 import io.openbas.rest.group.form.OrganizationGrantInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.RoleService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.Objects;
@@ -39,6 +44,7 @@ public class GroupApi extends RestBehavior {
   private OrganizationRepository organizationRepository;
   private GroupRepository groupRepository;
   private UserRepository userRepository;
+  private RoleService roleService;
 
   @Autowired
   public void setOrganizationRepository(OrganizationRepository organizationRepository) {
@@ -68,6 +74,11 @@ public class GroupApi extends RestBehavior {
   @Autowired
   public void setGroupRepository(GroupRepository groupRepository) {
     this.groupRepository = groupRepository;
+  }
+
+  @Autowired
+  public void setRoleService(RoleService roleService) {
+    this.roleService = roleService;
   }
 
   @GetMapping("/api/groups")
@@ -123,6 +134,35 @@ public class GroupApi extends RestBehavior {
             .filter(Objects::nonNull)
             .collect(Collectors.toList()));
     return savedGroup;
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/api/groups/{groupId}/roles")
+  @Operation(
+      description = "Update roles associated to a group",
+      summary = "Update roles associated to a group")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Group updated"),
+        @ApiResponse(responseCode = "404", description = "Role or Group not found")
+      })
+  @Transactional(rollbackOn = Exception.class)
+  public Group updateGroupRoles(
+      @PathVariable String groupId, @Valid @RequestBody GroupUpdateRolesInput input) {
+    Group group =
+        groupRepository
+            .findById(groupId)
+            .orElseThrow(() -> new ElementNotFoundException("Group not found with id: " + groupId));
+
+    input.getRoleIds().stream()
+        .map(
+            id ->
+                roleService
+                    .findById(id)
+                    .orElseThrow(
+                        () -> new ElementNotFoundException("Role not found with id: " + id)))
+        .forEach(group.getRoles()::add);
+    return groupRepository.save(group);
   }
 
   @Secured(ROLE_ADMIN)

@@ -1,4 +1,4 @@
-import { Box, Checkbox, FormControlLabel, Typography } from '@mui/material';
+import { Box, Checkbox, FormControlLabel } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -10,27 +10,9 @@ import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
 import { type AttackPattern, type EsSeries, type KillChainPhase } from '../../../../../../utils/api-types';
 import { sortKillChainPhase } from '../../../../../../utils/kill_chain_phases/kill_chain_phases';
+import ColoredPercentageRate from './components/ColoredPercentageRate';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
-import { filterByKillChainPhase, resolvedData, SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './securityCoverageUtils';
-
-const items = [
-  {
-    label: '100%',
-    color: SUCCESS_100_COLOR,
-  },
-  {
-    label: '< 75%',
-    color: SUCCESS_75_COLOR,
-  },
-  {
-    label: '< 50%',
-    color: SUCCESS_50_COLOR,
-  },
-  {
-    label: '< 25%',
-    color: SUCCESS_25_COLOR,
-  },
-];
+import { filterByKillChainPhase, resolvedData } from './securityCoverageUtils';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -75,7 +57,6 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) =
       minHeight={0}
     >
       <div style={{
-        position: 'sticky',
         display: 'flex',
         justifyContent: 'space-between',
         padding: theme.spacing(1),
@@ -94,23 +75,7 @@ const SecurityCoverageContent: FunctionComponent<Props> = ({ widgetId, data }) =
           />
         </Box>
         <div>
-          <div style={{ display: 'flex' }}>
-            {items.map(({ label, color }) => (
-              <Box
-                key={label}
-                sx={{
-                  backgroundColor: color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: `${theme.spacing(0.5)} ${theme.spacing(1)}`,
-                }}
-              >
-                <Typography variant="body2" color="white">
-                  {label}
-                </Typography>
-              </Box>
-            ))}
-          </div>
+          <ColoredPercentageRate />
         </div>
       </div>
       <Box className={classes.container}>

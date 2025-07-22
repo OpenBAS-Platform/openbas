@@ -41,7 +41,7 @@ import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.mapper.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -456,8 +456,20 @@ public class ScenarioService {
     // Add Injects
     objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
     scenarioFileExport.setInjects(scenario.getInjects());
-    scenarioTags.addAll(
-        scenario.getInjects().stream().flatMap(inject -> inject.getTags().stream()).toList());
+    scenario
+        .getInjects()
+        .forEach(
+            inject -> {
+              scenarioTags.addAll(inject.getTags());
+              inject
+                  .getInjectorContract()
+                  .ifPresent(
+                      injectorContract -> {
+                        if (injectorContract.getPayload() != null) {
+                          scenarioTags.addAll(injectorContract.getPayload().getTags());
+                        }
+                      });
+            });
 
     // Add Articles
     objectMapper.addMixIn(Article.class, Mixins.Article.class);
@@ -577,6 +589,18 @@ public class ScenarioService {
     List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
     scenario.setTeams(teams);
 
+    List<String> teamIdsAdded =
+        teamIds.stream().filter(id -> !previousTeamList.contains(id)).toList();
+
+    List<Team> teamsAdded = fromIterable(this.teamRepository.findAllById(teamIdsAdded));
+
+    // Enable user
+    teamsAdded.forEach(
+        team -> {
+          List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
+          this.enablePlayers(scenarioId, team, playerIds);
+        });
+
     // You must return all the modified teams to ensure the frontend store updates correctly
     List<String> modifiedTeamIds =
         Stream.concat(previousTeamList.stream(), teams.stream().map(Team::getId))
@@ -585,12 +609,30 @@ public class ScenarioService {
     return teamService.find(fromIds(modifiedTeamIds));
   }
 
-  public Scenario enablePlayers(
+  public Scenario addScenarioPlayer(
       @NotBlank final String scenarioId,
       @NotBlank final String teamId,
       @NotNull final List<String> playerIds) {
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+    Iterable<User> teamUsers = userRepository.findAllById(playerIds);
+    team.getUsers().addAll(fromIterable(teamUsers));
+    Team savedTeam = teamRepository.save(team);
+    return this.enablePlayers(scenarioId, savedTeam, playerIds);
+  }
+
+  public Scenario enableAddScenarioTeamPlayer(
+      @NotBlank final String scenarioId,
+      @NotBlank final String teamId,
+      @NotNull final List<String> playerIds) {
+    Team team = teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new);
+    return this.enablePlayers(scenarioId, team, playerIds);
+  }
+
+  public Scenario enablePlayers(
+      @NotBlank final String scenarioId,
+      @NotBlank final Team team,
+      @NotNull final List<String> playerIds) {
     Scenario scenario = this.scenario(scenarioId);
-    Team team = this.teamRepository.findById(teamId).orElseThrow();
     playerIds.forEach(
         playerId -> {
           ScenarioTeamUser scenarioTeamUser = new ScenarioTeamUser();

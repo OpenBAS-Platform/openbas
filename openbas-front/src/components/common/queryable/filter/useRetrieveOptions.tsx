@@ -3,24 +3,34 @@ import { useState } from 'react';
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchCustomDashboardByIdAsOptions } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
-import {
-  searchInjectByIdAsOption,
-  searchTargetOptionsById,
-} from '../../../../actions/injects/inject-action';
+import { searchInjectByIdAsOption, searchTargetOptionsById } from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchSimulationByIdAsOptions } from '../../../../actions/simulations/simulation-action';
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
-import { type Option } from '../../../../utils/Option';
+import { type GroupOption, type Option } from '../../../../utils/Option';
+import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
 
-  const searchOptions = (filterKey: string, ids: string[]) => {
+  const searchOptions = (filterKey: string, ids: string[], defaultValues: GroupOption[] = []) => {
+    const filterDefaultValues = defaultValues.filter(v => ids.includes(v.id));
     switch (filterKey) {
+      case SIMULATIONS:
+      case 'base_simulation_side':
+        searchSimulationByIdAsOptions(ids).then((response) => {
+          setOptions([...filterDefaultValues, ...response.data.map((d: Option) => ({
+            ...d,
+            group: 'Values',
+          }))]);
+        });
+        break;
       case 'injector_contract_injector':
       case 'inject_injector_contract':
         searchInjectorByIdAsOptions(ids).then((response) => {
@@ -37,6 +47,7 @@ const useRetrieveOptions = () => {
         break;
       case 'payload_attack_patterns':
       case 'base_attack_patterns_side':
+      case 'inject_attack_patterns':
         searchAttackPatternsByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
@@ -107,6 +118,11 @@ const useRetrieveOptions = () => {
         break;
       case 'user_organization':
         searchOrganizationByIdAsOptions(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case CUSTOM_DASHBOARD:
+        searchCustomDashboardByIdAsOptions(ids).then((response) => {
           setOptions(response.data);
         });
         break;

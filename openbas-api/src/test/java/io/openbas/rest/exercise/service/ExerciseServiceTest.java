@@ -19,10 +19,10 @@ import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.*;
+import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectMapper;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +56,7 @@ class ExerciseServiceTest {
   @Mock private ArticleRepository articleRepository;
   @Mock private ExerciseRepository exerciseRepository;
   @Mock private TeamRepository teamRepository;
+  @Mock private UserRepository userRepository;
   @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock private InjectRepository injectRepository;
   @Mock private LessonsCategoryRepository lessonsCategoryRepository;
@@ -85,6 +86,7 @@ class ExerciseServiceTest {
             articleRepository,
             exerciseRepository,
             teamRepository,
+            userRepository,
             exerciseTeamUserRepository,
             injectRepository,
             lessonsCategoryRepository);

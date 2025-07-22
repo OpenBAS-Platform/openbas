@@ -37,6 +37,8 @@ import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -90,6 +92,7 @@ public class ExerciseService {
   private final ArticleRepository articleRepository;
   private final ExerciseRepository exerciseRepository;
   private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
   private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -676,12 +679,41 @@ public class ExerciseService {
     List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
     exercise.setTeams(teams);
 
+    List<String> teamIdsAdded =
+        teamIds.stream().filter(id -> !previousTeamIds.contains(id)).toList();
+
+    List<Team> teamsAdded = fromIterable(this.teamRepository.findAllById(teamIdsAdded));
+
+    // Enable user
+    teamsAdded.forEach(
+        team -> {
+          List<String> playerIds = team.getUsers().stream().map(User::getId).toList();
+          this.enablePlayers(exerciseId, team, playerIds);
+        });
+
     // You must return all the modified teams to ensure the frontend store updates correctly
     List<String> modifiedTeamIds =
         Stream.concat(previousTeamIds.stream(), teams.stream().map(Team::getId))
             .distinct()
             .toList();
     return teamService.find(fromIds(modifiedTeamIds));
+  }
+
+  public Exercise enablePlayers(
+      @NotBlank final String exerciseId,
+      @NotBlank final Team team,
+      @NotNull final List<String> playerIds) {
+    Exercise exercise =
+        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    playerIds.forEach(
+        playerId -> {
+          ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+          exerciseTeamUser.setExercise(exercise);
+          exerciseTeamUser.setTeam(team);
+          exerciseTeamUser.setUser(this.userRepository.findById(playerId).orElseThrow());
+          this.exerciseTeamUserRepository.save(exerciseTeamUser);
+        });
+    return exercise;
   }
 
   /**

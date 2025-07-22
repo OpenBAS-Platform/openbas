@@ -50,7 +50,7 @@ public class InjectStatusService {
   }
 
   public void addStartImplantExecutionTraceByInject(
-      String injectId, String agentId, String message) {
+      String injectId, String agentId, String message, Instant startTime) {
     InjectStatus injectStatus =
         injectStatusRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
@@ -62,7 +62,7 @@ public class InjectStatusService {
             message,
             ExecutionTraceAction.START,
             agent,
-            null);
+            startTime);
     injectStatus.addTrace(trace);
     injectStatusRepository.save(injectStatus);
   }
@@ -84,13 +84,11 @@ public class InjectStatusService {
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.info("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.info("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -101,11 +99,34 @@ public class InjectStatusService {
       InjectExecutionInput input,
       Agent agent,
       ObjectNode structuredOutput) {
+
+    // We start by computing the trace date. It should be qual to the START execution trace +
+    // input.duration.
+    // If the duration is 0 or if there is no START execution trace, we use the current time.
+    Instant traceCreationTime =
+        (injectStatus.getTraces().isEmpty() || input.getDuration() == 0)
+            ? Instant.now()
+            : injectStatus.getTraces().stream()
+                .filter(
+                    t ->
+                        ExecutionTraceAction.START.equals(t.getAction())
+                            && t.getAgent().getId().equals(agent.getId()))
+                .findFirst()
+                .map(startTrace -> startTrace.getTime().plusMillis(input.getDuration()))
+                .orElse(Instant.now());
+
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
+
     ExecutionTrace base =
         new ExecutionTrace(
-            injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
+            injectStatus,
+            traceStatus,
+            null,
+            input.getMessage(),
+            executionAction,
+            agent,
+            traceCreationTime);
     return ExecutionTrace.from(base, structuredOutput);
   }
 
@@ -178,21 +199,16 @@ public class InjectStatusService {
   }
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    log.info("[issue/2797] fromExecution 1: " + injectStatus.getId());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
       injectStatus.getTraces().addAll(traces);
     }
-    log.info("[issue/2797] fromExecution 2:  " + injectStatus.getId());
     if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
-      log.info("[issue/2797] fromExecution 3a: " + injectStatus.getId());
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      log.info("[issue/2797] fromExecution 3b: " + injectStatus.getId());
       updateFinalInjectStatus(injectStatus);
     }
-    log.info("[issue/2797] fromExecution 4: " + injectStatus.getId());
     return injectStatus;
   }
 

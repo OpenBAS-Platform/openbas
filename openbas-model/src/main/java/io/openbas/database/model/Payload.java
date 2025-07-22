@@ -181,6 +181,14 @@ public class Payload implements Base {
   @Schema(type = "string")
   private Collector collector;
 
+  @OneToMany(
+      mappedBy = "payload",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  @JsonProperty("payload_detection_remediations")
+  private List<DetectionRemediation> detectionRemediations = new ArrayList<>();
+
   // -- TAG --
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -193,6 +201,16 @@ public class Payload implements Base {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("payload_tags")
   private Set<Tag> tags = new HashSet<>();
+
+  // -- OUTPUT PARSERS
+
+  @OneToMany(
+      mappedBy = "payload",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParser> outputParsers = new HashSet<>();
 
   // -- AUDIT --
 
@@ -207,14 +225,6 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  @OneToMany(
-      mappedBy = "payload",
-      fetch = FetchType.EAGER,
-      cascade = CascadeType.ALL,
-      orphanRemoval = true)
-  @JsonProperty("payload_output_parsers")
-  private Set<OutputParser> outputParsers = new HashSet<>();
-
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {
     return this.collector != null ? this.collector.getType() : null;
@@ -228,6 +238,14 @@ public class Payload implements Base {
   @JsonIgnore
   public Optional<Document> getAttachedDocument() {
     return Optional.empty();
+  }
+
+  @JsonIgnore
+  public List<String> getArgumentsDocumentsIds() {
+    return this.getArguments().stream()
+        .filter(payloadArgument -> payloadArgument.getType().equals("document"))
+        .map(PayloadArgument::getDefaultValue)
+        .toList();
   }
 
   @Override
@@ -252,6 +270,18 @@ public class Payload implements Base {
     if (outputParser != null) {
       outputParser.setPayload(this);
       this.outputParsers.add(outputParser);
+    }
+  }
+
+  public void setDetectionRemediations(final List<DetectionRemediation> detectionRemediations) {
+    this.detectionRemediations.clear();
+    detectionRemediations.forEach(this::addDetectionRemediation);
+  }
+
+  public void addDetectionRemediation(DetectionRemediation detectionRemediation) {
+    if (detectionRemediation != null) {
+      detectionRemediation.setPayload(this);
+      this.detectionRemediations.add(detectionRemediation);
     }
   }
 }

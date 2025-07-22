@@ -88,6 +88,44 @@ export interface AgentTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+}
+
+export interface AggregatedFindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve";
+  /** Finding Value */
+  finding_value: string;
 }
 
 export interface AiGenericTextInput {
@@ -263,6 +301,12 @@ export interface AssetGroupTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Full contract */
@@ -344,18 +388,23 @@ export interface AttackPatternUpdateInput {
 
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
+  ignore_dependencies?: boolean;
 }
 
-interface BaseHistogramWidget {
-  display_legend?: boolean;
-  field: string;
-  mode: string;
-  stacked?: boolean;
-  title?: string;
+interface BaseEsBase {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
 }
 
-type BaseHistogramWidgetModeMapping<Key, Type> = {
-  mode: Key;
+type BaseEsBaseBaseEntityMapping<Key, Type> = {
+  base_entity: Key;
 } & Type;
 
 interface BaseInjectTarget {
@@ -388,6 +437,12 @@ interface BaseInjectTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 type BaseInjectTargetTargetTypeMapping<Key, Type> = {
@@ -405,6 +460,7 @@ interface BasePayload {
   /** @format date-time */
   payload_created_at: string;
   payload_description?: string;
+  payload_detection_remediations?: DetectionRemediation[];
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
@@ -448,6 +504,8 @@ interface BasePayloadCreateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
+  /** List of detection remediation gaps for collectors */
+  payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
@@ -478,6 +536,14 @@ type BasePayloadCreateInputPayloadTypeMapping<Key, Type> = {
 
 type BasePayloadPayloadTypeMapping<Key, Type> = {
   payload_type: Key;
+} & Type;
+
+interface BaseWidgetConfiguration {
+  widget_configuration_type: string;
+}
+
+type BaseWidgetConfigurationWidgetConfigurationTypeMapping<Key, Type> = {
+  widget_configuration_type: Key;
 } & Type;
 
 export interface Challenge {
@@ -848,6 +914,7 @@ export interface ContractOutputElementSimple {
 
 export interface CreateExerciseInput {
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -893,6 +960,7 @@ export interface CustomDashboard {
   custom_dashboard_description?: string;
   custom_dashboard_id: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParameters[];
   /** @format date-time */
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
@@ -902,6 +970,214 @@ export interface CustomDashboard {
 export interface CustomDashboardInput {
   custom_dashboard_description?: string;
   custom_dashboard_name: string;
+  custom_dashboard_parameters?: CustomDashboardParametersInput[];
+}
+
+export interface CustomDashboardOutput {
+  custom_dashboard_id?: string;
+  custom_dashboard_name?: string;
+}
+
+export interface CustomDashboardParameters {
+  custom_dashboards_parameter_id: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+  listened?: boolean;
+}
+
+export interface CustomDashboardParametersInput {
+  custom_dashboards_parameter_id?: string;
+  custom_dashboards_parameter_name: string;
+  custom_dashboards_parameter_type: "simulation";
+}
+
+/** Payload to create a CVE */
+export interface CveCreateInput {
+  /**
+   * Date when action is due by CISA
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * Date when CISA added the CVE to the exploited list
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Vulnerability name used by CISA */
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * CVSS score
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   * @example 7.5
+   */
+  cve_cvss: number;
+  /** List of linked CWEs */
+  cve_cwes?: CweInput[];
+  /** Description of the CVE */
+  cve_description?: string;
+  /**
+   * External Unique CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /**
+   * Publication date of the CVE
+   * @format date-time
+   */
+  cve_published?: string;
+  /** List of reference URLs */
+  cve_reference_urls?: string[];
+  /** Suggested remediation */
+  cve_remediation?: string;
+  /**
+   * Identifier of the CVE source
+   * @example "MITRE"
+   */
+  cve_source_identifier?: string;
+  /**
+   * Vulnerability status
+   * @example "ANALYZED"
+   */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** Full CVE output including references and CWEs */
+export interface CveOutput {
+  /**
+   * CISA required action due date
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * CISA exploit addition date
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Name used by CISA for the vulnerability */
+  cve_cisa_vulnerability_name?: string;
+  /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss: number;
+  /** List of CWE outputs */
+  cve_cwes?: CweOutput[];
+  /** Detailed CVE description */
+  cve_description?: string;
+  /**
+   * External CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /** Id */
+  cve_id: string;
+  /**
+   * CVE published date
+   * @format date-time
+   */
+  cve_published?: string;
+  /** External references */
+  cve_reference_urls?: string[];
+  /** Remediation suggestions */
+  cve_remediation?: string;
+  /** Source identifier */
+  cve_source_identifier?: string;
+  /** Status of the vulnerability */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** Simplified CVE representation */
+export interface CveSimple {
+  /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss: number;
+  /**
+   * External CVE identifier
+   * @example "CVE-2024-0001"
+   */
+  cve_external_id: string;
+  /** Id */
+  cve_id: string;
+  /**
+   * CVE published date
+   * @format date-time
+   */
+  cve_published?: string;
+}
+
+/** Payload to update a CVE */
+export interface CveUpdateInput {
+  /**
+   * Date when action is due by CISA
+   * @format date-time
+   */
+  cve_cisa_action_due?: string;
+  /**
+   * Date when CISA added the CVE to the exploited list
+   * @format date-time
+   */
+  cve_cisa_exploit_add?: string;
+  /** Action required by CISA */
+  cve_cisa_required_action?: string;
+  /** Vulnerability name used by CISA */
+  cve_cisa_vulnerability_name?: string;
+  /** List of linked CWEs */
+  cve_cwes?: CweInput[];
+  /** Description of the CVE */
+  cve_description?: string;
+  /**
+   * Publication date of the CVE
+   * @format date-time
+   */
+  cve_published?: string;
+  /** List of reference URLs */
+  cve_reference_urls?: string[];
+  /** Suggested remediation */
+  cve_remediation?: string;
+  /**
+   * Identifier of the CVE source
+   * @example "MITRE"
+   */
+  cve_source_identifier?: string;
+  /**
+   * Vulnerability status
+   * @example "ANALYZED"
+   */
+  cve_vuln_status?: "ANALYZED" | "DEFERRED" | "MODIFIED";
+}
+
+/** CWE input used in CVE creation/update */
+export interface CweInput {
+  /**
+   * External CWE identifier
+   * @example "CWE-79"
+   */
+  cwe_external_id: string;
+  /**
+   * Source of the CWE
+   * @example "NIST"
+   */
+  cwe_source?: string;
+}
+
+/** CWE output data */
+export interface CweOutput {
+  /**
+   * CWE identifier
+   * @example "CWE-79"
+   */
+  cwe_external_id: string;
+  /** Source of the CWE */
+  cwe_source?: string;
 }
 
 export interface DateHistogramSeries {
@@ -911,14 +1187,49 @@ export interface DateHistogramSeries {
 }
 
 export type DateHistogramWidget = UtilRequiredKeys<
-  HistogramWidget,
-  "mode" | "field"
+  WidgetConfiguration,
+  "widget_configuration_type"
 > & {
+  display_legend?: boolean;
   end: string;
+  field: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  mode: string;
   series: DateHistogramSeries[];
+  stacked?: boolean;
   start: string;
 };
+
+export interface DetectionRemediation {
+  detection_remediation_collector_type: string;
+  /** @format date-time */
+  detection_remediation_created_at?: string;
+  detection_remediation_id: string;
+  detection_remediation_payload_id: Payload;
+  /** @format date-time */
+  detection_remediation_updated_at?: string;
+  detection_remediation_values: string;
+  listened?: boolean;
+}
+
+/** List of detection remediation gaps for collectors */
+export interface DetectionRemediationInput {
+  /** Collector type */
+  detection_remediation_collector: string;
+  detection_remediation_id?: string;
+  /** Value of detection remediation, for exemple: query for sentinel */
+  detection_remediation_values: string;
+}
+
+export interface DetectionRemediationOutput {
+  /** Collector type */
+  detection_remediation_collector: string;
+  detection_remediation_id?: string;
+  /** Payload id */
+  detection_remediation_payload: string;
+  /** Value of detection remediation, for exemple: query for sentinel */
+  detection_remediation_values: string;
+}
 
 export interface DirectInjectInput {
   inject_content?: object;
@@ -992,6 +1303,29 @@ export interface DocumentCreateInput {
   document_tags?: string[];
 }
 
+export interface DocumentRelationsOutput {
+  /** @uniqueItems true */
+  atomicTestings?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  challenges?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  channels?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  payloads?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  scenarioArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  scenarioInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  securityPlatforms?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulationArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulationInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulations?: RelatedEntityOutput[];
+}
+
 export interface DocumentTagUpdateInput {
   tags?: string[];
 }
@@ -1017,6 +1351,7 @@ export interface Endpoint {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"
@@ -1043,6 +1378,8 @@ export interface EndpointInput {
    * @minItems 1
    */
   endpoint_ips: string[];
+  /** True if the endpoint is in an End of Life state */
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"
@@ -1114,6 +1451,8 @@ export interface EndpointOverviewOutput {
    * @uniqueItems true
    */
   endpoint_ips?: string[];
+  /** True if the endpoint is in an End of Life state */
+  endpoint_is_eol?: boolean;
   /**
    * List of MAC addresses
    * @uniqueItems true
@@ -1150,6 +1489,8 @@ export interface EndpointRegisterInput {
    * @minItems 1
    */
   endpoint_ips: string[];
+  /** True if the endpoint is in an End of Life state */
+  endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
     | "Linux"
@@ -1202,6 +1543,180 @@ export interface EndpointTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
+}
+
+export interface EngineSortField {
+  direction: "ASC" | "DESC";
+  fieldName: string;
+}
+
+export interface EsAttackPath {
+  /** @uniqueItems true */
+  attackPatternChildrenIds?: string[];
+  attackPatternExternalId: string;
+  attackPatternId: string;
+  attackPatternName: string;
+  /** @uniqueItems true */
+  injectIds?: string[];
+  killChainPhases?: KillChainPhaseObject[];
+  /** @format int64 */
+  value?: number;
+}
+
+export interface EsAttackPattern {
+  base_attack_pattern_side?: string;
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  /** @uniqueItems true */
+  base_kill_chain_phases_side?: string[];
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  description?: string;
+  externalId?: string;
+  name?: string;
+  platforms?: string[];
+  stixId?: string;
+}
+
+export type EsBase = BaseEsBase &
+  (
+    | BaseEsBaseBaseEntityMapping<"attack-pattern", EsAttackPattern>
+    | BaseEsBaseBaseEntityMapping<"endpoint", EsEndpoint>
+    | BaseEsBaseBaseEntityMapping<"finding", EsFinding>
+    | BaseEsBaseBaseEntityMapping<"inject", EsInject>
+    | BaseEsBaseBaseEntityMapping<"expectation-inject", EsInjectExpectation>
+    | BaseEsBaseBaseEntityMapping<"simulation", EsSimulation>
+    | BaseEsBaseBaseEntityMapping<"scenario", EsScenario>
+    | BaseEsBaseBaseEntityMapping<"tag", EsTag>
+    | BaseEsBaseBaseEntityMapping<"vulnerable-endpoint", EsVulnerableEndpoint>
+  );
+
+export interface EsEndpoint {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  /** @uniqueItems true */
+  base_findings_side?: string[];
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  endpoint_arch?: string;
+  endpoint_description?: string;
+  endpoint_external_reference?: string;
+  endpoint_hostname?: string;
+  /** @uniqueItems true */
+  endpoint_ips?: string[];
+  endpoint_is_eol?: boolean;
+  /** @uniqueItems true */
+  endpoint_mac_addresses?: string[];
+  endpoint_name?: string;
+  endpoint_platform?: string;
+  endpoint_seen_ip?: string;
+}
+
+export interface EsFinding {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_endpoint_side?: string;
+  base_entity?: string;
+  base_id?: string;
+  base_inject_side?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_scenario_side?: string;
+  base_simulation_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  finding_field?: string;
+  finding_type?: string;
+  finding_value?: string;
+}
+
+export interface EsInject {
+  /** @uniqueItems true */
+  base_attack_patterns_children_side?: string[];
+  /** @uniqueItems true */
+  base_attack_patterns_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  /** @uniqueItems true */
+  base_inject_children_side?: string[];
+  base_inject_contract_side?: string;
+  /** @uniqueItems true */
+  base_kill_chain_phases_side?: string[];
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_scenario_side?: string;
+  base_simulation_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  inject_status?: string;
+  inject_title?: string;
+}
+
+export interface EsInjectExpectation {
+  base_agent_side?: string;
+  base_asset_group_side?: string;
+  base_asset_side?: string;
+  /** @uniqueItems true */
+  base_attack_patterns_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_inject_side?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_simulation_side?: string;
+  base_team_side?: string;
+  /** @format date-time */
+  base_updated_at?: string;
+  base_user_side?: string;
+  inject_expectation_description?: string;
+  /** @format double */
+  inject_expectation_expected_score?: number;
+  /** @format int64 */
+  inject_expectation_expiration_time?: number;
+  inject_expectation_group?: boolean;
+  inject_expectation_name?: string;
+  inject_expectation_results?: string;
+  /** @format double */
+  inject_expectation_score?: number;
+  inject_expectation_status?: string;
+  inject_expectation_type?: string;
+}
+
+export interface EsScenario {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
 }
 
 export interface EsSearch {
@@ -1225,6 +1740,58 @@ export interface EsSeriesData {
   label?: string;
   /** @format int64 */
   value?: number;
+}
+
+export interface EsSimulation {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+}
+
+export interface EsTag {
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  tag_color?: string;
+}
+
+export interface EsVulnerableEndpoint {
+  /** @uniqueItems true */
+  base_agents_side?: string[];
+  /** @format date-time */
+  base_created_at?: string;
+  base_dependencies?: string[];
+  base_entity?: string;
+  /** @uniqueItems true */
+  base_findings_side?: string[];
+  base_id?: string;
+  base_representative?: string;
+  base_restrictions?: string[];
+  base_simulation_side?: string;
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @format date-time */
+  base_updated_at?: string;
+  vulnerable_endpoint_action?: string;
+  vulnerable_endpoint_agents_active_status?: boolean[];
+  vulnerable_endpoint_agents_privileges?: string[];
+  vulnerable_endpoint_architecture?: string;
+  vulnerable_endpoint_findings_summary?: string;
+  vulnerable_endpoint_hostname?: string;
+  vulnerable_endpoint_id?: string;
+  vulnerable_endpoint_platform?: string;
 }
 
 export interface Evaluation {
@@ -1406,6 +1973,7 @@ export interface Exercise {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_documents?: string[];
   /** @format date-time */
@@ -1554,7 +2122,7 @@ export interface ExercisesGlobalScoresOutput {
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
-  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION";
+  type: "DETECTION" | "HUMAN_RESPONSE" | "PREVENTION" | "VULNERABILITY";
 }
 
 export interface ExpectationUpdateInput {
@@ -1693,52 +2261,6 @@ export interface FindingInput {
   finding_value: string;
 }
 
-export interface FindingOutput {
-  /**
-   * Asset groups linked to endpoints
-   * @uniqueItems true
-   */
-  finding_asset_groups?: AssetGroupSimple[];
-  /**
-   * Endpoint linked to finding
-   * @uniqueItems true
-   */
-  finding_assets: EndpointSimple[];
-  /** @format date-time */
-  finding_created_at: string;
-  /** Finding field that corresponds to the key of the output parser */
-  finding_field: string;
-  /** Finding Id */
-  finding_id: string;
-  /** Inject linked to finding */
-  finding_inject: InjectSimple;
-  /** Finding Name */
-  finding_name: string;
-  /** Scenario linked to inject */
-  finding_scenario?: ScenarioSimple;
-  finding_simulation?: ExerciseSimple;
-  /**
-   * Tags that correspond to the output parser tags
-   * @uniqueItems true
-   */
-  finding_tags?: string[];
-  /**
-   * Represents the data type being extracted.
-   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
-   */
-  finding_type:
-    | "text"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials"
-    | "cve";
-  /** Finding Value */
-  finding_value: string;
-}
-
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -1770,16 +2292,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -1805,19 +2327,30 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
+}
+
+export interface GroupUpdateRolesInput {
+  /** List of role ids associated with the group */
+  group_roles?: string[];
 }
 
 export interface GroupUpdateUsersInput {
   group_users?: string[];
 }
 
-export type HistogramWidget = BaseHistogramWidget &
-  (
-    | BaseHistogramWidgetModeMapping<"temporal", DateHistogramWidget>
-    | BaseHistogramWidgetModeMapping<"structural", StructuralHistogramWidget>
-  );
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: string;
+  stacked?: boolean;
+  title?: string;
+  widget_configuration_type:
+    | "list"
+    | "temporal-histogram"
+    | "structural-histogram";
+}
 
 export interface ImportMapper {
   /** @format date-time */
@@ -2046,7 +2579,8 @@ export interface InjectExpectation {
     | "CHALLENGE"
     | "MANUAL"
     | "PREVENTION"
-    | "DETECTION";
+    | "DETECTION"
+    | "VULNERABILITY";
   /** @format date-time */
   inject_expectation_updated_at?: string;
   inject_expectation_user?: string;
@@ -2603,6 +3137,13 @@ export interface KillChainPhaseCreateInput {
   phase_stix_id?: string;
 }
 
+export interface KillChainPhaseObject {
+  id: string;
+  name?: string;
+  /** @format int64 */
+  order?: number;
+}
+
 /** Kill chain phases */
 export interface KillChainPhaseSimple {
   phase_id: string;
@@ -2800,6 +3341,26 @@ export interface License {
   /** @format date-time */
   license_start_date?: string;
   license_type?: "trial" | "nfr" | "standard" | "lts";
+}
+
+export type ListConfiguration = UtilRequiredKeys<
+  WidgetConfiguration,
+  "widget_configuration_type"
+> & {
+  columns?: string[];
+  /**
+   * @format int32
+   * @min 1
+   */
+  limit?: number;
+  perspective: ListPerspective;
+  sorts?: EngineSortField[];
+};
+
+export interface ListPerspective {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
 }
 
 export interface Log {
@@ -3037,6 +3598,25 @@ export interface OutputParserSimple {
   output_parser_type: "REGEX";
 }
 
+export interface PageAggregatedFindingOutput {
+  content?: AggregatedFindingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageAssetGroupOutput {
   content?: AssetGroupOutput[];
   empty?: boolean;
@@ -3094,6 +3674,25 @@ export interface PageCustomDashboard {
   totalPages?: number;
 }
 
+export interface PageCveSimple {
+  content?: CveSimple[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageEndpointOutput {
   content?: EndpointOutput[];
   empty?: boolean;
@@ -3115,25 +3714,6 @@ export interface PageEndpointOutput {
 
 export interface PageExerciseSimple {
   content?: ExerciseSimple[];
-  empty?: boolean;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  number?: number;
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  /** @format int32 */
-  size?: number;
-  sort?: SortObject[];
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-}
-
-export interface PageFindingOutput {
-  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3436,6 +4016,25 @@ export interface PageRawPaginationScenario {
   totalPages?: number;
 }
 
+export interface PageRelatedFindingOutput {
+  content?: RelatedFindingOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageRoleOutput {
   content?: RoleOutput[];
   empty?: boolean;
@@ -3594,6 +4193,14 @@ export type PayloadCreateInput = BasePayloadCreateInput &
     | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
   );
 
+export interface PayloadExportRequestInput {
+  payloads?: PayloadExportTarget[];
+}
+
+export interface PayloadExportTarget {
+  payload_id?: string;
+}
+
 export interface PayloadPrerequisite {
   check_command?: string;
   description?: string | null;
@@ -3618,6 +4225,8 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
+  /** List of detection remediation gaps for collectors */
+  payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
@@ -3651,6 +4260,8 @@ export interface PayloadUpsertInput {
   payload_cleanup_executor?: string | null;
   payload_collector?: string;
   payload_description?: string;
+  /** List of detection remediation gaps for collectors */
+  payload_detection_remediations?: DetectionRemediationInput[];
   payload_elevation_required?: boolean;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
@@ -3733,6 +4344,11 @@ export interface PlatformSettings {
    * @format int64
    */
   expectation_prevention_expiration_time: number;
+  /**
+   * Time to wait before vulnerability time has expired
+   * @format int64
+   */
+  expectation_vulnerability_expiration_time: number;
   /** Current version of Java */
   java_version?: string;
   /** URL of the server containing the map tile with dark theme */
@@ -3781,6 +4397,10 @@ export interface PlatformSettings {
   rabbitmq_version?: string;
   /** True if telemetry manager enable */
   telemetry_manager_enable?: boolean;
+  /** True if connection with XTM Hub is enabled */
+  xtm_hub_enable?: boolean;
+  /** Url of XTM Hub */
+  xtm_hub_url?: string;
   /** True if connection with OpenCTI is enabled */
   xtm_opencti_enable?: boolean;
   /** Url of OpenCTI */
@@ -3865,6 +4485,12 @@ export interface PlayerTarget {
   /** @uniqueItems true */
   target_teams?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 /** Policies of the platform */
@@ -3882,6 +4508,20 @@ export interface PropertySchemaDTO {
   schema_property_has_dynamic_value?: boolean;
   schema_property_label: string;
   schema_property_name: string;
+  schema_property_override_operators?: (
+    | "eq"
+    | "not_eq"
+    | "contains"
+    | "not_contains"
+    | "starts_with"
+    | "not_starts_with"
+    | "gt"
+    | "gte"
+    | "lt"
+    | "lte"
+    | "empty"
+    | "not_empty"
+  )[];
   schema_property_type: string;
   schema_property_type_array?: boolean;
   schema_property_values?: string[];
@@ -4025,6 +4665,49 @@ export interface RegexGroupSimple {
   regex_group_index_values: string;
 }
 
+export interface RelatedEntityOutput {
+  context?: string;
+  id?: string;
+  name?: string;
+}
+
+export interface RelatedFindingOutput {
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  /** Finding Id */
+  finding_id: string;
+  /** Inject linked to finding */
+  finding_inject: InjectSimple;
+  /** Scenario linked to inject */
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve";
+  /** Finding Value */
+  finding_value: string;
+}
+
 export interface RenewTokenInput {
   token_id: string;
 }
@@ -4099,7 +4782,44 @@ export interface ResultDistribution {
 
 export interface RoleInput {
   /** @uniqueItems true */
-  role_capabilities?: string[];
+  role_capabilities?: (
+    | "BYPASS"
+    | "ACCESS_ATOMIC_TESTING"
+    | "MANAGE_ATOMIC_TESTING"
+    | "DELETE_ATOMIC_TESTING"
+    | "LAUNCH_ATOMIC_TESTING"
+    | "MANAGE_TEAMS_AND_PLAYERS"
+    | "DELETE_TEAMS_AND_PLAYERS"
+    | "ACCESS_ASSETS"
+    | "MANAGE_ASSETS"
+    | "DELETE_ASSETS"
+    | "ACCESS_PAYLOADS"
+    | "MANAGE_PAYLOADS"
+    | "DELETE_PAYLOADS"
+    | "ACCESS_DASHBOARDS"
+    | "MANAGE_DASHBOARDS"
+    | "DELETE_DASHBOARDS"
+    | "ACCESS_FINDINGS"
+    | "MANAGE_FINDINGS"
+    | "DELETE_FINDINGS"
+    | "ACCESS_DOCUMENTS"
+    | "MANAGE_DOCUMENTS"
+    | "DELETE_DOCUMENTS"
+    | "ACCESS_CHANNELS"
+    | "MANAGE_CHANNELS"
+    | "DELETE_CHANNELS"
+    | "ACCESS_CHALLENGES"
+    | "MANAGE_CHALLENGES"
+    | "DELETE_CHALLENGES"
+    | "ACCESS_LESSONS_LEARNED"
+    | "MANAGE_LESSONS_LEARNED"
+    | "DELETE_LESSONS_LEARNED"
+    | "ACCESS_SECURITY_PLATFORMS"
+    | "MANAGE_SECURITY_PLATFORMS"
+    | "DELETE_SECURITY_PLATFORMS"
+    | "ACCESS_PLATFORM_SETTINGS"
+    | "MANAGE_PLATFORM_SETTINGS"
+  )[];
   role_name: string;
 }
 
@@ -4148,6 +4868,7 @@ export interface Scenario {
   scenario_communications_number?: number;
   /** @format date-time */
   scenario_created_at: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_documents?: string[];
   scenario_exercises?: string[];
@@ -4202,6 +4923,7 @@ export interface ScenarioChallengesReader {
 
 export interface ScenarioInput {
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
@@ -4350,6 +5072,7 @@ export interface SimulationDetails {
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   /** @format date-time */
   exercise_end_date?: string;
@@ -4484,10 +5207,19 @@ export interface StructuralHistogramSeries {
 }
 
 export type StructuralHistogramWidget = UtilRequiredKeys<
-  BaseHistogramWidget,
-  "mode" | "field"
+  WidgetConfiguration,
+  "widget_configuration_type"
 > & {
+  display_legend?: boolean;
+  field: string;
+  /**
+   * @format int32
+   * @min 1
+   */
+  limit?: number;
+  mode: string;
   series: StructuralHistogramSeries[];
+  stacked?: boolean;
 };
 
 export interface Tag {
@@ -4704,6 +5436,12 @@ export interface TeamTarget {
   /** @uniqueItems true */
   target_tags?: string[];
   target_type?: string;
+  target_vulnerability_status?:
+    | "FAILED"
+    | "PENDING"
+    | "PARTIAL"
+    | "UNKNOWN"
+    | "SUCCESS";
 }
 
 export interface TeamUpdateInput {
@@ -4755,6 +5493,7 @@ export interface UpdateAssetsOnAssetGroupInput {
 export interface UpdateExerciseInput {
   apply_tag_rule?: boolean;
   exercise_category?: string;
+  exercise_custom_dashboard?: string;
   exercise_description?: string;
   exercise_mail_from?: string;
   exercise_mails_reply_to?: string[];
@@ -4789,6 +5528,7 @@ export interface UpdateProfileInput {
 export interface UpdateScenarioInput {
   apply_tag_rule?: boolean;
   scenario_category?: string;
+  scenario_custom_dashboard?: string;
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
@@ -4855,19 +5595,8 @@ export interface User {
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
     | "LAUNCH_ATOMIC_TESTING"
-    | "ACCESS_SIMULATION"
-    | "MANAGE_SIMULATION"
-    | "DELETE_SIMULATION"
-    | "LAUNCH_SIMULATION"
-    | "ACCESS_SCENARIO"
-    | "MANAGE_SCENARIO"
-    | "DELETE_SCENARIO"
-    | "LAUNCH_SCENARIO"
-    | "ACCESS_TEAMS_AND_PLAYERS"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
-    | "MANAGE_ASSETS_FROM_TEAMS"
-    | "DELETE_ASSETS_FROM_TEAMS"
     | "ACCESS_ASSETS"
     | "MANAGE_ASSETS"
     | "DELETE_ASSETS"
@@ -5038,21 +5767,57 @@ export interface ViolationErrorBag {
 
 export interface Widget {
   listened?: boolean;
-  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_config:
+    | DateHistogramWidget
+    | ListConfiguration
+    | StructuralHistogramWidget;
   /** @format date-time */
   widget_created_at: string;
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "horizontal-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "list"
+    | "attack-path";
   /** @format date-time */
   widget_updated_at: string;
 }
 
+export type WidgetConfiguration = BaseWidgetConfiguration &
+  (
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "list",
+        ListConfiguration
+      >
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "temporal-histogram",
+        DateHistogramWidget
+      >
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "structural-histogram",
+        StructuralHistogramWidget
+      >
+  );
+
 export interface WidgetInput {
-  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_config:
+    | DateHistogramWidget
+    | ListConfiguration
+    | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  widget_type:
+    | "vertical-barchart"
+    | "horizontal-barchart"
+    | "security-coverage"
+    | "line"
+    | "donut"
+    | "list"
+    | "attack-path";
 }
 
 export interface WidgetLayout {

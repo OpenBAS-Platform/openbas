@@ -63,6 +63,7 @@ export default ({ mode }: { mode: string }) => {
         'date-fns/locale',
         'dompurify',
         'final-form-arrays',
+        '@hello-pangea/dnd',
         'html-react-parser',
         'js-file-download',
         'mdi-material-ui',

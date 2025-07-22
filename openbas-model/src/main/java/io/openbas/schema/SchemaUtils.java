@@ -196,6 +196,9 @@ public class SchemaUtils {
         if (!queryable.refEnumClazz().equals(Void.class)) {
           builder.availableValues(getEnumNames(queryable.refEnumClazz()));
         }
+        if (queryable.overrideOperators() != null) {
+          builder.overrideOperators(Arrays.stream(queryable.overrideOperators()).toList());
+        }
       }
     } else if (annotation.annotationType().equals(EsQueryable.class)) {
       EsQueryable esQueryable =

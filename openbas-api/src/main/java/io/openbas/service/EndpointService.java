@@ -19,8 +19,8 @@ import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -82,6 +82,16 @@ public class EndpointService {
   // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
     return this.endpointRepository.save(endpoint);
+  }
+
+  public Endpoint createEndpoint(@NotNull final EndpointInput input) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(input);
+    endpoint.setIps(EndpointMapper.setIps(input.getIps()));
+    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(input.getMacAddresses()));
+    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.setEoL(input.isEol());
+    return createEndpoint(endpoint);
   }
 
   public Endpoint endpoint(@NotBlank final String endpointId) {
@@ -195,6 +205,7 @@ public class EndpointService {
       @NotBlank final String endpointId, @NotNull final EndpointInput input) {
     Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
+    toUpdate.setEoL(input.isEol());
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return updateEndpoint(toUpdate);
   }

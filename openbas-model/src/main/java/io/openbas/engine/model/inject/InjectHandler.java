@@ -37,7 +37,15 @@ public class InjectHandler implements Handler<EsInject> {
               esInject.setBase_id(inject.getInject_id());
               esInject.setBase_representative(inject.getInject_title());
               esInject.setBase_created_at(inject.getInject_created_at());
-              esInject.setBase_updated_at(inject.getInject_updated_at());
+
+              if (inject.getInjector_contract_updated_at() != null
+                  && inject
+                      .getInjector_contract_updated_at()
+                      .isAfter(inject.getInject_updated_at())) {
+                esInject.setBase_updated_at(inject.getInjector_contract_updated_at());
+              } else {
+                esInject.setBase_updated_at(inject.getInject_updated_at());
+              }
               esInject.setBase_restrictions(
                   buildRestrictions(inject.getInject_scenario(), inject.getInject_Exercise()));
               // Specific
@@ -56,6 +64,13 @@ public class InjectHandler implements Handler<EsInject> {
               if (!isEmpty(inject.getInject_attack_patterns())) {
                 dependencies.addAll(inject.getInject_attack_patterns());
                 esInject.setBase_attack_patterns_side(inject.getInject_attack_patterns());
+              }
+              if (!isEmpty(inject.getInject_children())) {
+                esInject.setBase_inject_children_side(inject.getInject_children());
+              }
+              if (!isEmpty(inject.getAttack_patterns_children())) {
+                esInject.setBase_attack_patterns_children_side(
+                    inject.getAttack_patterns_children());
               }
               if (!isEmpty(inject.getInject_kill_chain_phases())) {
                 dependencies.addAll(inject.getInject_kill_chain_phases());

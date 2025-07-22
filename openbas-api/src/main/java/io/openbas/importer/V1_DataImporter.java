@@ -22,10 +22,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
-import io.openbas.rest.payload.form.ContractOutputElementInput;
-import io.openbas.rest.payload.form.OutputParserInput;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.RegexGroupInput;
+import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
@@ -43,6 +40,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +74,7 @@ public class V1_DataImporter implements Importer {
   private final VariableRepository variableRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final PayloadCreationService payloadCreationService;
+  @Autowired private CollectorRepository collectorRepository;
 
   // endregion
 
@@ -145,17 +144,28 @@ public class V1_DataImporter implements Importer {
       Exercise exercise,
       Scenario scenario) {
     Map<String, Base> baseIds = new HashMap<>();
-    final String prefix =
-        importNode.has("exercise_information")
-            ? "exercise_"
-            : importNode.has("scenario_information") ? "scenario_" : "inject_";
 
+    String prefix = "inject_";
+    if (importNode.has("exercise_information")) {
+      prefix = "exercise_";
+    } else if (importNode.has("scenario_information")) {
+      prefix = "scenario_";
+    } else if (importNode.has("payload_information")) {
+      prefix = "payload_";
+    }
     importTags(importNode, prefix, baseIds);
     Exercise savedExercise =
         Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
     Scenario savedScenario =
         Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
     importDocuments(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
+    importDocument(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
+
+    // Should be done after tags & documents
+    if (prefix.equals("payload_")) {
+      importPayloadAsMain(importNode, baseIds);
+    }
+
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -205,7 +215,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeAttackPattern -> {
               JsonNode idNode = nodeAttackPattern.get("attack_pattern_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -250,7 +262,9 @@ public class V1_DataImporter implements Importer {
         .forEach(
             nodeKillChainPhase -> {
               JsonNode idNode = nodeKillChainPhase.get("phase_external_id");
-              if (idNode == null) return;
+              if (idNode == null) {
+                return;
+              }
               String id = idNode.textValue();
 
               if (baseIds.get(id) != null) {
@@ -369,6 +383,41 @@ public class V1_DataImporter implements Importer {
             handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
           }
         });
+    // Handle argument documents
+    Stream<JsonNode> argumentDcumentsStream =
+        resolveJsonElements(importNode, prefix + "arguments_documents");
+    argumentDcumentsStream.forEach(
+        nodeDoc -> {
+          String target = nodeDoc.get("document_target").textValue();
+          ImportEntry entry = docReferences.get(target);
+
+          if (entry != null) {
+            handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+          }
+        });
+  }
+
+  private void importDocument(
+      JsonNode importNode,
+      String prefix,
+      Map<String, ImportEntry> docReferences,
+      Exercise savedExercise,
+      Scenario savedScenario,
+      Map<String, Base> baseIds) {
+
+    if (importNode == null) {
+      return;
+    }
+
+    JsonNode nodeDoc = importNode.path(prefix + "document");
+    String target = nodeDoc.path("document_target").textValue();
+
+    if (target != null) {
+      ImportEntry entry = docReferences.get(target);
+      if (entry != null) {
+        handleDocumentWithEntry(nodeDoc, entry, target, savedExercise, savedScenario, baseIds);
+      }
+    }
   }
 
   private void handleDocumentWithEntry(
@@ -420,7 +469,7 @@ public class V1_DataImporter implements Importer {
       Map<String, Base> baseIds) {
     try {
       this.documentService.uploadFile(
-          target, entry.getData(), entry.getEntry().getSize(), contentType);
+          target, entry.getData(), entry.getContentLength(), contentType);
     } catch (Exception e) {
       throw new ImportException(e);
     }
@@ -1170,13 +1219,71 @@ public class V1_DataImporter implements Importer {
   private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
       JsonNode payloadNode, Map<String, Base> baseIds) {
     Set<OutputParserInput> outputParserInputs = new HashSet<>();
-    if (!payloadNode.has("payload_output_parsers")) return outputParserInputs;
+    if (!payloadNode.has("payload_output_parsers")) {
+      return outputParserInputs;
+    }
 
     ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
     for (JsonNode outputParserNode : outputParserNodes) {
       outputParserInputs.add(buildOutputParserFromJsonNode(outputParserNode, baseIds));
     }
     return outputParserInputs;
+  }
+
+  private String importPayloadAsMain(
+      @NotNull final JsonNode importNode, Map<String, Base> baseIds) {
+    JsonNode payloadNode = importNode.get("payload_information");
+    if (payloadNode == null) {
+      return null;
+    }
+
+    if (payloadNode.has("executable_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "executable_file",
+              baseIds.get(payloadNode.get("executable_file").textValue()).getId());
+    }
+    if (payloadNode.has("file_drop_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
+    }
+
+    if (payloadNode.has("payload_arguments")) {
+      for (JsonNode argNode : payloadNode.get("payload_arguments")) {
+        if (argNode.has("type") && "document".equals(argNode.get("type").asText())) {
+          JsonNode defaultValueNode = argNode.get("default_value");
+          if (defaultValueNode != null
+              && !defaultValueNode.asText().isBlank()
+              && baseIds.containsKey(defaultValueNode.asText())) {
+            ((ObjectNode) argNode)
+                .put("default_value", baseIds.get(defaultValueNode.asText()).getId());
+          }
+        }
+      }
+    }
+
+    PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
+    payloadCreateInput.setOutputParsers(
+        buildOutputParsersFromPayloadJsonNode(payloadNode, baseIds));
+
+    List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
+    payloadCreateInput.setAttackPatternsIds(attackPatternIds);
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
+    Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    payload.setTags(
+        resolveJsonIds(payloadNode, "payload_tags").stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet()));
+    Optional<InjectorContract> injectorContractFromPayload =
+        this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+    if (injectorContractFromPayload.isPresent()) {
+      return injectorContractFromPayload.get().getId();
+    } else {
+      log.warn("An error has occurred when importing the payload: {}", payload.getName());
+      return null;
+    }
   }
 
   private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {
@@ -1199,20 +1306,63 @@ public class V1_DataImporter implements Importer {
 
     List<String> attackPatternIds = importAttackPattern(payloadNode, "payload_", baseIds);
     payloadCreateInput.setAttackPatternsIds(attackPatternIds);
+    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
     payload.setTags(
         resolveJsonIds(payloadNode, "payload_tags").stream()
             .map(baseIds::get)
             .map(Tag.class::cast)
             .collect(Collectors.toSet()));
+
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+
     if (injectorContractFromPayload.isPresent()) {
       return injectorContractFromPayload.get().getId();
     } else {
       log.warn("An error has occurred when importing the payload: {}", payload.getName());
       return null;
     }
+  }
+
+  private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(JsonNode payloadNode) {
+    List<DetectionRemediationInput> detectionRemediationInputs = new ArrayList<>();
+
+    JsonNode remediationsNode = payloadNode.get("payload_detection_remediations");
+    if (remediationsNode == null || !remediationsNode.isArray()) {
+      return detectionRemediationInputs;
+    }
+
+    for (JsonNode detectionNode : remediationsNode) {
+      String valuesText = getTextValue(detectionNode, "detection_remediation_values");
+      String type = getTextValue(detectionNode, "detection_remediation_collector_type");
+
+      if (valuesText.isEmpty()) {
+        continue;
+      }
+
+      Optional<Collector> collector = collectorRepository.findByType(type);
+      if (collector.isPresent()) {
+        detectionRemediationInputs.add(buildDetectionRemediationFromJsonNode(detectionNode));
+      } else {
+        log.warn("Import Detection Remediations: Missing Collector type: {}", type);
+      }
+    }
+
+    return detectionRemediationInputs;
+  }
+
+  private DetectionRemediationInput buildDetectionRemediationFromJsonNode(JsonNode node) {
+    DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
+    detectionRemediation.setValues((node.get("detection_remediation_values").textValue()));
+    detectionRemediation.setCollectorType(
+        (node.get("detection_remediation_collector_type").textValue()));
+    return detectionRemediation;
+  }
+
+  private String getTextValue(JsonNode node, String fieldName) {
+    JsonNode fieldNode = node.get(fieldName);
+    return (fieldNode != null && !fieldNode.isNull()) ? fieldNode.asText().trim() : "";
   }
 
   private void importVariables(

@@ -11,4 +11,7 @@ import lombok.Setter;
 public class UpdateExerciseInput extends ExerciseInput {
   @JsonProperty("apply_tag_rule")
   private boolean applyTagRule = false;
+
+  @JsonProperty("exercise_custom_dashboard")
+  private String customDashboard;
 }

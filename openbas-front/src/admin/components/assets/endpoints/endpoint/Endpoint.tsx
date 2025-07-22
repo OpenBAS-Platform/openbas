@@ -4,7 +4,8 @@ import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
-import { searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import { searchDistinctFindingsOnEndpoint, searchFindingsOnEndpoint } from '../../../../../actions/findings/finding-actions';
+import InverseBooleanFragment from '../../../../../components/common/list/fragments/InverseBooleanFragment';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
@@ -13,7 +14,7 @@ import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { INJECT, SIMULATION } from '../../../../../constants/Entities';
 import { useHelper } from '../../../../../store';
-import { type EndpointOverviewOutput as EndpointType, type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
+import { type AggregatedFindingOutput, type EndpointOverviewOutput as EndpointType, type RelatedFindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
 import FindingContextLink from '../../../findings/FindingContextLink';
 import FindingList from '../../../findings/FindingList';
@@ -24,10 +25,18 @@ const useStyles = makeStyles()(theme => ({
     'marginTop': theme.spacing(2),
     '& > div:nth-child(even)': { marginBottom: theme.spacing(2) },
   },
-  endpointInformationContainer: {
-    'display': 'grid',
-    'gridTemplateColumns': '1fr 1fr 1fr 1fr',
-    '& > *:nth-child(8n)': { marginBottom: theme.spacing(3) },
+  gridContainer: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+    gap: theme.spacing(2),
+  },
+  chipInList: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 20,
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 100,
   },
 }));
 
@@ -51,19 +60,19 @@ const Endpoint = () => {
       field: 'finding_inject',
       label: 'Inject',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={INJECT} />,
     },
     {
       field: 'finding_simulation',
       label: 'Simulation',
       isSortable: false,
-      value: (finding: FindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
+      value: (finding: RelatedFindingOutput) => <FindingContextLink finding={finding} type={SIMULATION} />,
     },
     {
       field: 'finding_asset_groups',
       label: 'Asset groups',
       isSortable: false,
-      value: (finding: FindingOutput) => (
+      value: (finding: AggregatedFindingOutput) => (
         <ItemTargets targets={(finding.finding_asset_groups || []).map(group => ({
           target_id: group.asset_group_id,
           target_name: group.asset_group_name,
@@ -77,60 +86,80 @@ const Endpoint = () => {
   const search = (input: SearchPaginationInput) => {
     return searchFindingsOnEndpoint(endpointId, input);
   };
+  const searchDistinct = (input: SearchPaginationInput) => {
+    return searchDistinctFindingsOnEndpoint(endpointId, input);
+  };
 
   return (
     <div className={classes.endpointPage}>
       <Typography variant="h4">{t('Endpoint Information')}</Typography>
-      <Paper className={`paper ${classes.endpointInformationContainer}`} variant="outlined">
-        <Typography variant="h3" gutterBottom>{t('Description')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('Hostname')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('Seen IP address')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('Platform')}</Typography>
-
-        <ExpandableMarkdown source={endpoint.asset_description} limit={300} />
-        <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_hostname)}</Typography>
-        <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_seen_ip)}</Typography>
-        <span style={{ display: 'flex' }}>
-          <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
-          &nbsp;
-          {endpoint.endpoint_platform}
-        </span>
-
-        <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
-        <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
-
-        <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_arch)}</Typography>
-        <div style={{
-          maxHeight: theme.spacing(20),
-          overflowY: 'auto',
-          marginRight: theme.spacing(1.5),
-        }}
-        >
-          <Typography variant="body2" gutterBottom>
-            {endpoint.endpoint_ips?.map((ip: string, index: number) => (
-              <div key={index}>
-                {formatIp(ip)}
-              </div>
-            ))}
-          </Typography>
+      <Paper className={`paper ${classes.gridContainer}`} variant="outlined">
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Description')}</Typography>
+          <ExpandableMarkdown source={endpoint.asset_description} limit={300} />
         </div>
-        <div style={{
-          maxHeight: theme.spacing(20),
-          overflowY: 'auto',
-          marginRight: theme.spacing(1),
-        }}
-        >
-          <Typography variant="body2" gutterBottom>
-            {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
-              <div key={index}>
-                {formatMacAddress(mac)}
-              </div>
-            ))}
-          </Typography>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Hostname')}</Typography>
+          <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_hostname)}</Typography>
         </div>
-        <ItemTags variant="list" tags={endpoint.asset_tags} />
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Seen IP address')}</Typography>
+          <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_seen_ip)}</Typography>
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Platform')}</Typography>
+          <span style={{ display: 'flex' }}>
+            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
+            &nbsp;
+            {endpoint.endpoint_platform}
+          </span>
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('End of Life')}</Typography>
+          <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Architecture')}</Typography>
+          <Typography variant="body2" gutterBottom>{emptyFilled(endpoint.endpoint_arch)}</Typography>
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('IP Addresses')}</Typography>
+          <div style={{
+            maxHeight: theme.spacing(20),
+            overflowY: 'auto',
+            marginRight: theme.spacing(1.5),
+          }}
+          >
+            <Typography variant="body2" gutterBottom>
+              {endpoint.endpoint_ips?.map((ip: string, index: number) => (
+                <div key={index}>
+                  {formatIp(ip)}
+                </div>
+              ))}
+            </Typography>
+          </div>
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('MAC Addresses')}</Typography>
+          <div style={{
+            maxHeight: theme.spacing(20),
+            overflowY: 'auto',
+            marginRight: theme.spacing(1),
+          }}
+          >
+            <Typography variant="body2" gutterBottom>
+              {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
+                <div key={index}>
+                  {formatMacAddress(mac)}
+                </div>
+              ))}
+            </Typography>
+          </div>
+        </div>
+        <div>
+          <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
+          <ItemTags variant="list" tags={endpoint.asset_tags} />
+        </div>
       </Paper>
       <Typography variant="h4">{t('Agents')}</Typography>
       <Paper className="paper" variant="outlined">
@@ -146,6 +175,7 @@ const Endpoint = () => {
       <Paper className="paper" variant="outlined">
         <FindingList
           filterLocalStorageKey="endpoint-findings"
+          searchDistinctFindings={searchDistinct}
           searchFindings={search}
           additionalHeaders={additionalHeaders}
           additionalFilterNames={additionalFilterNames}

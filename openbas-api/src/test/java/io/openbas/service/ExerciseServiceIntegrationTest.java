@@ -18,10 +18,10 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.ExerciseFixture;
+import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -92,6 +92,7 @@ class ExerciseServiceIntegrationTest {
             articleRepository,
             exerciseRepository,
             teamRepository,
+            userRepository,
             exerciseTeamUserRepository,
             injectRepository,
             lessonsCategoryRepository);

@@ -59,4 +59,7 @@ public class ScenarioInput {
 
   @JsonProperty("scenario_message_footer")
   private String footer;
+
+  @JsonProperty("scenario_custom_dashboard")
+  private String customDashboard;
 }

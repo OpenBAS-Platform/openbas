@@ -110,6 +110,16 @@ public class InjectExpectationUtils {
             preventionExpectation.getAssetGroup());
         expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
       }
+      case VULNERABILITY -> {
+        VulnerabilityExpectation vulnerabilityExpectation = (VulnerabilityExpectation) expectation;
+        expectationExecution.setName(vulnerabilityExpectation.getName());
+        expectationExecution.setVulnerability(
+            vulnerabilityExpectation.getAgent(),
+            vulnerabilityExpectation.getAsset(),
+            vulnerabilityExpectation.getAssetGroup());
+        expectationExecution.setSignatures(
+            vulnerabilityExpectation.getInjectExpectationSignatures());
+      }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;
         expectationExecution.setName(((ManualExpectation) expectation).getName());

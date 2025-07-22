@@ -1,5 +1,6 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AgentUtils.isPrimaryAgent;
@@ -9,6 +10,7 @@ import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,6 +19,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.ee.Ee;
+import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
@@ -27,15 +30,15 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.LicenseRestrictionException;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.output.AgentsAndAssetsAgentless;
+import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
-import io.openbas.service.TagRuleService;
-import io.openbas.service.UserService;
+import io.openbas.service.*;
 import io.openbas.utils.*;
+import io.openbas.utils.mapper.InjectMapper;
+import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -69,6 +72,7 @@ public class InjectService {
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
   private final Ee eeService;
+  private final EndpointService endpointService;
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final InjectStatusRepository injectStatusRepository;
@@ -82,6 +86,7 @@ public class InjectService {
   private final InjectStatusMapper injectStatusMapper;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
+  private final PayloadRepository payloadRepository;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -169,7 +174,7 @@ public class InjectService {
     // this is the case when creating an inject from OpenCti
     if (inject.getContent() == null || inject.getContent().isEmpty()) {
       inject.setContent(
-          injectorContractService.getDynamicInjectorContractFieldsForInject(injectorContract));
+          InjectorContractContentUtils.getDynamicInjectorContractFieldsForInject(injectorContract));
     }
 
     return injectRepository.save(inject);
@@ -874,5 +879,132 @@ public class InjectService {
   public InjectStatusOutput getInjectStatusWithGlobalExecutionTraces(String injectId) {
     return injectStatusMapper.toInjectStatusOutput(
         injectStatusRepository.findInjectStatusWithGlobalExecutionTraces(injectId));
+  }
+
+  /**
+   * Function used to get the targeted property field of a targeted asset.
+   *
+   * @param injectorContractFields InjectorContract Fields from where to extract the targeted
+   *     property
+   * @param targetedAssetKey The key of the targeted Asset field
+   * @return the object node of targetedProperty field
+   */
+  private ObjectNode getTargetedPropertyFieldOfTargetedAsset(
+      List<ObjectNode> injectorContractFields, String targetedAssetKey) {
+    return injectorContractFields.stream()
+        .filter(
+            f -> f.get("key").asText().startsWith(CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY))
+        .filter(
+            f -> {
+              JsonNode linkedFieldsNode = f.get("linkedFields");
+              return linkedFieldsNode != null
+                  && linkedFieldsNode.isArray()
+                  && StreamSupport.stream(linkedFieldsNode.spliterator(), false)
+                      .anyMatch(
+                          linkedField -> targetedAssetKey.equals(linkedField.get("key").asText()));
+            })
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
+   * Get a map of value (e.g., hostname, seen_ip ) for targeted assets of inject
+   *
+   * @param inject inject to extract the targeted assets from
+   * @return a map where the key is the value of the targeted asset (e.g., hostname, seen_ip) and
+   *     the value is the Endpoint object representing the targeted asset
+   */
+  public Map<String, Endpoint> getValueTargetedAssetMap(Inject inject) {
+    Map<String, Endpoint> valueTargetedAssetsMap = new HashMap<>();
+    InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+
+    JsonNode injectorContractFieldsNode = injectorContract.getConvertedContent().get("fields");
+    if (injectorContractFieldsNode == null || !injectorContractFieldsNode.isArray()) {
+      return valueTargetedAssetsMap;
+    }
+
+    List<ObjectNode> injectorContractFields =
+        StreamSupport.stream(injectorContractFieldsNode.spliterator(), false)
+            .map(ObjectNode.class::cast)
+            .toList();
+
+    // Get all fields of type TargetedAsset
+    List<ObjectNode> targetedAssetFields =
+        injectorContractFields.stream()
+            .filter(
+                node ->
+                    node.has("type")
+                        && ContractFieldType.TargetedAsset.label.equals(node.get("type").asText()))
+            .toList();
+
+    targetedAssetFields.forEach(
+        f -> {
+          // For each targeted asset field, retrieve the values of the targeted assets based on the
+          // targeted property
+          String keyField = f.get("key").asText();
+          Map<String, Endpoint> valuesAssetsMap =
+              this.retrieveValuesOfTargetedAssetFromInject(
+                  injectorContractFields, inject.getContent(), keyField);
+          valueTargetedAssetsMap.putAll(valuesAssetsMap);
+        });
+
+    return valueTargetedAssetsMap;
+  }
+
+  /**
+   * Function used to retrieve the targetedAsset value from an Inject.
+   *
+   * @param injectorContractContentFields InjectorContract Content fields from which to retrieve all
+   *     the fields set on the inject
+   * @param injectContent Inject content to obtain the value set on an inject
+   * @param targetedAssetKey The targeted asset key for which we want to retrieve values (can have
+   *     many assets set on one targeted asset key)
+   * @return a map where the key is the value of the targeted asset (e.g., hostname, seen_ip) and
+   *     the value is the Endpoint object representing the targeted asset
+   */
+  public Map<String, Endpoint> retrieveValuesOfTargetedAssetFromInject(
+      List<ObjectNode> injectorContractContentFields,
+      ObjectNode injectContent,
+      String targetedAssetKey) {
+    Map<String, Endpoint> valueTargetedAssetsMap = new HashMap<>();
+    List<String> assetIds =
+        mapper.convertValue(
+            injectContent.get(targetedAssetKey), new TypeReference<List<String>>() {});
+    List<Endpoint> endpointList = endpointService.endpoints(assetIds);
+
+    ObjectNode targetedPropertiesField =
+        getTargetedPropertyFieldOfTargetedAsset(injectorContractContentFields, targetedAssetKey);
+
+    if (targetedPropertiesField == null) {
+      throw new BadRequestException(
+          "No targeted property field found for key: " + targetedAssetKey);
+    }
+
+    String targetedPropertyKey = targetedPropertiesField.get("key").asText();
+    String targetedPropertyValue =
+        injectContent.has(targetedPropertyKey)
+            ? injectContent.get(targetedPropertyKey).asText()
+            : targetedPropertiesField.get("defaultValue").get(0).asText();
+
+    ContractTargetedProperty contractTargetedProperty =
+        ContractTargetedProperty.valueOf(targetedPropertyValue);
+
+    endpointList.forEach(
+        endpoint -> {
+          String endpointValue = contractTargetedProperty.toEndpointValue.apply(endpoint);
+          valueTargetedAssetsMap.put(endpointValue, endpoint);
+        });
+
+    return valueTargetedAssetsMap;
+  }
+
+  /**
+   * Function used to fetch the detection remediations in a inject based on payload definition.
+   *
+   * @param injectId
+   * @return a list of detection remediations
+   */
+  public List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId) {
+    return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
   }
 }

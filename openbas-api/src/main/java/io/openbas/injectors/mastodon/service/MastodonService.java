@@ -3,6 +3,7 @@ package io.openbas.injectors.mastodon.service;
 import static io.openbas.database.model.ExecutionTrace.getNewErrorTrace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.ExecutionTraceAction;
@@ -17,7 +18,6 @@ import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.ByteArrayBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -28,12 +28,17 @@ import org.springframework.stereotype.Component;
 public class MastodonService {
 
   @Resource private MastodonConfig config;
-
   @Resource private ObjectMapper mapper;
+  private HttpClientFactory httpClientFactory;
 
   @Autowired
   public void setConfig(MastodonConfig config) {
     this.config = config;
+  }
+
+  @Autowired
+  public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = httpClientFactory;
   }
 
   // public List<MastodonAttachment> resolveAttachments(Execution execution, List<Document>
@@ -61,7 +66,7 @@ public class MastodonService {
   public String sendStatus(
       Execution execution, String token, String status, List<DataAttachment> attachments)
       throws Exception {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       // upload files
       List<String> attachmentIds = new ArrayList<>();
       attachments.forEach(

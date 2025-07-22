@@ -38,8 +38,8 @@ import io.openbas.rest.tag.form.TagExportImport;
 import io.openbas.service.utils.CustomColumnPositionStrategy;
 import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
-import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.TargetType;
+import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
@@ -368,6 +368,7 @@ public class MapperService {
               endpoint.getTags().stream()
                   .map(tag -> new TagExportImport(tag.getName(), tag.getColor()))
                   .collect(Collectors.toSet())));
+      endpointExport.setEol(endpoint.isEoL());
       exports.add(endpointExport);
     }
     return exports;
@@ -468,6 +469,7 @@ public class MapperService {
         tagsForCreation.add(this.tagService.upsertTag(tagCreateInput));
       }
       endpoint.setTags(iterableToSet(tagsForCreation));
+      endpoint.setEoL(endpointExportImport.isEol());
       endpointService.createEndpoint(endpoint);
     }
   }
@@ -478,7 +480,15 @@ public class MapperService {
     strategy.setType(EndpointExportImport.class);
     String[] columns =
         new String[] {
-          "name", "description", "hostname", "ips", "platform", "arch", "macAddresses", "tags"
+          "name",
+          "description",
+          "hostname",
+          "ips",
+          "platform",
+          "arch",
+          "macAddresses",
+          "tags",
+          "isEol"
         };
     strategy.setColumnMapping(columns);
     return strategy;

@@ -48,7 +48,7 @@ public class RoleApiTest extends IntegrationTest {
     String roleName = "roleName";
     Capability capa1 = Capability.ACCESS_ASSETS;
     Capability capa2 = Capability.ACCESS_CHALLENGES;
-    Set<String> capabilities = Set.of(capa1.name(), capa2.name());
+    Set<Capability> capabilities = Set.of(capa1, capa2);
 
     // Create
     RoleInput roleInput = RoleInput.builder().name(roleName).capabilities(capabilities).build();
@@ -66,7 +66,9 @@ public class RoleApiTest extends IntegrationTest {
     assertNotNull(response);
     assertEquals(roleName, JsonPath.read(response, "$.role_name"));
     List<String> capabilitiesJson = JsonPath.read(response, "$.role_capabilities");
-    assertEquals(capabilities, new HashSet<>(capabilitiesJson));
+    Set<Capability> responseCapabilities =
+        capabilitiesJson.stream().map(Capability::valueOf).collect(Collectors.toSet());
+    assertEquals(capabilities, responseCapabilities);
   }
 
   @Test
@@ -99,13 +101,7 @@ public class RoleApiTest extends IntegrationTest {
     Role savedRole = roleRepository.save(RoleFixture.getRole());
 
     RoleInput input =
-        RoleInput.builder()
-            .name(updatedRoleName)
-            .capabilities(
-                savedRole.getCapabilities().stream()
-                    .map(Capability::name)
-                    .collect(Collectors.toSet()))
-            .build();
+        RoleInput.builder().name(updatedRoleName).capabilities(savedRole.getCapabilities()).build();
     String response =
         mvc.perform(
                 put(ROLE_URI + "/" + savedRole.getId())

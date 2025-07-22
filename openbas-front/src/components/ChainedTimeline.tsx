@@ -799,11 +799,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
 const ChainedTimeline: FunctionComponent<Props> = (props) => {
   return (
-    <>
-      <ReactFlowProvider>
-        <ChainedTimelineFlow {...props} />
-      </ReactFlowProvider>
-    </>
+    <ReactFlowProvider>
+      <ChainedTimelineFlow {...props} />
+    </ReactFlowProvider>
   );
 };
 

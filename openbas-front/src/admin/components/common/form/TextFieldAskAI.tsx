@@ -1,20 +1,5 @@
 import { AutoAwesomeOutlined } from '@mui/icons-material';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Select,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, Menu, MenuItem, Select, TextField, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useState } from 'react';
 
@@ -191,17 +176,24 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   };
 
   const renderButton = () => {
+    const isAvailable = isEnterpriseEdition && enabled && configured;
     return (
       <>
-        <EETooltip forAi={true} title={t('Ask AI')}>
+        <EETooltip
+          forAi
+          title={`${t('Ask AI')}${!isAvailable ? ' (EE)' : ''}`}
+        >
           <span>
             <IconButton
               size="medium"
-              onClick={event => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
-              disabled={disabled}
+              onClick={event =>
+                (isAvailable ? handleOpenMenu(event) : null)}
+              disabled={disabled || !isAvailable}
               style={{
                 marginTop: -4,
-                color: theme.palette.ai.main,
+                color: isAvailable
+                  ? theme.palette.ai.main
+                  : theme.palette.action.disabled,
               }}
             >
               <AutoAwesomeOutlined fontSize="small" />

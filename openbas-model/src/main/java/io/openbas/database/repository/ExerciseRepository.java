@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.raw.*;
+import io.openbas.utils.Constants;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -236,7 +237,7 @@ public interface ExerciseRepository
           " SELECT ex.exercise_id, ex.exercise_name, ex.exercise_description, ex.exercise_status, ex.exercise_subtitle, "
               + "ex.exercise_category, ex.exercise_main_focus, ex.exercise_severity, ex.exercise_start_date, "
               + "ex.exercise_end_date, ex.exercise_message_header, ex.exercise_message_footer, ex.exercise_mail_from, "
-              + "ex.exercise_lessons_anonymized, ex.exercise_created_at, ex.exercise_updated_at, "
+              + "ex.exercise_lessons_anonymized, ex.exercise_custom_dashboard, ex.exercise_created_at, ex.exercise_updated_at, "
               + "se.scenario_id, inj.inject_scenario, "
               + " coalesce(array_agg(emrt.exercise_reply_to) FILTER ( WHERE emrt.exercise_reply_to IS NOT NULL ), '{}') as exercise_reply_to, "
               + " coalesce(array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ), '{}') as exercise_tags, "
@@ -347,4 +348,16 @@ public interface ExerciseRepository
       nativeQuery = true)
   List<Object[]> findAllOptionByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
+
+  // -- INDEXING --
+
+  @Query(
+      value =
+          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at "
+              + "FROM exercises ex "
+              + "WHERE ex.exercise_updated_at > :from ORDER BY ex.exercise_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
+      nativeQuery = true)
+  List<RawSimulation> findForIndexing(@Param("from") Instant from);
 }

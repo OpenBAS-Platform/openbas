@@ -1,16 +1,26 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
-import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import {
+  Alert,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ToggleButtonGroup,
+} from '@mui/material';
 import { type CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import { fetchExecutors } from '../../../../actions/Executor';
-import { type ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
+import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
+import AssetTagsFragment from '../../../../components/common/list/fragments/AssetTagsFragment';
+import EndpointActiveFragment from '../../../../components/common/list/fragments/EndpointActiveFragment';
+import EndpointAgentsPrivilegeFragment from '../../../../components/common/list/fragments/EndpointAgentsPrivilegeFragment';
+import EndpointArchFragment from '../../../../components/common/list/fragments/EndpointArchFragment';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -18,17 +28,13 @@ import SortHeadersComponentV2 from '../../../../components/common/queryable/sort
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
-import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import PlatformIcon from '../../../../components/PlatformIcon';
+import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
-import { getActiveMsgTooltip, getExecutorsCount } from '../../../../utils/endpoints/utils';
-import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import AssetStatus from '../AssetStatus';
-import AgentPrivilege from './AgentPrivilege';
+import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
+import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 import ImportUploaderEndpoints from './ImportUploaderEndpoints';
@@ -60,24 +66,15 @@ const Endpoints = () => {
   // Standard hooks
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const { settings } = useAuth();
-  const theme = useTheme();
 
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
 
   // Fetching data
-  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
-    userAdmin: helper.getMeAdmin(),
-    executorsMap: helper.getExecutorsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchExecutors());
-  });
-
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const availableFilterNames = [
     'endpoint_platform',
     'endpoint_arch',
@@ -106,160 +103,49 @@ const Endpoints = () => {
     return searchEndpoints(input).finally(() => setLoading(false));
   };
 
-  const getPrivilegesCount = (endpoint: EndpointOutput) => {
-    if (endpoint.asset_agents.length > 0) {
-      const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
-      const privilegeCount = privileges?.reduce((count, privilege) => {
-        if (privilege === 'admin') {
-          count.admin += 1;
-        } else {
-          count.user += 1;
-        }
-        return count;
-      }, {
-        admin: 0,
-        user: 0,
-      });
-
-      return {
-        adminCount: privilegeCount?.admin,
-        userCount: privilegeCount?.user,
-      };
-    } else {
-      return {
-        adminCount: 0,
-        userCount: 0,
-      };
-    }
-  };
-
   // Headers
   const headers = [
     {
-      field: 'asset_name',
+      field: EndpointListItemFragments.ASSET_NAME,
       label: 'Name',
       isSortable: true,
       value: (endpoint: EndpointOutput) => endpoint.asset_name,
     },
     {
-      field: 'endpoint_active',
+      field: EndpointListItemFragments.ENDPOINT_ACTIVE,
       label: 'Status',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => {
-        const status = getActiveMsgTooltip(endpoint, t('Active'), t('Inactive'), t('Agentless'));
-        return (
-          <Tooltip title={status.activeMsgTooltip}>
-            <span>
-              <AssetStatus variant="list" status={status.status} />
-            </span>
-          </Tooltip>
-        );
-      },
+      value: (endpoint: EndpointOutput) => <EndpointActiveFragment activity_map={endpoint.asset_agents.map(a => a.agent_active ?? false)} />,
     },
     {
-      field: 'endpoint_agents_privilege',
+      field: EndpointListItemFragments.ENDPOINT_AGENTS_PRIVILEGE,
       label: 'Agents Privileges',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => {
-        const privileges = getPrivilegesCount(endpoint);
-        return (
-          <>
-            <Tooltip title={t('Admin') + `: ${privileges.adminCount}`} placement="top">
-              <span>
-                {privileges.adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('User') + `: ${privileges.userCount}`} placement="top">
-              <span>
-                {privileges.userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
-              </span>
-            </Tooltip>
-            {
-              endpoint.asset_agents.length === 0 && (
-                <span>{t('N/A')}</span>
-              )
-            }
-          </>
-        );
-      },
+      value: (endpoint: EndpointOutput) => <EndpointAgentsPrivilegeFragment privileges={endpoint.asset_agents.map(a => a.agent_privilege)} />,
     },
     {
-      field: 'endpoint_platform',
+      field: EndpointListItemFragments.ENDPOINT_PLATFORM,
       label: 'Platform',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => {
-        return (
-          <>
-            <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />
-            {endpoint.endpoint_platform ?? t('Unknown')}
-          </>
-        );
-      },
+      value: (endpoint: EndpointOutput) => <AssetPlatformFragment platform={endpoint.endpoint_platform} />,
     },
     {
-      field: 'endpoint_arch',
+      field: EndpointListItemFragments.ENDPOINT_ARCH,
       label: 'Architecture',
       isSortable: true,
-      value: (endpoint: EndpointOutput) => endpoint.endpoint_arch ?? t('Unknown'),
+      value: (endpoint: EndpointOutput) => <EndpointArchFragment arch={endpoint.endpoint_arch} />,
     },
     {
       field: 'endpoint_agents_executor',
       label: 'Executors',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => {
-        if (endpoint.asset_agents.length > 0) {
-          const groupedExecutors = getExecutorsCount(endpoint, executorsMap);
-          if (!groupedExecutors) {
-            return '-';
-          }
-          return (
-            <>
-              {
-                Object.keys(groupedExecutors).map((executorType) => {
-                  const executorsOfType = groupedExecutors[executorType];
-                  const count = executorsOfType.length;
-                  const base = executorsOfType[0];
-
-                  if (count > 0) {
-                    return (
-                      <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
-                        <div style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                        }}
-                        >
-                          <img
-                            src={`/api/images/executors/icons/${executorType}`}
-                            alt={executorType}
-                            style={{
-                              width: 20,
-                              height: 20,
-                              borderRadius: 4,
-                              marginRight: 10,
-                            }}
-                          />
-                        </div>
-                      </Tooltip>
-                    );
-                  } else {
-                    return t('Unknown');
-                  }
-                })
-              }
-            </>
-          );
-        } else {
-          return <span>{t('N/A')}</span>;
-        }
-      },
+      value: (endpoint: EndpointOutput) => <EndpointAgentsExecutorsFragment endpoint={endpoint} />,
     },
     {
-      field: 'asset_tags',
+      field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => {
-        return (<ItemTags variant="list" tags={endpoint.asset_tags} />);
-      },
+      value: (endpoint: EndpointOutput) => <AssetTagsFragment tags={endpoint.asset_tags} />,
     },
   ];
 
@@ -340,7 +226,7 @@ const Endpoints = () => {
                   >
                     <ListItemButton
                       component={Link}
-                      to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+                      to={`${ENDPOINT_BASE_URL}/${endpoint.asset_id}`}
                       classes={{ root: classes.item }}
                     >
                       <ListItemIcon>

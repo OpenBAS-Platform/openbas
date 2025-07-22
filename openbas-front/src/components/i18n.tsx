@@ -313,6 +313,32 @@ export const useFormatter = () => {
     }
     return intl.formatDate(date, { year: 'numeric' });
   };
+
+  const formatDuration = (miliSeconds: number) => {
+    const seconds = miliSeconds / 1000;
+    const date = new Date(0);
+    date.setSeconds(seconds);
+
+    if (seconds < 60) {
+      return `${Math.round(seconds)}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.round(seconds % 60);
+
+      if (remainingSeconds === 0) {
+        return `${minutes}min`;
+      }
+      return `${minutes}min ${remainingSeconds}s`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const remainingMinutes = Math.floor((seconds % 3600) / 60);
+
+      if (remainingMinutes === 0) {
+        return `${hours}h`;
+      }
+      return `${hours}h ${remainingMinutes}min`;
+    }
+  };
   return {
     t: translate,
     locale: intl.locale ?? intl.defaultLocale,
@@ -331,6 +357,7 @@ export const useFormatter = () => {
     md: monthDate,
     mtd: monthTextDate,
     yd: yearDate,
+    du: formatDuration,
   };
 };
 

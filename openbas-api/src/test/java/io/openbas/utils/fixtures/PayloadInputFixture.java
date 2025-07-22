@@ -52,6 +52,28 @@ public class PayloadInputFixture {
     return input;
   }
 
+  public static PayloadCreateInput createDefaultPayloadCreateInputWithDetectionRemediation() {
+    PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
+    input.setDetectionRemediations(buildDetectionRemediations());
+    return input;
+  }
+
+  @NotNull
+  private static List<DetectionRemediationInput> buildDetectionRemediations() {
+    DetectionRemediationInput drInputCS = new DetectionRemediationInput();
+    drInputCS.setCollectorType("CS");
+    drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
+
+    DetectionRemediationInput drInputSentinel = new DetectionRemediationInput();
+    drInputSentinel.setCollectorType("SENTINEL");
+    drInputSentinel.setValues("Detection Remediation Gap for Sentinel");
+
+    DetectionRemediationInput srInputDefender = new DetectionRemediationInput();
+    srInputDefender.setCollectorType("DEFENDER");
+    srInputDefender.setValues("Detection Remediation Gap for Defender");
+    return List.of(drInputCS, drInputSentinel, srInputDefender);
+  }
+
   public static PayloadCreateInput createDefaultPayloadCreateInputForExecutable() {
     PayloadCreateInput input = new PayloadCreateInput();
     input.setType("Executable");
@@ -105,6 +127,12 @@ public class PayloadInputFixture {
     return input;
   }
 
+  public static PayloadUpdateInput getDefaultPayloadUpdateInputWithDetectionRemediation() {
+    PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
+    input.setDetectionRemediations(buildDetectionRemediations());
+    return input;
+  }
+
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInput() {
     PayloadUpsertInput input = new PayloadUpsertInput();
     input.setType("Command");
@@ -136,6 +164,12 @@ public class PayloadInputFixture {
     outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
     input.setOutputParsers(Set.of(outputParserInput));
+    return input;
+  }
+
+  public static PayloadUpsertInput getDefaultCommandPayloadUpsertInputWithDetectionRemediations() {
+    PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
+    input.setDetectionRemediations(buildDetectionRemediations());
     return input;
   }
 

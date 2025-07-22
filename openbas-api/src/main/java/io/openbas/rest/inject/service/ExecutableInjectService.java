@@ -1,36 +1,38 @@
 package io.openbas.rest.inject.service;
 
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
-import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static org.springframework.util.StringUtils.hasText;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.service.PayloadService;
-import io.openbas.service.EndpointService;
 import jakarta.annotation.Resource;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ExecutableInjectService {
 
-  private final EndpointService endpointService;
   private final InjectService injectService;
+  private final DocumentService documentService;
   private final InjectStatusService injectStatusService;
   private final PayloadService payloadService;
 
@@ -58,18 +60,13 @@ public class ExecutableInjectService {
   }
 
   private String getTargetedAssetArgumentValue(
-      String argumentKey, ObjectNode injectContent, PayloadArgument defaultPayloadArgument) {
-    List<String> assetIds =
-        mapper.convertValue(injectContent.get(argumentKey), new TypeReference<List<String>>() {});
-    List<Endpoint> endpointList = endpointService.endpoints(assetIds);
-
-    String targetedProperty =
-        getArgumentValueOrDefault(
-            CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY + "-" + argumentKey,
-            injectContent,
-            defaultPayloadArgument.getDefaultValue());
-    ContractTargetedProperty contractTargetedProperty =
-        ContractTargetedProperty.valueOf(targetedProperty);
+      String argumentKey,
+      ObjectNode injectContent,
+      PayloadArgument defaultPayloadArgument,
+      List<ObjectNode> injectorContractContentFields) {
+    Map<String, Endpoint> valuesAssetsMap =
+        injectService.retrieveValuesOfTargetedAssetFromInject(
+            injectorContractContentFields, injectContent, argumentKey);
 
     String assetSeparator =
         getArgumentValueOrDefault(
@@ -77,20 +74,21 @@ public class ExecutableInjectService {
             injectContent,
             defaultPayloadArgument.getSeparator());
 
-    return endpointList.stream()
-        .map(contractTargetedProperty.toEndpointValue)
-        .collect(Collectors.joining(assetSeparator));
+    return String.join(assetSeparator, valuesAssetsMap.keySet());
   }
 
   private String replaceArgumentsByValue(
-      String command, List<PayloadArgument> defaultArguments, ObjectNode injectContent) {
+      String command,
+      List<PayloadArgument> defaultPayloadArguments,
+      List<ObjectNode> injectorContractContentFields,
+      ObjectNode injectContent) {
 
     List<String> argumentKeys = getArgumentsFromCommandLines(command);
 
     for (String argumentKey : argumentKeys) {
-      String value = "";
+      String value;
       PayloadArgument defaultPayloadArgument =
-          defaultArguments.stream()
+          defaultPayloadArguments.stream()
               .filter(a -> a.getKey().equals(argumentKey))
               .findFirst()
               .orElse(null);
@@ -98,7 +96,9 @@ public class ExecutableInjectService {
       // If the argument is a targeted asset, we need to fetch the asset details
       if (defaultPayloadArgument != null
           && ContractFieldType.TargetedAsset.label.equals(defaultPayloadArgument.getType())) {
-        value = getTargetedAssetArgumentValue(argumentKey, injectContent, defaultPayloadArgument);
+        value =
+            getTargetedAssetArgumentValue(
+                argumentKey, injectContent, defaultPayloadArgument, injectorContractContentFields);
 
       } else {
         value =
@@ -106,6 +106,20 @@ public class ExecutableInjectService {
                 argumentKey,
                 injectContent,
                 defaultPayloadArgument != null ? defaultPayloadArgument.getDefaultValue() : "");
+        // If arg is a doc, specific handling
+        // We need to resolve the doc name and add special prefix #{location} that will be resolved
+        // by the implant
+        boolean isDocArg =
+            defaultPayloadArgument != null
+                && defaultPayloadArgument.getType().equalsIgnoreCase("document");
+        if (isDocArg && !value.isEmpty()) {
+          try {
+            Document doc = documentService.document(value);
+            value = "#{location}/" + doc.getName();
+          } catch (ElementNotFoundException e) {
+            log.error("Payload argument target unexisting document", e);
+          }
+        }
       }
 
       command = command.replace("#{" + argumentKey + "}", value);
@@ -155,11 +169,14 @@ public class ExecutableInjectService {
   private String processAndEncodeCommand(
       String command,
       String executor,
-      List<PayloadArgument> defaultArguments,
+      List<PayloadArgument> defaultPayloadArguments,
       ObjectNode injectContent,
+      List<ObjectNode> injectorContractContentFields,
       String obfuscator) {
     OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
-    String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
+    String computedCommand =
+        replaceArgumentsByValue(
+            command, defaultPayloadArguments, injectorContractContentFields, injectContent);
 
     if (executor.equals("cmd")) {
       computedCommand = replaceCmdVariables(computedCommand);
@@ -173,9 +190,16 @@ public class ExecutableInjectService {
 
   public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
       throws Exception {
+    // Need startTime to be defined before everything else to be the most accurate start time, as
+    // this whole process is
+    // called at the beginning of the implant execution. A better solution would be to have the
+    // implant send the start time
+    // but it would require more changes in the implant code and change this endpoint from a get to
+    // a post.
+    Instant startTime = Instant.now();
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
     this.injectStatusService.addStartImplantExecutionTraceByInject(
-        injectId, agentId, "Implant is up and starting execution");
+        injectId, agentId, "Implant is up and starting execution", startTime);
     return payloadToExecute;
   }
 
@@ -193,6 +217,11 @@ public class ExecutableInjectService {
       throw new ElementNotFoundException("Payload not found");
     }
     Payload payloadToExecute = payloadService.generateDuplicatedPayload(contract.getPayload());
+    JsonNode injectorContractFieldsNode = contract.getConvertedContent().get("fields");
+    List<ObjectNode> injectorContractFields =
+        StreamSupport.stream(injectorContractFieldsNode.spliterator(), false)
+            .map(ObjectNode.class::cast)
+            .toList();
 
     // prerequisite
     List<PayloadPrerequisite> prerequisiteList = new ArrayList<>();
@@ -210,6 +239,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
+                        injectorContractFields,
                         obfuscator));
               }
               if (hasText(prerequisite.getGetCommand())) {
@@ -219,6 +249,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
+                        injectorContractFields,
                         obfuscator));
               }
               prerequisiteList.add(payload);
@@ -234,6 +265,7 @@ public class ExecutableInjectService {
               contract.getPayload().getCleanupExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
+              injectorContractFields,
               obfuscator));
     }
 
@@ -247,6 +279,7 @@ public class ExecutableInjectService {
               payloadCommand.getExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
+              injectorContractFields,
               obfuscator));
       return payloadCommand;
     }
