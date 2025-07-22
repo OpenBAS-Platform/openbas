@@ -45,8 +45,8 @@ public class InjectExpectationResultsByAttackPattern {
                   InjectExpectationResultsByType result = new InjectExpectationResultsByType();
                   result.setInjectId(inject.getId());
                   result.setInjectTitle(inject.getTitle());
-                  result.setResults(
-                      AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations()));
+                  result.setResults(extractExpectationResults(
+                      AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations())));
                   return result;
                 })
             .collect(Collectors.toList());
