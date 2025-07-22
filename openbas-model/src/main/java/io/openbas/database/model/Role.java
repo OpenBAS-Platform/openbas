@@ -1,9 +1,14 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
@@ -34,4 +39,16 @@ public class Role implements Base {
   @Enumerated(EnumType.STRING)
   @Column(name = "capability")
   private Set<Capability> capabilities = new HashSet<>();
+
+  @Column(name = "role_created_at")
+  @JsonProperty("role_created_at")
+  @NotNull
+  @Schema(description = "Creation date of the role", accessMode = Schema.AccessMode.READ_ONLY)
+  private Instant createdAt = now();
+
+  @Column(name = "role_updated_at")
+  @JsonProperty("role_updated_at")
+  @NotNull
+  @Schema(description = "Update date of the role", accessMode = Schema.AccessMode.READ_ONLY)
+  private Instant updatedAt = now();
 }

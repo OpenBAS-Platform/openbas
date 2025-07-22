@@ -12,6 +12,8 @@ public class RoleMapper {
     return RoleOutput.builder()
         .id(role.getId())
         .name(role.getName())
+        .updatedAt(role.getUpdatedAt().toString())
+        .createdAt(role.getCreatedAt().toString())
         .capabilities(
             role.getCapabilities().stream().map(Capability::name).collect(Collectors.toSet()))
         .build();
