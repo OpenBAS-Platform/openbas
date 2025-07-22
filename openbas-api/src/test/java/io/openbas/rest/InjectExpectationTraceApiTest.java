@@ -78,7 +78,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     savedInject = injectRepository.save(i);
 
     InjectExpectation ie =
-        InjectExpectationFixture.createDetectionInjectExpectation(null, savedInject);
+        InjectExpectationFixture.createDetectionInjectExpectation(savedInject);
     ie.setAsset(savedAsset);
     savedInjectExpectation = injectExpectationRepository.save(ie);
 

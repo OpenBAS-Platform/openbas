@@ -51,9 +51,9 @@ class InjectExpectationServiceTest {
     // Arrange
     Inject inject = InjectFixture.getDefaultInject();
     InjectExpectation detectionExpectation =
-        InjectExpectationFixture.createDetectionInjectExpectation(null, inject);
+        InjectExpectationFixture.createDetectionInjectExpectation(inject);
     InjectExpectation detectionExpectation2 =
-        InjectExpectationFixture.createDetectionInjectExpectation(null, inject);
+        InjectExpectationFixture.createDetectionInjectExpectation(inject);
 
     when(mockedInjectExpectationRepository.findAll(any()))
         .thenReturn(List.of(detectionExpectation, detectionExpectation2));

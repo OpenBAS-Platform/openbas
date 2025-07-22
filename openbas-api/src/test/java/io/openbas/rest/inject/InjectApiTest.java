@@ -2,6 +2,8 @@ package io.openbas.rest.inject;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_END_DATE;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_START_DATE;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
@@ -11,6 +13,7 @@ import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -91,6 +94,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserComposer userComposer;
 
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private AgentRepository agentRepository;
   @SpyBean private Executor executor;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private ScenarioRepository scenarioRepository;
@@ -463,7 +467,7 @@ class InjectApiTest extends IntegrationTest {
     injectExpectationRepository.save(
         InjectExpectationFixture.createPreventionInjectExpectation(TEAM, createdInject1));
     injectExpectationRepository.save(
-        InjectExpectationFixture.createDetectionInjectExpectation(TEAM, createdInject1));
+        InjectExpectationFixture.createDetectionInjectExpectation(createdInject1));
     injectExpectationRepository.save(
         InjectExpectationFixture.createManualInjectExpectation(TEAM, createdInject2));
 
@@ -667,6 +671,62 @@ class InjectApiTest extends IntegrationTest {
       assertEquals(expectedCmdEncoded, JsonPath.read(response, "$.command_content"));
     }
 
+    @DisplayName("Should set start date signature when calling RetrievingExecutablePayload")
+    @Test
+    void calling_RetrievingExecutablePayload_should_setStartDateSignature() throws Exception {
+      // -- PREPARE --
+      Command payloadCommand =
+          PayloadFixture.createCommand(
+              "bash", "echo command name #{arg_value}", List.of(), "echo cleanup cmd");
+      Payload payloadSaved = payloadRepository.save(payloadCommand);
+
+      Injector injector = injectorRepository.findByType("openbas_implant").orElseThrow();
+      InjectorContract injectorContract =
+          InjectorContractFixture.createPayloadInjectorContract(injector, payloadSaved);
+      InjectorContract injectorContractSaved = injectorContractRepository.save(injectorContract);
+
+      Inject inject =
+          InjectFixture.createInjectCommandPayload(injectorContractSaved, new HashMap<>());
+      Inject injectSaved = injectRepository.save(inject);
+
+      // Prepare injectExpectation on specific agent
+      Endpoint endpoint = EndpointFixture.createEndpoint();
+      endpoint.setSeenIp("seen-ip-endpoint");
+      Endpoint endpointSaved = endpointRepository.save(endpoint);
+      Agent agent = AgentFixture.createDefaultAgentService();
+      agent.setAsset(endpointSaved);
+      Agent agentSaved = agentRepository.save(agent);
+      InjectExpectation detectionExpectation =
+          InjectExpectationFixture.createDetectionInjectExpectation(injectSaved);
+      detectionExpectation.setAgent(agentSaved);
+      injectExpectationRepository.save(detectionExpectation);
+
+      doNothing()
+          .when(injectStatusService)
+          .addStartImplantExecutionTraceByInject(any(), any(), any(), any());
+
+      // -- EXECUTE --
+      mvc.perform(
+              get(INJECT_URI
+                      + "/"
+                      + injectSaved.getId()
+                      + "/"
+                      + agentSaved.getId()
+                      + "/executable-payload")
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is2xxSuccessful());
+
+      // -- ASSERT --
+      List<InjectExpectation> injectExpectationSaved =
+          injectExpectationRepository.findAllByInjectAndAgent(injectSaved.getId(), agent.getId());
+      assertEquals(1, injectExpectationSaved.size());
+      assertEquals(
+          1,
+          injectExpectationSaved.getFirst().getSignatures().stream()
+              .filter(s -> EXPECTATION_SIGNATURE_TYPE_START_DATE.equals(s.getType()))
+              .count());
+    }
+
     @DisplayName("Get obfuscate command")
     @Test
     void getExecutableObfuscatePayloadInject() throws Exception {
@@ -850,6 +910,37 @@ class InjectApiTest extends IntegrationTest {
         InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
         // Check inject status
         assertEquals(ExecutionStatus.PARTIAL, injectStatusSaved.getName());
+      }
+
+      @DisplayName("Should add end date signature to a specific agent when finishing execution")
+      @Test
+      void given_completeTrace_should_setEndDateSignature() throws Exception {
+
+        // -- PREPARE --
+        Inject inject = getPendingInjectWithAssets();
+        Agent agent = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst();
+
+        // create expectation
+        InjectExpectation detectionExpectation =
+            InjectExpectationFixture.createDetectionInjectExpectation(inject);
+        detectionExpectation.setAgent(agent);
+        injectExpectationRepository.save(detectionExpectation);
+
+        InjectExecutionInput input = new InjectExecutionInput();
+        input.setMessage("Complete log received");
+        input.setAction(InjectExecutionAction.complete);
+        input.setStatus("INFO");
+        input.setDuration(1000);
+
+        performCallbackRequest(agent.getId(), inject.getId(), input);
+        List<InjectExpectation> injectExpectationSaved =
+            injectExpectationRepository.findAllByInjectAndAgent(inject.getId(), agent.getId());
+        assertEquals(1, injectExpectationSaved.size());
+        List<InjectExpectationSignature> endDatesignatures =
+            injectExpectationSaved.getFirst().getSignatures().stream()
+                .filter(s -> EXPECTATION_SIGNATURE_TYPE_END_DATE.equals(s.getType()))
+                .toList();
+        assertEquals(1, endDatesignatures.size());
       }
     }
 

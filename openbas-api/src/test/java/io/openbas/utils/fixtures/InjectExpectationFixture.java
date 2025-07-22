@@ -36,11 +36,11 @@ public class InjectExpectationFixture {
     return injectExpectation;
   }
 
-  public static InjectExpectation createDetectionInjectExpectation(Team team, Inject inject) {
+  public static InjectExpectation createDetectionInjectExpectation(Inject inject) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.DETECTION);
-    injectExpectation.setTeam(team);
+    injectExpectation.setTeam(null);
     injectExpectation.setExpectedScore(EXPECTED_SCORE);
     injectExpectation.setExpirationTime(EXPIRATION_TIME_SIX_HOURS);
     return injectExpectation;
