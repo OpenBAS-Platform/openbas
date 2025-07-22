@@ -2,6 +2,7 @@ package io.openbas.injectors.caldera.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.Result;
@@ -21,7 +22,6 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,7 @@ public class CalderaInjectorClient {
 
   private final CalderaInjectorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private final HttpClientFactory httpClientFactory;
 
   // -- ABILITIES --
 
@@ -177,7 +178,7 @@ public class CalderaInjectorClient {
   // -- PRIVATE --
 
   private String get(@NotBlank final String url) throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpGet httpGet = new HttpGet(url);
       // Headers
       httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -189,7 +190,7 @@ public class CalderaInjectorClient {
 
   private String post(@NotBlank final String url, @NotNull final Map<String, Object> body)
       throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPost httpPost = new HttpPost(url);
       // Headers
       httpPost.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -205,7 +206,7 @@ public class CalderaInjectorClient {
 
   private void patch(@NotBlank final String url, @NotNull final Map<String, Object> body)
       throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPatch httpPatch = new HttpPatch(url);
       // Headers
       httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -219,7 +220,7 @@ public class CalderaInjectorClient {
   }
 
   private void delete(@NotBlank final String url) throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpDelete httpdelete = new HttpDelete(url);
       // Headers
       httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());
