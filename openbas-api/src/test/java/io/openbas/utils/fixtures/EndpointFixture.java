@@ -3,7 +3,7 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.mapper.EndpointMapper;
 import java.time.Instant;
 import java.util.List;
 

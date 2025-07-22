@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -91,9 +93,57 @@ public class Document implements Base {
   @JsonProperty("document_scenarios")
   private Set<Scenario> scenarios = new HashSet<>();
 
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "articles_documents",
+      joinColumns = @JoinColumn(name = "document_id"),
+      inverseJoinColumns = @JoinColumn(name = "article_id"))
+  @JsonIgnore
+  private Set<Article> articles = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "challenges_documents",
+      joinColumns = @JoinColumn(name = "document_id"),
+      inverseJoinColumns = @JoinColumn(name = "challenge_id"))
+  @JsonIgnore
+  private Set<Challenge> challenges = new HashSet<>();
+
   @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
   @JsonIgnore
-  private List<InjectDocument> injectDocuments = new ArrayList<>();
+  private Set<InjectDocument> injectDocuments = new HashSet<>();
+
+  @OneToMany(mappedBy = "fileDropFile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<FileDrop> payloadsByFileDrop = new HashSet<>();
+
+  @OneToMany(mappedBy = "executableFile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonIgnore
+  private Set<Executable> payloadsByExecutableFile = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoDark", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Channel> channelsByLogoDark = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoLight", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Channel> channelsByLogoLight = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoDark", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<SecurityPlatform> securityPlatformsByLogoDark = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoLight", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<SecurityPlatform> securityPlatformsByLogoLight = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoDark", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Exercise> simulationsByLogoDark = new HashSet<>();
+
+  @OneToMany(mappedBy = "logoLight", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Exercise> simulationsByLogoLight = new HashSet<>();
 
   @Override
   public boolean isUserHasAccess(User user) {
@@ -102,8 +152,12 @@ public class Document implements Base {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
+    }
     Base base = (Base) o;
     return id.equals(base.getId());
   }
