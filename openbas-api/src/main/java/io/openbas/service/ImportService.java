@@ -35,6 +35,8 @@ public class ImportService {
   public static final String EXPORT_ENTRY_SCENARIO = "Scenario";
   public static final String EXPORT_ENTRY_ATTACHMENT = "Attachment";
   public static final String EXPORT_ENTRY_ENCRYPTED_ATTACHMENT = "EncryptedAttachment";
+  public static final String EXPORT_ENTRY_ENCRYPTED_ARGUMENT_ATTACHMENT =
+      "EncryptedArgumentAttachment";
   public static final String EXPORT_ENTRY_PAYLOAD_ARCHIVE = "PayloadArchive";
   public static final String EXPORT_ENTRY_PAYLOAD = "Payload";
 
@@ -82,6 +84,7 @@ public class ImportService {
         String entryType = entry.getComment();
         String entryName = entry.getName();
         ByteArrayOutputStream encryptedAttachmentsBuffer = null;
+        ByteArrayOutputStream encryptedArgumentsAttachmentsBuffer = null;
         if (entry.isDirectory()) {
           continue;
         }
@@ -97,6 +100,12 @@ public class ImportService {
           try (InputStream dataStream = parentZip.getInputStream(entry)) {
             encryptedAttachmentsBuffer = new ByteArrayOutputStream();
             IOUtils.copy(dataStream, encryptedAttachmentsBuffer);
+            entryType = "DIRECT_IMPORT";
+          }
+        } else if (entryName.contains("arguments_attachments.zip")) {
+          try (InputStream dataStream = parentZip.getInputStream(entry)) {
+            encryptedArgumentsAttachmentsBuffer = new ByteArrayOutputStream();
+            IOUtils.copy(dataStream, encryptedArgumentsAttachmentsBuffer);
             entryType = "DIRECT_IMPORT";
           }
         }
@@ -121,6 +130,9 @@ public class ImportService {
                 } else if ("attachments.zip".equals(payloadEntryName)) {
                   encryptedAttachmentsBuffer = new ByteArrayOutputStream();
                   IOUtils.copy(payloadZipInputStream, encryptedAttachmentsBuffer);
+                } else if ("arguments_attachments.zip".equals(payloadEntryName)) {
+                  encryptedArgumentsAttachmentsBuffer = new ByteArrayOutputStream();
+                  IOUtils.copy(payloadZipInputStream, encryptedArgumentsAttachmentsBuffer);
                 }
                 payloadZipInputStream.closeEntry();
               }
@@ -132,7 +144,10 @@ public class ImportService {
             IOUtils.copy(attStream, attachmentBuffer);
             docReferences.put(
                 entryName,
-                new ImportEntry(entry, new ByteArrayInputStream(attachmentBuffer.toByteArray())));
+                new ImportEntry(
+                    entry,
+                    new ByteArrayInputStream(attachmentBuffer.toByteArray()),
+                    attachmentBuffer.toByteArray().length));
           }
         } else if (EXPORT_ENTRY_EXERCISE.equals(entryType)
             || EXPORT_ENTRY_SCENARIO.equals(entryType)) {
@@ -159,7 +174,35 @@ public class ImportService {
                   byte[] fileBytes = IOUtils.toByteArray(fileInZip);
                   ZipEntry fakeEntry = new ZipEntry(filename);
                   docReferences.put(
-                      filename, new ImportEntry(fakeEntry, new ByteArrayInputStream(fileBytes)));
+                      filename,
+                      new ImportEntry(
+                          fakeEntry, new ByteArrayInputStream(fileBytes), fileBytes.length));
+                }
+              }
+            }
+          } finally {
+            tempEncryptedAttachmentFile.delete();
+          }
+        }
+        // If encrypted arguments attachments exist, extract with zip4j
+        if (encryptedArgumentsAttachmentsBuffer != null) {
+          File tempEncryptedAttachmentFile = createTempFile("encrypted-attachment", ".zip");
+          try {
+            FileUtils.writeByteArrayToFile(
+                tempEncryptedAttachmentFile, encryptedArgumentsAttachmentsBuffer.toByteArray());
+            try (net.lingala.zip4j.ZipFile encryptedZip =
+                new net.lingala.zip4j.ZipFile(
+                    tempEncryptedAttachmentFile, ZIP_PASSWORD.toCharArray())) {
+              encryptedZip.setRunInThread(false);
+              for (net.lingala.zip4j.model.FileHeader encHeader : encryptedZip.getFileHeaders()) {
+                try (InputStream fileInZip = encryptedZip.getInputStream(encHeader)) {
+                  String filename = encHeader.getFileName();
+                  byte[] fileBytes = IOUtils.toByteArray(fileInZip);
+                  ZipEntry fakeEntry = new ZipEntry(filename);
+                  docReferences.put(
+                      filename,
+                      new ImportEntry(
+                          fakeEntry, new ByteArrayInputStream(fileBytes), fileBytes.length));
                 }
               }
             }
