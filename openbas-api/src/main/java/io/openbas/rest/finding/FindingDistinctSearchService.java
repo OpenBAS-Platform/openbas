@@ -9,7 +9,7 @@ import io.openbas.database.model.TypeValueKey;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.AggregatedFindingOutput;
-import io.openbas.utils.FindingMapper;
+import io.openbas.utils.mapper.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import java.util.Map;
