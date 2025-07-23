@@ -6,6 +6,7 @@ import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH
 import static io.openbas.rest.challenge.ChallengeHelper.resolveChallengeIds;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.ExerciseRepository;
@@ -44,6 +45,10 @@ public class SimulationChallengeApi extends RestBehavior {
 
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping(EXERCISE_URI + "/{exerciseId}/challenges")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(readOnly = true)
   public Iterable<ChallengeOutput> exerciseChallenges(
       @PathVariable @NotBlank final String exerciseId) {
@@ -59,6 +64,10 @@ public class SimulationChallengeApi extends RestBehavior {
   }
 
   @PostMapping("/api/player/challenges/{exerciseId}/{challengeId}/validate")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @jakarta.transaction.Transactional(rollbackOn = Exception.class)
   public SimulationChallengesReader validateChallenge(
       @PathVariable String exerciseId,
@@ -77,6 +86,10 @@ public class SimulationChallengeApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/simulations/{simulationId}/documents")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public List<Document> playerDocuments(
       @PathVariable String simulationId, @RequestParam Optional<String> userId) {
     Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(simulationId);
@@ -96,6 +109,10 @@ public class SimulationChallengeApi extends RestBehavior {
   }
 
   @GetMapping("/api/observer/simulations/{simulationId}/challenges")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public SimulationChallengesReader observerChallenges(@PathVariable String simulationId) {
     Exercise exercise =
         exerciseRepository.findById(simulationId).orElseThrow(ElementNotFoundException::new);
@@ -110,6 +127,10 @@ public class SimulationChallengeApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/simulations/{simulationId}/challenges")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public SimulationChallengesReader playerChallenges(
       @PathVariable String simulationId, @RequestParam Optional<String> userId) {
     final User user = impersonateUser(userRepository, userId);

@@ -4,6 +4,7 @@ import static io.openbas.database.specification.InjectSpecification.fromScenario
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -43,6 +44,10 @@ public class ScenarioInjectApi extends RestBehavior {
   private final InjectDuplicateService injectDuplicateService;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> scenarioInjectsSimple(
@@ -51,6 +56,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> scenarioInjectsSimple(
@@ -72,6 +81,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackFor = Exception.class)
   public Inject createInjectForScenario(
@@ -81,6 +94,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/assistant")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackFor = Exception.class)
   @Operation(
@@ -94,6 +111,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject duplicateInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -103,6 +124,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
     return this.injectRepository.findByScenarioId(scenarioId).stream()
@@ -111,6 +136,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Inject scenarioInject(
       @PathVariable @NotBlank final String scenarioId,
@@ -122,6 +151,10 @@ public class ScenarioInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -150,6 +183,10 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/activation")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectActivationForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -160,6 +197,10 @@ public class ScenarioInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,

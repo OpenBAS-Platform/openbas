@@ -12,12 +12,10 @@ import static java.time.Instant.now;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
 import io.openbas.config.OpenBASPrincipal;
-import io.openbas.database.model.Organization;
-import io.openbas.database.model.Team;
-import io.openbas.database.model.TeamSimple;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.AlreadyExistingException;
@@ -76,6 +74,7 @@ public class TeamApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(TEAM_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(summary = "List teams", description = "Return the teams")
@@ -104,6 +103,7 @@ public class TeamApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/teams/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
@@ -118,6 +118,7 @@ public class TeamApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/teams/find")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
@@ -127,6 +128,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @GetMapping("/api/teams/{teamId}")
+  @RBAC(resourceId = "#teamId", actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The team")})
   @Operation(description = "Get a team", summary = "Get team")
@@ -135,6 +137,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @GetMapping("/api/teams/{teamId}/players")
+  @RBAC(resourceId = "#teamId", actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of players of the team")})
@@ -145,6 +148,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PostMapping(TEAM_URI)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The created team")})
@@ -162,6 +166,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PostMapping("/api/teams/upsert")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   @ApiResponses(
@@ -196,6 +201,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @DeleteMapping("/api/teams/{teamId}")
+  @RBAC(resourceId = "#teamId", actionPerformed = Action.DELETE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @ApiResponses(value = {@ApiResponse(responseCode = "200")})
   @Operation(description = "Delete an existing team", summary = "Delete team")
@@ -204,6 +210,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PutMapping("/api/teams/{teamId}")
+  @RBAC(resourceId = "#teamId", actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated team")})
   @Operation(description = "Update an existing team", summary = "Update team")
@@ -220,6 +227,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PutMapping("/api/teams/{teamId}/players")
+  @RBAC(resourceId = "#teamId", actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated team")})
   @Operation(
@@ -236,6 +244,7 @@ public class TeamApi extends RestBehavior {
 
   // -- OPTION --
   @GetMapping(TEAM_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId) {
@@ -248,6 +257,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PostMapping(TEAM_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.teamRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

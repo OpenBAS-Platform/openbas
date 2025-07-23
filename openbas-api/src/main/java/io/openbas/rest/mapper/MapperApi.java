@@ -6,7 +6,10 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.ImportMapper;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
@@ -64,6 +67,7 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PostMapping("/api/mappers/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
   public Page<RawPaginationImportMapper> getImportMapper(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -73,6 +77,10 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @GetMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public ImportMapper getImportMapperById(@PathVariable String mapperId) {
     return importMapperRepository
         .findById(UUID.fromString(mapperId))
@@ -81,6 +89,7 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   public ImportMapper createImportMapper(
       @RequestBody @Valid final ImportMapperAddInput importMapperAddInput) {
     return mapperService.createAndSaveImportMapper(importMapperAddInput);
@@ -88,6 +97,7 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(value = "/api/mappers/export")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   public void exportMappers(
       @RequestBody @Valid final ExportMapperInput exportMapperInput, HttpServletResponse response) {
     try {
@@ -117,6 +127,7 @@ public class MapperApi extends RestBehavior {
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
   @Secured(ROLE_USER)
   @PostMapping(value = "/api/mappers/export/csv")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   @LogExecutionTime
   public void exportMappersCsv(
       @RequestParam TargetType targetType,
@@ -127,6 +138,7 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/import")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   public void importMappers(@RequestPart("file") @NotNull MultipartFile file)
       throws ImportException {
     try {
@@ -140,6 +152,10 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.DUPLICATE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Operation(summary = "Duplicate XLS mapper by id")
   public ImportMapper duplicateMapper(@PathVariable @NotBlank final String mapperId) {
     return mapperService.getDuplicateImportMapper(mapperId);
@@ -147,6 +163,10 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public ImportMapper updateImportMapper(
       @PathVariable String mapperId,
       @Valid @RequestBody ImportMapperUpdateInput importMapperUpdateInput) {
@@ -155,11 +175,16 @@ public class MapperApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public void deleteImportMapper(@PathVariable String mapperId) {
     importMapperRepository.deleteById(UUID.fromString(mapperId));
   }
 
   @PostMapping("/api/mappers/store")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Import injects into an xls file")
   @Secured(ROLE_USER)
@@ -169,6 +194,10 @@ public class MapperApi extends RestBehavior {
   }
 
   @PostMapping("/api/mappers/store/{importId}")
+  @RBAC(
+      resourceId = "#importId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
   @Secured(ROLE_USER)
@@ -194,6 +223,7 @@ public class MapperApi extends RestBehavior {
   // -- IMPORT --
   @Operation(
       description = "Import all datas from a specific target (endpoint,...) through a csv file")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Secured(ROLE_USER)
   @PostMapping("/api/mappers/import/csv")
   @LogExecutionTime

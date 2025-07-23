@@ -7,6 +7,7 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.*;
@@ -47,6 +48,7 @@ public class PlayerApi extends RestBehavior {
   private final PlayerService playerService;
 
   @GetMapping(PLAYER_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
   @PreAuthorize("isObserver()")
   public Iterable<RawPlayer> players() {
@@ -71,12 +73,14 @@ public class PlayerApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(PLAYER_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLAYER)
   public Page<PlayerOutput> players(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.playerService.playerPagination(searchPaginationInput);
   }
 
   @GetMapping("/api/player/{userId}/communications")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   public Iterable<Communication> playerCommunications(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
@@ -84,6 +88,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PostMapping(PLAYER_URI)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
@@ -99,6 +104,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PostMapping(PLAYER_URI + "/upsert")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
@@ -143,6 +149,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PutMapping(PLAYER_URI + "/{userId}")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
@@ -158,6 +165,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @DeleteMapping(PLAYER_URI + "/{userId}")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.DELETE, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);

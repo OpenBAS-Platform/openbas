@@ -1,8 +1,11 @@
 package io.openbas.rest.inject_expectation_trace;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Collector;
 import io.openbas.database.model.InjectExpectationTrace;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationTraceRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -45,6 +48,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
               + INJECT_EXPECTATION_TRACES_URI
               + "/bulk")
   @PostMapping()
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   public InjectExpectationTrace createInjectExpectationTraceForCollector(
       @Valid @RequestBody InjectExpectationTraceInput input) {
 
@@ -80,6 +84,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
       })
   @LogExecutionTime
   @PostMapping("/bulk")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   public void bulkInsertInjectExpectationTraceForCollector(
       @Valid @RequestBody @NotNull InjectExpectationTraceBulkInsertInput inputs) {
     if (inputs.getExpectationTraces().isEmpty()) {
@@ -91,6 +96,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
 
   @Operation(summary = "Get inject expectation traces from collector")
   @GetMapping()
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectationTrace> getInjectExpectationTracesFromCollector(
       @RequestParam String injectExpectationId, @RequestParam String sourceId) {
     Collector collector =
@@ -103,6 +109,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
 
   @Operation(summary = "Get inject expectation traces' count")
   @GetMapping("/count")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public long getAlertLinksNumber(
       @RequestParam String injectExpectationId,
       @RequestParam String sourceId,

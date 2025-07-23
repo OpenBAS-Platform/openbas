@@ -7,6 +7,7 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.audit.BaseEvent;
 import io.openbas.database.model.Action;
@@ -103,6 +104,7 @@ public class StreamApi extends RestBehavior {
 
   /** Create a flux for current user & session */
   @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @RBAC(skipRBAC = true) // TODO RBAC check must be done manually for every event in this method
   public ResponseEntity<Flux<Object>> streamFlux() {
     String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
     // Build the database event flux.

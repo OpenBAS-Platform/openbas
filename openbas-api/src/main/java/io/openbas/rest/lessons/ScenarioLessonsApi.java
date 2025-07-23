@@ -3,6 +3,7 @@ package io.openbas.rest.lessons;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.LessonsCategorySpecification;
@@ -32,12 +33,20 @@ public class ScenarioLessonsApi extends RestBehavior {
   private final UserRepository userRepository;
 
   @GetMapping(SCENARIO_URI + "{scenarioId}/lessons_categories")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsCategory> scenarioLessonsCategories(@PathVariable String scenarioId) {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId));
   }
 
   @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_apply_template/{lessonsTemplateId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyScenarioLessonsTemplate(
@@ -75,6 +84,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_categories")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createScenarioLessonsCategory(
@@ -88,6 +101,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "{scenarioId}/lessons_empty")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyScenarioLessons(@PathVariable String scenarioId) {
@@ -106,6 +123,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "{scenarioId}/lessons_categories/{lessonsCategoryId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategory(
@@ -122,6 +143,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "{scenarioId}/lessons_categories/{lessonsCategoryId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsCategory(
@@ -130,6 +155,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "{scenarioId}/lessons_categories/{lessonsCategoryId}/teams")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategoryTeams(
@@ -146,6 +175,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "{scenarioId}/lessons_questions")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsQuestion> scenarioLessonsQuestions(@PathVariable String scenarioId) {
     return lessonsCategoryRepository
@@ -161,6 +194,10 @@ public class ScenarioLessonsApi extends RestBehavior {
 
   @GetMapping(
       SCENARIO_URI + "{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsQuestion> scenarioLessonsCategoryQuestions(
       @PathVariable String scenarioId, @PathVariable String lessonsCategoryId) {
@@ -170,6 +207,10 @@ public class ScenarioLessonsApi extends RestBehavior {
 
   @PostMapping(
       SCENARIO_URI + "{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public LessonsQuestion createScenarioLessonsQuestion(
       @PathVariable String scenarioId,
@@ -188,6 +229,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   @PutMapping(
       SCENARIO_URI
           + "{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public LessonsQuestion updateScenarioLessonsQuestion(
       @PathVariable String scenarioId,
@@ -205,6 +250,10 @@ public class ScenarioLessonsApi extends RestBehavior {
   @DeleteMapping(
       SCENARIO_URI
           + "{scenarioId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsQuestion(

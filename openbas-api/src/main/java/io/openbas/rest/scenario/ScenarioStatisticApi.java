@@ -3,6 +3,9 @@ package io.openbas.rest.scenario;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.response.ScenarioStatistic;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
@@ -24,6 +27,10 @@ public class ScenarioStatisticApi extends RestBehavior {
   private final ScenarioStatisticService scenarioStatisticService;
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/statistics")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Retrieve scenario statistics")

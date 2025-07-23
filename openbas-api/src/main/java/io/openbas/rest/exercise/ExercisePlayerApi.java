@@ -1,6 +1,9 @@
 package io.openbas.rest.exercise;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -23,6 +26,10 @@ public class ExercisePlayerApi extends RestBehavior {
   private final ExerciseRepository exerciseRepository;
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public PublicExercise playerExercise(
       @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(this.userRepository, userId);

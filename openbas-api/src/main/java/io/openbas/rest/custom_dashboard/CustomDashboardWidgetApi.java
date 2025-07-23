@@ -2,6 +2,9 @@ package io.openbas.rest.custom_dashboard;
 
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
@@ -27,6 +30,7 @@ public class CustomDashboardWidgetApi extends RestBehavior {
   // -- CRUD --
 
   @PostMapping
+  @RBAC(resourceId = "#id", actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Widget> createWidget(
       @PathVariable @NotBlank final String id,
       @RequestBody @Valid @NotNull final WidgetInput input) {
@@ -34,17 +38,20 @@ public class CustomDashboardWidgetApi extends RestBehavior {
   }
 
   @GetMapping
+  @RBAC(resourceId = "#id", actionPerformed = Action.READ, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<List<Widget>> widgets(@PathVariable @NotBlank final String id) {
     return ResponseEntity.ok(this.widgetService.widgets(id));
   }
 
   @GetMapping("/{widgetId}")
+  @RBAC(resourceId = "#id", actionPerformed = Action.READ, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Widget> widget(
       @PathVariable @NotBlank final String id, @PathVariable @NotBlank final String widgetId) {
     return ResponseEntity.ok(this.widgetService.widget(id, widgetId));
   }
 
   @PutMapping("/{widgetId}")
+  @RBAC(resourceId = "#id", actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Widget> updateWidget(
       @PathVariable @NotBlank final String id,
       @PathVariable @NotBlank final String widgetId,
@@ -55,6 +62,7 @@ public class CustomDashboardWidgetApi extends RestBehavior {
   }
 
   @PutMapping("/{widgetId}/layout")
+  @RBAC(resourceId = "#id", actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Widget> updateWidgetLayout(
       @PathVariable @NotBlank final String id,
       @PathVariable @NotBlank final String widgetId,
@@ -65,6 +73,7 @@ public class CustomDashboardWidgetApi extends RestBehavior {
   }
 
   @DeleteMapping("/{widgetId}")
+  @RBAC(resourceId = "#id", actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Void> deleteWidget(
       @PathVariable @NotBlank final String id, @PathVariable @NotBlank final String widgetId) {
     this.widgetService.deleteWidget(id, widgetId);

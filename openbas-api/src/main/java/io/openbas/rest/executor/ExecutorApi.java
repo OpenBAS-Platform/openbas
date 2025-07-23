@@ -7,7 +7,10 @@ import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
 import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Token;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.database.repository.TokenRepository;
@@ -80,6 +83,7 @@ public class ExecutorApi extends RestBehavior {
   }
 
   @GetMapping("/api/executors")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
   public Iterable<Executor> executors() {
     return executorRepository.findAll();
   }
@@ -94,6 +98,10 @@ public class ExecutorApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/executors/{executorId}")
+  @RBAC(
+      resourceId = "#executorId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.ASSET)
   public Executor updateExecutor(
       @PathVariable String executorId, @Valid @RequestBody ExecutorUpdateInput input) {
     Executor executor =
@@ -107,6 +115,7 @@ public class ExecutorApi extends RestBehavior {
       value = "/api/executors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackOn = Exception.class)
   public Executor registerExecutor(
       @Valid @RequestPart("input") ExecutorCreateInput input,
@@ -166,6 +175,7 @@ public class ExecutorApi extends RestBehavior {
   @GetMapping(
       value = "/api/agent/executable/openbas/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
       @Parameter(
               description =
@@ -233,6 +243,7 @@ public class ExecutorApi extends RestBehavior {
   @GetMapping(
       value = "/api/agent/package/openbas/{platform}/{architecture}/{installationMode}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(
       @Parameter(
               description =
@@ -314,6 +325,7 @@ public class ExecutorApi extends RestBehavior {
         @ApiResponse(responseCode = "404", description = "Token not found."),
       })
   @GetMapping(value = "/api/agent/installer/openbas/{platform}/{installationMode}/{token}")
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
       @Parameter(
               description =

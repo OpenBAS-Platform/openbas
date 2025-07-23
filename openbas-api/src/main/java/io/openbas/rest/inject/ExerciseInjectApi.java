@@ -9,6 +9,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 import static java.time.Instant.now;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -83,6 +84,10 @@ public class ExerciseInjectApi extends RestBehavior {
             }),
       })
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/simple")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(
@@ -91,6 +96,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/simple")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(
@@ -113,6 +122,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
     return injectRepository.findByExerciseId(exerciseId).stream()
@@ -122,6 +135,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.SEARCH,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> searchExerciseInjects(
@@ -132,6 +149,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
@@ -139,12 +160,20 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
     return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Team> exerciseInjectTeams(
       @PathVariable String exerciseId, @PathVariable String injectId) {
@@ -155,6 +184,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/communications")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Communication> exerciseInjectCommunications(
       @PathVariable String exerciseId, @PathVariable String injectId) {
@@ -166,6 +199,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
   public Inject createInjectForExercise(
@@ -176,6 +213,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject duplicateInjectForExercise(
       @PathVariable @NotBlank final String exerciseId,
@@ -186,6 +227,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(value = EXERCISE_URI + "/{exerciseId}/inject")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public InjectStatus executeInject(
       @PathVariable @NotBlank final String exerciseId,
@@ -234,6 +279,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
     injectDocumentRepository.deleteDocumentsFromInject(injectId);
@@ -241,6 +290,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/activation")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectActivationForExercise(
       @PathVariable String exerciseId,
@@ -250,6 +303,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/trigger")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTrigger(
       @PathVariable String exerciseId, @PathVariable String injectId) {
@@ -261,6 +318,10 @@ public class ExerciseInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/status")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject setInjectStatus(
       @PathVariable String exerciseId,
@@ -270,6 +331,10 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInjectTeams(
       @PathVariable String exerciseId,

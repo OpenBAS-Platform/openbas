@@ -6,8 +6,11 @@ import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -32,6 +35,10 @@ public class ScenarioExerciseApi {
 
   @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId) {
@@ -40,6 +47,10 @@ public class ScenarioExerciseApi {
 
   @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.SEARCH,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId,

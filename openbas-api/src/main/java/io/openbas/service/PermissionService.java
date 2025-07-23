@@ -15,7 +15,8 @@ public class PermissionService {
   private static final EnumSet<ResourceType> RESOURCES_OPEN =
       EnumSet.of(ResourceType.PLAYER, ResourceType.TEAM);
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
-      EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
+      EnumSet.of(
+          ResourceType.SCENARIO, ResourceType.SIMULATION, ResourceType.SIMULATION_OR_SCENARIO);
   private final GrantService grantService;
 
   @Transactional
@@ -37,8 +38,12 @@ public class PermissionService {
     // Scenario and simulation are  only accessible by GRANT
     if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
       // creation and duplication are managed using capa
-      if (Action.CREATE.equals(action) || Action.DUPLICATE.equals(action)) {
+      if (Action.CREATE.equals(action)) {
         return hasCapaPermission(user, resourceType, action);
+      }
+      if (Action.DUPLICATE.equals(action)) {
+        return hasCapaPermission(user, resourceType, action)
+            && hasGrantPermission(user, resourceId, resourceType, Action.READ);
       }
       return hasGrantPermission(user, resourceId, resourceType, action);
     } else {
@@ -84,10 +89,6 @@ public class PermissionService {
 
     Capability requiredCapability = Capability.of(resourceType, action).orElse(Capability.BYPASS);
 
-    if (userCapabilities.contains(requiredCapability)) {
-      return true;
-    } else {
-      return false;
-    }
+    return userCapabilities.contains(requiredCapability);
   }
 }
