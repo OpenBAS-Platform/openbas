@@ -94,6 +94,27 @@ public class InjectStatusService {
     injectStatus.getInject().setUpdatedAt(Instant.now());
   }
 
+  /**
+   * Get the execution time from the start trace time and the duration for a specific agent.
+   *
+   * @param injectStatus the InjectStatus containing the traces
+   * @param agentId the ID of the agent to filter the start trace
+   * @param durationInMilis the duration in milliseconds to add to the start trace time
+   * @return the calculated execution time as an Instant, or the current time if no start trace is
+   *     found
+   */
+  public Instant getExecutionTimeFromStartTraceTimeAndDurationByAgentId(
+      InjectStatus injectStatus, String agentId, int durationInMilis) {
+    return injectStatus.getTraces().stream()
+        .filter(
+            trace ->
+                trace.getAction() == ExecutionTraceAction.START
+                    && agentId.equals(trace.getAgent().getId()))
+        .findFirst()
+        .map(startTrace -> startTrace.getTime().plusMillis(durationInMilis))
+        .orElse(Instant.now());
+  }
+
   public ExecutionTrace createExecutionTrace(
       InjectStatus injectStatus,
       InjectExecutionInput input,
@@ -106,14 +127,8 @@ public class InjectStatusService {
     Instant traceCreationTime =
         (injectStatus.getTraces().isEmpty() || input.getDuration() == 0)
             ? Instant.now()
-            : injectStatus.getTraces().stream()
-                .filter(
-                    t ->
-                        ExecutionTraceAction.START.equals(t.getAction())
-                            && t.getAgent().getId().equals(agent.getId()))
-                .findFirst()
-                .map(startTrace -> startTrace.getTime().plusMillis(input.getDuration()))
-                .orElse(Instant.now());
+            : getExecutionTimeFromStartTraceTimeAndDurationByAgentId(
+                injectStatus, agent.getId(), input.getDuration());
 
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());

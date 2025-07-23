@@ -14,6 +14,8 @@ public class InjectExpectationSignature {
   public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_IPV6_ADDRESS = "target_ipv6_address";
   public static final String EXPECTATION_SIGNATURE_TYPE_TARGET_HOSTNAME_ADDRESS =
       "target_hostname_address";
+  public static final String EXPECTATION_SIGNATURE_TYPE_START_DATE = "start_date";
+  public static final String EXPECTATION_SIGNATURE_TYPE_END_DATE = "end_date";
 
   private String type;
   private String value;

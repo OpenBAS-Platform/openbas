@@ -3,10 +3,11 @@ package io.openbas.service;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeSuccessMessage;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_END_DATE;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_START_DATE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.InjectExpectationUtils.*;
-import static io.openbas.utils.ExpectationUtils.HUMAN_EXPECTATION;
-import static io.openbas.utils.ExpectationUtils.isAssetGroupExpectation;
+import static io.openbas.utils.ExpectationUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -850,6 +851,61 @@ public class InjectExpectationService {
     } catch (IllegalArgumentException e) {
       return Collections.emptyList();
     }
+  }
+
+  /**
+   * Add a date signature to all inject expectations by agent.
+   *
+   * @param injectId the injectId for which to add the end date signature
+   * @param agentId the agentId for which to add the end date signature
+   * @param date the date to set as the signature value
+   * @param signatureType the type of signature to add (start date or end date)
+   */
+  private void addDateSignatureToInjectExpectationsByAgent(
+      @NotBlank final String injectId,
+      @NotBlank final String agentId,
+      @NotBlank final Instant date,
+      @NotBlank final String signatureType) {
+    List<InjectExpectation> injectExpectations =
+        this.injectExpectationRepository.findAllByInjectAndAgent(injectId, agentId);
+
+    injectExpectations.forEach(
+        expectation -> {
+          List<InjectExpectationSignature> signatures = expectation.getSignatures();
+          signatures.add(new InjectExpectationSignature(signatureType, date.toString()));
+        });
+
+    injectExpectationRepository.saveAll(injectExpectations);
+  }
+
+  /**
+   * Create a new End Date InjectExpectationSignature by a given agent.
+   *
+   * @param injectId the injectId for which to add the end date signature
+   * @param agentId the agentId for which to add the end date signature
+   * @param date the date to set as the end date signature
+   */
+  public void addEndDateSignatureToInjectExpectationsByAgent(
+      @NotBlank final String injectId,
+      @NotBlank final String agentId,
+      @NotBlank final Instant date) {
+    addDateSignatureToInjectExpectationsByAgent(
+        injectId, agentId, date, EXPECTATION_SIGNATURE_TYPE_END_DATE);
+  }
+
+  /**
+   * Create a new Start Date InjectExpectationSignature by a given agent.
+   *
+   * @param injectId the injectId for which to add the start date signature
+   * @param agentId the agentId for which to add the start date signature
+   * @param date the date to set as the start date signature
+   */
+  public void addStartDateSignatureToInjectExpectationsByAgent(
+      @NotBlank final String injectId,
+      @NotBlank final String agentId,
+      @NotBlank final Instant date) {
+    addDateSignatureToInjectExpectationsByAgent(
+        injectId, agentId, date, EXPECTATION_SIGNATURE_TYPE_START_DATE);
   }
 
   private List<InjectExpectation> mergeExpectationResultsByExpectationType(

@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 
 public class InjectExpectationFixture {
@@ -26,21 +27,23 @@ public class InjectExpectationFixture {
     return expectation;
   }
 
-  public static InjectExpectation createPreventionInjectExpectation(Team team, Inject inject) {
+  public static InjectExpectation createPreventionInjectExpectation(
+      Inject inject, @Nullable Agent agent) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.PREVENTION);
-    injectExpectation.setTeam(team);
+    injectExpectation.setAgent(agent);
     injectExpectation.setExpectedScore(EXPECTED_SCORE);
     injectExpectation.setExpirationTime(EXPIRATION_TIME_SIX_HOURS);
     return injectExpectation;
   }
 
-  public static InjectExpectation createDetectionInjectExpectation(Team team, Inject inject) {
+  public static InjectExpectation createDetectionInjectExpectation(
+      Inject inject, @Nullable Agent agent) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
     injectExpectation.setType(InjectExpectation.EXPECTATION_TYPE.DETECTION);
-    injectExpectation.setTeam(team);
+    injectExpectation.setAgent(agent);
     injectExpectation.setExpectedScore(EXPECTED_SCORE);
     injectExpectation.setExpirationTime(EXPIRATION_TIME_SIX_HOURS);
     return injectExpectation;
