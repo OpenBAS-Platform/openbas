@@ -8,6 +8,7 @@ import { Link } from 'react-router';
 import { useFormatter } from '../../../../components/i18n';
 import { type ExpectationResultsByType, type ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
+import { sortOrder } from './expectations/Expectation';
 
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
@@ -162,7 +163,11 @@ const ResponsePie: FunctionComponent<Props> = ({
         width: '100%',
       }}
     >
-      {definedTypes.map(type => (
+      {definedTypes.sort((a, b) => {
+        const typeAIndex = sortOrder.indexOf(a);
+        const typeBIndex = sortOrder.indexOf(b);
+        return typeAIndex - typeBIndex;
+      }).map(type => (
         <Pie
           key={type}
           type={type.toLowerCase()}
