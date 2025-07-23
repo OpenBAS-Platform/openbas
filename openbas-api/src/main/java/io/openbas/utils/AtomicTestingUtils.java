@@ -9,9 +9,6 @@ import java.util.*;
 
 public class AtomicTestingUtils {
 
-  public static final String ENDPOINT = "Endpoint";
-
-  // -- RESULTS BY EXPECTATION TYPE --
   @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypesFromRaw(
       List<RawInjectExpectation> expectations) {
