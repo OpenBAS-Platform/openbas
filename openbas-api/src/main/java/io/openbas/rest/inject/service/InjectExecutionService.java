@@ -61,9 +61,9 @@ public class InjectExecutionService {
         // If we receive a status update with a terminal state status, we must first check that the
         // current status is in the PENDING state
         log.warn(
-            "Received a complete action for inject {} with status {}, but current status is not PENDING",
-            injectId,
-            inject.getStatus().map(is -> is.getName().toString()).orElse("unknown"));
+            String.format(
+                "Received a complete action for inject %s with status %s, but current status is not PENDING",
+                injectId, inject.getStatus().map(is -> is.getName().toString()).orElse("unknown")));
         throw new DataIntegrityViolationException(
             "Cannot complete inject that is not in PENDING state");
       }
