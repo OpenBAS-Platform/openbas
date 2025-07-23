@@ -92,10 +92,20 @@ public class TlsConfig {
         break;
       }
     }
-
     Set<String> filesPaths = getFilesPaths(openBASConfig.getExtraTrustedCertsDir());
 
     List<X509Certificate> extraCerts = getExtraCerts(filesPaths);
+
+    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+    keyStore.load(null, null);
+    for (X509Certificate cert : extraCerts) {
+      keyStore.setCertificateEntry(cert.getSubjectX500Principal().getName(), cert);
+    }
+
+    TrustManagerFactory trustManagerFactory2 = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+    trustManagerFactory2.init(keyStore);
+
+    X509TrustManager myTrustManager = Arrays.stream(trustManagerFactory2.getTrustManagers()).filter(tm -> tm instanceof X509TrustManager).map(tm -> (X509TrustManager) tm).findFirst().orElse(null);
 
     X509TrustManager finalDefaultTm = defaultX509CertificateTrustManager;
 
@@ -114,11 +124,11 @@ public class TlsConfig {
           }
 
           @Override
-          public void checkServerTrusted(X509Certificate[] chain, String authType) {
+          public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
             try {
-              finalDefaultTm.checkServerTrusted(chain, authType);
+              myTrustManager.checkServerTrusted(chain, authType);
             } catch (CertificateException e) {
-              log.error("Error occurred during checkServerTrusted", e);
+              finalDefaultTm.checkServerTrusted(chain, authType);
             }
           }
 
