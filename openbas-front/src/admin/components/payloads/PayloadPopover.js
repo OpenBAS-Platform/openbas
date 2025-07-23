@@ -14,11 +14,10 @@ import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
-import { documentOptions } from '../../../utils/Option';
 import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
 
-const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
+const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
