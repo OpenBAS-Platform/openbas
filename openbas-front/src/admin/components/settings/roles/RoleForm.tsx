@@ -51,7 +51,6 @@ const RoleForm: FC<RoleFormProps> = ({
     role_capabilities: z.string().array().describe('Capabilities-tab'),
   });
 
-  /* ---------- React‑Hook‑Form ---------- */
   const methods = useForm<RoleCreateInput>({
     mode: 'onTouched',
     resolver: zodResolver(schema),
@@ -68,7 +67,6 @@ const RoleForm: FC<RoleFormProps> = ({
     handleSubmit,
   } = methods;
 
-  /* ---------- Helpers ---------- */
   const getTabForField = (field: string) =>
     (schema.shape as Record<string, z.ZodTypeAny>)[field]?.description?.replace('-tab', '');
 
@@ -113,7 +111,7 @@ const RoleForm: FC<RoleFormProps> = ({
         {activeTab === 'Capabilities' && (
           <>
             {capabilities.map(cap => (
-              <CapabilitiesTab capability={cap} key={cap.name} />
+              <CapabilitiesTab capability={cap} key={cap.name} capabilities={capabilities} />
             ))}
             {errors.role_capabilities && <span>{errors.role_capabilities.message}</span>}
           </>

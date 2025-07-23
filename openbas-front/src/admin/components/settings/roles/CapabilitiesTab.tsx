@@ -6,15 +6,16 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type RoleCreateInput } from './RoleForm';
 
-interface CapabilityNode {
+interface Capability {
   name: string;
   value: string;
   checkable: boolean;
-  children?: CapabilityNode[];
+  children?: Capability[];
 }
 
 interface CapabilitiesTabProps {
-  capability: CapabilityNode;
+  capabilities: Capability[];
+  capability: Capability;
   depth?: number;
 }
 
@@ -26,7 +27,7 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capability, depth = 0 }) => {
+const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capabilities, capability, depth = 0 }) => {
   const { classes } = useStyles();
   const { control } = useFormContext<RoleCreateInput>();
   const selected = useWatch({
@@ -34,10 +35,67 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capability, depth = 0 }) =>
     name: 'role_capabilities',
   }) ?? [];
 
-  const toggle = (checked: boolean) =>
-    checked
-      ? [...selected, capability.value]
-      : selected.filter(v => v !== capability.value);
+  // Get all children's capabilities
+  const getAllChildren = (capability: Capability): string[] => {
+    const children: string[] = [];
+
+    const collectCheckableValues = (cap: Capability) => {
+      if (cap.checkable && cap.value) {
+        children.push(cap.value);
+      }
+      cap.children?.forEach(child => collectCheckableValues(child));
+    };
+
+    capability.children?.forEach(child => collectCheckableValues(child));
+    return children;
+  };
+
+  // Get all parent's capabilities
+  const getAllParents = (targetValue: string, capabilities: Capability[], parents: string[] = []): string[] => {
+    for (const capability of capabilities) {
+      if (capability.children) {
+        const directChild = capability.children.find(child => child.value === targetValue);
+        if (directChild && capability.checkable && capability.value) {
+          return [...parents, capability.value];
+        }
+
+        const foundParents = getAllParents(targetValue, capability.children,
+          capability.checkable && capability.value ? [...parents, capability.value] : parents);
+        if (foundParents.length > (capability.checkable && capability.value ? parents.length + 1 : parents.length)) {
+          return foundParents;
+        }
+      }
+    }
+    return parents;
+  };
+
+  const toggle = (checked: boolean, capability: Capability, allCapabilities: Capability[]) => {
+    let newSelected = [...selected];
+
+    if (checked) {
+      // check item
+      if (!newSelected.includes(capability.value)) {
+        newSelected.push(capability.value);
+      }
+
+      // Check his parents
+      const parents = getAllParents(capability.value, allCapabilities);
+      parents.forEach((parentValue) => {
+        if (!newSelected.includes(parentValue)) {
+          newSelected.push(parentValue);
+        }
+      });
+    } else {
+      // uncheck item
+      newSelected = newSelected.filter(v => v !== capability.value);
+
+      // uncheck his children
+      const children = getAllChildren(capability);
+      newSelected = newSelected.filter(v => !children.includes(v));
+    }
+
+    return newSelected;
+  };
 
   return (
     <>
@@ -54,7 +112,7 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capability, depth = 0 }) =>
               render={({ field }) => (
                 <Checkbox
                   checked={selected.includes(capability.value)}
-                  onChange={e => field.onChange(toggle(e.target.checked))}
+                  onChange={e => field.onChange(toggle(e.target.checked, capability, capabilities))}
                 />
               )}
             />
@@ -68,6 +126,7 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capability, depth = 0 }) =>
           key={child.name}
           capability={child}
           depth={depth + 1}
+          capabilities={capabilities}
         />
       ))}
     </>
