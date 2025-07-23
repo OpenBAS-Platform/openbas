@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InjectExpectationMapper {
 
+  public static final String NODE_EXPECTATION_TYPE = "expectation_type";
   private final InjectUtils injectUtils;
 
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
@@ -40,7 +41,7 @@ public class InjectExpectationMapper {
 
     Set<ExpectationType> uniqueTypes = new HashSet<>();
     for (JsonNode expectationNode : contentNode) {
-      JsonNode typeNode = expectationNode.get("expectation_type");
+      JsonNode typeNode = expectationNode.get(NODE_EXPECTATION_TYPE);
       if (typeNode != null && typeNode.isTextual()) {
         try {
           ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
@@ -98,7 +99,7 @@ public class InjectExpectationMapper {
 
     Set<ExpectationType> uniqueTypes = new HashSet<>();
     for (JsonNode expectationNode : contentNode) {
-      JsonNode typeNode = expectationNode.get("expectation_type");
+      JsonNode typeNode = expectationNode.get(NODE_EXPECTATION_TYPE);
       if (typeNode != null && typeNode.isTextual()) {
         try {
           ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
