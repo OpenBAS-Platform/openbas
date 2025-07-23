@@ -33,41 +33,18 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
     };
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
+
   if (!expectations || expectations.length === 0) {
-    return (
-      <div className={classes.inline}>
-        <ShieldOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <TrackChangesOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <SensorOccupiedOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <BugReportOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-      </div>
-    );
+    return null;
   }
+
   return (
     <div className={classes.inline} id={`inject_expectations_${injectId}`}>
       {expectations.map((expectation, index) => {
         const color = getColor(expectation.avgResult);
         let IconComponent;
+        let tooltipLabel = '';
+
         switch (expectation.type) {
           case 'PREVENTION':
             tooltipLabel = t('Prevention');
@@ -81,17 +58,21 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
             tooltipLabel = t('Vulnerability');
             IconComponent = BugReportOutlined;
             break;
+          case 'HUMAN_RESPONSE':
           default:
             tooltipLabel = t('Human Response');
             IconComponent = SensorOccupiedOutlined;
+            break;
         }
+
         return (
           <Tooltip key={index} title={tooltipLabel}>
-            <IconComponent style={{
-              color,
-              marginRight: 10,
-              fontSize: 22,
-            }}
+            <IconComponent
+              style={{
+                color,
+                marginRight: 10,
+                fontSize: 22,
+              }}
             />
           </Tooltip>
         );
