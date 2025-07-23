@@ -1,5 +1,8 @@
 package io.openbas.executors.tanium.client;
 
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.authorisation.HttpClientFactory;
@@ -7,6 +10,13 @@ import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.DataEndpoints;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
@@ -17,17 +27,6 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequiredArgsConstructor
 @Service
@@ -77,8 +76,7 @@ public class TaniumExecutorClient {
       String jsonResponse = this.post(body);
 
       GraphQLResponse<DataEndpoints> response =
-          objectMapper.readValue(jsonResponse, new TypeReference<>() {
-          });
+          objectMapper.readValue(jsonResponse, new TypeReference<>() {});
 
       if (response == null || response.data == null) {
         throw new RuntimeException("API response malformed or empty");
