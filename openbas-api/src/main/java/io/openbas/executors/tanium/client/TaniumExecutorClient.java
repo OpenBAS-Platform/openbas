@@ -3,6 +3,7 @@ package io.openbas.executors.tanium.client;
 import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.authorisation.HttpClientFactory;
@@ -83,6 +84,9 @@ public class TaniumExecutorClient {
       }
 
       return response.data;
+    } catch (JsonProcessingException e) {
+      log.error(String.format("Failed to parse JSON response. Error: %s", e.getMessage()), e);
+      throw new RuntimeException(e);
     } catch (IOException e) {
       log.error("Error while querying endpoints", e);
       throw new RuntimeException(e);
@@ -145,6 +149,30 @@ public class TaniumExecutorClient {
             String result = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
 
             if (HttpStatus.valueOf(response.getCode()).is2xxSuccessful()) {
+              Map<String, Object> responseMap =
+                  objectMapper.readValue(result, new TypeReference<>() {});
+              if (responseMap.containsKey("errors")) {
+                StringBuilder errorMessage = new StringBuilder("GraphQL errors detected:\n");
+                for (Map<String, Object> error :
+                    (Iterable<Map<String, Object>>) responseMap.get("errors")) {
+                  errorMessage.append("- ").append(error.get("message")).append("\n");
+
+                  Map<String, Object> extensions = (Map<String, Object>) error.get("extensions");
+                  if (extensions != null && extensions.containsKey("argumentErrors")) {
+                    for (Map<String, Object> argError :
+                        (Iterable<Map<String, Object>>) extensions.get("argumentErrors")) {
+                      errorMessage
+                          .append("  • ")
+                          .append(argError.get("message"))
+                          .append(" (code: ")
+                          .append(argError.get("code"))
+                          .append(")\n");
+                    }
+                  }
+                }
+                throw new RuntimeException(errorMessage.toString());
+              }
+
               return result;
             } else {
               throw new ClientProtocolException(
