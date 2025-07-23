@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PermissionService {
 
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
-      EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
+      EnumSet.of(
+          ResourceType.SCENARIO, ResourceType.SIMULATION, ResourceType.SIMULATION_OR_SCENARIO);
   private final GrantService grantService;
 
   @Transactional

@@ -11,6 +11,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
@@ -68,6 +69,7 @@ public class ScenarioApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI)
+  @RBAC(requiredAction = Action.WRITE, resourceType = ResourceType.SCENARIO)
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scenario input cannot be null");
@@ -85,29 +87,43 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.DUPLICATE,
+      resourceType = ResourceType.SCENARIO)
   public Scenario duplicateScenario(@PathVariable @NotBlank final String scenarioId) {
     return scenarioService.getDuplicateScenario(scenarioId);
   }
 
   @GetMapping(SCENARIO_URI)
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.SCENARIO)
   public List<ScenarioSimple> scenarios() {
     return this.scenarioService.scenarios();
   }
 
   @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/search")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.SCENARIO)
   public Page<RawPaginationScenario> scenarios(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.scenarioService.scenarios(searchPaginationInput);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Scenario scenario(@PathVariable @NotBlank final String scenarioId) {
     return scenarioService.scenario(scenarioId);
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -126,6 +142,10 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.DELETE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
     this.scenarioService.deleteScenario(scenarioId);
@@ -134,6 +154,10 @@ public class ScenarioApi extends RestBehavior {
   // -- TAGS --
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/tags")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenarioTags(
       @PathVariable @NotBlank final String scenarioId,
@@ -147,6 +171,10 @@ public class ScenarioApi extends RestBehavior {
   // -- EXPORT --
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/export")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.SEARCH,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public void exportScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -162,6 +190,7 @@ public class ScenarioApi extends RestBehavior {
   // -- IMPORT --
 
   @PostMapping(SCENARIO_URI + "/import")
+  @RBAC(requiredAction = Action.WRITE, resourceType = ResourceType.SCENARIO)
   @Secured(ROLE_ADMIN)
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
@@ -170,6 +199,10 @@ public class ScenarioApi extends RestBehavior {
   // -- TEAMS --
   @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public List<TeamOutput> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
     return this.teamService.find(fromScenario(scenarioId));
@@ -177,6 +210,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Iterable<TeamOutput> removeScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
@@ -186,6 +223,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/replace")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<TeamOutput> replaceScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
@@ -195,6 +236,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/enable")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario enableScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
@@ -206,6 +251,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/disable")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario disableScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
@@ -216,6 +265,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/add")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario addScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
@@ -226,6 +279,10 @@ public class ScenarioApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/{teamId}/players/remove")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario removeScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
@@ -241,6 +298,10 @@ public class ScenarioApi extends RestBehavior {
   // -- RECURRENCE --
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/recurrence")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenarioRecurrence(
       @PathVariable @NotBlank final String scenarioId,
@@ -256,6 +317,7 @@ public class ScenarioApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(SCENARIO_URI + "/options")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.SCENARIO)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -267,6 +329,7 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/options")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.SCENARIO)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.scenarioRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
@@ -274,6 +337,7 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/category/options")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.SCENARIO)
   public List<FilterUtilsJpa.Option> categoryOptionsByName(
       @RequestParam(required = false) final String searchText) {
     return this.scenarioRepository
@@ -285,6 +349,10 @@ public class ScenarioApi extends RestBehavior {
 
   // -- LESSON --
   @PutMapping(SCENARIO_URI + "/{scenarioId}/lessons")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Scenario updateScenarioLessons(
@@ -295,6 +363,10 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercise/running")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.LAUNCH,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Exercise createRunningExerciseFromScenario(
       @PathVariable @NotBlank final String scenarioId) {
@@ -305,6 +377,10 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/check-rules")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "Returns whether or not the rules apply")
@@ -321,6 +397,10 @@ public class ScenarioApi extends RestBehavior {
 
   // region lesson templates
   @GetMapping(SCENARIO_URI + "/{scenarioId}/lessons_templates")
+  @RBAC(
+      resourceId = "#scenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Operation(
       summary = "Get documents. Can only be called if the user has access to the given scenario.",
       description = "Get all documents for a given scenario")

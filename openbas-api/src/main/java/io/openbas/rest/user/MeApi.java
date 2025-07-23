@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TokenSpecification.fromUser;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 
+import io.openbas.aop.RBAC;
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.Token;
 import io.openbas.database.model.User;
@@ -62,12 +63,14 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @GetMapping("/api/logout")
+  @RBAC(skipRBAC = true)
   public ResponseEntity<Object> logout() {
     return ResponseEntity.ok().build();
   }
 
   @Secured(ROLE_USER)
   @GetMapping("/api/me")
+  @RBAC(skipRBAC = true)
   public User me() {
     return userRepository
         .findById(currentUser().getId())
@@ -76,6 +79,7 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/profile")
+  @RBAC(skipRBAC = true)
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
     User user =
         userRepository
@@ -91,6 +95,7 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/information")
+  @RBAC(skipRBAC = true)
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
     User user =
         userRepository
@@ -104,6 +109,7 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/password")
+  @RBAC(skipRBAC = true)
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input)
       throws InputValidationException {
     User user =
@@ -120,6 +126,7 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @PostMapping("/api/me/token/refresh")
+  @RBAC(skipRBAC = true)
   @Transactional(rollbackOn = Exception.class)
   public Token renewToken(@Valid @RequestBody RenewTokenInput input)
       throws InputValidationException {
@@ -138,6 +145,7 @@ public class MeApi extends RestBehavior {
 
   @Secured(ROLE_USER)
   @GetMapping("/api/me/tokens")
+  @RBAC(skipRBAC = true)
   public List<Token> tokens() {
     return tokenRepository.findAll(fromUser(currentUser().getId()));
   }

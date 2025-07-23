@@ -7,6 +7,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
@@ -70,6 +71,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PostMapping("/api/documents")
+  @RBAC(requiredAction = Action.WRITE, resourceType = ResourceType.DOCUMENT)
   @Transactional(rollbackOn = Exception.class)
   public Document uploadDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -123,6 +125,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PostMapping("/api/documents/upsert")
+  @RBAC(requiredAction = Action.WRITE, resourceType = ResourceType.DOCUMENT)
   @Transactional(rollbackOn = Exception.class)
   public Document upsertDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,
@@ -209,6 +212,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping("/api/documents")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.DOCUMENT)
   public List<RawDocument> documents() {
     OpenBASPrincipal user = currentUser();
     if (user.isAdmin()) {
@@ -219,6 +223,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PostMapping("/api/documents/search")
+  @RBAC(requiredAction = Action.SEARCH, resourceType = ResourceType.DOCUMENT)
   public Page<RawPaginationDocument> searchDocuments(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     OpenBASPrincipal user = currentUser();
@@ -254,12 +259,20 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping("/api/documents/{documentId}")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.DOCUMENT)
   public Document document(@PathVariable String documentId) {
     return resolveDocument(documentId)
         .orElseThrow(() -> new ElementNotFoundException("Document not found"));
   }
 
   @GetMapping("/api/documents/{documentId}/tags")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.DOCUMENT)
   public Set<Tag> documentTags(@PathVariable String documentId) {
     Document document =
         resolveDocument(documentId)
@@ -268,6 +281,10 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PutMapping("/api/documents/{documentId}/tags")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.DOCUMENT)
   public Document documentTags(
       @PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
     Document document =
@@ -279,6 +296,10 @@ public class DocumentApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/documents/{documentId}")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.DOCUMENT)
   public Document updateDocumentInformation(
       @PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
     Document document =
@@ -336,6 +357,10 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping("/api/documents/{documentId}/file")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.DOCUMENT)
   public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
       throws IOException {
     Document document =
@@ -354,6 +379,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/injectors/{injectorType}", produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectorType)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getInjectorImage(injectorType);
@@ -366,6 +392,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/injectors/id/{injectorId}", produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getInjectorImageFromId(
       @PathVariable String injectorId) throws IOException {
     Injector injector =
@@ -384,6 +411,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/collectors/{collectorType}",
       produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorType)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getCollectorImage(collectorType);
@@ -412,6 +440,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/collectors/id/{collectorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(
       @PathVariable String collectorId) throws IOException {
     Collector collector =
@@ -428,6 +457,10 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/security_platforms/id/{assetId}/{theme}")
+  @RBAC(
+      resourceId = "#assetId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.DOCUMENT)
   public void getSecurityPlatformImageFromId(
       @PathVariable String assetId, @PathVariable String theme, HttpServletResponse response)
       throws IOException {
@@ -447,6 +480,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/executors/icons/{executorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getExecutorIconImage(@PathVariable String executorId)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getExecutorIconImage(executorId);
@@ -461,6 +495,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/executors/banners/{executorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.DOCUMENT)
   public @ResponseBody ResponseEntity<byte[]> getExecutorBannerImage(
       @PathVariable String executorId) throws IOException {
     Optional<InputStream> fileStream = fileService.getExecutorBannerImage(executorId);
@@ -486,6 +521,10 @@ public class DocumentApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @DeleteMapping("/api/documents/{documentId}")
+  @RBAC(
+      resourceId = "#documentId",
+      requiredAction = Action.DELETE,
+      resourceType = ResourceType.DOCUMENT)
   public void deleteDocument(@PathVariable String documentId) {
     injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
     List<Document> documents = documentRepository.removeById(documentId);
@@ -501,6 +540,10 @@ public class DocumentApi extends RestBehavior {
 
   // -- EXERCISE & SENARIO--
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents")
+  @RBAC(
+      resourceId = "#exerciseOrScenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SIMULATION_OR_SCENARIO)
   public List<Document> playerDocuments(
       @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId) {
     Optional<Exercise> exerciseOpt = this.exerciseRepository.findById(exerciseOrScenarioId);
@@ -529,6 +572,10 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/{exerciseOrScenarioId}/documents/{documentId}/file")
+  @RBAC(
+      resourceId = "#exerciseOrScenarioId",
+      requiredAction = Action.READ,
+      resourceType = ResourceType.SIMULATION_OR_SCENARIO)
   public void downloadPlayerDocument(
       @PathVariable String exerciseOrScenarioId,
       @PathVariable String documentId,

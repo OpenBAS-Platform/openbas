@@ -17,5 +17,9 @@ public enum ResourceType {
   DASHBOARD,
   PLATFORM_SETTING,
   LESSON_LEARNED,
-  CHALLENGE
+  CHALLENGE,
+
+  // Special resource types
+  SIMULATION_OR_SCENARIO, // Used to represent either a simulation or a scenario.
+  SKIP_RBAC, // Used to skip RBAC checks.
 }

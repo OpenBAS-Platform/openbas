@@ -2,6 +2,7 @@ package io.openbas.search;
 
 import static io.openbas.database.model.User.ROLE_USER;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.Base;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -27,12 +28,14 @@ public class FullTextSearchApi extends RestBehavior {
   private final FullTextSearchService<? extends Base> fullTextSearchService;
 
   @PostMapping(GLOBAL_SEARCH_URI)
+  @RBAC(skipRBAC = true)
   public Map<? extends Class<? extends Base>, FullTextSearchService.FullTextSearchCountResult>
       fullTextSearch(@Valid @RequestBody final SearchTerm searchTerm) {
     return this.fullTextSearchService.fullTextSearch(searchTerm.getSearchTerm());
   }
 
   @PostMapping(GLOBAL_SEARCH_URI + "/{clazz}")
+  @RBAC(skipRBAC = true)
   public Page<FullTextSearchService.FullTextSearchResult> fullTextSearch(
       @PathVariable @NotBlank final String clazz,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput)
