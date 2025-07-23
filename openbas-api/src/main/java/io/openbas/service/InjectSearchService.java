@@ -1,14 +1,12 @@
 package io.openbas.service;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
@@ -16,12 +14,14 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
-import io.openbas.expectation.ExpectationType;
-import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
+import io.openbas.rest.atomic_testing.form.InjectorContractSimple;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.payload.output.PayloadSimple;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.TargetType;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
@@ -51,6 +51,7 @@ public class InjectSearchService {
   private final AssetGroupRepository assetGroupRepository;
 
   private final InjectMapper injectMapper;
+  private final InjectExpectationMapper injectExpectationMapper;
 
   @PersistenceContext private EntityManager entityManager;
 
@@ -366,7 +367,8 @@ public class InjectSearchService {
     for (InjectResultOutput inject : injects) {
       if (inject.getId() != null) {
         // Set global score (expectations)
-        inject.setExpectationResultByTypes(extractExpectationResults(expectationMap, inject));
+        inject.setExpectationResultByTypes(
+            injectExpectationMapper.extractExpectationResults(expectationMap, inject));
 
         // Set targets (teams, assets, asset groups)
         List<TargetSimple> allTargets =
@@ -391,42 +393,6 @@ public class InjectSearchService {
         inject.getTargets().addAll(allTargets);
       }
     }
-  }
-
-  private static List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      Map<String, List<RawInjectExpectation>> expectationMap, InjectResultOutput inject) {
-    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-            expectationMap.getOrDefault(inject.getId(), emptyList()));
-
-    if (!expectationResultByTypesFromRaw.isEmpty()) {
-      return expectationResultByTypesFromRaw;
-    }
-
-    JsonNode contentNode = inject.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
-    if (contentNode == null || !contentNode.isArray()) {
-      return Collections.emptyList();
-    }
-
-    Set<ExpectationType> uniqueTypes = new HashSet<>();
-    for (JsonNode expectationNode : contentNode) {
-      JsonNode typeNode = expectationNode.get("expectation_type");
-      if (typeNode != null && typeNode.isTextual()) {
-        try {
-          ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
-          uniqueTypes.add(type);
-        } catch (IllegalArgumentException e) {
-        }
-      }
-    }
-
-    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
-    for (ExpectationType type : uniqueTypes) {
-      AtomicTestingUtils.getExpectationByType(type, Collections.emptyList())
-          .ifPresent(fallbackResults::add);
-    }
-
-    return fallbackResults;
   }
 
   private void selectForInjects(
