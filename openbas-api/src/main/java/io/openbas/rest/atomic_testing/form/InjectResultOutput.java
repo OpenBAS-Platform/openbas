@@ -2,6 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +26,10 @@ public class InjectResultOutput {
   @JsonProperty("inject_title")
   @NotBlank
   private String title;
+
+  @Schema(description = "Content of inject")
+  @JsonProperty("inject_content")
+  private ObjectNode content;
 
   @Schema(description = "Timestamp when the inject was last updated")
   @JsonProperty("inject_updated_at")

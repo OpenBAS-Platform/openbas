@@ -1,16 +1,19 @@
 package io.openbas.injects.atomic_testing;
 
-import static io.openbas.expectation.ExpectationType.*;
+import static io.openbas.expectation.ExpectationType.DETECTION;
+import static io.openbas.expectation.ExpectationType.HUMAN_RESPONSE;
+import static io.openbas.expectation.ExpectationType.PREVENTION;
+import static io.openbas.expectation.ExpectationType.VULNERABILITY;
 import static io.openbas.utils.fixtures.ExpectationResultByTypeFixture.createDefaultExpectationResultsByType;
 import static io.openbas.utils.fixtures.RawInjectExpectationFixture.createDefaultInjectExpectation;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.repository.*;
-import io.openbas.service.AssetGroupService;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,26 +27,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ResultUtilsTest {
 
   @Mock private InjectExpectationRepository injectExpectationRepository;
-  @Mock private TeamRepository teamRepository;
-  @Mock private UserRepository userRepository;
-  @Mock private AssetRepository assetRepository;
-  @Mock private AgentRepository agentRepository;
-  @Mock private AssetGroupRepository assetGroupRepository;
-  @Mock private AssetGroupService assetGroupService;
+  @Mock private InjectExpectationMapper injectExpectationMapper;
 
   private ResultUtils resultUtils;
 
   @BeforeEach
   void before() {
-    resultUtils =
-        new ResultUtils(
-            injectExpectationRepository,
-            teamRepository,
-            userRepository,
-            assetRepository,
-            assetGroupRepository,
-            assetGroupService,
-            agentRepository);
+    resultUtils = new ResultUtils(injectExpectationRepository, injectExpectationMapper);
   }
 
   @Test

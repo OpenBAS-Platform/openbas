@@ -103,6 +103,8 @@ public class ExerciseApi extends RestBehavior {
   private final ExportService exportService;
   private final ActionMetricCollector actionMetricCollector;
 
+  private final ResultUtils resultUtils;
+
   // endregion
 
   // region logs
@@ -537,8 +539,7 @@ public class ExerciseApi extends RestBehavior {
       @NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository
         .findById(exerciseId)
-        .map(Exercise::getInjects)
-        .map(ResultUtils::computeInjectExpectationResults)
+        .map(exercise -> resultUtils.computeInjectExpectationResults(exercise.getInjects()))
         .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
   }
 

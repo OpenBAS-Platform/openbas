@@ -21,7 +21,6 @@ interface Props {
 
 const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId }) => {
   const { t } = useFormatter();
-  let tooltipLabel: string = '';
   const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {

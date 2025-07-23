@@ -11,7 +11,6 @@ import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.payload.output.PayloadSimple;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectUtils;
-import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,7 +23,6 @@ public class InjectMapper {
 
   private final InjectStatusMapper injectStatusMapper;
   private final InjectUtils injectUtils;
-  private final ResultUtils resultUtils;
 
   public InjectResultOverviewOutput toInjectResultOverviewOutput(Inject inject) {
     // --
@@ -55,7 +53,7 @@ public class InjectMapper {
         .build();
   }
 
-  private List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
+  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
       Inject inject) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
         AtomicTestingUtils.getExpectationResultByTypes(injectUtils.getPrimaryExpectations(inject));

@@ -1,12 +1,14 @@
 package io.openbas.service;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
@@ -14,6 +16,7 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.payload.output.PayloadSimple;
@@ -363,9 +366,7 @@ public class InjectSearchService {
     for (InjectResultOutput inject : injects) {
       if (inject.getId() != null) {
         // Set global score (expectations)
-        inject.setExpectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                expectationMap.getOrDefault(inject.getId(), emptyList())));
+        inject.setExpectationResultByTypes(extractExpectationResults(expectationMap, inject));
 
         // Set targets (teams, assets, asset groups)
         List<TargetSimple> allTargets =
@@ -390,6 +391,42 @@ public class InjectSearchService {
         inject.getTargets().addAll(allTargets);
       }
     }
+  }
+
+  private static List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
+      Map<String, List<RawInjectExpectation>> expectationMap, InjectResultOutput inject) {
+    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
+        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+            expectationMap.getOrDefault(inject.getId(), emptyList()));
+
+    if (!expectationResultByTypesFromRaw.isEmpty()) {
+      return expectationResultByTypesFromRaw;
+    }
+
+    JsonNode contentNode = inject.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
+    if (contentNode == null || !contentNode.isArray()) {
+      return Collections.emptyList();
+    }
+
+    Set<ExpectationType> uniqueTypes = new HashSet<>();
+    for (JsonNode expectationNode : contentNode) {
+      JsonNode typeNode = expectationNode.get("expectation_type");
+      if (typeNode != null && typeNode.isTextual()) {
+        try {
+          ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
+          uniqueTypes.add(type);
+        } catch (IllegalArgumentException e) {
+        }
+      }
+    }
+
+    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
+    for (ExpectationType type : uniqueTypes) {
+      AtomicTestingUtils.getExpectationByType(type, Collections.emptyList())
+          .ifPresent(fallbackResults::add);
+    }
+
+    return fallbackResults;
   }
 
   private void selectForInjects(
@@ -424,6 +461,7 @@ public class InjectSearchService {
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("updatedAt").alias("inject_updated_at"),
+            injectRoot.get("content").alias("inject_content"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.get("id").alias("injector_contract_id"),
             injectorContractJoin.get("content").alias("injector_contract_content"),
@@ -499,6 +537,7 @@ public class InjectSearchService {
               InjectResultOutput injectResultOutput = new InjectResultOutput();
               injectResultOutput.setId(tuple.get("inject_id", String.class));
               injectResultOutput.setTitle(tuple.get("inject_title", String.class));
+              injectResultOutput.setContent(tuple.get("inject_content", ObjectNode.class));
               injectResultOutput.setUpdatedAt(tuple.get("inject_updated_at", Instant.class));
               injectResultOutput.setInjectType(tuple.get("inject_type", String.class));
               injectResultOutput.setInjectorContract(injectorContractSimple);
