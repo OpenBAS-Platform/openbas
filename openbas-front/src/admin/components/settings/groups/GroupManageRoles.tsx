@@ -1,5 +1,6 @@
 import { SecurityOutlined } from '@mui/icons-material';
 import { Box, Button, Checkbox, Divider } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FC, useEffect, useState } from 'react';
 
 import { fetchRoles } from '../../../../actions/roles/roles-actions';
@@ -7,7 +8,6 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import type { Role } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import {useTheme} from "@mui/material/styles";
 
 interface GroupManageRolesProps {
   initialState: string[];
