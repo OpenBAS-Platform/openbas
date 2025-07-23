@@ -5839,6 +5839,8 @@ export interface WidgetLayout {
 export interface Role {
   role_id: string;
   role_name: string;
+  role_created_at: string;
+  role_updated_at: string;
   role_description?: string;
   role_capabilities: string[];
 }

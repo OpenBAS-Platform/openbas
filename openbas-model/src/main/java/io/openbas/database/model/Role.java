@@ -42,12 +42,14 @@ public class Role implements Base {
   @Column(name = "capability")
   private Set<Capability> capabilities = new HashSet<>();
 
+  @Queryable(sortable = true)
   @Column(name = "role_created_at")
   @JsonProperty("role_created_at")
   @NotNull
   @Schema(description = "Creation date of the role", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
+  @Queryable(sortable = true)
   @Column(name = "role_updated_at")
   @JsonProperty("role_updated_at")
   @NotNull
