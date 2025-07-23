@@ -2536,7 +2536,10 @@ export interface InjectExecutionInput {
     | "file_execution"
     | "file_drop"
     | "complete";
-  /** @format int32 */
+  /**
+   * Duration of the execution in miliseconds
+   * @format int32
+   */
   execution_duration?: number;
   execution_message: string;
   execution_output_raw?: string;

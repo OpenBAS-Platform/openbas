@@ -3,6 +3,7 @@ package io.openbas.rest.inject.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -24,6 +25,7 @@ public class InjectExecutionInput {
   @JsonProperty("execution_status")
   private String status;
 
+  @Schema(description = "Duration of the execution in miliseconds")
   @JsonProperty("execution_duration")
   private int duration;
 
