@@ -1,6 +1,6 @@
 import { HelpOutlineOutlined, SecurityOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, type FC, type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { useMemo } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -31,12 +31,12 @@ const inlineStyles: Record<string, CSSProperties> = {
   role_updated_at: { width: '25%' },
 };
 
-const RolesList: FC<RolesListProps> = ({
+const RolesList = ({
   roles,
   queryableHelpers,
   loading,
   secondaryAction,
-}) => {
+}: RolesListProps) => {
   const { t, nsdt } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
