@@ -31,3 +31,5 @@ export enum ExpectationType {
   VULNERABILITY = 'VULNERABILITY',
   MANUAL = 'MANUAL',
 }
+
+export const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];

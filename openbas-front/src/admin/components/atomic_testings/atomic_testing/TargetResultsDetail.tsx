@@ -23,7 +23,7 @@ import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAu
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { isNotEmptyField } from '../../../../utils/utils';
-import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+import { type InjectExpectationsStore, sortOrder } from '../../common/injects/expectations/Expectation';
 import {
   HUMAN_EXPECTATION,
   isManualExpectation,
@@ -158,7 +158,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     type: '',
     key: 'attack-ended',
   }];
-  const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',

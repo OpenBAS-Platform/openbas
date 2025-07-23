@@ -95,26 +95,29 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     }
     return 'SUCCESS';
   };
-  const aggregatedPrevention = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'PREVENTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedDetection = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'DETECTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedHumanResponse = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'HUMAN_RESPONSE').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedResults: ExpectationResultsByType[] = [
-    {
-      type: 'PREVENTION',
-      avgResult: lowestSelector(aggregatedPrevention),
+
+  type ExpectationType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | 'VULNERABILITY';
+  const expectationTypes: ExpectationType [] = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE', 'VULNERABILITY'];
+
+  const buildAggregate = (type: ExpectationType): ExpectationResultsByType | null => {
+    const filtered = results
+      .map(r => r.results?.filter(er => er.type === type).map(er => er.avgResult))
+      .flat()
+      .filter(Boolean);
+
+    if (filtered.length === 0) return null;
+
+    return {
+      type,
+      avgResult: lowestSelector(filtered),
       distribution: [],
-    },
-    {
-      type: 'DETECTION',
-      avgResult: lowestSelector(aggregatedDetection),
-      distribution: [],
-    },
-    {
-      type: 'HUMAN_RESPONSE',
-      avgResult: lowestSelector(aggregatedHumanResponse),
-      distribution: [],
-    },
-  ];
+    };
+  };
+
+  const aggregatedResults: ExpectationResultsByType[] = expectationTypes
+    .map(buildAggregate)
+    .filter((agg): agg is ExpectationResultsByType => agg !== null);
+
   return (
     <>
       <Button

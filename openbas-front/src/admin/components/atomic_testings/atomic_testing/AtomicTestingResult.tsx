@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { type ExpectationResultsByType, type InjectResultOutput } from '../../../../utils/api-types';
+import { sortOrder } from '../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles()(() => ({
   inline: {
@@ -39,7 +40,11 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
 
   return (
     <div className={classes.inline} id={`inject_expectations_${injectId}`}>
-      {expectations.map((expectation, index) => {
+      {expectations.sort((a, b) => {
+        const typeAIndex = sortOrder.indexOf(a.type);
+        const typeBIndex = sortOrder.indexOf(b.type);
+        return typeAIndex - typeBIndex;
+      }).map((expectation, index) => {
         const color = getColor(expectation.avgResult);
         let IconComponent;
         let tooltipLabel = '';
