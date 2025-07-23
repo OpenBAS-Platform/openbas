@@ -4,8 +4,11 @@ import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.rest.channel.ChannelHelper.enrichArticleWithVirtualPublication;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.ArticleSpecification;
@@ -30,6 +33,10 @@ public class ScenarioArticleApi extends RestBehavior {
 
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(readOnly = true)
   public Iterable<ArticleOutput> scenarioArticles(@PathVariable @NotBlank final String scenarioId) {
     List<Inject> injects =

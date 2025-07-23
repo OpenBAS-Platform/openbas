@@ -3,6 +3,9 @@ package io.openbas.opencti;
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +45,10 @@ public class OpenCTIApi {
       })
   @LogExecutionTime
   @GetMapping(OPENCTI_URI + "/exercises/latest/{externalReferenceId}")
+  @RBAC(
+      resourceId = "#externalReferenceId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public ExerciseSimple latestExerciseByExternalReference(
       @PathVariable @NotBlank final String externalReferenceId) {
     return scenarioService.latestExerciseByExternalReference(externalReferenceId);

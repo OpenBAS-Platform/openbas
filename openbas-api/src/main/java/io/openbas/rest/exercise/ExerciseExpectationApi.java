@@ -1,7 +1,10 @@
 package io.openbas.rest.exercise;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ExerciseExpectationService;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +23,10 @@ public class ExerciseExpectationApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(value = "/api/exercises/{exerciseId}/expectations")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectation> exerciseInjectExpectations(
       @PathVariable @NotBlank final String exerciseId) {

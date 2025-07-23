@@ -4,9 +4,8 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.DatabaseHelper.resolveRelation;
 import static java.time.Instant.now;
 
-import io.openbas.database.model.Evaluation;
-import io.openbas.database.model.Objective;
-import io.openbas.database.model.Scenario;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.EvaluationRepository;
 import io.openbas.database.repository.ObjectiveRepository;
 import io.openbas.database.repository.ScenarioRepository;
@@ -36,12 +35,20 @@ public class ScenarioObjectiveApi extends RestBehavior {
 
   // region objectives
   @GetMapping(SCENARIO_URI + "{scenarioId}/objectives")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Objective> getMainObjectives(@PathVariable String scenarioId) {
     return objectiveRepository.findAll(ObjectiveSpecification.fromScenario(scenarioId));
   }
 
   @PostMapping(SCENARIO_URI + "{scenarioId}/objectives")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
@@ -55,6 +62,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Objective updateObjective(
       @PathVariable String scenarioId,
@@ -67,6 +78,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteObjective(@PathVariable String scenarioId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
@@ -76,6 +91,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
 
   // region evaluations
   @GetMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Evaluation getEvaluation(
       @PathVariable String scenarioId, @PathVariable String evaluationId) {
@@ -83,6 +102,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}/evaluations")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Evaluation> getEvaluations(
       @PathVariable String scenarioId, @PathVariable String objectiveId) {
@@ -90,6 +113,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}/evaluations")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
@@ -115,6 +142,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @PutMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Evaluation updateEvaluation(
       @PathVariable String scenarioId,
@@ -137,6 +168,10 @@ public class ScenarioObjectiveApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "{scenarioId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteEvaluation(@PathVariable String scenarioId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);

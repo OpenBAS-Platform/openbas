@@ -2,7 +2,10 @@ package io.openbas.rest.settings;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
+import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
@@ -45,6 +48,7 @@ public class PlatformSettingsApi extends RestBehavior {
   }
 
   @GetMapping()
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of settings")})
   @Operation(summary = "List settings", description = "Return the settings")
   public PlatformSettings settings() {
@@ -53,6 +57,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping()
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update settings", description = "Update the settings")
   public PlatformSettings updateBasicConfigurationSettings(
@@ -62,6 +67,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/enterprise-edition")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "The updated settings"),
@@ -75,6 +81,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/platform_whitemark")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update Whitemark settings", description = "Update the whitemark settings")
   public PlatformSettings updateSettingsPlatformWhitemark(
@@ -84,6 +91,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/theme/light")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(
       summary = "Update light theme settings",
@@ -94,6 +102,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/theme/dark")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update dark theme settings", description = "Update the dark theme settings")
   public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
@@ -102,6 +111,7 @@ public class PlatformSettingsApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/policies")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update policies settings", description = "Update the policies settings")
   public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {

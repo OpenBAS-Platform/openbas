@@ -22,7 +22,12 @@ public enum ResourceType {
   PLATFORM_SETTING,
   LESSON_LEARNED,
   CHALLENGE,
-  UNKNOWN;
+  INJECT,
+
+  // Special resource types
+  UNKNOWN,
+  SIMULATION_OR_SCENARIO, // Used to represent either a simulation or a scenario.
+  SKIP_RBAC; // Used to skip RBAC checks.
 
   public static ResourceType fromString(@NotNull String name) {
     try {
