@@ -72,7 +72,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const [exportation, setExportation] = useState(false);
   const handleOpenExport = () => setExportation(true);
   const handleCloseExport = () => setExportation(false);
-  const submitExport = (exportTeams: boolean, exportPlayers: boolean, exportVariableValues: boolean) => {
+  const submitExport = (exportPlayers: boolean, exportTeams: boolean, exportVariableValues: boolean) => {
     const link = document.createElement('a');
     link.href = exportScenarioUri(scenario.scenario_id, exportTeams, exportPlayers, exportVariableValues);
     link.click();
