@@ -6,7 +6,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.service.targets.search.specifications.SearchSpecificationUtils;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
@@ -23,18 +22,20 @@ import org.springframework.stereotype.Component;
 public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
 
   private final AgentRepository agentRepository;
-  private final InjectExpectationService injectExpectationService;
   private final SearchSpecificationUtils<Agent> specificationUtils;
+  private final HelperTargetSearchAdaptor helperTargetSearchAdaptor;
 
   private final List<String> joinPath = List.of("assets", "agents");
 
   public AgentTargetSearchAdaptor(
       AgentRepository agentRepository,
       InjectExpectationService injectExpectationService,
-      SearchSpecificationUtils<Agent> specificationUtils) {
+      SearchSpecificationUtils<Agent> specificationUtils,
+      HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.agentRepository = agentRepository;
-    this.injectExpectationService = injectExpectationService;
+    this.helperTargetSearchAdaptor = helperTargetSearchAdaptor;
     this.specificationUtils = specificationUtils;
+
     // field name translations
     this.fieldTranslations.put("target_name", "agent_executed_by_user");
     this.fieldTranslations.put("target_endpoint", "agent_asset");
@@ -100,28 +101,15 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   private InjectTarget convertFromAgent(Agent agent, Inject inject) {
-    InjectTarget target =
-        new AgentTarget(
-            agent.getId(),
-            agent.getTargetDisplayName(),
-            Set.of(),
-            agent.getAsset().getId(),
-            agent.getExecutor().getType());
-
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
-      switch (result.type()) {
-        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
-        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
-        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
-        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
-      }
-    }
-
-    return target;
+    return helperTargetSearchAdaptor.buildTargetWithExpectations(
+        inject,
+        () ->
+            new AgentTarget(
+                agent.getId(),
+                agent.getTargetDisplayName(),
+                Set.of(),
+                agent.getAsset().getId(),
+                agent.getExecutor().getType()),
+        true);
   }
 }

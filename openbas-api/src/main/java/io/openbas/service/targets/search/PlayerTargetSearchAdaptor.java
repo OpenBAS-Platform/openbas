@@ -4,8 +4,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.InjectExpectationService;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
@@ -21,13 +19,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PlayerTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final UserRepository userRepository;
-  private final InjectExpectationService injectExpectationService;
+  private final HelperTargetSearchAdaptor helperTargetSearchAdaptor;
 
   public PlayerTargetSearchAdaptor(
-      UserRepository userRepository, InjectExpectationService injectExpectationService) {
+      UserRepository userRepository, HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.userRepository = userRepository;
-    this.injectExpectationService = injectExpectationService;
+    this.helperTargetSearchAdaptor = helperTargetSearchAdaptor;
 
     // field name translations
     this.fieldTranslations.put("target_tags", "user_tags");
@@ -94,26 +93,14 @@ public class PlayerTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   private InjectTarget convertFromPlayerOutput(User player, Inject inject) {
-    PlayerTarget target =
-        new PlayerTarget(
-            player.getId(),
-            player.getNameOrEmail(),
-            player.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
-            player.getTeams().stream().map(Team::getId).collect(Collectors.toSet()));
-
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
-      switch (result.type()) {
-        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
-        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
-        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
-      }
-    }
-
-    return target;
+    return helperTargetSearchAdaptor.buildTargetWithExpectations(
+        inject,
+        () ->
+            new PlayerTarget(
+                player.getId(),
+                player.getNameOrEmail(),
+                player.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+                player.getTeams().stream().map(Team::getId).collect(Collectors.toSet())),
+        false);
   }
 }
