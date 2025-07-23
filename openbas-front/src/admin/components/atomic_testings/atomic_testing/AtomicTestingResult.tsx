@@ -1,5 +1,6 @@
 import { BugReportOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -22,6 +23,7 @@ interface Props {
 
 const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId }) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
@@ -74,7 +76,7 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
             <IconComponent
               style={{
                 color,
-                marginRight: 10,
+                marginRight: theme.spacing(1),
                 fontSize: 22,
               }}
             />
