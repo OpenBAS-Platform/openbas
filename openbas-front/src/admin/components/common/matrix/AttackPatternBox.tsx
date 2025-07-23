@@ -97,7 +97,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   };
 
   type ExpectationType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | 'VULNERABILITY';
-  const expectationTypes: ExpectationType [] = ['PREVENTION', 'DETECTION', 'HUMAN_RESPONSE', 'VULNERABILITY'];
+  const expectationTypes: ExpectationType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
 
   const buildAggregate = (type: ExpectationType): ExpectationResultsByType | null => {
     const filtered = results
