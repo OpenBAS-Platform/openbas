@@ -1813,7 +1813,7 @@ export interface EvaluationInput {
 }
 
 export interface Executable {
-  executable_file: string;
+  executable_file?: string;
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
