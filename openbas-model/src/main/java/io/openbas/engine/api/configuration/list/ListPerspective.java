@@ -1,5 +1,6 @@
 package io.openbas.engine.api.configuration.list;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.Filters;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class ListPerspective {
   private Filters.FilterGroup filter = new Filters.FilterGroup();
   private List<Join<ListPerspective>> joins = new ArrayList<>();
 
+  @JsonIgnore
   public String getEntityName() {
     Optional<Filters.Filter> entityFilter = filter.getFilters().stream().filter(f -> "base_entity".equals(f.getKey())).findAny();
     if (entityFilter.isPresent()) {
