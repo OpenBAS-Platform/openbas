@@ -4,6 +4,9 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.cve.form.*;
 import io.openbas.rest.cve.service.CveService;
 import io.openbas.rest.helper.RestBehavior;
@@ -33,12 +36,17 @@ public class CveApi extends RestBehavior {
   @LogExecutionTime
   @Operation(summary = "Search CVEs")
   @PostMapping(CVE_API + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
   public Page<CveSimple> searchCves(@Valid @RequestBody SearchPaginationInput input) {
     return cveService.searchCves(input).map(cveMapper::toCveSimple);
   }
 
   @Operation(summary = "Get a CVE by ID", description = "Fetches detailed CVE info by ID")
   @GetMapping(CVE_API + "/{cveId}")
+  @RBAC(
+      resourceId = "#cveId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public CveOutput getCve(@PathVariable String cveId) {
     return cveMapper.toCveOutput(cveService.findById(cveId));
   }
@@ -47,6 +55,10 @@ public class CveApi extends RestBehavior {
       summary = "Get a CVE by external ID",
       description = "Fetches detailed CVE info by external CVE ID")
   @GetMapping(CVE_API + "/external-id/{externalId}")
+  @RBAC(
+      resourceId = "#externalId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public CveOutput getCvebyExternalId(@PathVariable String externalId) {
     return cveMapper.toCveOutput(cveService.findByExternalId(externalId));
   }
@@ -54,6 +66,7 @@ public class CveApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @Operation(summary = "Create a new CVE")
   @PostMapping(CVE_API)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public CveSimple createCve(@Valid @RequestBody CveCreateInput input) {
     return cveMapper.toCveSimple(cveService.createCve(input));
@@ -63,6 +76,7 @@ public class CveApi extends RestBehavior {
   @Operation(summary = "Bulk insert CVEs")
   @LogExecutionTime
   @PostMapping(CVE_API + "/bulk")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   public void bulkInsertCVEsForCollector(@Valid @RequestBody @NotNull CVEBulkInsertInput input) {
     this.cveService.bulkUpsertCVEs(input);
   }
@@ -70,6 +84,10 @@ public class CveApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @Operation(summary = "Update an existing CVE")
   @PutMapping(CVE_API + "/{cveId}")
+  @RBAC(
+      resourceId = "#cveId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public CveSimple updateCve(@PathVariable String cveId, @Valid @RequestBody CveUpdateInput input) {
     return cveMapper.toCveSimple(cveService.updateCve(cveId, input));
@@ -78,6 +96,10 @@ public class CveApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @Operation(summary = "Delete a CVE")
   @DeleteMapping(CVE_API + "/{cveId}")
+  @RBAC(
+      resourceId = "#cveId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public void deleteCve(@PathVariable String cveId) {
     cveService.deleteById(cveId);

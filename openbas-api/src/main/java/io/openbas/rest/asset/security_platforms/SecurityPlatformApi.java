@@ -4,6 +4,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformInput;
@@ -36,11 +37,13 @@ public class SecurityPlatformApi {
   private final TagRepository tagRepository;
 
   @GetMapping(SECURITY_PLATFORM_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SECURITY_PLATFORM)
   public Iterable<SecurityPlatform> securityPlatforms() {
     return securityPlatformRepository.findAll();
   }
 
   @PostMapping(SECURITY_PLATFORM_URI)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public SecurityPlatform createSecurityPlatform(
@@ -63,6 +66,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI + "/upsert")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public SecurityPlatform upsertSecurityPlatform(
@@ -110,6 +114,10 @@ public class SecurityPlatformApi {
   }
 
   @GetMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   public SecurityPlatform securityPlatform(
       @PathVariable @NotBlank final String securityPlatformId) {
@@ -119,6 +127,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SECURITY_PLATFORM)
   public Page<SecurityPlatform> securityPlatforms(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -126,6 +135,10 @@ public class SecurityPlatformApi {
   }
 
   @PutMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public SecurityPlatform updateSecurityPlatform(
@@ -149,6 +162,10 @@ public class SecurityPlatformApi {
   }
 
   @DeleteMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public void deleteSecurityPlatform(@PathVariable @NotBlank final String securityPlatformId) {

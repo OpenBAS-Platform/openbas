@@ -2,6 +2,7 @@ package io.openbas.schema;
 
 import static io.openbas.schema.SchemaUtils.isValidClassName;
 
+import io.openbas.aop.RBAC;
 import io.openbas.engine.EngineContext;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
@@ -21,6 +22,7 @@ public class SchemaApi extends RestBehavior {
   private final EngineContext engineContext;
 
   @PostMapping("/api/schemas/{className}")
+  @RBAC(skipRBAC = true)
   public List<PropertySchemaDTO> schemas(
       @PathVariable @NotNull final String className,
       @RequestParam final boolean filterableOnly,
@@ -44,6 +46,7 @@ public class SchemaApi extends RestBehavior {
   }
 
   @GetMapping("/api/engine/schemas")
+  @RBAC(skipRBAC = true)
   public Set<PropertySchemaDTO> engineSchemas(
       @RequestParam(name = "classNames", required = false) List<String> classNames) {
     return engineContext.getModels().stream()

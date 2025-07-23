@@ -3,6 +3,9 @@ package io.openbas.rest.role;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.role.form.RoleInput;
 import io.openbas.rest.role.form.RoleMapper;
@@ -40,6 +43,10 @@ public class RoleApi {
 
   @LogExecutionTime
   @GetMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Operation(description = "Get Role by Id", summary = "Get Role")
   @ApiResponses(
       value = {
@@ -56,6 +63,7 @@ public class RoleApi {
 
   @LogExecutionTime
   @GetMapping(RoleApi.ROLE_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   @Operation(description = "Get All Roles", summary = "Get Roles")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of all Roles")})
   public List<RoleOutput> roles() {
@@ -65,6 +73,10 @@ public class RoleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Delete Role", description = "Role needs to exists")
   @ApiResponses(
@@ -80,6 +92,7 @@ public class RoleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create Role")
   @ApiResponses(
@@ -95,6 +108,10 @@ public class RoleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Update Role", description = "Role needs to exists")
   @ApiResponses(
@@ -111,6 +128,7 @@ public class RoleApi {
 
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
   @Operation(
       description = "Search Roles corresponding to search criteria",
       summary = "Search Roles")

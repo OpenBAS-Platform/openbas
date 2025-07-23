@@ -6,8 +6,11 @@ import static io.openbas.utils.InjectExpectationResultUtils.getExpectationResult
 import static java.util.stream.Collectors.groupingBy;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.raw.impl.SimpleRawInjectExpectation;
@@ -54,6 +57,7 @@ public class StatisticApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/api/statistics")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DASHBOARD)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Retrieve platform statistics")
   @ApiResponse(
