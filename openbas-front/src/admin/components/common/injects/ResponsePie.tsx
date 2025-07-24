@@ -1,7 +1,7 @@
 import { BugReportOutlined, InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Button, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { type FunctionComponent, memo, useCallback, useMemo } from 'react';
+import { type FunctionComponent, memo, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
