@@ -11,9 +11,12 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-interface Props { onClick: () => void }
+interface Props {
+  onClick: () => void;
+  style?: React.CSSProperties;
+}
 
-const ButtonCreate: FunctionComponent<Props> = ({ onClick }) => {
+const ButtonCreate: FunctionComponent<Props> = ({ onClick, style }) => {
   // Standard hooks
   const { classes } = useStyles();
 
@@ -23,6 +26,7 @@ const ButtonCreate: FunctionComponent<Props> = ({ onClick }) => {
       color="primary"
       aria-label="Add"
       className={classes.createButton}
+      style={style}
     >
       <Add />
     </Fab>
