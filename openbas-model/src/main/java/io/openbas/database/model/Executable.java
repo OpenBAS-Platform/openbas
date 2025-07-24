@@ -7,9 +7,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import java.util.Optional;
-
 import jakarta.validation.constraints.NotNull;
+import java.util.Optional;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
