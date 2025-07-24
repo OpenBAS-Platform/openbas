@@ -79,9 +79,7 @@ class ScenarioStatisticServiceTest {
             DETECTION,
             List.of(
                 new GlobalScoreBySimulationEndDate(exercise2EndDate, 0),
-                new GlobalScoreBySimulationEndDate(exercise1EndDate, 100)),
-            HUMAN_RESPONSE,
-            List.of());
+                new GlobalScoreBySimulationEndDate(exercise1EndDate, 100)));
     assertEquals(expected, result.simulationsResultsLatest().globalScoresByExpectationType());
   }
 }
