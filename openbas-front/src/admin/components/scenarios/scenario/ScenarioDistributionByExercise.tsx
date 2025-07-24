@@ -103,25 +103,18 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({ scenarioId }
   const globalScoresByExpectationType = preventionData && preventionData.length > 0 ? statistic?.simulations_results_latest.global_scores_by_expectation_type : generateFakeData();
   const isStatisticsDataEmpty = preventionData && preventionData.length === 0;
 
-  const labelMap: Record<string, string> = {
-    PREVENTION: t('Blocked'),
-    DETECTION: t('Detected'),
-    VULNERABILITY: t('Not vulnerable'),
-    HUMAN_RESPONSE: t('Successful'),
-  };
+  const EXPECTATION_TYPES = [
+    ['PREVENTION', 'Prevention', 'Blocked'],
+    ['DETECTION', 'Detection', 'Detected'],
+    ['VULNERABILITY', 'Vulnerability', 'Not vulnerable'],
+    ['HUMAN_RESPONSE', 'Human Response', 'Successful'],
+  ] as const;
 
-  const nameMap: Record<string, string> = {
-    PREVENTION: t('Prevention'),
-    DETECTION: t('Detection'),
-    VULNERABILITY: t('Vulnerability'),
-    HUMAN_RESPONSE: t('Human Response'),
-  };
-
-  const series = Object.entries(globalScoresByExpectationType)
-    .filter(([, data]) => data && data.length > 0)
-    .map(([expectationType, data]) => ({
-      name: nameMap[expectationType] ?? expectationType,
-      data: generateSeriesData(data, labelMap[expectationType] ?? ''),
+  const series = EXPECTATION_TYPES
+    .filter(([type]) => globalScoresByExpectationType[type]?.length > 0)
+    .map(([type, name, label]) => ({
+      name: t(name),
+      data: generateSeriesData(globalScoresByExpectationType[type], t(label)),
     }));
 
   return (

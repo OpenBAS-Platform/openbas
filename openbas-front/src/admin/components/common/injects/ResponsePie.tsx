@@ -63,13 +63,6 @@ const ResponsePie: FunctionComponent<Props> = ({
     }, {} as Record<string, ExpectationResultsByType>);
   }, [expectationResultsByTypes]);
 
-  const expectationLabels: Record<string, string> = {
-    PREVENTION: t('TYPE_PREVENTION'),
-    DETECTION: t('TYPE_DETECTION'),
-    VULNERABILITY: t('TYPE_VULNERABILITY'),
-    HUMAN_RESPONSE: t('TYPE_HUMAN_RESPONSE'),
-  };
-
   const humanResponse = expectationResultsMap['HUMAN_RESPONSE'];
   const pending = useMemo(() => humanResponse?.distribution?.filter(res => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [], [humanResponse]);
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
@@ -133,7 +126,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   const pieTitle = (title: string, expectationResultsByType?: ExpectationResultsByType) => {
     const hasDistribution = expectationResultsByType?.distribution && expectationResultsByType?.distribution.length > 0;
     return (
-      <span
+      <div
         style={{
           ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
           fontWeight: 300,
@@ -141,7 +134,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         }}
       >
         {title}
-      </span>
+      </div>
     );
   };
 
@@ -154,42 +147,34 @@ const ResponsePie: FunctionComponent<Props> = ({
         width: '100%',
       }}
     >
-      {definedTypes.sort((a, b) => {
-        const typeAIndex = sortOrder.indexOf(a);
-        const typeBIndex = sortOrder.indexOf(b);
-        return typeAIndex - typeBIndex;
-      }).map(type => (
-        <Pie
-          key={type}
-          type={type.toLowerCase()}
-          title={expectationLabels[type]}
-          expectationResultsByType={expectationResultsMap[type]}
-        />
-      ))}
+      {definedTypes
+        .sort((a, b) => sortOrder.indexOf(a) - sortOrder.indexOf(b))
+        .map(type => (
+          <div key={type}>
+            <Pie
+              type={type.toLowerCase()}
+              title={t(type)}
+              expectationResultsByType={expectationResultsMap[type]}
+            />
+            {hasTitles && pieTitle(t(type))}
 
-      {hasTitles
-        && definedTypes.map(type => (
-          <React.Fragment key={`${type}_title`}>
-            {pieTitle(expectationLabels[type])}
-          </React.Fragment>
+            {displayHumanValidationBtn && type === 'HUMAN_RESPONSE' && (
+              <Button
+                startIcon={<InfoOutlined />}
+                color="primary"
+                component={Link}
+                to={humanValidationLink}
+                style={{
+                  textAlign: 'center',
+                  fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
+                  width: '100%',
+                }}
+              >
+                {`${pending.length} ${t('validations needed')}`}
+              </Button>
+            )}
+          </div>
         ))}
-
-      {displayHumanValidationBtn && (
-        <Button
-          startIcon={<InfoOutlined />}
-          color="primary"
-          component={Link}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${definedTypes.length}, minmax(25%, 1fr))`,
-            textAlign: 'center',
-            fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
-          }}
-          to={humanValidationLink}
-        >
-          {`${pending.length} ${t('validations needed')}`}
-        </Button>
-      )}
     </div>
   );
 };
