@@ -4,6 +4,7 @@ import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTEN
 import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInjectExpectation;
@@ -34,9 +35,27 @@ public class InjectExpectationMapper {
       return expectationResultByTypes;
     }
 
-    JsonNode contentNode = inject.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
+    return buildExpectationResultsFromInjectContent(inject.getContent());
+  }
+
+  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
+      Map<String, List<RawInjectExpectation>> expectationMap, InjectResultOutput inject) {
+    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
+        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+            expectationMap.getOrDefault(inject.getId(), emptyList()));
+
+    if (!expectationResultByTypesFromRaw.isEmpty()) {
+      return expectationResultByTypesFromRaw;
+    }
+
+    return buildExpectationResultsFromInjectContent(inject.getContent());
+  }
+
+  private static List<AtomicTestingUtils.ExpectationResultsByType>
+      buildExpectationResultsFromInjectContent(ObjectNode injectContent) {
+    JsonNode contentNode = injectContent.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
     if (contentNode == null || !contentNode.isArray()) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     Set<ExpectationType> uniqueTypes = new HashSet<>();
@@ -80,41 +99,5 @@ public class InjectExpectationMapper {
                 .collect(Collectors.toList()))
         .attackPattern(attackPattern)
         .build();
-  }
-
-  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      Map<String, List<RawInjectExpectation>> expectationMap, InjectResultOutput inject) {
-    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-            expectationMap.getOrDefault(inject.getId(), emptyList()));
-
-    if (!expectationResultByTypesFromRaw.isEmpty()) {
-      return expectationResultByTypesFromRaw;
-    }
-
-    JsonNode contentNode = inject.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
-    if (contentNode == null || !contentNode.isArray()) {
-      return Collections.emptyList();
-    }
-
-    Set<ExpectationType> uniqueTypes = new HashSet<>();
-    for (JsonNode expectationNode : contentNode) {
-      JsonNode typeNode = expectationNode.get(NODE_EXPECTATION_TYPE);
-      if (typeNode != null && typeNode.isTextual()) {
-        try {
-          ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
-          uniqueTypes.add(type);
-        } catch (IllegalArgumentException e) {
-        }
-      }
-    }
-
-    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
-    for (ExpectationType type : uniqueTypes) {
-      AtomicTestingUtils.getExpectationByType(type, Collections.emptyList())
-          .ifPresent(fallbackResults::add);
-    }
-
-    return fallbackResults;
   }
 }
