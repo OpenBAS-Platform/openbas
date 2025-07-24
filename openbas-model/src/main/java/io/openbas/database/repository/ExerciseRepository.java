@@ -304,7 +304,7 @@ public interface ExerciseRepository
 
   @Query(
       value =
-          " SELECT ex.exercise_end_date, "
+          " SELECT ex.exercise_id, ex.exercise_end_date, "
               + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids "
               + "FROM exercises ex "
               + "LEFT JOIN scenarios_exercises s ON s.exercise_id = ex.exercise_id "
