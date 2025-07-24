@@ -28,6 +28,7 @@ const generateFakeData = (): Record<string, GlobalScoreBySimulationEndDate[]> =>
   return ({
     ...({ PREVENTION: generateFakeDataFromDates(dates, 69.0) }),
     ...({ DETECTION: generateFakeDataFromDates(dates, 84.0) }),
+    ...({ VULNERABILITY: generateFakeDataFromDates(dates, 84.0) }),
     ...({ HUMAN_RESPONSE: generateFakeDataFromDates(dates, 46.0) }),
   });
 };
@@ -102,20 +103,26 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({ scenarioId }
   const globalScoresByExpectationType = preventionData && preventionData.length > 0 ? statistic?.simulations_results_latest.global_scores_by_expectation_type : generateFakeData();
   const isStatisticsDataEmpty = preventionData && preventionData.length === 0;
 
-  const series = [
-    {
-      name: t('Prevention'),
-      data: generateSeriesData(globalScoresByExpectationType['PREVENTION'], t('Blocked')),
-    },
-    {
-      name: t('Detection'),
-      data: generateSeriesData(globalScoresByExpectationType['DETECTION'], t('Detected')),
-    },
-    {
-      name: t('Human Response'),
-      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE'], t('Successful')),
-    },
-  ];
+  const labelMap: Record<string, string> = {
+    PREVENTION: t('Blocked'),
+    DETECTION: t('Detected'),
+    VULNERABILITY: t('Not vulnerable'),
+    HUMAN_RESPONSE: t('Successful'),
+  };
+
+  const nameMap: Record<string, string> = {
+    PREVENTION: t('Prevention'),
+    DETECTION: t('Detection'),
+    VULNERABILITY: t('Vulnerability'),
+    HUMAN_RESPONSE: t('Human Response'),
+  };
+
+  const series = Object.entries(globalScoresByExpectationType)
+    .filter(([, data]) => data && data.length > 0)
+    .map(([expectationType, data]) => ({
+      name: nameMap[expectationType] ?? expectationType,
+      data: generateSeriesData(data, labelMap[expectationType] ?? ''),
+    }));
 
   return (
     <>
