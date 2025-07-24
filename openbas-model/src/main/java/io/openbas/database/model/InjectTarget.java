@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
@@ -9,8 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Set;
 import lombok.Data;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 @Schema(

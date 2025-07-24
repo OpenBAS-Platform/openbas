@@ -537,10 +537,13 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectationResultsByAttackPattern> injectResults(
       @NotBlank final @PathVariable String exerciseId) {
-    return exerciseRepository
-        .findById(exerciseId)
-        .map(exercise -> resultUtils.computeInjectExpectationResults(exercise.getInjects()))
-        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
+    Exercise exercise =
+        exerciseRepository
+            .findById(exerciseId)
+            .orElseThrow(
+                () -> new ElementNotFoundException("Exercise not found with ID: " + exerciseId));
+
+    return resultUtils.computeInjectExpectationResults(exercise.getInjects());
   }
 
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/{documentId}")
