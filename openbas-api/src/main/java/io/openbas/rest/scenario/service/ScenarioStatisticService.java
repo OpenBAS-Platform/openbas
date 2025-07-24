@@ -44,20 +44,20 @@ public class ScenarioStatisticService {
 
   private Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>
       getGlobalScoresByExpectationTypes(List<FinishedExerciseWithInjects> finishedExercises) {
+
     List<ExpectationTypeAndGlobalScore> allGlobalScores = getAllGlobalScores(finishedExercises);
 
-    List<GlobalScoreBySimulationEndDate> preventionGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.PREVENTION);
-    List<GlobalScoreBySimulationEndDate> detectionGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.DETECTION);
-    List<GlobalScoreBySimulationEndDate> humanResponseGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.HUMAN_RESPONSE);
+    Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> result = new HashMap<>();
 
-    return new HashMap<>(
-        Map.of(
-            ExpectationType.PREVENTION, preventionGlobalScores,
-            ExpectationType.DETECTION, detectionGlobalScores,
-            ExpectationType.HUMAN_RESPONSE, humanResponseGlobalScores));
+    for (ExpectationType type : ExpectationType.values()) {
+      List<GlobalScoreBySimulationEndDate> scores =
+          getGlobalScoresForExpectationType(allGlobalScores, type);
+      if (!scores.isEmpty()) {
+        result.put(type, scores);
+      }
+    }
+
+    return result;
   }
 
   private List<ExpectationTypeAndGlobalScore> getAllGlobalScores(
@@ -67,7 +67,9 @@ public class ScenarioStatisticService {
 
   private Stream<ExpectationTypeAndGlobalScore> getExpectationTypeAndGlobalScores(
       FinishedExerciseWithInjects finishedExercise) {
-    return resultUtils.getResultsByTypes(finishedExercise.injectIds()).stream()
+    return resultUtils
+        .getResultsByTypes(finishedExercise.exerciseId, finishedExercise.injectIds())
+        .stream()
         .map(
             expectationResultByType ->
                 getExpectationTypeAndGlobalScore(finishedExercise, expectationResultByType));
@@ -97,7 +99,9 @@ public class ScenarioStatisticService {
         .map(
             exercise ->
                 new FinishedExerciseWithInjects(
-                    exercise.getExercise_end_date(), exercise.getInject_ids()))
+                    exercise.getExercise_id(),
+                    exercise.getExercise_end_date(),
+                    exercise.getInject_ids()))
         .sorted(Collections.reverseOrder())
         .toList();
   }
@@ -138,7 +142,8 @@ public class ScenarioStatisticService {
         .reduce(0, Integer::sum);
   }
 
-  private record FinishedExerciseWithInjects(Instant endDate, Set<String> injectIds)
+  private record FinishedExerciseWithInjects(
+      String exerciseId, Instant endDate, Set<String> injectIds)
       implements Comparable<FinishedExerciseWithInjects> {
     @Override
     public int compareTo(FinishedExerciseWithInjects exercise) {

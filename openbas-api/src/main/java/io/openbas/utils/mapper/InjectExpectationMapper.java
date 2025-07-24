@@ -3,29 +3,42 @@ package io.openbas.utils.mapper;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
 import static java.util.Collections.emptyList;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectUtils;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class InjectExpectationMapper {
 
   public static final String NODE_EXPECTATION_TYPE = "expectation_type";
-  private final InjectUtils injectUtils;
 
+  private static final EnumSet<ExpectationType> ALL_EXPECTATION_TYPES =
+      EnumSet.allOf(ExpectationType.class);
+
+  private final InjectRepository injectRepository;
+  private final InjectUtils injectUtils;
+  private final ObjectMapper objectMapper = new ObjectMapper();
+
+  // -- INJECT
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
       Inject inject) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
@@ -72,8 +85,7 @@ public class InjectExpectationMapper {
 
     List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
     for (ExpectationType type : uniqueTypes) {
-      AtomicTestingUtils.getExpectationByType(type, Collections.emptyList())
-          .ifPresent(fallbackResults::add);
+      AtomicTestingUtils.getExpectationByType(type, emptyList()).ifPresent(fallbackResults::add);
     }
 
     return fallbackResults;
@@ -99,5 +111,57 @@ public class InjectExpectationMapper {
                 .collect(Collectors.toList()))
         .attackPattern(attackPattern)
         .build();
+  }
+
+  // -- EXERCISE --
+  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResultByTypesFromRaw(
+      String exerciseId, List<RawInjectExpectation> expectations) {
+    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
+        AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
+
+    if (!expectationResultByTypesFromRaw.isEmpty()) {
+      return expectationResultByTypesFromRaw;
+    }
+
+    return buildExpectationResultsFromInjectContents(exerciseId);
+  }
+
+  private List<AtomicTestingUtils.ExpectationResultsByType>
+      buildExpectationResultsFromInjectContents(@NotBlank String exerciseId) {
+
+    List<String> rawContents = injectRepository.findContentsByExerciseId(exerciseId);
+    Set<ExpectationType> foundTypes = new HashSet<>();
+
+    for (String contentJson : rawContents) {
+      try {
+        ObjectNode contentNode = (ObjectNode) objectMapper.readTree(contentJson);
+
+        List<AtomicTestingUtils.ExpectationResultsByType> results =
+            buildExpectationResultsFromInjectContent(contentNode);
+
+        for (AtomicTestingUtils.ExpectationResultsByType r : results) {
+          if (ALL_EXPECTATION_TYPES.contains(r.type())) {
+            foundTypes.add(r.type());
+            if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
+              break;
+            }
+          }
+        }
+
+        if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
+          break;
+        }
+
+      } catch (JsonProcessingException e) {
+        log.warn("Invalid JSON in inject content", e);
+      }
+    }
+
+    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
+    for (ExpectationType type : foundTypes) {
+      AtomicTestingUtils.getExpectationByType(type, emptyList()).ifPresent(fallbackResults::add);
+    }
+
+    return fallbackResults;
   }
 }

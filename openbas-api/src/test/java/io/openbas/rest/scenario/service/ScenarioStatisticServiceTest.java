@@ -44,6 +44,8 @@ class ScenarioStatisticServiceTest {
     String injectId2 = "1838c23d-3bbe-4d8e-ba40-aa8b5fd1614d";
     String injectId3 = "0f728b68-ec1f-4a5d-a2e5-53d897c7a7fd";
     String injectId4 = "92b0531d-b32f-4a22-9bfd-65c773c30e61";
+    String exerciseId1 = "3e95b1ea-8957-4452-b0f7-edf4003eaa98";
+    String exerciseId2 = "c740797e-e34c-4066-a16c-a8baad9058f9";
 
     Set<String> exercise1InjectIds = Set.of(injectId1, injectId2, injectId3);
     Set<String> exercise2InjectIds = Set.of(injectId4);
@@ -52,16 +54,18 @@ class ScenarioStatisticServiceTest {
     Instant exercise2EndDate = Instant.parse("2023-12-10T11:15:30.00Z");
 
     RawFinishedExerciseWithInjects rawFinishedExerciseWithInjects1 =
-        createDefaultRawFinishedExerciseWithInjects(exercise1EndDate, exercise1InjectIds);
+        createDefaultRawFinishedExerciseWithInjects(
+            exerciseId1, exercise1EndDate, exercise1InjectIds);
     RawFinishedExerciseWithInjects rawFinishedExerciseWithInjects2 =
-        createDefaultRawFinishedExerciseWithInjects(exercise2EndDate, exercise2InjectIds);
+        createDefaultRawFinishedExerciseWithInjects(
+            exerciseId2, exercise2EndDate, exercise2InjectIds);
 
     when(exerciseRepository.rawLatestFinishedExercisesWithInjectsByScenarioId(scenarioId))
         .thenReturn(List.of(rawFinishedExerciseWithInjects1, rawFinishedExerciseWithInjects2));
 
-    when(resultUtils.getResultsByTypes(exercise1InjectIds))
+    when(resultUtils.getResultsByTypes(exerciseId1, exercise1InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise1GlobalScores);
-    when(resultUtils.getResultsByTypes(exercise2InjectIds))
+    when(resultUtils.getResultsByTypes(exerciseId2, exercise2InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise2GlobalScores);
 
     ScenarioStatistic result = scenarioStatisticService.getStatistics(scenarioId);

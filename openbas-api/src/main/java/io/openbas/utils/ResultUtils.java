@@ -1,16 +1,19 @@
 package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
-import io.openbas.database.raw.*;
-import io.openbas.database.repository.*;
+import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import jakarta.validation.constraints.NotNull;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +26,19 @@ public class ResultUtils {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectExpectationMapper injectExpectationMapper;
 
-  public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
-    if (injectIds == null || injectIds.isEmpty()) {
-      return emptyList();
-    }
-    return computeGlobalExpectationResults(injectIds);
+  public List<ExpectationResultsByType> getResultsByTypes(
+      String exerciseId, Set<String> injectIds) {
+    return computeGlobalExpectationResults(exerciseId, injectIds);
   }
 
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
-      @NotNull Set<String> injectIds) {
-    return AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds));
+      String exerciseId, @NotNull Set<String> injectIds) {
+    Set<String> safeInjectIds = injectIds == null ? emptySet() : injectIds;
+    List<RawInjectExpectation> expectations =
+        safeInjectIds.isEmpty()
+            ? emptyList()
+            : injectExpectationRepository.rawForComputeGlobalByInjectIds(safeInjectIds);
+    return injectExpectationMapper.extractExpectationResultByTypesFromRaw(exerciseId, expectations);
   }
 
   public List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(

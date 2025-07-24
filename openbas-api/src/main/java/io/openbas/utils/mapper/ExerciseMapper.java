@@ -15,7 +15,6 @@ import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ public class ExerciseMapper {
 
   private final ResultUtils resultUtils;
   private final InjectMapper injectMapper;
+  private final InjectExpectationMapper injectExpectationMapper;
 
   // -- EXERCISE SIMPLE --
   public ExerciseSimple getExerciseSimple(RawExerciseSimple rawExercise) {
@@ -47,7 +47,7 @@ public class ExerciseMapper {
     if (rawExercise.getInject_ids() != null) {
       // -- GLOBAL SCORE ---
       simple.setExpectationResultByTypes(
-          resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
+          resultUtils.getResultsByTypes(rawExercise.getExercise_id(), rawExercise.getInject_ids()));
 
       // -- TARGETS --
       List<Object[]> teams =
@@ -120,8 +120,8 @@ public class ExerciseMapper {
     if (rawExercise.getInject_ids() != null) {
       // -- GLOBAL SCORE ---
       simple.setExpectationResultByTypes(
-          AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations));
-
+          injectExpectationMapper.extractExpectationResultByTypesFromRaw(
+              rawExercise.getExercise_id(), expectations));
       // -- TARGETS --
       List<TargetSimple> allTargets =
           Stream.concat(

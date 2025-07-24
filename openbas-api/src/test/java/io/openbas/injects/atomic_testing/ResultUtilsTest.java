@@ -41,6 +41,7 @@ class ResultUtilsTest {
   void getExercisesGlobalScores() {
     String injectId1 = "103da74a-055b-40e2-a934-9605cd3e4191";
     String injectId2 = "1838c23d-3bbe-4d8e-ba40-aa8b5fd1614d";
+    String exerciseId1 = "3e95b1ea-8957-4452-b0f7-edf4003eaa98";
 
     Set<String> injectIds = Set.of(injectId1, injectId2);
 
@@ -72,7 +73,7 @@ class ResultUtilsTest {
                 createDefaultInjectExpectation(
                     InjectExpectation.EXPECTATION_TYPE.MANUAL.toString(), 0.0, 100.0)));
 
-    var result = resultUtils.computeGlobalExpectationResults(injectIds);
+    var result = resultUtils.computeGlobalExpectationResults(exerciseId1, injectIds);
 
     ExpectationResultsByType expectedPreventionResult =
         createDefaultExpectationResultsByType(
