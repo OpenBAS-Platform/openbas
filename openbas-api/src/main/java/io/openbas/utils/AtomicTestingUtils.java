@@ -6,73 +6,65 @@ import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public class AtomicTestingUtils {
 
-  @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypesFromRaw(
       List<RawInjectExpectation> expectations) {
-
-    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
-
-    addIfRawScoresPresent(
-        resultAvgOfExpectations,
-        List.of(EXPECTATION_TYPE.PREVENTION),
-        ExpectationType.PREVENTION,
-        expectations);
-
-    addIfRawScoresPresent(
-        resultAvgOfExpectations,
-        List.of(EXPECTATION_TYPE.DETECTION),
-        ExpectationType.DETECTION,
-        expectations);
-
-    addIfRawScoresPresent(
-        resultAvgOfExpectations,
-        List.of(EXPECTATION_TYPE.VULNERABILITY),
-        ExpectationType.VULNERABILITY,
-        expectations);
-
-    addIfRawScoresPresent(
-        resultAvgOfExpectations,
-        List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
-        ExpectationType.HUMAN_RESPONSE,
-        expectations);
-
-    return resultAvgOfExpectations;
+    return computeExpectationResults(expectations, AtomicTestingUtils::getScoresFromRaw);
   }
 
-  @NotNull
   public static List<ExpectationResultsByType> getExpectationResultByTypes(
-      final List<InjectExpectation> expectations) {
+      List<InjectExpectation> expectations) {
+    return computeExpectationResults(expectations, AtomicTestingUtils::getScores);
+  }
 
-    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
+  private static <T> List<ExpectationResultsByType> computeExpectationResults(
+      List<T> expectations,
+      BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
+
+    List<ExpectationResultsByType> result = new ArrayList<>();
 
     addIfScoresPresent(
-        resultAvgOfExpectations,
+        result,
         List.of(EXPECTATION_TYPE.PREVENTION),
         ExpectationType.PREVENTION,
-        expectations);
-
+        expectations,
+        scoreExtractor);
     addIfScoresPresent(
-        resultAvgOfExpectations,
+        result,
         List.of(EXPECTATION_TYPE.DETECTION),
         ExpectationType.DETECTION,
-        expectations);
-
+        expectations,
+        scoreExtractor);
     addIfScoresPresent(
-        resultAvgOfExpectations,
+        result,
         List.of(EXPECTATION_TYPE.VULNERABILITY),
         ExpectationType.VULNERABILITY,
-        expectations);
-
+        expectations,
+        scoreExtractor);
     addIfScoresPresent(
-        resultAvgOfExpectations,
+        result,
         List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
         ExpectationType.HUMAN_RESPONSE,
-        expectations);
+        expectations,
+        scoreExtractor);
 
-    return resultAvgOfExpectations;
+    return result;
+  }
+
+  private static <T> void addIfScoresPresent(
+      List<ExpectationResultsByType> resultList,
+      List<EXPECTATION_TYPE> types,
+      ExpectationType resultType,
+      List<T> expectations,
+      BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
+
+    List<Double> scores = scoreExtractor.apply(types, expectations);
+    if (!scores.isEmpty()) {
+      getExpectationByType(resultType, scores).ifPresent(resultList::add);
+    }
   }
 
   // -- NORMALIZED SCORES --
@@ -180,28 +172,6 @@ public class AtomicTestingUtils {
         new ResultDistribution(ExpectationType.PENDING_ID, type.pendingLabel, (int) pendingCount),
         new ResultDistribution(ExpectationType.PARTIAL_ID, type.partialLabel, (int) partialCount),
         new ResultDistribution(ExpectationType.FAILED_ID, type.failureLabel, (int) failureCount));
-  }
-
-  private static void addIfScoresPresent(
-      List<ExpectationResultsByType> resultList,
-      List<EXPECTATION_TYPE> types,
-      ExpectationType resultType,
-      List<InjectExpectation> expectations) {
-    List<Double> scores = getScores(types, expectations);
-    if (!scores.isEmpty()) {
-      getExpectationByType(resultType, scores).ifPresent(resultList::add);
-    }
-  }
-
-  private static void addIfRawScoresPresent(
-      List<ExpectationResultsByType> resultList,
-      List<EXPECTATION_TYPE> types,
-      ExpectationType resultType,
-      List<RawInjectExpectation> expectations) {
-    List<Double> scores = getScoresFromRaw(types, expectations);
-    if (!scores.isEmpty()) {
-      getExpectationByType(resultType, scores).ifPresent(resultList::add);
-    }
   }
 
   // -- RECORDS --
