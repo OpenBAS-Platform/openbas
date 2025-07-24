@@ -7,6 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import { type AttackPattern, type ExpectationResultsByType, type InjectExpectationResultsByAttackPattern, type InjectExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
+import { type ExpectationResultType, expectationResultTypes } from '../injects/expectations/Expectation';
 
 const useStyles = makeStyles()(theme => ({
   button: {
@@ -96,9 +97,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     return 'SUCCESS';
   };
 
-  type ExpectationType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | 'VULNERABILITY';
-  const expectationTypes: ExpectationType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
-  const buildAggregate = (type: ExpectationType): ExpectationResultsByType | null => {
+  const buildAggregate = (type: ExpectationResultType): ExpectationResultsByType | null => {
     const filtered = results
       .map(r => r.results?.filter(er => er.type === type).map(er => er.avgResult))
       .flat()
@@ -113,7 +112,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     };
   };
 
-  const aggregatedResults: ExpectationResultsByType[] = expectationTypes
+  const aggregatedResults: ExpectationResultsByType[] = expectationResultTypes
     .map(buildAggregate)
     .filter((agg): agg is ExpectationResultsByType => agg !== null);
 

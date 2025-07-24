@@ -53,16 +53,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     fontSize: forceSize ? forceSize * 0.3 : 35,
   };
 
-  const definedTypes = useMemo(() => {
-    const resultTypes = new Set(
-      (expectationResultsByTypes ?? []).map(r => r?.type).filter(Boolean),
-    );
-
-    const merged = new Set<string>();
-    resultTypes.forEach(type => merged.add(type));
-
-    return Array.from(merged);
-  }, [expectationResultsByTypes]);
+  const definedTypes = Array.from(new Set(expectationResultsByTypes?.map(r => r?.type).filter(Boolean)));
 
   const expectationResultsMap = useMemo(() => {
     const result = expectationResultsByTypes || [];
