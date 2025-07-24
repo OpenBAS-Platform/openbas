@@ -8,6 +8,8 @@ import io.openbas.database.repository.IndexingStatusRepository;
 import io.openbas.engine.EngineContext;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.model.EsBase;
+import io.openbas.exception.AnalyticsEngineException;
+import io.openbas.exception.StartupException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -16,7 +18,6 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -26,7 +27,6 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
-import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
@@ -50,7 +50,6 @@ import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -64,15 +63,16 @@ public class OpenSearchDriver {
   public static final String ES_ILM_POLICY = "-ilm-policy";
   public static final String ES_CORE_SETTINGS = "-core-settings";
 
-  private EngineContext searchEngine;
+  private final EngineContext searchEngine;
   private final EngineConfig config;
   private final IndexingStatusRepository indexingStatusRepository;
 
-  @Autowired
-  public void setSearchEngine(EngineContext searchEngine) {
-    this.searchEngine = searchEngine;
-  }
-
+  /**
+   * Initializing the standard client
+   *
+   * @return the OpenSearchClient
+   * @throws URISyntaxException throw an exception in case of a malformed URI
+   */
   private OpenSearchClient standardClient() throws URISyntaxException {
     final HttpHost host = HttpHost.create(config.getUrl());
     final ApacheHttpClient5TransportBuilder builder =
@@ -102,17 +102,14 @@ public class OpenSearchDriver {
                       .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                       // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
                       .setTlsDetailsFactory(
-                          new Factory<SSLEngine, TlsDetails>() {
-                            @Override
-                            public TlsDetails create(final SSLEngine sslEngine) {
-                              return new TlsDetails(
-                                  sslEngine.getSession(), sslEngine.getApplicationProtocol());
-                            }
-                          })
+                          sslEngine ->
+                              new TlsDetails(
+                                  sslEngine.getSession(), sslEngine.getApplicationProtocol()))
                       .build();
               managerBuilder.setTlsStrategy(tlsStrategy);
             } catch (Exception e) {
-              throw new RuntimeException(e);
+              throw new StartupException(
+                  "Error during startup. Cannot initialize Opensearch - ", e);
             }
           }
 
@@ -130,6 +127,12 @@ public class OpenSearchDriver {
     return new OpenSearchClient(transport);
   }
 
+  /**
+   * Returns the opensearch client depending on the situation
+   *
+   * @return the opensearch client
+   * @throws URISyntaxException throw an exception in case of a malformed URI
+   */
   private OpenSearchClient getOpensearchClient() throws URISyntaxException {
     // If client is not AWS specific
     if (config.getEngineAwsMode().equalsIgnoreCase("no")) {
@@ -146,6 +149,12 @@ public class OpenSearchDriver {
             AwsSdk2TransportOptions.builder().build()));
   }
 
+  /**
+   * Create the rollover policy
+   *
+   * @param client the client to use
+   * @throws IOException in case of error during the call to opensearch
+   */
   private void createRolloverPolicy(OpenSearchClient client) throws IOException {
     String endpoint = "/_plugins/_ism/policies/" + config.getIndexPrefix() + ES_ILM_POLICY;
     try (Response response =
@@ -160,7 +169,7 @@ public class OpenSearchDriver {
             """
                     {
                       "policy": {
-                          "description": "OpenCTI ISM Policy",
+                          "description": "OpenBAS ISM Policy",
                           "default_state": "hot",
                           "states": [
                             {
@@ -200,6 +209,12 @@ public class OpenSearchDriver {
     }
   }
 
+  /**
+   * Creating the core settings
+   *
+   * @param client the client to use
+   * @throws IOException in case of error during the call to opensearch
+   */
   private void createCoreSettings(OpenSearchClient client) throws IOException {
     PutComponentTemplateRequest.Builder coreSettings = new PutComponentTemplateRequest.Builder();
     coreSettings.name(config.getIndexPrefix() + ES_CORE_SETTINGS);
@@ -227,6 +242,15 @@ public class OpenSearchDriver {
     client.cluster().putComponentTemplate(coreSettings.build());
   }
 
+  /**
+   * Create the index
+   *
+   * @param client the client to use
+   * @param name the name of the index
+   * @param version the version
+   * @param mappings the mappings of the data
+   * @throws IOException in case of error during the call to opensearch
+   */
   @SuppressWarnings("SameParameterValue")
   private void createIndex(
       OpenSearchClient client, String name, String version, Map<String, Property> mappings)
@@ -234,7 +258,6 @@ public class OpenSearchDriver {
     // Create template
     String indexName = config.getIndexPrefix() + "_" + name;
     String coreSettings = config.getIndexPrefix() + ES_CORE_SETTINGS;
-    String ilmPolicy = config.getIndexPrefix() + ES_ILM_POLICY;
     PutIndexTemplateRequest.Builder template = new PutIndexTemplateRequest.Builder();
     template.name(indexName);
     template.meta("version", JsonData.of(version));
@@ -262,11 +285,6 @@ public class OpenSearchDriver {
                                   }
                             """,
                                     indexName))))
-                    // .lifecycle(
-                    //     new IndexSettingsLifecycle.Builder()
-                    //         .name(ilmPolicy)
-                    //         .rolloverAlias(indexName)
-                    //         .build())
                     .mapping(
                         new IndexSettingsMapping.Builder()
                             .totalFields(
@@ -297,6 +315,12 @@ public class OpenSearchDriver {
     }
   }
 
+  /**
+   * Mapping generator for the class representing the ES Model
+   *
+   * @param esModel the esmodel to use
+   * @return a map of properties
+   */
   private Map<String, Property> mappingGeneratorForClass(EsModel<?> esModel) {
     Property subKeyword =
         new Property.Builder()
@@ -327,10 +351,7 @@ public class OpenSearchDriver {
       } else if (fieldType == Instant.class) {
         mappings.put(
             field.getName(),
-            new Property.Builder()
-                // .dateNanos(new DateNanosProperty.Builder().build())
-                .date(new DateProperty.Builder().build())
-                .build());
+            new Property.Builder().date(new DateProperty.Builder().build()).build());
       } else if (fieldType == Boolean.class) {
         mappings.put(
             field.getName(),
@@ -344,12 +365,19 @@ public class OpenSearchDriver {
             field.getName(),
             new Property.Builder().long_(new LongNumberProperty.Builder().build()).build());
       } else {
-        throw new RuntimeException("Unsupported field type: " + fieldType);
+        throw new StartupException("Error with Opensearch - Unsupported field type: " + fieldType);
       }
     }
     return mappings;
   }
 
+  /**
+   * Creating the opensearchClient
+   *
+   * @return the client
+   * @param <T> a type extending EsBase
+   * @throws Exception in case of an exception during the calls to opensearch
+   */
   public <T extends EsBase> OpenSearchClient opensearchClient() throws Exception {
     log.info("Creating OpensearchClient");
     OpenSearchClient openClient = getOpensearchClient();
@@ -386,12 +414,20 @@ public class OpenSearchDriver {
                 log.info("Creating Index {}", esModel.getName());
                 createIndex(openClient, esModel.getName(), ES_MODEL_VERSION, mappings);
               } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new AnalyticsEngineException(
+                    "Error while cleanup of indexes with Opensearch - " + e);
               }
             });
     return openClient;
   }
 
+  /**
+   * Clean up of the index
+   *
+   * @param indexName the name of the index
+   * @param client the client to use
+   * @throws IOException in case of an exception during the call to opensearch
+   */
   public void cleanUpIndex(String indexName, OpenSearchClient client) throws IOException {
     try {
       String fullIndexName = config.getIndexPrefix() + "_" + indexName;
@@ -415,7 +451,7 @@ public class OpenSearchDriver {
         log.warn("Index template {} does not exist or already deleted", fullIndexName);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Failed to delete index " + indexName, e);
+      throw new AnalyticsEngineException("Failed to delete index " + indexName, e);
     }
   }
 }

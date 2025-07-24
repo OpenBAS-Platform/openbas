@@ -22,6 +22,7 @@ import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
+import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,6 +55,16 @@ public class OpenSearchService implements EngineService {
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
 
+  /**
+   * Constructor for the opensearch engine
+   *
+   * @param searchEngine the context of the engine
+   * @param driver the driver
+   * @param indexingStatusRepository the repository for the indexing status
+   * @param engineConfig the config of the engine
+   * @param commonSearchService the common search service
+   * @throws Exception in case of an issue during the initialization of the opensearchclient
+   */
   public OpenSearchService(
       EngineContext searchEngine,
       OpenSearchDriver driver,
@@ -69,12 +80,20 @@ public class OpenSearchService implements EngineService {
     this.commonSearchService = commonSearchService;
   }
 
+  /**
+   * Convert a field to a FieldValue
+   *
+   * @param field the field
+   * @param value the value
+   * @param parameters the map of parameters
+   * @return the FieldValue
+   */
   private FieldValue toVal(String field, String value, Map<String, String> parameters) {
     FieldValue.Builder builder = new FieldValue.Builder();
     String target = ofNullable(parameters.getOrDefault(value, value)).orElse("");
     PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     if (propertyField == null) {
-      throw new RuntimeException("Unknown field: " + field);
+      throw new AnalyticsEngineException("Unknown field: " + field);
     }
     if (propertyField.getType().isAssignableFrom(String.class)) {
       builder.stringValue(target);
@@ -83,12 +102,21 @@ public class OpenSearchService implements EngineService {
     } else if (propertyField.getType().isAssignableFrom(Boolean.class)) {
       builder.booleanValue(Boolean.parseBoolean(target));
     } else {
-      throw new RuntimeException("Unsupported field type: " + propertyField.getType());
+      throw new AnalyticsEngineException("Unsupported field type: " + propertyField.getType());
     }
     return builder.build();
   }
 
   // region utils
+
+  /**
+   * Query an engine using the filter, parameters and definition
+   *
+   * @param filter the filter
+   * @param parameters the parameters
+   * @param definitionParameters the map of parameters
+   * @return the query
+   */
   private Query queryFromBaseFilter(
       Filters.Filter filter,
       Map<String, String> parameters,
@@ -198,6 +226,12 @@ public class OpenSearchService implements EngineService {
     return boolQuery.build().toQuery();
   }
 
+  /**
+   * Build the query restrictions
+   *
+   * @param user the auth of the user
+   * @return the query
+   */
   private Query buildQueryRestrictions(RawUserAuth user) {
     // If user is admin, no need to check the ACL
     if (user.getUser_admin()) {
@@ -220,12 +254,26 @@ public class OpenSearchService implements EngineService {
     return authQuery.should(compliantField, emptyRestrictQuery).build().toQuery();
   }
 
+  /**
+   * Build the query from a search
+   *
+   * @param search the search
+   * @return the query
+   */
   private Query queryFromSearch(String search) {
     QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
     queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
     return queryStringQuery.build().toQuery();
   }
 
+  /**
+   * Build the query from filter
+   *
+   * @param groupFilter the filter
+   * @param parameters the parameters to use
+   * @param definitionParameters the definition of the parameters
+   * @return the query generated
+   */
   private Query queryFromFilter(
       Filters.FilterGroup groupFilter,
       Map<String, String> parameters,
@@ -245,6 +293,16 @@ public class OpenSearchService implements EngineService {
     return filterQuery.build().toQuery();
   }
 
+  /**
+   * Build the query
+   *
+   * @param user the user auth to use
+   * @param search the search to use
+   * @param groupFilter the filter to use
+   * @param parameters the parameters to use
+   * @param definitionParameters the definition parameters to use
+   * @return the query built
+   */
   private Query buildQuery(
       RawUserAuth user,
       String search,
@@ -275,6 +333,13 @@ public class OpenSearchService implements EngineService {
     return mainQuery.must(mainMust).build().toQuery();
   }
 
+  /**
+   * Resolve the ids of the representative
+   *
+   * @param user the user to use
+   * @param ids the ids to check
+   * @return a map of ids
+   */
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     Filters.Filter filter = new Filters.Filter();
@@ -302,6 +367,8 @@ public class OpenSearchService implements EngineService {
   // endregion
 
   // region indexing
+
+  /** {@inheritDoc} */
   public <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models) {
     models.forEach(
         model -> {
@@ -352,6 +419,7 @@ public class OpenSearchService implements EngineService {
         });
   }
 
+  /** {@inheritDoc} */
   public void bulkDelete(List<String> ids) {
     try {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
@@ -380,6 +448,7 @@ public class OpenSearchService implements EngineService {
   // endregion
 
   // region query
+  /** {@inheritDoc} */
   public long count(RawUserAuth user, CountRuntime runtime) {
     try {
       CountConfig config = runtime.getConfig();
@@ -399,6 +468,7 @@ public class OpenSearchService implements EngineService {
     return 0;
   }
 
+  /** {@inheritDoc} */
   public EsSeries termHistogram(
       RawUserAuth user,
       StructuralHistogramWidget widgetConfig,
@@ -453,6 +523,15 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName());
   }
 
+  /**
+   * Histogram for string type
+   *
+   * @param user the user to use
+   * @param config the config for a structural histogram
+   * @param aggregate the aggregate
+   * @param field the field
+   * @return the series to use
+   */
   private EsSeries termHistogramSTerms(
       @NotNull final RawUserAuth user,
       @NotNull final StructuralHistogramSeries config,
@@ -482,6 +561,13 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName(), data);
   }
 
+  /**
+   * Histogram for double type
+   *
+   * @param config the config to use
+   * @param aggregate the aggregate to use
+   * @return a series
+   */
   private EsSeries termHistogramDTerms(
       @NotNull final StructuralHistogramSeries config, @NotNull final Aggregate aggregate) {
     Buckets<DoubleTermsBucket> buckets = aggregate.dterms().buckets();
@@ -496,6 +582,13 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName(), data);
   }
 
+  /**
+   * Histogram for long type
+   *
+   * @param config the config to use
+   * @param aggregate the aggregate to use
+   * @return a series
+   */
   private EsSeries termHistogramLTerms(
       @NotNull final StructuralHistogramSeries config, @NotNull final Aggregate aggregate) {
     Buckets<LongTermsBucket> buckets = aggregate.lterms().buckets();
@@ -510,6 +603,7 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName(), data);
   }
 
+  /** {@inheritDoc} */
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -519,6 +613,7 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
+  /** {@inheritDoc} */
   public EsSeries dateHistogram(
       RawUserAuth user,
       DateHistogramWidget widgetConfig,
@@ -577,6 +672,7 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName());
   }
 
+  /** {@inheritDoc} */
   public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -586,8 +682,9 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
+  /** {@inheritDoc} */
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
-    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().get(0).getFilter();
+    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().getFirst().getFilter();
     String entityName =
         searchFilters.getFilters().stream()
             .filter(filter -> "base_entity".equals(filter.getKey()))
@@ -642,21 +739,21 @@ public class OpenSearchService implements EngineService {
     return List.of();
   }
 
-  private Class<?> getClassForEntity(String entity_name) {
+  /**
+   * Return the class for the entity
+   *
+   * @param entityName the name of the entity
+   * @return the class itself
+   */
+  private Class<?> getClassForEntity(String entityName) {
     Optional<EsModel<EsBase>> model =
         searchEngine.getModels().stream()
-            .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
+            .filter(esBaseEsModel -> entityName.equals(esBaseEsModel.getName()))
             .findAny();
     return model.get().getModel();
   }
 
-  /**
-   * Create a list configuration for the given entity name and filter value map.
-   *
-   * @param entityName the name of the entity to filter on
-   * @param filterValueMap a map of filter
-   * @return a ListConfiguration object
-   */
+  /** {@inheritDoc} */
   public ListConfiguration createListConfiguration(
       String entityName, Map<String, List<String>> filterValueMap) {
     // Create filters
@@ -715,6 +812,7 @@ public class OpenSearchService implements EngineService {
     return List.of();
   }
 
+  /** {@inheritDoc} */
   @Override
   public void cleanUpIndex(String model) throws IOException {
     driver.cleanUpIndex(model, openSearchClient);
@@ -722,6 +820,12 @@ public class OpenSearchService implements EngineService {
 
   // endregion
 
+  /**
+   * Convert from a string to an elastic field
+   *
+   * @param field the field name
+   * @return the elastic field
+   */
   private String toElasticField(@NotBlank final String field) {
     PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     return propertyField.isKeyword() ? (field + ".keyword") : field;
