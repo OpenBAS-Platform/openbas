@@ -83,12 +83,11 @@ public class PayloadFixture {
 
   public static Payload createDefaultExecutable() {
     final Executable executable =
-            new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
+        new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
     executable.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
     initializeDefaultPayload(executable, MACOS_PLATFORM);
     return executable;
   }
-
 
   public static Payload createDefaultFileDrop() {
     final FileDrop filedrop =
