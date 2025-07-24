@@ -1,5 +1,5 @@
 import { AccountTree, List, TableChart } from '@mui/icons-material';
-import {AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine, Counter} from 'mdi-material-ui';
+import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine, Counter } from 'mdi-material-ui';
 
 import {
   type CustomDashboardParameters,
@@ -70,7 +70,10 @@ export const widgetVisualizationTypes: {
   },
   {
     category: 'number',
-    seriesLimit: 2,
+    modes: ['temporal'],
+    seriesLimit: 1,
+    limit: false,
+    fields: [],
   },
 ];
 

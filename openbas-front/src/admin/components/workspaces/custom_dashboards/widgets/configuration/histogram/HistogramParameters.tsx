@@ -173,7 +173,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
           )}
         />
       )}
-      {mode === 'temporal' && (
+      {mode === 'temporal' && widgetType !== 'number' && (
         <>
           <Controller
             control={control}

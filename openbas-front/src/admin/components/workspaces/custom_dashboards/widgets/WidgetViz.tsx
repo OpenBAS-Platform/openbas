@@ -11,10 +11,10 @@ import DonutChart from './viz/DonutChart';
 import HorizontalBarChart from './viz/HorizontalBarChart';
 import LineChart from './viz/LineChart';
 import ListWidget from './viz/list/ListWidget';
+import NumberWidget from './viz/NumberWidget';
 import SecurityCoverage from './viz/SecurityCoverage';
 import VerticalBarChart from './viz/VerticalBarChart';
 import { getWidgetTitle } from './WidgetUtils';
-import NumberWidget from './viz/NumberWidget';
 
 interface WidgetTemporalVizProps {
   widget: Widget;
