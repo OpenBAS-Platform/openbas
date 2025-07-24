@@ -66,6 +66,11 @@ public class InjectExpectationMapper {
 
   private static List<AtomicTestingUtils.ExpectationResultsByType>
       buildExpectationResultsFromInjectContent(ObjectNode injectContent) {
+
+    if (injectContent == null) {
+      return emptyList();
+    }
+
     JsonNode contentNode = injectContent.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
     if (contentNode == null || !contentNode.isArray()) {
       return emptyList();
@@ -79,6 +84,7 @@ public class InjectExpectationMapper {
           ExpectationType type = ExpectationType.of(typeNode.asText().toUpperCase());
           uniqueTypes.add(type);
         } catch (IllegalArgumentException e) {
+          log.warn("Expectation Type is no valid", e);
         }
       }
     }
