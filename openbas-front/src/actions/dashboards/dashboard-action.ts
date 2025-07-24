@@ -2,6 +2,10 @@ import { simplePostCall } from '../../utils/Action';
 
 export const DASHBOARD_URI = '/api/dashboards';
 
+export const count = (widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${DASHBOARD_URI}/count/${widgetId}`, parameters);
+};
+
 export const series = (widgetId: string, parameters: Record<string, string | undefined>) => {
   return simplePostCall(`${DASHBOARD_URI}/series/${widgetId}`, parameters);
 };
