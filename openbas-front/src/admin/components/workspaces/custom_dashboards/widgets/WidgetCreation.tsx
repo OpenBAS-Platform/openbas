@@ -47,7 +47,7 @@ const WidgetCreation: FunctionComponent<{
     let width = 10;
     let height = 10;
     if ('number' === input.widget_type) {
-      width = 3;
+      width = 2;
       height = 2;
     }
     const layout = {
