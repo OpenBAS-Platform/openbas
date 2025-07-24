@@ -107,7 +107,7 @@ const Payloads = () => {
   const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
-  const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
+  const { collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
     documentsMap: helper.getDocumentsMap(),
     collectorsMap: helper.getCollectorsMap(),
   }));
@@ -297,7 +297,6 @@ const Payloads = () => {
                     divider
                     secondaryAction={(
                       <PayloadPopover
-                        documentsMap={documentsMap}
                         payload={payload}
                         onUpdate={(result: Payload) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
                         onDuplicate={(result: Payload) => setPayloads([result, ...payloads])}

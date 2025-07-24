@@ -14,8 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Document;
 import io.openbas.database.model.Payload;
+import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.utils.fixtures.DocumentFixture;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -30,11 +33,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class PayloadApiSearchTest extends IntegrationTest {
 
-  @Autowired private MockMvc mvc;
-
-  @Autowired private PayloadRepository payloadRepository;
-
   private static final List<String> PAYLOAD_COMMAND_IDS = new ArrayList<>();
+  @Autowired private MockMvc mvc;
+  @Autowired private PayloadRepository payloadRepository;
+  @Autowired private DocumentRepository documentRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -46,7 +48,10 @@ public class PayloadApiSearchTest extends IntegrationTest {
     Payload dnsResolutionSaved = this.payloadRepository.save(dnsResolution);
     PAYLOAD_COMMAND_IDS.add(dnsResolutionSaved.getId());
 
-    Payload executable = createDefaultExecutable();
+    Document document = DocumentFixture.getDocumentJpeg();
+    Document documentSaved = this.documentRepository.save(document);
+
+    Payload executable = createDefaultExecutable(documentSaved);
     Payload executableSaved = this.payloadRepository.save(executable);
     PAYLOAD_COMMAND_IDS.add(executableSaved.getId());
   }

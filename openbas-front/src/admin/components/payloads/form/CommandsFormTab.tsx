@@ -132,9 +132,9 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
               name="executable_file"
               label={t('Executable file')}
               setFieldValue={(_name, document) => {
-                onChange(document);
+                onChange(document?.id);
               }}
-              initialValue={{ id: value?.id }}
+              initialValue={{ id: value }}
               InputLabelProps={{ required: true }}
               error={!!error}
             />
