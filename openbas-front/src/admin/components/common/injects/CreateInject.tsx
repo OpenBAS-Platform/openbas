@@ -139,6 +139,7 @@ const CreateInject: FunctionComponent<Props> = ({
       value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPattern>) => (
         <>
           {Object.values(contractAttackPatterns)
+            .filter((value, index, self) => index === self.findIndex(v => v.attack_pattern_external_id === value.attack_pattern_external_id))
             .map((contractAttackPattern: AttackPattern) => (
               <Chip
                 key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
