@@ -3,8 +3,11 @@ package io.openbas.rest.collector;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Collector;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -52,6 +55,7 @@ public class CollectorApi extends RestBehavior {
   }
 
   @GetMapping("/api/collectors")
+  @RBAC(requiredAction = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   public Iterable<Collector> collectors() {
     return collectorRepository.findAll();
   }
@@ -78,6 +82,10 @@ public class CollectorApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/collectors/{collectorId}")
+  @RBAC(
+      resourceId = "#collectorId",
+      requiredAction = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public Collector updateCollector(
       @PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
@@ -97,6 +105,7 @@ public class CollectorApi extends RestBehavior {
       value = "/api/collectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @RBAC(requiredAction = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public Collector registerCollector(
       @Valid @RequestPart("input") CollectorCreateInput input,

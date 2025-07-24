@@ -174,6 +174,11 @@ export const searchScenarioCategoryAsOption = (searchText: string = '') => {
 
 // -- LESSONS --
 
+export const fetchScenarioLessonsTemplates = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/lessons_templates`;
+  return getReferential(schema.arrayOfLessonsTemplates, uri)(dispatch);
+};
+
 export const updateScenarioLessons = (scenarioId: string, data: LessonsInput) => (dispatch: Dispatch) => putReferential(
   scenario,
   `/api/scenarios/${scenarioId}/lessons`,

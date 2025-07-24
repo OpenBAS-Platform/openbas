@@ -34,7 +34,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../../../actions/Document';
+import { fetchDocumentsForSimulation } from '../../../../../actions/Document';
 import { addInjectForExercise } from '../../../../../actions/Inject';
 import { storeHelper } from '../../../../../actions/Schema';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
@@ -241,7 +241,7 @@ class QuickInject extends Component {
 
   componentDidMount() {
     const { exerciseId } = this.props;
-    this.props.fetchDocuments();
+    this.props.fetchDocumentsForSimulation(exerciseId);
     this.props.fetchVariablesForExercise(exerciseId);
   }
 
@@ -1459,7 +1459,7 @@ const select = (state, ownProps) => {
 
 export default R.compose(
   connect(select, {
-    fetchDocuments,
+    fetchDocumentsForSimulation,
     fetchVariablesForExercise,
     addInject: addInjectForExercise,
   }),
