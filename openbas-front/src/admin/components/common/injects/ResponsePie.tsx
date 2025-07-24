@@ -180,7 +180,8 @@ const ResponsePie: FunctionComponent<Props> = ({
           color="primary"
           component={Link}
           style={{
-            gridColumnStart: 3,
+            display: 'grid',
+            gridTemplateColumns: `repeat(${definedTypes.length}, minmax(25%, 1fr))`,
             textAlign: 'center',
             fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
           }}
