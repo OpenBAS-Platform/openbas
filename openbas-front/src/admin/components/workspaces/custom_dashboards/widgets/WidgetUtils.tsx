@@ -70,10 +70,7 @@ export const widgetVisualizationTypes: {
   },
   {
     category: 'number',
-    modes: ['temporal'],
     seriesLimit: 1,
-    limit: false,
-    fields: [],
   },
 ];
 

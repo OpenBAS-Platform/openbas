@@ -2266,6 +2266,19 @@ export interface FlagInput {
   flag_value: string;
 }
 
+export type FlatConfiguration = UtilRequiredKeys<
+  WidgetConfiguration,
+  "widget_configuration_type"
+> & {
+  series: FlatSeries[];
+};
+
+export interface FlatSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
 export interface FullTextSearchCountResult {
   clazz: string;
   /** @format int64 */
@@ -2347,6 +2360,7 @@ export interface HistogramWidget {
   stacked?: boolean;
   title?: string;
   widget_configuration_type:
+    | "flat"
     | "list"
     | "temporal-histogram"
     | "structural-histogram";
@@ -5774,6 +5788,7 @@ export interface Widget {
   listened?: boolean;
   widget_config:
     | DateHistogramWidget
+    | FlatConfiguration
     | ListConfiguration
     | StructuralHistogramWidget;
   /** @format date-time */
@@ -5797,6 +5812,10 @@ export interface Widget {
 export type WidgetConfiguration = BaseWidgetConfiguration &
   (
     | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
+        "flat",
+        FlatConfiguration
+      >
+    | BaseWidgetConfigurationWidgetConfigurationTypeMapping<
         "list",
         ListConfiguration
       >
@@ -5813,6 +5832,7 @@ export type WidgetConfiguration = BaseWidgetConfiguration &
 export interface WidgetInput {
   widget_config:
     | DateHistogramWidget
+    | FlatConfiguration
     | ListConfiguration
     | StructuralHistogramWidget;
   widget_layout: WidgetLayout;

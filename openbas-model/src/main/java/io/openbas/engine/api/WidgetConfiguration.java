@@ -18,8 +18,12 @@ import lombok.Setter;
     oneOf = {
       HistogramWidget.class,
       ListConfiguration.class,
+      FlatConfiguration.class
     },
     discriminatorMapping = {
+      @DiscriminatorMapping(
+              value = WidgetConfigurationType.Values.FLAT,
+              schema = FlatConfiguration.class),
       @DiscriminatorMapping(
           value = WidgetConfigurationType.Values.LIST,
           schema = ListConfiguration.class),
@@ -36,6 +40,7 @@ import lombok.Setter;
     property = "widget_configuration_type",
     visible = true)
 @JsonSubTypes({
+  @JsonSubTypes.Type(value = FlatConfiguration.class, name = WidgetConfigurationType.Values.FLAT),
   @JsonSubTypes.Type(value = ListConfiguration.class, name = WidgetConfigurationType.Values.LIST),
   @JsonSubTypes.Type(
       value = DateHistogramWidget.class,
