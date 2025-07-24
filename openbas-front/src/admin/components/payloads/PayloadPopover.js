@@ -14,11 +14,10 @@ import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
-import { documentOptions } from '../../../utils/Option';
 import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
 
-const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
+const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -48,7 +47,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
       R.assoc('payload_platforms', data.payload_platforms),
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
-      R.assoc('executable_file', data.executable_file?.id),
+      R.assoc('executable_file', data.executable_file),
       R.assoc('payload_cleanup_executor', handleCleanupExecutorValue(data.payload_cleanup_executor, data.payload_cleanup_command)),
       R.assoc('payload_cleanup_command', handleCleanupCommandValue(data.payload_cleanup_command)),
       R.assoc('payload_detection_remediations', Object.entries(data.remediations).filter(value => value[1]).map(value => ({
@@ -108,7 +107,6 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     });
   };
 
-  const payloadExecutableFiles = documentOptions(payload.executable_file ? [payload.executable_file] : [], documentsMap);
   const initialValues = {
     payload_name: payload.payload_name,
     payload_description: payload.payload_description,
@@ -125,7 +123,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     payload_execution_arch: payload.payload_execution_arch,
     payload_output_parsers: payload.payload_output_parsers,
     payload_platforms: payload.payload_platforms,
-    executable_file: R.head(payloadExecutableFiles),
+    executable_file: payload.executable_file,
     payload_cleanup_executor: payload.payload_cleanup_executor === null ? '' : payload.payload_cleanup_executor,
     payload_cleanup_command: payload.payload_cleanup_command === null ? '' : payload.payload_cleanup_command,
     remediations: {},

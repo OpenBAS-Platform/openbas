@@ -37,7 +37,7 @@ const PayloadForm = ({
     payload_attack_patterns: [],
     payload_cleanup_command: '',
     payload_cleanup_executor: '',
-    executable_file: undefined,
+    executable_file: '',
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
@@ -163,7 +163,7 @@ const PayloadForm = ({
   const executableSchema = z.object({
     ...baseSchema,
     payload_type: z.literal('Executable').describe('Commands-tab'),
-    executable_file: z.string().optional().describe('Commands-tab'),
+    executable_file: z.string().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
   });
   const fileDropSchema = z.object({
     ...baseSchema,
