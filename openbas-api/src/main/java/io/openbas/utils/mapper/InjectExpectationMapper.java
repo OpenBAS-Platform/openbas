@@ -147,22 +147,28 @@ public class InjectExpectationMapper {
 
     for (String contentJson : rawContents) {
       try {
-        ObjectNode contentNode = (ObjectNode) objectMapper.readTree(contentJson);
+        if (contentJson != null && !contentJson.isBlank()) {
+          JsonNode jsonNode = objectMapper.readTree(contentJson);
 
-        List<AtomicTestingUtils.ExpectationResultsByType> results =
-            buildExpectationResultsFromInjectContent(contentNode);
+          if (jsonNode != null && jsonNode.isObject()) {
+            ObjectNode contentNode = (ObjectNode) jsonNode;
 
-        for (AtomicTestingUtils.ExpectationResultsByType r : results) {
-          if (ALL_EXPECTATION_TYPES.contains(r.type())) {
-            foundTypes.add(r.type());
-            if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
-              break;
+            List<AtomicTestingUtils.ExpectationResultsByType> results =
+                buildExpectationResultsFromInjectContent(contentNode);
+
+            for (AtomicTestingUtils.ExpectationResultsByType r : results) {
+              if (ALL_EXPECTATION_TYPES.contains(r.type())) {
+                foundTypes.add(r.type());
+                if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
+                  break;
+                }
+              }
             }
           }
-        }
 
-        if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
-          break;
+          if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
+            break;
+          }
         }
 
       } catch (JsonProcessingException e) {

@@ -35,5 +35,3 @@ export enum ExpectationType {
 export type ExpectationResultType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | 'VULNERABILITY';
 
 export const expectationResultTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
-
-export const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
