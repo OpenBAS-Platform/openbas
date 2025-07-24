@@ -15,15 +15,11 @@ import lombok.Setter;
 @Setter
 @Schema(
     discriminatorProperty = "widget_configuration_type",
-    oneOf = {
-      HistogramWidget.class,
-      ListConfiguration.class,
-      FlatConfiguration.class
-    },
+    oneOf = {HistogramWidget.class, ListConfiguration.class, FlatConfiguration.class},
     discriminatorMapping = {
       @DiscriminatorMapping(
-              value = WidgetConfigurationType.Values.FLAT,
-              schema = FlatConfiguration.class),
+          value = WidgetConfigurationType.Values.FLAT,
+          schema = FlatConfiguration.class),
       @DiscriminatorMapping(
           value = WidgetConfigurationType.Values.LIST,
           schema = ListConfiguration.class),

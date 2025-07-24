@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useState } from 'react';
 
-import { attackPaths, entities, series } from '../../../../../actions/dashboards/dashboard-action';
+import { attackPaths, count, entities, series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsAttackPath, type EsBase, type EsSeries } from '../../../../../utils/api-types';
@@ -27,13 +27,14 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const [seriesVizData, setSeriesVizData] = useState<EsSeries[]>([]);
   const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([]);
   const [attackPathsVizData, setAttackPathsVizData] = useState<EsAttackPath[]>([]);
+  const [numberVizData, setNumberVizData] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   const { customDashboardParameters } = useContext(CustomDashboardContext);
 
-  const fetchData = <T extends EsSeries | EsBase | EsAttackPath>(
-    fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T[] }>,
-    setData: React.Dispatch<React.SetStateAction<T[]>>,
+  const fetchData = <T extends EsSeries[] | EsBase[] | EsAttackPath[] | number>(
+    fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T }>,
+    setData: React.Dispatch<React.SetStateAction<T>>,
   ) => {
     fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {
       if (response.data) {
@@ -49,6 +50,9 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
         fetchData(attackPaths, setAttackPathsVizData);
         break;
       }
+      case 'number':
+        fetchData(count, setNumberVizData);
+        break;
       case 'list':
         fetchData(entities, setEntitiesVizData);
         break;
@@ -128,8 +132,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     case 'number':
       return (
         <NumberWidget
-          widgetId={widget.widget_id}
-          data={seriesVizData}
+          data={numberVizData}
         />
       );
     default:

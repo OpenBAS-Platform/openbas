@@ -28,6 +28,19 @@ public class DashboardApi extends RestBehavior {
   private final WidgetService widgetService;
   private final DashboardService dashboardService;
 
+  @PostMapping(DASHBOARD_URI + "/count/{widgetId}")
+  public long count(
+      @PathVariable final String widgetId,
+      @RequestBody(required = false) Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
+    Widget widget = this.widgetService.widget(widgetId);
+    CustomDashboard customDashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    return this.dashboardService.count(widget, parameters, definitionParameters);
+  }
+
   @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(
       @PathVariable final String widgetId,
