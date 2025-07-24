@@ -6,7 +6,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { addGrant, addGroupOrganization, deleteGrant, deleteGroupOrganization } from '../../../../actions/Grant';
-import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupUsers, updateGroupRoles } from '../../../../actions/Group';
+import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupRoles, updateGroupUsers } from '../../../../actions/Group';
 import { storeHelper } from '../../../../actions/Schema';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
