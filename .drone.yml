@@ -10,7 +10,6 @@ steps:
     image: alpine:3.19
     commands:
     - echo DRONE_STAGE_MACHINE ${DRONE_STAGE_MACHINE}
-    - echo "Run VM no cache 1"
 
   - name: api-tests
     image: maven:3.9.9-eclipse-temurin-22
@@ -158,19 +157,19 @@ steps:
       - frontend-tests
       - frontend-e2e-tests
 
-#  - name: slack
-#    image: plugins/slack
-#    settings:
-#      webhook:
-#        from_secret: slack_webhook
-#      username: drone
-#      channel: notifications
-#    when:
-#      status: [ success, failure ]
-#    depends_on:
-#      - api-tests
-#      - frontend-tests
-#      - frontend-e2e-tests
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      username: drone
+      channel: notifications
+    when:
+      status: [ success, failure ]
+    depends_on:
+      - api-tests
+      - frontend-tests
+      - frontend-e2e-tests
 
 services:
   - name: minio
