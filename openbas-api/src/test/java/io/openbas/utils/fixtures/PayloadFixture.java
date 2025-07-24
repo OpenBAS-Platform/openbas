@@ -72,13 +72,23 @@ public class PayloadFixture {
     return dnsResolution;
   }
 
-  public static Payload createDefaultExecutable() {
+  public static Payload createDefaultExecutable(Document document) {
     final Executable executable =
         new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
+    executable.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
+    executable.setExecutableFile(document);
+    initializeDefaultPayload(executable, MACOS_PLATFORM);
+    return executable;
+  }
+
+  public static Payload createDefaultExecutable() {
+    final Executable executable =
+            new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
     executable.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
     initializeDefaultPayload(executable, MACOS_PLATFORM);
     return executable;
   }
+
 
   public static Payload createDefaultFileDrop() {
     final FileDrop filedrop =
