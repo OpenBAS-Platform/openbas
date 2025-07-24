@@ -126,9 +126,16 @@ public class InjectExpectationMapper {
     return buildExpectationResultsFromInjectContents(exerciseId);
   }
 
+  /**
+   * Build InjectResults based on content of injects from an exercise
+   *
+   * @param exerciseId the exercise id
+   * @return List of InjectResultsByType
+   */
   private List<AtomicTestingUtils.ExpectationResultsByType>
       buildExpectationResultsFromInjectContents(@NotBlank String exerciseId) {
 
+    // Fetch all inject contents in order to extract expectations defined in every inject
     List<String> rawContents = injectRepository.findContentsByExerciseId(exerciseId);
     Set<ExpectationType> foundTypes = new HashSet<>();
 
