@@ -35,3 +35,5 @@ export enum ExpectationType {
 export type ExpectationResultType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE' | 'VULNERABILITY';
 
 export const expectationResultTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
+
+export const mitreMatrixExpectationTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION'];
