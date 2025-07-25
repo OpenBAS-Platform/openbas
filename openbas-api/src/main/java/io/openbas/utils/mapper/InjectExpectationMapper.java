@@ -38,7 +38,12 @@ public class InjectExpectationMapper {
   private final InjectUtils injectUtils;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  // -- INJECT
+  /**
+   * Build ExpectationResultsByType from inject
+   *
+   * @param inject
+   * @return List of ExpectationResultsByType
+   */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
       Inject inject) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
@@ -51,11 +56,17 @@ public class InjectExpectationMapper {
     return buildExpectationResultsFromInjectContent(inject.getContent());
   }
 
+  /**
+   * Build ExpectationResultsByType from raw queries
+   *
+   * @param expectations list of raw queries
+   * @param inject dto inject result
+   * @return List of ExpectationResultsByType
+   */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      Map<String, List<RawInjectExpectation>> expectationMap, InjectResultOutput inject) {
+      List<RawInjectExpectation> expectations, InjectResultOutput inject) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-            expectationMap.getOrDefault(inject.getId(), emptyList()));
+        AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
 
     if (!expectationResultByTypesFromRaw.isEmpty()) {
       return expectationResultByTypesFromRaw;
@@ -67,7 +78,7 @@ public class InjectExpectationMapper {
   /**
    * Build InjectResults based on expectation defined in the content of inject
    *
-   * @param injectContent content of inject where expectation have been defined
+   * @param injectContent content of inject where expectations have been defined
    * @return List of InjectResultsByType
    */
   private static List<AtomicTestingUtils.ExpectationResultsByType>

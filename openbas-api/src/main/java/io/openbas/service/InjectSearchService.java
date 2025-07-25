@@ -368,7 +368,8 @@ public class InjectSearchService {
       if (inject.getId() != null) {
         // Set global score (expectations)
         inject.setExpectationResultByTypes(
-            injectExpectationMapper.extractExpectationResults(expectationMap, inject));
+            injectExpectationMapper.extractExpectationResults(
+                expectationMap.getOrDefault(inject.getId(), emptyList()), inject));
 
         // Set targets (teams, assets, asset groups)
         List<TargetSimple> allTargets =
