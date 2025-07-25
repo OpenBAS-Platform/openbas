@@ -138,7 +138,6 @@ public class InjectExpectationMapper {
         .build();
   }
 
-
   /**
    * Extract ExpectationResultsByType from exercises using data from raw queries
    *
