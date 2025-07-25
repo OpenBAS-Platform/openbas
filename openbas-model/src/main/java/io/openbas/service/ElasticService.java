@@ -1,6 +1,6 @@
 package io.openbas.service;
 
-import static io.openbas.utils.EsUtils.*;
+import static io.openbas.utils.ElasticUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -20,7 +20,9 @@ import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.IndexingStatusRepository;
-import io.openbas.engine.EsEngine;
+import io.openbas.driver.ElasticDriver;
+import io.openbas.engine.EngineContext;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
@@ -31,58 +33,45 @@ import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
-import io.openbas.schema.SchemaUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-public class EsService {
+public class ElasticService implements EngineService {
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
-  private final EsEngine esEngine;
+  private final ElasticDriver driver;
+  private final EngineContext searchEngine;
   private final ElasticsearchClient elasticClient;
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
+  private final CommonSearchService commonSearchService;
 
-  private static final ConcurrentHashMap<String, PropertySchema> cacheMap =
-      new ConcurrentHashMap<>();
-
-  // TODO Test cache
-  private Map<String, PropertySchema> getIndexingSchema() {
-    if (!cacheMap.isEmpty()) {
-      return cacheMap;
-    }
-    Set<PropertySchema> properties =
-        esEngine.getModels().stream()
-            .flatMap(
-                model -> {
-                  try {
-                    return SchemaUtils.schemaWithSubtypes(model.getModel()).stream();
-                  } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .filter(PropertySchema::isFilterable)
-            .collect(Collectors.toSet());
-    properties.forEach(p -> cacheMap.putIfAbsent(p.getName(), p));
-    return cacheMap;
+  public ElasticService(
+      EngineContext searchEngine,
+      ElasticDriver driver,
+      IndexingStatusRepository indexingStatusRepository,
+      EngineConfig engineConfig,
+      CommonSearchService commonSearchService)
+      throws Exception {
+    this.driver = driver;
+    this.elasticClient = driver.elasticClient();
+    this.searchEngine = searchEngine;
+    this.indexingStatusRepository = indexingStatusRepository;
+    this.engineConfig = engineConfig;
+    this.commonSearchService = commonSearchService;
   }
 
   private FieldValue toVal(String field, String value, Map<String, String> parameters) {
     FieldValue.Builder builder = new FieldValue.Builder();
     String target = ofNullable(parameters.getOrDefault(value, value)).orElse("");
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     if (propertyField == null) {
       throw new RuntimeException("Unknown field: " + field);
     }
@@ -108,7 +97,7 @@ public class EsService {
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
     String elasticField = toElasticField(field);
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     boolean hasFilteringValues =
         filter.getValues().stream()
             .anyMatch(
@@ -363,6 +352,11 @@ public class EsService {
         });
   }
 
+  @Override
+  public void cleanUpIndex(String model) throws IOException {
+    driver.cleanUpIndex(model, elasticClient);
+  }
+
   public void bulkDelete(List<String> ids) {
     try {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
@@ -420,7 +414,7 @@ public class EsService {
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
-      PropertySchema propertyField = getIndexingSchema().get(field);
+      PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
       String elasticField = toElasticField(field);
 
       SearchRequest.Builder searchBuilder =
@@ -568,7 +562,7 @@ public class EsService {
                                       h.field(widgetConfig.getField())
                                           .minDocCount(0)
                                           .format(widgetConfig.getInterval().format)
-                                          .calendarInterval(widgetConfig.getInterval().type)
+                                          .calendarInterval(widgetConfig.getInterval().esType)
                                           .extendedBounds(extendedBounds)
                                           .keyed(false))),
               Void.class);
@@ -655,7 +649,7 @@ public class EsService {
 
   private Class<?> getClassForEntity(String entity_name) {
     Optional<EsModel<EsBase>> model =
-        esEngine.getModels().stream()
+        searchEngine.getModels().stream()
             .filter(esBaseEsModel -> entity_name.equals(esBaseEsModel.getName()))
             .findAny();
     return model.get().getModel();
@@ -729,7 +723,7 @@ public class EsService {
   // endregion
 
   private String toElasticField(@NotBlank final String field) {
-    PropertySchema propertyField = getIndexingSchema().get(field);
+    PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     return propertyField.isKeyword() ? (field + ".keyword") : field;
   }
 }
