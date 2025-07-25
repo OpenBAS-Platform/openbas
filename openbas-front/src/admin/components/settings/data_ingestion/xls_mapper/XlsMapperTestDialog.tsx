@@ -1,7 +1,7 @@
 import { type FunctionComponent, useState } from 'react';
 
 import { storeXlsFile } from '../../../../../actions/mapper/mapper-actions';
-import Dialog from '../../../../../components/common/Dialog';
+import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
 import { useFormatter } from '../../../../../components/i18n';
 import { type ImportMapperAddInput, type ImportPostSummary } from '../../../../../utils/api-types';
 import ImportFileSelector from '../../../common/injects/ImportFileSelector';
@@ -39,7 +39,7 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
   };
 
   return (
-    <Dialog
+    <FiligranDialog
       open={open}
       handleClose={handleClose}
       title={t('Testing XLS mapper')}
@@ -66,7 +66,7 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
             />
           )}
       </>
-    </Dialog>
+    </FiligranDialog>
   );
 };
 

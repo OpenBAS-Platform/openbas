@@ -13,7 +13,10 @@ public enum SettingKeys {
   PLATFORM_NAME("platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
   PLATFORM_BANNER("platform_banner", ""),
   PLATFORM_INSTANCE("instance_id", ""),
-  PLATFORM_INSTANCE_CREATION("instance_creation_date", "");
+  PLATFORM_INSTANCE_CREATION("instance_creation_date", ""),
+  PLATFORM_ONBOARDING_WIDGET_ENABLE("platform_onboarding_widget_enable", "true"),
+  PLATFORM_ONBOARDING_CONTEXTUAL_HELP_ENABLE("platform_onboarding_contextual_help_enable", "true"),
+  ;
 
   private final String key;
   private final String defaultValue;

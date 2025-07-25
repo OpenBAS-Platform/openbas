@@ -16,6 +16,7 @@ const THEME_DARK_DEFAULT_PAPER = '#09101e';
 const THEME_DARK_DEFAULT_NAV = '#070d19';
 const THEME_DARK_DEFAULT_SCROLL_BACKGROUND = '#00020c';
 const THEME_DARK_DEFAULT_SCROLL_COLOR = '#7a7c85b3';
+export const BACKGROUND_COLOR_GREY = '#181E27';
 
 const ThemeDark = (
   logo: string | null = null,

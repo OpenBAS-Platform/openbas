@@ -1,7 +1,7 @@
 import { type FunctionComponent, useContext, useState } from 'react';
 
 import ButtonPopover, { type VariantButtonPopover } from '../../../../components/common/ButtonPopover';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import { type Report, type ReportInput } from '../../../../utils/api-types';
@@ -53,13 +53,13 @@ const ReportPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} variant={variant} />
-      <Dialog
+      <FiligranDialog
         title={t('Update the report')}
         open={openEdit}
         handleClose={handleCloseEdit}
       >
         {renderReportForm(submitUpdate, handleCloseEdit, report)}
-      </Dialog>
+      </FiligranDialog>
       <DialogDelete
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
