@@ -3,6 +3,7 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.model.inject.form.Expectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import java.util.List;
 
@@ -66,6 +67,15 @@ public class ExpectationFixture {
       AssetGroup assetGroup, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAssetGroup(
         SCORE, "Detection", "Detection Expectation", assetGroup, false, expirationTime);
+  }
+
+  public static Expectation createExpectation() {
+    Expectation expectation = new Expectation();
+    expectation.setScore(SCORE);
+    expectation.setName("Expectation Name");
+    expectation.setDescription("Expectation Description");
+    expectation.setExpirationTime(60L);
+    return expectation;
   }
 
   public static ExpectationUpdateInput getExpectationUpdateInput(String sourceId, Double score) {

@@ -9,6 +9,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -49,6 +50,7 @@ public class RoleService {
             .findById(roleId)
             .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
 
+    role.setUpdatedAt(Instant.now());
     role.setName(roleName);
     role.setCapabilities(capabilities);
 

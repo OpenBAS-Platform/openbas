@@ -28,9 +28,9 @@ class InjectExpectationServiceTest {
     // Arrange
     Inject inject = InjectFixture.getDefaultInject();
     InjectExpectation preventionExpectation =
-        InjectExpectationFixture.createPreventionInjectExpectation(null, inject);
+        InjectExpectationFixture.createPreventionInjectExpectation(inject, null);
     InjectExpectation preventionExpectation2 =
-        InjectExpectationFixture.createPreventionInjectExpectation(null, inject);
+        InjectExpectationFixture.createPreventionInjectExpectation(inject, null);
 
     when(mockedInjectExpectationRepository.findAll(any()))
         .thenReturn(List.of(preventionExpectation, preventionExpectation2));
@@ -51,9 +51,9 @@ class InjectExpectationServiceTest {
     // Arrange
     Inject inject = InjectFixture.getDefaultInject();
     InjectExpectation detectionExpectation =
-        InjectExpectationFixture.createDetectionInjectExpectation(null, inject);
+        InjectExpectationFixture.createDetectionInjectExpectation(inject, null);
     InjectExpectation detectionExpectation2 =
-        InjectExpectationFixture.createDetectionInjectExpectation(null, inject);
+        InjectExpectationFixture.createDetectionInjectExpectation(inject, null);
 
     when(mockedInjectExpectationRepository.findAll(any()))
         .thenReturn(List.of(detectionExpectation, detectionExpectation2));

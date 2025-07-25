@@ -11,22 +11,27 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class DocumentService {
+
+  @Resource private ObjectMapper mapper;
 
   private final DocumentRepository documentRepository;
   private final ChallengeRepository challengeRepository;
-
-  @Resource private ObjectMapper mapper;
+  private final FileService fileService;
 
   // -- CRUD --
 
@@ -68,5 +73,33 @@ public class DocumentService {
         .flatMap(documentStream -> documentStream)
         .distinct()
         .toList();
+  }
+
+  public void deleteDocument(String documentId) {
+    Document document = document(documentId); // fetch or throw if not found
+
+    boolean isUsedInFileDrop =
+        document.getPayloadsByFileDrop() != null && !document.getPayloadsByFileDrop().isEmpty();
+    boolean isUsedInExecutable =
+        document.getPayloadsByExecutableFile() != null
+            && !document.getPayloadsByExecutableFile().isEmpty();
+
+    if (isUsedInFileDrop || isUsedInExecutable) {
+      throw new BadRequestException(
+          "Document is still in use for some payloads and cannot be deleted.");
+    }
+
+    List<Document> documents = documentRepository.removeById(documentId);
+
+    // Remove document from minio
+    documents.forEach(
+        documentToRemove -> {
+          try {
+            fileService.deleteFile(documentToRemove.getTarget());
+          } catch (Exception e) {
+            log.warn(
+                "File already removed or not found in minio: {}", documentToRemove.getTarget(), e);
+          }
+        });
   }
 }

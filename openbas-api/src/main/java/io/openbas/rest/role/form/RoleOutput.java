@@ -23,4 +23,10 @@ public class RoleOutput {
 
   @JsonProperty("role_capabilities")
   private Set<String> capabilities;
+
+  @JsonProperty("role_created_at")
+  private String createdAt;
+
+  @JsonProperty("role_updated_at")
+  private String updatedAt;
 }

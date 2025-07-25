@@ -1,5 +1,7 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +16,7 @@ import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -61,9 +64,9 @@ public class InjectExecutionService {
         // If we receive a status update with a terminal state status, we must first check that the
         // current status is in the PENDING state
         log.warn(
-            "Received a complete action for inject {} with status {}, but current status is not PENDING",
-            injectId,
-            inject.getStatus().map(is -> is.getName().toString()).orElse("unknown"));
+            String.format(
+                "Received a complete action for inject %s with status %s, but current status is not PENDING",
+                injectId, inject.getStatus().map(is -> is.getName().toString()).orElse("unknown")));
         throw new DataIntegrityViolationException(
             "Cannot complete inject that is not in PENDING state");
       }
@@ -82,13 +85,13 @@ public class InjectExecutionService {
   /** Processes the execution of an inject by updating its status and extracting findings. */
   private void processInjectExecution(
       Inject inject,
-      Agent agent,
+      @Nullable Agent agent,
       InjectExecutionInput input,
       Set<OutputParser> outputParsers,
       Optional<ObjectNode> structuredOutput) {
-
     ObjectNode structured = structuredOutput.orElse(null);
     injectStatusService.updateInjectStatus(agent, inject, input, structured);
+    addEndDateInjectExpectationTimeSignatureIfNeeded(inject, agent, input);
 
     if (structured == null) {
       return;
@@ -104,6 +107,26 @@ public class InjectExecutionService {
     } else {
       // Structured output directly provided (e.g., from injectors)
       findingService.extractFindingsFromInjectorContract(inject, structured);
+    }
+  }
+
+  /**
+   * Adds an end date signature to inject expectations if the action is COMPLETE.
+   *
+   * @param inject the inject for which to add the end date signature
+   * @param agent the agent for which to add the end date signature
+   * @param input the input containing the action and duration
+   */
+  private void addEndDateInjectExpectationTimeSignatureIfNeeded(
+      Inject inject, Agent agent, InjectExecutionInput input) {
+    if (agent != null
+        && ExecutionTraceAction.COMPLETE.equals(convertExecutionAction(input.getAction()))) {
+      InjectStatus injectStatus = inject.getStatus().orElseThrow();
+      Instant endDate =
+          injectStatusService.getExecutionTimeFromStartTraceTimeAndDurationByAgentId(
+              injectStatus, agent.getId(), input.getDuration());
+      injectExpectationService.addEndDateSignatureToInjectExpectationsByAgent(
+          inject.getId(), agent.getId(), endDate);
     }
   }
 

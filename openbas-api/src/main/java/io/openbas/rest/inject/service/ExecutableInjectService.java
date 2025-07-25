@@ -13,6 +13,7 @@ import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.service.PayloadService;
+import io.openbas.service.InjectExpectationService;
 import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class ExecutableInjectService {
   private final InjectService injectService;
   private final DocumentService documentService;
   private final InjectStatusService injectStatusService;
+  private final InjectExpectationService injectExpectationService;
   private final PayloadService payloadService;
 
   @Resource protected ObjectMapper mapper;
@@ -200,6 +202,8 @@ public class ExecutableInjectService {
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
     this.injectStatusService.addStartImplantExecutionTraceByInject(
         injectId, agentId, "Implant is up and starting execution", startTime);
+    this.injectExpectationService.addStartDateSignatureToInjectExpectationsByAgent(
+        injectId, agentId, startTime);
     return payloadToExecute;
   }
 

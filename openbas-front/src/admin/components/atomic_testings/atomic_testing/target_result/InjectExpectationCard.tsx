@@ -177,8 +177,8 @@ const InjectExpectationCard = ({ inject, injectExpectation, onUpdateInjectExpect
                 onClick={() => onOpenEditInjectExpectationResultResult(null)}
               >
                 {['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
-                  ? <AddModeratorOutlined fontSize="medium" />
-                  : <InventoryOutlined fontSize="medium" />}
+                  ? <AddModeratorOutlined color="primary" fontSize="medium" />
+                  : <InventoryOutlined color="primary" fontSize="medium" />}
               </IconButton>
             </Tooltip>
           )}

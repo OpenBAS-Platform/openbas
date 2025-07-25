@@ -2,6 +2,7 @@ package io.openbas.executors.caldera.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.authorisation.HttpClientFactory;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Injector;
 import io.openbas.executors.caldera.client.model.Ability;
@@ -22,7 +23,6 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,7 @@ public class CalderaExecutorClient {
 
   private final CalderaExecutorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private final HttpClientFactory httpClientFactory;
 
   // -- AGENTS --
 
@@ -265,7 +266,7 @@ public class CalderaExecutorClient {
   // -- PRIVATE --
 
   private String get(@NotBlank final String uri) throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpGet httpGet = new HttpGet(this.config.getRestApiV2Url() + uri);
       // Headers
       httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -278,7 +279,7 @@ public class CalderaExecutorClient {
 
   private String post(@NotBlank final String url, @NotNull final Map<String, Object> body)
       throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPost httpPost = new HttpPost(url);
       // Headers
       httpPost.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -294,7 +295,7 @@ public class CalderaExecutorClient {
 
   private void patch(@NotBlank final String url, @NotNull final Map<String, Object> body)
       throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpPatch httpPatch = new HttpPatch(url);
       // Headers
       httpPatch.addHeader(KEY_HEADER, this.config.getApiKey());
@@ -308,7 +309,7 @@ public class CalderaExecutorClient {
   }
 
   private void delete(@NotBlank final String url) throws IOException {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = httpClientFactory.httpClientCustom()) {
       HttpDelete httpdelete = new HttpDelete(url);
       // Headers
       httpdelete.addHeader(KEY_HEADER, this.config.getApiKey());

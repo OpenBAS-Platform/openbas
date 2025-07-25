@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.utils.mapper;
 
 import io.openbas.database.raw.RawCustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;

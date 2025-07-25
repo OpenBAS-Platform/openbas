@@ -1303,6 +1303,29 @@ export interface DocumentCreateInput {
   document_tags?: string[];
 }
 
+export interface DocumentRelationsOutput {
+  /** @uniqueItems true */
+  atomicTestings?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  challenges?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  channels?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  payloads?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  scenarioArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  scenarioInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  securityPlatforms?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulationArticles?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulationInjects?: RelatedEntityOutput[];
+  /** @uniqueItems true */
+  simulations?: RelatedEntityOutput[];
+}
+
 export interface DocumentTagUpdateInput {
   tags?: string[];
 }
@@ -1790,7 +1813,7 @@ export interface EvaluationInput {
 }
 
 export interface Executable {
-  executable_file?: string;
+  executable_file: string;
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
@@ -2513,7 +2536,10 @@ export interface InjectExecutionInput {
     | "file_execution"
     | "file_drop"
     | "complete";
-  /** @format int32 */
+  /**
+   * Duration of the execution in miliseconds
+   * @format int32
+   */
   execution_duration?: number;
   execution_message: string;
   execution_output_raw?: string;
@@ -4642,6 +4668,12 @@ export interface RegexGroupSimple {
   regex_group_index_values: string;
 }
 
+export interface RelatedEntityOutput {
+  context?: string;
+  id?: string;
+  name?: string;
+}
+
 export interface RelatedFindingOutput {
   /**
    * Asset groups linked to endpoints
@@ -4797,8 +4829,10 @@ export interface RoleInput {
 export interface RoleOutput {
   /** @uniqueItems true */
   role_capabilities?: string[];
+  role_created_at?: string;
   role_id: string;
   role_name: string;
+  role_updated_at?: string;
 }
 
 export interface RuleAttribute {
