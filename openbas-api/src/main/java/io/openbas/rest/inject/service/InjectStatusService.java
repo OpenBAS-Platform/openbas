@@ -83,7 +83,7 @@ public class InjectStatusService {
   public boolean isAllInjectAgentsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
-    log.info(
+    log.debug(
         "[issue/2797] Inputs for inject ID: "
             + inject.getId()
             + "::agents.size="
@@ -94,13 +94,13 @@ public class InjectStatusService {
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.info("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
+    log.debug("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.info("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
+    log.debug("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -165,7 +165,7 @@ public class InjectStatusService {
 
   @Scheduled(fixedDelay = 60000) // Run every 1 minutes
   public void cleanupOldLocks() {
-    log.info("[issue/2797] Clean up of old locks started");
+    log.debug("[issue/2797] Clean up of old locks started");
     long currentTime = System.currentTimeMillis();
     int removedCount = 0;
 
@@ -180,9 +180,7 @@ public class InjectStatusService {
       }
     }
 
-    if (removedCount > 0) {
-      log.info("[issue/2797] Cleaned up {} old locks", removedCount);
-    }
+    log.debug("[issue/2797] Cleaned up {} old locks", removedCount);
   }
 
   // [issue/2797] region end: Added an alternative locking mechanism
@@ -201,11 +199,11 @@ public class InjectStatusService {
     // Update last access time
     lastAccessTime.put(inject.getId(), System.currentTimeMillis());
 
-    log.info("[issue/2797] Waiting for lock for inject ID: " + inject.getId());
+    log.debug("[issue/2797] Waiting for lock for inject ID: " + inject.getId());
     synchronized (lock) {
       boolean isAllInjectAgentsExecuted = isAllInjectAgentsExecuted(inject);
-      log.info("[issue/2797] Acquired lock for inject ID: " + inject.getId());
-      log.info(
+      log.debug("[issue/2797] Acquired lock for inject ID: " + inject.getId());
+      log.debug(
           "[issue/2797] Inputs for inject ID: "
               + inject.getId()
               + "::action="
@@ -218,7 +216,7 @@ public class InjectStatusService {
       }
 
       injectRepository.save(inject);
-      log.info("Successfully updated inject: " + inject.getId());
+      log.debug("Successfully updated inject: " + inject.getId());
     }
   }
 
