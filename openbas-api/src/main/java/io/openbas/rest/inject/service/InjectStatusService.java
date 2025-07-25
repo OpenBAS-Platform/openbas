@@ -18,8 +18,11 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -80,6 +83,13 @@ public class InjectStatusService {
   public boolean isAllInjectAgentsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
+    log.info(
+        "[issue/2797] Inputs for inject ID: "
+            + inject.getId()
+            + "::agents.size="
+            + agents.size()
+            + "::totalCompleteTrace="
+            + totalCompleteTrace);
     return agents.size() == totalCompleteTrace;
   }
 
@@ -146,6 +156,37 @@ public class InjectStatusService {
     }
   }
 
+  // [issue/2797] region start: Added an alternative locking mechanism
+  // Lock map to ensure synchronization on the same inject ID
+  private final ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Long> lastAccessTime = new ConcurrentHashMap<>();
+  // Maximum age for locks in milliseconds (2 minute)
+  private static final long MAX_LOCK_AGE_MS = 120000;
+
+  @Scheduled(fixedDelay = 60000) // Run every 1 minutes
+  public void cleanupOldLocks() {
+    log.info("[issue/2797] Clean up of old locks started");
+    long currentTime = System.currentTimeMillis();
+    int removedCount = 0;
+
+    for (Map.Entry<String, Long> entry : lastAccessTime.entrySet()) {
+      String injectId = entry.getKey();
+      Long lastAccess = entry.getValue();
+
+      if (currentTime - lastAccess > MAX_LOCK_AGE_MS) {
+        locks.remove(injectId);
+        lastAccessTime.remove(injectId);
+        removedCount++;
+      }
+    }
+
+    if (removedCount > 0) {
+      log.info("[issue/2797] Cleaned up {} old locks", removedCount);
+    }
+  }
+
+  // [issue/2797] region end: Added an alternative locking mechanism
+
   public void updateInjectStatus(
       Agent agent, Inject inject, InjectExecutionInput input, ObjectNode structuredOutput) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -155,13 +196,29 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
-    synchronized (inject.getId()) {
+    // Get or create a lock object for this inject ID
+    Object lock = locks.computeIfAbsent(inject.getId(), k -> new Object());
+    // Update last access time
+    lastAccessTime.put(inject.getId(), System.currentTimeMillis());
+
+    log.info("[issue/2797] Waiting for lock for inject ID: " + inject.getId());
+    synchronized (lock) {
+      boolean isAllInjectAgentsExecuted = isAllInjectAgentsExecuted(inject);
+      log.info("[issue/2797] Acquired lock for inject ID: " + inject.getId());
+      log.info(
+          "[issue/2797] Inputs for inject ID: "
+              + inject.getId()
+              + "::action="
+              + executionTrace.getAction()
+              + "::isAllInjectAgentsExecuted="
+              + isAllInjectAgentsExecuted);
       if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-          && (agent == null || isAllInjectAgentsExecuted(inject))) {
+          && (agent == null || isAllInjectAgentsExecuted)) {
         updateFinalInjectStatus(injectStatus);
       }
 
       injectRepository.save(inject);
+      log.info("Successfully updated inject: " + inject.getId());
     }
   }
 
