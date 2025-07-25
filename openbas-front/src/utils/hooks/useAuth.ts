@@ -1,16 +1,14 @@
 import { createContext, useContext } from 'react';
 
-import { type PlatformSettings } from '../api-types';
-
-export interface User { id?: string | null }
+import { type PlatformSettings, type User } from '../api-types';
 
 export interface UserContextType {
-  me: User;
+  me: User | undefined;
   settings: PlatformSettings | undefined;
 }
 
 const defaultContext = {
-  me: {},
+  me: undefined,
   settings: undefined,
 };
 export const UserContext = createContext<UserContextType>(defaultContext);

@@ -7,7 +7,7 @@ import { type OrganizationHelper, type TagHelper } from '../../../../actions/hel
 import { type TeamInputForm } from '../../../../actions/teams/Team';
 import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../actions/teams/team-helper';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -201,7 +201,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
           </Button>
         </DialogActions>
       </MuiDialog>
-      <Dialog
+      <FiligranDialog
         open={openEdit}
         handleClose={handleCloseEdit}
         title={t('Update the team')}
@@ -212,7 +212,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
           onSubmit={onSubmitEdit}
           editing
         />
-      </Dialog>
+      </FiligranDialog>
       <MuiDialog
         open={openRemove}
         TransitionComponent={Transition}

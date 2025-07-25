@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { SettingsEnterpriseEditionUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -50,7 +50,7 @@ const EnterpriseEditionAgreementDialog = () => {
   const enableEnterpriseEdition = () => updateEnterpriseEdition({ platform_enterprise_license: enterpriseLicense });
 
   return (
-    <Dialog
+    <FiligranDialog
       open={open}
       handleClose={onCloseEnterpriseEditionDialog}
       title={t('OpenBAS Enterprise Edition (EE) license agreement')}
@@ -122,7 +122,7 @@ const EnterpriseEditionAgreementDialog = () => {
           .
         </div>
       </div>
-    </Dialog>
+    </FiligranDialog>
   );
 };
 

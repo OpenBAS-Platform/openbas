@@ -2,7 +2,7 @@ import { Edit } from '@mui/icons-material';
 import { Button, IconButton, Paper } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import MarkDownField from '../../../../components/fields/MarkDownField';
 import { useFormatter } from '../../../../components/i18n';
@@ -32,7 +32,7 @@ const ReportComment: FunctionComponent<Props> = ({ initialComment, saveComment, 
           </IconButton>
         )}
 
-      <Dialog
+      <FiligranDialog
         title={t('Update inject comment')}
         open={openEdit}
         handleClose={() => setOpenEdit(false)}
@@ -68,7 +68,7 @@ const ReportComment: FunctionComponent<Props> = ({ initialComment, saveComment, 
             </Button>
           </div>
         </>
-      </Dialog>
+      </FiligranDialog>
     </div>
 
   );

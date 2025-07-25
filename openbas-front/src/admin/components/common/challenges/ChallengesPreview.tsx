@@ -9,7 +9,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { tryChallenge } from '../../../../actions/Challenge';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
@@ -177,7 +177,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
             );
           })}
         </div>
-        <Dialog
+        <FiligranDialog
           open={currentChallenge !== null}
           handleClose={handleClose}
           maxWidth="md"
@@ -228,7 +228,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
               <ChallengeTryForm onSubmit={data => submit(currentChallenge?.challenge_id, data)} handleClose={handleClose} />
             )}
           </>
-        </Dialog>
+        </FiligranDialog>
       </div>
     );
   }

@@ -35,7 +35,7 @@ const EndpointForm: FunctionComponent<Props> = ({
     endpoint_hostname: '',
     endpoint_ips: [],
     endpoint_mac_addresses: [],
-    endpoint_platform: undefined,
+    endpoint_platform: 'Linux',
     endpoint_arch: 'x86_64',
   },
 }) => {
@@ -162,8 +162,8 @@ const EndpointForm: FunctionComponent<Props> = ({
                 gap: theme.spacing(2),
               }}
               >
-                <SelectFieldController name="endpoint_arch" label={t('Architecture')} items={architecturesItems} />
-                <SelectFieldController name="endpoint_platform" label={t('Platform')} items={platformItems} />
+                <SelectFieldController name="endpoint_arch" label={t('Architecture')} items={architecturesItems} required />
+                <SelectFieldController name="endpoint_platform" label={t('Platform')} items={platformItems} required />
               </div>
 
               <TextFieldController

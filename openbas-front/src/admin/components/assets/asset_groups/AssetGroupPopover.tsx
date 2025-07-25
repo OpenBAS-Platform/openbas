@@ -4,7 +4,7 @@ import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -172,7 +172,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
       />
 
       {inline ? (
-        <Dialog
+        <FiligranDialog
           open={edition}
           handleClose={() => setEdition(false)}
           title={t('Update the asset group')}
@@ -183,7 +183,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
           />
-        </Dialog>
+        </FiligranDialog>
       ) : (
         <Drawer
           open={edition}

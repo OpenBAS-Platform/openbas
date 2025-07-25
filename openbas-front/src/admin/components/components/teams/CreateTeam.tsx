@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type TeamInputForm } from '../../../../actions/teams/Team';
 import { addTeam } from '../../../../actions/teams/team-actions';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import { useFormatter } from '../../../../components/i18n';
 import { type Team, type TeamCreateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -86,7 +86,7 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
           <Add />
         </Fab>
       )}
-      <Dialog
+      <FiligranDialog
         open={openDialog}
         handleClose={handleClose}
         title={t('Create a new team')}
@@ -96,7 +96,7 @@ const CreateTeam: FunctionComponent<CreateTeamProps> = ({
           handleClose={handleClose}
           onSubmit={onSubmit}
         />
-      </Dialog>
+      </FiligranDialog>
     </div>
   );
 };

@@ -4,6 +4,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SessionHelper {
 
+  private SessionHelper() {}
+
   public static final String ANONYMOUS_USER = "anonymousUser";
 
   public static OpenBASPrincipal currentUser() {

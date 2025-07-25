@@ -1,4 +1,4 @@
-import Dialog from '../../../../../components/common/Dialog';
+import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
 import type { InjectExpectationResult } from '../../../../../utils/api-types';
 import { type InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import { isManualExpectation } from '../../../common/injects/expectations/ExpectationUtils';
@@ -17,7 +17,7 @@ interface Props {
 }
 const EditInjectExpectationResultDialog = ({ open, injectExpectation, sourceIds, resultToEdit, onClose, onUpdate }: Props) => {
   return (
-    <Dialog
+    <FiligranDialog
       open={open}
       handleClose={onClose}
     >
@@ -36,7 +36,7 @@ const EditInjectExpectationResultDialog = ({ open, injectExpectation, sourceIds,
             )}
         </>
       )}
-    </Dialog>
+    </FiligranDialog>
   );
 };
 

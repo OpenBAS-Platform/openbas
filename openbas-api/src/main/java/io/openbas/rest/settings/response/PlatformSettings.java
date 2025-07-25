@@ -9,6 +9,7 @@ import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class PlatformSettings {
   @Schema(description = "id of the platform")
   private String platformId;
 
+  @NotBlank
   @JsonProperty("platform_name")
   @Schema(description = "Name of the platform")
   private String platformName;
@@ -41,10 +43,12 @@ public class PlatformSettings {
   @Schema(description = "Agent URL of the platform")
   private String platformAgentUrl;
 
+  @NotBlank
   @JsonProperty("platform_theme")
   @Schema(description = "Theme of the platform")
   private String platformTheme;
 
+  @NotBlank
   @JsonProperty("platform_lang")
   @Schema(description = "Language of the platform")
   private String platformLang;
@@ -247,4 +251,13 @@ public class PlatformSettings {
   @JsonProperty("platform_license")
   @Schema(description = "Platform licensing")
   private License platformLicense;
+
+  // ONBOARDING
+  @JsonProperty("platform_onboarding_widget_enable")
+  @Schema(description = "Platform onboarding widget enabled")
+  private boolean onboardingWidgetEnable;
+
+  @JsonProperty("platform_onboarding_contextual_help_enable")
+  @Schema(description = "Platform onboarding contextual help enabled")
+  private boolean onboardingContextualHelpEnable;
 }

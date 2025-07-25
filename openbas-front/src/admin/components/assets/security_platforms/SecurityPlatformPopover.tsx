@@ -3,7 +3,6 @@ import { IconButton, Menu, MenuItem } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
 import { deleteSecurityPlatform, updateSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
-import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
@@ -14,7 +13,6 @@ import SecurityPlatformForm from './SecurityPlatformForm';
 type SecurityPlatformStoreWithType = SecurityPlatform & { type: string };
 
 interface Props {
-  inline?: boolean;
   securityPlatform: SecurityPlatformStoreWithType;
   assetGroupId?: string;
   assetGroupSecurityPlatformIds?: string[];
@@ -27,7 +25,6 @@ interface Props {
 }
 
 const SecurityPlatformPopover: FunctionComponent<Props> = ({
-  inline,
   securityPlatform,
   openEditOnInit = false,
   onUpdate,
@@ -126,33 +123,18 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
           {t('Delete')}
         </MenuItem>
       </Menu>
-      {inline ? (
-        <Dialog
-          open={edition}
+      <Drawer
+        open={edition}
+        handleClose={() => setEdition(false)}
+        title={t('Update the security platform')}
+      >
+        <SecurityPlatformForm
+          initialValues={initialValues}
+          editing
+          onSubmit={submitEdit}
           handleClose={() => setEdition(false)}
-          title={t('Update the security platform')}
-        >
-          <SecurityPlatformForm
-            initialValues={initialValues}
-            editing={true}
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Dialog>
-      ) : (
-        <Drawer
-          open={edition}
-          handleClose={() => setEdition(false)}
-          title={t('Update the security platform')}
-        >
-          <SecurityPlatformForm
-            initialValues={initialValues}
-            editing
-            onSubmit={submitEdit}
-            handleClose={() => setEdition(false)}
-          />
-        </Drawer>
-      )}
+        />
+      </Drawer>
       <DialogDelete
         open={deletion}
         handleClose={() => setDeletion(false)}

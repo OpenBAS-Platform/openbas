@@ -36,11 +36,18 @@ export const deleteUser = userId => dispatch => delReferential(`/api/users/${use
 // endregion
 
 // region me
+export const ME_URI = '/api/me';
+
 export const meTokens = () => dispatch => getReferential(schema.arrayOfTokens, '/api/me/tokens')(dispatch);
 
 export const updateMePassword = (currentPassword, newPassword) => dispatch => putReferential(schema.user, '/api/me/password', {
   user_current_password: currentPassword,
   user_plain_password: newPassword,
+})(dispatch);
+
+export const updateMeOnboarding = (onboardingWidgetEnable, onboardingContextualHelpEnable) => dispatch => putReferential(schema.user, ME_URI + '/onboarding', {
+  user_onboarding_widget_enable: onboardingWidgetEnable,
+  user_onboarding_contextual_help_enable: onboardingContextualHelpEnable,
 })(dispatch);
 
 export const updateMeProfile = data => dispatch => putReferential(schema.user, '/api/me/profile', data)(dispatch);
