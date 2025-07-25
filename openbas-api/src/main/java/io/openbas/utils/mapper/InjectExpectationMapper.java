@@ -64,6 +64,12 @@ public class InjectExpectationMapper {
     return buildExpectationResultsFromInjectContent(inject.getContent());
   }
 
+  /**
+   * Build InjectResults based on expectation defined in the content of inject
+   *
+   * @param injectContent content of inject where expectation have been defined
+   * @return List of InjectResultsByType
+   */
   private static List<AtomicTestingUtils.ExpectationResultsByType>
       buildExpectationResultsFromInjectContent(ObjectNode injectContent) {
 
@@ -89,12 +95,7 @@ public class InjectExpectationMapper {
       }
     }
 
-    List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
-    for (ExpectationType type : uniqueTypes) {
-      AtomicTestingUtils.getExpectationByType(type, emptyList()).ifPresent(fallbackResults::add);
-    }
-
-    return fallbackResults;
+    return buildFallbackResults(uniqueTypes);
   }
 
   public InjectExpectationResultsByAttackPattern toInjectExpectationResultsByattackPattern(
@@ -146,28 +147,26 @@ public class InjectExpectationMapper {
     Set<ExpectationType> foundTypes = new HashSet<>();
 
     for (String contentJson : rawContents) {
+      if (contentJson == null || contentJson.isBlank()) continue;
+
       try {
-        if (contentJson != null && !contentJson.isBlank()) {
-          JsonNode jsonNode = objectMapper.readTree(contentJson);
+        JsonNode jsonNode = objectMapper.readTree(contentJson);
 
-          if (jsonNode != null && jsonNode.isObject()) {
-            ObjectNode contentNode = (ObjectNode) jsonNode;
+        if (jsonNode != null && jsonNode.isObject()) {
+          ObjectNode contentNode = (ObjectNode) jsonNode;
 
-            List<AtomicTestingUtils.ExpectationResultsByType> results =
-                buildExpectationResultsFromInjectContent(contentNode);
+          // ExpectationResults from one injectContent
+          List<AtomicTestingUtils.ExpectationResultsByType> results =
+              buildExpectationResultsFromInjectContent(contentNode);
 
-            for (AtomicTestingUtils.ExpectationResultsByType r : results) {
-              if (ALL_EXPECTATION_TYPES.contains(r.type())) {
-                foundTypes.add(r.type());
-                if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
-                  break;
-                }
+          // Check if all expectation types have already been added, if so stop the loop
+          for (AtomicTestingUtils.ExpectationResultsByType r : results) {
+            if (ALL_EXPECTATION_TYPES.contains(r.type())) {
+              foundTypes.add(r.type());
+              if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
+                break;
               }
             }
-          }
-
-          if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
-            break;
           }
         }
 
@@ -176,11 +175,15 @@ public class InjectExpectationMapper {
       }
     }
 
+    return buildFallbackResults(foundTypes);
+  }
+
+  private static List<AtomicTestingUtils.ExpectationResultsByType> buildFallbackResults(
+      Set<ExpectationType> foundTypes) {
     List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
     for (ExpectationType type : foundTypes) {
       AtomicTestingUtils.getExpectationByType(type, emptyList()).ifPresent(fallbackResults::add);
     }
-
     return fallbackResults;
   }
 }
