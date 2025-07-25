@@ -1,4 +1,4 @@
-package io.openbas.config.tls;
+package io.openbas.config.tls.trustmanager;
 
 import static io.openbas.utils.helpers.X509CertificateHelper.readCertificate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -13,7 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestInstance(PER_CLASS)
 @TestPropertySource(
-    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/extra-certs/one"})
+    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/tls/extra-certs/one"})
 class TlsConfigOneExtraCertTest extends IntegrationTest {
 
   @Autowired private X509TrustManager trustManager;
@@ -21,7 +21,7 @@ class TlsConfigOneExtraCertTest extends IntegrationTest {
   @Test
   @DisplayName("Should get one extra certs")
   void tlsContextCustomWithOneExtraCert() throws Exception {
-    X509Certificate cert = readCertificate("src/test/resources/extra-certs/one/cert.pem");
+    X509Certificate cert = readCertificate("src/test/resources/tls/extra-certs/one/cert.pem");
     assertThat(trustManager.getAcceptedIssuers()).contains(cert);
   }
 }

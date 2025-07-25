@@ -1,4 +1,4 @@
-package io.openbas.config.tls;
+package io.openbas.config.tls.trustmanager;
 
 import static io.openbas.utils.helpers.X509CertificateHelper.readCertificate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -15,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestInstance(PER_CLASS)
 @TestPropertySource(
-    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/extra-certs/identical"})
+    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/tls/extra-certs/identical"})
 public class TlsConfigIdenticalCertsTest extends IntegrationTest {
 
   @Autowired private X509TrustManager trustManager;
@@ -23,8 +23,10 @@ public class TlsConfigIdenticalCertsTest extends IntegrationTest {
   @Test
   @DisplayName("Should get a single extra cert, based on both identical certs")
   void tlsContextCustomWithWrongFolder() throws Exception {
-    X509Certificate cert1 = readCertificate("src/test/resources/extra-certs/identical/cert1.pem");
-    X509Certificate cert2 = readCertificate("src/test/resources/extra-certs/identical/cert2.pem");
+    X509Certificate cert1 =
+        readCertificate("src/test/resources/tls/extra-certs/identical/cert1.pem");
+    X509Certificate cert2 =
+        readCertificate("src/test/resources/tls/extra-certs/identical/cert2.pem");
 
     assertThat(trustManager.getAcceptedIssuers()).contains(cert1);
     assertThat(trustManager.getAcceptedIssuers()).contains(cert2);

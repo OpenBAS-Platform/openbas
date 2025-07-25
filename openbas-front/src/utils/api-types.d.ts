@@ -463,6 +463,16 @@ interface BasePayload {
   payload_detection_remediations?: DetectionRemediation[];
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -507,6 +517,16 @@ interface BasePayloadCreateInput {
   /** List of detection remediation gaps for collectors */
   payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_name: string;
   /**
    * Set of output parsers
@@ -772,6 +792,16 @@ export interface Command {
   payload_description?: string;
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -1254,6 +1284,16 @@ export interface DnsResolution {
   payload_description?: string;
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -1826,6 +1866,16 @@ export interface Executable {
   payload_description?: string;
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2158,6 +2208,16 @@ export interface FileDrop {
   payload_description?: string;
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -3450,6 +3510,16 @@ export interface NetworkTraffic {
   payload_description?: string;
   payload_elevation_required?: boolean;
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations?: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -4231,6 +4301,16 @@ export interface PayloadUpdateInput {
   /** List of detection remediation gaps for collectors */
   payload_detection_remediations?: DetectionRemediationInput[];
   payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_name: string;
   /**
    * Set of output parsers
@@ -4267,6 +4347,16 @@ export interface PayloadUpsertInput {
   payload_detection_remediations?: DetectionRemediationInput[];
   payload_elevation_required?: boolean;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_expectations: (
+    | "TEXT"
+    | "DOCUMENT"
+    | "ARTICLE"
+    | "CHALLENGE"
+    | "MANUAL"
+    | "PREVENTION"
+    | "DETECTION"
+    | "VULNERABILITY"
+  )[];
   payload_external_id: string;
   payload_name: string;
   /**

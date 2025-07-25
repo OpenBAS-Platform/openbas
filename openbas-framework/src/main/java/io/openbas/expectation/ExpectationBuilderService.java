@@ -15,6 +15,9 @@ public class ExpectationBuilderService {
   public static final String VULNERABILITY_NAME = "Vulnerability";
   public static final String CHALLENGE_NAME = "Expect targets to complete the challenge(s)";
   public static final String ARTICLE_NAME = "Expect targets to read the article(s)";
+  public static final String TEXT_NAME = "Simple expectation";
+  public static final String MANUAL_NAME = "Manual expectation";
+  public static final String DOCUMENT_NAME = "A document must be sent / uploaded";
   private final ExpectationPropertiesConfig expectationPropertiesConfig;
 
   public static Double DEFAULT_EXPECTATION_SCORE = 100.0;
@@ -67,5 +70,33 @@ public class ExpectationBuilderService {
     articleExpectation.setExpirationTime(
         this.expectationPropertiesConfig.getArticleExpirationTime());
     return articleExpectation;
+  }
+
+  public Expectation buildTextExpectation() {
+    Expectation textExpectation = new Expectation();
+    textExpectation.setType(TEXT);
+    textExpectation.setName(TEXT_NAME);
+    textExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
+    textExpectation.setExpirationTime(this.expectationPropertiesConfig.getManualExpirationTime());
+    return textExpectation;
+  }
+
+  public Expectation buildManualExpectation() {
+    Expectation manualExpectation = new Expectation();
+    manualExpectation.setType(MANUAL);
+    manualExpectation.setName(MANUAL_NAME);
+    manualExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
+    manualExpectation.setExpirationTime(this.expectationPropertiesConfig.getManualExpirationTime());
+    return manualExpectation;
+  }
+
+  public Expectation buildDocumentExpectation() {
+    Expectation documentExpectation = new Expectation();
+    documentExpectation.setType(DOCUMENT);
+    documentExpectation.setName(DOCUMENT_NAME);
+    documentExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
+    documentExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getManualExpirationTime());
+    return documentExpectation;
   }
 }
