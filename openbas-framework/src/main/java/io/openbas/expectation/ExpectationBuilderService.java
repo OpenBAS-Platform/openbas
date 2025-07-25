@@ -95,7 +95,8 @@ public class ExpectationBuilderService {
     documentExpectation.setType(DOCUMENT);
     documentExpectation.setName(DOCUMENT_NAME);
     documentExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
-    documentExpectation.setExpirationTime(this.expectationPropertiesConfig.getManualExpirationTime());
+    documentExpectation.setExpirationTime(
+        this.expectationPropertiesConfig.getManualExpirationTime());
     return documentExpectation;
   }
 }

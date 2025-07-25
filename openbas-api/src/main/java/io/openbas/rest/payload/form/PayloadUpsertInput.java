@@ -47,11 +47,11 @@ public class PayloadUpsertInput {
 
   @JsonProperty("payload_expectations")
   @NotNull
-  private InjectExpectation.EXPECTATION_TYPE[] expectations = new InjectExpectation.EXPECTATION_TYPE[] {
-          InjectExpectation.EXPECTATION_TYPE.PREVENTION,
-          InjectExpectation.EXPECTATION_TYPE.DETECTION
-  };
-  
+  private InjectExpectation.EXPECTATION_TYPE[] expectations =
+      new InjectExpectation.EXPECTATION_TYPE[] {
+        InjectExpectation.EXPECTATION_TYPE.PREVENTION, InjectExpectation.EXPECTATION_TYPE.DETECTION
+      };
+
   @JsonProperty("payload_description")
   private String description;
 

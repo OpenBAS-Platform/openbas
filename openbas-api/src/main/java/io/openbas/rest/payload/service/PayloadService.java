@@ -189,22 +189,26 @@ public class PayloadService {
     List<Expectation> expectations = new ArrayList<>();
     if (expectationTypes.length == 0) {
       return expectationsField(
-              List.of(
-                      this.expectationBuilderService.buildPreventionExpectation(),
-                      this.expectationBuilderService.buildDetectionExpectation()
-              )
-      );
+          List.of(
+              this.expectationBuilderService.buildPreventionExpectation(),
+              this.expectationBuilderService.buildDetectionExpectation()));
     } else {
       for (InjectExpectation.EXPECTATION_TYPE type : expectationTypes) {
         switch (type) {
           case TEXT -> expectations.add(this.expectationBuilderService.buildTextExpectation());
-          case DOCUMENT -> expectations.add(this.expectationBuilderService.buildDocumentExpectation());
-          case ARTICLE -> expectations.add(this.expectationBuilderService.buildArticleExpectation());
-          case CHALLENGE -> expectations.add(this.expectationBuilderService.buildChallengeExpectation());
+          case DOCUMENT ->
+              expectations.add(this.expectationBuilderService.buildDocumentExpectation());
+          case ARTICLE ->
+              expectations.add(this.expectationBuilderService.buildArticleExpectation());
+          case CHALLENGE ->
+              expectations.add(this.expectationBuilderService.buildChallengeExpectation());
           case MANUAL -> expectations.add(this.expectationBuilderService.buildManualExpectation());
-          case PREVENTION -> expectations.add(this.expectationBuilderService.buildPreventionExpectation());
-          case DETECTION -> expectations.add(this.expectationBuilderService.buildDetectionExpectation());
-          case VULNERABILITY -> expectations.add(this.expectationBuilderService.buildVulnerabilityExpectation());
+          case PREVENTION ->
+              expectations.add(this.expectationBuilderService.buildPreventionExpectation());
+          case DETECTION ->
+              expectations.add(this.expectationBuilderService.buildDetectionExpectation());
+          case VULNERABILITY ->
+              expectations.add(this.expectationBuilderService.buildVulnerabilityExpectation());
           default -> throw new IllegalArgumentException("Unsupported expectation type: " + type);
         }
       }
