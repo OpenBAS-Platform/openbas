@@ -684,7 +684,7 @@ public class OpenSearchService implements EngineService {
 
   /** {@inheritDoc} */
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
-    Filters.FilterGroup searchFilters = runtime.getWidget().getSeries().getFirst().getFilter();
+    Filters.FilterGroup searchFilters = runtime.getWidget().getPerspective().getFilter();
     String entityName =
         searchFilters.getFilters().stream()
             .filter(filter -> "base_entity".equals(filter.getKey()))
@@ -771,14 +771,14 @@ public class OpenSearchService implements EngineService {
     engineSortField.setDirection(SortDirection.DESC);
 
     // Create series
-    ListConfiguration.ListSeries listSeries = new ListConfiguration.ListSeries();
+    ListConfiguration.ListPerspective listSeries = new ListConfiguration.ListPerspective();
     listSeries.setName("Attack Paths");
     listSeries.setFilter(filterGroup);
 
     // Create list configuration
     ListConfiguration listConfiguration = new ListConfiguration();
     listConfiguration.setSorts(List.of(engineSortField));
-    listConfiguration.setSeries(List.of(listSeries));
+    listConfiguration.setPerspective(listSeries);
     return listConfiguration;
   }
 
