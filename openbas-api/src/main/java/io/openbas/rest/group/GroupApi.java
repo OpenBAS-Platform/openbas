@@ -6,8 +6,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -47,7 +45,6 @@ public class GroupApi extends RestBehavior {
   private GroupRepository groupRepository;
   private UserRepository userRepository;
   private RoleService roleService;
-  private RoleRepository roleRepository;
 
   @Autowired
   public void setOrganizationRepository(OrganizationRepository organizationRepository) {
@@ -157,9 +154,15 @@ public class GroupApi extends RestBehavior {
             .findById(groupId)
             .orElseThrow(() -> new ElementNotFoundException("Group not found with id: " + groupId));
 
-    Spliterator<Role> newRoles =
-            roleRepository.findAllById(input.getRoleIds()).spliterator();
-    group.setRoles(stream(newRoles, false).collect(toList()));
+    group.setRoles(
+        input.getRoleIds().stream()
+            .map(
+                id ->
+                    roleService
+                        .findById(id)
+                        .orElseThrow(
+                            () -> new ElementNotFoundException("Role not found with id: " + id)))
+            .collect(toList()));
 
     return groupRepository.save(group);
   }
@@ -264,10 +267,5 @@ public class GroupApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public void deleteGroup(@PathVariable String groupId) {
     groupRepository.deleteById(groupId);
-  }
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-    this.roleRepository = roleRepository;
   }
 }
