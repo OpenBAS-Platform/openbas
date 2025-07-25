@@ -5,10 +5,7 @@ import static io.openbas.engine.api.WidgetType.VERTICAL_BAR_CHART;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
-import io.openbas.engine.api.DateHistogramWidget;
-import io.openbas.engine.api.HistogramInterval;
-import io.openbas.engine.api.ListConfiguration;
-import io.openbas.engine.api.WidgetType;
+import io.openbas.engine.api.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +26,59 @@ public class WidgetFixture {
     widget.setWidgetConfiguration(widgetConfig);
     WidgetLayout widgetLayout = new WidgetLayout();
     widget.setLayout(widgetLayout);
+    return widget;
+  }
+
+  public static Widget createNumberWidgetWithEntity(String entityName) {
+    Widget widget = new Widget();
+    widget.setType(WidgetType.NUMBER);
+    // series
+    FlatConfiguration.FlatSeries series = new FlatConfiguration.FlatSeries();
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
+    Filters.Filter filter = new Filters.Filter();
+    filter.setValues(List.of(entityName));
+    filter.setOperator(Filters.FilterOperator.eq);
+    filter.setMode(Filters.FilterMode.and);
+    filter.setKey("base_entity");
+    filterGroup.setFilters(List.of(filter));
+    series.setFilter(filterGroup);
+    // basic configuration
+    FlatConfiguration flatConfiguration = new FlatConfiguration();
+    flatConfiguration.setSeries(List.of(series));
+    widget.setWidgetConfiguration(flatConfiguration);
+    // basic layout
+    widget.setLayout(new WidgetLayout());
+    return widget;
+  }
+
+  public static Widget createNumberWidgetWithEndpointAndFilter() {
+    Widget widget = new Widget();
+    widget.setType(WidgetType.NUMBER);
+    // series
+    FlatConfiguration.FlatSeries series = new FlatConfiguration.FlatSeries();
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
+    List<Filters.Filter> filters = new ArrayList<>();
+    Filters.Filter filter = new Filters.Filter();
+    filter.setValues(List.of("endpoint"));
+    filter.setOperator(Filters.FilterOperator.eq);
+    filter.setMode(Filters.FilterMode.or);
+    filter.setKey("base_entity");
+    filters.add(filter);
+    filter.setValues(List.of("Windows"));
+    filter.setOperator(Filters.FilterOperator.eq);
+    filter.setMode(Filters.FilterMode.or);
+    filter.setKey("endpoint_platform");
+    filters.add(filter);
+    filterGroup.setFilters(filters);
+    series.setFilter(filterGroup);
+    // basic configuration
+    FlatConfiguration flatConfiguration = new FlatConfiguration();
+    flatConfiguration.setSeries(List.of(series));
+    widget.setWidgetConfiguration(flatConfiguration);
+    // basic layout
+    widget.setLayout(new WidgetLayout());
     return widget;
   }
 

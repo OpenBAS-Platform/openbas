@@ -261,4 +261,116 @@ class DashboardApiTest extends IntegrationTest {
       assertThatJson(response).isArray().size().isEqualTo(2);
     }
   }
+
+  @Nested
+  @DisplayName("When fetching entities to count")
+  class WhenFetchingEntitiesToCount {
+
+    @Test
+    @DisplayName("Count all entities with no specific filter.")
+    void countAllEntitiesWithNoSpecificFilter() throws Exception {
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist();
+      Widget widget =
+          widgetComposer
+              .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createDefaultCustomDashboard()))
+              .persist()
+              .get();
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      esService.bulkProcessing(esEngine.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/count/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Count no entity with no specific filter.")
+    void countNoEntityWithNoSpecificFilter() throws Exception {
+      Widget widget =
+          widgetComposer
+              .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createDefaultCustomDashboard()))
+              .persist()
+              .get();
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      esService.bulkProcessing(esEngine.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/count/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Count all entities with specific filter.")
+    void countAllEntitiesWithSpecificFilter() throws Exception {
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createDefaultWindowsEndpointWithArch(Endpoint.PLATFORM_ARCH.x86_64))
+          .persist();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createDefaultLinuxEndpointWithArch(Endpoint.PLATFORM_ARCH.x86_64))
+          .persist();
+      Widget widget =
+          widgetComposer
+              .forWidget(WidgetFixture.createNumberWidgetWithEndpointAndFilter())
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createDefaultCustomDashboard()))
+              .persist()
+              .get();
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      esService.bulkProcessing(esEngine.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/count/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).isEqualTo(1);
+    }
+  }
 }
