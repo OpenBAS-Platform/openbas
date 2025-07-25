@@ -1,10 +1,12 @@
 import { BugReportOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { type ExpectationResultsByType, type InjectResultOutput } from '../../../../utils/api-types';
+import { expectationResultTypes } from '../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles()(() => ({
   inline: {
@@ -21,7 +23,7 @@ interface Props {
 
 const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId }) => {
   const { t } = useFormatter();
-  let tooltipLabel: string = '';
+  const theme = useTheme();
   const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
@@ -33,41 +35,18 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
     };
     return colorMap[result ?? ''] ?? 'rgb(245, 166, 35)';
   };
+
   if (!expectations || expectations.length === 0) {
-    return (
-      <div className={classes.inline}>
-        <ShieldOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <TrackChangesOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <SensorOccupiedOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-        <BugReportOutlined style={{
-          color: getColor('PENDING'),
-          marginRight: 10,
-          fontSize: 22,
-        }}
-        />
-      </div>
-    );
+    return null;
   }
+
   return (
     <div className={classes.inline} id={`inject_expectations_${injectId}`}>
-      {expectations.map((expectation, index) => {
+      {expectations.sort((a, b) => expectationResultTypes.indexOf(a.type) - expectationResultTypes.indexOf(b.type)).map((expectation, index) => {
         const color = getColor(expectation.avgResult);
         let IconComponent;
+        let tooltipLabel = '';
+
         switch (expectation.type) {
           case 'PREVENTION':
             tooltipLabel = t('Prevention');
@@ -81,17 +60,21 @@ const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId 
             tooltipLabel = t('Vulnerability');
             IconComponent = BugReportOutlined;
             break;
+          case 'HUMAN_RESPONSE':
           default:
             tooltipLabel = t('Human Response');
             IconComponent = SensorOccupiedOutlined;
+            break;
         }
+
         return (
           <Tooltip key={index} title={tooltipLabel}>
-            <IconComponent style={{
-              color,
-              marginRight: 10,
-              fontSize: 22,
-            }}
+            <IconComponent
+              style={{
+                color,
+                marginRight: theme.spacing(1),
+                fontSize: 22,
+              }}
             />
           </Tooltip>
         );

@@ -21,6 +21,7 @@ import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ class ExerciseServiceIntegrationTest {
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Autowired private LicenseCacheManager licenseCacheManager;
+  @Autowired private InjectExpectationMapper injectExpectationMapper;
 
   private static String USER_ID;
   private static String TEAM_ID;
@@ -95,7 +97,8 @@ class ExerciseServiceIntegrationTest {
             userRepository,
             exerciseTeamUserRepository,
             injectRepository,
-            lessonsCategoryRepository);
+            lessonsCategoryRepository,
+            injectExpectationMapper);
   }
 
   @AfterAll

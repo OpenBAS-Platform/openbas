@@ -5,9 +5,6 @@ import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.payload.output.PayloadSimple;
-import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.InjectUtils;
-import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
 import java.util.List;
 import java.util.Objects;
@@ -22,8 +19,7 @@ import org.springframework.stereotype.Component;
 public class InjectMapper {
 
   private final InjectStatusMapper injectStatusMapper;
-  private final InjectUtils injectUtils;
-  private final ResultUtils resultUtils;
+  private final InjectExpectationMapper injectExpectationMapper;
 
   public InjectResultOverviewOutput toInjectResultOverviewOutput(Inject inject) {
     // --
@@ -48,9 +44,7 @@ public class InjectMapper {
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
-        .expectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypes(
-                injectUtils.getPrimaryExpectations(inject)))
+        .expectationResultByTypes(injectExpectationMapper.extractExpectationResults(inject))
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
         .build();

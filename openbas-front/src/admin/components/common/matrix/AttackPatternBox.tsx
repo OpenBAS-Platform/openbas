@@ -7,6 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import { type AttackPattern, type ExpectationResultsByType, type InjectExpectationResultsByAttackPattern, type InjectExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
+import { type ExpectationResultType, mitreMatrixExpectationTypes } from '../injects/expectations/Expectation';
 
 const useStyles = makeStyles()(theme => ({
   button: {
@@ -95,26 +96,26 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     }
     return 'SUCCESS';
   };
-  const aggregatedPrevention = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'PREVENTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedDetection = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'DETECTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedHumanResponse = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'HUMAN_RESPONSE').map((r: ExpectationResultsByType) => r.avgResult)).flat();
-  const aggregatedResults: ExpectationResultsByType[] = [
-    {
-      type: 'PREVENTION',
-      avgResult: lowestSelector(aggregatedPrevention),
+
+  const buildAggregate = (type: ExpectationResultType): ExpectationResultsByType | null => {
+    const filtered = results
+      .map(r => r.results?.filter(er => er.type === type).map(er => er.avgResult))
+      .flat()
+      .filter(Boolean);
+
+    if (filtered.length === 0) return null;
+
+    return {
+      type,
+      avgResult: lowestSelector(filtered),
       distribution: [],
-    },
-    {
-      type: 'DETECTION',
-      avgResult: lowestSelector(aggregatedDetection),
-      distribution: [],
-    },
-    {
-      type: 'HUMAN_RESPONSE',
-      avgResult: lowestSelector(aggregatedHumanResponse),
-      distribution: [],
-    },
-  ];
+    };
+  };
+
+  const aggregatedResults: ExpectationResultsByType[] = mitreMatrixExpectationTypes
+    .map(buildAggregate)
+    .filter((agg): agg is ExpectationResultsByType => agg !== null);
+
   return (
     <>
       <Button

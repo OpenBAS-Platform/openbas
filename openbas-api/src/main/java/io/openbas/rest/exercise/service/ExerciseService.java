@@ -2,7 +2,9 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ExerciseSpecification.*;
+import static io.openbas.database.specification.ExerciseSpecification.closestBefore;
+import static io.openbas.database.specification.ExerciseSpecification.finished;
+import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -29,15 +31,23 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
+import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.*;
+import io.openbas.service.GrantService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.TeamService;
+import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.*;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.ResultUtils;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -96,6 +106,8 @@ public class ExerciseService {
   private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
+
+  private final InjectExpectationMapper injectExpectationMapper;
 
   // region properties
   @Value("${openbas.mail.imap.enabled}")
@@ -464,6 +476,17 @@ public class ExerciseService {
         .toList();
   }
 
+  public List<InjectExpectationResultsByAttackPattern> extractExpectationResultsByAttackPattern(
+      String exerciseId) {
+    Exercise exercise =
+        exerciseRepository
+            .findById(exerciseId)
+            .orElseThrow(
+                () -> new ElementNotFoundException("Exercise not found with ID: " + exerciseId));
+
+    return resultUtils.computeInjectExpectationResults(exercise.getInjects());
+  }
+
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
 
   // -- SELECT --
@@ -605,11 +628,13 @@ public class ExerciseService {
         .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
   }
 
-  private static void setGlobalScore(
+  private void setGlobalScore(
       ExerciseSimple exercise, Map<String, List<RawInjectExpectation>> expectationsByExerciseIds) {
+    List<RawInjectExpectation> expectations =
+        expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList());
     exercise.setExpectationResultByTypes(
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-            expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList())));
+        injectExpectationMapper.extractExpectationResultByTypesFromRaw(
+            exercise.getId(), expectations));
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
@@ -645,7 +670,8 @@ public class ExerciseService {
 
   // -- GLOBAL RESULTS --
   public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
-    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
+    return resultUtils.getResultsByTypes(
+        exerciseId, exerciseRepository.findInjectsByExercise(exerciseId));
   }
 
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(ExercisesGlobalScoresInput input) {

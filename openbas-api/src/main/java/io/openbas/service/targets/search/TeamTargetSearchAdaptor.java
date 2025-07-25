@@ -4,9 +4,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.TeamRepository;
-import io.openbas.service.InjectExpectationService;
 import io.openbas.service.TeamService;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Path;
@@ -20,17 +18,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
+
   private final TeamService teamService;
   private final TeamRepository teamRepository;
-  private final InjectExpectationService injectExpectationService;
+  private final HelperTargetSearchAdaptor helperTargetSearchAdaptor;
 
   public TeamTargetSearchAdaptor(
       TeamService teamService,
       TeamRepository teamRepository,
-      InjectExpectationService injectExpectationService) {
+      HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.teamService = teamService;
     this.teamRepository = teamRepository;
-    this.injectExpectationService = injectExpectationService;
+    this.helperTargetSearchAdaptor = helperTargetSearchAdaptor;
 
     // field name translations
     this.fieldTranslations.put("target_name", "team_name");
@@ -105,25 +104,13 @@ public class TeamTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   private InjectTarget convertFromTeamOutput(Team team, Inject inject) {
-    TeamTarget target =
-        new TeamTarget(
-            team.getId(),
-            team.getName(),
-            team.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
-
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
-      switch (result.type()) {
-        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
-        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
-        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
-      }
-    }
-
-    return target;
+    return helperTargetSearchAdaptor.buildTargetWithExpectations(
+        inject,
+        () ->
+            new TeamTarget(
+                team.getId(),
+                team.getName(),
+                team.getTags().stream().map(Tag::getId).collect(Collectors.toSet())),
+        false);
   }
 }

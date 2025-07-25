@@ -28,6 +28,7 @@ const generateFakeData = (): Record<string, GlobalScoreBySimulationEndDate[]> =>
   return ({
     ...({ PREVENTION: generateFakeDataFromDates(dates, 69.0) }),
     ...({ DETECTION: generateFakeDataFromDates(dates, 84.0) }),
+    ...({ VULNERABILITY: generateFakeDataFromDates(dates, 24.0) }),
     ...({ HUMAN_RESPONSE: generateFakeDataFromDates(dates, 46.0) }),
   });
 };
@@ -98,24 +99,24 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({ scenarioId }
     fetchStatistics();
   }, []);
 
-  const preventionData = statistic?.simulations_results_latest.global_scores_by_expectation_type['PREVENTION'];
-  const globalScoresByExpectationType = preventionData && preventionData.length > 0 ? statistic?.simulations_results_latest.global_scores_by_expectation_type : generateFakeData();
-  const isStatisticsDataEmpty = preventionData && preventionData.length === 0;
+  const EXPECTATION_TYPES = [
+    ['PREVENTION', 'Prevention', 'Blocked'],
+    ['DETECTION', 'Detection', 'Detected'],
+    ['VULNERABILITY', 'Vulnerability', 'Not vulnerable'],
+    ['HUMAN_RESPONSE', 'Human Response', 'Successful'],
+  ] as const;
 
-  const series = [
-    {
-      name: t('Prevention'),
-      data: generateSeriesData(globalScoresByExpectationType['PREVENTION'], t('Blocked')),
-    },
-    {
-      name: t('Detection'),
-      data: generateSeriesData(globalScoresByExpectationType['DETECTION'], t('Detected')),
-    },
-    {
-      name: t('Human Response'),
-      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE'], t('Successful')),
-    },
-  ];
+  const rawScores = statistic?.simulations_results_latest.global_scores_by_expectation_type || {};
+  const hasRealData = EXPECTATION_TYPES.some(([type]) => Array.isArray(rawScores[type]) && rawScores[type].length > 0);
+  const globalScoresByExpectationType = hasRealData ? rawScores : generateFakeData();
+  const isFakeData = !hasRealData;
+
+  const series = EXPECTATION_TYPES
+    .filter(([type]) => globalScoresByExpectationType[type]?.length > 0)
+    .map(([type, name, label]) => ({
+      name: t(name),
+      data: generateSeriesData(globalScoresByExpectationType[type], t(label)),
+    }));
 
   return (
     <>
@@ -132,7 +133,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({ scenarioId }
             true,
             'dataPoints',
             true,
-            isStatisticsDataEmpty,
+            isFakeData,
             1,
             t('No data to display'),
             customTooltip(simulationEndDateLabel),

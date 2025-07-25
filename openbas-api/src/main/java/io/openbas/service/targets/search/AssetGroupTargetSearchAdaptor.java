@@ -6,8 +6,6 @@ import io.openbas.database.model.InjectTarget;
 import io.openbas.rest.asset_group.AssetGroupCriteriaBuilderService;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.service.AssetGroupService;
-import io.openbas.service.InjectExpectationService;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
@@ -19,21 +17,21 @@ import org.springframework.stereotype.Component;
 public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
 
   private final AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService;
-  private final InjectExpectationService injectExpectationService;
   private final AssetGroupService assetGroupService;
+  private final HelperTargetSearchAdaptor helperTargetSearchAdaptor;
 
   public AssetGroupTargetSearchAdaptor(
       AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService,
-      InjectExpectationService injectExpectationService,
-      AssetGroupService assetGroupService) {
+      AssetGroupService assetGroupService,
+      HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.assetGroupCriteriaBuilderService = assetGroupCriteriaBuilderService;
-    this.injectExpectationService = injectExpectationService;
+    this.helperTargetSearchAdaptor = helperTargetSearchAdaptor;
+    this.assetGroupService = assetGroupService;
 
     // field name translations
     this.fieldTranslations.put("target_name", "asset_group_name");
     this.fieldTranslations.put("target_tags", "asset_group_tags");
     this.fieldTranslations.put("target_injects", "asset_group_injects");
-    this.assetGroupService = assetGroupService;
   }
 
   @Override
@@ -65,24 +63,11 @@ public class AssetGroupTargetSearchAdaptor extends SearchAdaptorBase {
 
   private InjectTarget convertFromAssetGroupOutput(
       AssetGroupOutput assetGroupOutput, Inject inject) {
-    AssetGroupTarget target =
-        new AssetGroupTarget(
-            assetGroupOutput.getId(), assetGroupOutput.getName(), assetGroupOutput.getTags());
-
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
-      switch (result.type()) {
-        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
-        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
-        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
-        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
-      }
-    }
-
-    return target;
+    return helperTargetSearchAdaptor.buildTargetWithExpectations(
+        inject,
+        () ->
+            new AssetGroupTarget(
+                assetGroupOutput.getId(), assetGroupOutput.getName(), assetGroupOutput.getTags()),
+        true);
   }
 }
