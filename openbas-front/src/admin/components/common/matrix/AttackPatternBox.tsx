@@ -7,7 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import { type AttackPattern, type ExpectationResultsByType, type InjectExpectationResultsByAttackPattern, type InjectExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
-import { type ExpectationResultType, expectationResultTypes } from '../injects/expectations/Expectation';
+import { type ExpectationResultType, mitreMatrixExpectationTypes } from '../injects/expectations/Expectation';
 
 const useStyles = makeStyles()(theme => ({
   button: {
@@ -112,7 +112,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     };
   };
 
-  const aggregatedResults: ExpectationResultsByType[] = expectationResultTypes
+  const aggregatedResults: ExpectationResultsByType[] = mitreMatrixExpectationTypes
     .map(buildAggregate)
     .filter((agg): agg is ExpectationResultsByType => agg !== null);
 
