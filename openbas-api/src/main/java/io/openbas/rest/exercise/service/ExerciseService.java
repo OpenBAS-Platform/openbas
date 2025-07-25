@@ -31,6 +31,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
+import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
@@ -473,6 +474,17 @@ public class ExerciseService {
     return results.stream()
         .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
         .toList();
+  }
+
+  public List<InjectExpectationResultsByAttackPattern> extractExpectationResultsByAttackPattern(
+      String exerciseId) {
+    Exercise exercise =
+        exerciseRepository
+            .findById(exerciseId)
+            .orElseThrow(
+                () -> new ElementNotFoundException("Exercise not found with ID: " + exerciseId));
+
+    return resultUtils.computeInjectExpectationResults(exercise.getInjects());
   }
 
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
