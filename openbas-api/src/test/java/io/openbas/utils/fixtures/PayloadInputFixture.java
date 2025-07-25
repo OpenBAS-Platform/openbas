@@ -59,7 +59,7 @@ public class PayloadInputFixture {
   }
 
   @NotNull
-  private static List<DetectionRemediationInput> buildDetectionRemediations() {
+  public static List<DetectionRemediationInput> buildDetectionRemediations() {
     DetectionRemediationInput drInputCS = new DetectionRemediationInput();
     drInputCS.setCollectorType("CS");
     drInputCS.setValues("Detection Remediation Gap for Crowdstrike");
