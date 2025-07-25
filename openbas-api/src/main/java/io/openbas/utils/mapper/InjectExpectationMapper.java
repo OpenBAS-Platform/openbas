@@ -109,6 +109,13 @@ public class InjectExpectationMapper {
     return buildFallbackResults(uniqueTypes);
   }
 
+  /**
+   * Build InjectExpectationResultsByAttackPattern from InjectExpectation related to attackPatterns
+   *
+   * @param attackPattern
+   * @param injects
+   * @return List of InjectExpectationResultsByAttackPattern
+   */
   public InjectExpectationResultsByAttackPattern toInjectExpectationResultsByattackPattern(
       final AttackPattern attackPattern, @NotNull final List<Inject> injects) {
 
@@ -131,7 +138,14 @@ public class InjectExpectationMapper {
         .build();
   }
 
-  // -- EXERCISE --
+
+  /**
+   * Extract ExpectationResultsByType from exercises using data from raw queries
+   *
+   * @param exerciseId
+   * @param expectations
+   * @return List of ExpectationResultsByType
+   */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResultByTypesFromRaw(
       String exerciseId, List<RawInjectExpectation> expectations) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
