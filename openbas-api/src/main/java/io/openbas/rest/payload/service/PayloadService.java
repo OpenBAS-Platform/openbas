@@ -187,7 +187,7 @@ public class PayloadService {
 
   private ContractExpectations expectations(InjectExpectation.EXPECTATION_TYPE[] expectationTypes) {
     List<Expectation> expectations = new ArrayList<>();
-    if (expectationTypes.length == 0) {
+    if (expectationTypes == null || expectationTypes.length == 0) {
       return expectationsField(
           List.of(
               this.expectationBuilderService.buildPreventionExpectation(),
