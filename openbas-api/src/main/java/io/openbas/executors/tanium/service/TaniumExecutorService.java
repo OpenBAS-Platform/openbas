@@ -89,7 +89,7 @@ public class TaniumExecutorService implements Runnable {
   public void run() {
     log.info("Running Tanium executor endpoints gathering...");
     List<NodeEndpoint> nodeEndpoints =
-        this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
+        this.client.endpoints().getEndpoints().getEdges().stream().toList();
     List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(nodeEndpoints);
     log.info("Tanium executor provisioning based on " + endpointRegisterList.size() + " assets");
 
