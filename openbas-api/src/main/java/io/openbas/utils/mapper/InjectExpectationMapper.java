@@ -178,6 +178,12 @@ public class InjectExpectationMapper {
     return buildFallbackResults(foundTypes);
   }
 
+  /**
+   * Build final list of ExpectationResults using AtomicTestingUtils methods
+   *
+   * @param foundTypes ExpectationTypes defined in the content of inject
+   * @return List of ExpectationResultsByType
+   */
   private static List<AtomicTestingUtils.ExpectationResultsByType> buildFallbackResults(
       Set<ExpectationType> foundTypes) {
     List<AtomicTestingUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
