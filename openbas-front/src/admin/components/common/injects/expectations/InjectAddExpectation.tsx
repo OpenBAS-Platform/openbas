@@ -3,7 +3,7 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import Dialog from '../../../../../components/common/Dialog';
+import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
 import { useFormatter } from '../../../../../components/i18n';
 import { PermissionsContext } from '../../Context';
 import { type ExpectationInput, type ExpectationInputForm } from './Expectation';
@@ -66,7 +66,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
-      <Dialog
+      <FiligranDialog
         open={openDialog}
         handleClose={handleClose}
         title={t('Add expectation in this inject')}
@@ -76,7 +76,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
           onSubmit={onSubmit}
           handleClose={handleClose}
         />
-      </Dialog>
+      </FiligranDialog>
     </>
   );
 };

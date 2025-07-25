@@ -1,4 +1,4 @@
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import { useFormatter } from '../../../../components/i18n';
 import ImportFileSelector from './ImportFileSelector';
 
@@ -11,7 +11,7 @@ const InjectImportJsonDialog = (props: ImportJsonDialogProps) => {
   const { t } = useFormatter();
 
   return (
-    <Dialog
+    <FiligranDialog
       open={props.open}
       handleClose={props.handleClose}
       title={t('Import injects')}
@@ -24,7 +24,7 @@ const InjectImportJsonDialog = (props: ImportJsonDialogProps) => {
         handleClose={props.handleClose}
         handleSubmit={props.handleSubmit}
       />
-    </Dialog>
+    </FiligranDialog>
   );
 };
 

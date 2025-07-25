@@ -3,8 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 
-import { fetchOrganizations } from '../../../actions/Organization';
-import { meTokens, renewToken, updateMeInformation, updateMePassword, updateMeProfile } from '../../../actions/User';
+import { meTokens, renewToken, updateMeInformation, updateMeOnboarding, updateMePassword, updateMeProfile } from '../../../actions/User';
 import Paper from '../../../components/common/Paper';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
@@ -13,19 +12,18 @@ import { countryOption } from '../../../utils/Option';
 import PasswordForm from './PasswordForm';
 import ProfileForm from './ProfileForm';
 import UserForm from './UserForm';
+import UserOnboardingForm from './UserOnboardingForm.js';
 
 const Index = () => {
   const { t } = useFormatter();
   const theme = useTheme();
   const dispatch = useDispatch();
   useDataLoader(() => {
-    dispatch(fetchOrganizations());
     dispatch(meTokens());
   });
-  const { user, tokens, organizationsMap } = useHelper(helper => ({
+  const { user, tokens } = useHelper(helper => ({
     user: helper.getMe(),
     tokens: helper.getMeTokens(),
-    organizationsMap: helper.getOrganizationsMap(),
   }));
   const onRenew = tokenId => dispatch(renewToken(tokenId));
   const onUpdate = (data) => {
@@ -49,30 +47,25 @@ const Index = () => {
   const onUpdatePassword = data => dispatch(
     updateMePassword(data.user_current_password, data.user_plain_password),
   );
-  const userOrganizationValue = organizationsMap[user.user_organization];
-  const userOrganization = userOrganizationValue
-    ? {
-        id: userOrganizationValue.organization_id,
-        label: userOrganizationValue.organization_name,
-      }
-    : null;
-  const initialValues = R.pipe(
-    R.assoc('user_organization', userOrganization),
-    R.assoc('user_country', countryOption(user.user_country)),
-    R.pick([
-      'user_firstname',
-      'user_lastname',
-      'user_email',
-      'user_organization',
-      'user_country',
-      'user_phone',
-      'user_phone2',
-      'user_pgp_key',
-      'user_lang',
-      'user_theme',
-      'user_is_external',
-    ]),
-  )(user);
+  const onUpdateOnboarding = data => dispatch(
+    updateMeOnboarding(data.user_onboarding_widget_enable, data.user_onboarding_contextual_help_enable),
+  );
+  const initialValues = {
+    user_firstname: user.user_firstname,
+    user_lastname: user.user_lastname,
+    user_email: user.user_email,
+    user_phone: user.user_phone,
+    user_phone2: user.user_phone2,
+    user_pgp_key: user.user_pgp_key,
+    user_lang: user.user_lang,
+    user_theme: user.user_theme,
+    user_is_external: user.user_is_external,
+    user_onboarding_enable: user.user_onboarding_enable,
+    user_organization: user.user_organization ?? '',
+    user_country: countryOption(user.user_country)?.id ?? '',
+    user_onboarding_widget_enable: user.user_onboarding_widget_enable,
+    user_onboarding_contextual_help_enable: user.user_onboarding_contextual_help_enable,
+  };
   const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
   return (
     <div style={{
@@ -86,11 +79,13 @@ const Index = () => {
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('Profile')}
         </Typography>
-        <UserForm
-          organizations={R.values(organizationsMap)}
-          onSubmit={onUpdate}
-          initialValues={initialValues}
-        />
+        <UserForm onSubmit={onUpdate} initialValues={initialValues} />
+      </Paper>
+      <Paper>
+        <Typography variant="h1" style={{ marginBottom: 20 }}>
+          {t('onboarding_help_settings')}
+        </Typography>
+        <UserOnboardingForm onSubmit={onUpdateOnboarding} initialValues={initialValues} />
       </Paper>
       <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
