@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useState } from 'react';
 
-import { attackPaths, entities, series } from '../../../../../actions/dashboards/dashboard-action';
+import { attackPaths, count, entities, series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsAttackPath, type EsBase, type EsSeries } from '../../../../../utils/api-types';
@@ -11,6 +11,7 @@ import DonutChart from './viz/DonutChart';
 import HorizontalBarChart from './viz/HorizontalBarChart';
 import LineChart from './viz/LineChart';
 import ListWidget from './viz/list/ListWidget';
+import NumberWidget from './viz/NumberWidget';
 import SecurityCoverage from './viz/SecurityCoverage';
 import VerticalBarChart from './viz/VerticalBarChart';
 import { getWidgetTitle } from './WidgetUtils';
@@ -26,16 +27,17 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const [seriesVizData, setSeriesVizData] = useState<EsSeries[]>([]);
   const [entitiesVizData, setEntitiesVizData] = useState<EsBase[]>([]);
   const [attackPathsVizData, setAttackPathsVizData] = useState<EsAttackPath[]>([]);
+  const [numberVizData, setNumberVizData] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   const { customDashboardParameters } = useContext(CustomDashboardContext);
 
-  const fetchData = <T extends EsSeries | EsBase | EsAttackPath>(
-    fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T[] }>,
-    setData: React.Dispatch<React.SetStateAction<T[]>>,
+  const fetchData = <T extends EsSeries[] | EsBase[] | EsAttackPath[] | number>(
+    fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T }>,
+    setData: React.Dispatch<React.SetStateAction<T>>,
   ) => {
     fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {
-      if (response.data) {
+      if (response.data || typeof response.data === 'number') {
         setData(response.data);
       }
     }).finally(() => setLoading(false));
@@ -48,6 +50,9 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
         fetchData(attackPaths, setAttackPathsVizData);
         break;
       }
+      case 'number':
+        fetchData(count, setNumberVizData);
+        break;
       case 'list':
         fetchData(entities, setEntitiesVizData);
         break;
@@ -124,6 +129,12 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     }
     case 'list':
       return (<ListWidget elements={entitiesVizData} config={widget.widget_config} />);
+    case 'number':
+      return (
+        <NumberWidget
+          data={numberVizData}
+        />
+      );
     default:
       return 'Not implemented yet';
   }

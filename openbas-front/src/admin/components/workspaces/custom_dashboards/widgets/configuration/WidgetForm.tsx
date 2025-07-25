@@ -58,6 +58,15 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   // Form
   const widgetConfigSchema = z.discriminatedUnion('widget_configuration_type', [
+    // FlatConfiguration
+    z.object({
+      title: z.string().optional(),
+      widget_configuration_type: z.literal('flat'),
+      series: z.array(z.object({
+        name: z.string().optional(),
+        filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
+      })),
+    }),
     // DateHistogramConfiguration
     z.object({
       mode: z.literal('temporal'),
@@ -121,7 +130,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
         widget_config: widgetConfigSchema,
       }),
     ),

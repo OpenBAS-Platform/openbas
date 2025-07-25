@@ -18,6 +18,10 @@ const WidgetConfigurationParameters: FunctionComponent<{
   const getParametersControl = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
       case 'list': return <ListWidgetParameters setValue={setValue} control={control} widgetType={widgetType} />;
+      case 'number': {
+        setValue('widget_config.widget_configuration_type', 'flat');
+        return <></>;
+      }
       default: return <HistogramParameters setValue={setValue} control={control} widgetType={widgetType} />;
     }
   };

@@ -1,5 +1,5 @@
 import { AccountTree, List, TableChart } from '@mui/icons-material';
-import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
+import { AlignHorizontalLeft, ChartBar, ChartDonut, ChartLine, Counter } from 'mdi-material-ui';
 
 import {
   type CustomDashboardParameters,
@@ -68,6 +68,10 @@ export const widgetVisualizationTypes: {
     category: 'list',
     seriesLimit: 1,
   },
+  {
+    category: 'number',
+    seriesLimit: 1,
+  },
 ];
 
 export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' | 'small' | 'medium') => {
@@ -86,6 +90,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
       return <AccountTree fontSize={fontSize} color="primary" />;
     case 'list':
       return <List fontSize={fontSize} color="primary" />;
+    case 'number':
+      return <Counter fontSize={fontSize} color="primary" />;
     default:
       return <div />;
   }

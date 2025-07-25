@@ -29,6 +29,24 @@ public class DashboardService {
   private final UserRepository userRepository;
 
   /**
+   * Retrieves count data from Elasticsearch for a specific widget based on its configuration.
+   *
+   * @param widget the {@link Widget} defining the type and configuration
+   * @param parameters parameters passed at runtime (e.g. filters, date ranges)
+   * @param definitionParameters dashboard-level parameters definitions
+   * @return long representing the count result
+   */
+  public long count(
+      @NotNull final Widget widget,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
+    FlatConfiguration config = (FlatConfiguration) widget.getWidgetConfiguration();
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    CountRuntime runtime = new CountRuntime(config, parameters, definitionParameters);
+    return esService.count(userWithAuth, runtime);
+  }
+
+  /**
    * Retrieves time series or structural histogram data from Elasticsearch for a specific widget
    * based on its configuration.
    *
