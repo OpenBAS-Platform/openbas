@@ -36,4 +36,4 @@ export type ExpectationResultType = 'PREVENTION' | 'DETECTION' | 'HUMAN_RESPONSE
 
 export const expectationResultTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
 
-export const mitreMatrixExpectationTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION'];
+export const mitreMatrixExpectationTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY'];
