@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -61,6 +62,13 @@ public class PayloadCreateInput {
   @NotNull
   private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
       Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
+
+  @JsonProperty("payload_expectations")
+  @NotNull
+  private EXPECTATION_TYPE[] expectations = new EXPECTATION_TYPE[] {
+          EXPECTATION_TYPE.PREVENTION,
+          EXPECTATION_TYPE.DETECTION
+  };
 
   @JsonProperty("payload_description")
   private String description;

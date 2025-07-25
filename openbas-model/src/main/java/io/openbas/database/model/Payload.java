@@ -1,9 +1,5 @@
 package io.openbas.database.model;
 
-import static jakarta.persistence.DiscriminatorType.STRING;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,6 +8,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
@@ -22,13 +19,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.time.Instant;
+import java.util.*;
+
+import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
@@ -156,6 +158,12 @@ public class Payload implements Base {
   @JsonProperty("payload_source")
   @NotNull
   private PAYLOAD_SOURCE source;
+
+  @Queryable(filterable = true, searchable = true)
+  @Type(StringArrayType.class)
+  @Column(name = "payload_expectations", columnDefinition = "text[]")
+  @JsonProperty("payload_expectations")
+  private EXPECTATION_TYPE[] expectations;
 
   @Setter
   @Queryable(filterable = true)

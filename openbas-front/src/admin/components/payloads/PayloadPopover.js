@@ -121,6 +121,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     file_drop_file: payload.file_drop_file,
     payload_attack_patterns: payload.payload_attack_patterns,
     payload_tags: payload.payload_tags,
+    payload_expectations: payload.payload_expectations,
     payload_execution_arch: payload.payload_execution_arch,
     payload_output_parsers: payload.payload_output_parsers,
     payload_platforms: payload.payload_platforms,

@@ -29,6 +29,7 @@ import io.openbas.injector_contract.ContractDef;
 import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.*;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
+import io.openbas.model.inject.form.Expectation;
 import io.openbas.rest.payload.PayloadUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -146,7 +147,7 @@ public class PayloadService {
             true);
     ContractAsset assetField = assetField(Multiple);
     ContractAssetGroup assetGroupField = assetGroupField(Multiple);
-    ContractExpectations expectationsField = expectations();
+    ContractExpectations expectationsField = expectations(payload.getExpectations());
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
 
@@ -184,12 +185,31 @@ public class PayloadService {
         true);
   }
 
-  private ContractExpectations expectations() {
-    return expectationsField(
-        List.of(
-            this.expectationBuilderService.buildPreventionExpectation(),
-            this.expectationBuilderService.buildDetectionExpectation(),
-            this.expectationBuilderService.buildVulnerabilityExpectation()));
+  private ContractExpectations expectations(InjectExpectation.EXPECTATION_TYPE[] expectationTypes) {
+    List<Expectation> expectations = new ArrayList<>();
+    if (expectationTypes.length == 0) {
+      return expectationsField(
+              List.of(
+                      this.expectationBuilderService.buildPreventionExpectation(),
+                      this.expectationBuilderService.buildDetectionExpectation()
+              )
+      );
+    } else {
+      for (InjectExpectation.EXPECTATION_TYPE type : expectationTypes) {
+        switch (type) {
+          case TEXT -> expectations.add(this.expectationBuilderService.buildTextExpectation());
+          case DOCUMENT -> expectations.add(this.expectationBuilderService.buildDocumentExpectation());
+          case ARTICLE -> expectations.add(this.expectationBuilderService.buildArticleExpectation());
+          case CHALLENGE -> expectations.add(this.expectationBuilderService.buildChallengeExpectation());
+          case MANUAL -> expectations.add(this.expectationBuilderService.buildManualExpectation());
+          case PREVENTION -> expectations.add(this.expectationBuilderService.buildPreventionExpectation());
+          case DETECTION -> expectations.add(this.expectationBuilderService.buildDetectionExpectation());
+          case VULNERABILITY -> expectations.add(this.expectationBuilderService.buildVulnerabilityExpectation());
+          default -> throw new IllegalArgumentException("Unsupported expectation type: " + type);
+        }
+      }
+      return expectationsField(expectations);
+    }
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {
