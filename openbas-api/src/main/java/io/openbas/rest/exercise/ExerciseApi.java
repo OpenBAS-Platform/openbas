@@ -15,6 +15,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
@@ -93,9 +94,13 @@ public class ExerciseApi extends RestBehavior {
   private final EvaluationRepository evaluationRepository;
   private final KillChainPhaseRepository killChainPhaseRepository;
   private final GrantRepository grantRepository;
+  private final ChannelRepository channelRepository;
+  private final LessonsTemplateRepository lessonsTemplateRepository;
   // endregion
 
   // region services
+  private final AssetGroupService assetGroupService;
+  private final EndpointService endpointService;
   private final FileService fileService;
   private final InjectService injectService;
   private final ExerciseService exerciseService;
@@ -773,5 +778,58 @@ public class ExerciseApi extends RestBehavior {
         .rulesFound(this.exerciseService.checkIfTagRulesApplies(exercise, input.getNewTags()))
         .build();
   }
+
   // endregion
+
+  // region asset groups, endpoints, documents and channels
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/asset_groups")
+  @Operation(
+      summary =
+          "Get asset groups. Can only be called if the user has access to the given simulation.",
+      description = "Get all asset groups for a given simulation")
+  @PreAuthorize("isObserver()")
+  public List<AssetGroup> assetGroups() {
+    return this.assetGroupService.assetGroups();
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/channels")
+  @Operation(
+      summary = "Get channels. Can only be called if the user has access to the given simulation.",
+      description = "Get all channels for a given simulation")
+  @PreAuthorize("isObserver()")
+  public Iterable<Channel> channels() {
+    return this.channelRepository.findAll();
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/endpoints")
+  @Operation(
+      summary = "Get endpoints. Can only be called if the user has access to the given simulation.",
+      description = "Get all endpoints for a given simulation")
+  @PreAuthorize("isObserver()")
+  public List<Endpoint> endpoints() {
+    return this.endpointService.endpoints(
+        EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints());
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/documents")
+  @Operation(
+      summary = "Get documents. Can only be called if the user has access to the given simulation.",
+      description = "Get all documents for a given simulation")
+  public List<RawDocument> documents() {
+    OpenBASPrincipal user = currentUser();
+    if (user.isAdmin()) {
+      return documentRepository.rawAllDocuments();
+    } else {
+      return documentRepository.rawAllDocumentsByAccessLevel(user.getId());
+    }
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/lessons_templates")
+  @Operation(
+      summary = "Get documents. Can only be called if the user has access to the given simulation.",
+      description = "Get all documents for a given simulation")
+  public Iterable<LessonsTemplate> lessonsTemplates() {
+    return this.lessonsTemplateRepository.findAll();
+  }
+  // end region
 }
