@@ -5,6 +5,7 @@ import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class EmailExecutorTest {
+public class EmailExecutorTest extends IntegrationTest {
 
   @Autowired private EmailExecutor emailExecutor;
   @Autowired private UserRepository userRepository;

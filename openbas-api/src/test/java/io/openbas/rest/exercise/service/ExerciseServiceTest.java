@@ -3,6 +3,7 @@ package io.openbas.rest.exercise.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
@@ -33,7 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class ExerciseServiceTest {
+class ExerciseServiceTest extends IntegrationTest {
 
   @Mock private Ee eeService;
   @Mock private GrantService grantService;

@@ -5,6 +5,7 @@ import static io.openbas.utils.fixtures.RawFinishedExerciseWithInjectsFixture.cr
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.raw.RawFinishedExerciseWithInjects;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.expectation.ExpectationType;
@@ -25,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ScenarioStatisticServiceTest {
+class ScenarioStatisticServiceTest extends IntegrationTest {
   @Mock private ExerciseRepository exerciseRepository;
   @Mock private ResultUtils resultUtils;
 

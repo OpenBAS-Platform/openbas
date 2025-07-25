@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import io.openbas.IntegrationTest;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.rest.settings.PreviewFeature;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @TestInstance(PER_CLASS)
-public class PlatformServiceSettingsTest {
+public class PlatformServiceSettingsTest extends IntegrationTest {
 
   @Autowired private PlatformSettingsService platformSettingsService;
   @Resource private RabbitmqConfig rabbitmqConfig;

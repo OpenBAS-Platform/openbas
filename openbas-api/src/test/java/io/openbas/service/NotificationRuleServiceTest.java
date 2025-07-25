@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.NotificationRule;
 import io.openbas.database.model.NotificationRuleResourceType;
 import io.openbas.database.model.NotificationRuleTrigger;
@@ -17,7 +18,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class NotificationRuleServiceTest {
+public class NotificationRuleServiceTest extends IntegrationTest {
 
   @Mock private NotificationRuleRepository notificationRuleRepository;
 

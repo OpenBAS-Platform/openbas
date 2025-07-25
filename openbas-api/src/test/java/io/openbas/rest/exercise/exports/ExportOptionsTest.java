@@ -3,10 +3,7 @@ package io.openbas.rest.exercise.exports;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import io.openbas.IntegrationTest;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 
 @TestInstance(PER_CLASS)
 public class ExportOptionsTest extends IntegrationTest {

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Channel;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ArticleRepository;
@@ -29,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-class ChannelApiTest {
+class ChannelApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
 

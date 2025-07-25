@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.model.InjectImporter;
 import io.openbas.database.repository.EndpointRepository;
@@ -28,7 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class MapperServiceTest {
+public class MapperServiceTest extends IntegrationTest {
 
   @Mock private ImportMapperRepository importMapperRepository;
   @Mock private InjectorContractRepository injectorContractRepository;

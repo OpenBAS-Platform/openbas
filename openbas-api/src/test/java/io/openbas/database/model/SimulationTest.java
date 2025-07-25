@@ -2,15 +2,13 @@ package io.openbas.database.model;
 
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.composers.ExerciseComposer;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @TestInstance(PER_CLASS)
 @Transactional
-class SimulationTest {
+class SimulationTest extends IntegrationTest {
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private EntityManager entityManager;

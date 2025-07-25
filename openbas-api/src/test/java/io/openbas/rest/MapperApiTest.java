@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.inject.service.InjectService;
@@ -48,7 +49,7 @@ import org.springframework.util.ResourceUtils;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class MapperApiTest {
+public class MapperApiTest extends IntegrationTest {
 
   private MockMvc mvc;
 

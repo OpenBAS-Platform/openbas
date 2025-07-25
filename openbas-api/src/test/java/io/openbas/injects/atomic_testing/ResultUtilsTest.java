@@ -6,6 +6,7 @@ import static io.openbas.utils.fixtures.RawInjectExpectationFixture.createDefaul
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.service.AssetGroupService;
@@ -21,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ResultUtilsTest {
+class ResultUtilsTest extends IntegrationTest {
 
   @Mock private InjectExpectationRepository injectExpectationRepository;
   @Mock private TeamRepository teamRepository;

@@ -5,6 +5,7 @@ import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class InjectHelperTest {
+public class InjectHelperTest extends IntegrationTest {
 
   public static final String USER_EMAIL = "test@gmail.com";
   @Autowired private InjectHelper injectHelper;

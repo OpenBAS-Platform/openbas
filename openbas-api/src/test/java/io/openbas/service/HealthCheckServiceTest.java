@@ -9,6 +9,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
 import io.minio.errors.*;
+import io.openbas.IntegrationTest;
 import io.openbas.config.MinioConfig;
 import io.openbas.database.repository.*;
 import io.openbas.driver.MinioDriver;
@@ -24,7 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class HealthCheckServiceTest {
+class HealthCheckServiceTest extends IntegrationTest {
 
   private static final String BUCKET = "bucket";
 
