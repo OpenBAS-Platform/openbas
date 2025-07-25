@@ -6,14 +6,14 @@ import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type Role } from '../../../../utils/api-types';
+import { type RoleOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import RoleForm from './RoleForm';
 
 export interface RolePopoverProps {
   onDelete?: (result: string) => void;
-  onUpdate?: (result: Role) => void;
-  role: Role;
+  onUpdate?: (result: RoleOutput) => void;
+  role: RoleOutput;
 }
 
 const RolePopover: FunctionComponent<RolePopoverProps> = ({ onDelete, onUpdate, role }) => {

@@ -9,7 +9,7 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
-import type { Role, SearchPaginationInput } from '../../../../utils/api-types';
+import type { RoleOutput, SearchPaginationInput } from '../../../../utils/api-types';
 import SecurityMenu from '../SecurityMenu';
 import CreateRole from './CreateRole';
 import RolePopover from './RolePopover';
@@ -29,7 +29,7 @@ const Roles = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
 
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<RoleOutput[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('role', buildSearchPagination({
@@ -37,7 +37,7 @@ const Roles = () => {
     textSearch: search,
   }));
 
-  const secondaryAction = (role: Role) => (
+  const secondaryAction = (role: RoleOutput) => (
     <RolePopover
       onDelete={result => setRoles(roles.filter(r => (r.role_id !== result)))}
       onUpdate={result => setRoles(roles.map(r => (r.role_id !== result.role_id ? r : result)))}
@@ -72,7 +72,7 @@ const Roles = () => {
           disableFilters
         />
         <RolesList roles={roles} queryableHelpers={queryableHelpers} loading={loading} secondaryAction={secondaryAction} />
-        <CreateRole onCreate={(result: Role) => setRoles([...roles, result])} />
+        <CreateRole onCreate={(result: RoleOutput) => setRoles([...roles, result])} />
 
       </div>
       <SecurityMenu />

@@ -9,13 +9,13 @@ import SortHeadersComponentV2 from '../../../../components/common/queryable/sort
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import { type Role } from '../../../../utils/api-types';
+import { type RoleOutput } from '../../../../utils/api-types';
 
 interface RolesListProps {
-  roles: Role[];
+  roles: RoleOutput[];
   queryableHelpers: QueryableHelpers;
   loading: boolean;
-  secondaryAction?: (role: Role) => ReactNode;
+  secondaryAction?: (role: RoleOutput) => ReactNode;
 }
 
 const useStyles = makeStyles()(() => ({
@@ -46,13 +46,13 @@ const RolesList = ({
       field: 'role_name',
       label: t('Name'),
       isSortable: true,
-      value: (role: Role) => role.role_name,
+      value: (role: RoleOutput) => role.role_name,
     },
     {
       field: 'role_created_at',
       label: t('Platform creation date'),
       isSortable: true,
-      value: (role: Role) => {
+      value: (role: RoleOutput) => {
         if (!role.role_created_at) {
           return '-';
         }
@@ -63,7 +63,7 @@ const RolesList = ({
       field: 'role_updated_at',
       label: t('Modification date'),
       isSortable: true,
-      value: (role: Role) => {
+      value: (role: RoleOutput) => {
         if (!role.role_updated_at) {
           return '-';
         }
@@ -94,7 +94,7 @@ const RolesList = ({
         ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
         : (
             <div>
-              {roles.map((role: Role) => (
+              {roles.map((role: RoleOutput) => (
                 <ListItem
                   key={role.role_id}
                   classes={{ root: classes.item }}
