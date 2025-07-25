@@ -37,7 +37,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     setData: React.Dispatch<React.SetStateAction<T>>,
   ) => {
     fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {
-      if (response.data) {
+      if (response.data || typeof response.data === 'number') {
         setData(response.data);
       }
     }).finally(() => setLoading(false));
