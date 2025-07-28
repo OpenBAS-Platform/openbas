@@ -4,6 +4,7 @@ import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.api.ListConfiguration;
 import io.openbas.engine.api.ListRuntime;
 import io.openbas.engine.api.StructuralHistogramRuntime;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class EsAttackPathService {
   private final AttackPatternRepository attackPatternRepository;
 
-  private final EsService esService;
+  private final EngineService esService;
 
   /**
    * Fetches attack paths for a given simulation.

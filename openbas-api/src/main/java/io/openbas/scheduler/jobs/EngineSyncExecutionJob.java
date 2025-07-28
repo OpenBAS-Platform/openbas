@@ -1,9 +1,9 @@
 package io.openbas.scheduler.jobs;
 
-import io.openbas.engine.EsEngine;
+import io.openbas.engine.EngineContext;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.model.EsBase;
-import io.openbas.service.EsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ElasticSyncExecutionJob implements Job {
+public class EngineSyncExecutionJob implements Job {
 
-  private final EsService esService;
-  private final EsEngine esEngine;
+  private final EngineService engineService;
+  private final EngineContext engineContext;
 
   @Override
   @Transactional(rollbackFor = Exception.class)
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    List<EsModel<EsBase>> models = esEngine.getModels();
+    List<EsModel<EsBase>> models = engineContext.getModels();
     log.info("Executing bulk parallel processing for {} models", models.size());
-    esService.bulkProcessing(models.stream().parallel());
+    engineService.bulkProcessing(models.stream().parallel());
   }
 }

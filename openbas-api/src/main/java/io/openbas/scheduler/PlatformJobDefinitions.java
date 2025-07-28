@@ -3,7 +3,7 @@ package io.openbas.scheduler;
 import static org.quartz.JobKey.jobKey;
 
 import io.openbas.scheduler.jobs.ComchecksExecutionJob;
-import io.openbas.scheduler.jobs.ElasticSyncExecutionJob;
+import io.openbas.scheduler.jobs.EngineSyncExecutionJob;
 import io.openbas.scheduler.jobs.InjectsExecutionJob;
 import io.openbas.scheduler.jobs.ScenarioExecutionJob;
 import org.quartz.JobBuilder;
@@ -39,8 +39,8 @@ public class PlatformJobDefinitions {
   }
 
   @Bean
-  public JobDetail getElasticSyncExecution() {
-    return JobBuilder.newJob(ElasticSyncExecutionJob.class)
+  public JobDetail getEngineSyncExecution() {
+    return JobBuilder.newJob(EngineSyncExecutionJob.class)
         .storeDurably()
         .withIdentity(jobKey("ElasticSyncExecutionJob"))
         .build();
