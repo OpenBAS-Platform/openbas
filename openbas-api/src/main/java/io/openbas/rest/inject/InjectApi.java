@@ -4,6 +4,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
+import com.google.common.util.concurrent.Striped;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.authorisation.AuthorisationService;
 import io.openbas.database.model.*;
@@ -35,7 +36,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +44,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,34 +74,11 @@ public class InjectApi extends RestBehavior {
   private final UserRepository userRepository;
   private final PayloadMapper payloadMapper;
 
-  // [issue/2797] region start: Added an alternative locking mechanism
-  // Lock map to ensure synchronization on the same inject ID
-  private final ConcurrentHashMap<String, Object> locks = new ConcurrentHashMap<>();
-  private final ConcurrentHashMap<String, Long> lastAccessTime = new ConcurrentHashMap<>();
-  // Maximum age for locks in milliseconds (2 minute)
-  private static final long MAX_LOCK_AGE_MS = 120000;
-
-  @Scheduled(fixedDelay = 60000) // Run every 1 minutes
-  public void cleanupOldLocks() {
-    log.debug("[issue/2797] Clean up of old locks started");
-    long currentTime = System.currentTimeMillis();
-    int removedCount = 0;
-
-    for (Map.Entry<String, Long> entry : lastAccessTime.entrySet()) {
-      String injectId = entry.getKey();
-      Long lastAccess = entry.getValue();
-
-      if (currentTime - lastAccess > MAX_LOCK_AGE_MS) {
-        locks.remove(injectId);
-        lastAccessTime.remove(injectId);
-        removedCount++;
-      }
-    }
-
-    log.debug("[issue/2797] Cleaned up {} old locks", removedCount);
-  }
-
-  // [issue/2797] region end: Added an alternative locking mechanism
+  // Creates 4096 locks that are distributed across IDs
+  // 1024 is the default number of locks, but we increase it to reduce contention for highly
+  // concurrent scenarios
+  // (example: user with 10000+ implants triggered by the same inject)
+  private final Striped<Lock> stripedLocks = Striped.lock(4096);
 
   // -- INJECTS --
 
@@ -373,15 +350,16 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    // Get or create a lock object for this inject ID
-    Object lock = locks.computeIfAbsent(injectId, k -> new Object());
-    // Update last access time
-    lastAccessTime.put(injectId, System.currentTimeMillis());
 
-    log.debug("[issue/2797] Waiting for lock for inject ID: " + injectId);
-    synchronized (lock) {
-      log.debug("[issue/2797] Acquired lock for inject ID: " + injectId);
+    log.debug("Waiting for lock for inject ID: " + injectId);
+    Lock lock = stripedLocks.get(injectId);
+    lock.lock();
+    try {
+      log.debug("Acquired lock for inject ID: " + injectId);
       injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
+    } finally {
+      lock.unlock();
+      log.debug("Released lock for inject ID: " + injectId);
     }
   }
 

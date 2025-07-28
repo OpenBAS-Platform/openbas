@@ -80,24 +80,15 @@ public class InjectStatusService {
   public boolean isAllInjectAgentsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
-    log.debug(
-        "[issue/2797] Inputs for inject ID: "
-            + inject.getId()
-            + "::agents.size="
-            + agents.size()
-            + "::totalCompleteTrace="
-            + totalCompleteTrace);
     return agents.size() == totalCompleteTrace;
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
-    log.debug("[issue/2797] updateFinalInjectStatus 1: " + injectStatus.getId());
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
-    log.debug("[issue/2797] updateFinalInjectStatus 2: " + injectStatus.getId());
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -162,17 +153,10 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
-    boolean isAllInjectAgentsExecuted = isAllInjectAgentsExecuted(inject);
-    log.debug(
-        "[issue/2797] Inputs for inject ID: "
-            + inject.getId()
-            + "::action="
-            + executionTrace.getAction()
-            + "::isAllInjectAgentsExecuted="
-            + isAllInjectAgentsExecuted);
     if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-        && (agent == null || isAllInjectAgentsExecuted)) {
+        && (agent == null || isAllInjectAgentsExecuted(inject))) {
       updateFinalInjectStatus(injectStatus);
+      log.debug("Successfully updated inject final status: " + inject.getId());
     }
 
     injectRepository.save(inject);
@@ -215,21 +199,16 @@ public class InjectStatusService {
   }
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    log.info("[issue/2797] fromExecution 1: " + injectStatus.getId());
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTrace> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
       injectStatus.getTraces().addAll(traces);
     }
-    log.info("[issue/2797] fromExecution 2:  " + injectStatus.getId());
     if (execution.isAsync() && ExecutionStatus.EXECUTING.equals(injectStatus.getName())) {
-      log.info("[issue/2797] fromExecution 3a: " + injectStatus.getId());
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      log.info("[issue/2797] fromExecution 3b: " + injectStatus.getId());
       updateFinalInjectStatus(injectStatus);
     }
-    log.info("[issue/2797] fromExecution 4: " + injectStatus.getId());
     return injectStatus;
   }
 
