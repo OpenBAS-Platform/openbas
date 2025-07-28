@@ -4,8 +4,9 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
-import com.google.common.util.concurrent.Striped;
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.lock.Lock;
+import io.openbas.aop.lock.LockResourceType;
 import io.openbas.authorisation.AuthorisationService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -36,7 +37,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -73,12 +73,6 @@ public class InjectApi extends RestBehavior {
   private final TargetService targetService;
   private final UserRepository userRepository;
   private final PayloadMapper payloadMapper;
-
-  // Creates 4096 locks that are distributed across IDs
-  // 1024 is the default number of locks, but we increase it to reduce contention for highly
-  // concurrent scenarios
-  // (example: user with 10000+ implants triggered by the same inject)
-  private final Striped<Lock> stripedLocks = Striped.lock(4096);
 
   // -- INJECTS --
 
@@ -330,6 +324,7 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
+  @Lock(type = LockResourceType.INJECT, key = "#injectId")
   @Operation(
       summary = "Inject execution callback for implants",
       description =
@@ -350,17 +345,7 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-
-    log.debug("Waiting for lock for inject ID: " + injectId);
-    Lock lock = stripedLocks.get(injectId);
-    lock.lock();
-    try {
-      log.debug("Acquired lock for inject ID: " + injectId);
-      injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
-    } finally {
-      lock.unlock();
-      log.debug("Released lock for inject ID: " + injectId);
-    }
+    injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
   @Secured(ROLE_ADMIN)
