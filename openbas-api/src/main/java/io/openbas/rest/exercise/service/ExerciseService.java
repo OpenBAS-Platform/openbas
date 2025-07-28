@@ -629,7 +629,7 @@ public class ExerciseService {
         expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList());
     exercise.setExpectationResultByTypes(
         injectExpectationMapper.extractExpectationResultByTypesFromRaw(
-            Set.of(exercise.getInjectIds()), expectations)); // ttodo
+            new HashSet<>(Arrays.asList(exercise.getInjectIds())), expectations));
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
