@@ -7,7 +7,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

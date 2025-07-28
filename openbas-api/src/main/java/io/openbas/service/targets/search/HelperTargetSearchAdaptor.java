@@ -4,7 +4,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectTarget;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectExpectationResultUtils;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,13 +26,13 @@ public class HelperTargetSearchAdaptor {
         injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
             inject.getId(), target.getId(), target.getTargetType());
 
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
+    List<InjectExpectationResultUtils.ExpectationResultsByType> results =
         injectExpectationMapper.extractExpectationResults(
             inject.getContent(),
             mergedExpectationsByInjectAndTargetAndTargetType,
-            AtomicTestingUtils::getScores);
+            InjectExpectationResultUtils::getScores);
 
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
+    for (InjectExpectationResultUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {
         case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
         case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());

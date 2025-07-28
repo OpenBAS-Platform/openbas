@@ -41,9 +41,9 @@ import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InjectExpectationResultUtils;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.mapper.ExerciseMapper;
@@ -627,9 +627,10 @@ public class ExerciseService {
       ExerciseSimple exercise, Map<String, List<RawInjectExpectation>> expectationsByExerciseIds) {
     List<RawInjectExpectation> expectations =
         expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList());
+    HashSet<String> injectIds = new HashSet<>(Arrays.asList(exercise.getInjectIds()));
+
     exercise.setExpectationResultByTypes(
-        injectExpectationMapper.extractExpectationResultByTypesFromRaw(
-            new HashSet<>(Arrays.asList(exercise.getInjectIds())), expectations));
+        injectExpectationMapper.extractExpectationResultByTypesFromRaw(injectIds, expectations));
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
@@ -777,8 +778,9 @@ public class ExerciseService {
   }
 
   public boolean isThereAScoreDegradation(
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap,
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
+          lastSimulationResultsMap,
+      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
           secondLastSimulationResultsMap) {
 
     for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :

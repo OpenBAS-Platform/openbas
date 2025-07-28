@@ -5,8 +5,8 @@ import static io.openbas.expectation.ExpectationType.PREVENTION;
 import static io.openbas.utils.fixtures.ExpectationResultByTypeFixture.createDefaultExpectationResultsByType;
 
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import java.util.List;
 
 public class ExpectationResultsByTypeFixture {
@@ -27,6 +27,6 @@ public class ExpectationResultsByTypeFixture {
 
   public static final List<ExpectationResultsByType> exercise1GlobalScores =
       List.of(exercise1Prevention, exercise1Detection);
-  public static final List<AtomicTestingUtils.ExpectationResultsByType> exercise2GlobalScores =
-      List.of(exercise2Prevention, exercise2Detection);
+  public static final List<InjectExpectationResultUtils.ExpectationResultsByType>
+      exercise2GlobalScores = List.of(exercise2Prevention, exercise2Detection);
 }

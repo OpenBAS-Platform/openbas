@@ -9,7 +9,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.service.NotificationRuleService;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectExpectationResultUtils;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -45,17 +45,20 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
 
       // create map with the results to facilitate the computing of the score difference
       // TODO update exerciseService to return a map with result
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap =
-          exerciseService.getGlobalResults(lastSimulation.getId()).stream()
-              .collect(
-                  Collectors.toMap(
-                      AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
+          lastSimulationResultsMap =
+              exerciseService.getGlobalResults(lastSimulation.getId()).stream()
+                  .collect(
+                      Collectors.toMap(
+                          InjectExpectationResultUtils.ExpectationResultsByType::type,
+                          Function.identity()));
+      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
           secondLastSimulationResultsMap =
               exerciseService.getGlobalResults(secondLastSimulation.getId()).stream()
                   .collect(
                       Collectors.toMap(
-                          AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
+                          InjectExpectationResultUtils.ExpectationResultsByType::type,
+                          Function.identity()));
 
       if (exerciseService.isThereAScoreDegradation(
           lastSimulationResultsMap, secondLastSimulationResultsMap)) {
@@ -79,10 +82,10 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
       @NotNull final Exercise lastSimulation,
       @NotNull final Exercise secondLastSimulation,
       @NotNull
-          final Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+          final Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
               lastSimulationResultsMap,
       @NotNull
-          final Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+          final Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
               secondLastSimulationResultsMap) {
     // TODO handle date format dynamically
     DateTimeFormatter formatter =

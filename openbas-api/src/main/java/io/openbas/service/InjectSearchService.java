@@ -20,7 +20,7 @@ import io.openbas.rest.atomic_testing.form.InjectorContractSimple;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.payload.output.PayloadSimple;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectExpectationResultUtils;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
@@ -372,7 +372,7 @@ public class InjectSearchService {
             injectExpectationMapper.extractExpectationResults(
                 inject.getContent(),
                 expectationMap.getOrDefault(inject.getId(), emptyList()),
-                AtomicTestingUtils::getScoresFromRaw));
+                InjectExpectationResultUtils::getScoresFromRaw));
 
         // Set targets (teams, assets, asset groups)
         List<TargetSimple> allTargets =

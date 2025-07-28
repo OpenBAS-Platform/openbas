@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.BiFunction;
 
-public class AtomicTestingUtils {
+public class InjectExpectationResultUtils {
 
   public static <T> List<ExpectationResultsByType> getExpectationResultByTypes(
       List<T> expectations, BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> getScores) {
