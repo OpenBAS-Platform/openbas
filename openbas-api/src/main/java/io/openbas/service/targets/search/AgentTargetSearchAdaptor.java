@@ -4,7 +4,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
-import io.openbas.service.InjectExpectationService;
 import io.openbas.service.targets.search.specifications.SearchSpecificationUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -29,7 +28,6 @@ public class AgentTargetSearchAdaptor extends SearchAdaptorBase {
 
   public AgentTargetSearchAdaptor(
       AgentRepository agentRepository,
-      InjectExpectationService injectExpectationService,
       SearchSpecificationUtils<Agent> specificationUtils,
       HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.agentRepository = agentRepository;

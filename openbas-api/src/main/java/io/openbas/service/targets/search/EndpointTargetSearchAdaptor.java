@@ -5,7 +5,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
-import io.openbas.service.InjectExpectationService;
 import io.openbas.service.targets.search.specifications.IncludeDirectEndpointTargetsSpecification;
 import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGroupsSpecification;
 import io.openbas.service.targets.search.specifications.SearchSpecificationUtils;
@@ -35,7 +34,6 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   public EndpointTargetSearchAdaptor(
       EndpointRepository endpointRepository,
-      InjectExpectationService injectExpectationService,
       SearchSpecificationUtils<Endpoint> searchSpecificationUtils,
       IncludeMembersOfAssetGroupsSpecification<Endpoint> includeMembersOfAssetGroupsSpecification,
       IncludeDirectEndpointTargetsSpecification<Endpoint> includeDirectEndpointTargetsSpecification,
