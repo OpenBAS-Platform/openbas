@@ -17,15 +17,14 @@ public class InjectFixture {
   public static final String INJECT_EMAIL_NAME = "Test email inject";
   public static final String INJECT_CHALLENGE_NAME = "Test challenge inject";
 
-  static ObjectMapper objectMapper = new ObjectMapper();
-  static ObjectNode injectContent = objectMapper.createObjectNode();
-
   private static Inject createInject(InjectorContract injectorContract, String title) {
     Inject inject = createInjectWithTitle(title);
     inject.setInjectorContract(injectorContract);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
 
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode injectContent = objectMapper.createObjectNode();
     injectContent.set(
         CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS,
         objectMapper.convertValue(
@@ -105,6 +104,8 @@ public class InjectFixture {
   public static Inject createInjectCommandPayload(
       InjectorContract injectorContract, Map<String, Object> payloadArguments) {
 
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode injectContent = objectMapper.createObjectNode();
     Inject inject = createInject(injectorContract, "Inject title");
     payloadArguments.forEach(
         (key, value) -> injectContent.set(key, objectMapper.convertValue(value, JsonNode.class)));
