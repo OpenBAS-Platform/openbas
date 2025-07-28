@@ -2822,7 +2822,6 @@ export interface InjectReceptionInput {
 }
 
 export interface InjectResultOutput {
-  inject_content?: object;
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
   /** Id of inject */
