@@ -13,13 +13,13 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,40 +40,28 @@ public class InjectExpectationMapper {
   private final InjectUtils injectUtils;
 
   /**
-   * Build ExpectationResultsByType from inject
+   * Build ExpectationResultsByType from injectContent
    *
-   * @param inject
+   * @param injectContent
+   * @param expectations
+   * @param scoreExtractor
    * @return List of ExpectationResultsByType
    */
-  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      Inject inject, List<InjectExpectation> expectations) {
+  public <T> List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
+      ObjectNode injectContent,
+      List<T> expectations,
+      BiFunction<List<InjectExpectation.EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
-        AtomicTestingUtils.getExpectationResultByTypes(expectations);
+        AtomicTestingUtils.getExpectationResultByTypes(expectations, scoreExtractor);
 
     if (!expectationResultByTypes.isEmpty()) {
       return expectationResultByTypes;
     }
-
-    return buildExpectationResultsFromInjectContent(inject.getContent());
-  }
-
-  /**
-   * Build ExpectationResultsByType from raw queries
-   *
-   * @param expectations list of raw queries
-   * @param inject dto inject result
-   * @return List of ExpectationResultsByType
-   */
-  public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      List<RawInjectExpectation> expectations, InjectResultOutput inject) {
-    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
-
-    if (!expectationResultByTypesFromRaw.isEmpty()) {
-      return expectationResultByTypesFromRaw;
+    if (injectContent == null) {
+      return emptyList();
     }
 
-    return buildExpectationResultsFromInjectContent(inject.getContent());
+    return buildExpectationResultsFromInjectContent(injectContent);
   }
 
   /**
@@ -84,10 +72,6 @@ public class InjectExpectationMapper {
    */
   private static List<AtomicTestingUtils.ExpectationResultsByType>
       buildExpectationResultsFromInjectContent(ObjectNode injectContent) {
-
-    if (injectContent == null) {
-      return emptyList();
-    }
 
     JsonNode contentNode = injectContent.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
     if (contentNode == null || !contentNode.isArray()) {
@@ -133,7 +117,9 @@ public class InjectExpectationMapper {
                       result.setInjectTitle(inject.getTitle());
                       result.setResults(
                           extractExpectationResults(
-                              inject, injectUtils.getPrimaryExpectations(inject)));
+                              inject.getContent(),
+                              injectUtils.getPrimaryExpectations(inject),
+                              AtomicTestingUtils::getScores));
                       return result;
                     })
                 .collect(Collectors.toList()))
@@ -152,7 +138,8 @@ public class InjectExpectationMapper {
       Set<String> injectIds, List<RawInjectExpectation> expectations) {
 
     if (expectations != null && !expectations.isEmpty()) {
-      return AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
+      return AtomicTestingUtils.getExpectationResultByTypes(
+          expectations, AtomicTestingUtils::getScoresFromRaw);
     }
 
     return buildExpectationResultsFromInjectContents(injectIds);

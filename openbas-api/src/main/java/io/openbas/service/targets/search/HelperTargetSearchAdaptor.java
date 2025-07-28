@@ -28,7 +28,9 @@ public class HelperTargetSearchAdaptor {
 
     List<AtomicTestingUtils.ExpectationResultsByType> results =
         injectExpectationMapper.extractExpectationResults(
-            inject, mergedExpectationsByInjectAndTargetAndTargetType);
+            inject.getContent(),
+            mergedExpectationsByInjectAndTargetAndTargetType,
+            AtomicTestingUtils::getScores);
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {

@@ -2,7 +2,6 @@ package io.openbas.rest.statistic;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypesFromRaw;
 import static java.util.stream.Collectors.groupingBy;
 
 import io.openbas.aop.LogExecutionTime;
@@ -123,7 +122,8 @@ public class StatisticApi extends RestBehavior {
     Instant minus6Months = from.minus(180, ChronoUnit.DAYS);
     List<RawInjectExpectation> rawInjectExpectations =
         fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(minus6Months));
-    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return AtomicTestingUtils.getExpectationResultByTypes(
+        rawInjectExpectations, AtomicTestingUtils::getScoresFromRaw);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(
@@ -134,7 +134,8 @@ public class StatisticApi extends RestBehavior {
         fromIterable(
             this.exerciseRepository.allGrantedInjectExpectationsFromDate(
                 minus6Months, user.getId()));
-    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return AtomicTestingUtils.getExpectationResultByTypes(
+        rawInjectExpectations, AtomicTestingUtils::getScoresFromRaw);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
@@ -215,8 +216,8 @@ public class StatisticApi extends RestBehavior {
                                     });
 
                             resultInjectExpectationResultsByAttackPattern.setResults(
-                                AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                                    expectationsRefined));
+                                AtomicTestingUtils.getExpectationResultByTypes(
+                                    expectationsRefined, AtomicTestingUtils::getScoresFromRaw));
 
                             results.add(resultInjectExpectationResultsByAttackPattern);
                           });

@@ -1,8 +1,8 @@
 package io.openbas.utils;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import io.openbas.database.raw.*;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.expectation.ExpectationType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -10,14 +10,9 @@ import java.util.function.BiFunction;
 
 public class AtomicTestingUtils {
 
-  public static List<ExpectationResultsByType> getExpectationResultByTypesFromRaw(
-      List<RawInjectExpectation> expectations) {
-    return computeExpectationResults(expectations, AtomicTestingUtils::getScoresFromRaw);
-  }
-
-  public static List<ExpectationResultsByType> getExpectationResultByTypes(
-      List<InjectExpectation> expectations) {
-    return computeExpectationResults(expectations, AtomicTestingUtils::getScores);
+  public static <T> List<ExpectationResultsByType> getExpectationResultByTypes(
+      List<T> expectations, BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> getScores) {
+    return computeExpectationResults(expectations, getScores);
   }
 
   private static <T> List<ExpectationResultsByType> computeExpectationResults(

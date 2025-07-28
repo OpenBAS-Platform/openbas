@@ -5,6 +5,7 @@ import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.document.form.RelatedEntityOutput;
 import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.payload.output.PayloadSimple;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.TargetType;
 import java.util.List;
@@ -48,7 +49,9 @@ public class InjectMapper {
         .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .expectationResultByTypes(
             injectExpectationMapper.extractExpectationResults(
-                inject, injectUtils.getPrimaryExpectations(inject)))
+                inject.getContent(),
+                injectUtils.getPrimaryExpectations(inject),
+                AtomicTestingUtils::getScores))
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
         .build();
