@@ -150,11 +150,9 @@ public class InjectExpectationMapper {
    */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResultByTypesFromRaw(
       Set<String> injectIds, List<RawInjectExpectation> expectations) {
-    List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
 
-    if (!expectationResultByTypesFromRaw.isEmpty()) {
-      return expectationResultByTypesFromRaw;
+    if (expectations != null && !expectations.isEmpty()) {
+      return AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
     }
 
     return buildExpectationResultsFromInjectContents(injectIds);

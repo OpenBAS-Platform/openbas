@@ -1,7 +1,6 @@
 package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
@@ -30,15 +29,16 @@ public class ResultUtils {
     return computeGlobalExpectationResults(injectIds);
   }
 
-  public List<ExpectationResultsByType> computeGlobalExpectationResults(
-      @NotNull Set<String> injectIds) {
-    Set<String> safeInjectIds = injectIds == null ? emptySet() : injectIds;
+  public List<ExpectationResultsByType> computeGlobalExpectationResults(Set<String> injectIds) {
+
+    if (injectIds == null || injectIds.isEmpty()) {
+      return emptyList();
+    }
+
     List<RawInjectExpectation> expectations =
-        safeInjectIds.isEmpty()
-            ? emptyList()
-            : injectExpectationRepository.rawForComputeGlobalByInjectIds(safeInjectIds);
-    return injectExpectationMapper.extractExpectationResultByTypesFromRaw(
-        safeInjectIds, expectations);
+        injectExpectationRepository.rawForComputeGlobalByInjectIds(injectIds);
+
+    return injectExpectationMapper.extractExpectationResultByTypesFromRaw(injectIds, expectations);
   }
 
   public List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(
