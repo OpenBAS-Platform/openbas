@@ -43,7 +43,7 @@ public class DashboardService {
     FlatConfiguration config = (FlatConfiguration) widget.getWidgetConfiguration();
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
     CountRuntime runtime = new CountRuntime(config, parameters, definitionParameters);
-    return esService.count(userWithAuth, runtime);
+    return engineService.count(userWithAuth, runtime);
   }
 
   /**
