@@ -6,20 +6,21 @@ import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "custom_dashboards_parameters")
 @EntityListeners(ModelBaseListener.class)
 public class CustomDashboardParameters implements Base {
 
   public enum CustomDashboardParameterType {
-    scenario("scenario", true),
-    simulation("simulation", true);
+    simulation("simulation", true),
+    timeRange("timeRange", false),
+    startDate("startDate", false),
+    endDate("endDate", false),
+    scenario("scenario", true);
 
     public final String name;
     public final boolean isInstance;

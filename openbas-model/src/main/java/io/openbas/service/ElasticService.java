@@ -40,6 +40,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -544,20 +545,59 @@ public class ElasticService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
+    String timeRangeParameterId = definitionParameters.entrySet().stream()
+        .filter(entry -> entry.getValue().getType().name.equals("timeRange")).findFirst().get().getKey();
+    String startDateParameterId = definitionParameters.entrySet().stream()
+        .filter(entry -> entry.getValue().getType().name.equals("startDate")).findFirst().get().getKey();
+    String endDateParameterId = definitionParameters.entrySet().stream()
+        .filter(entry -> entry.getValue().getType().name.equals("endDate")).findFirst().get().getKey();
+    String timeRange = parameters.get(timeRangeParameterId);
+    Instant start = Instant.now();
+    Instant end = Instant.now();
+
+    /*
+    if (widgetConfig.timeRange == DEFAULT) {
+      on utilise la startDate et la endDate du dashboard
+    } else {
+      on utilise la startDate et la endDate de widgetConfig
+    }
+     */
+
+    start = switch (timeRange) {
+      case "LAST_DAY" -> Instant.now().minus(24, ChronoUnit.HOURS);
+      case "LAST_WEEK" -> Instant.now().minus(7, ChronoUnit.DAYS);
+      case "LAST_MONTH" -> Instant.now().minus(30, ChronoUnit.DAYS);
+      case "LAST_QUARTER" -> Instant.now().minus(90, ChronoUnit.DAYS);
+      case "LAST_SEMESTER" -> Instant.now().minus(180, ChronoUnit.DAYS);
+      case "LAST_YEAR" -> Instant.now().minus(360, ChronoUnit.DAYS);
+      default -> start;
+    };
+
+    if (timeRange.equals("CUSTOM") && (parameters.get(startDateParameterId) != null)) {
+      start = Instant.parse(parameters.get(startDateParameterId));
+    }
+
+    if (timeRange.equals("CUSTOM") && (parameters.get(endDateParameterId) != null)) {
+      end = Instant.parse(parameters.get(endDateParameterId));
+    }
+
+    /*String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
     Instant startInstant = Instant.parse(start);
     String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
-    Instant endInstant = Instant.parse(end);
+    Instant endInstant = Instant.parse(end);*/
+    Instant finalStart = start;
+    Instant finalEnd = end;
     Query dateRangeQuery =
-        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
+        DateRangeQuery.of(
+                d -> d.field(widgetConfig.getField()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
             ._toRangeQuery()
             ._toQuery();
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
+    bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
+    bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
     ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
     try {
       String aggregationKey = "date_histogram";
