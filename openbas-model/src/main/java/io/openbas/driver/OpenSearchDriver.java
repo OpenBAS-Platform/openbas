@@ -439,14 +439,14 @@ public class OpenSearchDriver {
           client.indices().delete(d -> d.index(name));
           log.info("Deleted index: {}", name);
         } catch (OpenSearchException e) {
-          log.warn("Index {} does not exist or already deleted", name);
+          log.warn("Index " + name + " does not exist or already deleted");
         }
       }
 
       // 2. Delete index template
       try {
         client.indices().deleteIndexTemplate(d -> d.name(fullIndexName));
-        log.info("Deleted index template: {}", fullIndexName);
+        log.info("Deleted index template: " + fullIndexName);
       } catch (OpenSearchException e) {
         log.warn("Index template {} does not exist or already deleted", fullIndexName);
       }

@@ -298,7 +298,7 @@ public class ElasticDriver {
                   log.info("Cleanup old Index {}", esModel.getName());
                   cleanUpIndex(esModel.getName(), elasticClient);
                 }
-                log.info("Creating Index {}", esModel.getName());
+                log.info("Creating Index " + esModel.getName());
                 createIndex(elasticClient, esModel.getName(), ES_MODEL_VERSION, mappings);
               } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -318,14 +318,14 @@ public class ElasticDriver {
           client.indices().delete(d -> d.index(name));
           log.info("Deleted index: {}", name);
         } catch (ElasticsearchException e) {
-          log.warn("Index {} does not exist or already deleted", name);
+          log.warn("Index " + name + " does not exist or already deleted");
         }
       }
 
       // 2. Delete index template
       try {
         client.indices().deleteIndexTemplate(d -> d.name(fullIndexName));
-        log.info("Deleted index template: {}", fullIndexName);
+        log.info("Deleted index template: " + fullIndexName);
       } catch (ElasticsearchException e) {
         log.warn("Index template {} does not exist or already deleted", fullIndexName);
       }
