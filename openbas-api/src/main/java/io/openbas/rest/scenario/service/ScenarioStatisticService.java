@@ -67,9 +67,7 @@ public class ScenarioStatisticService {
 
   private Stream<ExpectationTypeAndGlobalScore> getExpectationTypeAndGlobalScores(
       FinishedExerciseWithInjects finishedExercise) {
-    return resultUtils
-        .getResultsByTypes(finishedExercise.exerciseId, finishedExercise.injectIds())
-        .stream()
+    return resultUtils.getResultsByTypes(finishedExercise.injectIds()).stream()
         .map(
             expectationResultByType ->
                 getExpectationTypeAndGlobalScore(finishedExercise, expectationResultByType));
@@ -99,9 +97,7 @@ public class ScenarioStatisticService {
         .map(
             exercise ->
                 new FinishedExerciseWithInjects(
-                    exercise.getExercise_id(),
-                    exercise.getExercise_end_date(),
-                    exercise.getInject_ids()))
+                    exercise.getExercise_end_date(), exercise.getInject_ids()))
         .sorted(Collections.reverseOrder())
         .toList();
   }
@@ -142,8 +138,7 @@ public class ScenarioStatisticService {
         .reduce(0, Integer::sum);
   }
 
-  private record FinishedExerciseWithInjects(
-      String exerciseId, Instant endDate, Set<String> injectIds)
+  private record FinishedExerciseWithInjects(Instant endDate, Set<String> injectIds)
       implements Comparable<FinishedExerciseWithInjects> {
     @Override
     public int compareTo(FinishedExerciseWithInjects exercise) {

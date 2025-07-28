@@ -26,19 +26,19 @@ public class ResultUtils {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectExpectationMapper injectExpectationMapper;
 
-  public List<ExpectationResultsByType> getResultsByTypes(
-      String exerciseId, Set<String> injectIds) {
-    return computeGlobalExpectationResults(exerciseId, injectIds);
+  public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
+    return computeGlobalExpectationResults(injectIds);
   }
 
   public List<ExpectationResultsByType> computeGlobalExpectationResults(
-      String exerciseId, @NotNull Set<String> injectIds) {
+      @NotNull Set<String> injectIds) {
     Set<String> safeInjectIds = injectIds == null ? emptySet() : injectIds;
     List<RawInjectExpectation> expectations =
         safeInjectIds.isEmpty()
             ? emptyList()
             : injectExpectationRepository.rawForComputeGlobalByInjectIds(safeInjectIds);
-    return injectExpectationMapper.extractExpectationResultByTypesFromRaw(exerciseId, expectations);
+    return injectExpectationMapper.extractExpectationResultByTypesFromRaw(
+        safeInjectIds, expectations);
   }
 
   public List<InjectExpectationResultsByAttackPattern> computeInjectExpectationResults(

@@ -47,7 +47,7 @@ public class ExerciseMapper {
     if (rawExercise.getInject_ids() != null) {
       // -- GLOBAL SCORE ---
       simple.setExpectationResultByTypes(
-          resultUtils.getResultsByTypes(rawExercise.getExercise_id(), rawExercise.getInject_ids()));
+          resultUtils.getResultsByTypes(rawExercise.getInject_ids()));
 
       // -- TARGETS --
       List<Object[]> teams =
@@ -121,7 +121,7 @@ public class ExerciseMapper {
       // -- GLOBAL SCORE ---
       simple.setExpectationResultByTypes(
           injectExpectationMapper.extractExpectationResultByTypesFromRaw(
-              rawExercise.getExercise_id(), expectations));
+              rawExercise.getInject_ids(), expectations));
       // -- TARGETS --
       List<TargetSimple> allTargets =
           Stream.concat(

@@ -6,14 +6,8 @@ import java.util.Set;
 
 public class RawFinishedExerciseWithInjectsFixture {
 
-  private record TestableRawFinishedExerciseWithInjects(
-      String exerciseId, Instant endDate, Set<String> injectIds)
+  private record TestableRawFinishedExerciseWithInjects(Instant endDate, Set<String> injectIds)
       implements RawFinishedExerciseWithInjects {
-
-    @Override
-    public String getExercise_id() {
-      return exerciseId;
-    }
 
     @Override
     public Instant getExercise_end_date() {
@@ -27,7 +21,7 @@ public class RawFinishedExerciseWithInjectsFixture {
   }
 
   public static RawFinishedExerciseWithInjects createDefaultRawFinishedExerciseWithInjects(
-      String exerciseId, Instant endDate, Set<String> injectIds) {
-    return new TestableRawFinishedExerciseWithInjects(exerciseId, endDate, injectIds);
+      Instant endDate, Set<String> injectIds) {
+    return new TestableRawFinishedExerciseWithInjects(endDate, injectIds);
   }
 }

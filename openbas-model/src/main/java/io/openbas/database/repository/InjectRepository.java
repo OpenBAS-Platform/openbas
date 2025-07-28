@@ -319,7 +319,7 @@ public interface InjectRepository
       @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
 
   @Query(
-      value = "SELECT i.inject_content from injects i where i.inject_exercise = :exerciseId",
+      value = "SELECT i.inject_content FROM injects i WHERE i.inject_id IN :injectIds",
       nativeQuery = true)
-  List<String> findContentsByExerciseId(@NotBlank String exerciseId);
+  List<String> findContentsByInjectIds(@NotBlank Set<String> injectIds);
 }

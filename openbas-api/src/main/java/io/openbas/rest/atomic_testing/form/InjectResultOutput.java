@@ -27,10 +27,6 @@ public class InjectResultOutput {
   @NotBlank
   private String title;
 
-  @Schema(description = "Content of inject")
-  @JsonProperty("inject_content")
-  private ObjectNode content;
-
   @Schema(description = "Timestamp when the inject was last updated")
   @JsonProperty("inject_updated_at")
   @NotNull
@@ -48,6 +44,7 @@ public class InjectResultOutput {
   @JsonProperty("inject_status")
   private InjectStatusSimple status;
 
+  @JsonIgnore private ObjectNode content;
   @JsonIgnore private String[] teamIds;
   @JsonIgnore private String[] assetIds;
   @JsonIgnore private String[] assetGroupIds;

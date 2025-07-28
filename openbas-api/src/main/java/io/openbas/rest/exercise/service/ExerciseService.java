@@ -629,7 +629,7 @@ public class ExerciseService {
         expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList());
     exercise.setExpectationResultByTypes(
         injectExpectationMapper.extractExpectationResultByTypesFromRaw(
-            exercise.getId(), expectations));
+            Set.of(exercise.getInjectIds()), expectations)); // ttodo
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
@@ -665,8 +665,7 @@ public class ExerciseService {
 
   // -- GLOBAL RESULTS --
   public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
-    return resultUtils.getResultsByTypes(
-        exerciseId, exerciseRepository.findInjectsByExercise(exerciseId));
+    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
   }
 
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(ExercisesGlobalScoresInput input) {

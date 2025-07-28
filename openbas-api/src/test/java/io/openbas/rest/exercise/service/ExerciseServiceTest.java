@@ -124,9 +124,9 @@ class ExerciseServiceTest {
     when(exerciseRepository.findInjectsByExercise(exerciseId1)).thenReturn(exercise1InjectIds);
     when(exerciseRepository.findInjectsByExercise(exerciseId2)).thenReturn(exercise2InjectIds);
 
-    when(resultUtils.getResultsByTypes(exerciseId1, exercise1InjectIds))
+    when(resultUtils.getResultsByTypes(exercise1InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise1GlobalScores);
-    when(resultUtils.getResultsByTypes(exerciseId2, exercise2InjectIds))
+    when(resultUtils.getResultsByTypes(exercise2InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise2GlobalScores);
 
     var results =

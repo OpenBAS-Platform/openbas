@@ -144,12 +144,12 @@ public class InjectExpectationMapper {
   /**
    * Extract ExpectationResultsByType from exercises using data from raw queries
    *
-   * @param exerciseId
+   * @param injectIds
    * @param expectations
    * @return List of ExpectationResultsByType
    */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResultByTypesFromRaw(
-      String exerciseId, List<RawInjectExpectation> expectations) {
+      Set<String> injectIds, List<RawInjectExpectation> expectations) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypesFromRaw =
         AtomicTestingUtils.getExpectationResultByTypesFromRaw(expectations);
 
@@ -157,20 +157,20 @@ public class InjectExpectationMapper {
       return expectationResultByTypesFromRaw;
     }
 
-    return buildExpectationResultsFromInjectContents(exerciseId);
+    return buildExpectationResultsFromInjectContents(injectIds);
   }
 
   /**
    * Build InjectResults based on content of injects from an exercise
    *
-   * @param exerciseId the exercise id
+   * @param injectIds the exercise id
    * @return List of InjectResultsByType
    */
   private List<AtomicTestingUtils.ExpectationResultsByType>
-      buildExpectationResultsFromInjectContents(@NotBlank String exerciseId) {
+      buildExpectationResultsFromInjectContents(@NotBlank Set<String> injectIds) {
 
     // Fetch all inject contents in order to extract expectations defined in every inject
-    List<String> rawContents = injectRepository.findContentsByExerciseId(exerciseId);
+    List<String> rawContents = injectRepository.findContentsByInjectIds(injectIds);
     Set<ExpectationType> foundTypes = new HashSet<>();
 
     for (String contentJson : rawContents) {
