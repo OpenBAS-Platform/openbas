@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.expectation.ExpectationType;
@@ -35,8 +36,8 @@ public class InjectExpectationMapper {
       EnumSet.allOf(ExpectationType.class);
 
   private final InjectRepository injectRepository;
-  private final InjectUtils injectUtils;
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private final InjectUtils injectUtils;
 
   /**
    * Build ExpectationResultsByType from inject
@@ -45,9 +46,9 @@ public class InjectExpectationMapper {
    * @return List of ExpectationResultsByType
    */
   public List<AtomicTestingUtils.ExpectationResultsByType> extractExpectationResults(
-      Inject inject) {
+      Inject inject, List<InjectExpectation> expectations) {
     List<AtomicTestingUtils.ExpectationResultsByType> expectationResultByTypes =
-        AtomicTestingUtils.getExpectationResultByTypes(injectUtils.getPrimaryExpectations(inject));
+        AtomicTestingUtils.getExpectationResultByTypes(expectations);
 
     if (!expectationResultByTypes.isEmpty()) {
       return expectationResultByTypes;
@@ -130,7 +131,9 @@ public class InjectExpectationMapper {
                                   .InjectExpectationResultsByType();
                       result.setInjectId(inject.getId());
                       result.setInjectTitle(inject.getTitle());
-                      result.setResults(extractExpectationResults(inject));
+                      result.setResults(
+                          extractExpectationResults(
+                              inject, injectUtils.getPrimaryExpectations(inject)));
                       return result;
                     })
                 .collect(Collectors.toList()))

@@ -478,12 +478,7 @@ public class ExerciseService {
 
   public List<InjectExpectationResultsByAttackPattern> extractExpectationResultsByAttackPattern(
       String exerciseId) {
-    Exercise exercise =
-        exerciseRepository
-            .findById(exerciseId)
-            .orElseThrow(
-                () -> new ElementNotFoundException("Exercise not found with ID: " + exerciseId));
-
+    Exercise exercise = exercise(exerciseId);
     return resultUtils.computeInjectExpectationResults(exercise.getInjects());
   }
 

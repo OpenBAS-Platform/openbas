@@ -1,6 +1,7 @@
 package io.openbas.service.targets.search;
 
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectTarget;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.AtomicTestingUtils;
@@ -21,14 +22,13 @@ public class HelperTargetSearchAdaptor {
       Inject inject, Supplier<InjectTarget> targetSupplier, boolean allowVulnerability) {
     InjectTarget target = targetSupplier.get();
 
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
+    List<InjectExpectation> mergedExpectationsByInjectAndTargetAndTargetType =
+        injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
+            inject.getId(), target.getId(), target.getTargetType());
 
-    if (results.isEmpty()) {
-      results = injectExpectationMapper.extractExpectationResults(inject);
-    }
+    List<AtomicTestingUtils.ExpectationResultsByType> results =
+        injectExpectationMapper.extractExpectationResults(
+            inject, mergedExpectationsByInjectAndTargetAndTargetType);
 
     for (AtomicTestingUtils.ExpectationResultsByType result : results) {
       switch (result.type()) {
