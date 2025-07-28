@@ -1,5 +1,7 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,11 +17,23 @@ public class InjectFixture {
   public static final String INJECT_EMAIL_NAME = "Test email inject";
   public static final String INJECT_CHALLENGE_NAME = "Test challenge inject";
 
+  static ObjectMapper objectMapper = new ObjectMapper();
+  static ObjectNode injectContent = objectMapper.createObjectNode();
+
   private static Inject createInject(InjectorContract injectorContract, String title) {
     Inject inject = createInjectWithTitle(title);
     inject.setInjectorContract(injectorContract);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
+
+    injectContent.set(
+        CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS,
+        objectMapper.convertValue(
+            List.of(
+                ExpectationFixture.createExpectation(InjectExpectation.EXPECTATION_TYPE.MANUAL)),
+            ArrayNode.class));
+    inject.setContent(injectContent);
+
     return inject;
   }
 
@@ -92,8 +106,6 @@ public class InjectFixture {
       InjectorContract injectorContract, Map<String, Object> payloadArguments) {
 
     Inject inject = createInject(injectorContract, "Inject title");
-    ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode injectContent = objectMapper.createObjectNode();
     payloadArguments.forEach(
         (key, value) -> injectContent.set(key, objectMapper.convertValue(value, JsonNode.class)));
 
