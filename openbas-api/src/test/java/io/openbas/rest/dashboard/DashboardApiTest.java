@@ -284,7 +284,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -316,7 +316,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -356,7 +356,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      esService.bulkProcessing(esEngine.getModels().stream());
+      engineService.bulkProcessing(engineContext.getModels().stream());
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);

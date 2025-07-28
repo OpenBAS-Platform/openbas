@@ -451,12 +451,15 @@ public class OpenSearchService implements EngineService {
   /** {@inheritDoc} */
   public long count(RawUserAuth user, CountRuntime runtime) {
     try {
-      CountConfig config = runtime.getConfig();
       Query query =
           buildQuery(
               user,
               null,
-              config.getFilter(),
+              runtime
+                  .getConfig()
+                  .getSeries()
+                  .getFirst()
+                  .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
       return openSearchClient
