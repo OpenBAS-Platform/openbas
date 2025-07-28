@@ -104,9 +104,9 @@ public class InjectFixture {
   public static Inject createInjectCommandPayload(
       InjectorContract injectorContract, Map<String, Object> payloadArguments) {
 
+    Inject inject = createInject(injectorContract, "Inject title");
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode injectContent = objectMapper.createObjectNode();
-    Inject inject = createInject(injectorContract, "Inject title");
     payloadArguments.forEach(
         (key, value) -> injectContent.set(key, objectMapper.convertValue(value, JsonNode.class)));
 
