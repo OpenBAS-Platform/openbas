@@ -1,6 +1,7 @@
 package io.openbas.utils.mapper;
 
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import static io.openbas.utils.InjectExpectationResultUtils.getExpectationResultByTypes;
 import static java.util.Collections.emptyList;
 
@@ -48,11 +49,11 @@ public class InjectExpectationMapper {
    * @param scoreExtractor
    * @return List of ExpectationResultsByType
    */
-  public <T> List<InjectExpectationResultUtils.ExpectationResultsByType> extractExpectationResults(
+  public <T> List<ExpectationResultsByType> extractExpectationResults(
       ObjectNode injectContent,
       List<T> expectations,
       BiFunction<List<InjectExpectation.EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
-    List<InjectExpectationResultUtils.ExpectationResultsByType> expectationResultByTypes =
+    List<ExpectationResultsByType> expectationResultByTypes =
         getExpectationResultByTypes(expectations, scoreExtractor);
 
     if (!expectationResultByTypes.isEmpty()) {
@@ -71,8 +72,8 @@ public class InjectExpectationMapper {
    * @param injectContent content of inject where expectations have been defined
    * @return List of InjectResultsByType
    */
-  private static List<InjectExpectationResultUtils.ExpectationResultsByType>
-      buildExpectationResultsFromInjectContent(ObjectNode injectContent) {
+  private static List<ExpectationResultsByType> buildExpectationResultsFromInjectContent(
+      ObjectNode injectContent) {
 
     JsonNode contentNode = injectContent.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
     if (contentNode == null || !contentNode.isArray()) {
@@ -135,9 +136,8 @@ public class InjectExpectationMapper {
    * @param expectations
    * @return List of ExpectationResultsByType
    */
-  public List<InjectExpectationResultUtils.ExpectationResultsByType>
-      extractExpectationResultByTypesFromRaw(
-          Set<String> injectIds, List<RawInjectExpectation> expectations) {
+  public List<ExpectationResultsByType> extractExpectationResultByTypesFromRaw(
+      Set<String> injectIds, List<RawInjectExpectation> expectations) {
 
     if (expectations != null && !expectations.isEmpty()) {
       return getExpectationResultByTypes(
@@ -153,8 +153,8 @@ public class InjectExpectationMapper {
    * @param injectIds the exercise id
    * @return List of InjectResultsByType
    */
-  private List<InjectExpectationResultUtils.ExpectationResultsByType>
-      buildExpectationResultsFromInjectContents(@NotBlank Set<String> injectIds) {
+  private List<ExpectationResultsByType> buildExpectationResultsFromInjectContents(
+      @NotBlank Set<String> injectIds) {
 
     // Fetch all inject contents in order to extract expectations defined in every inject
     List<String> rawContents = injectRepository.findContentsByInjectIds(injectIds);
@@ -170,11 +170,11 @@ public class InjectExpectationMapper {
           ObjectNode contentNode = (ObjectNode) jsonNode;
 
           // ExpectationResults from one injectContent
-          List<InjectExpectationResultUtils.ExpectationResultsByType> results =
+          List<ExpectationResultsByType> results =
               buildExpectationResultsFromInjectContent(contentNode);
 
           // Check if all expectation types have already been added, if so stop the loop
-          for (InjectExpectationResultUtils.ExpectationResultsByType r : results) {
+          for (ExpectationResultsByType r : results) {
             if (ALL_EXPECTATION_TYPES.contains(r.type())) {
               foundTypes.add(r.type());
               if (foundTypes.size() == ALL_EXPECTATION_TYPES.size()) {
@@ -198,9 +198,9 @@ public class InjectExpectationMapper {
    * @param foundTypes ExpectationTypes defined in the content of inject
    * @return List of ExpectationResultsByType
    */
-  private static List<InjectExpectationResultUtils.ExpectationResultsByType> buildFallbackResults(
+  private static List<ExpectationResultsByType> buildFallbackResults(
       Set<ExpectationType> foundTypes) {
-    List<InjectExpectationResultUtils.ExpectationResultsByType> fallbackResults = new ArrayList<>();
+    List<ExpectationResultsByType> fallbackResults = new ArrayList<>();
     for (ExpectationType type : foundTypes) {
       InjectExpectationResultUtils.getExpectationByType(type, emptyList())
           .ifPresent(fallbackResults::add);

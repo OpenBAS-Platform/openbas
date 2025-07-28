@@ -42,7 +42,6 @@ import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.FilterUtilsJpa;
-import io.openbas.utils.InjectExpectationResultUtils;
 import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.TargetType;
@@ -778,10 +777,8 @@ public class ExerciseService {
   }
 
   public boolean isThereAScoreDegradation(
-      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
-          lastSimulationResultsMap,
-      Map<ExpectationType, InjectExpectationResultUtils.ExpectationResultsByType>
-          secondLastSimulationResultsMap) {
+      Map<ExpectationType, ExpectationResultsByType> lastSimulationResultsMap,
+      Map<ExpectationType, ExpectationResultsByType> secondLastSimulationResultsMap) {
 
     for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :
         lastSimulationResultsMap.entrySet()) {
