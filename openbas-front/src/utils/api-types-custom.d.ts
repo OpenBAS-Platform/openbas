@@ -10,12 +10,22 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
   display_legend?: boolean;
   widget_configuration_type: 'temporal-histogram';
   stacked?: boolean;
-  end: string;
+  end?: string;
   mode: 'temporal';
   field: string;
   interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
+  timeRange:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
   series: ApiTypes.DateHistogramSeries[];
-  start: string;
+  start?: string;
 };
 export type FlatConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.FlatSeries[];
