@@ -14,11 +14,15 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
-import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.atomic_testing.form.InjectStatusSimple;
+import io.openbas.rest.atomic_testing.form.InjectorContractSimple;
+import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.payload.output.PayloadSimple;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectExpectationResultUtils;
 import io.openbas.utils.TargetType;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
@@ -48,6 +52,7 @@ public class InjectSearchService {
   private final AssetGroupRepository assetGroupRepository;
 
   private final InjectMapper injectMapper;
+  private final InjectExpectationMapper injectExpectationMapper;
 
   @PersistenceContext private EntityManager entityManager;
 
@@ -364,8 +369,10 @@ public class InjectSearchService {
       if (inject.getId() != null) {
         // Set global score (expectations)
         inject.setExpectationResultByTypes(
-            AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                expectationMap.getOrDefault(inject.getId(), emptyList())));
+            injectExpectationMapper.extractExpectationResults(
+                inject.getContent(),
+                expectationMap.getOrDefault(inject.getId(), emptyList()),
+                InjectExpectationResultUtils::getScoresFromRaw));
 
         // Set targets (teams, assets, asset groups)
         List<TargetSimple> allTargets =
@@ -424,6 +431,7 @@ public class InjectSearchService {
             injectRoot.get("id").alias("inject_id"),
             injectRoot.get("title").alias("inject_title"),
             injectRoot.get("updatedAt").alias("inject_updated_at"),
+            injectRoot.get("content").alias("inject_content"),
             injectorJoin.get("type").alias("inject_type"),
             injectorContractJoin.get("id").alias("injector_contract_id"),
             injectorContractJoin.get("content").alias("injector_contract_content"),
@@ -499,6 +507,7 @@ public class InjectSearchService {
               InjectResultOutput injectResultOutput = new InjectResultOutput();
               injectResultOutput.setId(tuple.get("inject_id", String.class));
               injectResultOutput.setTitle(tuple.get("inject_title", String.class));
+              injectResultOutput.setContent(tuple.get("inject_content", ObjectNode.class));
               injectResultOutput.setUpdatedAt(tuple.get("inject_updated_at", Instant.class));
               injectResultOutput.setInjectType(tuple.get("inject_type", String.class));
               injectResultOutput.setInjectorContract(injectorContractSimple);

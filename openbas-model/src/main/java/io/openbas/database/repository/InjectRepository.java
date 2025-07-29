@@ -4,6 +4,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
 import io.openbas.database.raw.RawInjectIndexing;
 import io.openbas.utils.Constants;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -316,4 +317,9 @@ public interface InjectRepository
       nativeQuery = true)
   List<Object[]> findAllByTitleLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("title") String title, Pageable pageable);
+
+  @Query(
+      value = "SELECT i.inject_content FROM injects i WHERE i.inject_id IN :injectIds",
+      nativeQuery = true)
+  List<String> findContentsByInjectIds(@NotBlank Set<String> injectIds);
 }

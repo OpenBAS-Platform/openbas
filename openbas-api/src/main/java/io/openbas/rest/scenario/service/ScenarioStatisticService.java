@@ -6,8 +6,8 @@ import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.scenario.response.GlobalScoreBySimulationEndDate;
 import io.openbas.rest.scenario.response.ScenarioStatistic;
 import io.openbas.rest.scenario.response.SimulationsResultsLatest;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.AtomicTestingUtils.ResultDistribution;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils.ResultDistribution;
 import io.openbas.utils.ResultUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,20 +44,20 @@ public class ScenarioStatisticService {
 
   private Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>
       getGlobalScoresByExpectationTypes(List<FinishedExerciseWithInjects> finishedExercises) {
+
     List<ExpectationTypeAndGlobalScore> allGlobalScores = getAllGlobalScores(finishedExercises);
 
-    List<GlobalScoreBySimulationEndDate> preventionGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.PREVENTION);
-    List<GlobalScoreBySimulationEndDate> detectionGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.DETECTION);
-    List<GlobalScoreBySimulationEndDate> humanResponseGlobalScores =
-        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.HUMAN_RESPONSE);
+    Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> result = new HashMap<>();
 
-    return new HashMap<>(
-        Map.of(
-            ExpectationType.PREVENTION, preventionGlobalScores,
-            ExpectationType.DETECTION, detectionGlobalScores,
-            ExpectationType.HUMAN_RESPONSE, humanResponseGlobalScores));
+    for (ExpectationType type : ExpectationType.values()) {
+      List<GlobalScoreBySimulationEndDate> scores =
+          getGlobalScoresForExpectationType(allGlobalScores, type);
+      if (!scores.isEmpty()) {
+        result.put(type, scores);
+      }
+    }
+
+    return result;
   }
 
   private List<ExpectationTypeAndGlobalScore> getAllGlobalScores(

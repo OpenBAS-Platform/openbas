@@ -453,8 +453,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 agent1Wrapper.get().getExecutor().getType());
         expectedTarget1.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
         expectedTarget1.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
-        expectedTarget1.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
-        expectedTarget1.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
         AgentTarget expectedTarget2 =
             new AgentTarget(
                 agent2Wrapper.get().getId(),
@@ -464,8 +462,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 agent2Wrapper.get().getExecutor().getType());
         expectedTarget2.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
         expectedTarget2.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
-        expectedTarget2.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
-        expectedTarget2.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
         // expect two out of three endpoints in the resultset, i.e. not the extra one
         List<AgentTarget> expected = List.of(expectedTarget1, expectedTarget2);
 
@@ -1706,8 +1702,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 ep1Wrapper.get().getPlatform().name());
         expectedTarget1.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
         expectedTarget1.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
-        expectedTarget1.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
-        expectedTarget1.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
         EndpointTarget expectedTarget2 =
             new EndpointTarget(
                 ep2Wrapper.get().getId(),
@@ -1716,8 +1710,6 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 ep2Wrapper.get().getPlatform().name());
         expectedTarget2.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
         expectedTarget2.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.PARTIAL);
-        expectedTarget2.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
-        expectedTarget2.setTargetExecutionStatus(InjectExpectation.EXPECTATION_STATUS.UNKNOWN);
         // expect two out of three endpoints in the resultset, i.e. not the extra one
         List<EndpointTarget> expected = List.of(expectedTarget1, expectedTarget2);
 

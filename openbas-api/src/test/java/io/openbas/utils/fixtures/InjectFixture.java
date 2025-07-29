@@ -1,5 +1,7 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -20,6 +22,17 @@ public class InjectFixture {
     inject.setInjectorContract(injectorContract);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode injectContent = objectMapper.createObjectNode();
+    injectContent.set(
+        CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS,
+        objectMapper.convertValue(
+            List.of(
+                ExpectationFixture.createExpectation(InjectExpectation.EXPECTATION_TYPE.MANUAL)),
+            ArrayNode.class));
+    inject.setContent(injectContent);
+
     return inject;
   }
 
