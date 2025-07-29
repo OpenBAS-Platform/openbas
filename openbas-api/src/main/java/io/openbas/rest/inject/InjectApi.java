@@ -5,6 +5,8 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.lock.Lock;
+import io.openbas.aop.lock.LockResourceType;
 import io.openbas.authorisation.AuthorisationService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -34,10 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -325,6 +324,7 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
+  @Lock(type = LockResourceType.INJECT, key = "#injectId")
   @Operation(
       summary = "Inject execution callback for implants",
       description =
