@@ -18,6 +18,9 @@ public class InjectorContractAddInput {
   @JsonProperty("contract_id")
   private String id;
 
+  @JsonProperty("external_contract_id")
+  private String externalId;
+
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("injector_id")
   private String injectorId;

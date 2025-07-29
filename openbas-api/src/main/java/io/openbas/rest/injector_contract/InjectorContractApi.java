@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class InjectorContractApi extends RestBehavior {
 
+  public static final String INJECTOR_CONTRACT_URL = "/api/injector_contracts";
+
   private final AttackPatternRepository attackPatternRepository;
 
   private final InjectorRepository injectorRepository;
@@ -38,12 +40,12 @@ public class InjectorContractApi extends RestBehavior {
 
   private final InjectorContractService injectorContractService;
 
-  @GetMapping("/api/injector_contracts")
+  @GetMapping(INJECTOR_CONTRACT_URL)
   public Iterable<RawInjectorsContrats> injectContracts() {
     return injectorContractRepository.getAllRawInjectorsContracts();
   }
 
-  @PostMapping("/api/injector_contracts/search")
+  @PostMapping(INJECTOR_CONTRACT_URL + "/search")
   public Page<InjectorContractOutput> injectorContracts(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
@@ -53,7 +55,7 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @GetMapping("/api/injector_contracts/{injectorContractId}")
+  @GetMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   public InjectorContract injectorContract(@PathVariable String injectorContractId) {
     return injectorContractRepository
         .findById(injectorContractId)
@@ -61,7 +63,7 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping("/api/injector_contracts")
+  @PostMapping(INJECTOR_CONTRACT_URL)
   @Transactional(rollbackOn = Exception.class)
   public InjectorContract createInjectorContract(
       @Valid @RequestBody InjectorContractAddInput input) {
@@ -83,7 +85,7 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PutMapping("/api/injector_contracts/{injectorContractId}")
+  @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   public InjectorContract updateInjectorContract(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateInput input) {
@@ -99,7 +101,7 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PutMapping("/api/injector_contracts/{injectorContractId}/mapping")
+  @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}/mapping")
   public InjectorContract updateInjectorContractMapping(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateMappingInput input) {
@@ -114,7 +116,7 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/injector_contracts/{injectorContractId}")
+  @DeleteMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   public void deleteInjectorContract(@PathVariable String injectorContractId) {
     this.injectorContractService.deleteInjectorContract(injectorContractId);
   }
