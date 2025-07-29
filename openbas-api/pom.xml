@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.18.3</version>
+        <version>1.18.5</version>
     </parent>
 
     <artifactId>openbas-api</artifactId>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
-            <version>1.18.3</version>
+            <version>1.18.5</version>
         </dependency>
         <dependency>
             <groupId>co.elastic.clients</groupId>
@@ -233,6 +233,12 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+            <version>5.15.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>

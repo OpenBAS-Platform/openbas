@@ -7,9 +7,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
-public class EsUtils {
+public class ElasticUtils {
 
-  private EsUtils() {}
+  private ElasticUtils() {}
 
   public static Query existsQuery(@NotBlank final String field) {
     return ExistsQuery.of(e -> e.field(field))._toQuery();

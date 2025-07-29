@@ -1,4 +1,4 @@
-package io.openbas.config.tls;
+package io.openbas.config.tls.trustmanager;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -15,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestInstance(PER_CLASS)
 @TestPropertySource(
-    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/does_not_exist"})
+    properties = {"openbas.extra-trusted-certs-dir=src/test/resources/tls/does_not_exist"})
 public class TlsConfigNonExistingDirTest extends IntegrationTest {
 
   @Autowired private X509TrustManager trustManager;

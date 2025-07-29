@@ -103,6 +103,29 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+  openbas-dev-opensearch:
+    container_name: openbas-dev-opensearch
+    image: opensearchproject/opensearch:3.1.0
+    volumes:
+      - osdata:/usr/share/opensearch/data
+      - ossnapshots:/usr/share/opensearch/snapshots
+    environment:
+      - discovery.type=single-node
+      # -XX:UseSVE=0 is necessary for Apple M4 architecture
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2G -XX:+IgnoreUnrecognizedVMOptions -XX:UseSVE=0"
+      - "CLI_JAVA_OPTS=-XX:+IgnoreUnrecognizedVMOptions -XX:UseSVE=0"
+      - "DISABLE_SECURITY_PLUGIN=true" # Disables Security plugin
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9600:9600
   openbas-test-elasticsearch:
     container_name: openbas-test-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.3
@@ -147,7 +170,11 @@ services:
 volumes:
   esdata:
     driver: local
+  osdata:
+    driver: local
   essnapshots:
+    driver: local
+  ossnapshots:
     driver: local
   pgdata  :
     driver: local

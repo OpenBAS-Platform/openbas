@@ -7,17 +7,16 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_12__Update_Role_table extends BaseJavaMigration {
+public class V4_11__Payload_Expectations extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
-    Statement stmt = connection.createStatement();
-    stmt.execute(
-        """
-          ALTER TABLE roles
-            ADD COLUMN role_created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            ADD COLUMN role_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW();
-          """);
+    try (Statement statement = connection.createStatement()) {
+      statement.execute(
+          """
+              ALTER TABLE payloads ADD COLUMN payload_expectations text[];
+              """);
+    }
   }
 }
