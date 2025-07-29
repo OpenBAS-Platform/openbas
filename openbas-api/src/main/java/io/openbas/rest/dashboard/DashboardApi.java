@@ -2,14 +2,10 @@ package io.openbas.rest.dashboard;
 
 import static io.openbas.database.model.User.ROLE_USER;
 
-import io.openbas.database.model.CustomDashboard;
-import io.openbas.database.model.CustomDashboardParameters;
-import io.openbas.database.model.Widget;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
-import io.openbas.rest.custom_dashboard.WidgetService;
 import io.openbas.rest.helper.RestBehavior;
 import java.util.List;
 import java.util.Map;
@@ -25,46 +21,27 @@ public class DashboardApi extends RestBehavior {
 
   public static final String DASHBOARD_URI = "/api/dashboards";
 
-  private final WidgetService widgetService;
   private final DashboardService dashboardService;
 
   @PostMapping(DASHBOARD_URI + "/count/{widgetId}")
   public long count(
       @PathVariable final String widgetId,
       @RequestBody(required = false) Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    return this.dashboardService.count(widget, parameters, definitionParameters);
+    return this.dashboardService.count(widgetId, parameters);
   }
 
   @PostMapping(DASHBOARD_URI + "/series/{widgetId}")
   public List<EsSeries> series(
       @PathVariable final String widgetId,
       @RequestBody(required = false) Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    return this.dashboardService.series(widget, parameters, definitionParameters);
+    return this.dashboardService.series(widgetId, parameters);
   }
 
   @PostMapping(DASHBOARD_URI + "/entities/{widgetId}")
   public List<EsBase> entities(
       @PathVariable final String widgetId,
       @RequestBody(required = false) Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    return this.dashboardService.entities(widget, parameters, definitionParameters);
+    return this.dashboardService.entities(widgetId, parameters);
   }
 
   @PostMapping(DASHBOARD_URI + "/attack-paths/{widgetId}")
@@ -72,13 +49,7 @@ public class DashboardApi extends RestBehavior {
       @PathVariable final String widgetId,
       @RequestBody(required = false) Map<String, String> parameters)
       throws ExecutionException, InterruptedException {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    return this.dashboardService.attackPaths(widget, parameters, definitionParameters);
+    return this.dashboardService.attackPaths(widgetId, parameters);
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")
