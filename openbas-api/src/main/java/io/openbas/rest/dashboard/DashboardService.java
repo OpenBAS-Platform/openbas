@@ -6,13 +6,13 @@ import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.engine.EngineService;
 import io.openbas.engine.api.*;
 import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.service.EsAttackPathService;
-import io.openbas.service.EsService;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class DashboardService {
 
   private final EsAttackPathService esAttackPathService;
-  private final EsService esService;
+  private final EngineService engineService;
   private final UserRepository userRepository;
 
   /**
@@ -48,7 +48,7 @@ public class DashboardService {
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime =
           new DateHistogramRuntime(config, parameters, definitionParameters);
-      return esService.multiDateHistogram(userWithAuth, runtime);
+      return engineService.multiDateHistogram(userWithAuth, runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
         widget.getWidgetConfiguration().getConfigurationType())) {
       StructuralHistogramWidget config =
@@ -56,7 +56,7 @@ public class DashboardService {
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime =
           new StructuralHistogramRuntime(config, parameters, definitionParameters);
-      return esService.multiTermHistogram(userWithAuth, runtime);
+      return engineService.multiTermHistogram(userWithAuth, runtime);
     }
     throw new UnsupportedOperationException("Unsupported widget: " + widget);
   }
@@ -77,7 +77,7 @@ public class DashboardService {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
     ListRuntime runtime = new ListRuntime(config, parameters, definitionParameters);
 
-    return esService.entities(userWithAuth, runtime);
+    return engineService.entities(userWithAuth, runtime);
   }
 
   public List<EsAttackPath> attackPaths(
@@ -102,6 +102,6 @@ public class DashboardService {
    */
   public List<EsSearch> search(final String search) {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.search(userWithAuth, search, null);
+    return engineService.search(userWithAuth, search, null);
   }
 }

@@ -29,6 +29,7 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.ee.Ee;
 import io.openbas.rest.collector.form.CollectorCreateInput;
+import io.openbas.rest.payload.form.DetectionRemediationInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
@@ -189,6 +190,46 @@ class PayloadApiTest extends IntegrationTest {
           .andExpect(status().is2xxSuccessful())
           .andExpect(jsonPath("$.payload_name").value("Command line payload"))
           .andExpect(jsonPath("$.payload_detection_remediations.length()").value(3));
+    }
+
+    @Test
+    @DisplayName("Create Payload with detection remediations and then update remediation")
+    void
+        given_payload_update_input_with_detection_remediation_should_return_payload_with_detection_remediation_updated()
+            throws Exception {
+      when(eeService.isEnterpriseLicenseInactive(any())).thenReturn(false);
+      /******* Create *******/
+      PayloadCreateInput input =
+          PayloadInputFixture.createDefaultPayloadCreateInputWithDetectionRemediation();
+
+      String response =
+          mvc.perform(
+                  post(PAYLOAD_URI)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      String payloadId = JsonPath.read(response, "$.payload_id");
+
+      /******* Update *******/
+      PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultCommandPayloadUpdateInput();
+      String updatedValues = "test values";
+      List<DetectionRemediationInput> detectionRemediation =
+          PayloadInputFixture.buildDetectionRemediations();
+      detectionRemediation.stream().forEach(dr -> dr.setValues(updatedValues));
+      updateInput.setDetectionRemediations(detectionRemediation);
+      mvc.perform(
+              put(PAYLOAD_URI + "/" + payloadId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(updateInput)))
+          .andExpect(status().is2xxSuccessful())
+          .andExpect(jsonPath("$.payload_detection_remediations.length()").value(3))
+          .andExpect(
+              jsonPath("$.payload_detection_remediations[0].detection_remediation_values")
+                  .value(updatedValues));
     }
 
     @Test

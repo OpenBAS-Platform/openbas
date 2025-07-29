@@ -1,6 +1,7 @@
 package io.openbas.telemetry;
 
-import static io.openbas.database.model.SettingKeys.*;
+import static io.openbas.database.model.SettingKeys.PLATFORM_INSTANCE;
+import static io.openbas.database.model.SettingKeys.PLATFORM_INSTANCE_CREATION;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Objects.requireNonNull;
 
@@ -20,7 +21,10 @@ import io.opentelemetry.semconv.ServerAttributes;
 import io.opentelemetry.semconv.ServiceAttributes;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -32,37 +36,46 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
+@Component
 @Profile("!test")
 @RequiredArgsConstructor
 public class OpenTelemetryConfig {
 
-  private final Environment env;
+  private final Environment environment;
   private final SettingRepository settingRepository;
   private final ThreadPoolTaskScheduler taskScheduler;
 
   @Getter private final Duration collectInterval = Duration.ofMinutes(60);
   @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
-  @Autowired private Environment environment;
 
   private static final DateTimeFormatter CREATION_DATE_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.n]");
 
+  @Value("${openbas.telemetry.enabled:true}")
+  private boolean telemetryEnabled;
+
   @Bean
   public OpenTelemetry openTelemetry() {
-    log.info("Start telemetry");
+    if (!telemetryEnabled) {
+      log.info("OpenTelemetry is disabled via 'openbas.telemetry.enabled=false'. Skipping init.");
+      return OpenTelemetry.noop();
+    }
+
+    String endpoint = getOTELEndpoint();
+    log.info("Telemetry enabled - using endpoint: " + endpoint);
     log.info("Telemetry - Using collect interval: " + collectInterval);
     log.info("Telemetry - Using export interval: " + exportInterval);
 
-    if (!isEndpointReachable(getOTELEndpoint())) {
+    if (!isEndpointReachable(endpoint)) {
+      log.warn("OTLP endpoint not reachable. Falling back to noop OpenTelemetry.");
       return OpenTelemetry.noop();
     }
 
@@ -86,7 +99,7 @@ public class OpenTelemetryConfig {
             .registerMetricReader(customMetricReader)
             .build();
 
-    return OpenTelemetrySdk.builder().setMeterProvider(meterProvider).buildAndRegisterGlobal();
+    return OpenTelemetrySdk.builder().setMeterProvider(meterProvider).build();
   }
 
   @Bean
@@ -163,6 +176,6 @@ public class OpenTelemetryConfig {
   }
 
   private String getRequiredProperty(@NotBlank final String key) {
-    return requireNonNull(env.getProperty(key), "Property " + key + " must not be null");
+    return requireNonNull(environment.getProperty(key), "Property " + key + " must not be null");
   }
 }
