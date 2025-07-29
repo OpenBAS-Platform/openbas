@@ -17,7 +17,6 @@ const useStyles = makeStyles()(theme => ({
     color: theme.palette.text?.primary,
     backgroundColor: theme.palette.background.accent,
     borderRadius: 4,
-    padding: '6px 0px 6px 8px',
   },
   buttonDummy: {
     whiteSpace: 'nowrap',
@@ -26,14 +25,13 @@ const useStyles = makeStyles()(theme => ({
     color: theme.palette.text?.primary,
     backgroundColor: hexToRGB(theme.palette.background.accent, 0.4),
     borderRadius: 4,
-    padding: '6px 0px 6px 8px',
   },
   buttonText: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
-    padding: 4,
+    padding: theme.spacing(0.2),
     width: '100%',
   },
 }));
