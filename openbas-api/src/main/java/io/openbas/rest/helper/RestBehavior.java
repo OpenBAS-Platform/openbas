@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import io.openbas.aop.lock.LockAcquisitionException;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.User;
@@ -166,7 +167,7 @@ public class RestBehavior {
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)
-  @ExceptionHandler(DataIntegrityViolationException.class)
+  @ExceptionHandler({DataIntegrityViolationException.class, LockAcquisitionException.class})
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -174,15 +175,21 @@ public class RestBehavior {
             description = "Conflict",
             content = @Content(schema = @Schema(implementation = ViolationErrorBag.class))),
       })
-  public ViolationErrorBag handleIntegrityException(DataIntegrityViolationException e) {
+  public ViolationErrorBag handleIntegrityException(Exception e) {
     ViolationErrorBag errorBag = new ViolationErrorBag();
-    errorBag.setType(DataIntegrityViolationException.class.getSimpleName());
-    if (e.getCause() instanceof ConstraintViolationException violationException) {
-      errorBag.setType(ConstraintViolationException.class.getSimpleName());
-      errorBag.setMessage("Error applying constraint " + violationException.getConstraintName());
-      errorBag.setError(violationException.getMessage());
-    } else {
-      errorBag.setMessage("Database integrity violation");
+    if (e instanceof DataIntegrityViolationException) {
+      errorBag.setType(DataIntegrityViolationException.class.getSimpleName());
+      if (e.getCause() instanceof ConstraintViolationException violationException) {
+        errorBag.setType(ConstraintViolationException.class.getSimpleName());
+        errorBag.setMessage("Error applying constraint " + violationException.getConstraintName());
+        errorBag.setError(violationException.getMessage());
+      } else {
+        errorBag.setMessage("Database integrity violation");
+        errorBag.setError(e.getMessage());
+      }
+    } else if (e instanceof LockAcquisitionException) {
+      errorBag.setType(LockAcquisitionException.class.getSimpleName());
+      errorBag.setMessage("Resource is locked");
       errorBag.setError(e.getMessage());
     }
     return errorBag;

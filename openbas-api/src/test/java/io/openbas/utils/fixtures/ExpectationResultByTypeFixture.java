@@ -4,8 +4,8 @@ import static io.openbas.expectation.ExpectationType.*;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.AtomicTestingUtils.ResultDistribution;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils.ResultDistribution;
 import java.util.List;
 
 public class ExpectationResultByTypeFixture {

@@ -1,69 +1,65 @@
 package io.openbas.utils;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
-import io.openbas.database.raw.*;
+import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.expectation.ExpectationType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.BiFunction;
 
-public class AtomicTestingUtils {
+public class InjectExpectationResultUtils {
 
-  public static final String ENDPOINT = "Endpoint";
-
-  // -- RESULTS BY EXPECTATION TYPE --
-  @NotNull
-  public static List<ExpectationResultsByType> getExpectationResultByTypesFromRaw(
-      List<RawInjectExpectation> expectations) {
-    List<Double> preventionScores =
-        getScoresFromRaw(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-    List<Double> detectionScores =
-        getScoresFromRaw(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-    List<Double> vulnerabilityScores =
-        getScoresFromRaw(List.of(EXPECTATION_TYPE.VULNERABILITY), expectations);
-    List<Double> humanScores =
-        getScoresFromRaw(
-            List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
-            expectations);
-
-    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
-
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores)
-        .ifPresent(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.DETECTION, detectionScores)
-        .ifPresent(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.VULNERABILITY, vulnerabilityScores)
-        .ifPresent(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores)
-        .ifPresent(resultAvgOfExpectations::add);
-
-    return resultAvgOfExpectations;
+  public static <T> List<ExpectationResultsByType> getExpectationResultByTypes(
+      List<T> expectations, BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> getScores) {
+    return computeExpectationResults(expectations, getScores);
   }
 
-  @NotNull
-  public static List<ExpectationResultsByType> getExpectationResultByTypes(
-      final List<InjectExpectation> expectations) {
-    List<Double> preventionScores = getScores(List.of(EXPECTATION_TYPE.PREVENTION), expectations);
-    List<Double> detectionScores = getScores(List.of(EXPECTATION_TYPE.DETECTION), expectations);
-    List<Double> humanScores =
-        getScores(
-            List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
-            expectations);
-    List<Double> vulnerabilityScores =
-        getScores(List.of(EXPECTATION_TYPE.VULNERABILITY), expectations);
+  private static <T> List<ExpectationResultsByType> computeExpectationResults(
+      List<T> expectations,
+      BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
 
-    List<ExpectationResultsByType> resultAvgOfExpectations = new ArrayList<>();
+    List<ExpectationResultsByType> result = new ArrayList<>();
 
-    getExpectationByType(ExpectationType.PREVENTION, preventionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.DETECTION, detectionScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.VULNERABILITY, vulnerabilityScores)
-        .map(resultAvgOfExpectations::add);
-    getExpectationByType(ExpectationType.HUMAN_RESPONSE, humanScores)
-        .map(resultAvgOfExpectations::add);
+    addIfScoresPresent(
+        result,
+        List.of(EXPECTATION_TYPE.PREVENTION),
+        ExpectationType.PREVENTION,
+        expectations,
+        scoreExtractor);
+    addIfScoresPresent(
+        result,
+        List.of(EXPECTATION_TYPE.DETECTION),
+        ExpectationType.DETECTION,
+        expectations,
+        scoreExtractor);
+    addIfScoresPresent(
+        result,
+        List.of(EXPECTATION_TYPE.VULNERABILITY),
+        ExpectationType.VULNERABILITY,
+        expectations,
+        scoreExtractor);
+    addIfScoresPresent(
+        result,
+        List.of(EXPECTATION_TYPE.ARTICLE, EXPECTATION_TYPE.CHALLENGE, EXPECTATION_TYPE.MANUAL),
+        ExpectationType.HUMAN_RESPONSE,
+        expectations,
+        scoreExtractor);
 
-    return resultAvgOfExpectations;
+    return result;
+  }
+
+  private static <T> void addIfScoresPresent(
+      List<ExpectationResultsByType> resultList,
+      List<EXPECTATION_TYPE> types,
+      ExpectationType resultType,
+      List<T> expectations,
+      BiFunction<List<EXPECTATION_TYPE>, List<T>, List<Double>> scoreExtractor) {
+
+    List<Double> scores = scoreExtractor.apply(types, expectations);
+    if (!scores.isEmpty()) {
+      getExpectationByType(resultType, scores).ifPresent(resultList::add);
+    }
   }
 
   // -- NORMALIZED SCORES --

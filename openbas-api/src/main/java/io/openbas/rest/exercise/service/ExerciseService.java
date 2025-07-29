@@ -2,7 +2,9 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ExerciseSpecification.*;
+import static io.openbas.database.specification.ExerciseSpecification.closestBefore;
+import static io.openbas.database.specification.ExerciseSpecification.finished;
+import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -29,15 +31,22 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
+import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.*;
+import io.openbas.service.GrantService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.TeamService;
+import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.*;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
+import io.openbas.utils.ResultUtils;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.mapper.ExerciseMapper;
+import io.openbas.utils.mapper.InjectExpectationMapper;
 import io.openbas.utils.mapper.InjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -96,6 +105,8 @@ public class ExerciseService {
   private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
+
+  private final InjectExpectationMapper injectExpectationMapper;
 
   // region properties
   @Value("${openbas.mail.imap.enabled}")
@@ -464,6 +475,12 @@ public class ExerciseService {
         .toList();
   }
 
+  public List<InjectExpectationResultsByAttackPattern> extractExpectationResultsByAttackPattern(
+      String exerciseId) {
+    Exercise exercise = exercise(exerciseId);
+    return resultUtils.computeInjectExpectationResults(exercise.getInjects());
+  }
+
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
 
   // -- SELECT --
@@ -605,11 +622,14 @@ public class ExerciseService {
         .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
   }
 
-  private static void setGlobalScore(
+  private void setGlobalScore(
       ExerciseSimple exercise, Map<String, List<RawInjectExpectation>> expectationsByExerciseIds) {
+    List<RawInjectExpectation> expectations =
+        expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList());
+    HashSet<String> injectIds = new HashSet<>(Arrays.asList(exercise.getInjectIds()));
+
     exercise.setExpectationResultByTypes(
-        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-            expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList())));
+        injectExpectationMapper.extractExpectationResultByTypesFromRaw(injectIds, expectations));
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
@@ -757,9 +777,8 @@ public class ExerciseService {
   }
 
   public boolean isThereAScoreDegradation(
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap,
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-          secondLastSimulationResultsMap) {
+      Map<ExpectationType, ExpectationResultsByType> lastSimulationResultsMap,
+      Map<ExpectationType, ExpectationResultsByType> secondLastSimulationResultsMap) {
 
     for (Map.Entry<ExpectationType, ExpectationResultsByType> entry :
         lastSimulationResultsMap.entrySet()) {

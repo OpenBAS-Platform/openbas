@@ -6,7 +6,11 @@ import { fetchTargetResultMerged } from '../../../../../actions/atomic_testings/
 import Paper from '../../../../../components/common/Paper';
 import { useFormatter } from '../../../../../components/i18n';
 import type { InjectResultOverviewOutput, InjectTarget } from '../../../../../utils/api-types';
-import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
+import {
+  type ExpectationResultType,
+  expectationResultTypes,
+  type InjectExpectationsStore,
+} from '../../../common/injects/expectations/Expectation';
 import ExecutionStatusDetail from '../../../common/injects/status/ExecutionStatusDetail';
 import {
   InjectResultOverviewOutputContext,
@@ -32,7 +36,6 @@ const useStyles = makeStyles()(theme => ({
 const TargetResultsDetail = ({ inject, target }: Props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];
   const canShowExecutionTab = target.target_type !== 'ASSETS_GROUPS';
 
   const [sortedGroupedTargetResults, setSortedGroupedTargetResults] = useState<Record<string, InjectExpectationsStore[]>>({});
@@ -56,7 +59,7 @@ const TargetResultsDetail = ({ inject, target }: Props) => {
 
     const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
     Object.keys(groupedByType)
-      .toSorted((a, b) => sortOrder.indexOf(a) - sortOrder.indexOf(b))
+      .toSorted((a, b) => expectationResultTypes.indexOf(a as ExpectationResultType) - expectationResultTypes.indexOf(b as ExpectationResultType))
       .forEach((key) => {
         sortedGroupedResults[key] = groupedByType[key].toSorted((a, b) => {
           if (a.inject_expectation_name && b.inject_expectation_name) {

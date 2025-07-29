@@ -9,7 +9,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.service.NotificationRuleService;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -45,17 +45,12 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
 
       // create map with the results to facilitate the computing of the score difference
       // TODO update exerciseService to return a map with result
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap =
+      Map<ExpectationType, ExpectationResultsByType> lastSimulationResultsMap =
           exerciseService.getGlobalResults(lastSimulation.getId()).stream()
-              .collect(
-                  Collectors.toMap(
-                      AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
-      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-          secondLastSimulationResultsMap =
-              exerciseService.getGlobalResults(secondLastSimulation.getId()).stream()
-                  .collect(
-                      Collectors.toMap(
-                          AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
+              .collect(Collectors.toMap(ExpectationResultsByType::type, Function.identity()));
+      Map<ExpectationType, ExpectationResultsByType> secondLastSimulationResultsMap =
+          exerciseService.getGlobalResults(secondLastSimulation.getId()).stream()
+              .collect(Collectors.toMap(ExpectationResultsByType::type, Function.identity()));
 
       if (exerciseService.isThereAScoreDegradation(
           lastSimulationResultsMap, secondLastSimulationResultsMap)) {
@@ -78,12 +73,9 @@ public class ScenarioNotificationEventHandler implements NotificationEventHandle
       @NotNull final String scenarioId,
       @NotNull final Exercise lastSimulation,
       @NotNull final Exercise secondLastSimulation,
+      @NotNull final Map<ExpectationType, ExpectationResultsByType> lastSimulationResultsMap,
       @NotNull
-          final Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-              lastSimulationResultsMap,
-      @NotNull
-          final Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-              secondLastSimulationResultsMap) {
+          final Map<ExpectationType, ExpectationResultsByType> secondLastSimulationResultsMap) {
     // TODO handle date format dynamically
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneId.systemDefault());
