@@ -6,7 +6,7 @@ import { type FC, useEffect, useState } from 'react';
 import { fetchRoles } from '../../../../actions/roles/roles-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Role } from '../../../../utils/api-types';
+import { type RoleOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 interface GroupManageRolesProps {
@@ -28,7 +28,7 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
   const theme = useTheme();
   const dispatch = useAppDispatch();
 
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<RoleOutput[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(initialState);
 
   const handleToggleRole = (roleId: string) => {
@@ -41,7 +41,7 @@ const GroupManageRoles: FC<GroupManageRolesProps> = (
 
   const fetchRolesToLoad = () => {
     return dispatch(fetchRoles())
-      .then((result: { entities: { roles: Record<string, Role> } }) => {
+      .then((result: { entities: { roles: Record<string, RoleOutput> } }) => {
         const rolesArray = Object.values(result.entities.roles);
         setRoles(rolesArray);
       });
