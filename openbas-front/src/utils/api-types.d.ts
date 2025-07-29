@@ -1042,14 +1042,24 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "scenario" | "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "scenario"
+    | "timeRange"
+    | "startDate"
+    | "endDate";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "scenario" | "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "scenario"
+    | "timeRange"
+    | "startDate"
+    | "endDate";
 }
 
 /** Payload to create a CVE */
@@ -1259,6 +1269,16 @@ export type DateHistogramWidget = UtilRequiredKeys<
   series: DateHistogramSeries[];
   stacked?: boolean;
   start: string;
+  timeRange?:
+    | "DEFAULT"
+    | "ALL_TIME"
+    | "CUSTOM"
+    | "LAST_DAY"
+    | "LAST_WEEK"
+    | "LAST_MONTH"
+    | "LAST_QUARTER"
+    | "LAST_SEMESTER"
+    | "LAST_YEAR";
 };
 
 export interface DetectionRemediation {

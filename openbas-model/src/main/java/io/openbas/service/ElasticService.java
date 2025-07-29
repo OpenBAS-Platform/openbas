@@ -37,6 +37,7 @@ import io.openbas.schema.PropertySchema;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
@@ -44,11 +45,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
 @Slf4j
 public class ElasticService implements EngineService {
+
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
   private final ElasticDriver driver;
@@ -551,40 +554,76 @@ public class ElasticService implements EngineService {
         .filter(entry -> entry.getValue().getType().name.equals("startDate")).findFirst().get().getKey();
     String endDateParameterId = definitionParameters.entrySet().stream()
         .filter(entry -> entry.getValue().getType().name.equals("endDate")).findFirst().get().getKey();
-    String timeRange = parameters.get(timeRangeParameterId);
+    String dashboardTimeRange = parameters.get(timeRangeParameterId);
+    String widgetTimeRange = widgetConfig.getTimeRange().name();
     Instant start = Instant.now();
     Instant end = Instant.now();
 
-    /*
-    if (widgetConfig.timeRange == DEFAULT) {
-      on utilise la startDate et la endDate du dashboard
-    } else {
-      on utilise la startDate et la endDate de widgetConfig
+    switch (widgetTimeRange) {
+      case "ALL_TIME":
+        start = Instant.parse("2016-01-01T00:00:00Z");
+        break;
+      case "LAST_DAY":
+        start = Instant.now().minus(24, ChronoUnit.HOURS);
+        break;
+      case "LAST_WEEK":
+        start = Instant.now().minus(7, ChronoUnit.DAYS);
+        break;
+      case "LAST_MONTH":
+        start = Instant.now().minus(30, ChronoUnit.DAYS);
+        break;
+      case "LAST_QUARTER":
+        start = Instant.now().minus(90, ChronoUnit.DAYS);
+        break;
+      case "LAST_SEMESTER":
+        start = Instant.now().minus(180, ChronoUnit.DAYS);
+        break;
+      case "LAST_YEAR":
+        start = Instant.now().minus(360, ChronoUnit.DAYS);
+        break;
+      case "CUSTOM":
+        if (!widgetConfig.getStart().isEmpty()) {
+          start = Instant.parse(parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
+        }
+        if (!widgetConfig.getEnd().isEmpty()) {
+          end = Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
+        }
+        break;
+      default:
+        switch (dashboardTimeRange) {
+          case "ALL_TIME":
+            start = Instant.parse("2016-01-01T00:00:00Z");
+            break;
+          case "LAST_DAY":
+            start = Instant.now().minus(24, ChronoUnit.HOURS);
+            break;
+          case "LAST_WEEK":
+            start = Instant.now().minus(7, ChronoUnit.DAYS);
+            break;
+          case "LAST_MONTH":
+            start = Instant.now().minus(30, ChronoUnit.DAYS);
+            break;
+          case "LAST_QUARTER":
+            start = Instant.now().minus(90, ChronoUnit.DAYS);
+            break;
+          case "LAST_SEMESTER":
+            start = Instant.now().minus(180, ChronoUnit.DAYS);
+            break;
+          case "LAST_YEAR":
+            start = Instant.now().minus(360, ChronoUnit.DAYS);
+            break;
+          case "CUSTOM":
+            if (parameters.get(startDateParameterId) != null) {
+              start = Instant.parse(parameters.get(startDateParameterId));
+            }
+            if (parameters.get(endDateParameterId) != null) {
+              end = Instant.parse(parameters.get(endDateParameterId));
+            }
+          default:
+        }
+        ;
     }
-     */
 
-    start = switch (timeRange) {
-      case "LAST_DAY" -> Instant.now().minus(24, ChronoUnit.HOURS);
-      case "LAST_WEEK" -> Instant.now().minus(7, ChronoUnit.DAYS);
-      case "LAST_MONTH" -> Instant.now().minus(30, ChronoUnit.DAYS);
-      case "LAST_QUARTER" -> Instant.now().minus(90, ChronoUnit.DAYS);
-      case "LAST_SEMESTER" -> Instant.now().minus(180, ChronoUnit.DAYS);
-      case "LAST_YEAR" -> Instant.now().minus(360, ChronoUnit.DAYS);
-      default -> start;
-    };
-
-    if (timeRange.equals("CUSTOM") && (parameters.get(startDateParameterId) != null)) {
-      start = Instant.parse(parameters.get(startDateParameterId));
-    }
-
-    if (timeRange.equals("CUSTOM") && (parameters.get(endDateParameterId) != null)) {
-      end = Instant.parse(parameters.get(endDateParameterId));
-    }
-
-    /*String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
-    Instant startInstant = Instant.parse(start);
-    String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
-    Instant endInstant = Instant.parse(end);*/
     Instant finalStart = start;
     Instant finalEnd = end;
     Query dateRangeQuery =
@@ -711,7 +750,7 @@ public class ElasticService implements EngineService {
   /**
    * Create a list configuration for the given entity name and filter value map.
    *
-   * @param entityName the name of the entity to filter on
+   * @param entityName     the name of the entity to filter on
    * @param filterValueMap a map of filter
    * @return a ListConfiguration object
    */
