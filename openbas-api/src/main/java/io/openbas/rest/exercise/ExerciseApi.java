@@ -22,7 +22,7 @@ import io.openbas.database.specification.*;
 import io.openbas.rest.custom_dashboard.CustomDashboardService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
-import io.openbas.rest.exercise.exports.*;
+import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
@@ -31,11 +31,13 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.*;
+import io.openbas.service.FileContainer;
+import io.openbas.service.FileService;
+import io.openbas.service.ImportService;
+import io.openbas.service.TeamService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.FilterUtilsJpa;
-import io.openbas.utils.ResultUtils;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -535,11 +537,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public List<InjectExpectationResultsByAttackPattern> injectResults(
       @NotBlank final @PathVariable String exerciseId) {
-    return exerciseRepository
-        .findById(exerciseId)
-        .map(Exercise::getInjects)
-        .map(ResultUtils::computeInjectExpectationResults)
-        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + exerciseId));
+    return exerciseService.extractExpectationResultsByAttackPattern(exerciseId);
   }
 
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/{documentId}")
