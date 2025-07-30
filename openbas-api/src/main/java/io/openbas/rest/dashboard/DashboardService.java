@@ -38,16 +38,11 @@ public class DashboardService {
    * @return long representing the count result
    */
   public long count(String widgetId, Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    FlatConfiguration config = (FlatConfiguration) widget.getWidgetConfiguration();
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    CountRuntime runtime = new CountRuntime(config, parameters, definitionParameters);
-    return engineService.count(userWithAuth, runtime);
+    WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
+    FlatConfiguration config = (FlatConfiguration) widgetContext.widget().getWidgetConfiguration();
+    CountRuntime runtime =
+        new CountRuntime(config, parameters, widgetContext.definitionParameters());
+    return engineService.count(widgetContext.user(), runtime);
   }
 
   /**
@@ -60,29 +55,23 @@ public class DashboardService {
    * @throws RuntimeException if the widget type is unsupported
    */
   public List<EsSeries> series(String widgetId, Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
+    WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
     if (WidgetConfigurationType.TEMPORAL_HISTOGRAM.equals(
-        widget.getWidgetConfiguration().getConfigurationType())) {
-      DateHistogramWidget config = (DateHistogramWidget) widget.getWidgetConfiguration();
-      RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+        widgetContext.widget().getWidgetConfiguration().getConfigurationType())) {
+      DateHistogramWidget config =
+          (DateHistogramWidget) widgetContext.widget().getWidgetConfiguration();
       DateHistogramRuntime runtime =
-          new DateHistogramRuntime(config, parameters, definitionParameters);
-      return engineService.multiDateHistogram(userWithAuth, runtime);
+          new DateHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+      return engineService.multiDateHistogram(widgetContext.user(), runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
-        widget.getWidgetConfiguration().getConfigurationType())) {
+        widgetContext.widget().getWidgetConfiguration().getConfigurationType())) {
       StructuralHistogramWidget config =
-          (StructuralHistogramWidget) widget.getWidgetConfiguration();
-      RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+          (StructuralHistogramWidget) widgetContext.widget().getWidgetConfiguration();
       StructuralHistogramRuntime runtime =
-          new StructuralHistogramRuntime(config, parameters, definitionParameters);
-      return engineService.multiTermHistogram(userWithAuth, runtime);
+          new StructuralHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+      return engineService.multiTermHistogram(widgetContext.user(), runtime);
     }
-    throw new UnsupportedOperationException("Unsupported widget: " + widget);
+    throw new UnsupportedOperationException("Unsupported widget: " + widgetContext.widget());
   }
 
   /**
@@ -93,31 +82,21 @@ public class DashboardService {
    * @return list of {@link EsBase} entities matching the list widget query
    */
   public List<EsBase> entities(String widgetId, Map<String, String> parameters) {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    ListConfiguration config = (ListConfiguration) widget.getWidgetConfiguration();
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    ListRuntime runtime = new ListRuntime(config, parameters, definitionParameters);
-    return engineService.entities(userWithAuth, runtime);
+    WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
+    ListConfiguration config = (ListConfiguration) widgetContext.widget().getWidgetConfiguration();
+    ListRuntime runtime = new ListRuntime(config, parameters, widgetContext.definitionParameters());
+    return engineService.entities(widgetContext.user(), runtime);
   }
 
   public List<EsAttackPath> attackPaths(String widgetId, Map<String, String> parameters)
       throws ExecutionException, InterruptedException {
-    if (parameters == null) {
-      parameters = Map.of();
-    }
-    Widget widget = this.widgetService.widget(widgetId);
-    CustomDashboard customDashboard = widget.getCustomDashboard();
-    Map<String, CustomDashboardParameters> definitionParameters = customDashboard.toParametersMap();
-    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getWidgetConfiguration();
+    WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
+    StructuralHistogramWidget config =
+        (StructuralHistogramWidget) widgetContext.widget().getWidgetConfiguration();
     StructuralHistogramRuntime runtime =
-        new StructuralHistogramRuntime(config, parameters, definitionParameters);
-    return esAttackPathService.attackPaths(userWithAuth, runtime, parameters, definitionParameters);
+        new StructuralHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+    return esAttackPathService.attackPaths(
+        widgetContext.user(), runtime, parameters, widgetContext.definitionParameters());
   }
 
   /**
@@ -130,4 +109,21 @@ public class DashboardService {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
     return engineService.search(userWithAuth, search, null);
   }
+
+  private WidgetContext getWidgetContext(String widgetId, Map<String, String> parameters) {
+    if (parameters == null) {
+      parameters = Map.of();
+    }
+    Widget widget = widgetService.widget(widgetId);
+    CustomDashboard dashboard = widget.getCustomDashboard();
+    Map<String, CustomDashboardParameters> defParams = dashboard.toParametersMap();
+    RawUserAuth user = userRepository.getUserWithAuth(currentUser().getId());
+    return new WidgetContext(widget, parameters, defParams, user);
+  }
+
+  private record WidgetContext(
+      Widget widget,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters,
+      RawUserAuth user) {}
 }
