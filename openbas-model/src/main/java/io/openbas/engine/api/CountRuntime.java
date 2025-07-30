@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 public class CountRuntime extends Runtime {
 
-  private CountConfig config;
+  private FlatConfiguration config;
 
   public CountRuntime(
-      CountConfig config,
+      FlatConfiguration config,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     this.config = config;
