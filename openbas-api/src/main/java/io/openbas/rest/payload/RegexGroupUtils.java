@@ -1,6 +1,7 @@
 package io.openbas.rest.payload;
 
 import static java.time.Instant.now;
+import static org.flywaydb.core.internal.util.StringUtils.hasText;
 
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.RegexGroup;
@@ -42,7 +43,7 @@ public class RegexGroupUtils {
       boolean copyId,
       Instant now) {
     RegexGroup regexGroup;
-    if (copyId) {
+    if (copyId && hasText(((RegexGroupInput) inputElement).getId())) {
       regexGroup =
           this.regexGroupRepository
               .findById(((RegexGroupInput) inputElement).getId())

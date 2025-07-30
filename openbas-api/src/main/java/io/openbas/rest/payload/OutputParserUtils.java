@@ -1,6 +1,7 @@
 package io.openbas.rest.payload;
 
 import static java.time.Instant.now;
+import static org.flywaydb.core.internal.util.StringUtils.hasText;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.OutputParserRepository;
@@ -38,7 +39,7 @@ public class OutputParserUtils {
   private <T> OutputParser copyOutputParser(
       T inputParser, Payload target, boolean copyId, Instant now) {
     OutputParser outputParser;
-    if (copyId) {
+    if (copyId && hasText(((OutputParserInput) inputParser).getId())) {
       outputParser =
           this.outputParserRepository
               .findById(((OutputParserInput) inputParser).getId())

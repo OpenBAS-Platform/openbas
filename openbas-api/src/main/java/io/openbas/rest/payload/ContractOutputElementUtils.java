@@ -3,6 +3,7 @@ package io.openbas.rest.payload;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.StringUtils.isValidRegex;
 import static java.time.Instant.now;
+import static org.flywaydb.core.internal.util.StringUtils.hasText;
 
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.OutputParser;
@@ -45,7 +46,7 @@ public class ContractOutputElementUtils {
   private ContractOutputElement copyContractOutputElement(
       Object inputElement, OutputParser outputParser, boolean copyId, Instant now) {
     ContractOutputElement contractOutputElement;
-    if (copyId) {
+    if (copyId && hasText(((ContractOutputElementInput) inputElement).getId())) {
       contractOutputElement =
           this.contractOutputElementRepository
               .findById(((ContractOutputElementInput) inputElement).getId())
