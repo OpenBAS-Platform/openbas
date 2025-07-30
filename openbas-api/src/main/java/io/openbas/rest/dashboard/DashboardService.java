@@ -41,7 +41,7 @@ public class DashboardService {
     WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
     FlatConfiguration config = (FlatConfiguration) widgetContext.widget().getWidgetConfiguration();
     CountRuntime runtime =
-        new CountRuntime(config, parameters, widgetContext.definitionParameters());
+        new CountRuntime(config, widgetContext.parameters(), widgetContext.definitionParameters());
     return engineService.count(widgetContext.user(), runtime);
   }
 
@@ -61,14 +61,16 @@ public class DashboardService {
       DateHistogramWidget config =
           (DateHistogramWidget) widgetContext.widget().getWidgetConfiguration();
       DateHistogramRuntime runtime =
-          new DateHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+          new DateHistogramRuntime(
+              config, widgetContext.parameters(), widgetContext.definitionParameters());
       return engineService.multiDateHistogram(widgetContext.user(), runtime);
     } else if (WidgetConfigurationType.STRUCTURAL_HISTOGRAM.equals(
         widgetContext.widget().getWidgetConfiguration().getConfigurationType())) {
       StructuralHistogramWidget config =
           (StructuralHistogramWidget) widgetContext.widget().getWidgetConfiguration();
       StructuralHistogramRuntime runtime =
-          new StructuralHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+          new StructuralHistogramRuntime(
+              config, widgetContext.parameters(), widgetContext.definitionParameters());
       return engineService.multiTermHistogram(widgetContext.user(), runtime);
     }
     throw new UnsupportedOperationException("Unsupported widget: " + widgetContext.widget());
@@ -84,7 +86,8 @@ public class DashboardService {
   public List<EsBase> entities(String widgetId, Map<String, String> parameters) {
     WidgetContext widgetContext = getWidgetContext(widgetId, parameters);
     ListConfiguration config = (ListConfiguration) widgetContext.widget().getWidgetConfiguration();
-    ListRuntime runtime = new ListRuntime(config, parameters, widgetContext.definitionParameters());
+    ListRuntime runtime =
+        new ListRuntime(config, widgetContext.parameters(), widgetContext.definitionParameters());
     return engineService.entities(widgetContext.user(), runtime);
   }
 
@@ -94,9 +97,13 @@ public class DashboardService {
     StructuralHistogramWidget config =
         (StructuralHistogramWidget) widgetContext.widget().getWidgetConfiguration();
     StructuralHistogramRuntime runtime =
-        new StructuralHistogramRuntime(config, parameters, widgetContext.definitionParameters());
+        new StructuralHistogramRuntime(
+            config, widgetContext.parameters(), widgetContext.definitionParameters());
     return esAttackPathService.attackPaths(
-        widgetContext.user(), runtime, parameters, widgetContext.definitionParameters());
+        widgetContext.user(),
+        runtime,
+        widgetContext.parameters(),
+        widgetContext.definitionParameters());
   }
 
   /**
