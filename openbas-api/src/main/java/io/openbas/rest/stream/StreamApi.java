@@ -9,10 +9,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.audit.BaseEvent;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
+import io.openbas.database.model.User;
 import io.openbas.rest.helper.RestBehavior;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.openbas.service.PermissionService;
+import io.openbas.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +42,15 @@ public class StreamApi extends RestBehavior {
   public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
   private final Map<String, Tuple2<OpenBASPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
 
-  private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
+  private final PermissionService permissionService;
+  private final UserService userService;
+
+    public StreamApi(PermissionService permissionService, UserService userService) {
+        this.permissionService = permissionService;
+        this.userService = userService;
+    }
+
+    private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
     event.setInstanceData(mapper.valueToTree(event.getInstance()));
     ServerSentEvent<BaseEvent> message =
@@ -46,6 +60,10 @@ public class StreamApi extends RestBehavior {
 
   @EventListener
   public void listenDatabaseUpdate(BaseEvent event) {
+
+    ResourceType resourceType = ResourceType.fromString(event.getInstance().getClass().getSimpleName());
+    User user = userService.currentUser();
+
     consumers.entrySet().stream()
         .parallel()
         .forEach(
@@ -54,9 +72,10 @@ public class StreamApi extends RestBehavior {
               OpenBASPrincipal listener = tupleFlux.getT1();
               FluxSink<Object> fluxSink = tupleFlux.getT2();
               boolean isCurrentObserver = event.isUserObserver(listener.isAdmin());
-              if (!isCurrentObserver) {
+              if (permissionService.hasPermission(user, event.getInstance().getId(), resourceType, Action.READ)) {
                 // If user as no visibility, we can send a "delete" userEvent with only the internal
                 // id
+                //TODO -> rethink this logic -> do we need to send DELETE events
                 try {
                   String propertyId =
                       event

@@ -27,6 +27,11 @@ public class PermissionService {
       return true;
     }
 
+    //if for some reason we are not able to identify the resource we only allow admin
+    if(ResourceType.UNKNOWN.equals(resourceType)) {
+      return user.isAdmin();
+    }
+
     // Scenario and simulation are  only accessible by GRANT
     if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
       return hasGrantPermission(user, resourceId, resourceType, action);

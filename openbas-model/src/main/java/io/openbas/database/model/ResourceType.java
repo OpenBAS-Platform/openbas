@@ -17,5 +17,15 @@ public enum ResourceType {
   DASHBOARD,
   PLATFORM_SETTING,
   LESSON_LEARNED,
-  CHALLENGE
+  CHALLENGE,
+  UNKNOWN;
+
+
+  public static ResourceType fromString(String name) {
+    try {
+      return ResourceType.valueOf(name);
+    } catch (IllegalArgumentException e) {
+      return UNKNOWN;
+    }
+  }
 }
