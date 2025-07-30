@@ -6,6 +6,7 @@ import static java.time.Instant.now;
 
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.OutputParser;
+import io.openbas.database.repository.ContractOutputElementRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.ContractOutputElementInput;
@@ -25,6 +26,7 @@ public class ContractOutputElementUtils {
 
   private final TagRepository tagRepository;
   private final RegexGroupUtils regexGroupUtils;
+  private final ContractOutputElementRepository contractOutputElementRepository;
 
   public void copyContractOutputElements(
       Set<?> inputElements, OutputParser outputParser, boolean copyId) {
@@ -42,7 +44,15 @@ public class ContractOutputElementUtils {
 
   private ContractOutputElement copyContractOutputElement(
       Object inputElement, OutputParser outputParser, boolean copyId, Instant now) {
-    ContractOutputElement contractOutputElement = new ContractOutputElement();
+    ContractOutputElement contractOutputElement;
+    if (copyId) {
+      contractOutputElement =
+          this.contractOutputElementRepository
+              .findById(((ContractOutputElementInput) inputElement).getId())
+              .orElseThrow();
+    } else {
+      contractOutputElement = new ContractOutputElement();
+    }
     contractOutputElement.setOutputParser(outputParser);
     contractOutputElement.setCreatedAt(now);
     contractOutputElement.setUpdatedAt(now);
@@ -66,7 +76,6 @@ public class ContractOutputElementUtils {
     }
 
     BeanUtils.copyProperties(input, contractOutputElement, "id", "tags", "regexGroups");
-    contractOutputElement.setId(copyId ? input.getId() : null);
     if (tagRepository != null) {
       contractOutputElement.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     }
@@ -82,7 +91,6 @@ public class ContractOutputElementUtils {
     }
 
     BeanUtils.copyProperties(existing, contractOutputElement, "id", "tags", "regexGroups");
-    contractOutputElement.setId(copyId ? existing.getId() : null);
     contractOutputElement.setTags(new HashSet<>(existing.getTags()));
     regexGroupUtils.copyRegexGroups(existing.getRegexGroups(), contractOutputElement, copyId);
   }

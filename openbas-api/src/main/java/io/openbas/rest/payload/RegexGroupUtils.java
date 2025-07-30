@@ -4,6 +4,7 @@ import static java.time.Instant.now;
 
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.RegexGroup;
+import io.openbas.database.repository.RegexGroupRepository;
 import io.openbas.rest.payload.form.RegexGroupInput;
 import java.time.Instant;
 import java.util.Set;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class RegexGroupUtils {
+
+  private final RegexGroupRepository regexGroupRepository;
 
   public void copyRegexGroups(
       Set<?> inputElements, ContractOutputElement contractOutputElement, boolean copyId) {
@@ -38,29 +41,35 @@ public class RegexGroupUtils {
       ContractOutputElement contractOutputElement,
       boolean copyId,
       Instant now) {
-    RegexGroup regexGroup = new RegexGroup();
+    RegexGroup regexGroup;
+    if (copyId) {
+      regexGroup =
+          this.regexGroupRepository
+              .findById(((RegexGroupInput) inputElement).getId())
+              .orElseThrow();
+    } else {
+      regexGroup = new RegexGroup();
+    }
     regexGroup.setContractOutputElement(contractOutputElement);
     regexGroup.setCreatedAt(now);
     regexGroup.setUpdatedAt(now);
 
     if (inputElement instanceof RegexGroupInput) {
-      copyFromInput((RegexGroupInput) inputElement, regexGroup, copyId);
+      copyFromInput((RegexGroupInput) inputElement, regexGroup);
     } else if (inputElement instanceof RegexGroup) {
-      copyFromEntity((RegexGroup) inputElement, regexGroup, copyId);
+      copyFromEntity((RegexGroup) inputElement, regexGroup);
     }
 
     return regexGroup;
   }
 
-  private void copyFromInput(RegexGroupInput input, RegexGroup regexGroup, boolean copyId) {
-    regexGroup.setId(copyId ? input.getId() : null);
+  private void copyFromInput(RegexGroupInput input, RegexGroup regexGroup) {
     regexGroup.setField(input.getField());
     regexGroup.setIndexValues(input.getIndexValues());
   }
 
-  private void copyFromEntity(RegexGroup existing, RegexGroup regexGroup, boolean copyId) {
-    regexGroup.setId(copyId ? existing.getId() : null);
-    regexGroup.setField(existing.getField());
-    regexGroup.setIndexValues(existing.getIndexValues());
+  private void copyFromEntity(RegexGroup input, RegexGroup regexGroup) {
+    regexGroup.setField(input.getField());
+    regexGroup.setIndexValues(input.getIndexValues());
   }
 }
