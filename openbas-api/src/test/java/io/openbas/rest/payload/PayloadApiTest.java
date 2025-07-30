@@ -540,7 +540,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().isOk())
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_mode")
-                .value(ParserMode.STDERR.name()))
+                .value(ParserMode.STDOUT.name()))
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_type")
                 .value(ParserType.REGEX.name()))
@@ -551,7 +551,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
-                .value("credentials_user"))
+                .value("username"))
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_field")

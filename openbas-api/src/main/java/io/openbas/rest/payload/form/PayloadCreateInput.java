@@ -8,6 +8,7 @@ import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
+import io.openbas.rest.payload.output_parser.OutputParserInput;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

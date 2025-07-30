@@ -9,9 +9,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.ee.Ee;
-import io.openbas.integrations.CollectorService;
 import io.openbas.rest.exception.BadRequestException;
-import io.openbas.rest.payload.form.*;
+import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.rest.payload.form.PayloadUpdateInput;
+import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.payload.output_parser.OutputParserService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,9 +31,8 @@ public class PayloadUtils {
 
   private final Ee eeService;
   private final LicenseCacheManager licenseCacheManager;
-  private final OutputParserUtils outputParserUtils;
+  private final OutputParserService outputParserService;
   private final DetectionRemediationUtils detectionRemediationUtils;
-  private final CollectorService collectorService;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -121,6 +122,17 @@ public class PayloadUtils {
     }
   }
 
+  public static Payload instantiatePayload(PayloadType type) {
+    return switch (type) {
+      case COMMAND -> new Command();
+      case EXECUTABLE -> new Executable();
+      case FILE_DROP -> new FileDrop();
+      case DNS_RESOLUTION -> new DnsResolution();
+      case NETWORK_TRAFFIC -> new NetworkTraffic();
+      default -> throw new UnsupportedOperationException("Unsupported payload type: " + type);
+    };
+  }
+
   public <T extends Payload> void duplicateCommonProperties(
       @NotNull final T origin, @NotNull T duplicate) {
     BeanUtils.copyProperties(
@@ -146,14 +158,26 @@ public class PayloadUtils {
     duplicate.setCollector(null);
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
     duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
-    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
+    outputParserService.copyOutputParsersFromEntity(origin.getOutputParsers(), duplicate);
 
     if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
       detectionRemediationUtils.copy(origin.getDetectionRemediations(), duplicate, false);
     }
   }
 
-  public Payload copyProperties(Object payloadInput, Payload target, boolean copyId) {
+  public Payload copyProperties(PayloadCreateInput payloadInput, Payload target) {
+    if (payloadInput == null) {
+      throw new IllegalArgumentException("Input payload cannot be null");
+    }
+    BeanUtils.copyProperties(
+        payloadInput, target, "outputParsers", "tags", "attackPatterns", "detectionRemediations");
+
+    outputParserService.copyOutputParsersFromInput(payloadInput.getOutputParsers(), target);
+    detectionRemediationUtils.copy(payloadInput.getDetectionRemediations(), target, false);
+    return target;
+  }
+
+  public Payload copyProperties(PayloadUpdateInput payloadInput, Payload target) {
     if (payloadInput == null) {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
@@ -161,24 +185,24 @@ public class PayloadUtils {
     BeanUtils.copyProperties(
         payloadInput, target, "outputParsers", "tags", "attackPatterns", "detectionRemediations");
 
-    if (payloadInput instanceof PayloadCreateInput) {
-      outputParserUtils.copyOutputParsers(
-          ((PayloadCreateInput) payloadInput).getOutputParsers(), target, copyId);
-      detectionRemediationUtils.copy(
-          ((PayloadCreateInput) payloadInput).getDetectionRemediations(), target, copyId);
-    } else if (payloadInput instanceof PayloadUpdateInput) {
-      outputParserUtils.copyOutputParsers(
-          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target, copyId);
-      detectionRemediationUtils.copy(
-          ((PayloadUpdateInput) payloadInput).getDetectionRemediations(), target, copyId);
-    } else if (payloadInput instanceof PayloadUpsertInput) {
-      outputParserUtils.copyOutputParsers(
-          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target, copyId);
-      detectionRemediationUtils.copy(
-          ((PayloadUpsertInput) payloadInput).getDetectionRemediations(), target, copyId);
-    } else {
-      throw new IllegalArgumentException("Unsupported payload input type");
+    outputParserService.copyOutputParsersFromInput((payloadInput).getOutputParsers(), target);
+    detectionRemediationUtils.copy((payloadInput).getDetectionRemediations(), target, true);
+    return target;
+  }
+
+  public Payload copyProperties(
+      PayloadUpsertInput payloadInput,
+      Payload target,
+      boolean copyId) { // false if create, true if update
+    if (payloadInput == null) {
+      throw new IllegalArgumentException("Input payload cannot be null");
     }
+
+    BeanUtils.copyProperties(
+        payloadInput, target, "outputParsers", "tags", "attackPatterns", "detectionRemediations");
+
+    outputParserService.copyOutputParsersFromInput(payloadInput.getOutputParsers(), target);
+    detectionRemediationUtils.copy(payloadInput.getDetectionRemediations(), target, copyId);
     return target;
   }
 }

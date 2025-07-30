@@ -28,7 +28,9 @@ import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -221,11 +223,13 @@ public class Payload implements Base {
 
   // -- AUDIT --
 
+  @CreationTimestamp
   @Column(name = "payload_created_at")
   @JsonProperty("payload_created_at")
   @NotNull
   private Instant createdAt = now();
 
+  @UpdateTimestamp
   @Queryable(filterable = true, sortable = true)
   @Column(name = "payload_updated_at")
   @JsonProperty("payload_updated_at")
