@@ -1,5 +1,8 @@
 package io.openbas.database.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
@@ -26,6 +29,7 @@ import lombok.Data;
       @DiscriminatorMapping(value = "PLAYERS", schema = PlayerTarget.class),
       @DiscriminatorMapping(value = "AGENT", schema = AgentTarget.class),
     })
+@JsonInclude(NON_NULL)
 public abstract class InjectTarget {
 
   @Id
@@ -45,20 +49,16 @@ public abstract class InjectTarget {
   protected abstract String getTargetSubtype();
 
   @JsonProperty("target_detection_status")
-  private InjectExpectation.EXPECTATION_STATUS targetDetectionStatus =
-      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  private InjectExpectation.EXPECTATION_STATUS targetDetectionStatus;
 
   @JsonProperty("target_prevention_status")
-  private InjectExpectation.EXPECTATION_STATUS targetPreventionStatus =
-      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  private InjectExpectation.EXPECTATION_STATUS targetPreventionStatus;
 
   @JsonProperty("target_vulnerability_status")
-  private InjectExpectation.EXPECTATION_STATUS targetVulnerabilityStatus =
-      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  private InjectExpectation.EXPECTATION_STATUS targetVulnerabilityStatus;
 
   @JsonProperty("target_human_response_status")
-  private InjectExpectation.EXPECTATION_STATUS targetHumanResponseStatus =
-      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  private InjectExpectation.EXPECTATION_STATUS targetHumanResponseStatus;
 
   @JsonProperty("target_execution_status")
   private InjectExpectation.EXPECTATION_STATUS targetExecutionStatus =

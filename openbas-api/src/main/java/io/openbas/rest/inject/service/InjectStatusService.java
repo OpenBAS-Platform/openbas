@@ -4,11 +4,14 @@ import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.aop.lock.Lock;
+import io.openbas.aop.lock.LockResourceType;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -168,14 +171,14 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTrace, agent);
     injectStatus.addTrace(executionTrace);
 
-    synchronized (inject.getId()) {
-      if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
-          && (agent == null || isAllInjectAgentsExecuted(inject))) {
-        updateFinalInjectStatus(injectStatus);
-      }
-
-      injectRepository.save(inject);
+    if (executionTrace.getAction().equals(ExecutionTraceAction.COMPLETE)
+        && (agent == null || isAllInjectAgentsExecuted(inject))) {
+      updateFinalInjectStatus(injectStatus);
+      log.debug("Successfully updated inject final status: " + inject.getId());
     }
+
+    injectRepository.save(inject);
+    log.debug("Successfully updated inject: " + inject.getId());
   }
 
   public ExecutionStatus computeStatus(List<ExecutionTrace> traces) {
@@ -264,5 +267,31 @@ public class InjectStatusService {
 
   public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses) {
     return this.injectStatusRepository.saveAll(injectStatuses);
+  }
+
+  @Lock(type = LockResourceType.INJECT, key = "#injectId")
+  public void setImplantErrorTrace(String injectId, String agentId, String message) {
+    if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
+      // Create execution traces to inform that the architecture or platform are not compatible with
+      // the OpenBAS implant
+      Inject inject =
+          injectRepository
+              .findById(injectId)
+              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
+      Agent agent =
+          agentRepository
+              .findById(agentId)
+              .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
+      InjectStatus injectStatus =
+          inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+      injectStatus.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
+      injectStatusRepository.save(injectStatus);
+      InjectExecutionInput input = new InjectExecutionInput();
+      input.setMessage("Execution done");
+      input.setStatus(ExecutionTraceStatus.INFO.name());
+      input.setAction(InjectExecutionAction.complete);
+      this.updateInjectStatus(agent, inject, input, null);
+    }
+    throw new IllegalArgumentException(message);
   }
 }

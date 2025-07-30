@@ -8,6 +8,7 @@ import { Link } from 'react-router';
 import { useFormatter } from '../../../../components/i18n';
 import { type ExpectationResultsByType, type ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
+import { expectationResultTypes } from './expectations/Expectation';
 
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
@@ -52,10 +53,17 @@ const ResponsePie: FunctionComponent<Props> = ({
     fontSize: forceSize ? forceSize * 0.3 : 35,
   };
 
-  const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
-  const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');
-  const humanResponse = expectationResultsByTypes?.find(e => e.type === 'HUMAN_RESPONSE');
-  const vulnerability = expectationResultsByTypes?.find(e => e.type === 'VULNERABILITY');
+  const definedTypes = Array.from(new Set(expectationResultsByTypes?.map(r => r?.type).filter(Boolean)));
+
+  const expectationResultsMap = useMemo(() => {
+    const result = expectationResultsByTypes || [];
+    return result.reduce((acc, curr) => {
+      acc[curr.type] = curr;
+      return acc;
+    }, {} as Record<string, ExpectationResultsByType>);
+  }, [expectationResultsByTypes]);
+
+  const humanResponse = expectationResultsMap['HUMAN_RESPONSE'];
   const pending = useMemo(() => humanResponse?.distribution?.filter(res => res.label === 'Pending' && (res.value ?? 0) > 0) ?? [], [humanResponse]);
   const displayHumanValidationBtn = humanValidationLink && (pending.length > 0);
   const renderIcon = (type: string, hasDistribution: boolean | undefined) => {
@@ -118,7 +126,7 @@ const ResponsePie: FunctionComponent<Props> = ({
   const pieTitle = (title: string, expectationResultsByType?: ExpectationResultsByType) => {
     const hasDistribution = expectationResultsByType?.distribution && expectationResultsByType?.distribution.length > 0;
     return (
-      <span
+      <div
         style={{
           ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
           fontWeight: 300,
@@ -126,7 +134,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         }}
       >
         {title}
-      </span>
+      </div>
     );
   };
 
@@ -135,39 +143,38 @@ const ResponsePie: FunctionComponent<Props> = ({
       id="score_details"
       style={{
         display: 'grid',
-        gridTemplateColumns: '25% 25% 25% 25%',
+        gridTemplateColumns: `repeat(${definedTypes.length}, minmax(25%, 1fr))`,
         width: '100%',
       }}
     >
-      <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
-      <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
-      <Pie type="vulnerability" title={t('TYPE_VULNERABILITY')} expectationResultsByType={vulnerability} />
-      <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
+      {definedTypes
+        .sort((a, b) => expectationResultTypes.indexOf(a) - expectationResultTypes.indexOf(b))
+        .map(type => (
+          <div key={type}>
+            <Pie
+              type={type.toLowerCase()}
+              title={t(type)}
+              expectationResultsByType={expectationResultsMap[type]}
+            />
+            {hasTitles && pieTitle(t(type))}
 
-      {hasTitles && (
-        <>
-          {pieTitle(t('TYPE_PREVENTION'), prevention)}
-          {pieTitle(t('TYPE_DETECTION'), detection)}
-          {pieTitle(t('TYPE_VULNERABILITY'), vulnerability)}
-          {pieTitle(t('TYPE_HUMAN_RESPONSE'), humanResponse)}
-        </>
-      )}
-
-      {displayHumanValidationBtn && (
-        <Button
-          startIcon={<InfoOutlined />}
-          color="primary"
-          component={Link}
-          style={{
-            gridColumnStart: 3,
-            textAlign: 'center',
-            fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
-          }}
-          to={humanValidationLink}
-        >
-          {`${pending.length} ${t('validations needed')}`}
-        </Button>
-      )}
+            {displayHumanValidationBtn && type === 'HUMAN_RESPONSE' && (
+              <Button
+                startIcon={<InfoOutlined />}
+                color="primary"
+                component={Link}
+                to={humanValidationLink}
+                style={{
+                  textAlign: 'center',
+                  fontSize: 'clamp(0.75rem, 0.5vw, 1rem)',
+                  width: '100%',
+                }}
+              >
+                {`${pending.length} ${t('validations needed')}`}
+              </Button>
+            )}
+          </div>
+        ))}
     </div>
   );
 };

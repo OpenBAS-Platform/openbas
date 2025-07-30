@@ -19,8 +19,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.inject.form.InjectExecutionAction;
-import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
@@ -349,11 +347,11 @@ public class InjectorApi extends RestBehavior {
       @RequestParam(required = false) final String agentId)
       throws IOException {
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
-      setImplantErrorTrace(
+      this.injectStatusService.setImplantErrorTrace(
           injectId, agentId, "Unable to download the implant. Platform invalid: " + platform);
     }
     if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
-      setImplantErrorTrace(
+      this.injectStatusService.setImplantErrorTrace(
           injectId,
           agentId,
           "Unable to download the implant. Architecture invalid: " + architecture);
@@ -384,31 +382,6 @@ public class InjectorApi extends RestBehavior {
           .body(IOUtils.toByteArray(in));
     }
     throw new UnsupportedOperationException("Implant " + platform + " executable not supported");
-  }
-
-  private void setImplantErrorTrace(String injectId, String agentId, String message) {
-    if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
-      // Create execution traces to inform that the architecture or platform are not compatible with
-      // the OpenBAS implant
-      Inject inject =
-          injectRepository
-              .findById(injectId)
-              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
-      Agent agent =
-          agentRepository
-              .findById(agentId)
-              .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
-      InjectStatus injectStatus =
-          inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
-      injectStatus.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
-      injectStatusRepository.save(injectStatus);
-      InjectExecutionInput input = new InjectExecutionInput();
-      input.setMessage("Execution done");
-      input.setStatus(ExecutionTraceStatus.INFO.name());
-      input.setAction(InjectExecutionAction.complete);
-      injectStatusService.updateInjectStatus(agent, inject, input, null);
-    }
-    throw new IllegalArgumentException(message);
   }
 
   // -- OPTION --

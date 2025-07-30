@@ -1,7 +1,7 @@
 package io.openbas.rest.exercise.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;

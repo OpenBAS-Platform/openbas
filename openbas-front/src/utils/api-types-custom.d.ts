@@ -17,6 +17,10 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
   series: ApiTypes.DateHistogramSeries[];
   start: string;
 };
+export type FlatConfiguration = BaseWidgetConfiguration & {
+  series: ApiTypes.FlatSeries[];
+  widget_configuration_type: 'flat';
+};
 export type ListConfiguration = BaseWidgetConfiguration & {
   perspective: ApiTypes.ListPerspective;
   columns: string[];
@@ -38,8 +42,8 @@ export type HistogramWidget = ApiTypes.BaseWidgetConfiguration &
     | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'temporal-histogram', DateHistogramWidget>
     | ApiTypes.BaseWidgetConfigurationWidgetConfigurationTypeMapping<'structural-histogram', StructuralHistogramWidget>
     );
-export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration };
-export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration };
+export type WidgetInput = Omit<ApiTypes.WidgetInput, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration | FlatConfiguration };
+export type Widget = Omit<ApiTypes.Widget, 'widget_config'> & { widget_config: DateHistogramWidget | StructuralHistogramWidget | ListConfiguration | FlatConfiguration };
 type PayloadCreateInputOmit = 'payload_type' | 'payload_source' | 'payload_status' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_output_parsers';
 type PayloadCreateInputMore = {
   payload_output_parsers?: (
