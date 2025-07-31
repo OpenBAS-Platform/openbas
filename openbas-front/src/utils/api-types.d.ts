@@ -3003,6 +3003,7 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_created_at: string;
   injector_contract_custom?: boolean;
+  injector_contract_external_id?: string;
   injector_contract_id: string;
   injector_contract_import_available?: boolean;
   injector_contract_injector: string;
@@ -3036,6 +3037,7 @@ export interface InjectorContractAddInput {
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   contract_platforms?: string[];
+  external_contract_id?: string;
   injector_id: string;
   is_atomic_testing?: boolean;
 }
