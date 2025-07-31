@@ -2,9 +2,19 @@ package io.openbas.utils.fixtures;
 
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.COMMUNITY;
 import static io.openbas.database.model.Payload.PAYLOAD_STATUS.UNVERIFIED;
+import static io.openbas.utils.fixtures.payload_fixture.ContractOutputElementInputFixture.createDefaultContractOutputElementInputCredentials;
+import static io.openbas.utils.fixtures.payload_fixture.ContractOutputElementInputFixture.createDefaultContractOutputElementInputIPV6;
+import static io.openbas.utils.fixtures.payload_fixture.OutputParserInputFixture.createDefaultOutputParseInput;
+import static io.openbas.utils.fixtures.payload_fixture.RegexGroupInputFixture.createDefaultRegexGroupInputCredentials;
+import static io.openbas.utils.fixtures.payload_fixture.RegexGroupInputFixture.createDefaultRegexGroupInputIPV6;
 
-import io.openbas.database.model.*;
+import io.openbas.database.model.Document;
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Payload;
+import io.openbas.rest.payload.contract_output_element.ContractOutputElementInput;
 import io.openbas.rest.payload.form.*;
+import io.openbas.rest.payload.output_parser.OutputParserInput;
+import io.openbas.rest.payload.regex_group.RegexGroupInput;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -30,22 +40,13 @@ public class PayloadInputFixture {
   public static PayloadCreateInput createDefaultPayloadCreateInputWithOutputParser() {
     PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
 
-    RegexGroupInput regexGroupInput = new RegexGroupInput();
-    regexGroupInput.setField("ipv6");
-    regexGroupInput.setIndexValues("$0");
+    RegexGroupInput regexGroupInput = createDefaultRegexGroupInputIPV6();
 
-    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setKey("IPV6");
-    contractOutputElementInput.setType(ContractOutputType.IPv6);
-    contractOutputElementInput.setName("IPV6");
-    contractOutputElementInput.setRule("rule");
-    contractOutputElementInput.setTagIds(List.of("id"));
-    contractOutputElementInput.setFinding(true);
+    ContractOutputElementInput contractOutputElementInput =
+        createDefaultContractOutputElementInputIPV6();
     contractOutputElementInput.setRegexGroups(Set.of(regexGroupInput));
 
-    OutputParserInput outputParserInput = new OutputParserInput();
-    outputParserInput.setMode(ParserMode.STDOUT);
-    outputParserInput.setType(ParserType.REGEX);
+    OutputParserInput outputParserInput = createDefaultOutputParseInput();
     outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
     input.setOutputParsers(Set.of(outputParserInput));
@@ -110,17 +111,10 @@ public class PayloadInputFixture {
   public static PayloadUpdateInput getDefaultCommandPayloadUpdateInputWithOutputParser() {
     PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
 
-    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setKey("IPV6");
-    contractOutputElementInput.setType(ContractOutputType.IPv6);
-    contractOutputElementInput.setName("IPV6");
-    contractOutputElementInput.setRule("rule");
-    contractOutputElementInput.setTagIds(List.of("id"));
-    contractOutputElementInput.setFinding(true);
+    ContractOutputElementInput contractOutputElementInput =
+        createDefaultContractOutputElementInputIPV6();
 
-    OutputParserInput outputParserInput = new OutputParserInput();
-    outputParserInput.setMode(ParserMode.STDOUT);
-    outputParserInput.setType(ParserType.REGEX);
+    OutputParserInput outputParserInput = createDefaultOutputParseInput();
     outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
     input.setOutputParsers(Set.of(outputParserInput));
@@ -158,9 +152,7 @@ public class PayloadInputFixture {
 
     ContractOutputElementInput contractOutputElementInput = getContractOutputElementInput();
 
-    OutputParserInput outputParserInput = new OutputParserInput();
-    outputParserInput.setMode(ParserMode.STDERR);
-    outputParserInput.setType(ParserType.REGEX);
+    OutputParserInput outputParserInput = createDefaultOutputParseInput();
     outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
     input.setOutputParsers(Set.of(outputParserInput));
@@ -175,17 +167,10 @@ public class PayloadInputFixture {
 
   @NotNull
   private static ContractOutputElementInput getContractOutputElementInput() {
-    RegexGroupInput regexGroupUserNameInput = new RegexGroupInput();
-    regexGroupUserNameInput.setField("username");
-    regexGroupUserNameInput.setIndexValues("$1");
+    RegexGroupInput regexGroupUserNameInput = createDefaultRegexGroupInputCredentials();
 
-    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setKey("credentials_user");
-    contractOutputElementInput.setType(ContractOutputType.Credentials);
-    contractOutputElementInput.setName("Credentials");
-    contractOutputElementInput.setRule("regex xPath");
-    contractOutputElementInput.setTagIds(List.of("id"));
-    contractOutputElementInput.setFinding(true);
+    ContractOutputElementInput contractOutputElementInput =
+        createDefaultContractOutputElementInputCredentials();
     contractOutputElementInput.setRegexGroups(Set.of(regexGroupUserNameInput));
     return contractOutputElementInput;
   }

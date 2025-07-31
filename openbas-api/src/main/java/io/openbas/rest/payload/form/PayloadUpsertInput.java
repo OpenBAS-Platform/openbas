@@ -4,6 +4,7 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
+import io.openbas.rest.payload.output_parser.OutputParserInput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

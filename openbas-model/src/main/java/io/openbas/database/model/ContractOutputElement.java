@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -32,7 +34,7 @@ public class ContractOutputElement implements Base {
   private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "contract_output_element_output_parser_id")
+  @JoinColumn(name = "contract_output_element_output_parser_id", nullable = false)
   @JsonIgnore
   private OutputParser outputParser;
 
@@ -81,11 +83,15 @@ public class ContractOutputElement implements Base {
   @JsonProperty("contract_output_element_tags")
   private Set<Tag> tags = new HashSet<>();
 
+  // -- AUDIT --
+
+  @CreationTimestamp
   @Column(name = "contract_output_element_created_at")
   @JsonProperty("contract_output_element_created_at")
   @NotNull
   private Instant createdAt = now();
 
+  @UpdateTimestamp
   @Column(name = "contract_output_element_updated_at")
   @JsonProperty("contract_output_element_updated_at")
   @NotNull

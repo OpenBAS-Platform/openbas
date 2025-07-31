@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.utils.fixtures.composers.payload_composers.OutputParserComposer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class PayloadComposer extends ComposerBase<Payload> {
     private final Payload payload;
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private Optional<DocumentComposer.Composer> documentComposer = Optional.empty();
+    private final List<OutputParserComposer.Composer> outputParserComposers = new ArrayList<>();
     private final List<DetectionRemediationComposer.Composer> detectionRemediationComposers =
         new ArrayList<>();
 
@@ -58,6 +60,14 @@ public class PayloadComposer extends ComposerBase<Payload> {
       }
       documentComposer = Optional.of(newDocumentComposer);
       ((Executable) payload).setExecutableFile(newDocumentComposer.get());
+      return this;
+    }
+
+    public Composer withOutputParser(OutputParserComposer.Composer outputParserComposer) {
+      outputParserComposers.add(outputParserComposer);
+      Set<OutputParser> outputParsers = payload.getOutputParsers();
+      outputParsers.add(outputParserComposer.get());
+      this.payload.setOutputParsers(outputParsers);
       return this;
     }
 

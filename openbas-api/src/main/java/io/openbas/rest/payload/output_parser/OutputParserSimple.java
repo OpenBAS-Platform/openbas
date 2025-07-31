@@ -1,32 +1,37 @@
-package io.openbas.rest.payload.form;
+package io.openbas.rest.payload.output_parser;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ParserMode;
 import io.openbas.database.model.ParserType;
+import io.openbas.rest.payload.contract_output_element.ContractOutputElementSimple;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Set;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class OutputParserInput {
+@Builder
+@Schema(description = "Represents a single output parser")
+public class OutputParserSimple {
 
   @JsonProperty("output_parser_id")
+  @NotBlank
   private String id;
 
   @JsonProperty("output_parser_mode")
-  @Schema(description = "Paser Mode: STDOUT, STDERR, READ_FILE")
+  @Schema(
+      description = "Mode of parser, which output will be parsed, for now only STDOUT is supported")
   @NotNull
   private ParserMode mode;
 
   @JsonProperty("output_parser_type")
-  @Schema(description = "Parser Type: REGEX")
+  @Schema(description = "Type of parser, for now only REGEX is supported")
   @NotNull
   private ParserType type;
 
   @JsonProperty("output_parser_contract_output_elements")
-  @Schema(description = "List of Contract output elements")
   @NotNull
-  private Set<ContractOutputElementInput> contractOutputElements = new HashSet<>();
+  private Set<ContractOutputElementSimple> contractOutputElement;
 }
