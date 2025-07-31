@@ -98,8 +98,8 @@ public class OutputParserService {
         .map(
             source -> {
               OutputParser copy = OutputParserUtils.copyFromInput(input, source);
-              contractOutputElementService.copyContractOutputElementsFromEntity(
-                  source.getContractOutputElements(), copy);
+              contractOutputElementService.copyContractOutputElementsFromInput(
+                  input.getContractOutputElements(), copy);
               return copy;
             })
         .orElseGet(

@@ -97,7 +97,7 @@ public class ContractOutputElementService {
         .map(
             source -> {
               ContractOutputElement copy = ContractOutputElementUtils.copyFromInput(input, source);
-              regexGroupService.copyRegexGroupsFromEntity(source.getRegexGroups(), copy);
+              regexGroupService.copyRegexGroupsFromInput(input.getRegexGroups(), copy);
               return copy;
             })
         .orElseGet(
