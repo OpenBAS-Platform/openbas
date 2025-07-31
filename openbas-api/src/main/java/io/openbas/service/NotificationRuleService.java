@@ -50,7 +50,8 @@ public class NotificationRuleService {
 
   public NotificationRule createNotificationRule(@NotNull final NotificationRule notificationRule) {
     User currentUser = userService.currentUser();
-    if (NotificationRuleResourceType.SCENARIO.equals(notificationRule.getNotificationResourceType())) {
+    if (NotificationRuleResourceType.SCENARIO.equals(
+        notificationRule.getNotificationResourceType())) {
       // verify if the scenario exists
       if (scenarioService.scenario(notificationRule.getResourceId()) == null) {
         new ElementNotFoundException(

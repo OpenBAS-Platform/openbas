@@ -10,15 +10,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.audit.BaseEvent;
 import io.openbas.database.model.Action;
-import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.User;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.PermissionService;
+import io.openbas.service.UserService;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.openbas.service.PermissionService;
-import io.openbas.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
@@ -45,12 +43,12 @@ public class StreamApi extends RestBehavior {
   private final PermissionService permissionService;
   private final UserService userService;
 
-    public StreamApi(PermissionService permissionService, UserService userService) {
-        this.permissionService = permissionService;
-        this.userService = userService;
-    }
+  public StreamApi(PermissionService permissionService, UserService userService) {
+    this.permissionService = permissionService;
+    this.userService = userService;
+  }
 
-    private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
+  private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
     event.setInstanceData(mapper.valueToTree(event.getInstance()));
     ServerSentEvent<BaseEvent> message =
@@ -68,9 +66,14 @@ public class StreamApi extends RestBehavior {
 
               Tuple2<OpenBASPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
               FluxSink<Object> fluxSink = tupleFlux.getT2();
-              if (!permissionService.hasPermission(user, event.getInstance().getId(), event.getInstance().getResourceType(), Action.READ)) {
-                // If user as no visibility, we can send a "delete" userEvent with only the internal id
-                //TODO -> rethink this logic -> do we need to send DELETE events
+              if (!permissionService.hasPermission(
+                  user,
+                  event.getInstance().getId(),
+                  event.getInstance().getResourceType(),
+                  Action.READ)) {
+                // If user as no visibility, we can send a "delete" userEvent with only the internal
+                // id
+                // TODO -> rethink this logic -> do we need to send DELETE events
                 try {
                   String propertyId =
                       event
