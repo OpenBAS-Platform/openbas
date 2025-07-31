@@ -2,7 +2,7 @@ package io.openbas.collectors.expectations_expiration_manager;
 
 import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
 import io.openbas.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService;
-import io.openbas.integrations.CollectorService;
+import io.openbas.rest.collector.service.CollectorService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

@@ -30,7 +30,7 @@ const useStyles = makeStyles()({
 
 const inlineStyles: Record<string, CSSProperties> = ({
   cve_external_id: { width: '20%' },
-  cve_cvss: { width: '20%' },
+  cve_cvss_v31: { width: '20%' },
   cve_published: { width: '60%' },
 });
 
@@ -67,11 +67,11 @@ const Cves = () => {
       value: (cve: CveSimple) => cve.cve_external_id,
     },
     {
-      field: 'cve_cvss',
+      field: 'cve_cvss_v31',
       label: 'CVSS',
       isSortable: true,
       value: (cve: CveSimple) => (
-        <CVSSBadge score={cve.cve_cvss}></CVSSBadge>
+        <CVSSBadge score={cve.cve_cvss_v31}></CVSSBadge>
       ),
     },
     {
@@ -165,9 +165,9 @@ const Cves = () => {
         <Drawer
           open={!!selectedCve}
           handleClose={() => setSelectedCve(null)}
-          title={selectedCve?.cve_external_id || ''}
-          additionalTitle={selectedCve?.cve_cvss ? 'CVSS' : undefined}
-          additionalChipLabel={selectedCve?.cve_cvss.toFixed(1)}
+          title={selectedCve?.cve_external_id ?? ''}
+          additionalTitle={selectedCve?.cve_cvss_v31 ? 'CVSS' : undefined}
+          additionalChipLabel={selectedCve?.cve_cvss_v31.toFixed(1)}
         >
           {selectedCve && (
             <CveDetail

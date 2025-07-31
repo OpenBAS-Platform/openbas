@@ -12,14 +12,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+@Data
 @Entity
 @Table(name = "cwes")
 @EntityListeners(ModelBaseListener.class)
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cwe implements Base {
 
   @Id

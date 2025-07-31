@@ -2,7 +2,7 @@ package io.openbas.collectors.expectations_expiration_manager;
 
 import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
 import io.openbas.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService;
-import io.openbas.integrations.CollectorService;
+import io.openbas.rest.collector.service.CollectorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
