@@ -36,7 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @TestInstance(PER_CLASS)
-public class ExerciseApiExportTest extends IntegrationTest {
+class ExerciseApiExportTest extends IntegrationTest {
+
   @Autowired private MockMvc mvc;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ArticleComposer articleComposer;
@@ -183,7 +184,13 @@ public class ExerciseApiExportTest extends IntegrationTest {
             ExerciseFileExport.fromExercise(ex, exportMapper, challengeService, articleService)
                 .withOptions(0));
 
-    assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
+    assertThatJson(expectedJson)
+        .whenIgnoringPaths(
+            "exercise_injects[*].inject_injector_contract.injector_contract_payload.payload_created_at",
+            "exercise_injects[*].inject_injector_contract.injector_contract_payload.payload_updated_at"
+        )
+        .isObject()
+        .isEqualTo(actualJson);
   }
 
   @DisplayName(
@@ -213,7 +220,12 @@ public class ExerciseApiExportTest extends IntegrationTest {
             ExerciseFileExport.fromExercise(ex, exportMapper, challengeService, articleService)
                 .withOptions(7));
 
-    assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
+    assertThatJson(expectedJson)
+        .whenIgnoringPaths(
+            "exercise_injects[*].inject_injector_contract.injector_contract_payload.payload_created_at",
+            "exercise_injects[*].inject_injector_contract.injector_contract_payload.payload_updated_at"
+        )
+        .isObject().isEqualTo(actualJson);
   }
 
   @DisplayName("Given a valid simulation and default options, exported tags are correct")
