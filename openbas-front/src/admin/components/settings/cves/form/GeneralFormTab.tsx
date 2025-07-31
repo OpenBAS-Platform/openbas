@@ -40,7 +40,7 @@ const GeneralFormTab = ({ editing = false }: Props) => {
   return (
     <>
       <TextFieldController name="cve_external_id" label={t('CVE ID')} required disabled={editing} />
-      <TextFieldController name="cve_cvss" label={t('CVSS')} required type="number" disabled={editing} />
+      <TextFieldController name="cve_cvss_v31" label={t('CVSS Version 3.1')} required type="number" disabled={editing} />
 
       <TextFieldController variant="standard" name="cve_description" label={t('Description')} multiline rows={5} />
 

@@ -52,7 +52,7 @@ class CveApiTest extends IntegrationTest {
     void shouldCreateNewCve() throws Exception {
       CveCreateInput input = new CveCreateInput();
       input.setExternalId("CVE-2025-1234");
-      input.setCvss(new BigDecimal("5.2"));
+      input.setCvssV31(new BigDecimal("5.2"));
       input.setDescription("Test summary for CVE creation");
 
       String response =
@@ -73,7 +73,7 @@ class CveApiTest extends IntegrationTest {
     void shouldFetchCveById() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5678");
-      cve.setCvss(new BigDecimal("8.9"));
+      cve.setCvssV31(new BigDecimal("8.9"));
       cve.setDescription("Test CVE");
 
       cveComposer.forCve(cve).persist();
@@ -93,7 +93,7 @@ class CveApiTest extends IntegrationTest {
     void shouldUpdateCve() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5679");
-      cve.setCvss(new BigDecimal("4.5"));
+      cve.setCvssV31(new BigDecimal("4.5"));
       cve.setDescription("Old description");
       cveComposer.forCve(cve).persist();
 
@@ -121,7 +121,7 @@ class CveApiTest extends IntegrationTest {
     void shouldDeleteCve() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5679");
-      cve.setCvss(new BigDecimal("7.5"));
+      cve.setCvssV31(new BigDecimal("7.5"));
       cve.setDescription("To be deleted");
       cveComposer.forCve(cve).persist();
 
@@ -135,13 +135,13 @@ class CveApiTest extends IntegrationTest {
     void shouldReturnCvesOnSearch() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2024-5679");
-      cve.setCvss(new BigDecimal("4.5"));
+      cve.setCvssV31(new BigDecimal("4.5"));
       cve.setDescription("Cve 1");
       cveComposer.forCve(cve).persist();
 
       Cve cve1 = new Cve();
       cve1.setExternalId("CVE-2025-5671");
-      cve1.setCvss(new BigDecimal("1.8"));
+      cve1.setCvssV31(new BigDecimal("1.8"));
       cve1.setDescription("Cve 2");
       cveComposer.forCve(cve1).persist();
 

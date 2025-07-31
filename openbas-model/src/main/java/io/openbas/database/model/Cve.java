@@ -95,10 +95,10 @@ public class Cve implements Base {
   private List<String> referenceUrls = new ArrayList<>();
 
   @NotNull
-  @Column(name = "cve_cvss", precision = 3, scale = 1)
-  @JsonProperty("cve_cvss")
+  @Column(name = "cve_cvss_v31", precision = 3, scale = 1)
+  @JsonProperty("cve_cvss_v31")
   @Queryable(searchable = true, filterable = true, sortable = true)
-  private BigDecimal cvss;
+  private BigDecimal cvssV31;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany

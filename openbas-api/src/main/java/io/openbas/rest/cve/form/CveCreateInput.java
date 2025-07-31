@@ -23,7 +23,7 @@ public class CveCreateInput extends CveInput {
   @NotNull
   @DecimalMin("0.0")
   @DecimalMax("10.0")
-  @JsonProperty("cve_cvss")
+  @JsonProperty("cve_cvss_v31")
   @Schema(description = "CVSS score", example = "7.5", minimum = "0.0", maximum = "10.0")
-  private BigDecimal cvss;
+  private BigDecimal cvssV31;
 }
