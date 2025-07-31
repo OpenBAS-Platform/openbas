@@ -1,27 +1,33 @@
 package io.openbas.rest.injector_contract;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawInjectorsContrats;
+import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +47,8 @@ public class InjectorContractService {
   @PersistenceContext private EntityManager entityManager;
 
   private final InjectorContractRepository injectorContractRepository;
+  private final AttackPatternRepository attackPatternRepository;
+  private final InjectorRepository injectorRepository;
 
   @Value("${openbas.xls.import.mail.enable}")
   private boolean mailImportEnabled;
@@ -52,7 +60,7 @@ public class InjectorContractService {
 
   public InjectorContract injectorContract(@NotBlank final String id) {
     return injectorContractRepository
-        .findById(id)
+        .findByIdOrExternalId(id, id)
         .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"));
   }
 
@@ -117,10 +125,80 @@ public class InjectorContractService {
     return new PageImpl<>(injectorContractOutputs, pageable, total);
   }
 
+  public Iterable<RawInjectorsContrats> getAllRawInjectContracts() {
+    return injectorContractRepository.getAllRawInjectorsContracts();
+  }
+
+  public InjectorContract getSingleInjectorContract(String injectorContractId) {
+    return injectorContractRepository
+        .findByIdOrExternalId(injectorContractId, injectorContractId)
+        .orElseThrow(ElementNotFoundException::new);
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  public InjectorContract createNewInjectorContract(InjectorContractAddInput input) {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setCustom(true);
+    injectorContract.setUpdateAttributes(input);
+    if (!input.getAttackPatternsExternalIds().isEmpty()) {
+      injectorContract.setAttackPatterns(
+          fromIterable(
+              attackPatternRepository.findAllByExternalIdInIgnoreCase(
+                  input.getAttackPatternsExternalIds())));
+    } else if (!input.getAttackPatternsIds().isEmpty()) {
+      injectorContract.setAttackPatterns(
+          fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+    }
+    injectorContract.setInjector(
+        updateRelation(input.getInjectorId(), injectorContract.getInjector(), injectorRepository));
+    return injectorContractRepository.save(injectorContract);
+  }
+
+  public InjectorContract updateInjectorContract(
+      String injectorContractId, InjectorContractUpdateInput input) {
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
+            .orElseThrow(ElementNotFoundException::new);
+    injectorContract.setUpdateAttributes(input);
+    injectorContract.setAttackPatterns(
+        fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+    injectorContract.setUpdatedAt(Instant.now());
+    return injectorContractRepository.save(injectorContract);
+  }
+
+  public InjectorContract updateAttackPatternMappings(
+      String injectorContractId, InjectorContractUpdateMappingInput input) {
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
+            .orElseThrow(ElementNotFoundException::new);
+    List<AttackPattern> resolvedAttackPatterns =
+        fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds()));
+    List<String> missingIds =
+        input.getAttackPatternsIds().stream()
+            .filter(
+                apid ->
+                    !resolvedAttackPatterns.stream()
+                        .map(AttackPattern::getId)
+                        .toList()
+                        .contains(apid))
+            .toList();
+
+    if (!missingIds.isEmpty()) {
+      throw new ElementNotFoundException(
+          String.format("Missing attack pattern ids: %s", String.join(", ", missingIds)));
+    }
+
+    injectorContract.setAttackPatterns(resolvedAttackPatterns);
+    injectorContract.setUpdatedAt(Instant.now());
+    return injectorContractRepository.save(injectorContract);
+  }
+
   public void deleteInjectorContract(final String injectorContractId) {
     InjectorContract injectorContract =
         this.injectorContractRepository
-            .findById(injectorContractId)
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
             .orElseThrow(
                 () ->
                     new ElementNotFoundException(
@@ -130,7 +208,7 @@ public class InjectorContractService {
           "This injector contract can't be removed because is not a custom one: "
               + injectorContractId);
     } else {
-      this.injectorContractRepository.deleteById(injectorContractId);
+      this.injectorContractRepository.deleteById(injectorContract.getId());
     }
   }
 
