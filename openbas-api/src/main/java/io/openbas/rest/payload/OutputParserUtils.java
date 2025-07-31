@@ -1,8 +1,10 @@
 package io.openbas.rest.payload;
 
 import static java.time.Instant.now;
+import static org.flywaydb.core.internal.util.StringUtils.hasText;
 
 import io.openbas.database.model.*;
+import io.openbas.database.repository.OutputParserRepository;
 import io.openbas.rest.payload.form.*;
 import java.time.Instant;
 import java.util.HashSet;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class OutputParserUtils {
 
   private final ContractOutputElementUtils contractOutputElementUtils;
+  private final OutputParserRepository outputParserRepository;
 
   public <T> void copyOutputParsers(Set<T> inputParsers, Payload target, boolean copyId) {
     if (inputParsers == null) {
@@ -35,7 +38,15 @@ public class OutputParserUtils {
 
   private <T> OutputParser copyOutputParser(
       T inputParser, Payload target, boolean copyId, Instant now) {
-    OutputParser outputParser = new OutputParser();
+    OutputParser outputParser;
+    if (copyId && hasText(((OutputParserInput) inputParser).getId())) {
+      outputParser =
+          this.outputParserRepository
+              .findById(((OutputParserInput) inputParser).getId())
+              .orElseThrow();
+    } else {
+      outputParser = new OutputParser();
+    }
     outputParser.setPayload(target);
     outputParser.setCreatedAt(now);
     outputParser.setUpdatedAt(now);
@@ -50,9 +61,6 @@ public class OutputParserUtils {
   private void copyFromParserInput(
       OutputParserInput parserInput, OutputParser outputParser, boolean copyId) {
     BeanUtils.copyProperties(parserInput, outputParser, "id", "contractOutputElements");
-    if (copyId) {
-      outputParser.setId(parserInput.getId());
-    }
     contractOutputElementUtils.copyContractOutputElements(
         parserInput.getContractOutputElements(), outputParser, copyId);
   }
@@ -60,9 +68,6 @@ public class OutputParserUtils {
   private void copyFromParserEntity(
       OutputParser parser, OutputParser outputParser, boolean copyId) {
     BeanUtils.copyProperties(parser, outputParser, "id", "contractOutputElements");
-    if (copyId) {
-      outputParser.setId(parser.getId());
-    }
     contractOutputElementUtils.copyContractOutputElements(
         parser.getContractOutputElements(), outputParser, copyId);
   }
