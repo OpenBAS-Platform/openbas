@@ -2,7 +2,6 @@ package io.openbas.rest.injector_contract;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
@@ -14,6 +13,7 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
@@ -47,7 +47,7 @@ public class InjectorContractService {
   @PersistenceContext private EntityManager entityManager;
 
   private final InjectorContractRepository injectorContractRepository;
-  private final AttackPatternRepository attackPatternRepository;
+  private final AttackPatternService attackPatternService;
   private final InjectorRepository injectorRepository;
 
   @Value("${openbas.xls.import.mail.enable}")
@@ -87,7 +87,7 @@ public class InjectorContractService {
     injectorContractRepository.saveAll(listInjectorContract);
   }
 
-  public Page<InjectorContractOutput> injectorContracts(
+  public Page<InjectorContractOutput> getSinglePage(
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
       @NotNull final Pageable pageable) {
@@ -140,15 +140,18 @@ public class InjectorContractService {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setCustom(true);
     injectorContract.setUpdateAttributes(input);
+    List<AttackPattern> aps = new ArrayList<>();
     if (!input.getAttackPatternsExternalIds().isEmpty()) {
-      injectorContract.setAttackPatterns(
-          fromIterable(
-              attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                  input.getAttackPatternsExternalIds())));
+      aps =
+          attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
+              new HashSet<>(input.getAttackPatternsExternalIds()));
     } else if (!input.getAttackPatternsIds().isEmpty()) {
-      injectorContract.setAttackPatterns(
-          fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+      aps =
+          attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+              new HashSet<>(input.getAttackPatternsIds()));
     }
+
+    injectorContract.setAttackPatterns(aps);
     injectorContract.setInjector(
         updateRelation(input.getInjectorId(), injectorContract.getInjector(), injectorRepository));
     return injectorContractRepository.save(injectorContract);
@@ -162,7 +165,8 @@ public class InjectorContractService {
             .orElseThrow(ElementNotFoundException::new);
     injectorContract.setUpdateAttributes(input);
     injectorContract.setAttackPatterns(
-        fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+            new HashSet<>(input.getAttackPatternsIds())));
     injectorContract.setUpdatedAt(Instant.now());
     return injectorContractRepository.save(injectorContract);
   }
@@ -173,24 +177,9 @@ public class InjectorContractService {
         injectorContractRepository
             .findByIdOrExternalId(injectorContractId, injectorContractId)
             .orElseThrow(ElementNotFoundException::new);
-    List<AttackPattern> resolvedAttackPatterns =
-        fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds()));
-    List<String> missingIds =
-        input.getAttackPatternsIds().stream()
-            .filter(
-                apid ->
-                    !resolvedAttackPatterns.stream()
-                        .map(AttackPattern::getId)
-                        .toList()
-                        .contains(apid))
-            .toList();
-
-    if (!missingIds.isEmpty()) {
-      throw new ElementNotFoundException(
-          String.format("Missing attack pattern ids: %s", String.join(", ", missingIds)));
-    }
-
-    injectorContract.setAttackPatterns(resolvedAttackPatterns);
+    injectorContract.setAttackPatterns(
+        attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+            new HashSet<>(input.getAttackPatternsIds())));
     injectorContract.setUpdatedAt(Instant.now());
     return injectorContractRepository.save(injectorContract);
   }
@@ -232,6 +221,7 @@ public class InjectorContractService {
     // SELECT
     cq.multiselect(
             injectorContractRoot.get("id").alias("injector_contract_id"),
+            injectorContractRoot.get("externalId").alias("injector_contract_external_id"),
             injectorContractRoot.get("labels").alias("injector_contract_labels"),
             injectorContractRoot.get("content").alias("injector_contract_content"),
             injectorContractRoot.get("platforms").alias("injector_contract_platforms"),
@@ -259,6 +249,7 @@ public class InjectorContractService {
             tuple ->
                 new InjectorContractOutput(
                     tuple.get("injector_contract_id", String.class),
+                    tuple.get("injector_contract_external_id", String.class),
                     tuple.get("injector_contract_labels", Map.class),
                     tuple.get("injector_contract_content", String.class),
                     tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),

@@ -1,11 +1,14 @@
 package io.openbas.rest.attack_pattern.service;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.ee.Ee;
 import io.openbas.rest.attack_pattern.form.AnalysisResultFromTTPExtractionAIWebserviceOutput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -113,6 +116,20 @@ public class AttackPatternService {
     return externalAttackPatternIds;
   }
 
+  private List<AttackPattern> getAttackPatternsByExternalIds(Set<String> ids) {
+    if (!ids.isEmpty()) {
+      return this.attackPatternRepository.findAllByExternalIdInIgnoreCase(new ArrayList<>(ids));
+    }
+    return Collections.emptyList();
+  }
+
+  private List<AttackPattern> getAttackPatternsByInternalIds(Set<String> ids) {
+    if (!ids.isEmpty()) {
+      return fromIterable(this.attackPatternRepository.findAllById(new ArrayList<>(ids)));
+    }
+    return Collections.emptyList();
+  }
+
   /**
    * Get the attack pattern IDs from the external IDs.
    *
@@ -120,14 +137,44 @@ public class AttackPatternService {
    *     IDs.
    * @return List of attack pattern IDs corresponding to the external IDs.
    */
-  private List<String> getAttackPatternIds(Set<String> externalAttackPatternIds) {
-    if (!externalAttackPatternIds.isEmpty()) {
-      List<AttackPattern> attackPatterns =
-          this.attackPatternRepository.findAllByExternalIdInIgnoreCase(
-              new ArrayList<>(externalAttackPatternIds));
-      return attackPatterns.stream().map(AttackPattern::getId).toList();
+  private List<String> getAttackPatternInternalIdsFromExternalIds(
+      Set<String> externalAttackPatternIds) {
+    return this.getAttackPatternsByExternalIds(externalAttackPatternIds).stream()
+        .map(AttackPattern::getId)
+        .toList();
+  }
+
+  public List<AttackPattern> getAttackPatternsByExternalIdsThrowIfMissing(
+      Set<String> externalAttackPatternIds) {
+    List<AttackPattern> attackPatterns =
+        this.getAttackPatternsByExternalIds(externalAttackPatternIds);
+    List<String> missingIds =
+        externalAttackPatternIds.stream()
+            .filter(
+                id ->
+                    !attackPatterns.stream()
+                        .map(AttackPattern::getExternalId)
+                        .toList()
+                        .contains(id))
+            .toList();
+    if (!missingIds.isEmpty()) {
+      throw new ElementNotFoundException(
+          String.format("Missing attack patterns: %s", String.join(", ", missingIds)));
     }
-    return Collections.emptyList();
+    return attackPatterns;
+  }
+
+  public List<AttackPattern> getAttackPatternsByInternalIdsThrowIfMissing(Set<String> ids) {
+    List<AttackPattern> attackPatterns = this.getAttackPatternsByInternalIds(ids);
+    List<String> missingIds =
+        ids.stream()
+            .filter(id -> !attackPatterns.stream().map(AttackPattern::getId).toList().contains(id))
+            .toList();
+    if (!missingIds.isEmpty()) {
+      throw new ElementNotFoundException(
+          String.format("Missing attack patterns: %s", String.join(", ", missingIds)));
+    }
+    return attackPatterns;
   }
 
   /**
@@ -159,7 +206,7 @@ public class AttackPatternService {
       String responseBody = callTTPExtractionAIWebservice(files, text);
       Set<String> attackPatternExternalIds =
           extractExternalAttackPatternIdsFromResponse(responseBody);
-      return getAttackPatternIds(attackPatternExternalIds);
+      return getAttackPatternInternalIdsFromExternalIds(attackPatternExternalIds);
 
     } catch (IOException e) {
       throw new RuntimeException(e);

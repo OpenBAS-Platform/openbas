@@ -10,8 +10,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
+import io.openbas.rest.injector_contract.input.SearchPaginationWithSerialisationOptionsInput;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
-import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,10 +33,10 @@ public class InjectorContractApi extends RestBehavior {
 
   @PostMapping(INJECTOR_CONTRACT_URL + "/search")
   public Page<InjectorContractOutput> injectorContracts(
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @Valid final SearchPaginationWithSerialisationOptionsInput input) {
     return buildPaginationCriteriaBuilder(
-        this.injectorContractService::injectorContracts,
-        handleArchitectureFilter(searchPaginationInput),
+        this.injectorContractService::getSinglePage,
+        handleArchitectureFilter(input),
         InjectorContract.class);
   }
 

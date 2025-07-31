@@ -18,6 +18,10 @@ public class InjectorContractOutput {
   @NotBlank
   private String id;
 
+  @Schema(description = "Injector contract external Id")
+  @JsonProperty("injector_contract_external_id")
+  private String externalId;
+
   @Schema(description = "Labels")
   @JsonProperty("injector_contract_labels")
   private Map<String, String> labels;
@@ -57,6 +61,7 @@ public class InjectorContractOutput {
 
   public InjectorContractOutput(
       String id,
+      String externalId,
       Map<String, String> labels,
       String content,
       PLATFORM_TYPE[] platforms,
@@ -68,6 +73,7 @@ public class InjectorContractOutput {
       Instant updatedAt,
       Payload.PAYLOAD_EXECUTION_ARCH arch) {
     this.id = id;
+    this.externalId = externalId;
     this.labels = labels;
     this.content = content;
     this.platforms = platforms;

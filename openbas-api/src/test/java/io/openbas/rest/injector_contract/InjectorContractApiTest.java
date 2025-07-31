@@ -210,7 +210,7 @@ public class InjectorContractApiTest extends IntegrationTest {
       private final String injectorContractInternalId = UUID.randomUUID().toString();
 
       @Test
-      @DisplayName("Creating contract succeeds")
+      @DisplayName("Without attack patterns, creating contract succeeds")
       void createContractSucceeds() throws Exception {
         InjectorContractAddInput input = new InjectorContractAddInput();
         input.setId(injectorContractInternalId);
@@ -232,20 +232,149 @@ public class InjectorContractApiTest extends IntegrationTest {
             .isEqualTo(
                 String.format(
                     """
-                                {
-                                  "convertedContent":null,"listened":true,"injector_contract_id":"%s",
-                                  "injector_contract_external_id":null,
-                                  "injector_contract_labels":null,"injector_contract_manual":false,
-                                  "injector_contract_content":"{\\"fields\\":[]}",
-                                  "injector_contract_custom":true,"injector_contract_needs_executor":false,
-                                  "injector_contract_platforms":[],"injector_contract_payload":null,
-                                  "injector_contract_injector":"49229430-b5b5-431f-ba5b-f36f599b0144",
-                                  "injector_contract_attack_patterns":[],"injector_contract_atomic_testing":true,
-                                  "injector_contract_import_available":false,"injector_contract_arch":null,
-                                  "injector_contract_injector_type":"openbas_implant",
-                                  "injector_contract_injector_type_name":"OpenBAS Implant"
-                                }""",
+                    {
+                      "convertedContent":null,"listened":true,"injector_contract_id":"%s",
+                      "injector_contract_external_id":null,
+                      "injector_contract_labels":null,"injector_contract_manual":false,
+                      "injector_contract_content":"{\\"fields\\":[]}",
+                      "injector_contract_custom":true,"injector_contract_needs_executor":false,
+                      "injector_contract_platforms":[],"injector_contract_payload":null,
+                      "injector_contract_injector":"49229430-b5b5-431f-ba5b-f36f599b0144",
+                      "injector_contract_attack_patterns":[],"injector_contract_atomic_testing":true,
+                      "injector_contract_import_available":false,"injector_contract_arch":null,
+                      "injector_contract_injector_type":"openbas_implant",
+                      "injector_contract_injector_type_name":"OpenBAS Implant"
+                    }
+                    """,
                     injectorContractInternalId));
+      }
+
+      @Test
+      @DisplayName("With missing attack patterns, creating contract fails with NOT FOUND")
+      void withMissingAttackPatternsCreateContractFailsWithNOTFOUND() throws Exception {
+        InjectorContractAddInput input = new InjectorContractAddInput();
+        input.setId(injectorContractInternalId);
+        input.setAttackPatternsIds(List.of(UUID.randomUUID().toString()));
+        input.setInjectorId(injectorFixture.getWellKnownObasImplantInjector().getId());
+        input.setContent("{\"fields\":[]}");
+
+        mvc.perform(
+                post(INJECTOR_CONTRACT_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(input)))
+            .andExpect(status().isNotFound());
+      }
+
+      @Test
+      @DisplayName("With existing attack patterns by internal ID, creating contract succeeds")
+      void withExistingAttackPatternsByInternalIdCreateContractSucceeds() throws Exception {
+        for (int i = 0; i < 3; ++i) {
+          attackPatternComposer
+              .forAttackPattern(AttackPatternFixture.createDefaultAttackPattern())
+              .persist();
+        }
+        em.flush();
+        em.clear();
+
+        InjectorContractAddInput input = new InjectorContractAddInput();
+        input.setId(injectorContractInternalId);
+        input.setAttackPatternsIds(
+            attackPatternComposer.generatedItems.stream().map(AttackPattern::getId).toList());
+        input.setInjectorId(injectorFixture.getWellKnownObasImplantInjector().getId());
+        input.setContent("{\"fields\":[]}");
+
+        String response =
+            mvc.perform(
+                    post(INJECTOR_CONTRACT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(input)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThatJson(response)
+            .whenIgnoringPaths("injector_contract_created_at", "injector_contract_updated_at")
+            .isEqualTo(
+                String.format(
+                    """
+                    {
+                      "convertedContent":null,"listened":true,"injector_contract_id":"%s",
+                      "injector_contract_external_id":null,
+                      "injector_contract_labels":null,"injector_contract_manual":false,
+                      "injector_contract_content":"{\\"fields\\":[]}",
+                      "injector_contract_custom":true,"injector_contract_needs_executor":false,
+                      "injector_contract_platforms":[],"injector_contract_payload":null,
+                      "injector_contract_injector":"49229430-b5b5-431f-ba5b-f36f599b0144",
+                      "injector_contract_attack_patterns":[%s],"injector_contract_atomic_testing":true,
+                      "injector_contract_import_available":false,"injector_contract_arch":null,
+                      "injector_contract_injector_type":"openbas_implant",
+                      "injector_contract_injector_type_name":"OpenBAS Implant"
+                    }
+                    """,
+                    injectorContractInternalId,
+                    String.join(
+                        ",",
+                        attackPatternComposer.generatedItems.stream()
+                            .map(ap -> String.format("\"" + ap.getId() + "\""))
+                            .toList())));
+      }
+
+      @Test
+      @DisplayName("With existing attack patterns by external ID, creating contract succeeds")
+      void withExistingAttackPatternsByExternalIdCreateContractSucceeds() throws Exception {
+        for (int i = 0; i < 3; ++i) {
+          attackPatternComposer
+              .forAttackPattern(AttackPatternFixture.createDefaultAttackPattern())
+              .persist();
+        }
+        em.flush();
+        em.clear();
+
+        InjectorContractAddInput input = new InjectorContractAddInput();
+        input.setId(injectorContractInternalId);
+        input.setAttackPatternsExternalIds(
+            attackPatternComposer.generatedItems.stream()
+                .map(AttackPattern::getExternalId)
+                .toList());
+        input.setInjectorId(injectorFixture.getWellKnownObasImplantInjector().getId());
+        input.setContent("{\"fields\":[]}");
+
+        String response =
+            mvc.perform(
+                    post(INJECTOR_CONTRACT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(input)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThatJson(response)
+            .whenIgnoringPaths("injector_contract_created_at", "injector_contract_updated_at")
+            .isEqualTo(
+                String.format(
+                    """
+                    {
+                      "convertedContent":null,"listened":true,"injector_contract_id":"%s",
+                      "injector_contract_external_id":null,
+                      "injector_contract_labels":null,"injector_contract_manual":false,
+                      "injector_contract_content":"{\\"fields\\":[]}",
+                      "injector_contract_custom":true,"injector_contract_needs_executor":false,
+                      "injector_contract_platforms":[],"injector_contract_payload":null,
+                      "injector_contract_injector":"49229430-b5b5-431f-ba5b-f36f599b0144",
+                      "injector_contract_attack_patterns":[%s],"injector_contract_atomic_testing":true,
+                      "injector_contract_import_available":false,"injector_contract_arch":null,
+                      "injector_contract_injector_type":"openbas_implant",
+                      "injector_contract_injector_type_name":"OpenBAS Implant"
+                    }
+                    """,
+                    injectorContractInternalId,
+                    String.join(
+                        ",",
+                        attackPatternComposer.generatedItems.stream()
+                            .map(ap -> String.format("\"" + ap.getId() + "\""))
+                            .toList())));
       }
 
       @Test
