@@ -56,6 +56,7 @@ public class ScenarioApi extends RestBehavior {
 
   public static final String SCENARIO_URI = "/api/scenarios";
 
+  private final LessonsTemplateRepository lessonsTemplateRepository;
   private final CustomDashboardService customDashboardService;
   private final TagRepository tagRepository;
   private final TeamRepository teamRepository;
@@ -317,4 +318,14 @@ public class ScenarioApi extends RestBehavior {
         .rulesFound(this.scenarioService.checkIfTagRulesApplies(scenario, input.getNewTags()))
         .build();
   }
+
+  // region lesson templates
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/lessons_templates")
+  @Operation(
+      summary = "Get documents. Can only be called if the user has access to the given scenario.",
+      description = "Get all documents for a given scenario")
+  public Iterable<LessonsTemplate> lessonsTemplates() {
+    return this.lessonsTemplateRepository.findAll();
+  }
+  // end region
 }

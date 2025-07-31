@@ -7,4 +7,5 @@ export interface ScenariosHelper {
   getScenarioObjectives: (scenarioId: string) => Objective[];
   getScenarioLessonsCategories: (scenarioId: string) => LessonsCategory[];
   getScenarioLessonsQuestions: (scenarioId: string) => LessonsQuestion[];
+  getScenarioLessonsTemplates: (scenarioId: string) => LessonsTemplate[];
 }
