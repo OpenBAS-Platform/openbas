@@ -2,8 +2,6 @@ package io.openbas.rest.collector;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Collector;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
@@ -12,44 +10,24 @@ import io.openbas.rest.collector.form.CollectorUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequiredArgsConstructor
 public class CollectorApi extends RestBehavior {
 
-  @Resource private OpenBASConfig openBASConfig;
+  private final CollectorRepository collectorRepository;
+  private final SecurityPlatformRepository securityPlatformRepository;
 
-  private CollectorRepository collectorRepository;
-
-  private FileService fileService;
-
-  private SecurityPlatformRepository securityPlatformRepository;
-
-  @Resource protected ObjectMapper mapper;
-
-  @Autowired
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
-  }
-
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
-
-  @Autowired
-  public void setSecurityPlatformRepository(SecurityPlatformRepository securityPlatformRepository) {
-    this.securityPlatformRepository = securityPlatformRepository;
-  }
+  private final FileService fileService;
 
   @GetMapping("/api/collectors")
   public Iterable<Collector> collectors() {
@@ -74,6 +52,12 @@ public class CollectorApi extends RestBehavior {
           securityPlatformRepository.findById(securityPlatform).orElseThrow());
     }
     return collectorRepository.save(collector);
+  }
+
+  @GetMapping("/api/collectors/{collectorId}")
+  @Secured(ROLE_ADMIN)
+  public Collector getCollector(@PathVariable String collectorId) {
+    return collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)

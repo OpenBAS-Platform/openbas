@@ -350,7 +350,6 @@
   "CVE ID": "ID CVE",
   "cve_external_id": "ID CVE",
   "CVEs": "CVEs",
-  "CVSS": "CVSS",
   "CVSS must be at least 0.0": "CVSS doit être au moins égal à 0.0",
   "CVSS must be at most 10.0": "CVSS doit être au plus égal à 10.0",
   "CVSS score is required": "Le score CVSS est requis",
@@ -920,7 +919,6 @@
   "Messages": "Messages",
   "Messages footer": "Pied des messages",
   "Messages header": "En-tête des messages",
-  "Metrics": "Métriques",
   "microblogging": "Microblogging",
   "Minimum value is 1": "La valeur minimale est 1",
   "Minutes": "Minutes",
@@ -1714,5 +1712,11 @@
   "Your file should be a XLS": "Votre fichier doit être un XLS",
   "Your overall evaluation about this question.": "Votre évaluation globale de cette question.",
   "your trial license online": "votre licence d'essai en ligne",
-  "YYYY": "AAAA"
+  "YYYY": "AAAA",
+  "CVSS Version 3": {
+    "1": "CVSS Version 3.1"
+  },
+  "Metrics Version 3": {
+    "1": "Métriques Version 3.1"
+  }
 }

@@ -27,9 +27,9 @@ public class CveSimple {
   private String externalId;
 
   @NotNull
-  @JsonProperty("cve_cvss")
+  @JsonProperty("cve_cvss_v31")
   @Schema(description = "CVSS score", example = "7.8")
-  private BigDecimal cvss;
+  private BigDecimal cvssV31;
 
   @JsonProperty("cve_published")
   @Schema(description = "CVE published date")

@@ -566,6 +566,13 @@ type BaseWidgetConfigurationWidgetConfigurationTypeMapping<Key, Type> = {
   widget_configuration_type: Key;
 } & Type;
 
+export interface CVEBulkInsertInput {
+  cves: CveCreateInput[];
+  /** @format date-time */
+  last_modified_date_fetched?: string;
+  source_identifier: string;
+}
+
 export interface Challenge {
   challenge_category?: string;
   challenge_content?: string;
@@ -717,6 +724,7 @@ export interface Collector {
   /** @format int32 */
   collector_period?: number;
   collector_security_platform?: SecurityPlatform;
+  collector_state?: object;
   collector_type: string;
   /** @format date-time */
   collector_updated_at: string;
@@ -1024,6 +1032,15 @@ export interface CustomDashboardParametersInput {
 /** Payload to create a CVE */
 export interface CveCreateInput {
   /**
+   * CVSS score
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   * @example 7.5
+   */
+  cve_cvss_v31: number;
+  /**
    * Date when action is due by CISA
    * @format date-time
    */
@@ -1037,15 +1054,6 @@ export interface CveCreateInput {
   cve_cisa_required_action?: string;
   /** Vulnerability name used by CISA */
   cve_cisa_vulnerability_name?: string;
-  /**
-   * CVSS score
-   * @min 0
-   * @exclusiveMin false
-   * @max 10
-   * @exclusiveMax false
-   * @example 7.5
-   */
-  cve_cvss: number;
   /** List of linked CWEs */
   cve_cwes?: CweInput[];
   /** Description of the CVE */
@@ -1079,6 +1087,11 @@ export interface CveCreateInput {
 /** Full CVE output including references and CWEs */
 export interface CveOutput {
   /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss_v31: number;
+  /**
    * CISA required action due date
    * @format date-time
    */
@@ -1092,11 +1105,6 @@ export interface CveOutput {
   cve_cisa_required_action?: string;
   /** Name used by CISA for the vulnerability */
   cve_cisa_vulnerability_name?: string;
-  /**
-   * CVSS score
-   * @example 7.8
-   */
-  cve_cvss: number;
   /** List of CWE outputs */
   cve_cwes?: CweOutput[];
   /** Detailed CVE description */
@@ -1129,7 +1137,7 @@ export interface CveSimple {
    * CVSS score
    * @example 7.8
    */
-  cve_cvss: number;
+  cve_cvss_v31: number;
   /**
    * External CVE identifier
    * @example "CVE-2024-0001"

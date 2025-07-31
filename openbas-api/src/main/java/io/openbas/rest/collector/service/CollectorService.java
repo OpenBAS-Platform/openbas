@@ -1,35 +1,43 @@
-package io.openbas.integrations;
+package io.openbas.rest.collector.service;
 
 import static io.openbas.service.FileService.COLLECTORS_IMAGES_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Collector;
 import io.openbas.database.repository.CollectorRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.io.InputStream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CollectorService {
 
   @Resource protected ObjectMapper mapper;
 
-  private FileService fileService;
+  private final CollectorRepository collectorRepository;
+  private final FileService fileService;
 
-  private CollectorRepository collectorRepository;
-
-  @Resource
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
+  public Collector findById(String id) {
+    return collectorRepository
+        .findById(id)
+        .orElseThrow(() -> new ElementNotFoundException("Collector not found with id: " + id));
   }
 
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
+  public Collector updateCollectorState(Collector collectorToUpdate, ObjectNode newState) {
+    ObjectNode state = collectorToUpdate.getState();
+    newState
+        .fieldNames()
+        .forEachRemaining(fieldName -> state.set(fieldName, newState.get(fieldName)));
+    return collectorRepository.save(collectorToUpdate);
   }
 
   @Transactional
