@@ -524,9 +524,7 @@ public class EndpointService {
         .replace(
             "${OPENBAS_UNSECURED_CERTIFICATE}",
             String.valueOf(openBASConfig.isUnsecuredCertificate()))
-        .replace(
-            "${OPENBAS_WITH_PROXY}",
-            String.valueOf(openBASConfig.isWithProxy()))
+        .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()))
         .replace("${OPENBAS_INSTALL_DIR}", installationDir);
   }
 
