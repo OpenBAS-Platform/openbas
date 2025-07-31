@@ -8,7 +8,6 @@ import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteri
 
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectorsContrats;
-import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.email.EmailContract;
