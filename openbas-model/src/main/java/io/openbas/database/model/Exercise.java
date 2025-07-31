@@ -281,7 +281,7 @@ public class Exercise implements Base {
   @JsonProperty("exercise_variables")
   private List<Variable> variables = new ArrayList<>();
 
-  @JsonIgnore private final ResourceType resourceType = ResourceType.SIMULATION;
+  @Transient private final ResourceType resourceType = ResourceType.SIMULATION;
 
   // region transient
   @JsonProperty("exercise_injects_statistics")

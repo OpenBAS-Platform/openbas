@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
@@ -88,7 +87,7 @@ public class Channel implements Base {
   @Schema(type = "string")
   private Document logoLight;
 
-  @JsonIgnore private final ResourceType resourceType = ResourceType.CHANNEL;
+  @Transient private final ResourceType resourceType = ResourceType.CHANNEL;
 
   @Override
   public String getId() {

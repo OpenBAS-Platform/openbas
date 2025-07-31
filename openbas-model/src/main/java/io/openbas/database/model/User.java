@@ -226,7 +226,7 @@ public class User implements Base {
   @JsonIgnore
   private List<Token> tokens = new ArrayList<>();
 
-  private final ResourceType resourceType = ResourceType.USER;
+  @Transient private final ResourceType resourceType = ResourceType.USER;
 
   @Setter
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

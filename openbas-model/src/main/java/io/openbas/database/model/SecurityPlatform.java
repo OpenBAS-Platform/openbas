@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -69,7 +68,7 @@ public class SecurityPlatform extends Asset {
   @Schema(type = "string")
   private Document logoDark;
 
-  @JsonIgnore private final ResourceType resourceType = ResourceType.SECURITY_PLATFORM;
+  @Transient private final ResourceType resourceType = ResourceType.SECURITY_PLATFORM;
 
   public SecurityPlatform() {}
 

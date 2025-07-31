@@ -137,7 +137,7 @@ public class Team implements Base {
           "True if the team is contextual (exists only in the scenario/simulation it is linked to)")
   private Boolean contextual = false;
 
-  @JsonIgnore private final ResourceType resourceType = ResourceType.TEAM;
+  @Transient private final ResourceType resourceType = ResourceType.TEAM;
 
   @ArraySchema(
       schema =

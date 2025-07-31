@@ -83,7 +83,7 @@ public class Asset implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  private final ResourceType resourceType = ResourceType.ASSET;
+  @Transient private final ResourceType resourceType = ResourceType.ASSET;
 
   @Override
   public int hashCode() {
