@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -136,6 +137,8 @@ public class Finding implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_users")
   private List<User> users = new ArrayList<>();
+
+  @JsonIgnore private final ResourceType resourceType = ResourceType.SIMULATION;
 
   @JsonProperty("finding_simulation")
   @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.id")

@@ -83,6 +83,8 @@ public class Asset implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  private final ResourceType resourceType = ResourceType.ASSET;
+
   @Override
   public int hashCode() {
     return Objects.hash(id);

@@ -145,6 +145,8 @@ public class Document implements Base {
   @JsonIgnore
   private Set<Exercise> simulationsByLogoLight = new HashSet<>();
 
+  @JsonIgnore private final ResourceType resourceType = ResourceType.DOCUMENT;
+
   @Override
   public boolean isUserHasAccess(User user) {
     return exercises.stream().anyMatch(exercise -> exercise.isUserHasAccess(user));

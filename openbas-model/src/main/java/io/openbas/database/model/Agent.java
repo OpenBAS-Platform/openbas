@@ -140,6 +140,8 @@ public class Agent implements Base {
   @JsonProperty("agent_cleared_at")
   private Instant clearedAt = now();
 
+  private final ResourceType resourceType = ResourceType.AGENT;
+
   @JsonIgnore
   @Transient
   public String getTargetDisplayName() {

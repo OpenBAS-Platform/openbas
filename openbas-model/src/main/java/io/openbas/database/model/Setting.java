@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
@@ -29,6 +30,8 @@ public class Setting implements Base {
   @Column(name = "parameter_value")
   @JsonProperty("setting_value")
   private String value;
+
+  @JsonIgnore private final ResourceType resourceType = ResourceType.PLATFORM_SETTING;
 
   public Setting(String key, String value) {
     this.key = key;

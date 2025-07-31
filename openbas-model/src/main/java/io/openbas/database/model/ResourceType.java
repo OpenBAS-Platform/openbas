@@ -1,10 +1,14 @@
 package io.openbas.database.model;
 
+import jakarta.validation.constraints.NotNull;
+
 public enum ResourceType {
   ASSET,
+  AGENT,
   SCENARIO,
   SIMULATION,
   PLAYER,
+  USER,
   TEAM,
   ATOMIC_TESTING,
   NOTIFICATION_RULE,
@@ -20,10 +24,9 @@ public enum ResourceType {
   CHALLENGE,
   UNKNOWN;
 
-
-  public static ResourceType fromString(String name) {
+  public static ResourceType fromString(@NotNull String name) {
     try {
-      return ResourceType.valueOf(name);
+      return ResourceType.valueOf(name.toUpperCase());
     } catch (IllegalArgumentException e) {
       return UNKNOWN;
     }

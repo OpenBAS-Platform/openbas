@@ -60,21 +60,16 @@ public class StreamApi extends RestBehavior {
 
   @EventListener
   public void listenDatabaseUpdate(BaseEvent event) {
-
-    ResourceType resourceType = ResourceType.fromString(event.getInstance().getClass().getSimpleName());
-    User user = userService.currentUser();
-
     consumers.entrySet().stream()
         .parallel()
         .forEach(
             entry -> {
+              User user = userService.user(entry.getValue().getT1().getId());
+
               Tuple2<OpenBASPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
-              OpenBASPrincipal listener = tupleFlux.getT1();
               FluxSink<Object> fluxSink = tupleFlux.getT2();
-              boolean isCurrentObserver = event.isUserObserver(listener.isAdmin());
-              if (permissionService.hasPermission(user, event.getInstance().getId(), resourceType, Action.READ)) {
-                // If user as no visibility, we can send a "delete" userEvent with only the internal
-                // id
+              if (!permissionService.hasPermission(user, event.getInstance().getId(), event.getInstance().getResourceType(), Action.READ)) {
+                // If user as no visibility, we can send a "delete" userEvent with only the internal id
                 //TODO -> rethink this logic -> do we need to send DELETE events
                 try {
                   String propertyId =
