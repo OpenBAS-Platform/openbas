@@ -353,6 +353,7 @@
   "CVSS must be at least 0.0": "CVSS 必须至少为 0.0",
   "CVSS must be at most 10.0": "CVSS 必须至少为 10.0",
   "CVSS score is required": "CVSS 分数是必需的",
+  "CVSS Version 3.1": "CVSS 版本 3.1",
   "CWE": "CWE",
   "CWE ID is required": "需要 CWE ID",
   "d": "d",
@@ -919,6 +920,7 @@
   "Messages": "信息",
   "Messages footer": "消息页脚",
   "Messages header": "消息头",
+  "Metrics Version 3.1": "度量标准 3.1 版",
   "microblogging": "微博",
   "Minimum value is 1": "最小值为 1",
   "Minutes": "分钟",
@@ -1712,11 +1714,5 @@
   "Your file should be a XLS": "你的文件应该为XLS",
   "Your overall evaluation about this question.": "您对此问题的总体评价。",
   "your trial license online": "在线试用许可证",
-  "YYYY": "YYYY",
-  "CVSS Version 3": {
-    "1": "CVSS 版本 3.1"
-  },
-  "Metrics Version 3": {
-    "1": "指标版本 3.1"
-  }
+  "YYYY": "YYYY"
 }
