@@ -1,7 +1,9 @@
 package io.openbas.rest.injector_contract.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -84,5 +86,26 @@ public class InjectorContractOutput {
         attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
     this.updatedAt = updatedAt;
     this.arch = arch;
+  }
+
+  public static InjectorContractOutput fromInjectorContract(InjectorContract sourceContract) {
+    return new InjectorContractOutput(
+        sourceContract.getId(),
+        sourceContract.getExternalId(),
+        sourceContract.getLabels(),
+        sourceContract.getContent(),
+        sourceContract.getPlatforms(),
+        sourceContract.getPayload() == null ? null : sourceContract.getPayload().getType(),
+        sourceContract.getInjector().getName(),
+        null,
+        sourceContract.getInjector().getType(),
+        sourceContract.getAttackPatterns().stream()
+            .map(AttackPattern::getId)
+            .toList()
+            .toArray(new String[0]),
+        sourceContract.getUpdatedAt(),
+        sourceContract.getPayload() == null
+            ? null
+            : sourceContract.getPayload().getExecutionArch());
   }
 }

@@ -9,21 +9,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.Filters;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
+import io.openbas.rest.injector_contract.input.SearchPaginationWithSerialisationOptionsInput;
+import io.openbas.rest.injector_contract.input.SerialisationOptions;
+import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import io.openbas.utils.fixtures.InjectorContractFixture;
 import io.openbas.utils.fixtures.InjectorFixture;
+import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.fixtures.composers.AttackPatternComposer;
 import io.openbas.utils.fixtures.composers.InjectorContractComposer;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.sql.BatchUpdateException;
 import java.util.List;
 import java.util.UUID;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -682,6 +689,86 @@ public class InjectorContractApiTest extends IntegrationTest {
                     .content(mapper.writeValueAsString(input)))
             .andExpect(status().isNotFound());
       }
+    }
+  }
+
+  @Nested
+  @DisplayName("Injector Contract search tests")
+  class InjectorContractSearchTests {
+    private void createStaticInjectorContract() {
+      injectorContractComposer
+          .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+          .withInjector(injectorFixture.getWellKnownObasImplantInjector())
+          .persist();
+      em.flush();
+      em.clear();
+    }
+
+    @BeforeEach
+    void setUp() {
+      for (int i = 0; i < 3; ++i) {
+        createStaticInjectorContract();
+      }
+    }
+
+    @Test
+    @DisplayName("With classic SearchPaginationInput, search returns expected items")
+    void WithClassicSearchPaginationInput() throws Exception {
+      SearchPaginationInput input =
+          PaginationFixture.simpleSearchWithAndOperator(
+              "injector_contract_injector",
+              injectorFixture.getWellKnownObasImplantInjector().getId(),
+              Filters.FilterOperator.eq);
+
+      String response =
+          mvc.perform(
+                  post(INJECTOR_CONTRACT_URL + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(input)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response)
+          .whenIgnoringPaths("content[*].injector_contract_updated_at")
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .node("content")
+          .isArray()
+          .isEqualTo(
+              mapper.writeValueAsString(
+                  injectorContractComposer.generatedItems.stream()
+                      .map(InjectorContractOutput::fromInjectorContract)));
+    }
+
+    @Test
+    @DisplayName(
+        "With SearchPaginationWithSerialisationOptionsInput and ignore content option is set, search returns expected items with no content")
+    void WithSearchPaginationWithSerialisationOptionsInput() throws Exception {
+      SearchPaginationWithSerialisationOptionsInput input =
+          PaginationFixture.optionedSearchWithAndOperator(
+              "injector_contract_injector",
+              injectorFixture.getWellKnownObasImplantInjector().getId(),
+              Filters.FilterOperator.eq);
+      SerialisationOptions options = new SerialisationOptions();
+      options.setExcludedProperties(List.of("injector_contract_content"));
+      input.setSerialisationOptions(options);
+
+      String response =
+          mvc.perform(
+                  post(INJECTOR_CONTRACT_URL + "/search")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(mapper.writeValueAsString(input)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response)
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .node("content[0]")
+          .node("injector_contract_content")
+          .isNull();
     }
   }
 }
