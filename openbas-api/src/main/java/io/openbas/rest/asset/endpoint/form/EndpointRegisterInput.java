@@ -28,5 +28,8 @@ public class EndpointRegisterInput extends EndpointInput {
   @JsonProperty("agent_installation_mode")
   private String installationMode;
 
+  @JsonProperty("agent_installation_directory")
+  private String installationDirectory;
+
   private String seenIp;
 }

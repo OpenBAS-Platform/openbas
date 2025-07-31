@@ -54,8 +54,18 @@ public class EndpointService {
   public static final String OPENBAS_AGENT_INSTALLER = "openbas-agent-installer";
   public static final String OPENBAS_AGENT_UPGRADE = "openbas-agent-upgrade";
   public static final String SERVICE = "service";
+  public static final String SERVICE_USER = "service-user";
+  public static final String SESSION_USER = "sessions-user";
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
+
+  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE =
+      ""; // Filled by the agent installer automatically
+  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE_USER = "C:\\Filigran";
+  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SESSION_USER = "C:\\Filigran";
+  public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE = "/opt/openbas-agent";
+  public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE_USER = "/opt/openbas-agent-service";
+  public static final String OPENBAS_INSTALL_DIR_UNIX_SESSION_USER = ".local/openbas-agent-session";
 
   @Resource private OpenBASConfig openBASConfig;
 
@@ -358,7 +368,10 @@ public class EndpointService {
     if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
-          generateUpgradeCommand(endpoint.getPlatform().name(), input.getInstallationMode()));
+          generateUpgradeCommand(
+              endpoint.getPlatform().name(),
+              input.getInstallationMode(),
+              input.getInstallationDirectory()));
       assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
     }
@@ -476,8 +489,8 @@ public class EndpointService {
     return agentInput;
   }
 
-  public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)
-      throws IOException {
+  public String getFileOrDownloadFromJfrog(
+      String platform, String file, String adminToken, String installationDir) throws IOException {
     String extension =
         switch (platform.toLowerCase()) {
           case "windows" -> "ps1";
@@ -501,16 +514,54 @@ public class EndpointService {
           "Agent installer version " + executorOpenbasBinariesVersion + " not found");
     }
 
+    if (installationDir == null) {
+      installationDir = "";
+    }
+
     return IOUtils.toString(in, StandardCharsets.UTF_8)
         .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
         .replace("${OPENBAS_TOKEN}", adminToken)
         .replace(
             "${OPENBAS_UNSECURED_CERTIFICATE}",
             String.valueOf(openBASConfig.isUnsecuredCertificate()))
-        .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
+        .replace(
+            "${OPENBAS_WITH_PROXY}",
+            String.valueOf(openBASConfig.isWithProxy())
+                .replace("${OPENBAS_INSTALL_DIR}", installationDir));
   }
 
-  public String generateInstallCommand(String platform, String token, String installationMode)
+  public String generateInstallationDir(
+      String platform, String installationMode, String installationDir) {
+    if (installationDir != null && !installationDir.equals("")) {
+      return installationDir;
+    }
+    if (platform.equals("windows")) {
+      if (installationMode != null && installationMode.equals(SERVICE)) {
+        return OPENBAS_INSTALL_DIR_WINDOWS_SERVICE;
+      }
+      if (installationMode != null && installationMode.equals(SERVICE_USER)) {
+        return OPENBAS_INSTALL_DIR_WINDOWS_SERVICE_USER;
+      }
+      if (installationMode != null && installationMode.equals(SESSION_USER)) {
+        return OPENBAS_INSTALL_DIR_WINDOWS_SESSION_USER;
+      }
+      return OPENBAS_INSTALL_DIR_WINDOWS_SERVICE;
+    } else {
+      if (installationMode != null && installationMode.equals(SERVICE)) {
+        return OPENBAS_INSTALL_DIR_UNIX_SERVICE;
+      }
+      if (installationMode != null && installationMode.equals(SERVICE_USER)) {
+        return OPENBAS_INSTALL_DIR_UNIX_SERVICE_USER;
+      }
+      if (installationMode != null && installationMode.equals(SESSION_USER)) {
+        return OPENBAS_INSTALL_DIR_UNIX_SESSION_USER;
+      }
+      return OPENBAS_INSTALL_DIR_UNIX_SERVICE;
+    }
+  }
+
+  public String generateInstallCommand(
+      String platform, String token, String installationMode, String installationDir)
       throws IOException {
     if (token == null || token.isEmpty()) {
       throw new IllegalArgumentException("Token must not be null or empty.");
@@ -519,16 +570,18 @@ public class EndpointService {
     if (installationMode != null && !installationMode.equals(SERVICE)) {
       installerName = installerName.concat("-").concat(installationMode);
     }
-    return getFileOrDownloadFromJfrog(platform, installerName, token);
+    installationDir = generateInstallationDir(platform, installationMode, installationDir);
+    return getFileOrDownloadFromJfrog(platform, installerName, token, installationDir);
   }
 
-  public String generateUpgradeCommand(String platform, String installationMode)
-      throws IOException {
+  public String generateUpgradeCommand(
+      String platform, String installationMode, String installationDir) throws IOException {
     String upgradeName = OPENBAS_AGENT_UPGRADE;
     if (installationMode != null && !installationMode.equals(SERVICE)) {
       upgradeName = upgradeName.concat("-").concat(installationMode);
     }
-    return getFileOrDownloadFromJfrog(platform, upgradeName, adminToken);
+    installationDir = generateInstallationDir(platform, installationMode, installationDir);
+    return getFileOrDownloadFromJfrog(platform, upgradeName, adminToken, installationDir);
   }
 
   // -- OPTIONS --

@@ -330,7 +330,9 @@ public class ExecutorApi extends RestBehavior {
               description = "Installation Mode: session, user or system service",
               required = true)
           @PathVariable
-          String installationMode)
+          String installationMode,
+      @Parameter(description = "Installation path") @RequestParam(required = false)
+          String installationPath)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
 
@@ -342,7 +344,8 @@ public class ExecutorApi extends RestBehavior {
       throw new UnsupportedOperationException("Invalid token");
     }
     String installCommand =
-        this.endpointService.generateInstallCommand(platform, token, installationMode);
+        this.endpointService.generateInstallCommand(
+            platform, token, installationMode, installationPath);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
   }
 }
