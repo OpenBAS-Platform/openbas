@@ -568,6 +568,9 @@ type BaseWidgetConfigurationWidgetConfigurationTypeMapping<Key, Type> = {
 
 export interface CVEBulkInsertInput {
   cves: CveCreateInput[];
+  initial_dataset_completed?: boolean;
+  /** @format int32 */
+  last_index?: number;
   /** @format date-time */
   last_modified_date_fetched?: string;
   source_identifier: string;
