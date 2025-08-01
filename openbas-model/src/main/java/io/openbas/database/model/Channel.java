@@ -87,6 +87,8 @@ public class Channel implements Base {
   @Schema(type = "string")
   private Document logoLight;
 
+  @Transient private final ResourceType resourceType = ResourceType.CHANNEL;
+
   @Override
   public String getId() {
     return id;

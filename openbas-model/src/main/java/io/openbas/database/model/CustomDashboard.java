@@ -76,6 +76,8 @@ public class CustomDashboard implements Base {
   @NotNull
   private Instant updateDate = now();
 
+  @Transient private final ResourceType resourceType = ResourceType.DASHBOARD;
+
   // -- UTILS --
 
   public Map<String, CustomDashboardParameters> toParametersMap() {

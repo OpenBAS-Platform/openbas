@@ -29,7 +29,7 @@ public class NotificationRule implements Base {
   @JsonProperty("notification_resource_type")
   @NotNull
   @Enumerated(EnumType.STRING)
-  private NotificationRuleResourceType resourceType;
+  private NotificationRuleResourceType notificationResourceType;
 
   @Column(name = "notification_resource_id")
   @JsonProperty("notification_resource_id")
@@ -60,4 +60,6 @@ public class NotificationRule implements Base {
   @ManyToOne(fetch = FetchType.LAZY)
   @Queryable(searchable = true, filterable = true, path = "owner.id")
   private User owner;
+
+  @Transient private final ResourceType resourceType = ResourceType.NOTIFICATION_RULE;
 }

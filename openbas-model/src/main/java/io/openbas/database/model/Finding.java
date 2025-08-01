@@ -137,6 +137,8 @@ public class Finding implements Base {
   @JsonProperty("finding_users")
   private List<User> users = new ArrayList<>();
 
+  @Transient private final ResourceType resourceType = ResourceType.SIMULATION;
+
   @JsonProperty("finding_simulation")
   @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.id")
   public Exercise getSimulation() {

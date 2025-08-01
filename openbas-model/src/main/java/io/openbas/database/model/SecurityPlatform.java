@@ -68,6 +68,8 @@ public class SecurityPlatform extends Asset {
   @Schema(type = "string")
   private Document logoDark;
 
+  @Transient private final ResourceType resourceType = ResourceType.SECURITY_PLATFORM;
+
   public SecurityPlatform() {}
 
   public SecurityPlatform(

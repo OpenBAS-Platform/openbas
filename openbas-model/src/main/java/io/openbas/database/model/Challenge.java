@@ -123,6 +123,8 @@ public class Challenge implements Base {
     return scenarioIds;
   }
 
+  @Transient private final ResourceType resourceType = ResourceType.CHALLENGE;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

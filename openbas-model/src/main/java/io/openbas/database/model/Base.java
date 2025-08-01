@@ -28,4 +28,8 @@ public interface Base {
   default boolean isListened() {
     return true;
   }
+
+  default ResourceType getResourceType() {
+    return ResourceType.UNKNOWN;
+  }
 }

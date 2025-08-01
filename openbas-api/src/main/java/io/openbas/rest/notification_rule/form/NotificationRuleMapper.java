@@ -13,7 +13,7 @@ public class NotificationRuleMapper {
     notificationRule.setResourceId(input.getResourceId());
     notificationRule.setSubject(input.getSubject());
     try {
-      notificationRule.setResourceType(
+      notificationRule.setNotificationResourceType(
           NotificationRuleResourceType.valueOf(input.getResourceType()));
     } catch (IllegalArgumentException e) {
       throw new UnsupportedOperationException(
@@ -35,7 +35,7 @@ public class NotificationRuleMapper {
   public NotificationRuleOutput toNotificationRuleOutput(final NotificationRule notificationRule) {
     return NotificationRuleOutput.builder()
         .id(notificationRule.getId())
-        .resourceType(notificationRule.getResourceType().name())
+        .resourceType(notificationRule.getNotificationResourceType().name())
         .resourceId(notificationRule.getResourceId())
         .trigger(notificationRule.getTrigger().name())
         .subject(notificationRule.getSubject())
