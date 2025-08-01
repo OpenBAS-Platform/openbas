@@ -1707,6 +1707,7 @@
   "You are about to disable the \"Enterprise Edition\" mode. Please note that this action will disable access to certain advanced features.": "您将禁用企业版模式。请注意，此操作将禁用某些高级功能。",
   "You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).": "您可以直接将以下 bash 代码粘贴到 root 控制台中，或者下载 .sh 脚本（并以 root 用户身份执行）。",
   "You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).": "您可以直接将以下 PowerShell 代码粘贴到提升的命令提示符中，或者下载 .ps1 脚本（并以管理员身份执行）。",
+  "You dont have the right access. Please contact your administrator.": "您没有正确的访问权限。请联系您的管理员。",
   "You just need to try? Get right now": " 想试试吗？立即获取",
   "You must be logged to access this page": "你必须登录后查看本页",
   "You must set a simulation": "您必须设置模拟",
