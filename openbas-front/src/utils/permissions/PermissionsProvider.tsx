@@ -4,6 +4,7 @@ import { createContext, useMemo } from 'react';
 
 import { type AppAbility, defineAbilityFromCapabilities } from './ability';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AbilityContext = createContext<AppAbility>({} as AppAbility);
 export const Can = createContextualCan<AppAbility>(AbilityContext.Consumer);
 
