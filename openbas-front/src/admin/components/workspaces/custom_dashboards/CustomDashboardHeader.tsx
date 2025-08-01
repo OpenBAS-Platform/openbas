@@ -12,7 +12,7 @@ import CustomDashboardPopover from './CustomDashboardPopover';
 const useStyles = makeStyles()(() => ({
   container: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    gridTemplateColumns: '3fr 1fr',
     alignItems: 'center',
   },
   rightAligned: { justifySelf: 'end' },

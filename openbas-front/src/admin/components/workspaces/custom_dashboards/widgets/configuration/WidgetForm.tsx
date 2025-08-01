@@ -72,8 +72,9 @@ const WidgetForm: FunctionComponent<Props> = ({
       mode: z.literal('temporal'),
       title: z.string().optional(),
       field: z.string().min(1, { message: t('Should not be empty') }),
-      start: z.string().min(1, { message: t('Should not be empty') }),
-      end: z.string().min(1, { message: t('Should not be empty') }),
+      timeRange: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional(), // z.string().min(1, { message: t('Should not be empty') }),
+      end: z.string().optional(), // z.string().min(1, { message: t('Should not be empty') }),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
@@ -188,48 +189,51 @@ const WidgetForm: FunctionComponent<Props> = ({
   const getSeriesComponent = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
       case 'attack-path':
-      case 'security-coverage': return (
-        <Controller
-          control={control}
-          name="widget_config.series"
-          render={({ field: { value, onChange } }) => (
-            <WidgetSecurityCoverageSeriesSelection
-              value={value ?? [{ name: '' }]}
-              onChange={onChange}
-              onSubmit={nextStep}
-              isSimulationFilterMandatory={widgetType === 'attack-path'}
-            />
-          )}
-        />
-      );
-      case 'list': return (
-        <Controller
-          control={control}
-          name="widget_config.perspective"
-          render={({ field: { value, onChange } }) => (
-            <WidgetPerspectiveSelection
-              perspective={value ?? { name: '' }}
-              onChange={onChange}
-              onSubmit={nextStep}
-            />
+      case 'security-coverage':
+        return (
+          <Controller
+            control={control}
+            name="widget_config.series"
+            render={({ field: { value, onChange } }) => (
+              <WidgetSecurityCoverageSeriesSelection
+                value={value ?? [{ name: '' }]}
+                onChange={onChange}
+                onSubmit={nextStep}
+                isSimulationFilterMandatory={widgetType === 'attack-path'}
+              />
+            )}
+          />
+        );
+      case 'list':
+        return (
+          <Controller
+            control={control}
+            name="widget_config.perspective"
+            render={({ field: { value, onChange } }) => (
+              <WidgetPerspectiveSelection
+                perspective={value ?? { name: '' }}
+                onChange={onChange}
+                onSubmit={nextStep}
+              />
 
-          )}
-        />
-      );
-      default: return (
-        <Controller
-          control={control}
-          name="widget_config.series"
-          render={({ field: { value, onChange } }) => (
-            <WidgetMultiSeriesSelection
-              widgetType={widgetType}
-              currentSeries={value ?? [{ name: '' }]}
-              onChange={onChange}
-              onSubmit={nextStep}
-            />
-          )}
-        />
-      );
+            )}
+          />
+        );
+      default:
+        return (
+          <Controller
+            control={control}
+            name="widget_config.series"
+            render={({ field: { value, onChange } }) => (
+              <WidgetMultiSeriesSelection
+                widgetType={widgetType}
+                currentSeries={value ?? [{ name: '' }]}
+                onChange={onChange}
+                onSubmit={nextStep}
+              />
+            )}
+          />
+        );
     }
   };
 
