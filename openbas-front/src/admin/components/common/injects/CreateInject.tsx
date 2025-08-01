@@ -28,7 +28,7 @@ import {
   type AttackPattern,
   type FilterGroup,
   type InjectInput, type InjectorContract,
-  type InjectorContractOutput,
+  type InjectorContractFullOutput,
   type KillChainPhase, type Variable,
 } from '../../../../utils/api-types';
 import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
@@ -106,7 +106,7 @@ const CreateInject: FunctionComponent<Props> = ({
       field: 'kill_chain_phase',
       label: 'Kill chain phase',
       isSortable: false,
-      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPattern>) => {
+      value: (_: InjectorContractFullOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPattern>) => {
         return (killChainPhase ? killChainPhase.phase_name : '-');
       },
     },
@@ -114,7 +114,7 @@ const CreateInject: FunctionComponent<Props> = ({
       field: 'injector_contract_labels',
       label: 'Label',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
+      value: (contract: InjectorContractFullOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <Tooltip title={tPick(contract.injector_contract_labels)}>
           <span>{tPick(contract.injector_contract_labels)}</span>
         </Tooltip>
@@ -124,7 +124,7 @@ const CreateInject: FunctionComponent<Props> = ({
       field: 'injector_contract_platforms',
       label: 'Platforms',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
+      value: (contract: InjectorContractFullOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <>
           {(contract.injector_contract_platforms ?? []).map(
             (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
@@ -136,7 +136,7 @@ const CreateInject: FunctionComponent<Props> = ({
       field: 'attack_patterns',
       label: 'Attack patterns',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPattern>) => (
+      value: (contract: InjectorContractFullOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPattern>) => (
         <>
           {Object.values(contractAttackPatterns)
             .filter((value, index, self) => index === self.findIndex(v => v.attack_pattern_external_id === value.attack_pattern_external_id))
@@ -193,7 +193,7 @@ const CreateInject: FunctionComponent<Props> = ({
   ];
 
   // Contracts
-  const [contracts, setContracts] = useState<InjectorContractOutput[]>([]);
+  const [contracts, setContracts] = useState<InjectorContractFullOutput[]>([]);
   const initSearchPaginationInput = () => {
     return ({
       sorts: initSorting('injector_contract_labels'),
@@ -205,12 +205,12 @@ const CreateInject: FunctionComponent<Props> = ({
 
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(isAtomic ? 'injector-contracts-atomic' : 'injector-contracts', initSearchPaginationInput());
 
-  const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } | null>(null);
-  const selectContract = (contract: InjectorContractOutput) => {
+  const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractFullOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } | null>(null);
+  const selectContract = (contract: InjectorContractFullOutput) => {
     if (drawerRef.current) {
       drawerRef.current.scrollTop = 0;
     }
-    const parsedContract: Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } = {
+    const parsedContract: Omit<InjectorContractFullOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } = {
       ...contract,
       injector_contract_content: JSON.parse(contract.injector_contract_content),
     };

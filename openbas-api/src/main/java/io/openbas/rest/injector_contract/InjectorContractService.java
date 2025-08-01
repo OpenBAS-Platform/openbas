@@ -1,35 +1,41 @@
 package io.openbas.rest.injector_contract;
 
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.model.InjectorContract.*;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.utils.JpaUtils.createJoinArrayAggOnId;
 import static io.openbas.utils.JpaUtils.createLeftJoin;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawInjectorsContrats;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.injector_contract.output.InjectorContractOutput;
+import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
+import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
+import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
+import io.openbas.rest.injector_contract.output.InjectorContractFullOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +48,8 @@ public class InjectorContractService {
   @PersistenceContext private EntityManager entityManager;
 
   private final InjectorContractRepository injectorContractRepository;
+  private final AttackPatternService attackPatternService;
+  private final InjectorRepository injectorRepository;
 
   @Value("${openbas.xls.import.mail.enable}")
   private boolean mailImportEnabled;
@@ -53,7 +61,7 @@ public class InjectorContractService {
 
   public InjectorContract injectorContract(@NotBlank final String id) {
     return injectorContractRepository
-        .findById(id)
+        .findByIdOrExternalId(id, id)
         .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"));
   }
 
@@ -80,15 +88,27 @@ public class InjectorContractService {
     injectorContractRepository.saveAll(listInjectorContract);
   }
 
-  public Page<InjectorContractOutput> injectorContracts(
+  @Setter
+  @Getter
+  private class QuerySetup {
+    private TypedQuery<Tuple> query;
+    private Long total;
+  }
+
+  private QuerySetup setupQuery(
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
-      @NotNull final Pageable pageable) {
+      @NotNull final Pageable pageable,
+      boolean include_full_details) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
-    selectForInjectorContract(cb, cq, injectorContractRoot);
+    if (include_full_details) {
+      selectForInjectorContractFull(cb, cq, injectorContractRoot);
+    } else {
+      selectForInjectorContractBase(cb, cq, injectorContractRoot);
+    }
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -109,19 +129,104 @@ public class InjectorContractService {
     query.setFirstResult((int) pageable.getOffset());
     query.setMaxResults(pageable.getPageSize());
 
-    // -- EXECUTION --
-    List<InjectorContractOutput> injectorContractOutputs = execInjectorContract(query);
-
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
 
-    return new PageImpl<>(injectorContractOutputs, pageable, total);
+    QuerySetup qs = new QuerySetup();
+    qs.setQuery(query);
+    qs.setTotal(total);
+    return qs;
+  }
+
+  public PageImpl<InjectorContractFullOutput> getSinglePageFullDetails(
+      @Nullable final Specification<InjectorContract> specification,
+      @Nullable final Specification<InjectorContract> specificationCount,
+      @NotNull final Pageable pageable) {
+    QuerySetup qs = setupQuery(specification, specificationCount, pageable, true);
+
+    // -- EXECUTION --
+    List<InjectorContractFullOutput> injectorContractFullOutputs =
+        execInjectorFullContract(qs.query);
+
+    return new PageImpl<>(injectorContractFullOutputs, pageable, qs.total);
+  }
+
+  public PageImpl<InjectorContractBaseOutput> getSinglePageBaseDetails(
+      @Nullable final Specification<InjectorContract> specification,
+      @Nullable final Specification<InjectorContract> specificationCount,
+      @NotNull final Pageable pageable) {
+    QuerySetup qs = setupQuery(specification, specificationCount, pageable, false);
+
+    // -- EXECUTION --
+    List<InjectorContractBaseOutput> injectorContractBaseOutputs =
+        execInjectorBaseContract(qs.query);
+
+    return new PageImpl<>(injectorContractBaseOutputs, pageable, qs.total);
+  }
+
+  public Iterable<RawInjectorsContrats> getAllRawInjectContracts() {
+    return injectorContractRepository.getAllRawInjectorsContracts();
+  }
+
+  public InjectorContract getSingleInjectorContract(String injectorContractId) {
+    return injectorContractRepository
+        .findByIdOrExternalId(injectorContractId, injectorContractId)
+        .orElseThrow(ElementNotFoundException::new);
+  }
+
+  @Transactional(rollbackOn = Exception.class)
+  public InjectorContract createNewInjectorContract(InjectorContractAddInput input) {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setCustom(true);
+    injectorContract.setUpdateAttributes(input);
+    List<AttackPattern> aps = new ArrayList<>();
+    if (!input.getAttackPatternsExternalIds().isEmpty()) {
+      aps =
+          attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
+              new HashSet<>(input.getAttackPatternsExternalIds()));
+    } else if (!input.getAttackPatternsIds().isEmpty()) {
+      aps =
+          attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+              new HashSet<>(input.getAttackPatternsIds()));
+    }
+
+    injectorContract.setAttackPatterns(aps);
+    injectorContract.setInjector(
+        updateRelation(input.getInjectorId(), injectorContract.getInjector(), injectorRepository));
+    return injectorContractRepository.save(injectorContract);
+  }
+
+  public InjectorContract updateInjectorContract(
+      String injectorContractId, InjectorContractUpdateInput input) {
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
+            .orElseThrow(ElementNotFoundException::new);
+    injectorContract.setUpdateAttributes(input);
+    injectorContract.setAttackPatterns(
+        attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+            new HashSet<>(input.getAttackPatternsIds())));
+    injectorContract.setUpdatedAt(Instant.now());
+    return injectorContractRepository.save(injectorContract);
+  }
+
+  public InjectorContract updateAttackPatternMappings(
+      String injectorContractId, InjectorContractUpdateMappingInput input) {
+    InjectorContract injectorContract =
+        injectorContractRepository
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
+            .orElseThrow(ElementNotFoundException::new);
+    injectorContract.setAttackPatterns(
+        attackPatternService.getAttackPatternsByInternalIdsThrowIfMissing(
+            new HashSet<>(input.getAttackPatternsIds())));
+    injectorContract.setUpdatedAt(Instant.now());
+    return injectorContractRepository.save(injectorContract);
   }
 
   public void deleteInjectorContract(final String injectorContractId) {
     InjectorContract injectorContract =
         this.injectorContractRepository
-            .findById(injectorContractId)
+            .findByIdOrExternalId(injectorContractId, injectorContractId)
             .orElseThrow(
                 () ->
                     new ElementNotFoundException(
@@ -131,13 +236,13 @@ public class InjectorContractService {
           "This injector contract can't be removed because is not a custom one: "
               + injectorContractId);
     } else {
-      this.injectorContractRepository.deleteById(injectorContractId);
+      this.injectorContractRepository.deleteById(injectorContract.getId());
     }
   }
 
   // -- CRITERIA BUILDER --
 
-  private void selectForInjectorContract(
+  private void selectForInjectorContractFull(
       @NotNull final CriteriaBuilder cb,
       @NotNull final CriteriaQuery<Tuple> cq,
       @NotNull final Root<InjectorContract> injectorContractRoot) {
@@ -155,6 +260,7 @@ public class InjectorContractService {
     // SELECT
     cq.multiselect(
             injectorContractRoot.get("id").alias("injector_contract_id"),
+            injectorContractRoot.get("externalId").alias("injector_contract_external_id"),
             injectorContractRoot.get("labels").alias("injector_contract_labels"),
             injectorContractRoot.get("content").alias("injector_contract_content"),
             injectorContractRoot.get("platforms").alias("injector_contract_platforms"),
@@ -176,12 +282,13 @@ public class InjectorContractService {
             injectorContractInjectorJoin.get("id")));
   }
 
-  private List<InjectorContractOutput> execInjectorContract(TypedQuery<Tuple> query) {
+  private List<InjectorContractFullOutput> execInjectorFullContract(TypedQuery<Tuple> query) {
     return query.getResultList().stream()
         .map(
             tuple ->
-                new InjectorContractOutput(
+                new InjectorContractFullOutput(
                     tuple.get("injector_contract_id", String.class),
+                    tuple.get("injector_contract_external_id", String.class),
                     tuple.get("injector_contract_labels", Map.class),
                     tuple.get("injector_contract_content", String.class),
                     tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),
@@ -192,6 +299,29 @@ public class InjectorContractService {
                     tuple.get("injector_contract_attack_patterns", String[].class),
                     tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
+        .toList();
+  }
+
+  private void selectForInjectorContractBase(
+      @NotNull final CriteriaBuilder cb,
+      @NotNull final CriteriaQuery<Tuple> cq,
+      @NotNull final Root<InjectorContract> injectorContractRoot) {
+    // SELECT
+    cq.multiselect(
+            injectorContractRoot.get("id").alias("injector_contract_id"),
+            injectorContractRoot.get("externalId").alias("injector_contract_external_id"),
+            injectorContractRoot.get("updatedAt").alias("injector_contract_updated_at"))
+        .distinct(true);
+  }
+
+  private List<InjectorContractBaseOutput> execInjectorBaseContract(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                new InjectorContractBaseOutput(
+                    tuple.get("injector_contract_id", String.class),
+                    tuple.get("injector_contract_external_id", String.class),
+                    tuple.get("injector_contract_updated_at", Instant.class)))
         .toList();
   }
 }

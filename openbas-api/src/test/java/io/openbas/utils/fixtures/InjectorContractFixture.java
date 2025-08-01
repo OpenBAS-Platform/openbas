@@ -50,7 +50,7 @@ public class InjectorContractFixture {
   }
 
   @SneakyThrows
-  public static InjectorContract createDefaultInjectorContract() {
+  private static InjectorContract createDefaultInjectorContractInternal() {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setInjector(createDefaultPayloadInjector());
     injectorContract.setId(UUID.randomUUID().toString());
@@ -59,6 +59,16 @@ public class InjectorContractFixture {
     ObjectNode content = createDefaultContent(objectMapper);
     injectorContract.setContent(objectMapper.writeValueAsString(content));
     injectorContract.setConvertedContent(content);
+    return injectorContract;
+  }
+
+  public static InjectorContract createDefaultInjectorContract() {
+    return createDefaultInjectorContractInternal();
+  }
+
+  public static InjectorContract createDefaultInjectorContractWithExternalId(String externalId) {
+    InjectorContract injectorContract = createDefaultInjectorContractInternal();
+    injectorContract.setExternalId(externalId);
     return injectorContract;
   }
 
