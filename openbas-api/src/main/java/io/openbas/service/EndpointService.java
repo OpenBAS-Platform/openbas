@@ -549,7 +549,7 @@ public class EndpointService {
     if (serviceNameOrPrefix != null && !serviceNameOrPrefix.equals("")) {
       return serviceNameOrPrefix;
     }
-    if (platform.equals("windows")) {
+    if (platform.equalsIgnoreCase(Endpoint.PLATFORM_TYPE.Windows.name())) {
       if (installationMode != null && installationMode.equals(SERVICE)) {
         return OPENBAS_SERVICE_NAME_WINDOWS_SERVICE;
       }
@@ -579,7 +579,7 @@ public class EndpointService {
     if (installationDir != null && !installationDir.equals("")) {
       return installationDir;
     }
-    if (platform.equals("windows")) {
+    if (platform.equalsIgnoreCase(Endpoint.PLATFORM_TYPE.Windows.name())) {
       if (installationMode != null && installationMode.equals(SERVICE)) {
         return OPENBAS_INSTALL_DIR_WINDOWS_SERVICE;
       }
