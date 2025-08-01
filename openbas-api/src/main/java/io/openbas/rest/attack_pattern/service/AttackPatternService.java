@@ -117,17 +117,17 @@ public class AttackPatternService {
   }
 
   private List<AttackPattern> getAttackPatternsByExternalIds(Set<String> ids) {
-    if (!ids.isEmpty()) {
-      return this.attackPatternRepository.findAllByExternalIdInIgnoreCase(new ArrayList<>(ids));
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
     }
-    return Collections.emptyList();
+    return this.attackPatternRepository.findAllByExternalIdInIgnoreCase(new ArrayList<>(ids));
   }
 
   private List<AttackPattern> getAttackPatternsByInternalIds(Set<String> ids) {
-    if (!ids.isEmpty()) {
-      return fromIterable(this.attackPatternRepository.findAllById(new ArrayList<>(ids)));
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
     }
-    return Collections.emptyList();
+    return fromIterable(this.attackPatternRepository.findAllById(new ArrayList<>(ids)));
   }
 
   /**
