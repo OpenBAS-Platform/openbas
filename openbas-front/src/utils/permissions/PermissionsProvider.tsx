@@ -4,15 +4,15 @@ import { createContext, useMemo } from 'react';
 
 import { type AppAbility, defineAbilityFromCapabilities } from './ability';
 
-const AbilityContext = createContext<AppAbility>({} as AppAbility);
+export const AbilityContext = createContext<AppAbility>({} as AppAbility);
 export const Can = createContextualCan<AppAbility>(AbilityContext.Consumer);
 
-type Props = {
+type PermissionsProviderProps = {
   capabilities: string[];
   children: React.ReactNode;
 };
 
-export const PermissionsProvider = ({ capabilities, children }: Props) => {
+export const PermissionsProvider = ({ capabilities, children }: PermissionsProviderProps) => {
   const ability = useMemo(() => defineAbilityFromCapabilities(capabilities), [capabilities]);
 
   return (

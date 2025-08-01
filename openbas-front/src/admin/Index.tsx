@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useContext, useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
@@ -16,6 +16,8 @@ import { computeBannerSettings } from '../public/components/systembanners/utils'
 import { useHelper } from '../store';
 import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
+import { AbilityContext } from '../utils/permissions/PermissionsProvider';
+import ProtectedRoute from '../utils/permissions/ProtectedRoute';
 import LeftBar from './components/nav/LeftBar';
 import TopBar from './components/nav/TopBar';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
@@ -44,6 +46,8 @@ const useStyles = makeStyles()(theme => ({ toolbar: theme.mixins.toolbar as CSSO
 
 const Index = () => {
   const theme = useTheme();
+  const ability = useContext(AbilityContext);
+
   const { classes } = useStyles();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -96,25 +100,28 @@ const Index = () => {
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
-              <Route path="findings" element={errorWrapper(Findings)()} />
+              <Route
+                path="findings"
+                element={<ProtectedRoute action="ACCESS" subject="FINDINGS" Component={errorWrapper(Findings)()} />}
+              />
               <Route path="simulations" element={errorWrapper(Exercises)()} />
               <Route path="simulations/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="simulations/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
-              <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />
-              <Route path="atomic_testings/:injectId/*" element={errorWrapper(IndexAtomicTesting)()} />
+              <Route path="atomic_testings" element={<ProtectedRoute action="ACCESS" subject="ATOMIC_TESTING" Component={errorWrapper(AtomicTestings)()} />} />
+              <Route path="atomic_testings/:injectId/*" element={<ProtectedRoute action="ACCESS" subject="ATOMIC_TESTING" Component={errorWrapper(IndexAtomicTesting)()} />} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
-              <Route path="teams/*" element={errorWrapper(Teams)()} />
+              <Route path="teams/*" element={<ProtectedRoute action="ACCESS" subject="TEAMS_AND_PLAYERS" Component={errorWrapper(Teams)()} />} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
-              <Route path="workspaces/custom_dashboards" element={errorWrapper(CustomDashboards)()} />
-              <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={errorWrapper(IndexCustomDashboard)()} />
-              <Route path="payloads" element={errorWrapper(Payloads)()} />
+              <Route path="workspaces/custom_dashboards" element={<ProtectedRoute action="ACCESS" subject="DASHBOARDS" Component={errorWrapper(CustomDashboards)()} />} />
+              <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={<ProtectedRoute action="ACCESS" subject="DASHBOARDS" Component={errorWrapper(IndexCustomDashboard)()} />} />
+              <Route path="payloads" element={<ProtectedRoute action="ACCESS" subject="PAYLOADS" Component={errorWrapper(Payloads)()} />} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route
                 path="settings/*"
-                element={logged.admin ? errorWrapper(IndexSettings)()
+                element={logged.admin || ability.can('ACCESS', 'PLATFORM_SETTINGS') ? errorWrapper(IndexSettings)()
                   : <Navigate to="/" replace={true} />}
               />
               {/* Not found */}

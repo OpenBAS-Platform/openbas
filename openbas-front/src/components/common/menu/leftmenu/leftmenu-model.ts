@@ -11,6 +11,7 @@ export interface LeftMenuItem {
   label: string;
   href?: string;
   subItems?: LeftMenuSubItem[];
+  userRight?: boolean;
 }
 
 export interface LeftMenuItemWithHref extends LeftMenuItem { href: string }
@@ -24,4 +25,5 @@ export interface LeftMenuSubItem {
   link: string;
   label: string;
   icon?: () => ReactElement;
+  userRight?: boolean;
 }

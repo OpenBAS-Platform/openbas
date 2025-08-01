@@ -20,7 +20,8 @@ import { useHelper } from './store';
 import ErrorHandler from './utils/error/ErrorHandler';
 import { useAppDispatch } from './utils/hooks';
 import { UserContext } from './utils/hooks/useAuth';
-import {PermissionsProvider} from "./utils/permissions/PermissionsProvider";
+import { PermissionsProvider } from './utils/permissions/PermissionsProvider';
+import ProtectedRoute from './utils/permissions/ProtectedRoute';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
@@ -90,8 +91,11 @@ const Root = () => {
                     <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
                     {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
                     <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-                    <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
-                    <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
+                    <Route
+                      path="channels/:exerciseId/:channelId"
+                      element={<ProtectedRoute action="ACCESS" subject="CHANNELS" Component={errorWrapper(Channel)()} />}
+                    />
+                    <Route path="challenges/:exerciseId" element={<ProtectedRoute action="ACCESS" subject="CHALLENGES" Component={errorWrapper(Challenges)()} />} />
                     <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                     <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                     <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />

@@ -1,6 +1,5 @@
 import {
   AbilityBuilder,
-  createAliasResolver,
   createMongoAbility,
   type MongoAbility,
 } from '@casl/ability';
@@ -9,15 +8,15 @@ import parseCapability from './parseCapability';
 import { type Actions, type Subjects } from './types';
 
 export type AppAbility = MongoAbility<[Actions, Subjects]>;
-// const resolveAction = createAliasResolver({ MANAGE: ['update', 'create'] });
 
-export function defineAbilityFromCapabilities(capabilities: string[]): AppAbility {
+export function defineAbilityFromCapabilities(capabilities: string[]): (AppAbility) {
   const { can, rules } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   for (const cap of capabilities) {
     if (cap === 'BYPASS') {
+      // We ignore ts here to accept lowercase which are CASL default keys
       // @ts-ignore
-      can('manage', 'all');
+      can('manage', 'all'); // "manage" in lowercase means all actions, "all" means all subject
       continue;
     }
 
@@ -27,6 +26,5 @@ export function defineAbilityFromCapabilities(capabilities: string[]): AppAbilit
       can(action, subject);
     }
   }
-  // return createMongoAbility(rules, { resolveAction });
   return createMongoAbility(rules);
 }
