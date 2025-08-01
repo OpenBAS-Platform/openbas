@@ -449,6 +449,26 @@ type BaseInjectTargetTargetTypeMapping<Key, Type> = {
   target_type: Key;
 } & Type;
 
+interface BaseInjectorContractBaseOutput {
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
+  /** Injector contract Id */
+  injector_contract_id: string;
+  /**
+   * Timestamp when the injector contract was last updated
+   * @format date-time
+   */
+  injector_contract_updated_at: string;
+}
+
+type BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+  Key,
+  Type,
+> = {
+  injector_contract_has_full_details: Key;
+} & Type;
+
 interface BasePayload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -3042,11 +3062,48 @@ export interface InjectorContractAddInput {
   is_atomic_testing?: boolean;
 }
 
-export interface InjectorContractBaseOutput {
+export type InjectorContractBaseOutput = BaseInjectorContractBaseOutput &
+  (
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "false",
+        InjectorContractBaseOutput
+      >
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "true",
+        InjectorContractFullOutput
+      >
+  );
+
+export interface InjectorContractFullOutput {
+  injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  /** Attack pattern IDs */
+  injector_contract_attack_patterns?: string[];
+  /** Content */
+  injector_contract_content: string;
   /** Injector contract external Id */
   injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
   /** Injector contract Id */
   injector_contract_id: string;
+  /** Injector name */
+  injector_contract_injector_name?: string;
+  /** Injector type */
+  injector_contract_injector_type?: string;
+  /** Labels */
+  injector_contract_labels?: Record<string, string>;
+  /** Payload type */
+  injector_contract_payload_type?: string;
+  /** Platforms */
+  injector_contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
   /**
    * Timestamp when the injector contract was last updated
    * @format date-time

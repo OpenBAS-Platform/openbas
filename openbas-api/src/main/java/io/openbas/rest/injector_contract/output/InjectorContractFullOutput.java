@@ -71,6 +71,7 @@ public class InjectorContractFullOutput extends InjectorContractBaseOutput {
             ? new ArrayList<>(Arrays.asList(attackPatterns))
             : new ArrayList<>());
     this.setArch(arch);
+    this.setHasFullDetails(true);
   }
 
   public static InjectorContractFullOutput fromInjectorContract(InjectorContract sourceContract) {
