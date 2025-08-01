@@ -63,8 +63,8 @@ public class StreamApi extends RestBehavior {
         .forEach(
             entry -> {
               User user = userService.user(entry.getValue().getT1().getId());
-              //FIXME find a way to cache user
-              //-> close session when user se login
+              // FIXME find a way to cache user
+              // -> close session when user se login
 
               Tuple2<OpenBASPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
               FluxSink<Object> fluxSink = tupleFlux.getT2();
