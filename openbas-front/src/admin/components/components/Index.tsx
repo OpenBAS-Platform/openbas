@@ -23,8 +23,16 @@ const Index = () => {
 
   const order = ['DOCUMENTS', 'CHANNELS', 'CHALLENGES', 'LESSONS_LEARNED'] as const;
 
-  const navigation
-      = order.find(subject => ability.can('ACCESS', subject))?.toLowerCase() ?? 'lessons';
+  const subjectToRoute: Record<typeof order[number], string> = {
+    DOCUMENTS: 'documents',
+    CHANNELS: 'channels',
+    CHALLENGES: 'challenges',
+    LESSONS_LEARNED: 'lessons',
+  };
+
+  const accessibleSubject = order.find(subject => ability.can('ACCESS', subject));
+
+  const navigation = accessibleSubject ? subjectToRoute[accessibleSubject] : '/';
 
   return (
     <div className={classes.root}>
