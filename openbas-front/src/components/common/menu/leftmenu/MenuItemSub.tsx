@@ -63,11 +63,14 @@ const MenuItemSub: FunctionComponent<Props> = ({
     return (
       <Collapse in={selectedMenu === menu} timeout="auto" unmountOnExit>
         <MenuList component="nav" disablePadding>
-          {subItems.map(items => (
-            <StyledTooltip key={items.label} title={t(items.label)} placement="right">
-              {renderMenuItem(items)}
-            </StyledTooltip>
-          ))}
+          {subItems.map((items) => {
+            if (!items.userRight) return null;
+            return (
+              <StyledTooltip key={items.label} title={t(items.label)} placement="right">
+                {renderMenuItem(items)}
+              </StyledTooltip>
+            );
+          })}
         </MenuList>
       </Collapse>
     );
@@ -99,7 +102,10 @@ const MenuItemSub: FunctionComponent<Props> = ({
       }}
     >
       <MenuList component="nav">
-        {subItems.map(entry => renderMenuItem(entry))}
+        {subItems.map((entry) => {
+          if (!entry.userRight) return null;
+          return renderMenuItem(entry);
+        })}
       </MenuList>
     </Popover>
   );
