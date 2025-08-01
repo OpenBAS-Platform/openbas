@@ -117,7 +117,7 @@ const Index = () => {
               <Route path="workspaces/custom_dashboards" element={<ProtectedRoute action="ACCESS" subject="DASHBOARDS" Component={errorWrapper(CustomDashboards)()} />} />
               <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={<ProtectedRoute action="ACCESS" subject="DASHBOARDS" Component={errorWrapper(IndexCustomDashboard)()} />} />
               <Route path="payloads" element={<ProtectedRoute action="ACCESS" subject="PAYLOADS" Component={errorWrapper(Payloads)()} />} />
-              <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
+              <Route path="integrations/*" element={<ProtectedRoute action="ACCESS" subject="PLATFORM_SETTINGS" Component={errorWrapper(IndexIntegrations)()} />} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route
                 path="settings/*"
