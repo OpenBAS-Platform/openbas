@@ -60,7 +60,7 @@ public class EndpointService {
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
   public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE =
-      "C:\\Program Files\\Filigran\\OBAS Agent";
+      "C:\\Program Files (x86)\\Filigran\\OBAS Agent";
   public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE_USER = "C:\\Filigran";
   public static final String OPENBAS_INSTALL_DIR_WINDOWS_SESSION_USER = "C:\\Filigran";
   public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE = "/opt/openbas-agent";
