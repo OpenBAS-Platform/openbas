@@ -2,6 +2,7 @@ package io.openbas.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.openbas.IntegrationTest;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import io.openbas.utils.mockConfig.WithMockOpenCTIConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @DisplayName("OpenCTIConfig tests")
-public class OpenCTIConfigTest {
+public class OpenCTIConfigTest extends IntegrationTest {
+
   @Nested
   @WithMockOpenCTIConfig(url = "public_url")
   @DisplayName("When setting only the public URL")

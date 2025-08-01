@@ -5,19 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.rest.inject.service.StructuredOutputUtils;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StructuredOutputUtilsTest {
+class StructuredOutputUtilsTest extends IntegrationTest {
 
   public static final String SIMPLE_RAW_OUTPUT_TASKLIST =
       "\r\nImage Name                 PID  Session Name        Session#    Mem Usage\r\n"

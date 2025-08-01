@@ -201,13 +201,17 @@ public class ElasticDriver {
     try {
       client.indices().get(new GetIndexRequest.Builder().index(indexName).build());
     } catch (ElasticsearchException e) {
-      client
-          .indices()
-          .create(
-              new CreateIndexRequest.Builder()
-                  .index(indexName + config.getIndexSuffix())
-                  .aliases(indexName, new Alias.Builder().build())
-                  .build());
+      try {
+        client
+            .indices()
+            .create(
+                new CreateIndexRequest.Builder()
+                    .index(indexName + config.getIndexSuffix())
+                    .aliases(indexName, new Alias.Builder().build())
+                    .build());
+      } catch (ElasticsearchException e2) {
+        log.error("cannot create index", e2);
+      }
     }
   }
 

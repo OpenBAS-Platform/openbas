@@ -26,6 +26,7 @@ public class WithMockPlannerUserSecurityContextFactory
     implements WithSecurityContextFactory<WithMockPlannerUser> {
 
   public static final String MOCK_USER_PLANNER_EMAIL = "planner@openbas.io";
+  public static final String MOCK_PLANNER_GROUP = "Mock Planner group";
   @Autowired private GrantRepository grantRepository;
   @Autowired private GroupRepository groupRepository;
   @Autowired private UserRepository userRepository;
@@ -51,16 +52,17 @@ public class WithMockPlannerUserSecurityContextFactory
   }
 
   private void createPlannerMockUser() {
-    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL).isPresent()) {
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
+    if (userOpt.isPresent() && userOpt.get().isPlanner()) {
       return;
     }
     // Create group
-    String groupName = "Planner group";
-    Optional<Group> groupOpt = this.groupRepository.findOne(GroupSpecification.fromName(groupName));
+    Optional<Group> groupOpt =
+        this.groupRepository.findOne(GroupSpecification.fromName(MOCK_PLANNER_GROUP));
     Group group;
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
-      newGroup.setName(groupName);
+      newGroup.setName(MOCK_PLANNER_GROUP);
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
       group = this.groupRepository.save(newGroup);
@@ -73,12 +75,14 @@ public class WithMockPlannerUserSecurityContextFactory
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_PLANNER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_PLANNER_EMAIL);
       this.userRepository.save(user);
+    } else if (!userOpt.get().isPlanner()) {
+      userOpt.get().setGroups(List.of(group));
+      this.userRepository.save(userOpt.get());
     }
   }
 }

@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.NotificationRuleResourceType;
 import io.openbas.notification.handler.ScenarioNotificationEventHandler;
 import io.openbas.notification.model.NotificationEvent;
@@ -16,7 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @SpringBootTest
-public class NotificationEvenServiceTest {
+public class NotificationEvenServiceTest extends IntegrationTest {
 
   @Mock private ApplicationEventPublisher appPublisher;
   @Mock private ScenarioNotificationEventHandler scenarioNotificationEventHandler;

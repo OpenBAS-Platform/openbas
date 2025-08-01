@@ -3,6 +3,7 @@ package io.openbas.injects;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ExerciseRepository;
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InjectCrudTest {
+class InjectCrudTest extends IntegrationTest {
 
   @Autowired private InjectRepository injectRepository;
 
