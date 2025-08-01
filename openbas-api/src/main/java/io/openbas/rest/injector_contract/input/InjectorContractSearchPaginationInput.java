@@ -7,7 +7,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class SearchPaginationWithSerialisationOptionsInput extends SearchPaginationInput {
-  @JsonProperty("serialisation_options")
-  private SerialisationOptions serialisationOptions;
+public class InjectorContractSearchPaginationInput extends SearchPaginationInput {
+  @JsonProperty("include_full_details")
+  private boolean includeFullDetails = true;
 }

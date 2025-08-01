@@ -1,7 +1,7 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Filters;
-import io.openbas.rest.injector_contract.input.SearchPaginationWithSerialisationOptionsInput;
+import io.openbas.rest.injector_contract.input.InjectorContractSearchPaginationInput;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,8 @@ public class PaginationFixture {
     return SearchPaginationInput.builder().page(0).size(10);
   }
 
-  public static SearchPaginationWithSerialisationOptionsInput getOptioned() {
-    SearchPaginationWithSerialisationOptionsInput si =
-        new SearchPaginationWithSerialisationOptionsInput();
+  public static InjectorContractSearchPaginationInput getOptioned() {
+    InjectorContractSearchPaginationInput si = new InjectorContractSearchPaginationInput();
     si.setPage(0);
     si.setSize(10);
     return si;
@@ -46,7 +45,7 @@ public class PaginationFixture {
     return getDefault().filterGroup(filterGroup).build();
   }
 
-  public static SearchPaginationWithSerialisationOptionsInput optionedSearchWithAndOperator(
+  public static InjectorContractSearchPaginationInput optionedSearchWithAndOperator(
       String key, String value, Filters.FilterOperator operator) {
     Filters.Filter filter = new Filters.Filter();
     filter.setKey(key);
@@ -55,12 +54,12 @@ public class PaginationFixture {
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.and);
     filterGroup.setFilters(new ArrayList<>(List.of(filter)));
-    SearchPaginationWithSerialisationOptionsInput si = getOptioned();
+    InjectorContractSearchPaginationInput si = getOptioned();
     si.setFilterGroup(filterGroup);
     return si;
   }
 
-  public static SearchPaginationWithSerialisationOptionsInput optionedSearchWithOrOperator(
+  public static InjectorContractSearchPaginationInput optionedSearchWithOrOperator(
       String key, String value, Filters.FilterOperator operator) {
     Filters.Filter filter = new Filters.Filter();
     filter.setKey(key);
@@ -69,7 +68,7 @@ public class PaginationFixture {
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.or);
     filterGroup.setFilters(new ArrayList<>(List.of(filter)));
-    SearchPaginationWithSerialisationOptionsInput si = getOptioned();
+    InjectorContractSearchPaginationInput si = getOptioned();
     si.setFilterGroup(filterGroup);
     return si;
   }

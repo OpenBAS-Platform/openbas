@@ -4,16 +4,15 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.raw.RawInjectorsContrats;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
-import io.openbas.rest.injector_contract.input.SearchPaginationWithSerialisationOptionsInput;
-import io.openbas.rest.injector_contract.input.SerialisationOptions;
-import io.openbas.rest.injector_contract.output.InjectorContractOutput;
+import io.openbas.rest.injector_contract.input.InjectorContractSearchPaginationInput;
+import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 public class InjectorContractApi extends RestBehavior {
+
+  private final ObjectMapper mapper;
 
   public static final String INJECTOR_CONTRACT_URL = "/api/injector_contracts";
 
@@ -34,22 +35,19 @@ public class InjectorContractApi extends RestBehavior {
   }
 
   @PostMapping(INJECTOR_CONTRACT_URL + "/search")
-  @JsonSerialize
-  public Page<InjectorContractOutput> injectorContracts(
-      @RequestBody @Valid final SearchPaginationWithSerialisationOptionsInput input) {
-    Page<InjectorContractOutput> page =
-        buildPaginationCriteriaBuilder(
-            this.injectorContractService::getSinglePage,
-            handleArchitectureFilter(input),
-            InjectorContract.class);
-
-    if (input.getSerialisationOptions() != null) {
-      SerialisationOptions so = input.getSerialisationOptions();
-      if (so != null && so.getExcludedProperties().contains("injector_contract_content")) {
-        page.getContent().forEach(content -> content.setContent(null));
-      }
+  public Page<? extends InjectorContractBaseOutput> injectorContracts(
+      @RequestBody @Valid final InjectorContractSearchPaginationInput input) {
+    if (input.isIncludeFullDetails()) {
+      return buildPaginationCriteriaBuilder(
+          this.injectorContractService::getSinglePageFullDetails,
+          handleArchitectureFilter(input),
+          InjectorContract.class);
+    } else {
+      return buildPaginationCriteriaBuilder(
+          this.injectorContractService::getSinglePageBaseDetails,
+          handleArchitectureFilter(input),
+          InjectorContract.class);
     }
-    return page;
   }
 
   @Secured(ROLE_ADMIN)

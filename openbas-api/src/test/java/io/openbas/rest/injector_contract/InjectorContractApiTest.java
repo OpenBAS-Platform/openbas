@@ -14,9 +14,9 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
-import io.openbas.rest.injector_contract.input.SearchPaginationWithSerialisationOptionsInput;
-import io.openbas.rest.injector_contract.input.SerialisationOptions;
-import io.openbas.rest.injector_contract.output.InjectorContractOutput;
+import io.openbas.rest.injector_contract.input.InjectorContractSearchPaginationInput;
+import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
+import io.openbas.rest.injector_contract.output.InjectorContractFullOutput;
 import io.openbas.utils.fixtures.InjectorContractFixture;
 import io.openbas.utils.fixtures.InjectorFixture;
 import io.openbas.utils.fixtures.PaginationFixture;
@@ -738,21 +738,19 @@ public class InjectorContractApiTest extends IntegrationTest {
           .isEqualTo(
               mapper.writeValueAsString(
                   injectorContractComposer.generatedItems.stream()
-                      .map(InjectorContractOutput::fromInjectorContract)));
+                      .map(InjectorContractFullOutput::fromInjectorContract)));
     }
 
     @Test
     @DisplayName(
         "With SearchPaginationWithSerialisationOptionsInput and ignore content option is set, search returns expected items with no content")
     void WithSearchPaginationWithSerialisationOptionsInput() throws Exception {
-      SearchPaginationWithSerialisationOptionsInput input =
+      InjectorContractSearchPaginationInput input =
           PaginationFixture.optionedSearchWithAndOperator(
               "injector_contract_injector",
               injectorFixture.getWellKnownObasImplantInjector().getId(),
               Filters.FilterOperator.eq);
-      SerialisationOptions options = new SerialisationOptions();
-      options.setExcludedProperties(List.of("injector_contract_content"));
-      input.setSerialisationOptions(options);
+      input.setIncludeFullDetails(false);
 
       String response =
           mvc.perform(
@@ -765,10 +763,14 @@ public class InjectorContractApiTest extends IntegrationTest {
               .getContentAsString();
 
       assertThatJson(response)
+          .whenIgnoringPaths("content[*].injector_contract_updated_at")
           .when(Option.IGNORING_ARRAY_ORDER)
-          .node("content[0]")
-          .node("injector_contract_content")
-          .isNull();
+          .node("content")
+          .isArray()
+          .isEqualTo(
+              mapper.writeValueAsString(
+                  injectorContractComposer.generatedItems.stream()
+                      .map(InjectorContractBaseOutput::fromInjectorContract)));
     }
   }
 }

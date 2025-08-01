@@ -17,7 +17,8 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateInput;
 import io.openbas.rest.injector_contract.form.InjectorContractUpdateMappingInput;
-import io.openbas.rest.injector_contract.output.InjectorContractOutput;
+import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
+import io.openbas.rest.injector_contract.output.InjectorContractFullOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
@@ -33,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -86,7 +86,7 @@ public class InjectorContractService {
     injectorContractRepository.saveAll(listInjectorContract);
   }
 
-  public Page<InjectorContractOutput> getSinglePage(
+  public PageImpl<InjectorContractFullOutput> getSinglePageFullDetails(
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
       @NotNull final Pageable pageable) {
@@ -116,12 +116,50 @@ public class InjectorContractService {
     query.setMaxResults(pageable.getPageSize());
 
     // -- EXECUTION --
-    List<InjectorContractOutput> injectorContractOutputs = execInjectorContract(query);
+    List<InjectorContractFullOutput> injectorContractFullOutputs = execInjectorFullContract(query);
 
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
 
-    return new PageImpl<>(injectorContractOutputs, pageable, total);
+    return new PageImpl<>(injectorContractFullOutputs, pageable, total);
+  }
+
+  public PageImpl<InjectorContractBaseOutput> getSinglePageBaseDetails(
+      @Nullable final Specification<InjectorContract> specification,
+      @Nullable final Specification<InjectorContract> specificationCount,
+      @NotNull final Pageable pageable) {
+    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
+    selectForInjectorContract(cb, cq, injectorContractRoot);
+
+    // -- Text Search and Filters --
+    if (specification != null) {
+      Predicate predicate = specification.toPredicate(injectorContractRoot, cq, cb);
+      if (predicate != null) {
+        cq.where(predicate);
+      }
+    }
+
+    // -- Sorting --
+    List<Order> orders = toSortCriteriaBuilder(cb, injectorContractRoot, pageable.getSort());
+    cq.orderBy(orders);
+
+    // Type Query
+    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+    // -- Pagination --
+    query.setFirstResult((int) pageable.getOffset());
+    query.setMaxResults(pageable.getPageSize());
+
+    // -- EXECUTION --
+    List<InjectorContractBaseOutput> injectorContractFullOutputs = execInjectorBaseContract(query);
+
+    // -- Count Query --
+    Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
+
+    return new PageImpl<>(injectorContractFullOutputs, pageable, total);
   }
 
   public Iterable<RawInjectorsContrats> getAllRawInjectContracts() {
@@ -242,11 +280,11 @@ public class InjectorContractService {
             injectorContractInjectorJoin.get("id")));
   }
 
-  private List<InjectorContractOutput> execInjectorContract(TypedQuery<Tuple> query) {
+  private List<InjectorContractFullOutput> execInjectorFullContract(TypedQuery<Tuple> query) {
     return query.getResultList().stream()
         .map(
             tuple ->
-                new InjectorContractOutput(
+                new InjectorContractFullOutput(
                     tuple.get("injector_contract_id", String.class),
                     tuple.get("injector_contract_external_id", String.class),
                     tuple.get("injector_contract_labels", Map.class),
@@ -259,6 +297,17 @@ public class InjectorContractService {
                     tuple.get("injector_contract_attack_patterns", String[].class),
                     tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
+        .toList();
+  }
+
+  private List<InjectorContractBaseOutput> execInjectorBaseContract(TypedQuery<Tuple> query) {
+    return query.getResultList().stream()
+        .map(
+            tuple ->
+                new InjectorContractBaseOutput(
+                    tuple.get("injector_contract_id", String.class),
+                    tuple.get("injector_contract_external_id", String.class),
+                    tuple.get("injector_contract_updated_at", Instant.class)))
         .toList();
   }
 }

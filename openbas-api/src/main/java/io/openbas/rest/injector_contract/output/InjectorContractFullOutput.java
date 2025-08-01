@@ -2,28 +2,18 @@ package io.openbas.rest.injector_contract.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 
 @Data
-public class InjectorContractOutput {
-
-  @Schema(description = "Injector contract Id")
-  @JsonProperty("injector_contract_id")
-  @NotBlank
-  private String id;
-
-  @Schema(description = "Injector contract external Id")
-  @JsonProperty("injector_contract_external_id")
-  private String externalId;
-
+public class InjectorContractFullOutput extends InjectorContractBaseOutput {
   @Schema(description = "Labels")
   @JsonProperty("injector_contract_labels")
   private Map<String, String> labels;
@@ -35,7 +25,7 @@ public class InjectorContractOutput {
 
   @Schema(description = "Platforms")
   @JsonProperty("injector_contract_platforms")
-  private PLATFORM_TYPE[] platforms;
+  private Endpoint.PLATFORM_TYPE[] platforms;
 
   @Schema(description = "Payload type")
   @JsonProperty("injector_contract_payload_type")
@@ -53,15 +43,10 @@ public class InjectorContractOutput {
   @JsonProperty("injector_contract_attack_patterns")
   private List<String> attackPatterns;
 
-  @Schema(description = "Timestamp when the injector contract was last updated")
-  @JsonProperty("injector_contract_updated_at")
-  @NotNull
-  private Instant updatedAt;
-
   @JsonProperty("injector_contract_arch")
   private Payload.PAYLOAD_EXECUTION_ARCH arch;
 
-  public InjectorContractOutput(
+  public InjectorContractFullOutput(
       String id,
       String externalId,
       Map<String, String> labels,
@@ -74,22 +59,22 @@ public class InjectorContractOutput {
       String[] attackPatterns,
       Instant updatedAt,
       Payload.PAYLOAD_EXECUTION_ARCH arch) {
-    this.id = id;
-    this.externalId = externalId;
-    this.labels = labels;
-    this.content = content;
-    this.platforms = platforms;
-    this.payloadType = Optional.ofNullable(collectorType).orElse(payloadType);
-    this.injectorName = injectorName;
-    this.injectorType = injectorType;
-    this.attackPatterns =
-        attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
-    this.updatedAt = updatedAt;
-    this.arch = arch;
+    super(id, externalId, updatedAt);
+    this.setLabels(labels);
+    this.setContent(content);
+    this.setPlatforms(platforms);
+    this.setPayloadType(Optional.ofNullable(collectorType).orElse(payloadType));
+    this.setInjectorName(injectorName);
+    this.setInjectorType(injectorType);
+    this.setAttackPatterns(
+        attackPatterns != null
+            ? new ArrayList<>(Arrays.asList(attackPatterns))
+            : new ArrayList<>());
+    this.setArch(arch);
   }
 
-  public static InjectorContractOutput fromInjectorContract(InjectorContract sourceContract) {
-    return new InjectorContractOutput(
+  public static InjectorContractFullOutput fromInjectorContract(InjectorContract sourceContract) {
+    return new InjectorContractFullOutput(
         sourceContract.getId(),
         sourceContract.getExternalId(),
         sourceContract.getLabels(),
