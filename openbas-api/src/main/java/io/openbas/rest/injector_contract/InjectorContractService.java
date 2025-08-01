@@ -28,7 +28,9 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,15 +88,27 @@ public class InjectorContractService {
     injectorContractRepository.saveAll(listInjectorContract);
   }
 
-  public PageImpl<InjectorContractFullOutput> getSinglePageFullDetails(
+  @Setter
+  @Getter
+  private class QuerySetup {
+    private TypedQuery<Tuple> query;
+    private Long total;
+  }
+
+  private QuerySetup setupQuery(
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
-      @NotNull final Pageable pageable) {
+      @NotNull final Pageable pageable,
+      boolean include_full_details) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
     Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
-    selectForInjectorContract(cb, cq, injectorContractRoot);
+    if (include_full_details) {
+      selectForInjectorContractFull(cb, cq, injectorContractRoot);
+    } else {
+      selectForInjectorContractBase(cb, cq, injectorContractRoot);
+    }
 
     // -- Text Search and Filters --
     if (specification != null) {
@@ -115,51 +129,39 @@ public class InjectorContractService {
     query.setFirstResult((int) pageable.getOffset());
     query.setMaxResults(pageable.getPageSize());
 
-    // -- EXECUTION --
-    List<InjectorContractFullOutput> injectorContractFullOutputs = execInjectorFullContract(query);
-
     // -- Count Query --
     Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
 
-    return new PageImpl<>(injectorContractFullOutputs, pageable, total);
+    QuerySetup qs = new QuerySetup();
+    qs.setQuery(query);
+    qs.setTotal(total);
+    return qs;
+  }
+
+  public PageImpl<InjectorContractFullOutput> getSinglePageFullDetails(
+      @Nullable final Specification<InjectorContract> specification,
+      @Nullable final Specification<InjectorContract> specificationCount,
+      @NotNull final Pageable pageable) {
+    QuerySetup qs = setupQuery(specification, specificationCount, pageable, true);
+
+    // -- EXECUTION --
+    List<InjectorContractFullOutput> injectorContractFullOutputs =
+        execInjectorFullContract(qs.query);
+
+    return new PageImpl<>(injectorContractFullOutputs, pageable, qs.total);
   }
 
   public PageImpl<InjectorContractBaseOutput> getSinglePageBaseDetails(
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
       @NotNull final Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
-    selectForInjectorContract(cb, cq, injectorContractRoot);
-
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectorContractRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
-      }
-    }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, injectorContractRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
+    QuerySetup qs = setupQuery(specification, specificationCount, pageable, false);
 
     // -- EXECUTION --
-    List<InjectorContractBaseOutput> injectorContractFullOutputs = execInjectorBaseContract(query);
+    List<InjectorContractBaseOutput> injectorContractBaseOutputs =
+        execInjectorBaseContract(qs.query);
 
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
-
-    return new PageImpl<>(injectorContractFullOutputs, pageable, total);
+    return new PageImpl<>(injectorContractBaseOutputs, pageable, qs.total);
   }
 
   public Iterable<RawInjectorsContrats> getAllRawInjectContracts() {
@@ -240,7 +242,7 @@ public class InjectorContractService {
 
   // -- CRITERIA BUILDER --
 
-  private void selectForInjectorContract(
+  private void selectForInjectorContractFull(
       @NotNull final CriteriaBuilder cb,
       @NotNull final CriteriaQuery<Tuple> cq,
       @NotNull final Root<InjectorContract> injectorContractRoot) {
@@ -298,6 +300,18 @@ public class InjectorContractService {
                     tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
         .toList();
+  }
+
+  private void selectForInjectorContractBase(
+      @NotNull final CriteriaBuilder cb,
+      @NotNull final CriteriaQuery<Tuple> cq,
+      @NotNull final Root<InjectorContract> injectorContractRoot) {
+    // SELECT
+    cq.multiselect(
+            injectorContractRoot.get("id").alias("injector_contract_id"),
+            injectorContractRoot.get("externalId").alias("injector_contract_external_id"),
+            injectorContractRoot.get("updatedAt").alias("injector_contract_updated_at"))
+        .distinct(true);
   }
 
   private List<InjectorContractBaseOutput> execInjectorBaseContract(TypedQuery<Tuple> query) {

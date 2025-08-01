@@ -3042,6 +3042,18 @@ export interface InjectorContractAddInput {
   is_atomic_testing?: boolean;
 }
 
+export interface InjectorContractBaseOutput {
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  /** Injector contract Id */
+  injector_contract_id: string;
+  /**
+   * Timestamp when the injector contract was last updated
+   * @format date-time
+   */
+  injector_contract_updated_at: string;
+}
+
 export interface InjectorContractInput {
   atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
@@ -3062,40 +3074,26 @@ export interface InjectorContractInput {
   is_atomic_testing?: boolean;
 }
 
-export interface InjectorContractOutput {
-  injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  /** Attack pattern IDs */
-  injector_contract_attack_patterns?: string[];
-  /** Content */
-  injector_contract_content: string;
-  /** Injector contract external Id */
-  injector_contract_external_id?: string;
-  /** Injector contract Id */
-  injector_contract_id: string;
-  /** Injector name */
-  injector_contract_injector_name?: string;
-  /** Injector type */
-  injector_contract_injector_type?: string;
-  /** Labels */
-  injector_contract_labels?: Record<string, string>;
-  /** Payload type */
-  injector_contract_payload_type?: string;
-  /** Platforms */
-  injector_contract_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
+export interface InjectorContractSearchPaginationInput {
+  /** Filter object to search within filterable attributes */
+  filterGroup?: FilterGroup;
+  include_full_details?: boolean;
   /**
-   * Timestamp when the injector contract was last updated
-   * @format date-time
+   * Page number to get
+   * @format int32
+   * @min 0
    */
-  injector_contract_updated_at: string;
+  page: number;
+  /**
+   * Element number by page
+   * @format int32
+   * @max 1000
+   */
+  size: number;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within searchable attributes */
+  textSearch?: string;
 }
 
 /** Injector contract */
@@ -3903,8 +3901,8 @@ export interface PageInjectTestStatusOutput {
   totalPages?: number;
 }
 
-export interface PageInjectorContractOutput {
-  content?: InjectorContractOutput[];
+export interface PageInjectorContractBaseOutput {
+  content?: InjectorContractBaseOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -5097,28 +5095,6 @@ export interface SearchPaginationInput {
   textSearch?: string;
 }
 
-export interface SearchPaginationWithSerialisationOptionsInput {
-  /** Filter object to search within filterable attributes */
-  filterGroup?: FilterGroup;
-  /**
-   * Page number to get
-   * @format int32
-   * @min 0
-   */
-  page: number;
-  serialisation_options?: SerialisationOptions;
-  /**
-   * Element number by page
-   * @format int32
-   * @max 1000
-   */
-  size: number;
-  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
-  sorts?: SortField[];
-  /** Text to search within searchable attributes */
-  textSearch?: string;
-}
-
 export interface SearchTerm {
   searchTerm?: string;
 }
@@ -5158,10 +5134,6 @@ export interface SecurityPlatformUpsertInput {
   security_platform_logo_dark?: string;
   security_platform_logo_light?: string;
   security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
-}
-
-export interface SerialisationOptions {
-  excluded_properties?: string[];
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
