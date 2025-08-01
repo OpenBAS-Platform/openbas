@@ -12,7 +12,6 @@ import { useHelper } from '../../../../store';
 import { type PlayerInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { countryOption, type Option, organizationOption, tagOptions } from '../../../../utils/Option';
-import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { TeamContext } from '../../common/Context';
 import { type PlayerInputForm, type UserStore } from './Player';
 import PlayerForm from './PlayerForm';
@@ -149,20 +148,16 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
             {t('Remove from the team')}
           </MenuItem>
         )}
-        <Can I="DELETE" a="TeamsAndPlayers">
-          {canDelete && (
-            <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
-          )}
-        </Can>
+        {canDelete && (
+          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        )}
       </Menu>
-      <Can I="DELETE" a="TeamsAndPlayers">
-        <DialogDelete
-          open={openDelete}
-          handleClose={handleCloseDelete}
-          handleSubmit={submitDelete}
-          text={t('Do you want to delete this player?')}
-        />
-      </Can>
+      <DialogDelete
+        open={openDelete}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={t('Do you want to delete this player?')}
+      />
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
