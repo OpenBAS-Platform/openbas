@@ -6,12 +6,13 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { addGrant, addGroupOrganization, deleteGrant, deleteGroupOrganization } from '../../../../actions/Grant';
-import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupUsers } from '../../../../actions/Group';
+import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupRoles, updateGroupUsers } from '../../../../actions/Group';
 import { storeHelper } from '../../../../actions/Schema';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
 import GroupForm from './GroupForm';
+import GroupManageRoles from './GroupManageRoles.js';
 import GroupManageUsers from './GroupManageUsers';
 
 const TabPanel = (props) => {
@@ -52,6 +53,7 @@ class GroupPopover extends Component {
       keyword: '',
       tags: [],
       usersIds: props.groupUsersIds,
+      rolesIds: props.groupRolesIds,
     };
   }
 
@@ -117,6 +119,23 @@ class GroupPopover extends Component {
 
   handleCloseGrants() {
     this.setState({ openGrants: false });
+  }
+
+  handleOpenRoles() {
+    this.setState({
+      openRoles: true,
+      rolesIds: this.props.groupRolesIds,
+    });
+    this.handlePopoverClose();
+  }
+
+  submitUpdateRoles(roleIds) {
+    this.props.updateGroupRoles(this.props.group.group_id, { group_roles: roleIds }).then(this.fetchAndUpdateGroup.bind(this));
+    this.handleCloseRoles();
+  }
+
+  handleCloseRoles() {
+    this.setState({ openRoles: false });
   }
 
   handleTabChange(_event, tabKey) {
@@ -239,6 +258,9 @@ class GroupPopover extends Component {
           <MenuItem onClick={this.handleOpenGrants.bind(this)}>
             {t('Manage grants')}
           </MenuItem>
+          <MenuItem onClick={this.handleOpenRoles.bind(this)}>
+            {t('Manage roles')}
+          </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
@@ -280,6 +302,12 @@ class GroupPopover extends Component {
           open={this.state.openUsers}
           onClose={this.handleCloseUsers.bind(this)}
           onSubmit={this.submitUpdateUsers.bind(this)}
+        />
+        <GroupManageRoles
+          initialState={this.state.rolesIds}
+          open={this.state.openRoles}
+          onClose={this.handleCloseRoles.bind(this)}
+          onSubmit={this.submitUpdateRoles.bind(this)}
         />
         <Drawer
           open={this.state.openGrants}
@@ -565,6 +593,7 @@ class GroupPopover extends Component {
             </div>
           </>
         </Drawer>
+
       </>
     );
   }
@@ -575,6 +604,7 @@ GroupPopover.propTypes = {
   group: PropTypes.object,
   fetchGroup: PropTypes.func,
   updateGroupUsers: PropTypes.func,
+  updateGroupRoles: PropTypes.func,
   updateGroupInformation: PropTypes.func,
   deleteGroup: PropTypes.func,
   addGrant: PropTypes.func,
@@ -582,6 +612,7 @@ GroupPopover.propTypes = {
   deleteGroupOrganization: PropTypes.func,
   deleteGrant: PropTypes.func,
   groupUsersIds: PropTypes.array,
+  groupRolesIds: PropTypes.array,
 };
 
 const select = (state) => {
@@ -599,6 +630,7 @@ export default R.compose(
     fetchGroup,
     updateGroupInformation,
     updateGroupUsers,
+    updateGroupRoles,
     deleteGroup,
     addGrant,
     deleteGrant,

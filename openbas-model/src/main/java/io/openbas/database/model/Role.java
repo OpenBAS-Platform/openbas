@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class Role implements Base {
   @NotBlank
   private String id;
 
+  @Queryable(searchable = true, sortable = true)
   @JsonProperty("role_name")
   @Column(name = "role_name")
   @NotBlank
@@ -40,12 +42,14 @@ public class Role implements Base {
   @Column(name = "capability")
   private Set<Capability> capabilities = new HashSet<>();
 
+  @Queryable(sortable = true)
   @Column(name = "role_created_at")
   @JsonProperty("role_created_at")
   @NotNull
   @Schema(description = "Creation date of the role", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
+  @Queryable(sortable = true)
   @Column(name = "role_updated_at")
   @JsonProperty("role_updated_at")
   @NotNull

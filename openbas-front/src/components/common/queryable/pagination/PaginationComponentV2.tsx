@@ -48,6 +48,7 @@ interface Props<T> {
   setContent: (data: T[]) => void;
   searchEnable?: boolean;
   disablePagination?: boolean;
+  disableFilters?: boolean;
   entityPrefix?: string;
   availableFilterNames?: string[];
   queryableHelpers: QueryableHelpers;
@@ -64,6 +65,7 @@ const PaginationComponentV2 = <T extends object>({
   setContent,
   searchEnable = true,
   disablePagination,
+  disableFilters,
   entityPrefix,
   availableFilterNames = [],
   queryableHelpers,
@@ -159,13 +161,16 @@ const PaginationComponentV2 = <T extends object>({
               textSearchHelpers={queryableHelpers.textSearchHelpers}
             />
           )}
-          <FilterAutocomplete
-            filterGroup={searchPaginationInput.filterGroup}
-            helpers={queryableHelpers.filterHelpers}
-            options={options}
-            setPristine={setPristine}
-            style={{ marginLeft: searchEnable ? 10 : 0 }}
-          />
+          {!disableFilters && (
+            <FilterAutocomplete
+              filterGroup={searchPaginationInput.filterGroup}
+              helpers={queryableHelpers.filterHelpers}
+              options={options}
+              setPristine={setPristine}
+              style={{ marginLeft: searchEnable ? 10 : 0 }}
+            />
+          ) }
+
           {queryableHelpers.filterHelpers && availableFilterNames?.includes('injector_contract_attack_patterns') && (
             <>
               <div style={{ cursor: 'pointer' }} onClick={() => setOpenMitreFilter(true)}>

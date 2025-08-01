@@ -154,14 +154,16 @@ public class GroupApi extends RestBehavior {
             .findById(groupId)
             .orElseThrow(() -> new ElementNotFoundException("Group not found with id: " + groupId));
 
-    input.getRoleIds().stream()
-        .map(
-            id ->
-                roleService
-                    .findById(id)
-                    .orElseThrow(
-                        () -> new ElementNotFoundException("Role not found with id: " + id)))
-        .forEach(group.getRoles()::add);
+    group.setRoles(
+        input.getRoleIds().stream()
+            .map(
+                id ->
+                    roleService
+                        .findById(id)
+                        .orElseThrow(
+                            () -> new ElementNotFoundException("Role not found with id: " + id)))
+            .collect(toList()));
+
     return groupRepository.save(group);
   }
 
