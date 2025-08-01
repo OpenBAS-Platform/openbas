@@ -128,7 +128,7 @@ class EndpointApiTest extends IntegrationTest {
 
     Mockito.doReturn("command")
         .when(endpointService)
-        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows), null);
+        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows), null, null, null);
 
     // --EXECUTE--
     String response =
@@ -166,7 +166,7 @@ class EndpointApiTest extends IntegrationTest {
 
     Mockito.doReturn("command")
         .when(endpointService)
-        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows), null);
+        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows), null, null, null);
 
     // --EXECUTE--
     String response =
