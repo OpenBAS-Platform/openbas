@@ -23,7 +23,7 @@ import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAu
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { isNotEmptyField } from '../../../../utils/utils';
-import { type ExpectationResultType, expectationResultTypes, type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+import { type ExpectationResultType, ExpectationType, type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import {
   HUMAN_EXPECTATION,
   isManualExpectation,
@@ -438,7 +438,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       })));
       const mergedSteps: Steptarget[] = [...computeInitialSteps(initialSteps), ...newSteps];
       // Custom sorting function
-      mergedSteps.sort((a, b) => expectationResultTypes.indexOf(a.type as ExpectationResultType) - expectationResultTypes.indexOf(b.type as ExpectationResultType));
+      mergedSteps.sort((a, b) => Object.keys(ExpectationType).indexOf(a.type as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b.type as ExpectationResultType));
       setNodes(mergedSteps.map((step, index) => ({
         id: `result-${index}`,
         type: 'result',
@@ -481,7 +481,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     groupedResults[type].push(result);
   });
   const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
-    return expectationResultTypes.indexOf(a as ExpectationResultType) - expectationResultTypes.indexOf(b as ExpectationResultType);
+    return Object.keys(ExpectationType).indexOf(a as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b as ExpectationResultType);
   });
   const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
   sortedKeys.forEach((key) => {
