@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Getter;
 
 public enum Capability {
 
@@ -87,7 +88,10 @@ public enum Capability {
 
   private final Set<ResourceTypeActionPair> pairs;
 
+  @Getter private final Capability parent;
+
   Capability(Capability parent, ResourceTypeActionPair... pairs) {
+    this.parent = parent;
     this.pairs = Set.of(pairs);
   }
 
