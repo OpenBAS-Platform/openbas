@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.io.InputStream;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,19 +27,24 @@ public class CollectorService {
   private final CollectorRepository collectorRepository;
   private final FileService fileService;
 
-  public Collector findById(String id) {
+  // -- CRUD --
+
+  public Collector collector(String id) {
     return collectorRepository
         .findById(id)
         .orElseThrow(() -> new ElementNotFoundException("Collector not found with id: " + id));
   }
 
   public Collector updateCollectorState(Collector collectorToUpdate, ObjectNode newState) {
-    ObjectNode state = collectorToUpdate.getState();
+    ObjectNode state =
+        Optional.ofNullable(collectorToUpdate.getState()).orElse(mapper.createObjectNode());
     newState
         .fieldNames()
         .forEachRemaining(fieldName -> state.set(fieldName, newState.get(fieldName)));
     return collectorRepository.save(collectorToUpdate);
   }
+
+  // -- ACTION --
 
   @Transactional
   public void register(String id, String type, String name, InputStream iconData) throws Exception {

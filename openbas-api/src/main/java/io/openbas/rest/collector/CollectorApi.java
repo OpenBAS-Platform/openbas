@@ -7,7 +7,7 @@ import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.collector.form.CollectorUpdateInput;
-import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.collector.service.CollectorService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
 import jakarta.transaction.Transactional;
@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CollectorApi extends RestBehavior {
 
+  private final CollectorService collectorService;
   private final CollectorRepository collectorRepository;
   private final SecurityPlatformRepository securityPlatformRepository;
 
@@ -57,7 +58,7 @@ public class CollectorApi extends RestBehavior {
   @GetMapping("/api/collectors/{collectorId}")
   @Secured(ROLE_ADMIN)
   public Collector getCollector(@PathVariable String collectorId) {
-    return collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
+    return collectorService.collector(collectorId);
   }
 
   @Secured(ROLE_ADMIN)
@@ -65,8 +66,7 @@ public class CollectorApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public Collector updateCollector(
       @PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
-    Collector collector =
-        collectorRepository.findById(collectorId).orElseThrow(ElementNotFoundException::new);
+    Collector collector = collectorService.collector(collectorId);
     return updateCollector(
         collector,
         collector.getType(),

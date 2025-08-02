@@ -1,5 +1,6 @@
 package io.openbas.rest.cve.service;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +82,7 @@ public class CveService {
                 })
             .toList();
 
-    return (List<Cve>) cveRepository.saveAll(cves);
+    return fromIterable(cveRepository.saveAll(cves));
   }
 
   private void updateCollectorStateFromCVEBulkInsertInput(
@@ -96,7 +97,7 @@ public class CveService {
 
   @Transactional(rollbackFor = Exception.class)
   public void bulkUpsertCVEs(@NotNull CVEBulkInsertInput inputs) {
-    Collector collector = this.collectorService.findById(inputs.getSourceIdentifier());
+    Collector collector = this.collectorService.collector(inputs.getSourceIdentifier());
 
     List<Cve> cves = this.batchUpsertCves(inputs.getCves());
     this.updateCollectorStateFromCVEBulkInsertInput(collector, inputs);
