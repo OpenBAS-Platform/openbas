@@ -2,7 +2,6 @@ package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadUtils.instantiatePayload;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.config.cache.LicenseCacheManager;
@@ -50,7 +49,7 @@ public class PayloadCreationService {
     PayloadType payloadType = PayloadType.fromString(input.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
 
-    Payload payload = instantiatePayload(payloadType);
+    Payload payload = payloadType.getPayloadSupplier().get();
     payloadUtils.copyProperties(input, payload);
 
     payload.setAttackPatterns(attackPatterns);

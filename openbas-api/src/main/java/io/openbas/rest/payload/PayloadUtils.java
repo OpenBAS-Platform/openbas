@@ -122,17 +122,6 @@ public class PayloadUtils {
     }
   }
 
-  public static Payload instantiatePayload(PayloadType type) {
-    return switch (type) {
-      case COMMAND -> new Command();
-      case EXECUTABLE -> new Executable();
-      case FILE_DROP -> new FileDrop();
-      case DNS_RESOLUTION -> new DnsResolution();
-      case NETWORK_TRAFFIC -> new NetworkTraffic();
-      default -> throw new UnsupportedOperationException("Unsupported payload type: " + type);
-    };
-  }
-
   public <T extends Payload> void duplicateCommonProperties(
       @NotNull final T origin, @NotNull T duplicate) {
     BeanUtils.copyProperties(
