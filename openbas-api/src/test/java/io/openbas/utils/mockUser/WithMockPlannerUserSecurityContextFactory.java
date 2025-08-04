@@ -5,6 +5,7 @@ import static io.openbas.service.UserService.buildAuthenticationToken;
 
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.database.repository.GroupRepository;
@@ -64,10 +65,14 @@ public class WithMockPlannerUserSecurityContextFactory
       newGroup.setScenariosDefaultGrants(List.of(PLANNER));
       newGroup.setExercisesDefaultGrants(List.of(PLANNER));
       group = this.groupRepository.save(newGroup);
+
       // Create grant
+      Scenario scenario = new Scenario();
+      scenario.setId("id");
       Grant grant = new Grant();
       grant.setName(PLANNER);
       grant.setGroup(group);
+      grant.setScenario(scenario);
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
