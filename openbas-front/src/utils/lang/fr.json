@@ -1519,7 +1519,6 @@
   "To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script.": "Pour installer, copiez et collez le code PowerShell suivant dans une invite élevée ou téléchargez le script .ps1.",
   "To obtain a license, please": "Pour obtenir une licence, veuillez",
   "To put arguments in the command line, use #{argument_key}": "Pour ajouter des arguments à la ligne de commande, utilisez #{argument_key}",
-  "To register new endpoints, you will need to install an agent. You can find detailed instructions on the ": "Pour enregistrer de nouveaux points d'extrémité, vous devez installer un agent. Vous trouverez des instructions détaillées sur le site ",
   "To use AI, please enable it in the configuration of your platform.": "Pour utiliser l'IA, veuillez l'activer dans la configuration de votre plateforme.",
   "toggle": "Basculer",
   "token": "Token du compte",
