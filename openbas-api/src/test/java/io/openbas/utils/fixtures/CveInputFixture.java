@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.rest.cve.form.CveCreateInput;
-
 import java.math.BigDecimal;
 
 public class CveInputFixture {

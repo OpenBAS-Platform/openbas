@@ -7,7 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.ee.Ee;
-import io.openbas.integrations.CollectorService;
+import io.openbas.rest.collector.service.CollectorService;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
