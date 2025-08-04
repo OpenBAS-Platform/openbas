@@ -1514,9 +1514,11 @@ export interface EndpointOverviewOutput {
 
 export interface EndpointRegisterInput {
   agent_executed_by_user?: string;
+  agent_installation_directory?: string;
   agent_installation_mode?: string;
   agent_is_elevated?: boolean;
   agent_is_service?: boolean;
+  agent_service_name?: string;
   asset_description?: string;
   asset_external_reference: string;
   asset_name: string;
