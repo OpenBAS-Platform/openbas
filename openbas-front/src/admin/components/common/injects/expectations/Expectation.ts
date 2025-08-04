@@ -24,10 +24,16 @@ export interface ExpectationInputForm extends Omit<ExpectationInput, 'expectatio
 }
 
 export enum ExpectationType {
-  ARTICLE = 'ARTICLE',
-  CHALLENGE = 'CHALLENGE',
   PREVENTION = 'PREVENTION',
   DETECTION = 'DETECTION',
   VULNERABILITY = 'VULNERABILITY',
   MANUAL = 'MANUAL',
+  ARTICLE = 'ARTICLE',
+  CHALLENGE = 'CHALLENGE',
 }
+
+export type ExpectationResultType = 'PREVENTION' | 'DETECTION' | 'VULNERABILITY' | 'HUMAN_RESPONSE';
+
+export const expectationResultTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'HUMAN_RESPONSE'];
+
+export const mitreMatrixExpectationTypes: ExpectationResultType [] = ['PREVENTION', 'DETECTION', 'VULNERABILITY'];

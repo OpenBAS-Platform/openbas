@@ -187,12 +187,7 @@ public class PayloadService {
 
   private ContractExpectations expectations(InjectExpectation.EXPECTATION_TYPE[] expectationTypes) {
     List<Expectation> expectations = new ArrayList<>();
-    if (expectationTypes == null || expectationTypes.length == 0) {
-      return expectationsField(
-          List.of(
-              this.expectationBuilderService.buildPreventionExpectation(),
-              this.expectationBuilderService.buildDetectionExpectation()));
-    } else {
+    if (expectationTypes != null) {
       for (InjectExpectation.EXPECTATION_TYPE type : expectationTypes) {
         switch (type) {
           case TEXT -> expectations.add(this.expectationBuilderService.buildTextExpectation());
@@ -212,8 +207,8 @@ public class PayloadService {
           default -> throw new IllegalArgumentException("Unsupported expectation type: " + type);
         }
       }
-      return expectationsField(expectations);
     }
+    return expectationsField(expectations);
   }
 
   public Payload duplicate(@NotBlank final String payloadId) {

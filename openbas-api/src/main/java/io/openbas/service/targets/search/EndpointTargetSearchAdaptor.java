@@ -5,11 +5,9 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
-import io.openbas.service.InjectExpectationService;
 import io.openbas.service.targets.search.specifications.IncludeDirectEndpointTargetsSpecification;
 import io.openbas.service.targets.search.specifications.IncludeMembersOfAssetGroupsSpecification;
 import io.openbas.service.targets.search.specifications.SearchSpecificationUtils;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
@@ -25,24 +23,23 @@ import org.springframework.stereotype.Component;
 public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
 
   private final EndpointRepository endpointRepository;
-  private final InjectExpectationService injectExpectationService;
   private final SearchSpecificationUtils<Endpoint> searchSpecificationUtils;
   private final IncludeMembersOfAssetGroupsSpecification<Endpoint>
       includeMembersOfAssetGroupsSpecification;
   private final IncludeDirectEndpointTargetsSpecification<Endpoint>
       includeDirectEndpointTargetsSpecification;
+  private final HelperTargetSearchAdaptor helperTargetSearchAdaptor;
 
   private final List<String> joinPath = List.of("assets");
 
   public EndpointTargetSearchAdaptor(
       EndpointRepository endpointRepository,
-      InjectExpectationService injectExpectationService,
       SearchSpecificationUtils<Endpoint> searchSpecificationUtils,
       IncludeMembersOfAssetGroupsSpecification<Endpoint> includeMembersOfAssetGroupsSpecification,
-      IncludeDirectEndpointTargetsSpecification<Endpoint>
-          includeDirectEndpointTargetsSpecification) {
+      IncludeDirectEndpointTargetsSpecification<Endpoint> includeDirectEndpointTargetsSpecification,
+      HelperTargetSearchAdaptor helperTargetSearchAdaptor) {
     this.endpointRepository = endpointRepository;
-    this.injectExpectationService = injectExpectationService;
+    this.helperTargetSearchAdaptor = helperTargetSearchAdaptor;
     this.searchSpecificationUtils = searchSpecificationUtils;
     this.includeMembersOfAssetGroupsSpecification = includeMembersOfAssetGroupsSpecification;
     this.includeDirectEndpointTargetsSpecification = includeDirectEndpointTargetsSpecification;
@@ -112,27 +109,14 @@ public class EndpointTargetSearchAdaptor extends SearchAdaptorBase {
   }
 
   private InjectTarget convertFromEndpoint(Endpoint endpoint, Inject inject) {
-    InjectTarget target =
-        new EndpointTarget(
-            endpoint.getId(),
-            endpoint.getName(),
-            endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
-            endpoint.getPlatform().name());
-
-    List<AtomicTestingUtils.ExpectationResultsByType> results =
-        AtomicTestingUtils.getExpectationResultByTypes(
-            injectExpectationService.findMergedExpectationsByInjectAndTargetAndTargetType(
-                inject.getId(), target.getId(), target.getTargetType()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : results) {
-      switch (result.type()) {
-        case DETECTION -> target.setTargetDetectionStatus(result.avgResult());
-        case PREVENTION -> target.setTargetPreventionStatus(result.avgResult());
-        case VULNERABILITY -> target.setTargetVulnerabilityStatus(result.avgResult());
-        case HUMAN_RESPONSE -> target.setTargetHumanResponseStatus(result.avgResult());
-      }
-    }
-
-    return target;
+    return helperTargetSearchAdaptor.buildTargetWithExpectations(
+        inject,
+        () ->
+            new EndpointTarget(
+                endpoint.getId(),
+                endpoint.getName(),
+                endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()),
+                endpoint.getPlatform().name()),
+        true);
   }
 }

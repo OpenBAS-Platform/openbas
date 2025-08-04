@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   public static final String SERVICE_NAME = CROWDSTRIKE_EXECUTOR_NAME;
-  private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
-  private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
   private static final int SLEEP_INTERVAL_BATCH_EXECUTIONS = 1000;
 
@@ -171,7 +169,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       actionWindows.setScriptName(this.crowdStrikeExecutorConfig.getWindowsScriptName());
       String implantLocation =
           "$location="
-              + IMPLANT_LOCATION_WINDOWS
+              + ExecutorHelper.IMPLANT_LOCATION_WINDOWS
               + ExecutorHelper.IMPLANT_BASE_NAME
               + UUID.randomUUID()
               + "\";md $location -ea 0;[Environment]::CurrentDirectory";
@@ -243,7 +241,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       String externalReferenceVariable) {
     String implantLocation =
         "location="
-            + IMPLANT_LOCATION_UNIX
+            + ExecutorHelper.IMPLANT_LOCATION_UNIX
             + ExecutorHelper.IMPLANT_BASE_NAME
             + UUID.randomUUID()
             + ";mkdir -p $location;filename=";

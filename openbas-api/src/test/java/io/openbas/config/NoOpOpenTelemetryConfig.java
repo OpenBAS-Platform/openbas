@@ -1,7 +1,5 @@
 package io.openbas.config;
 
-import static org.mockito.Mockito.*;
-
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.executors.ExecutorService;
 import io.openbas.service.AgentService;

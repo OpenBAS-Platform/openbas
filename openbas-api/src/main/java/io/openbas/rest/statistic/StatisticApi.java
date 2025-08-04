@@ -2,7 +2,7 @@ package io.openbas.rest.statistic;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.AtomicTestingUtils.getExpectationResultByTypesFromRaw;
+import static io.openbas.utils.InjectExpectationResultUtils.getExpectationResultByTypes;
 import static java.util.stream.Collectors.groupingBy;
 
 import io.openbas.aop.LogExecutionTime;
@@ -16,8 +16,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.statistic.response.PlatformStatistic;
 import io.openbas.rest.statistic.response.StatisticElement;
-import io.openbas.utils.AtomicTestingUtils;
-import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.InjectExpectationResultUtils;
+import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -123,7 +123,8 @@ public class StatisticApi extends RestBehavior {
     Instant minus6Months = from.minus(180, ChronoUnit.DAYS);
     List<RawInjectExpectation> rawInjectExpectations =
         fromIterable(this.exerciseRepository.allInjectExpectationsFromDate(minus6Months));
-    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return getExpectationResultByTypes(
+        rawInjectExpectations, InjectExpectationResultUtils::getScoresFromRaw);
   }
 
   private List<ExpectationResultsByType> computeUserExpectationResults(
@@ -134,7 +135,8 @@ public class StatisticApi extends RestBehavior {
         fromIterable(
             this.exerciseRepository.allGrantedInjectExpectationsFromDate(
                 minus6Months, user.getId()));
-    return getExpectationResultByTypesFromRaw(rawInjectExpectations);
+    return getExpectationResultByTypes(
+        rawInjectExpectations, InjectExpectationResultUtils::getScoresFromRaw);
   }
 
   private List<InjectExpectationResultsByAttackPattern> computeGlobalInjectExpectationResults(
@@ -215,8 +217,9 @@ public class StatisticApi extends RestBehavior {
                                     });
 
                             resultInjectExpectationResultsByAttackPattern.setResults(
-                                AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                                    expectationsRefined));
+                                getExpectationResultByTypes(
+                                    expectationsRefined,
+                                    InjectExpectationResultUtils::getScoresFromRaw));
 
                             results.add(resultInjectExpectationResultsByAttackPattern);
                           });

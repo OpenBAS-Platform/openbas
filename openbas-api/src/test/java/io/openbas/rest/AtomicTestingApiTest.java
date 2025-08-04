@@ -2,9 +2,12 @@ package io.openbas.rest;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,21 +102,41 @@ public class AtomicTestingApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Find an atomic testing with status and command lines")
+  @DisplayName(
+      "Find an atomic testing with status, command lines and expectation Results from inject content")
   @WithMockAdminUser
   void findAnAtomicTestingWithStatusAndCommandLines() throws Exception {
+    String url = ATOMIC_TESTINGS_URI + "/" + INJECT_WITH_STATUS_AND_COMMAND_LINES.getId();
+    String expectedInjectId = INJECT_WITH_STATUS_AND_COMMAND_LINES.getId();
+    String expectedExpectationsJson =
+        """
+        [
+          {
+            "type": "HUMAN_RESPONSE",
+            "avgResult": "UNKNOWN",
+            "distribution": []
+          }
+        ]
+        """;
+
     String response =
-        mvc.perform(
-                get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITH_STATUS_AND_COMMAND_LINES.getId())
-                    .accept(MediaType.APPLICATION_JSON))
+        mvc.perform(get(url).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
             .getContentAsString();
-    // -- ASSERT --
-    assertNotNull(response);
+
+    assertNotNull(response, "Response should not be null");
+
+    String actualInjectId = JsonPath.read(response, "$.inject_id");
+    assertEquals(expectedInjectId, actualInjectId);
+
+    Object actualExpectations = JsonPath.read(response, "$.inject_expectation_results");
+    String actualExpectationsJson = mapper.writeValueAsString(actualExpectations);
+
+    // Match Expectation results
     assertEquals(
-        INJECT_WITH_STATUS_AND_COMMAND_LINES.getId(), JsonPath.read(response, "$.inject_id"));
+        mapper.readTree(expectedExpectationsJson), mapper.readTree(actualExpectationsJson));
   }
 
   @Test
@@ -190,6 +213,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Lock Atomic testing EE feature")
   @WithMockAdminUser
   class LockAtomicTestingEEFeature {
+
     @Test
     @DisplayName("Throw license restricted error when launch with crowdstrike")
     void given_crowdstrike_should_not_LaunchAtomicTesting() throws Exception {
@@ -240,9 +264,11 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @DisplayName("Expectation results computation")
   @WithMockAdminUser
   public class ExpectationResultsComputation {
+
     @Nested
     @DisplayName("When target has multiple sets of expectations and must be merged")
     public class WhenTargetHasMultipleSetsOfExpectationsAndMerged {
+
       @Test
       @DisplayName("Merged expectations have superset of results of all expectations of same type")
       public void mergedExpectationsHaveSupersetOfExpectationsAndMerged() throws Exception {

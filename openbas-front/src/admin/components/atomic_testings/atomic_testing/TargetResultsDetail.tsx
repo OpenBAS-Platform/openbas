@@ -23,7 +23,7 @@ import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAu
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { isNotEmptyField } from '../../../../utils/utils';
-import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+import { type ExpectationResultType, ExpectationType, type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import {
   HUMAN_EXPECTATION,
   isManualExpectation,
@@ -158,7 +158,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     type: '',
     key: 'attack-ended',
   }];
-  const sortOrder = ['PREVENTION', 'DETECTION', 'VULNERABILITY', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
     algorithm: 'd3-hierarchy',
@@ -439,11 +438,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
       })));
       const mergedSteps: Steptarget[] = [...computeInitialSteps(initialSteps), ...newSteps];
       // Custom sorting function
-      mergedSteps.sort((a, b) => {
-        const typeAIndex = sortOrder.indexOf(a.type);
-        const typeBIndex = sortOrder.indexOf(b.type);
-        return typeAIndex - typeBIndex;
-      });
+      mergedSteps.sort((a, b) => Object.keys(ExpectationType).indexOf(a.type as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b.type as ExpectationResultType));
       setNodes(mergedSteps.map((step, index) => ({
         id: `result-${index}`,
         type: 'result',
@@ -486,7 +481,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     groupedResults[type].push(result);
   });
   const sortedKeys = Object.keys(groupedResults).sort((a, b) => {
-    return sortOrder.indexOf(a) - sortOrder.indexOf(b);
+    return Object.keys(ExpectationType).indexOf(a as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b as ExpectationResultType);
   });
   const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
   sortedKeys.forEach((key) => {
