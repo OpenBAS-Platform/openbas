@@ -449,6 +449,26 @@ type BaseInjectTargetTargetTypeMapping<Key, Type> = {
   target_type: Key;
 } & Type;
 
+interface BaseInjectorContractBaseOutput {
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
+  /** Injector contract Id */
+  injector_contract_id: string;
+  /**
+   * Timestamp when the injector contract was last updated
+   * @format date-time
+   */
+  injector_contract_updated_at: string;
+}
+
+type BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+  Key,
+  Type,
+> = {
+  injector_contract_has_full_details: Key;
+} & Type;
+
 interface BasePayload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -3030,6 +3050,7 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_created_at: string;
   injector_contract_custom?: boolean;
+  injector_contract_external_id?: string;
   injector_contract_id: string;
   injector_contract_import_available?: boolean;
   injector_contract_injector: string;
@@ -3055,7 +3076,6 @@ export interface InjectorContract {
 }
 
 export interface InjectorContractAddInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
   contract_attack_patterns_ids?: string[];
   contract_content: string;
@@ -3063,36 +3083,32 @@ export interface InjectorContractAddInput {
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   contract_platforms?: string[];
+  external_contract_id?: string;
   injector_id: string;
   is_atomic_testing?: boolean;
 }
 
-export interface InjectorContractInput {
-  atomicTesting?: boolean;
-  contract_attack_patterns_external_ids?: string[];
-  contract_content: string;
-  contract_id: string;
-  contract_labels?: Record<string, string>;
-  contract_manual?: boolean;
-  contract_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
-  is_atomic_testing?: boolean;
-}
+export type InjectorContractBaseOutput = BaseInjectorContractBaseOutput &
+  (
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "false",
+        InjectorContractBaseOutput
+      >
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "true",
+        InjectorContractFullOutput
+      >
+  );
 
-export interface InjectorContractOutput {
+export interface InjectorContractFullOutput {
   injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   /** Attack pattern IDs */
   injector_contract_attack_patterns?: string[];
   /** Content */
   injector_contract_content: string;
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
   /** Injector contract Id */
   injector_contract_id: string;
   /** Injector name */
@@ -3121,6 +3137,47 @@ export interface InjectorContractOutput {
   injector_contract_updated_at: string;
 }
 
+export interface InjectorContractInput {
+  contract_attack_patterns_external_ids?: string[];
+  contract_content: string;
+  contract_id: string;
+  contract_labels?: Record<string, string>;
+  contract_manual?: boolean;
+  contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+  is_atomic_testing?: boolean;
+}
+
+export interface InjectorContractSearchPaginationInput {
+  /** Filter object to search within filterable attributes */
+  filterGroup?: FilterGroup;
+  include_full_details?: boolean;
+  /**
+   * Page number to get
+   * @format int32
+   * @min 0
+   */
+  page: number;
+  /**
+   * Element number by page
+   * @format int32
+   * @max 1000
+   */
+  size: number;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within searchable attributes */
+  textSearch?: string;
+}
+
 /** Injector contract */
 export interface InjectorContractSimple {
   convertedContent?: object;
@@ -3141,7 +3198,6 @@ export interface InjectorContractSimple {
 }
 
 export interface InjectorContractUpdateInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_ids?: string[];
   contract_content: string;
   contract_labels?: Record<string, string>;
@@ -3926,8 +3982,8 @@ export interface PageInjectTestStatusOutput {
   totalPages?: number;
 }
 
-export interface PageInjectorContractOutput {
-  content?: InjectorContractOutput[];
+export interface PageInjectorContractBaseOutput {
+  content?: InjectorContractBaseOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
