@@ -3049,7 +3049,6 @@ export interface InjectorContract {
 }
 
 export interface InjectorContractAddInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
   contract_attack_patterns_ids?: string[];
   contract_content: string;
@@ -3112,7 +3111,6 @@ export interface InjectorContractFullOutput {
 }
 
 export interface InjectorContractInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
   contract_content: string;
   contract_id: string;
@@ -3173,7 +3171,6 @@ export interface InjectorContractSimple {
 }
 
 export interface InjectorContractUpdateInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_ids?: string[];
   contract_content: string;
   contract_labels?: Record<string, string>;
