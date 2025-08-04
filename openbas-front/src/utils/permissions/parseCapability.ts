@@ -9,8 +9,8 @@ export default function parseCapability(cap: string): [Actions, Subjects] | null
   const subject = parts.slice(1).join('_');
 
   // To avoid any mistake : check that the action or subject is one of those declared in the types.ts file
-  if (!ACTIONS.includes(action)) return null;
-  if (!SUBJECTS.includes(subject as Subjects)) return null;
+  if (!Object.values(ACTIONS).includes(action as Actions)) return null;
+  if (!Object.values(SUBJECTS).includes(subject as Subjects)) return null;
 
   return [action, subject as Subjects];
 }

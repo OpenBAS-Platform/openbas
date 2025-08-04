@@ -7,6 +7,7 @@ import Loader from '../../../components/Loader';
 import NotFound from '../../../components/NotFound';
 import { AbilityContext } from '../../../utils/permissions/PermissionsProvider';
 import ProtectedRoute from '../../../utils/permissions/ProtectedRoute';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 
 const IndexChannel = lazy(() => import('./channels/Index'));
 const Channels = lazy(() => import('./channels/Channels'));
@@ -30,7 +31,7 @@ const Index = () => {
     LESSONS_LEARNED: 'lessons',
   };
 
-  const accessibleSubject = order.find(subject => ability.can('ACCESS', subject));
+  const accessibleSubject = order.find(subject => ability.can(ACTIONS.ACCESS, subject));
 
   const navigation = accessibleSubject ? subjectToRoute[accessibleSubject] : '/';
 
@@ -39,12 +40,12 @@ const Index = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="" element={<Navigate to={navigation} replace={true} />} />
-          <Route path="documents" element={<ProtectedRoute action="ACCESS" subject="DOCUMENTS" Component={errorWrapper(Documents)()} />} />
-          <Route path="channels" element={<ProtectedRoute action="ACCESS" subject="CHANNELS" Component={errorWrapper(Channels)()} />} />
-          <Route path="channels/:channelId/*" element={<ProtectedRoute action="ACCESS" subject="CHANNELS" Component={errorWrapper(IndexChannel)()} />} />
-          <Route path="challenges" element={<ProtectedRoute action="ACCESS" subject="CHALLENGES" Component={errorWrapper(Challenges)()} />} />
-          <Route path="lessons" element={<ProtectedRoute action="ACCESS" subject="LESSONS_LEARNED" Component={errorWrapper(Lessons)()} />} />
-          <Route path="lessons/:lessonsTemplateId/*" element={<ProtectedRoute action="ACCESS" subject="LESSONS_LEARNED" Component={errorWrapper(LessonIndex)()} />} />
+          <Route path="documents" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.DOCUMENTS} Component={errorWrapper(Documents)()} />} />
+          <Route path="channels" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHANNELS} Component={errorWrapper(Channels)()} />} />
+          <Route path="channels/:channelId/*" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHANNELS} Component={errorWrapper(IndexChannel)()} />} />
+          <Route path="challenges" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHALLENGES} Component={errorWrapper(Challenges)()} />} />
+          <Route path="lessons" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.LESSONS_LEARNED} Component={errorWrapper(Lessons)()} />} />
+          <Route path="lessons/:lessonsTemplateId/*" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.LESSONS_LEARNED} Component={errorWrapper(LessonIndex)()} />} />
           {/* Not found */}
           <Route path="*" element={<NotFound />} />
         </Routes>

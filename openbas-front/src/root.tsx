@@ -22,6 +22,7 @@ import { useAppDispatch } from './utils/hooks';
 import { UserContext } from './utils/hooks/useAuth';
 import { PermissionsProvider } from './utils/permissions/PermissionsProvider';
 import ProtectedRoute from './utils/permissions/ProtectedRoute';
+import { ACTIONS, SUBJECTS } from './utils/permissions/types';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
@@ -93,9 +94,9 @@ const Root = () => {
                     <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
                     <Route
                       path="channels/:exerciseId/:channelId"
-                      element={<ProtectedRoute action="ACCESS" subject="CHANNELS" Component={errorWrapper(Channel)()} />}
+                      element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHANNELS} Component={errorWrapper(Channel)()} />}
                     />
-                    <Route path="challenges/:exerciseId" element={<ProtectedRoute action="ACCESS" subject="CHALLENGES" Component={errorWrapper(Challenges)()} />} />
+                    <Route path="challenges/:exerciseId" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHALLENGES} Component={errorWrapper(Challenges)()} />} />
                     <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                     <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                     <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />
