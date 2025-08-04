@@ -7,14 +7,13 @@ import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.ee.Ee;
 import io.openbas.executors.ExecutorContextService;
+import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -64,9 +63,37 @@ public class TaniumExecutorContextService extends ExecutorContextService {
           default -> throw new RuntimeException("Unsupported platform: " + platform);
         };
 
+    String implantLocation =
+        switch (platform) {
+          case Windows ->
+              "$location="
+                  + ExecutorHelper.IMPLANT_LOCATION_WINDOWS
+                  + ExecutorHelper.IMPLANT_BASE_NAME
+                  + UUID.randomUUID()
+                  + "\";md $location -ea 0;[Environment]::CurrentDirectory";
+          case Linux, MacOS ->
+              "location="
+                  + ExecutorHelper.IMPLANT_LOCATION_UNIX
+                  + ExecutorHelper.IMPLANT_BASE_NAME
+                  + UUID.randomUUID()
+                  + ";mkdir -p $location;filename=";
+          default -> throw new RuntimeException("Unsupported platform: " + platform);
+        };
+
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
     command = replaceArgs(platform, command, inject.getId(), agent.getId());
+    command =
+        switch (platform) {
+          case Windows ->
+              command.replaceFirst(
+                  "\\$?x=.+location=.+;\\[Environment]::CurrentDirectory",
+                  Matcher.quoteReplacement(implantLocation));
+          case Linux, MacOS ->
+              command.replaceFirst(
+                  "\\$?x=.+location=.+;filename=", Matcher.quoteReplacement(implantLocation));
+          default -> throw new RuntimeException("Unsupported platform: " + platform);
+        };
 
     this.taniumExecutorClient.executeAction(
         agent.getExternalReference(),
