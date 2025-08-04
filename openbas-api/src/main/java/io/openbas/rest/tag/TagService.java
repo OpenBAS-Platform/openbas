@@ -1,6 +1,6 @@
 package io.openbas.rest.tag;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 import io.openbas.database.model.Tag;
@@ -10,6 +10,7 @@ import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.rest.tag.form.TagUpdateInput;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,8 @@ public class TagService {
 
   // -- CRUD --
 
-  public List<Tag> tags(@NotNull final List<String> tagIds) {
-    return fromIterable(this.tagRepository.findAllById(tagIds));
+  public Set<Tag> tagSet(@NotNull final List<String> tagIds) {
+    return iterableToSet(this.tagRepository.findAllById(tagIds));
   }
 
   public Tag upsertTag(TagCreateInput input) {

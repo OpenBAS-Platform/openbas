@@ -1,16 +1,21 @@
 package io.openbas.database.model;
 
+import java.util.function.Supplier;
+import lombok.Getter;
+
 public enum PayloadType {
-  COMMAND("Command"),
-  EXECUTABLE("Executable"),
-  FILE_DROP("FileDrop"),
-  DNS_RESOLUTION("DnsResolution"),
-  NETWORK_TRAFFIC("NetworkTraffic");
+  COMMAND("Command", Command::new),
+  EXECUTABLE("Executable", Executable::new),
+  FILE_DROP("FileDrop", FileDrop::new),
+  DNS_RESOLUTION("DnsResolution", DnsResolution::new),
+  NETWORK_TRAFFIC("NetworkTraffic", NetworkTraffic::new);
 
   public final String key;
+  @Getter public final Supplier<Payload> payloadSupplier;
 
-  PayloadType(String key) {
+  PayloadType(String key, Supplier<Payload> payloadSupplier) {
     this.key = key;
+    this.payloadSupplier = payloadSupplier;
   }
 
   public static PayloadType fromString(String key) {

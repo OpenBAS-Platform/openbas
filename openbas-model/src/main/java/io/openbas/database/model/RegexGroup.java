@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -26,7 +28,7 @@ public class RegexGroup implements Base {
   private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "regex_group_contract_output_element_id")
+  @JoinColumn(name = "regex_group_contract_output_element_id", nullable = false)
   @JsonIgnore
   private ContractOutputElement contractOutputElement;
 
@@ -40,11 +42,15 @@ public class RegexGroup implements Base {
   @NotBlank
   private String indexValues;
 
+  // -- AUDIT --
+
+  @CreationTimestamp
   @Column(name = "regex_group_created_at")
   @JsonProperty("regex_group_created_at")
   @NotNull
   private Instant createdAt = now();
 
+  @UpdateTimestamp
   @Column(name = "regex_group_updated_at")
   @JsonProperty("regex_group_updated_at")
   @NotNull

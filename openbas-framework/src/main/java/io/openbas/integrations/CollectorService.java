@@ -8,6 +8,7 @@ import io.openbas.database.repository.CollectorRepository;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,5 +60,13 @@ public class CollectorService {
       newCollector.setType(type);
       collectorRepository.save(newCollector);
     }
+  }
+
+  // -- CRUD --
+
+  public Collector collector(@NotBlank final String collectorId) {
+    return collectorRepository
+        .findById(collectorId)
+        .orElseThrow(() -> new RuntimeException("Collector not found"));
   }
 }

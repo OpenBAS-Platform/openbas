@@ -1,50 +1,58 @@
-package io.openbas.rest.payload.output.output_parser;
+package io.openbas.rest.payload.contract_output_element;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
+import io.openbas.rest.payload.regex_group.RegexGroupInput;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-@Schema(description = "Represents the rules for parsing the output of an execution.")
-public class ContractOutputElementSimple {
+public class ContractOutputElementInput {
 
   @JsonProperty("contract_output_element_id")
-  @NotBlank
   private String id;
 
+  @JsonProperty("contract_output_element_is_finding")
+  @Schema(
+      description =
+          "Indicates whether this contract output element can be used to generate a finding")
+  @NotNull
+  private boolean isFinding;
+
   @JsonProperty("contract_output_element_rule")
-  @Schema(description = "The rule to apply for parsing the output, for example, can be a regex.")
+  @Schema(description = "Parser Rule")
   @NotBlank
   private String rule;
 
   @JsonProperty("contract_output_element_name")
-  @Schema(description = "Represents the name of the rule.")
+  @Schema(description = "Name")
   @NotBlank
   private String name;
 
   @JsonProperty("contract_output_element_key")
-  @Schema(description = "Represents a unique key identifier.")
+  @Schema(description = "Key")
   @NotBlank
   private String key;
 
   @JsonProperty("contract_output_element_type")
   @Schema(
-      description = "Represents the data type being extracted.",
-      example = "text, number, port, portscan, ipv4, ipv6, credentials")
+      description =
+          "Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials")
   @NotNull
   private ContractOutputType type;
 
   @JsonProperty("contract_output_element_tags")
-  private List<String> tagIds;
+  @Schema(description = "List of tags")
+  private List<String> tagIds = new ArrayList<>();
 
   @JsonProperty("contract_output_element_regex_groups")
+  @Schema(description = "Set of regex groups")
   @NotNull
-  private Set<RegexGroupSimple> regexGroups;
+  private Set<RegexGroupInput> regexGroups = new HashSet<>();
 }
