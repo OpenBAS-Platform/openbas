@@ -76,13 +76,4 @@ public class Grant implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
-
-  public String getResourceId() {
-    if (scenario != null) {
-      return scenario.getId();
-    } else if (exercise != null) {
-      return exercise.getId();
-    }
-    return null;
-  }
 }

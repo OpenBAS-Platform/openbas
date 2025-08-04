@@ -327,11 +327,18 @@ public class User implements Base {
         .collect(Collectors.toSet());
   }
 
+  // TODO: when adding grant on atomic testing refactor this logic
   @JsonProperty("user_grants")
   public Map<String, String> getGrants() {
     return getGroups().stream()
         .flatMap(group -> group.getGrants().stream())
-        .collect(Collectors.toMap(Grant::getResourceId, grant -> grant.getName().name()));
+        .collect(
+            Collectors.toMap(
+                grant ->
+                    grant.getScenario() != null
+                        ? grant.getScenario().getId()
+                        : grant.getExercise() != null ? grant.getExercise().getId() : null,
+                grant -> grant.getName().name()));
   }
 
   @Override
