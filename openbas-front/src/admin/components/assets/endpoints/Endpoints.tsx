@@ -1,6 +1,5 @@
 import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import {
-  Alert,
   List,
   ListItem,
   ListItemButton,
@@ -32,7 +31,6 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
-import useAuth from '../../../../utils/hooks/useAuth';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
 import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
 import EndpointCreation from './EndpointCreation';
@@ -67,7 +65,6 @@ const Endpoints = () => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
-  const { settings } = useAuth();
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -158,19 +155,6 @@ const Endpoints = () => {
           current: true,
         }]}
       />
-      <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('To register new endpoints, you will need to install an agent. You can find detailed instructions on the ')}
-        <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
-          {t('agent installation page')}
-        </a>
-        &nbsp;
-        {t('and in our')}
-        &nbsp;
-        <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">
-          {t('documentation')}
-        </a>
-        .
-      </Alert>
       <PaginationComponentV2
         fetch={searchEndpointsToLoad}
         searchPaginationInput={searchPaginationInput}
