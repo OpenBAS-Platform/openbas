@@ -82,8 +82,7 @@ public class Grant implements Base {
       return scenario.getId();
     } else if (exercise != null) {
       return exercise.getId();
-    } else {
-      throw new IllegalStateException("Grant must be linked to a resource");
     }
+    return null;
   }
 }
