@@ -916,10 +916,10 @@ public class ScenarioService {
 
         securityAssessment.setScheduling(obj.path("scheduling").asText());
 
-        if (obj.hasNonNull("execution_start")) {
+        if (obj.hasNonNull("period_start")) {
           securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
         }
-        if (obj.hasNonNull("execution_end")) {
+        if (obj.hasNonNull("period_end")) {
           securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
         }
 
