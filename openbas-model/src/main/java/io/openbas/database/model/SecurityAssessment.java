@@ -67,11 +67,6 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_scenario")
   private Scenario scenario;
 
-  @OneToOne
-  @JoinColumn(name = "security_assessment_exercise")
-  @JsonProperty("security_assessment_exercise")
-  private Exercise exercise;
-
   @CreationTimestamp
   @Column(name = "security_assessment_created_at", updatable = false)
   private Instant createdAt;

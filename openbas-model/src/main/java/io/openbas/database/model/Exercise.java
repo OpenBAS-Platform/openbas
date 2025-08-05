@@ -164,8 +164,10 @@ public class Exercise implements Base {
   private Scenario scenario;
 
   // STIX
-  @OneToOne(mappedBy = "exercise")
-  @JsonProperty("scenario_security_assessment")
+  @Getter
+  @ManyToOne
+  @JoinColumn(name = "exercise_security_assessment")
+  @JsonProperty("exercise_security_assessment")
   private SecurityAssessment securityAssessment;
 
   // -- AUDIT --
