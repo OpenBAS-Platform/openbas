@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
@@ -64,7 +63,6 @@ public class SecurityAssessment implements Base {
 
   @OneToOne
   @JoinColumn(name = "security_assessment_scenario")
-  @JsonProperty("security_assessment_scenario")
   private Scenario scenario;
 
   @CreationTimestamp
