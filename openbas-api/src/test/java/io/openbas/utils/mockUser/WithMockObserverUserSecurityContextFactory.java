@@ -9,6 +9,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.database.repository.GroupRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.GroupSpecification;
 import jakarta.annotation.PostConstruct;
@@ -30,6 +31,7 @@ public class WithMockObserverUserSecurityContextFactory
   @Autowired private GrantRepository grantRepository;
   @Autowired private GroupRepository groupRepository;
   @Autowired private UserRepository userRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   @Override
   public SecurityContext createSecurityContext(WithMockObserverUser customUser) {
@@ -69,6 +71,8 @@ public class WithMockObserverUserSecurityContextFactory
       // Create grant
       Scenario scenario = new Scenario();
       scenario.setId("id");
+      scenario.setName("scenario");
+      scenarioRepository.save(scenario);
       Grant grant = new Grant();
       grant.setName(OBSERVER);
       grant.setGroup(group);
