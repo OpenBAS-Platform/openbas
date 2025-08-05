@@ -85,7 +85,7 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   const initialValues = fullCve
     ? R.pick([
         'cve_external_id',
-        'cve_cvss',
+        'cve_cvss_v31',
         'cve_description',
         'cve_source_identifier',
         'cve_published',

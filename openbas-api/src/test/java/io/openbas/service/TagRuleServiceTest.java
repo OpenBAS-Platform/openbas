@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.TagRule;
@@ -25,7 +26,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class TagRuleServiceTest {
+public class TagRuleServiceTest extends IntegrationTest {
   private static final String TAG_RULE_ID = "tagruleid";
   private static final String TAG_RULE_ID_2 = "tagruleid2";
 

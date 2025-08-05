@@ -4,6 +4,7 @@ import static io.openbas.database.model.Token.ADMIN_TOKEN_UUID;
 import static io.openbas.database.model.User.ADMIN_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Token;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.TokenRepository;
@@ -17,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class InitAdminCommandLineRunnerTest {
+public class InitAdminCommandLineRunnerTest extends IntegrationTest {
 
   @Autowired private UserRepository userRepository;
 

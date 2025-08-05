@@ -449,6 +449,26 @@ type BaseInjectTargetTargetTypeMapping<Key, Type> = {
   target_type: Key;
 } & Type;
 
+interface BaseInjectorContractBaseOutput {
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
+  /** Injector contract Id */
+  injector_contract_id: string;
+  /**
+   * Timestamp when the injector contract was last updated
+   * @format date-time
+   */
+  injector_contract_updated_at: string;
+}
+
+type BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+  Key,
+  Type,
+> = {
+  injector_contract_has_full_details: Key;
+} & Type;
+
 interface BasePayload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -565,6 +585,16 @@ interface BaseWidgetConfiguration {
 type BaseWidgetConfigurationWidgetConfigurationTypeMapping<Key, Type> = {
   widget_configuration_type: Key;
 } & Type;
+
+export interface CVEBulkInsertInput {
+  cves: CveCreateInput[];
+  initial_dataset_completed?: boolean;
+  /** @format int32 */
+  last_index?: number;
+  /** @format date-time */
+  last_modified_date_fetched?: string;
+  source_identifier: string;
+}
 
 export interface Challenge {
   challenge_category?: string;
@@ -717,6 +747,7 @@ export interface Collector {
   /** @format int32 */
   collector_period?: number;
   collector_security_platform?: SecurityPlatform;
+  collector_state?: object;
   collector_type: string;
   /** @format date-time */
   collector_updated_at: string;
@@ -1024,6 +1055,15 @@ export interface CustomDashboardParametersInput {
 /** Payload to create a CVE */
 export interface CveCreateInput {
   /**
+   * CVSS score
+   * @min 0
+   * @exclusiveMin false
+   * @max 10
+   * @exclusiveMax false
+   * @example 7.5
+   */
+  cve_cvss_v31: number;
+  /**
    * Date when action is due by CISA
    * @format date-time
    */
@@ -1037,15 +1077,6 @@ export interface CveCreateInput {
   cve_cisa_required_action?: string;
   /** Vulnerability name used by CISA */
   cve_cisa_vulnerability_name?: string;
-  /**
-   * CVSS score
-   * @min 0
-   * @exclusiveMin false
-   * @max 10
-   * @exclusiveMax false
-   * @example 7.5
-   */
-  cve_cvss: number;
   /** List of linked CWEs */
   cve_cwes?: CweInput[];
   /** Description of the CVE */
@@ -1079,6 +1110,11 @@ export interface CveCreateInput {
 /** Full CVE output including references and CWEs */
 export interface CveOutput {
   /**
+   * CVSS score
+   * @example 7.8
+   */
+  cve_cvss_v31: number;
+  /**
    * CISA required action due date
    * @format date-time
    */
@@ -1092,11 +1128,6 @@ export interface CveOutput {
   cve_cisa_required_action?: string;
   /** Name used by CISA for the vulnerability */
   cve_cisa_vulnerability_name?: string;
-  /**
-   * CVSS score
-   * @example 7.8
-   */
-  cve_cvss: number;
   /** List of CWE outputs */
   cve_cwes?: CweOutput[];
   /** Detailed CVE description */
@@ -1129,7 +1160,7 @@ export interface CveSimple {
    * CVSS score
    * @example 7.8
    */
-  cve_cvss: number;
+  cve_cvss_v31: number;
   /**
    * External CVE identifier
    * @example "CVE-2024-0001"
@@ -3019,6 +3050,7 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_created_at: string;
   injector_contract_custom?: boolean;
+  injector_contract_external_id?: string;
   injector_contract_id: string;
   injector_contract_import_available?: boolean;
   injector_contract_injector: string;
@@ -3044,7 +3076,6 @@ export interface InjectorContract {
 }
 
 export interface InjectorContractAddInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_external_ids?: string[];
   contract_attack_patterns_ids?: string[];
   contract_content: string;
@@ -3052,36 +3083,32 @@ export interface InjectorContractAddInput {
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   contract_platforms?: string[];
+  external_contract_id?: string;
   injector_id: string;
   is_atomic_testing?: boolean;
 }
 
-export interface InjectorContractInput {
-  atomicTesting?: boolean;
-  contract_attack_patterns_external_ids?: string[];
-  contract_content: string;
-  contract_id: string;
-  contract_labels?: Record<string, string>;
-  contract_manual?: boolean;
-  contract_platforms?: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
-  is_atomic_testing?: boolean;
-}
+export type InjectorContractBaseOutput = BaseInjectorContractBaseOutput &
+  (
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "false",
+        InjectorContractBaseOutput
+      >
+    | BaseInjectorContractBaseOutputInjectorContractHasFullDetailsMapping<
+        "true",
+        InjectorContractFullOutput
+      >
+  );
 
-export interface InjectorContractOutput {
+export interface InjectorContractFullOutput {
   injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   /** Attack pattern IDs */
   injector_contract_attack_patterns?: string[];
   /** Content */
   injector_contract_content: string;
+  /** Injector contract external Id */
+  injector_contract_external_id?: string;
+  injector_contract_has_full_details?: boolean;
   /** Injector contract Id */
   injector_contract_id: string;
   /** Injector name */
@@ -3110,6 +3137,47 @@ export interface InjectorContractOutput {
   injector_contract_updated_at: string;
 }
 
+export interface InjectorContractInput {
+  contract_attack_patterns_external_ids?: string[];
+  contract_content: string;
+  contract_id: string;
+  contract_labels?: Record<string, string>;
+  contract_manual?: boolean;
+  contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+  is_atomic_testing?: boolean;
+}
+
+export interface InjectorContractSearchPaginationInput {
+  /** Filter object to search within filterable attributes */
+  filterGroup?: FilterGroup;
+  include_full_details?: boolean;
+  /**
+   * Page number to get
+   * @format int32
+   * @min 0
+   */
+  page: number;
+  /**
+   * Element number by page
+   * @format int32
+   * @max 1000
+   */
+  size: number;
+  /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
+  sorts?: SortField[];
+  /** Text to search within searchable attributes */
+  textSearch?: string;
+}
+
 /** Injector contract */
 export interface InjectorContractSimple {
   convertedContent?: object;
@@ -3130,7 +3198,6 @@ export interface InjectorContractSimple {
 }
 
 export interface InjectorContractUpdateInput {
-  atomicTesting?: boolean;
   contract_attack_patterns_ids?: string[];
   contract_content: string;
   contract_labels?: Record<string, string>;
@@ -3915,8 +3982,8 @@ export interface PageInjectTestStatusOutput {
   totalPages?: number;
 }
 
-export interface PageInjectorContractOutput {
-  content?: InjectorContractOutput[];
+export interface PageInjectorContractBaseOutput {
+  content?: InjectorContractBaseOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

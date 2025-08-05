@@ -64,8 +64,8 @@ const FindingDetail = ({
     fetchCveByExternalId(selectedFinding.finding_value)
       .then((res) => {
         setCve(res.data);
-        if (res.data?.cve_cvss && onCvssScore) {
-          onCvssScore(res.data.cve_cvss);
+        if (res.data?.cve_cvss_v31 && onCvssScore) {
+          onCvssScore(res.data.cve_cvss_v31);
         }
 
         setCveStatus(res.data ? 'loaded' : 'notAvailable');

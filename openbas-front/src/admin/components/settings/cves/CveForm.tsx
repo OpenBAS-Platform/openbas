@@ -26,7 +26,7 @@ const CveForm = ({
   editing,
   initialValues = {
     cve_external_id: '',
-    cve_cvss: undefined,
+    cve_cvss_v31: undefined,
     cve_description: '',
     cve_source_identifier: '',
     cve_published: '',
@@ -70,7 +70,7 @@ const CveForm = ({
 
   const schema = zodImplement<CveCreateInput>().with({
     cve_external_id: z.string().min(1, { message: t('Should not be empty') }),
-    cve_cvss: z.coerce.number().min(0).max(10),
+    cve_cvss_v31: z.coerce.number().min(0).max(10),
     cve_description: z.string().optional(),
     cve_source_identifier: z.string().optional(),
     cve_published: z.string().optional(),
