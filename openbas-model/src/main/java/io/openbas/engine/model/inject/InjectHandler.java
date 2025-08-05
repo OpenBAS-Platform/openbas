@@ -80,6 +80,10 @@ public class InjectHandler implements Handler<EsInject> {
                 dependencies.add(inject.getInject_injector_contract());
                 esInject.setBase_inject_contract_side(inject.getInject_injector_contract());
               }
+              if (!isEmpty(inject.getInject_tags())) {
+                dependencies.addAll(inject.getInject_tags());
+                esInject.setBase_tags_side(inject.getInject_tags());
+              }
               esInject.setBase_dependencies(dependencies);
               return esInject;
             })

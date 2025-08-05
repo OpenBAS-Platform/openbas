@@ -79,6 +79,7 @@ const useRetrieveOptions = () => {
       case 'team_tags':
       case 'finding_tags':
       case 'user_tags':
+      case 'base_tags_side':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });

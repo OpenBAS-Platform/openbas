@@ -1,11 +1,14 @@
 package io.openbas.engine.model.simulation;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import io.openbas.database.raw.RawSimulation;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.engine.Handler;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,13 @@ public class SimulationHandler implements Handler<EsSimulation> {
               esSimulation.setBase_representative(simulation.getExercise_name());
               esSimulation.setBase_restrictions(buildRestrictions(simulation.getExercise_id()));
               // Specific
+              // Dependencies
+              List<String> dependencies = new ArrayList<>();
+              if (!isEmpty(simulation.getExercise_tags())) {
+                dependencies.addAll(simulation.getExercise_tags());
+                esSimulation.setBase_tags_side(new HashSet<>(simulation.getExercise_tags()));
+              }
+              esSimulation.setBase_dependencies(dependencies);
               return esSimulation;
             })
         .toList();

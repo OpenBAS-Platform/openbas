@@ -1,0 +1,24 @@
+package io.openbas.migration;
+
+import java.sql.Statement;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
+
+@Component
+public class V4_14__Force_es_reindex_injects extends BaseJavaMigration {
+
+  @Override
+  public void migrate(Context context) throws Exception {
+    try (Statement statement = context.getConnection().createStatement()) {
+      // re-index injects in ES
+      statement.executeUpdate("DELETE FROM indexing_status WHERE indexing_status_type = 'inject';");
+      // re-index simulations in ES
+      statement.executeUpdate(
+          "DELETE FROM indexing_status WHERE indexing_status_type = 'simulation';");
+      // re-index scenarios in ES
+      statement.executeUpdate(
+          "DELETE FROM indexing_status WHERE indexing_status_type = 'scenario';");
+    }
+  }
+}

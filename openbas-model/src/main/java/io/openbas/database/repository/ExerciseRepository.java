@@ -353,9 +353,12 @@ public interface ExerciseRepository
 
   @Query(
       value =
-          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at "
+          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, "
+              + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
               + "FROM exercises ex "
-              + "WHERE ex.exercise_updated_at > :from ORDER BY ex.exercise_updated_at LIMIT "
+              + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+              + "WHERE ex.exercise_updated_at > :from "
+              + "GROUP BY ex.exercise_id ORDER BY ex.exercise_updated_at ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)
