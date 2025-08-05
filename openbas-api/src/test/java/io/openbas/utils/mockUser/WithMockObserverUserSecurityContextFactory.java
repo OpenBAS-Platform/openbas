@@ -5,14 +5,12 @@ import static io.openbas.service.UserService.buildAuthenticationToken;
 
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
-import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.database.repository.GroupRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.GroupSpecification;
-import io.openbas.utils.fixtures.ScenarioFixture;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
