@@ -880,7 +880,7 @@ public class ScenarioService {
       throws IOException {
     Scenario scenario = scenario(scenarioId);
 
-    if(file == null || file.isEmpty()){
+    if (file == null || file.isEmpty()) {
       return scenario;
     }
 
