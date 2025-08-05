@@ -34,6 +34,27 @@ export interface Agent {
   agent_updated_at: string;
   agent_version?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** List of primary agents */
@@ -183,6 +204,27 @@ export interface Article {
   /** @format date-time */
   article_virtual_publication?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ArticleCreateInput {
@@ -223,6 +265,27 @@ export interface AssetAgentJob {
   asset_agent_id: string;
   asset_agent_inject?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface AssetGroup {
@@ -240,6 +303,27 @@ export interface AssetGroup {
   /** @format date-time */
   asset_group_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface AssetGroupInput {
@@ -360,6 +444,27 @@ export interface AttackPattern {
   /** @format date-time */
   attack_pattern_updated_at?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface AttackPatternCreateInput {
@@ -495,6 +600,27 @@ interface BasePayload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -587,6 +713,27 @@ export interface Challenge {
   /** @format date-time */
   challenge_virtual_publication?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ChallengeFlag {
@@ -599,6 +746,27 @@ export interface ChallengeFlag {
   flag_updated_at?: string;
   flag_value?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ChallengeInformation {
@@ -654,6 +822,27 @@ export interface Channel {
   channel_updated_at: string;
   listened?: boolean;
   logos?: Document[];
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ChannelCreateInput {
@@ -721,6 +910,27 @@ export interface Collector {
   /** @format date-time */
   collector_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface CollectorCreateInput {
@@ -752,6 +962,27 @@ export interface Comcheck {
   /** @format int64 */
   comcheck_users_number?: number;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ComcheckInput {
@@ -775,6 +1006,27 @@ export interface ComcheckStatus {
   comcheckstatus_state?: "RUNNING" | "SUCCESS" | "FAILURE";
   comcheckstatus_user?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface Command {
@@ -824,6 +1076,27 @@ export interface Command {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -852,6 +1125,27 @@ export interface Communication {
   communication_to: string;
   communication_users?: string[];
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface Condition {
@@ -883,6 +1177,27 @@ export interface ContractOutputElement {
   /** @format date-time */
   contract_output_element_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** List of Contract output elements */
@@ -995,6 +1310,27 @@ export interface CustomDashboard {
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface CustomDashboardInput {
@@ -1013,6 +1349,27 @@ export interface CustomDashboardParameters {
   custom_dashboards_parameter_name: string;
   custom_dashboards_parameter_type: "simulation";
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface CustomDashboardParametersInput {
@@ -1240,6 +1597,27 @@ export interface DetectionRemediation {
   detection_remediation_updated_at?: string;
   detection_remediation_values: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** List of detection remediation gaps for collectors */
@@ -1316,6 +1694,27 @@ export interface DnsResolution {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -1334,6 +1733,27 @@ export interface Document {
   document_target?: string;
   document_type: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface DocumentCreateInput {
@@ -1404,6 +1824,27 @@ export interface Endpoint {
     | "Unknown";
   endpoint_seen_ip?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface EndpointInput {
@@ -1514,11 +1955,9 @@ export interface EndpointOverviewOutput {
 
 export interface EndpointRegisterInput {
   agent_executed_by_user?: string;
-  agent_installation_directory?: string;
   agent_installation_mode?: string;
   agent_is_elevated?: boolean;
   agent_is_service?: boolean;
-  agent_service_name?: string;
   asset_description?: string;
   asset_external_reference: string;
   asset_name: string;
@@ -1847,6 +2286,27 @@ export interface Evaluation {
   evaluation_updated_at: string;
   evaluation_user: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface EvaluationInput {
@@ -1900,6 +2360,27 @@ export interface Executable {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -1941,6 +2422,27 @@ export interface ExecutionTrace {
   injectStatus?: string;
   injectTestStatus?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** Represents a single execution trace detail */
@@ -1992,6 +2494,27 @@ export interface Executor {
   /** @format date-time */
   executor_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ExecutorCreateInput {
@@ -2088,6 +2611,27 @@ export interface Exercise {
   exercise_users_number?: number;
   exercise_variables?: string[];
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ExerciseSimple {
@@ -2242,6 +2786,27 @@ export interface FileDrop {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -2305,6 +2870,27 @@ export interface Finding {
   finding_users?: string[];
   finding_value: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface FindingInput {
@@ -2370,7 +2956,27 @@ export interface Grant {
   grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
-  resourceId?: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface Group {
@@ -2389,6 +2995,27 @@ export interface Group {
   group_roles?: string[];
   group_users?: string[];
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface GroupCreateInput {
@@ -2439,6 +3066,27 @@ export interface ImportMapper {
   /** @format date-time */
   import_mapper_updated_at?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ImportMapperAddInput {
@@ -2531,6 +3179,27 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** Input model for automatically generating injects, based on the provided attack pattern IDs and target asset or asset group IDs. */
@@ -2667,6 +3336,27 @@ export interface InjectExpectation {
   /** @format int64 */
   inject_expiration_time: number;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   target_id?: string;
 }
 
@@ -2720,6 +3410,27 @@ export interface InjectExpectationTrace {
   /** @format date-time */
   inject_expectation_trace_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface InjectExpectationTraceBulkInsertInput {
@@ -2778,6 +3489,27 @@ export interface InjectImporter {
   /** @format date-time */
   inject_importer_updated_at?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface InjectImporterAddInput {
@@ -2910,6 +3642,27 @@ export interface InjectSimple {
 
 export interface InjectStatus {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   status_id?: string;
   status_name:
     | "SUCCESS"
@@ -2999,6 +3752,27 @@ export interface Injector {
   /** @format date-time */
   injector_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface InjectorConnection {
@@ -3042,6 +3816,27 @@ export interface InjectorContract {
   /** @format date-time */
   injector_contract_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface InjectorContractAddInput {
@@ -3204,6 +3999,27 @@ export interface KillChainPhase {
   phase_stix_id?: string;
   /** @format date-time */
   phase_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface KillChainPhaseCreateInput {
@@ -3255,6 +4071,27 @@ export interface LessonsAnswer {
   lessons_answer_user?: string;
   lessonsanswer_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsAnswerCreateInput {
@@ -3280,6 +4117,27 @@ export interface LessonsCategory {
   lessons_category_users?: string[];
   lessonscategory_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsCategoryCreateInput {
@@ -3319,6 +4177,27 @@ export interface LessonsQuestion {
   lessons_question_updated_at: string;
   lessonsquestion_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsQuestionCreateInput {
@@ -3349,6 +4228,27 @@ export interface LessonsTemplate {
   lessons_template_updated_at: string;
   lessonstemplate_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsTemplateCategory {
@@ -3364,6 +4264,27 @@ export interface LessonsTemplateCategory {
   lessons_template_category_updated_at: string;
   lessonstemplatecategory_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsTemplateCategoryInput {
@@ -3390,6 +4311,27 @@ export interface LessonsTemplateQuestion {
   lessons_template_question_updated_at: string;
   lessonstemplatequestion_id: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LessonsTemplateQuestionInput {
@@ -3455,6 +4397,27 @@ export interface Log {
   /** @format date-time */
   log_updated_at: string;
   log_user?: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface LogCreateInput {
@@ -3484,6 +4447,27 @@ export interface Mitigation {
   mitigation_threat_hunting_techniques?: string;
   /** @format date-time */
   mitigation_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface MitigationCreateInput {
@@ -3559,6 +4543,27 @@ export interface NetworkTraffic {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   typeEnum?:
     | "COMMAND"
     | "EXECUTABLE"
@@ -3605,6 +4610,27 @@ export interface Objective {
   objective_title?: string;
   /** @format date-time */
   objective_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ObjectiveInput {
@@ -3632,6 +4658,27 @@ export interface Organization {
   organization_tags?: string[];
   /** @format date-time */
   organization_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface OrganizationCreateInput {
@@ -3661,6 +4708,27 @@ export interface OutputParser {
   output_parser_type: "REGEX";
   /** @format date-time */
   output_parser_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** Set of output parsers */
@@ -4755,6 +5823,27 @@ export interface RegexGroup {
   regex_group_index_values: string;
   /** @format date-time */
   regex_group_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 /** Set of regex groups */
@@ -4834,6 +5923,27 @@ export interface Report {
   report_name: string;
   /** @format date-time */
   report_updated_at: string;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ReportInformation {
@@ -4848,6 +5958,27 @@ export interface ReportInformation {
     | "GLOBAL_OBSERVATION"
     | "PLAYER_SURVEYS"
     | "EXERCISE_DETAILS";
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
 }
 
 export interface ReportInformationInput {
@@ -4944,6 +6075,27 @@ export interface RoleOutput {
 
 export interface RuleAttribute {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   rule_attribute_additional_config?: Record<string, string>;
   rule_attribute_columns?: string;
   /** @format date-time */
@@ -4972,6 +6124,27 @@ export interface RuleAttributeUpdateInput {
 
 export interface Scenario {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   /** @format int64 */
   scenario_all_users_number?: number;
   scenario_articles?: string[];
@@ -5126,6 +6299,27 @@ export interface SecurityPlatform {
   /** @format date-time */
   asset_updated_at: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   security_platform_logo_dark?: string;
   security_platform_logo_light?: string;
   security_platform_traces?: InjectExpectationTrace[];
@@ -5336,6 +6530,27 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
 
 export interface Tag {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   /** Color of the tag */
   tag_color?: string;
   /** ID of the tag */
@@ -5388,6 +6603,27 @@ export interface TargetSimple {
 
 export interface Team {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   /** List of communications of this team */
   team_communications?: Communication[];
   /** True if the team is contextual (exists only in the scenario/simulation it is linked to) */
@@ -5591,6 +6827,27 @@ export interface ThemeInput {
 
 export interface Token {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   /** @format date-time */
   token_created_at: string;
   token_id: string;
@@ -5697,6 +6954,27 @@ export interface User {
   /** Secondary phone number of the user */
   user_phone2?: string;
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   team_exercises_users?: string[];
   /** True if the user is admin */
   user_admin?: boolean;
@@ -5753,7 +7031,6 @@ export interface User {
   user_email: string;
   /** First name of the user */
   user_firstname?: string;
-  user_grants?: Record<string, string>;
   /** Gravatar of the user */
   user_gravatar?: string;
   user_groups?: string[];
@@ -5848,6 +7125,27 @@ export interface ValidationErrorBag {
 
 export interface Variable {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   /** @format date-time */
   variable_created_at: string;
   variable_description?: string;
@@ -5880,6 +7178,27 @@ export interface ViolationErrorBag {
 
 export interface Widget {
   listened?: boolean;
+  resourceType?:
+    | "ASSET"
+    | "AGENT"
+    | "SCENARIO"
+    | "SIMULATION"
+    | "PLAYER"
+    | "USER"
+    | "TEAM"
+    | "ATOMIC_TESTING"
+    | "NOTIFICATION_RULE"
+    | "PAYLOAD"
+    | "RESOURCE_TYPE"
+    | "SECURITY_PLATFORM"
+    | "DOCUMENT"
+    | "CHANNEL"
+    | "FINDING"
+    | "DASHBOARD"
+    | "PLATFORM_SETTING"
+    | "LESSON_LEARNED"
+    | "CHALLENGE"
+    | "UNKNOWN";
   widget_config:
     | DateHistogramWidget
     | FlatConfiguration
