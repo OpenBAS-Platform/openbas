@@ -327,7 +327,6 @@ public class User implements Base {
         .collect(Collectors.toSet());
   }
 
-  @Transient
   @JsonProperty("user_grants")
   public Map<String, String> getGrants() {
     return getGroups().stream()
