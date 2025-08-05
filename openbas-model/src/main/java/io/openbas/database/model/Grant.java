@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
@@ -70,6 +71,13 @@ public class Grant implements Base {
     if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
     Base base = (Base) o;
     return id.equals(base.getId());
+  }
+
+  @JsonIgnore
+  public String getResourceId(){
+    return this.getScenario() != null
+            ? this.getScenario().getId()
+            : this.getExercise() != null ? this.getExercise().getId() : null;
   }
 
   @Override
