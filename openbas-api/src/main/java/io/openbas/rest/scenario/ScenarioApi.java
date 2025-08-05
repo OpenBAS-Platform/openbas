@@ -30,7 +30,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -82,14 +81,6 @@ public class ScenarioApi extends RestBehavior {
       scenario.setCustomDashboard(null);
     }
     return this.scenarioService.createScenario(scenario);
-  }
-
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/generate-scenario-from-stix-bundle")
-  public Scenario generateScenarioFromSTIXBundle(
-      @PathVariable @NotBlank final String scenarioId,
-      @RequestPart("file") @Nullable MultipartFile file)
-      throws IOException {
-    return scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}")

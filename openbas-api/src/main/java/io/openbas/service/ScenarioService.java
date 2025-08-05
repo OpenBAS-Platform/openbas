@@ -13,6 +13,7 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -878,13 +879,12 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  @Transactional
-  public Scenario generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
+  public List<Inject> generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
       throws IOException {
     Scenario scenario = scenario(scenarioId);
 
     if (file == null || file.isEmpty()) {
-      return scenario;
+      return emptyList();
     }
 
     ObjectMapper mapper = new ObjectMapper();
@@ -952,11 +952,10 @@ public class ScenarioService {
 
         // Add vulnerabilities
 
-        securityAssessmentRepository.save(securityAssessment);
+        SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
         // Create Scenario using SecurityAssessment
-        scenario =
-            createScenarioFromSecurityAssessment(scenario, securityAssessment, threatContextRef);
+        scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
 
         // Creation injects based attack patterns from stix
         InjectAssistantInput input = new InjectAssistantInput();
@@ -964,18 +963,18 @@ public class ScenarioService {
             attackPatternService.getAttackPatternIds(
                 Arrays.stream(securityAssessment.getAttackPatternRefs())
                     .collect(Collectors.toSet()));
-        input.setAttackPatternIds(attackPatterns);
-        injectAssistantService.generateInjectsForScenario(scenario, input);
+        input.setAttackPatternIds(attackPatterns); // TODO Add ttps to placeholders
+        return injectAssistantService.generateInjectsForScenario(scenario, input);
       }
     }
 
-    return scenario;
+    return emptyList();
   }
 
   private Scenario createScenarioFromSecurityAssessment(
-      Scenario scenario, SecurityAssessment securityAssessment, String threatContextRef) {
+      Scenario scenario, SecurityAssessment securityAssessment) {
     scenario.setSecurityAssessment(securityAssessment);
-    scenario.setExternalReference(threatContextRef);
+    scenario.setExternalReference(securityAssessment.getThreatContextRef());
     scenario.setName(securityAssessment.getName());
     scenario.setDescription(securityAssessment.getDescription());
 

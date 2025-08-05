@@ -18,10 +18,12 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.*;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -91,6 +94,15 @@ public class ScenarioInjectApi extends RestBehavior {
       @Valid @RequestBody InjectAssistantInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     return this.injectAssistantService.generateInjectsForScenario(scenario, input);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/generate-scenario-from-stix-bundle")
+  public List<Inject> generateScenarioFromSTIXBundle(
+      @PathVariable @NotBlank final String scenarioId,
+      @RequestPart("file") @Nullable MultipartFile file)
+      throws IOException {
+    return scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
