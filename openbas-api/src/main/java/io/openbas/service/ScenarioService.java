@@ -876,6 +876,7 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
+  @Transactional
   public Scenario generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
       throws IOException {
     Scenario scenario = scenario(scenarioId);
