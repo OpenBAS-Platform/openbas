@@ -30,6 +30,7 @@ import io.openbas.database.specification.ScenarioSpecification;
 import io.openbas.ee.Ee;
 import io.openbas.export.Mixins;
 import io.openbas.helper.ObjectMapperHelper;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
@@ -119,6 +120,7 @@ public class ScenarioService {
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
   private final InjectAssistantService injectAssistantService;
+  private final AttackPatternService attackPatternService;
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -958,8 +960,11 @@ public class ScenarioService {
 
         // Creation injects based attack patterns from stix
         InjectAssistantInput input = new InjectAssistantInput();
-        input.setAttackPatternIds(
-            Arrays.stream(securityAssessment.getAttackPatternRefs()).toList());
+        List<String> attackPatterns =
+            attackPatternService.getAttackPatternIds(
+                Arrays.stream(securityAssessment.getAttackPatternRefs())
+                    .collect(Collectors.toSet()));
+        input.setAttackPatternIds(attackPatterns);
         injectAssistantService.generateInjectsForScenario(scenario, input);
       }
     }

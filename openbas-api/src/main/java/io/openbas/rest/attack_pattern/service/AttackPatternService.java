@@ -120,7 +120,7 @@ public class AttackPatternService {
    *     IDs.
    * @return List of attack pattern IDs corresponding to the external IDs.
    */
-  private List<String> getAttackPatternIds(Set<String> externalAttackPatternIds) {
+  public List<String> getAttackPatternIds(Set<String> externalAttackPatternIds) {
     if (!externalAttackPatternIds.isEmpty()) {
       List<AttackPattern> attackPatterns =
           this.attackPatternRepository.findAllByExternalIdInIgnoreCase(
