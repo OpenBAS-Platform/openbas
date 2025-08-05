@@ -333,6 +333,7 @@ public class User implements Base {
   public Map<String, String> getGrants() {
     return getGroups().stream()
         .flatMap(group -> group.getGrants().stream())
+        .filter(grant -> grant.getExercise() != null || grant.getScenario() != null)
         .collect(
             Collectors.toMap(
                 grant ->
