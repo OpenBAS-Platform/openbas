@@ -43,6 +43,7 @@ public class ScenarioToExerciseService {
       @NotBlank final Scenario scenario, @Nullable final Instant start, final boolean isRunning) {
     Exercise exercise = new Exercise();
     exercise.setScenario(scenario);
+    exercise.setSecurityAssessment(scenario.getSecurityAssessment());
     exercise.setName(scenario.getName());
     exercise.setDescription(scenario.getDescription());
     exercise.setSubtitle(scenario.getSubtitle());

@@ -176,6 +176,7 @@ public class ExerciseService {
     exerciseDuplicate.setFrom(exerciseOrigin.getFrom());
     exerciseDuplicate.setFooter(exerciseOrigin.getFooter());
     exerciseDuplicate.setScenario(exerciseOrigin.getScenario());
+    exerciseDuplicate.setSecurityAssessment(exerciseOrigin.getScenario().getSecurityAssessment());
     exerciseDuplicate.setHeader(exerciseOrigin.getHeader());
     exerciseDuplicate.setMainFocus(exerciseOrigin.getMainFocus());
     exerciseDuplicate.setSeverity(exerciseOrigin.getSeverity());

@@ -51,9 +51,12 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -76,7 +79,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -117,6 +119,7 @@ public class ScenarioService {
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
+  private final SecurityAssessmentRepository securityAssessmentRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -870,6 +873,103 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public Scenario generateScenarioFromSTIXBundle(MultipartFile file) {
+  public Scenario generateScenarioFromSTIXBundle(File file) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode root = mapper.readTree(file);
+
+    ArrayNode objects = (ArrayNode) root.get("objects");
+    if (objects == null) {
+      throw new IllegalArgumentException("No objects in STIX bundle");
+    }
+
+    SecurityAssessment securityAssessment;
+    Scenario scenario = new Scenario();
+
+    for (JsonNode obj : objects) {
+      if ("x-security-assessment".equals(obj.path("type").asText())) {
+
+        securityAssessment = new SecurityAssessment();
+        String id = obj.path("id").asText();
+
+        securityAssessment.setExternalId(id);
+        securityAssessment.setName(obj.path("name").asText());
+        securityAssessment.setDescription(obj.path("description").asText());
+        securityAssessment.setSecurityCoverageSubmissionUrl(
+            obj.path("security_coverage_submission_url").asText());
+
+        securityAssessment.setScheduling(obj.path("scheduling").asText());
+
+        if (obj.hasNonNull("execution_start")) {
+          securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
+        }
+        if (obj.hasNonNull("execution_end")) {
+          securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
+        }
+
+        String threatContextRef = obj.path("threat_context_ref").asText(null);
+        securityAssessment.setThreatContextRef(threatContextRef);
+
+        JsonNode attacksNode = obj.path("attack_pattern_refs");
+        if (attacksNode != null && attacksNode.isArray()) {
+          List<String> attackRefsList = new ArrayList<>();
+          for (JsonNode ref : attacksNode) {
+            attackRefsList.add(ref.asText());
+          }
+          securityAssessment.setAttackPatternRefs(attackRefsList.toArray(new String[0]));
+        } else {
+          securityAssessment.setAttackPatternRefs(new String[0]);
+        }
+
+        // Add vulnerabilities
+
+        securityAssessmentRepository.save(securityAssessment);
+
+        // Create Scenario using SecurityAssessment
+        scenario =
+            createScenarioFromSecurityAssessment(scenario, securityAssessment, threatContextRef);
+      }
+    }
+
+    return scenario;
+  }
+
+  private Scenario createScenarioFromSecurityAssessment(
+      Scenario scenario, SecurityAssessment securityAssessment, String threatContextRef) {
+    scenario.setSecurityAssessment(securityAssessment);
+    scenario.setExternalReference(threatContextRef);
+    scenario.setName(securityAssessment.getName());
+    scenario.setDescription(securityAssessment.getDescription());
+
+    Instant start = securityAssessment.getPeriodStart();
+    Instant end = securityAssessment.getPeriodEnd();
+
+    scenario.setRecurrenceStart(start);
+    scenario.setRecurrenceEnd(end);
+
+    String cron = getCronExpression(securityAssessment.getScheduling(), start);
+    scenario.setRecurrence(cron);
+
+    return scenarioRepository.save(scenario);
+  }
+
+  private String getCronExpression(String scheduling, Instant start) {
+    ZonedDateTime zdt = start.atZone(ZoneId.systemDefault());
+    int minute = zdt.getMinute();
+    int hour = zdt.getHour();
+    int dayOfMonth = zdt.getDayOfMonth();
+    int dayOfWeek = zdt.getDayOfWeek().getValue();
+
+    switch (scheduling) {
+      case "d": // daily
+        return String.format("0 %d %d * * *", minute, hour);
+      case "w": // weekly
+        return String.format("0 %d %d * * %d", minute, hour, dayOfWeek);
+      case "m": // monthly
+        return String.format("0 %d %d %d * *", minute, hour, dayOfMonth);
+      case "X": // one-shot
+        return null;
+      default:
+        throw new IllegalArgumentException("Unknown scheduling type: " + scheduling);
+    }
   }
 }

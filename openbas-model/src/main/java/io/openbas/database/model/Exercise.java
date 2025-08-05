@@ -163,6 +163,11 @@ public class Exercise implements Base {
   @Queryable(filterable = true, dynamicValues = true)
   private Scenario scenario;
 
+  // STIX
+  @OneToOne(mappedBy = "exercise")
+  @JsonProperty("scenario_security_assessment")
+  private SecurityAssessment securityAssessment;
+
   // -- AUDIT --
 
   @Getter
