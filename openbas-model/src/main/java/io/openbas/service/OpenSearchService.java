@@ -95,7 +95,10 @@ public class OpenSearchService implements EngineService {
     if (propertyField == null) {
       throw new AnalyticsEngineException("Unknown field: " + field);
     }
-    if (propertyField.getType().isAssignableFrom(String.class)) {
+    // Add subtype in PropertySchema if we want to manage attributes other than Set<String>
+    // Because at the moment, we have only Set<String> for all filters attributes
+    if (propertyField.getType().isAssignableFrom(String.class)
+        || propertyField.getType().isAssignableFrom(Set.class)) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));

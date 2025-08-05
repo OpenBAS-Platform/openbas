@@ -25,6 +25,8 @@ public interface RawInjectIndexing {
 
   Set<String> getInject_kill_chain_phases();
 
+  Set<String> getInject_tags();
+
   String getInject_status_name();
 
   String getInject_scenario();

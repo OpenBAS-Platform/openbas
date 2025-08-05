@@ -1,11 +1,13 @@
 package io.openbas.engine.model.scenario;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.engine.Handler;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,13 @@ public class ScenarioHandler implements Handler<EsScenario> {
               esScenario.setBase_representative(scenario.getScenario_name());
               esScenario.setBase_restrictions(buildRestrictions(scenario.getScenario_id()));
               // Specific
+              // Dependencies
+              List<String> dependencies = new ArrayList<>();
+              if (!isEmpty(scenario.getScenario_tags())) {
+                dependencies.addAll(scenario.getScenario_tags());
+                esScenario.setBase_tags_side(scenario.getScenario_tags());
+              }
+              esScenario.setBase_dependencies(dependencies);
               return esScenario;
             })
         .toList();
