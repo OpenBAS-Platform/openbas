@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
+import io.openbas.IntegrationTest;
 import io.openbas.rest.health_check.HealthCheckApi;
 import io.openbas.service.HealthCheckService;
 import io.openbas.service.exception.HealthCheckFailureException;
@@ -19,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @TestInstance(PER_CLASS)
-public class HealthCheckApiTest {
+public class HealthCheckApiTest extends IntegrationTest {
 
   private static final String KEY = "KEY";
 

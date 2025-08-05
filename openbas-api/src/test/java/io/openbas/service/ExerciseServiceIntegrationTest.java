@@ -9,6 +9,7 @@ import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import io.openbas.IntegrationTest;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ExerciseServiceIntegrationTest {
+class ExerciseServiceIntegrationTest extends IntegrationTest {
 
   @Mock Ee eeService;
   @Mock GrantService grantService;
