@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.injectors.email.service.EmailService;
@@ -20,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
 @ExtendWith(MockitoExtension.class)
-class EmailServiceTest {
+class EmailServiceTest extends IntegrationTest {
 
   @Mock private JavaMailSender emailSender;
   @InjectMocks private EmailService emailService;

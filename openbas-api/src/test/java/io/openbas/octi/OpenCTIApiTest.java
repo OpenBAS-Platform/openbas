@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
 import io.openbas.opencti.OpenCTIApi;
 import io.openbas.rest.attack_pattern.AttackPatternApi;
 import io.openbas.rest.inject.InjectApi;
@@ -45,7 +46,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * endpoints.
  */
 @ExtendWith(MockitoExtension.class)
-class OpenCTIApiTest {
+class OpenCTIApiTest extends IntegrationTest {
 
   @Mock InjectApi injectApi;
   @Mock ScenarioInjectApi scenarioInjectApi;

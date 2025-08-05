@@ -91,7 +91,9 @@ public class CrowdStrikeExecutorService implements Runnable {
                   Endpoint.PLATFORM_TYPE.MacOS.name()
                 });
       } else {
-        executorService.remove(config.getId());
+        if (executor != null) {
+          executorService.remove(config.getId());
+        }
       }
     } catch (Exception e) {
       log.error(String.format("Error creating CrowdStrike executor: %s", e.getMessage()), e);
