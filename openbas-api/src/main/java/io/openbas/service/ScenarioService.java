@@ -878,6 +878,12 @@ public class ScenarioService {
 
   public Scenario generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
       throws IOException {
+    Scenario scenario = scenario(scenarioId);
+
+    if(file == null || file.isEmpty()){
+      return scenario;
+    }
+
     ObjectMapper mapper = new ObjectMapper();
     JsonNode root = mapper.readTree(file.getInputStream());
 
@@ -900,7 +906,6 @@ public class ScenarioService {
     }
 
     SecurityAssessment securityAssessment;
-    Scenario scenario = scenario(scenarioId);
 
     for (JsonNode obj : objects) {
       if ("x-security-assessment".equals(obj.path("type").asText())) {
