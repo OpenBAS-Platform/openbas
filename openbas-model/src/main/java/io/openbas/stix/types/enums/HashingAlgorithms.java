@@ -8,7 +8,8 @@ public enum HashingAlgorithms {
   SHA3256("SHA3-256"),
   SHA3512("SHA3-512"),
   SSDEEP("SSDEEP"),
-  TLSH("TLSH"),;
+  TLSH("TLSH"),
+  ;
 
   public final String value;
 
@@ -20,22 +21,22 @@ public enum HashingAlgorithms {
     switch (value) {
       case "MD5":
         return MD5;
-        case "SHA-1":
-          return SHA1;
-          case "SHA-256":
-            return SHA256;
-            case "SHA-512":
-              return SHA512;
-              case "SHA3-256":
-                return SHA3256;
-                case "SHA3-512":
-                  return SHA3512;
-                  case "SSDEEP":
-                    return SSDEEP;
-                    case "TLSH":
-                      return TLSH;
-                      default:
-                        throw new IllegalArgumentException("Unknown HashingAlgorithms value: " + value);
+      case "SHA-1":
+        return SHA1;
+      case "SHA-256":
+        return SHA256;
+      case "SHA-512":
+        return SHA512;
+      case "SHA3-256":
+        return SHA3256;
+      case "SHA3-512":
+        return SHA3512;
+      case "SSDEEP":
+        return SSDEEP;
+      case "TLSH":
+        return TLSH;
+      default:
+        throw new IllegalArgumentException("Unknown HashingAlgorithms value: " + value);
     }
   }
 }

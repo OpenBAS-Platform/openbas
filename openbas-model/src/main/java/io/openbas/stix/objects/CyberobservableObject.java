@@ -1,4 +1,3 @@
 package io.openbas.stix.objects;
 
-public class CyberobservableObject {
-}
+public class CyberobservableObject {}

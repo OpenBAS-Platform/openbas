@@ -39,7 +39,7 @@ public class EmailContent {
   }
 
   public String buildMessage(ExecutableInject injection, boolean imapEnabled) {
-    // String footer = inject.getFooter();
+    // StixString footer = inject.getFooter();
     String header = injection.getInjection().getInject().getHeader();
     StringBuilder data = new StringBuilder();
     if (StringUtils.hasLength(header)) {

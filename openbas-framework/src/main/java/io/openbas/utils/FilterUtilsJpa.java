@@ -120,7 +120,7 @@ public class FilterUtilsJpa {
 
       // Single path or no path case
       Expression<U> paths = toPath(filterableProperty, root, joinMap);
-      // In case of join table, we will use ID so type is String
+      // In case of join table, we will use ID so type is StixString
       return toPredicate(
           paths,
           filter,

@@ -136,8 +136,8 @@
 //              injectTestStatusService.testInject(INJECT3.getId());
 //            });
 //
-//    String expectedMessage = "Inject: " + INJECT3.getId() + " is not testable";
-//    String actualMessage = exception.getMessage();
+//    StixString expectedMessage = "Inject: " + INJECT3.getId() + " is not testable";
+//    StixString actualMessage = exception.getMessage();
 //    assertTrue(actualMessage.contains(expectedMessage));
 //
 //    // -- CLEAN --
@@ -186,8 +186,8 @@
 //              injectTestStatusService.bulkTestInjects(Collections.singletonList(INJECT3.getId()));
 //            });
 //
-//    String expectedMessage = "No inject ID is testable";
-//    String actualMessage = exception.getMessage();
+//    StixString expectedMessage = "No inject ID is testable";
+//    StixString actualMessage = exception.getMessage();
 //    assertTrue(actualMessage.contains(expectedMessage));
 //
 //    // -- CLEAN --
