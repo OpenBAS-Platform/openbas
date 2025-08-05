@@ -103,6 +103,13 @@ public class Grant implements Base {
     return id.equals(base.getId());
   }
 
+  @JsonIgnore
+  public String getResourceId() {
+    return this.getScenario() != null
+        ? this.getScenario().getId()
+        : this.getExercise() != null ? this.getExercise().getId() : null;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
