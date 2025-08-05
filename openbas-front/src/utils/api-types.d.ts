@@ -1514,9 +1514,11 @@ export interface EndpointOverviewOutput {
 
 export interface EndpointRegisterInput {
   agent_executed_by_user?: string;
+  agent_installation_directory?: string;
   agent_installation_mode?: string;
   agent_is_elevated?: boolean;
   agent_is_service?: boolean;
+  agent_service_name?: string;
   asset_description?: string;
   asset_external_reference: string;
   asset_name: string;
@@ -2368,6 +2370,7 @@ export interface Grant {
   grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
+  resourceId?: string;
 }
 
 export interface Group {
@@ -5750,6 +5753,7 @@ export interface User {
   user_email: string;
   /** First name of the user */
   user_firstname?: string;
+  user_grants?: Record<string, string>;
   /** Gravatar of the user */
   user_gravatar?: string;
   user_groups?: string[];
