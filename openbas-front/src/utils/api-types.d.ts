@@ -2370,7 +2370,6 @@ export interface Grant {
   grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
-  resourceId?: string;
 }
 
 export interface Group {
