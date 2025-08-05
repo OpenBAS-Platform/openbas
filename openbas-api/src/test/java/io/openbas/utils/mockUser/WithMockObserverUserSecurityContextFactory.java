@@ -71,9 +71,8 @@ public class WithMockObserverUserSecurityContextFactory
       group = this.groupRepository.save(newGroup);
       // Create grant
       Scenario scenario = ScenarioFixture.createDefaultCrisisScenario();
-      scenario.setId("id");
       scenario.setName("scenario");
-      scenarioRepository.save(scenario);
+      scenario = scenarioRepository.save(scenario);
       Grant grant = new Grant();
       grant.setName(OBSERVER);
       grant.setGroup(group);
