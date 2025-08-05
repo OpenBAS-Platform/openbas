@@ -37,9 +37,9 @@ public class V4_15__Add_octi_stix_objects extends BaseJavaMigration {
       statement.execute(
           """
           ALTER TABLE exercises
-          ADD COLUMN exercise_security_assessment_id VARCHAR(255),
+          ADD COLUMN exercise_security_assessment VARCHAR(255),
           ADD CONSTRAINT fk_exercise_security_assessment
-              FOREIGN KEY (exercise_security_assessment_id)
+              FOREIGN KEY (exercise_security_assessment)
               REFERENCES security_assessments(security_assessment_id)
               ON DELETE SET NULL;
           """);
