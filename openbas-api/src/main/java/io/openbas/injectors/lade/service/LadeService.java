@@ -183,7 +183,7 @@ public class LadeService {
                   Map<String, String> hostsByIp = new HashMap<>();
                   nodeHosts.forEach(
                       nodeHost -> {
-                        // String hostIdentifier = nodeHost.get("identifier").asText();
+                        // StixString hostIdentifier = nodeHost.get("identifier").asText();
                         String hostname = nodeHost.get("hostname").asText();
                         String os = nodeHost.get("os").asText();
                         hostsByName.put(hostname, hostname + " (" + os + ")");

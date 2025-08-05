@@ -3,10 +3,9 @@ package io.openbas.stix.types;
 import io.openbas.IntegrationTest;
 import io.openbas.stix.objects.DomainObject;
 import jakarta.transaction.Transactional;
+import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
-import java.util.HashMap;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional

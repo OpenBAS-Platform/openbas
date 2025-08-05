@@ -1,12 +1,12 @@
 package io.openbas.stix.types;
 
-import lombok.Getter;
-
 import java.util.Objects;
+import lombok.Getter;
 
 @Getter
 public abstract class BaseType<T> {
   private final T value;
+
   public BaseType(T value) {
     this.value = value;
   }

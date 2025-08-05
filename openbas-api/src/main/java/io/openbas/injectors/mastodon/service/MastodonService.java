@@ -45,7 +45,7 @@ public class MastodonService {
   // attachments) {
   //     List<MastodonAttachment> resolved = new ArrayList<>();
   //     for (Document attachment : attachments) {
-  //         String documentId = attachment.getId();
+  //         StixString documentId = attachment.getId();
   //         Optional<Document> askedDocument = documentRepository.findById(documentId);
   //         try {
   //             Document doc = askedDocument.orElseThrow();
@@ -54,8 +54,8 @@ public class MastodonService {
   //             resolved.add(new MastodonAttachment(doc.getName(), content, doc.getType()));
   //         } catch (Exception e) {
   //             // Can't fetch the attachments, ignore
-  //             String docInfo = askedDocument.map(Document::getName).orElse(documentId);
-  //             String message = "Error getting document " + docInfo;
+  //             StixString docInfo = askedDocument.map(Document::getName).orElse(documentId);
+  //             StixString message = "Error getting document " + docInfo;
   //             execution.addTrace(ExecutionTrace.traceError(getClass().getSimpleName(), message,
   // e));
   //         }

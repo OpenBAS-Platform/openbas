@@ -22,7 +22,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class Variable implements Base {
 
   public enum VariableType {
-    @JsonProperty("String")
+    @JsonProperty("StixString")
     String,
 
     @JsonProperty("Object")

@@ -220,7 +220,7 @@ public class MimeMessageParser {
    */
   private boolean isMimeType(final MimePart part, final String mimeType)
       throws MessagingException, IOException {
-    // Do not use part.isMimeType(String) as it is broken for MimeBodyPart
+    // Do not use part.isMimeType(StixString) as it is broken for MimeBodyPart
     // and does not really check the actual content type.
 
     try {
