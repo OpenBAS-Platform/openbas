@@ -1,5 +1,7 @@
-import { Card, CardActionArea, CardContent, Checkbox, FormHelperText, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import {
+  MenuItem,
+  TextField,
+} from '@mui/material';
 import { type FunctionComponent, useEffect, useState } from 'react';
 
 import { engineSchemas } from '../../../../../../actions/schema/schema-action';
@@ -14,7 +16,7 @@ interface Props {
   error?: boolean;
 }
 
-const ENTITIES = ['expectation-inject', 'finding', 'endpoint', 'vulnerable-endpoint'];
+const ENTITIES = ['expectation-inject', 'finding', 'endpoint', 'vulnerable-endpoint', 'inject', 'scenario', 'simulation'];
 
 const FilterFieldBaseEntity: FunctionComponent<Props> = ({
   value,
@@ -23,7 +25,6 @@ const FilterFieldBaseEntity: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [entityOptions, setEntityOptions] = useState<Option[]>([]);
@@ -41,48 +42,28 @@ const FilterFieldBaseEntity: FunctionComponent<Props> = ({
     });
   }, []);
 
-  const handleOnChange = (v: string) => {
-    if (v === value) {
-      onChange(null);
-    } else {
-      onChange(v);
-    }
-  };
-
   if (loading) {
     return <Loader variant="inElement" />;
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gap: `${theme.spacing(1)}`,
-      gridTemplateColumns: '1fr 1fr',
-    }}
+    <TextField
+      select
+      variant="standard"
+      fullWidth
+      label={t('Entity type')}
+      value={value}
+      error={error}
+      helperText={error ? t('Should at least select one dimension') : ''}
+      onChange={e => onChange(e.target.value)}
+      required
     >
       {entityOptions.map(option => (
-        <Card
-          key={option.id}
-          variant="outlined"
-        >
-          <CardActionArea onClick={() => handleOnChange(option.id)}>
-            <CardContent sx={{
-              p: 0,
-              display: 'grid',
-              gridTemplateColumns: '50px 1fr',
-              alignItems: 'center',
-            }}
-            >
-              <Checkbox checked={value === option.id} />
-              <Typography color={error ? 'error' : 'default'} style={{ textAlign: 'center' }}>
-                {t(option.label)}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+        <MenuItem key={option.id} value={option.id}>
+          {t(option.label)}
+        </MenuItem>
       ))}
-      {error && <FormHelperText error>{t('Should at least select one dimension')}</FormHelperText>}
-    </div>
+    </TextField>
   );
 };
 
