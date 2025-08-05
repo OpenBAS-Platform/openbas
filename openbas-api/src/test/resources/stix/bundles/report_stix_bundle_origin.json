@@ -1,0 +1,231 @@
+{
+    "type": "bundle",
+    "id": "bundle--5045aadd-0bc1-4d22-bf20-d3896eeec089",
+    "objects": [
+        {
+            "id": "report--453a2ac1-e111-57bf-8277-dbec448cd851",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2025-01-23T15:12:55.000Z",
+            "modified": "2025-06-05T14:17:33.031Z",
+            "name": "Report Test entity obas email",
+            "published": "2025-01-23T15:12:55.000Z",
+            "x_opencti_workflow_id": "b28a370a-317b-4c50-8f0d-483b17d11abb",
+            "x_opencti_id": "9b13f670-d827-4f3f-91ec-cb1282eb3f95",
+            "x_opencti_type": "Report",
+            "type": "report",
+            "object_refs": [
+                "attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1",
+                "attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9"
+            ]
+        },
+        {
+            "id": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "The MITRE Corporation",
+            "created": "2024-10-07T08:07:56.925Z",
+            "modified": "2025-07-21T16:19:42.425Z",
+            "x_opencti_organization_type": "other",
+            "x_opencti_reliability": "B - Usually reliable",
+            "x_opencti_id": "366ce830-a032-4865-8d9c-f7449a9ec1b9",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+            "created": "2017-01-20T00:00:00.000Z",
+            "definition_type": "tlp",
+            "name": "TLP:CLEAR",
+            "definition": {
+                "tlp": "clear"
+            }
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd",
+            "created": "2017-06-01T00:00:00.000Z",
+            "definition_type": "statement",
+            "name": "Copyright 2015-2025, The MITRE Corporation. MITRE ATT&CK and ATT&CK are registered trademarks of The MITRE Corporation.",
+            "definition": {
+                "statement": "copyright 2015-2025, the mitre corporation. mitre att&ck and att&ck are registered trademarks of the mitre corporation."
+            }
+        },
+        {
+            "id": "attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2019-10-09T18:48:31.906Z",
+            "modified": "2025-01-31T14:04:33.112Z",
+            "name": "Account Access Removal",
+            "description": "Adversaries may interrupt availability of system and network resources by inhibiting access to accounts utilized by legitimate users. Accounts may be deleted, locked, or manipulated (ex: changed credentials) to remove access to accounts. Adversaries may also subsequently log off and/or perform a [System Shutdown/Reboot](https://attack.mitre.org/techniques/T1529) to set malicious changes into place.(Citation: CarbonBlack LockerGoga 2019)(Citation: Unit42 LockerGoga 2019)\n\nIn Windows, [Net](https://attack.mitre.org/software/S0039) utility, `Set-LocalUser` and `Set-ADAccountPassword` [PowerShell](https://attack.mitre.org/techniques/T1059/001) cmdlets may be used by adversaries to modify user accounts. In Linux, the `passwd` utility may be used to change passwords. Accounts could also be disabled by Group Policy. \n\nAdversaries who use ransomware or similar attacks may first perform this and other Impact behaviors, such as [Data Destruction](https://attack.mitre.org/techniques/T1485) and [Defacement](https://attack.mitre.org/techniques/T1491), in order to impede incident response/recovery before completing the [Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486) objective.",
+            "aliases": [
+                "T1531"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS",
+                "IaaS",
+                "SaaS",
+                "Office Suite"
+            ],
+            "x_mitre_detection": "Use process monitoring to monitor the execution and command line parameters of binaries involved in deleting accounts or changing passwords, such as use of [Net](https://attack.mitre.org/software/S0039). Windows event logs may also designate activity associated with an adversary's attempt to remove access to an account:\n\n* Event ID 4723 - An attempt was made to change an account's password\n* Event ID 4724 - An attempt was made to reset an account's password\n* Event ID 4726 - A user account was deleted\n* Event ID 4740 - A user account was locked out\n\nAlerting on [Net](https://attack.mitre.org/software/S0039) and these Event IDs may generate a high degree of false positives, so compare against baseline knowledge for how systems are typically used and correlate modification events with other indications of malicious activity where possible.",
+            "x_mitre_id": "T1531",
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "impact",
+                    "x_opencti_order": 0
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Unit42 LockerGoga 2019",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://unit42.paloaltonetworks.com/born-this-way-origins-of-lockergoga/"
+                },
+                {
+                    "source_name": "CarbonBlack LockerGoga 2019",
+                    "description": "CarbonBlack Threat Analysis Unit. (2019, March 22). TAU Threat Intelligence Notification \u2013 LockerGoga Ransomware. Retrieved April 16, 2019.",
+                    "url": "https://www.carbonblack.com/2019/03/22/tau-threat-intelligence-notification-lockergoga-ransomware/"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1531",
+                    "external_id": "T1531"
+                }
+            ],
+            "x_opencti_id": "65224fd3-a2e1-4fd8-9f20-37bbfdafea82",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "Recorded Future",
+            "contact_information": "recordedfuture.com",
+            "created": "2022-01-22T19:05:28.315Z",
+            "modified": "2025-07-21T16:19:41.665Z",
+            "x_opencti_organization_type": "vendor",
+            "x_opencti_reliability": "A - Completely reliable",
+            "labels": [
+                "finance",
+                "insurance",
+                "small",
+                "test",
+                "year in review"
+            ],
+            "x_opencti_id": "c06cdbc0-8443-4f31-8d56-e63046b1c1bb",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "id": "attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2024-04-15T13:30:53.662Z",
+            "modified": "2025-01-31T19:43:51.136Z",
+            "name": "T1003",
+            "description": "Adversaries may attempt to dump credentials to obtain account login and credential material, normally in the form of a hash or a clear text password. Credentials can be obtained from OS caches, memory, or structures.(Citation: Brining MimiKatz to Unix) Credentials can then be used to perform [Lateral Movement](https://attack.mitre.org/tactics/TA0008) and access restricted information.\n\nSeveral of the tools mentioned in associated sub-techniques may be used by both adversaries and professional security testers. Additional custom tools likely exist as well.",
+            "aliases": [
+                "OS Credential Dumping"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_detection": "### Windows\nMonitor for unexpected processes interacting with lsass.exe.(Citation: Medium Detecting Attempts to Steal Passwords from Memory) Common credential dumpers such as [Mimikatz](https://attack.mitre.org/software/S0002) access the LSA Subsystem Service (LSASS) process by opening the process, locating the LSA secrets key, and decrypting the sections in memory where credential details are stored. Credential dumpers may also use methods for reflective [Process Injection](https://attack.mitre.org/techniques/T1055) to reduce potential indicators of malicious activity.\n\nHash dumpers open the Security Accounts Manager (SAM) on the local file system (%SystemRoot%/system32/config/SAM) or create a dump of the Registry SAM key to access stored account password hashes. Some hash dumpers will open the local file system as a device and parse to the SAM table to avoid file access defenses. Others will make an in-memory copy of the SAM table before reading hashes. Detection of compromised [Valid Accounts](https://attack.mitre.org/techniques/T1078) in-use by adversaries may help as well. \n\nOn Windows 8.1 and Windows Server 2012 R2, monitor Windows Logs for LSASS.exe creation to verify that LSASS started as a protected process.\n\nMonitor processes and command-line arguments for program execution that may be indicative of credential dumping. Remote access tools may contain built-in features or incorporate existing tools like [Mimikatz](https://attack.mitre.org/software/S0002). [PowerShell](https://attack.mitre.org/techniques/T1059/001) scripts also exist that contain credential dumping functionality, such as PowerSploit's Invoke-Mimikatz module, (Citation: Powersploit) which may require additional logging features to be configured in the operating system to collect necessary information for analysis.\n\nMonitor domain controller logs for replication requests and other unscheduled activity possibly associated with DCSync. (Citation: Microsoft DRSR Dec 2017) (Citation: Microsoft GetNCCChanges) (Citation: Samba DRSUAPI) Note: Domain controllers may not log replication requests originating from the default domain controller account. (Citation: Harmj0y DCSync Sept 2015). Also monitor for network protocols  (Citation: Microsoft DRSR Dec 2017) (Citation: Microsoft NRPC Dec 2017) and other replication requests (Citation: Microsoft SAMR) from IPs not associated with known domain controllers. (Citation: AdSecurity DCSync Sept 2015)\n\n### Linux\nTo obtain the passwords and hashes stored in memory, processes must open a maps file in the `/proc` filesystem for the process being analyzed. This file is stored under the path `/proc/<pid>/maps`, where the `<pid>` directory is the unique pid of the program being interrogated for such authentication data. The AuditD monitoring tool, which ships stock in many Linux distributions, can be used to watch for hostile processes opening this file in the proc file system, alerting on the pid, process name, and arguments of such programs.",
+            "x_mitre_id": "T1003",
+            "labels": [
+                "test",
+                "year in review"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "credential-access",
+                    "x_opencti_order": 0
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Brining MimiKatz to Unix",
+                    "description": "Tim Wadhwa-Brown. (2018, November). Where 2 worlds collide Bringing Mimikatz et al to UNIX. Retrieved October 13, 2021.",
+                    "url": "https://labs.portcullis.co.uk/download/eu-18-Wadhwa-Brown-Where-2-worlds-collide-Bringing-Mimikatz-et-al-to-UNIX.pdf"
+                },
+                {
+                    "source_name": "AdSecurity DCSync Sept 2015",
+                    "description": "Metcalf, S. (2015, September 25). Mimikatz DCSync Usage, Exploitation, and Detection. Retrieved December 4, 2017.",
+                    "url": "https://adsecurity.org/?p=1729"
+                },
+                {
+                    "source_name": "Microsoft SAMR",
+                    "description": "Microsoft. (n.d.). MS-SAMR Security Account Manager (SAM) Remote Protocol (Client-to-Server) - Transport. Retrieved December 4, 2017.",
+                    "url": "https://msdn.microsoft.com/library/cc245496.aspx"
+                },
+                {
+                    "source_name": "Microsoft NRPC Dec 2017",
+                    "description": "Microsoft. (2017, December 1). MS-NRPC - Netlogon Remote Protocol. Retrieved December 6, 2017.",
+                    "url": "https://msdn.microsoft.com/library/cc237008.aspx"
+                },
+                {
+                    "source_name": "Harmj0y DCSync Sept 2015",
+                    "description": "Schroeder, W. (2015, September 22). Mimikatz and DCSync and ExtraSids, Oh My. Retrieved December 4, 2017.",
+                    "url": "http://www.harmj0y.net/blog/redteaming/mimikatz-and-dcsync-and-extrasids-oh-my/"
+                },
+                {
+                    "source_name": "Samba DRSUAPI",
+                    "description": "SambaWiki. (n.d.). DRSUAPI. Retrieved December 4, 2017.",
+                    "url": "https://wiki.samba.org/index.php/DRSUAPI"
+                },
+                {
+                    "source_name": "Microsoft GetNCCChanges",
+                    "description": "Microsoft. (n.d.). IDL_DRSGetNCChanges (Opnum 3). Retrieved December 4, 2017.",
+                    "url": "https://msdn.microsoft.com/library/dd207691.aspx"
+                },
+                {
+                    "source_name": "Microsoft DRSR Dec 2017",
+                    "description": "Microsoft. (2017, December 1). MS-DRSR Directory Replication Service (DRS) Remote Protocol. Retrieved December 4, 2017.",
+                    "url": "https://msdn.microsoft.com/library/cc228086.aspx"
+                },
+                {
+                    "source_name": "Powersploit",
+                    "description": "PowerSploit. (n.d.). Retrieved December 4, 2014.",
+                    "url": "https://github.com/mattifestation/PowerSploit"
+                },
+                {
+                    "source_name": "Medium Detecting Attempts to Steal Passwords from Memory",
+                    "description": "French, D. (2018, October 2). Detecting Attempts to Steal Passwords from Memory. Retrieved October 11, 2019.",
+                    "url": "https://medium.com/threatpunter/detecting-attempts-to-steal-passwords-from-memory-558f16dce4ea"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1003",
+                    "external_id": "T1003"
+                }
+            ],
+            "x_opencti_id": "eb25bbe2-7af3-4d93-837c-d1933eb521e7",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        }
+    ]
+}
