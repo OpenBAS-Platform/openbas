@@ -108,19 +108,19 @@ const LeftBar = () => {
           icon: () => (<Groups3Outlined />),
           label: 'People',
           href: 'teams',
-          userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+          userRight: true,
           subItems: [
             {
               link: '/admin/teams/players',
               label: 'Players',
               icon: () => (<PersonOutlined fontSize="small" />),
-              userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+              userRight: true,
             },
             {
               link: '/admin/teams/teams',
               label: 'Teams',
               icon: () => (<GroupsOutlined fontSize="small" />),
-              userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+              userRight: true,
             },
             {
               link: '/admin/teams/organizations',
