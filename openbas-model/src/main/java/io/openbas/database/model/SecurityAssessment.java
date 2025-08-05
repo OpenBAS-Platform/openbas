@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
@@ -25,51 +27,65 @@ public class SecurityAssessment implements Base {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @EqualsAndHashCode.Include
+  @JsonProperty("security_assessment_id")
   private String id;
 
   @Column(
       name = "security_assessment_external_id",
       nullable = false) // security assessment id from octi
+  @JsonProperty("security_assessment_external_id")
   private String externalId;
 
   @Column(name = "security_assessment_name", nullable = false)
+  @JsonProperty("security_assessment_name")
   private String name;
 
   @Column(name = "security_assessment_description")
+  @JsonProperty("security_assessment_description")
   private String description;
 
   @Column(name = "security_assessment_scheduling", nullable = false)
+  @JsonProperty("security_assessment_scheduling")
   private String scheduling;
 
   @Column(name = "security_assessment_security_coverage_submission_url", nullable = false)
+  @JsonProperty("security_assessment_security_coverage_submission_url")
   private String securityCoverageSubmissionUrl;
 
   @Column(name = "security_assessment_period_start")
+  @JsonProperty("security_assessment_period_start")
   private Instant periodStart;
 
   @Column(name = "security_assessment_period_end")
+  @JsonProperty("security_assessment_period_end")
   private Instant periodEnd;
 
   @Column(name = "security_assessment_threat_context_ref")
+  @JsonProperty("security_assessment_threat_context_ref")
   private String threatContextRef;
 
   @Type(StringArrayType.class)
   @Column(name = "security_assessment_attack_pattern_refs", columnDefinition = "text[]")
+  @JsonProperty("security_assessment_attack_pattern_refs")
   private String[] attackPatternRefs;
 
   @Type(StringArrayType.class)
   @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "text[]")
+  @JsonProperty("security_assessment_vulnerabilities_refs")
   private String[] vulnerabilitiesRefs;
 
   @OneToOne
   @JoinColumn(name = "security_assessment_scenario")
+  @JsonIgnore
   private Scenario scenario;
 
   @CreationTimestamp
   @Column(name = "security_assessment_created_at", updatable = false)
+  @JsonProperty("security_assessment_created_at")
   private Instant createdAt;
 
   @UpdateTimestamp
   @Column(name = "security_assessment_updated_at")
+  @JsonProperty("security_assessment_updated_at")
   private Instant updatedAt;
 }

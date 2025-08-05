@@ -161,6 +161,9 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const onUpdateAttackPatternAIDialog = (attackPatternIds: string[]) => {
     onUpdateAttackPattern(attackPatternIds);
     onCloseArianeAIAssistantDialog();
+  };
+  const onUpdateAttackPatternImportSTIX = (attackPatternIds: string[]) => {
+    onUpdateAttackPattern(attackPatternIds);
     onCloseImportSTIXBundle();
   };
 
@@ -253,7 +256,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
                 size="small"
                 onClick={() => setOpenImportSTIXBundle(true)}
               >
-                {t('Import STIX Bundle')}
+                {t('From STIX Bundle')}
               </Button>
             </div>
             <AttackPatternFieldController
@@ -288,6 +291,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
         <ImportStixBundleDialog
           open={openImportSTIXBundle}
           onClose={onCloseImportSTIXBundle}
+          onAttackPatternIdsFind={onUpdateAttackPatternImportSTIX}
         />
       </>
     </Drawer>

@@ -37,8 +37,6 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import io.openbas.rest.inject.form.InjectAssistantInput;
-import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
@@ -120,7 +118,6 @@ public class ScenarioService {
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
-  private final InjectAssistantService injectAssistantService;
   private final AttackPatternService attackPatternService;
 
   private final InjectRepository injectRepository;
@@ -879,7 +876,7 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public List<Inject> generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
+  public List<String> generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
       throws IOException {
     Scenario scenario = scenario(scenarioId);
 
@@ -955,26 +952,20 @@ public class ScenarioService {
         SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
         // Create Scenario using SecurityAssessment
-        scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
+        createScenarioFromSecurityAssessment(scenario, savedSecurity);
 
-        // Creation injects based attack patterns from stix
-        InjectAssistantInput input = new InjectAssistantInput();
-        List<String> attackPatterns =
-            attackPatternService.getAttackPatternIds(
-                Arrays.stream(securityAssessment.getAttackPatternRefs())
-                    .collect(Collectors.toSet()));
-        input.setAttackPatternIds(attackPatterns); // TODO Add ttps to placeholders
-        return injectAssistantService.generateInjectsForScenario(scenario, input);
+        // Send back ttps ids
+        return attackPatternService.getAttackPatternIds(
+            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet()));
       }
     }
 
     return emptyList();
   }
 
-  private Scenario createScenarioFromSecurityAssessment(
+  private void createScenarioFromSecurityAssessment(
       Scenario scenario, SecurityAssessment securityAssessment) {
     scenario.setSecurityAssessment(securityAssessment);
-    scenario.setExternalReference(securityAssessment.getThreatContextRef());
     scenario.setName(securityAssessment.getName());
     scenario.setDescription(securityAssessment.getDescription());
 
@@ -987,7 +978,7 @@ public class ScenarioService {
     String cron = getCronExpression(securityAssessment.getScheduling(), start);
     scenario.setRecurrence(cron);
 
-    return scenarioRepository.save(scenario);
+    scenarioRepository.save(scenario);
   }
 
   private String getCronExpression(String scheduling, Instant start) {

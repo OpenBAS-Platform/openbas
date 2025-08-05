@@ -98,11 +98,12 @@ public class ScenarioInjectApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(SCENARIO_URI + "/{scenarioId}/generate-scenario-from-stix-bundle")
-  public List<Inject> generateScenarioFromSTIXBundle(
+  public List<String> generateScenarioFromSTIXBundle(
       @PathVariable @NotBlank final String scenarioId,
       @RequestPart("file") @Nullable MultipartFile file)
       throws IOException {
-    return scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
+    List<String> strings = scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
+    return strings;
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
