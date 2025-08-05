@@ -240,3 +240,13 @@ export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) =
   const input = { new_tags: newTagIds };
   return simplePostCall(uri, input);
 };
+
+// STIX
+
+export const generateScenarioFromSTIXBundle = (files: File[]) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+  return simplePostCall(`${SCENARIO_URI}/generate-scenario-from-stix-bundle`, formData);
+};

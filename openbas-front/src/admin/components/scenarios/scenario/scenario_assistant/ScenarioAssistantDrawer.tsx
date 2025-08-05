@@ -11,10 +11,7 @@ import Drawer from '../../../../../components/common/Drawer';
 import AttackPatternFieldController from '../../../../../components/fields/AttackPatternFieldController';
 import TextFieldController from '../../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../../components/i18n';
-import {
-  type EndpointOutput,
-  type InjectAssistantInput,
-} from '../../../../../utils/api-types';
+import { type EndpointOutput, type InjectAssistantInput } from '../../../../../utils/api-types';
 import useEnterpriseEdition from '../../../../../utils/hooks/useEnterpriseEdition';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
@@ -24,6 +21,7 @@ import EEChip from '../../../common/entreprise_edition/EEChip';
 import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
 import InjectAddEndpoints from '../../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
 import AttackPatternAIAssistantDialog from '././AttackPatternAIAssistantDialog';
+import ImportStixBundleDialog from './ImportStixBundleDialog';
 import SelectTTPsDrawer from './SelectTTPsDrawer';
 
 const useStyles = makeStyles()(theme => ({
@@ -52,6 +50,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const [openMitreFilterDrawer, setOpenMitreFilterDrawer] = useState(false);
+  const [openImportSTIXBundle, setOpenImportSTIXBundle] = useState(false);
   const [openArianeAIAssistantDialog, setOpenArianeAIAssistantDialog] = useState(false);
   const {
     isValidated: isEnterpriseEdition,
@@ -118,6 +117,10 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
     setOpenArianeAIAssistantDialog(false);
   };
 
+  const onCloseImportSTIXBundle = () => {
+    setOpenImportSTIXBundle(false);
+  };
+
   const onCloseDrawer = () => {
     reset();
     onClose();
@@ -158,6 +161,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const onUpdateAttackPatternAIDialog = (attackPatternIds: string[]) => {
     onUpdateAttackPattern(attackPatternIds);
     onCloseArianeAIAssistantDialog();
+    onCloseImportSTIXBundle();
   };
 
   return (
@@ -243,6 +247,14 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
               >
                 {t('Select TTPs')}
               </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                onClick={() => setOpenImportSTIXBundle(true)}
+              >
+                {t('Import STIX Bundle')}
+              </Button>
             </div>
             <AttackPatternFieldController
               hideAddButton
@@ -271,6 +283,11 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
         <AttackPatternAIAssistantDialog
           open={openArianeAIAssistantDialog}
           onClose={onCloseArianeAIAssistantDialog}
+          onAttackPatternIdsFind={onUpdateAttackPatternAIDialog}
+        />
+        <ImportStixBundleDialog
+          open={openImportSTIXBundle}
+          onClose={onCloseImportSTIXBundle}
           onAttackPatternIdsFind={onUpdateAttackPatternAIDialog}
         />
       </>

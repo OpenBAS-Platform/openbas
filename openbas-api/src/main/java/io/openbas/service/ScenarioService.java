@@ -76,6 +76,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -867,5 +868,8 @@ public class ScenarioService {
       duplicatedObjectives.add(duplicatedObjective);
     }
     scenario.setObjectives(duplicatedObjectives);
+  }
+
+  public Scenario generateScenarioFromSTIXBundle(MultipartFile file) {
   }
 }
