@@ -74,10 +74,10 @@ public class Grant implements Base {
   }
 
   @JsonIgnore
-  public String getResourceId(){
+  public String getResourceId() {
     return this.getScenario() != null
-            ? this.getScenario().getId()
-            : this.getExercise() != null ? this.getExercise().getId() : null;
+        ? this.getScenario().getId()
+        : this.getExercise() != null ? this.getExercise().getId() : null;
   }
 
   @Override
