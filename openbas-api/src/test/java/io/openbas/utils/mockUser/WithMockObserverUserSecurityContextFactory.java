@@ -12,6 +12,7 @@ import io.openbas.database.repository.GroupRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.GroupSpecification;
+import io.openbas.utils.fixtures.ScenarioFixture;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.List;
@@ -69,7 +70,7 @@ public class WithMockObserverUserSecurityContextFactory
       newGroup.setExercisesDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
       // Create grant
-      Scenario scenario = new Scenario();
+      Scenario scenario = ScenarioFixture.createDefaultCrisisScenario();
       scenario.setId("id");
       scenario.setName("scenario");
       scenarioRepository.save(scenario);
