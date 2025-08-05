@@ -5819,6 +5819,7 @@ export interface User {
   user_email: string;
   /** First name of the user */
   user_firstname?: string;
+  user_grants?: Record<string, string>;
   /** Gravatar of the user */
   user_gravatar?: string;
   user_groups?: string[];
