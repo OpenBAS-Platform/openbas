@@ -53,7 +53,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
@@ -81,6 +80,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -876,9 +876,10 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public Scenario generateScenarioFromSTIXBundle(String scenarioId, File file) throws IOException {
+  public Scenario generateScenarioFromSTIXBundle(String scenarioId, MultipartFile file)
+      throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    JsonNode root = mapper.readTree(file);
+    JsonNode root = mapper.readTree(file.getInputStream());
 
     ArrayNode objects = (ArrayNode) root.get("objects");
     if (objects == null) {
@@ -887,7 +888,6 @@ public class ScenarioService {
 
     // Extract attack-patterns and their MITRE IDs
     Map<String, String> stixIdToMitreId = new HashMap<>();
-    Set<String> referencedAttackPatternIds = new HashSet<>();
 
     for (JsonNode obj : objects) {
       if ("attack-pattern".equals(obj.path("type").asText())) {

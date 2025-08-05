@@ -288,7 +288,6 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
         <ImportStixBundleDialog
           open={openImportSTIXBundle}
           onClose={onCloseImportSTIXBundle}
-          onAttackPatternIdsFind={onUpdateAttackPatternAIDialog}
         />
       </>
     </Drawer>

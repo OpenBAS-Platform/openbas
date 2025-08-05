@@ -7,6 +7,8 @@ import Dialog from '../../../../../components/common/Dialog';
 import ImportUploader from '../../../../../components/common/ImportUploader';
 import { useFormatter } from '../../../../../components/i18n';
 import { generateScenarioFromSTIXBundle } from '../../../../../actions/scenarios/scenario-actions';
+import { useParams } from 'react-router';
+import type { Scenario } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles()(theme => ({
   textLabel: { alignSelf: 'end' },
@@ -40,16 +42,17 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   open: boolean;
   onClose: () => void;
-  onAttackPatternIdsFind: (ids: string[]) => void;
 }
 
-const ImportSTIXBundleDialog = ({ open, onClose, onAttackPatternIdsFind }: Props) => {
+const ImportSTIXBundleDialog = ({ open, onClose }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const maxFilesNumber = 1;
   // State hooks
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const onResetAndClose = () => {
     setFiles([]);
@@ -58,7 +61,7 @@ const ImportSTIXBundleDialog = ({ open, onClose, onAttackPatternIdsFind }: Props
 
   const onSubmit = () => {
     setIsLoading(true);
-    generateScenarioFromSTIXBundle(files ?? [])
+    generateScenarioFromSTIXBundle(scenarioId, files ?? [])
       .finally(() => {
         setIsLoading(false);
         onResetAndClose();

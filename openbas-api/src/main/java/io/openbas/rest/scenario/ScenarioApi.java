@@ -36,7 +36,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +86,8 @@ public class ScenarioApi extends RestBehavior {
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/generate-scenario-from-stix-bundle")
   public Scenario generateScenarioFromSTIXBundle(
-      @PathVariable @NotBlank final String scenarioId, @RequestPart("file") @Nullable File file)
+      @PathVariable @NotBlank final String scenarioId,
+      @RequestPart("file") @Nullable MultipartFile file)
       throws IOException {
     return scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
   }
