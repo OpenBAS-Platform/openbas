@@ -70,13 +70,9 @@ public class WithMockObserverUserSecurityContextFactory
       newGroup.setExercisesDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
       // Create grant
-      Scenario scenario = ScenarioFixture.createDefaultCrisisScenario();
-      scenario.setName("scenario");
-      scenario = scenarioRepository.save(scenario);
       Grant grant = new Grant();
       grant.setName(OBSERVER);
       grant.setGroup(group);
-      grant.setScenario(scenario);
       this.grantRepository.save(grant);
     } else {
       group = groupOpt.get();
