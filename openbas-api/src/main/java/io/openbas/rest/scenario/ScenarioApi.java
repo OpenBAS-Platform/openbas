@@ -85,10 +85,11 @@ public class ScenarioApi extends RestBehavior {
     return this.scenarioService.createScenario(scenario);
   }
 
-  @PostMapping(SCENARIO_URI + "/generate-scenario-from-stix-bundle")
-  public Scenario generateScenarioFromSTIXBundle(@RequestPart("file") @Nullable File file)
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/generate-scenario-from-stix-bundle")
+  public Scenario generateScenarioFromSTIXBundle(
+      @PathVariable @NotBlank final String scenarioId, @RequestPart("file") @Nullable File file)
       throws IOException {
-    return scenarioService.generateScenarioFromSTIXBundle(file);
+    return scenarioService.generateScenarioFromSTIXBundle(scenarioId, file);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}")

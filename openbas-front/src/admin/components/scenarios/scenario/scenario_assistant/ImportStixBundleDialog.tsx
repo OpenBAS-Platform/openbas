@@ -59,7 +59,6 @@ const ImportSTIXBundleDialog = ({ open, onClose, onAttackPatternIdsFind }: Props
   const onSubmit = () => {
     setIsLoading(true);
     generateScenarioFromSTIXBundle(files ?? [])
-      .then(response => onAttackPatternIdsFind(response.data))
       .finally(() => {
         setIsLoading(false);
         onResetAndClose();

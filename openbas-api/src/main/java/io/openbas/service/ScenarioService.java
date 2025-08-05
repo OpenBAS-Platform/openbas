@@ -35,6 +35,8 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.inject.form.InjectAssistantInput;
+import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
@@ -116,6 +118,7 @@ public class ScenarioService {
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
+  private final InjectAssistantService injectAssistantService;
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -873,7 +876,7 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public Scenario generateScenarioFromSTIXBundle(File file) throws IOException {
+  public Scenario generateScenarioFromSTIXBundle(String scenarioId, File file) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode root = mapper.readTree(file);
 
@@ -882,8 +885,22 @@ public class ScenarioService {
       throw new IllegalArgumentException("No objects in STIX bundle");
     }
 
+    // Extract attack-patterns and their MITRE IDs
+    Map<String, String> stixIdToMitreId = new HashMap<>();
+    Set<String> referencedAttackPatternIds = new HashSet<>();
+
+    for (JsonNode obj : objects) {
+      if ("attack-pattern".equals(obj.path("type").asText())) {
+        String stixId = obj.path("id").asText();
+        String mitreId = obj.path("x_mitre_id").asText(null);
+        if (mitreId != null) {
+          stixIdToMitreId.put(stixId, mitreId);
+        }
+      }
+    }
+
     SecurityAssessment securityAssessment;
-    Scenario scenario = new Scenario();
+    Scenario scenario = scenario(scenarioId);
 
     for (JsonNode obj : objects) {
       if ("x-security-assessment".equals(obj.path("type").asText())) {
@@ -909,13 +926,18 @@ public class ScenarioService {
         String threatContextRef = obj.path("threat_context_ref").asText(null);
         securityAssessment.setThreatContextRef(threatContextRef);
 
+        // Attack pattern refs -> convert to MITRE IDs
         JsonNode attacksNode = obj.path("attack_pattern_refs");
         if (attacksNode != null && attacksNode.isArray()) {
-          List<String> attackRefsList = new ArrayList<>();
+          List<String> mitreIds = new ArrayList<>();
           for (JsonNode ref : attacksNode) {
-            attackRefsList.add(ref.asText());
+            String stixRef = ref.asText();
+            String mitreId = stixIdToMitreId.get(stixRef);
+            if (mitreId != null) {
+              mitreIds.add(mitreId);
+            }
           }
-          securityAssessment.setAttackPatternRefs(attackRefsList.toArray(new String[0]));
+          securityAssessment.setAttackPatternRefs(mitreIds.toArray(new String[0]));
         } else {
           securityAssessment.setAttackPatternRefs(new String[0]);
         }
@@ -927,6 +949,12 @@ public class ScenarioService {
         // Create Scenario using SecurityAssessment
         scenario =
             createScenarioFromSecurityAssessment(scenario, securityAssessment, threatContextRef);
+
+        // Creation injects based attack patterns from stix
+        InjectAssistantInput input = new InjectAssistantInput();
+        input.setAttackPatternIds(
+            Arrays.stream(securityAssessment.getAttackPatternRefs()).toList());
+        injectAssistantService.generateInjectsForScenario(scenario, input);
       }
     }
 

@@ -243,10 +243,6 @@ export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) =
 
 // STIX
 
-export const generateScenarioFromSTIXBundle = (files: File[]) => {
-  const formData = new FormData();
-  files.forEach((file) => {
-    formData.append('files', file);
-  });
-  return simplePostCall(`${SCENARIO_URI}/generate-scenario-from-stix-bundle`, formData);
+export const generateScenarioFromSTIXBundle = (scenarioId: string, file: File[]) => {
+  return simplePostCall(`${SCENARIO_URI}/${scenarioId}/generate-scenario-from-stix-bundle`, file);
 };
