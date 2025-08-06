@@ -126,7 +126,7 @@ const LeftBar = () => {
               link: '/admin/teams/organizations',
               label: 'Organizations',
               icon: () => (<DomainOutlined fontSize="small" />),
-              userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
+              userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS),
             },
           ],
         },
