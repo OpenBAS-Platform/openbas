@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectService;
@@ -38,7 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class ReportApiTest {
+public class ReportApiTest extends IntegrationTest {
 
   private MockMvc mvc;
 

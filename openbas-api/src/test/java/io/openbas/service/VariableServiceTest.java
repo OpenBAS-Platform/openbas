@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Variable;
 import io.openbas.database.model.Variable.VariableType;
@@ -16,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @TestInstance(PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VariableServiceTest {
+public class VariableServiceTest extends IntegrationTest {
 
   @Autowired private VariableService variableService;
 

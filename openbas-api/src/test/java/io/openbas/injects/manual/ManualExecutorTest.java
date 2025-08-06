@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
@@ -24,7 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
-public class ManualExecutorTest {
+public class ManualExecutorTest extends IntegrationTest {
 
   @Mock InjectExpectationService injectExpectationService;
 

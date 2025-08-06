@@ -975,9 +975,9 @@ public class ScenarioService {
         // Creation injects based attack patterns from stix
         InjectAssistantInput input = new InjectAssistantInput();
         List<String> attackPatternIds =
-            attackPatternService.getAttackPatternIds(
+            attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
                 Arrays.stream(securityAssessment.getAttackPatternRefs())
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet())).stream().map(AttackPattern::getExternalId).toList();
         input.setAttackPatternIds(attackPatternIds); // TODO Add ttps to placeholders
         injectAssistantService.generateInjectsForScenario(scenario, input);
 
@@ -1069,8 +1069,8 @@ public class ScenarioService {
         createScenarioFromSecurityAssessment(scenario, savedSecurity);
 
         // Send back ttps ids
-        return attackPatternService.getAttackPatternIds(
-            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet()));
+        return attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
+            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet())).stream().map(AttackPattern::getExternalId).toList();
       }
     }
 

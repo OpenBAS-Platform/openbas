@@ -26,6 +26,7 @@ public class WithMockObserverUserSecurityContextFactory
     implements WithSecurityContextFactory<WithMockObserverUser> {
 
   public static final String MOCK_USER_OBSERVER_EMAIL = "observer@openbas.io";
+  public static final String MOCK_OBSERVER_GROUP = "Mock Observer group";
   @Autowired private GrantRepository grantRepository;
   @Autowired private GroupRepository groupRepository;
   @Autowired private UserRepository userRepository;
@@ -51,17 +52,18 @@ public class WithMockObserverUserSecurityContextFactory
   }
 
   private void createObserverMockUser() {
-    if (this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL).isPresent()) {
+    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
+    if (userOpt.isPresent() && userOpt.get().isObserver()) {
       return;
     }
 
     // Create group
-    String groupName = "Observer group";
-    Optional<Group> groupOpt = this.groupRepository.findOne(GroupSpecification.fromName(groupName));
+    Optional<Group> groupOpt =
+        this.groupRepository.findOne(GroupSpecification.fromName(MOCK_OBSERVER_GROUP));
     Group group;
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
-      newGroup.setName(groupName);
+      newGroup.setName(MOCK_OBSERVER_GROUP);
       newGroup.setScenariosDefaultGrants(List.of(OBSERVER));
       newGroup.setExercisesDefaultGrants(List.of(OBSERVER));
       group = this.groupRepository.save(newGroup);
@@ -74,12 +76,14 @@ public class WithMockObserverUserSecurityContextFactory
       group = groupOpt.get();
     }
     // Create user
-    Optional<User> userOpt = this.userRepository.findByEmailIgnoreCase(MOCK_USER_OBSERVER_EMAIL);
     if (userOpt.isEmpty()) {
       User user = new User();
       user.setGroups(List.of(group));
       user.setEmail(MOCK_USER_OBSERVER_EMAIL);
       this.userRepository.save(user);
+    } else if (!userOpt.get().isObserver()) {
+      userOpt.get().setGroups(List.of(group));
+      this.userRepository.save(userOpt.get());
     }
   }
 }

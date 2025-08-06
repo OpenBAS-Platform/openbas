@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.inject.service.InjectService;
@@ -29,7 +30,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class ScenarioImportApiTest {
+public class ScenarioImportApiTest extends IntegrationTest {
 
   private MockMvc mvc;
 
