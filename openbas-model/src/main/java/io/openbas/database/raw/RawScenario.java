@@ -17,5 +17,9 @@ public interface RawScenario {
 
   public Set<String> getScenario_tags();
 
+  public Set<String> getScenario_assets();
+
+  public Set<String> getScenario_asset_groups();
+
   public Set<String> getScenario_injects();
 }

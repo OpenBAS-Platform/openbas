@@ -59,7 +59,6 @@ const useRetrieveOptions = () => {
         break;
       case 'target_assets':
       case 'target_endpoint':
-      case 'base_endpoint_side':
         searchTargetOptionsById('ASSETS', ids).then((response) => {
           setOptions(response.data);
         });
@@ -86,12 +85,14 @@ const useRetrieveOptions = () => {
         break;
       case 'finding_asset_groups':
       case 'inject_asset_groups':
+      case 'base_asset_group_side':
         searchAssetGroupByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'finding_assets':
       case 'inject_assets':
+      case 'base_endpoint_side':
         searchEndpointByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
