@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 
-import { importScenario } from '../../../actions/scenarios/scenario-actions';
+import {  importStix } from '../../../actions/scenarios/scenario-actions';
 import ImportUploader from '../../../components/common/ImportUploader';
 import { useAppDispatch } from '../../../utils/hooks';
 
@@ -10,7 +10,7 @@ const ImportUploaderScenario = () => {
   const navigate = useNavigate();
 
   const handleUpload = async (formData: FormData) => {
-    await dispatch(importScenario(formData)).then((result: { [x: string]: string }) => {
+    await dispatch(importStix(formData)).then((result: { [x: string]: string }) => {
       if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
         navigate(0);
       }
@@ -19,7 +19,7 @@ const ImportUploaderScenario = () => {
 
   return (
     <ImportUploader
-      title="Import a scenario"
+      title="Import from a STIX Bundle"
       handleUpload={handleUpload}
     />
   );

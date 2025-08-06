@@ -64,6 +64,11 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
   return postReferential(null, uri, formData)(dispatch);
 };
 
+export const importStix = (formData: FormData) => (dispatch: Dispatch) => {
+  const uri = `${SCENARIO_URI}/generate-scenario-from-stix-bundle`;
+  return postReferential(null, uri, formData)(dispatch);
+};
+
 export const duplicateScenario = (scenarioId: string) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}`;
   return postReferential(scenario, uri, null)(dispatch);
@@ -243,10 +248,10 @@ export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) =
 
 // STIX
 
-export const generateScenarioFromSTIXBundle = (scenarioId: string, files: File[]) => {
+export const extractTTPsFromSTIXBundle = (scenarioId: string, files: File[]) => {
   const formData = new FormData();
   files.forEach((file) => {
     formData.append('file', file);
   });
-  return simplePostCall(`${SCENARIO_URI}/${scenarioId}/generate-scenario-from-stix-bundle`, formData);
+  return simplePostCall(`${SCENARIO_URI}/${scenarioId}/extract-ttps-from-stix-bundle`, formData);
 };

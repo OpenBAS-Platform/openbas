@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { generateScenarioFromSTIXBundle } from '../../../../../actions/scenarios/scenario-actions';
+import { extractTTPsFromSTIXBundle } from '../../../../../actions/scenarios/scenario-actions';
 import Dialog from '../../../../../components/common/Dialog';
 import ImportUploader from '../../../../../components/common/ImportUploader';
 import { useFormatter } from '../../../../../components/i18n';
@@ -62,7 +62,7 @@ const ImportSTIXBundleDialog = ({ open, onClose, onAttackPatternIdsFind }: Props
 
   const onSubmit = () => {
     setIsLoading(true);
-    generateScenarioFromSTIXBundle(scenarioId, files ?? [])
+    extractTTPsFromSTIXBundle(scenarioId, files ?? [])
       .then(response => onAttackPatternIdsFind(response.data))
       .finally(() => {
         setIsLoading(false);

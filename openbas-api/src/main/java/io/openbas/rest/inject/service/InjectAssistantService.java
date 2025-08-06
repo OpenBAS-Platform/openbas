@@ -162,6 +162,8 @@ public class InjectAssistantService {
    */
   private Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
+    if(endpoints.isEmpty()) return Map.of("Windows:x86_64", Collections.emptyList(), "Linux:x86_64", Collections.emptyList());
+
     return endpoints.stream()
         .collect(
             Collectors.groupingBy(endpoint -> endpoint.getPlatform() + ":" + endpoint.getArch()));
@@ -379,9 +381,9 @@ public class InjectAssistantService {
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
-    if (endpoints.isEmpty()) {
-      return;
-    }
+//    if (endpoints.isEmpty()) {
+//      return;
+//    }
     ContractResultForEndpoints endpointResults =
         getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
 
