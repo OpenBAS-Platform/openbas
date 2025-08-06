@@ -126,6 +126,7 @@ public class ScenarioService {
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
   private final SecurityAssessmentRepository securityAssessmentRepository;
+  private final TagRepository tagRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -879,8 +880,7 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public List<String> generateScenarioFromSTIXBundle(MultipartFile file)
-      throws IOException {
+  public List<String> generateScenarioFromSTIXBundle(MultipartFile file) throws IOException {
 
     List<String> createdScenarios = new ArrayList<>();
 
@@ -909,23 +909,24 @@ public class ScenarioService {
       }
     }
 
-
-
     for (JsonNode obj : objects) { // Maybe we could have varoius security assestemnt
       if ("x-security-assessment".equals(obj.path("type").asText())) {
 
         String id = obj.path("id").asText();
 
-        SecurityAssessment securityAssessment = securityAssessmentRepository.findByExternalId(id).orElse(new SecurityAssessment());
-        Scenario scenario ;
-        if(securityAssessment.getScenario() == null){
+        SecurityAssessment securityAssessment =
+            securityAssessmentRepository.findByExternalId(id).orElse(new SecurityAssessment());
+        Scenario scenario;
+        if (securityAssessment.getScenario() == null) {
           scenario = new Scenario();
-        }else {
-          scenario = scenarioRepository.findById(securityAssessment.getScenario().getId())
-              .orElse(new Scenario());
+        } else {
+          scenario =
+              scenarioRepository
+                  .findById(securityAssessment.getScenario().getId())
+                  .orElse(new Scenario());
         }
 
-        if(scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
+        if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
 
         securityAssessment.setExternalId(id);
         securityAssessment.setName(obj.path("name").asText());
@@ -964,7 +965,8 @@ public class ScenarioService {
         // Add vulnerabilities
         // Add labels as upsert tags
 
-        // if security assessment exists before then check if any scenario was referenced in other case create a scenario
+        // if security assessment exists before then check if any scenario was referenced in other
+        // case create a scenario
         securityAssessment.setScenario(scenario);
         SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
@@ -1082,6 +1084,8 @@ public class ScenarioService {
     scenario.setDescription(securityAssessment.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
     scenario.setMainFocus("incident-response");
+    // TODO Set tags
+    scenario.setTags(Set.of(tagRepository.findByName("opencti").get()));
 
     Instant start = securityAssessment.getPeriodStart();
     Instant end = securityAssessment.getPeriodEnd();
