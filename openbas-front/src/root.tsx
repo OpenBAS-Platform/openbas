@@ -62,7 +62,7 @@ const Root = () => {
     );
   }
   return (
-    <PermissionsProvider capabilities={me.user_capabilities}>
+    <PermissionsProvider capabilities={me.user_capabilities} isAdmin={me.user_admin}>
       <UserContext.Provider
         value={{
           me,
@@ -92,11 +92,8 @@ const Root = () => {
                     <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
                     {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
                     <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-                    <Route
-                      path="channels/:exerciseId/:channelId"
-                      element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHANNELS} Component={errorWrapper(Channel)()} />}
-                    />
-                    <Route path="challenges/:exerciseId" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.CHALLENGES} Component={errorWrapper(Challenges)()} />} />
+                    <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
+                    <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
                     <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                     <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                     <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />
