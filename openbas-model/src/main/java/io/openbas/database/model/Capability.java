@@ -14,6 +14,13 @@ public enum Capability {
   // Superuser
   BYPASS(null, pair(null, null)),
 
+  // Assesment
+  CREATE_ASSESSMENT(
+      pair(ResourceType.SCENARIO, Action.CREATE),
+      pair(ResourceType.SIMULATION, Action.CREATE),
+      pair(ResourceType.SCENARIO, Action.DUPLICATE),
+      pair(ResourceType.SIMULATION, Action.DUPLICATE)),
+
   // Atomic Testing
   ACCESS_ATOMIC_TESTING(null, pair(ResourceType.ATOMIC_TESTING, Action.READ)),
   MANAGE_ATOMIC_TESTING(ACCESS_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.WRITE)),
