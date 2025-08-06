@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
@@ -19,9 +20,29 @@ import org.hibernate.annotations.UuidGenerator;
 public class Grant implements Base {
 
   public enum GRANT_TYPE {
-    OBSERVER,
-    PLANNER,
-    LAUNCHER
+    OBSERVER(1),
+    LAUNCHER(2),
+    PLANNER(3);
+
+    private final int priority;
+
+    GRANT_TYPE(int priority) {
+      this.priority = priority;
+    }
+
+    public int getPriority() {
+      return priority;
+    }
+
+    //  verify that priority is unique
+    static {
+      var priorities = new java.util.HashSet<Integer>();
+      for (GRANT_TYPE type : GRANT_TYPE.values()) {
+        if (!priorities.add(type.priority)) {
+          throw new IllegalStateException("Duplicate priority found in GRANT_TYPE: " + type.name());
+        }
+      }
+    }
   }
 
   @Id
@@ -75,5 +96,12 @@ public class Grant implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @JsonIgnore
+  public String getResourceId() {
+    return this.getScenario() != null
+        ? this.getScenario().getId()
+        : this.getExercise() != null ? this.getExercise().getId() : null;
   }
 }

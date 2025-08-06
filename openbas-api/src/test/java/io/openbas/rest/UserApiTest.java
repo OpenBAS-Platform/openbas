@@ -12,15 +12,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Grant;
+import io.openbas.database.model.Group;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.GrantRepository;
+import io.openbas.database.repository.GroupRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.user.form.login.LoginUserInput;
 import io.openbas.rest.user.form.login.ResetUserInput;
 import io.openbas.rest.user.form.user.CreateUserInput;
+import io.openbas.rest.user.form.user.UpdateUserInput;
 import io.openbas.service.MailingService;
+import io.openbas.utils.fixtures.ScenarioFixture;
 import io.openbas.utils.fixtures.UserFixture;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +38,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @TestInstance(PER_CLASS)
 class UserApiTest extends IntegrationTest {
@@ -37,6 +48,10 @@ class UserApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private GroupRepository groupRepository;
+  @Autowired private GrantRepository grantRepository;
 
   @MockBean private MailingService mailingService;
 
@@ -55,7 +70,10 @@ class UserApiTest extends IntegrationTest {
 
   @AfterAll
   public void teardown() {
-    this.userRepository.deleteById(savedUser.getId());
+    this.scenarioRepository.deleteAll();
+    this.userRepository.deleteAll();
+    this.groupRepository.deleteAll();
+    this.grantRepository.deleteAll();
   }
 
   @Nested
@@ -195,5 +213,51 @@ class UserApiTest extends IntegrationTest {
       // -- ASSERT --
       verify(mailingService, never()).sendEmail(anyString(), anyString(), any(List.class));
     }
+  }
+
+  @DisplayName(
+      "Get a user with several grant on the same resource, should return the highest grant")
+  @Test
+  @WithMockUser(roles = {"ADMIN"})
+  void given_user_with_several_grant_on_same_resource_should_return_highest_grant()
+      throws Exception {
+
+    Scenario scenario = scenarioRepository.save(ScenarioFixture.createDefaultCrisisScenario());
+    User user = userRepository.save(UserFixture.getUser("test", "test", "test3@gmail.com"));
+    Group group = new Group();
+    group.setName("test");
+    group = groupRepository.save(group);
+
+    Grant grantObserver = new Grant();
+    grantObserver.setScenario(scenario);
+    grantObserver.setGroup(group);
+    grantObserver.setName(Grant.GRANT_TYPE.OBSERVER);
+    Grant grantPlanner = new Grant();
+    grantPlanner.setScenario(scenario);
+    grantPlanner.setGroup(group);
+    grantPlanner.setName(Grant.GRANT_TYPE.PLANNER);
+    grantRepository.saveAll(List.of(grantObserver, grantPlanner));
+    group.setGrants(List.of(grantObserver, grantPlanner));
+    group.setUsers(List.of(user));
+    group = groupRepository.save(group);
+
+    UpdateUserInput updateUserInput = new UpdateUserInput();
+    updateUserInput.setFirstname(user.getFirstname());
+    updateUserInput.setLastname(user.getLastname());
+    updateUserInput.setEmail(user.getEmail());
+
+    String response =
+        mvc.perform(
+                MockMvcRequestBuilders.put("/api/users/" + user.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(updateUserInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    Map<String, Object> grants = JsonPath.read(response, "$.user_grants");
+    assertEquals(1, grants.size(), 1);
+    assertEquals(Grant.GRANT_TYPE.PLANNER.name(), grants.get(scenario.getId()));
   }
 }
