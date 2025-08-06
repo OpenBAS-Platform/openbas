@@ -113,7 +113,7 @@ const Index = () => {
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
-              <Route path="teams/*" element={<ProtectedRoute action={ACTIONS.MANAGE} subject={SUBJECTS.TEAMS_AND_PLAYERS} Component={errorWrapper(Teams)()} />} />
+              <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
               <Route path="workspaces/custom_dashboards" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.DASHBOARDS} Component={errorWrapper(CustomDashboards)()} />} />
               <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.DASHBOARDS} Component={errorWrapper(IndexCustomDashboard)()} />} />
