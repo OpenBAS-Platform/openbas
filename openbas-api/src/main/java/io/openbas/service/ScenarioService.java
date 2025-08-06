@@ -982,7 +982,7 @@ public class ScenarioService {
         List<String> attackPatternIds =
             attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
                 Arrays.stream(securityAssessment.getAttackPatternRefs())
-                    .collect(Collectors.toSet())).stream().map(AttackPattern::getExternalId).toList();
+                    .collect(Collectors.toSet())).stream().map(AttackPattern::getId).toList();
         input.setAttackPatternIds(attackPatternIds); // TODO Add ttps to placeholders
         injectAssistantService.generateInjectsForScenario(scenario, input);
 
@@ -1075,7 +1075,7 @@ public class ScenarioService {
 
         // Send back ttps ids
         return attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
-            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet())).stream().map(AttackPattern::getExternalId).toList();
+            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet())).stream().map(AttackPattern::getId).toList();
       }
     }
 

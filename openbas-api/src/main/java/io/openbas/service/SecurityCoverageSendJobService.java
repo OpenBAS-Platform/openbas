@@ -1,0 +1,37 @@
+package io.openbas.service;
+
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.SecurityCoverageSendJob;
+import io.openbas.database.repository.SecurityCoverageSendJobRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class SecurityCoverageSendJobService {
+  private final SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
+
+  public void createOrUpdateJobsForSimulation(List<Exercise> exercises) {
+    List<SecurityCoverageSendJob> jobs = new ArrayList<>();
+    for (Exercise exercise : exercises) {
+      Optional<SecurityCoverageSendJob> scsj = securityCoverageSendJobRepository.findBySimulation(exercise);
+      if (scsj.isPresent()) {
+        scsj.get().setUpdatedAt(Instant.now());
+        jobs.add(scsj.get());
+      } else {
+        SecurityCoverageSendJob newJob = new SecurityCoverageSendJob();
+        newJob.setSimulation(exercise);
+        newJob.setUpdatedAt(Instant.now());
+        jobs.add(newJob);
+      }
+    }
+    if(!jobs.isEmpty()) {
+      securityCoverageSendJobRepository.saveAll(jobs);
+    }
+  }
+}
