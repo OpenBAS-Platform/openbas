@@ -327,6 +327,14 @@ public class User implements Base {
         .collect(Collectors.toSet());
   }
 
+  @JsonProperty("user_grants")
+  public Map<String, String> getGrants() {
+    return getGroups().stream()
+        .flatMap(group -> group.getGrants().stream())
+        .filter(grant -> grant.getResourceId() != null)
+        .collect(Collectors.toMap(Grant::getResourceId, grant -> grant.getName().name()));
+  }
+
   @Override
   public boolean isUserHasAccess(User user) {
     return user.isAdmin() || user.getId().equals(getId());
