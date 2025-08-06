@@ -35,7 +35,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
   const parametersSchema = z.object({
     custom_dashboards_parameter_id: z.string().optional(),
     custom_dashboards_parameter_name: z.string().min(1, { message: t('Should not be empty') }),
-    custom_dashboards_parameter_type: z.literal('simulation'),
+    custom_dashboards_parameter_type: z.enum(['simulation', 'timeRange', 'startDate', 'endDate']),
   });
 
   const validationSchema = useMemo(
@@ -123,26 +123,33 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
               gap: theme.spacing(2),
             }}
           >
-            <TextFieldController
-              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_name`}
-              label={t('Parameter Name')}
-              variant="standard"
-              required
-              noHelperText
-            />
-            <TextFieldController
-              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
-              label={t('Parameter Type')}
-              variant="standard"
-              required
-              disabled
-              noHelperText
-            />
-            <Tooltip title={t('Delete')}>
-              <IconButton color="error" onClick={() => remove(index)}>
-                <DeleteOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            {
+              field.custom_dashboards_parameter_type === 'simulation' && (
+                <>
+                  <TextFieldController
+                    name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_name`}
+                    label={t('Parameter Name')}
+                    variant="standard"
+                    required
+                    noHelperText
+                  />
+                  <TextFieldController
+                    name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
+                    label={t('Parameter Type')}
+                    variant="standard"
+                    required
+                    disabled
+                    noHelperText
+                  />
+                  <Tooltip title={t('Delete')}>
+                    <IconButton color="error" onClick={() => remove(index)}>
+                      <DeleteOutlined fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )
+            }
+
           </Box>
         ))}
         <Box sx={{

@@ -2,34 +2,26 @@ import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } fro
 import { useTheme } from '@mui/material/styles';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent, useState } from 'react';
-import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
-
-const useStyles = makeStyles()(() => ({
-  container: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    alignItems: 'center',
-  },
-  rightAligned: { justifySelf: 'end' },
-}));
 
 interface Props {
   handleTimeRange: (data: string) => void;
   handleStartDate: (data: string) => void;
   handleEndDate: (data: string) => void;
-  defaultTimeRange: string;
+  defaultTimeRange: string | undefined;
+  defaultStartDate: string | undefined;
+  defaultEndDate: string | undefined;
 }
 
-const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleStartDate, handleEndDate, defaultTimeRange }) => {
+const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleStartDate, handleEndDate, defaultTimeRange, defaultStartDate, defaultEndDate }) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
 
-  const [timeRangeValue, setTimeRangeValue] = useState<string>(defaultTimeRange);
-  const [startDateValue, setStartDateValue] = useState<string>('');
-  const [endDateValue, setEndDateValue] = useState<string>('');
+  const [timeRangeValue, setTimeRangeValue] = useState<string | undefined>(defaultTimeRange);
+  const [startDateValue, setStartDateValue] = useState<string | undefined>(defaultStartDate);
+  const [endDateValue, setEndDateValue] = useState<string | undefined>(defaultEndDate);
 
   const timeRangeItems = [
     {
@@ -66,17 +58,6 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
     },
   ];
 
-  /* const submitTimeRange = async (data: CustomDashboardTimeFilterInput) => {
-    await updateCustomDashboardTimeRange(customDashboard.custom_dashboard_id, data);
-  };
-
-  const setDatesToNull = (timeRangePrev: CustomDashboardTimeFilterInput['custom_dashboard_time_range'], timRangeCur: CustomDashboardTimeFilterInput['custom_dashboard_time_range']) => {
-    if (timeRangePrev !== 'CUSTOM' && timRangeCur === 'CUSTOM') {
-      setStartDateValue('');
-      setEndDateValue('');
-    }
-  }; */
-
   return (
     <div style={{
       display: 'grid',
@@ -84,7 +65,10 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
       gap: theme.spacing(2),
     }}
     >
-      <FormControl size="small">
+      <FormControl
+        size="small"
+        sx={{ minWidth: 120 }}
+      >
         <InputLabel id="customDashboardTimeRangeSelectLabel" variant="outlined">{t('Time range')}</InputLabel>
         <Select
           labelId="customDashboardTimeRangeSelectLabel"
