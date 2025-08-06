@@ -949,6 +949,7 @@ public class ScenarioService {
 
         // Add vulnerabilities
 
+        securityAssessment.setScenario(scenario);
         SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
         // Create Scenario using SecurityAssessment
