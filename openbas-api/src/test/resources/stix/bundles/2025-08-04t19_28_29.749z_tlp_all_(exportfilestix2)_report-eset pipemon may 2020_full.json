@@ -1,0 +1,2679 @@
+{
+    "type": "bundle",
+    "id": "bundle--b051ed45-1591-4fd8-be8b-f258d8a14ab3",
+    "objects": [
+        {
+            "id": "identity--67364a5a-d033-525c-af72-acf37c073c82",
+            "spec_version": "2.1",
+            "identity_class": "individual",
+            "name": "testuser",
+            "contact_information": "testest@test.com",
+            "created": "2024-09-26T13:23:34.882Z",
+            "modified": "2024-09-26T13:23:34.882Z",
+            "x_opencti_id": "a6e668b3-b31e-425b-90dc-dbb21d4a3164",
+            "x_opencti_type": "Individual",
+            "type": "identity"
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--f88d31f6-486f-44da-b317-01333bde0b82",
+            "created": "2017-01-20T00:00:00.000Z",
+            "definition_type": "tlp",
+            "name": "TLP:AMBER",
+            "definition": {
+                "tlp": "amber"
+            }
+        },
+        {
+            "id": "report--0031409d-145a-54b5-940f-bb709242b310",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-05-21T00:00:00.000Z",
+            "modified": "2025-07-24T09:13:02.505Z",
+            "name": "ESET PipeMon May 2020",
+            "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.\n123123",
+            "report_types": [
+                "threat-report"
+            ],
+            "published": "2020-05-21T00:00:00.000Z",
+            "x_opencti_workflow_id": "b28a370a-317b-4c50-8f0d-483b17d11abb",
+            "labels": [
+                "test - 2",
+                "test_e_ford_apr_2025"
+            ],
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "b4fd713e-b92a-4206-94bc-b551cbc0cf5a",
+            "x_opencti_type": "Report",
+            "type": "report",
+            "created_by_ref": "identity--67364a5a-d033-525c-af72-acf37c073c82",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--f88d31f6-486f-44da-b317-01333bde0b82"
+            ],
+            "object_refs": [
+                "relationship--07a0a582-04eb-586e-b51a-0ecafe2f790d",
+                "relationship--873502fb-8b3e-5a3a-a708-af9e61b85265",
+                "indicator--0003a9d0-d933-59f3-802b-fa24fc5e2f32",
+                "indicator--00001761-0963-5c89-b673-9d8e5ba4801f",
+                "indicator--0005fb02-bea6-5c73-9d2b-d9c3e79b93ac",
+                "attack-pattern--5824a365-0699-58d4-aded-ae9d9a0fb42b",
+                "relationship--2bfd48fb-f2e8-42b4-b369-673f04dc5d0a",
+                "file--0001271e-ef98-5233-a64d-a7b7b7e217b1",
+                "indicator--1f9e2eea-f743-517c-8ff0-069d5abaa305",
+                "software--c6dea06c-c413-5a4a-bb58-b95de10f8cb8",
+                "relationship--c321d70e-c7da-4b4c-b29d-aa1996a228c2",
+                "relationship--e5a09146-fc34-432e-81cc-ad29b3988298",
+                "relationship--61966fad-667f-4db8-bc08-9e6946ab654c",
+                "relationship--f20a8b5a-4d6f-4952-a3f2-fa93cfded1c5",
+                "relationship--a4a78020-bfa5-45e3-9944-202a3194fe6e",
+                "relationship--55cff434-e71d-4426-b60a-d58dfef29ce1",
+                "intrusion-set--8d84d50f-147b-5e81-921c-940f6f6d7e14",
+                "attack-pattern--1619390b-fc8a-5af7-a7b6-252fa8aded0a",
+                "attack-pattern--0b75beed-9a14-5c11-a84d-58bf05894394",
+                "attack-pattern--21a5b9ae-fefb-5537-8775-080b43c422b8",
+                "attack-pattern--9c64897c-8026-562d-ac7e-7ac84532975f",
+                "attack-pattern--64e4d0b4-c714-5405-aa23-f86a97588a3c",
+                "relationship--6d4c0301-d402-49a4-ae49-be7b3267832c",
+                "relationship--b09eede4-161a-4c45-a2bf-c0f3e0518b24",
+                "relationship--b7c3cf23-8dc3-464f-b316-60e58d05b0eb",
+                "relationship--a84bd41b-2ec6-4fef-bab0-1a240a7a77db",
+                "relationship--3b77ea62-b2d8-4bbc-be46-2ceadc346583",
+                "relationship--03e0f7b3-fcaa-42b9-87b5-1450517f9dd7",
+                "relationship--d99813dd-2ce4-4e3d-9858-840e84575cda",
+                "relationship--e83a7069-6d6c-4a5e-b2a7-b0bf9ed9d225",
+                "relationship--ffd2904f-2c23-4af9-8d47-b8798f6dff0e",
+                "relationship--2de23073-92d4-49dc-850f-5b6298dd4b7d",
+                "attack-pattern--de0dfb5a-6c01-57e0-be8d-1996b22c0c70",
+                "attack-pattern--4d19d68e-c8b4-5fdc-b942-0f87a338e605",
+                "attack-pattern--67efc969-1bc4-544f-ab77-715dd734644c",
+                "attack-pattern--e8a8f23a-c1d2-5f4b-8356-d31b2a0c8065",
+                "attack-pattern--fb5adb10-bb73-5267-a0a8-7f5339fcd4fe",
+                "attack-pattern--dbcc14aa-4b59-5ce5-a9bd-edcc077965cf",
+                "attack-pattern--dddfcbea-f665-55cb-ae75-dab028a1ef70",
+                "attack-pattern--e467b67d-259e-55b3-8e93-8da8a4796da8",
+                "attack-pattern--141cb6c4-5036-566f-a534-24dccb94a337",
+                "attack-pattern--4bd0ecc3-ea17-531d-8b98-7a3e921c346b",
+                "relationship--cb3b6c7d-1918-4df8-86d2-1c16f8ed85c5",
+                "indicator--e8aab561-12be-5ae0-bbd5-48bc1d8bd317",
+                "ipv4-addr--0b2c98ab-53a2-51fa-b47d-ebb54979d81a",
+                "malware--3ce1c75d-7bd5-5685-86ca-7c6663f588dc",
+                "attack-pattern--0040f898-6262-5e32-acb0-cb333e59887f",
+                "malware--346c2c0d-1eee-58a2-b569-057e6819891d"
+            ],
+            "x_opencti_files": [
+                {
+                    "name": "2025-07-02T08:13:44-04:00_global.txt",
+                    "data": "MTg2LjE3Mi4wLjEKMTg2LjE3Mi4wLjI=",
+                    "mime_type": "text/plain",
+                    "version": "2025-07-02T12:14:16.458Z"
+                }
+            ]
+        },
+        {
+            "id": "relationship--07a0a582-04eb-586e-b51a-0ecafe2f790d",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "I want a description",
+            "start_time": "2025-07-21T08:14:52.000Z",
+            "stop_time": "2025-07-21T08:15:52.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2025-07-21T08:16:01.213Z",
+            "modified": "2025-07-21T08:16:05.353Z",
+            "x_opencti_workflow_id": "00f0dba3-7b18-4b62-a7e0-7e5661de5f7a",
+            "x_opencti_id": "b9c63f79-4d36-4a95-9d8b-30581231fa49",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--67364a5a-d033-525c-af72-acf37c073c82",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--f88d31f6-486f-44da-b317-01333bde0b82"
+            ],
+            "source_ref": "intrusion-set--8d84d50f-147b-5e81-921c-940f6f6d7e14",
+            "target_ref": "attack-pattern--21a5b9ae-fefb-5537-8775-080b43c422b8"
+        },
+        {
+            "id": "relationship--873502fb-8b3e-5a3a-a708-af9e61b85265",
+            "spec_version": "2.1",
+            "relationship_type": "based-on",
+            "start_time": "2024-12-13T09:01:26.000Z",
+            "stop_time": "2024-12-13T09:02:26.000Z",
+            "revoked": false,
+            "confidence": 50,
+            "lang": "en",
+            "created": "2024-12-13T09:02:37.087Z",
+            "modified": "2024-12-16T09:44:50.530Z",
+            "x_opencti_workflow_id": "00f0dba3-7b18-4b62-a7e0-7e5661de5f7a",
+            "x_opencti_id": "f6090784-2851-4756-af80-c10d92c23141",
+            "x_opencti_type": "based-on",
+            "type": "relationship",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6",
+                "identity--939ba930-2302-5081-9837-4127f96999ab",
+                "identity--67fabb23-c547-5c4a-b253-9d9a8548c466",
+                "identity--f2aa7711-75e7-5828-9bec-ddb6da15c829",
+                "identity--32753afa-41ef-5974-94d3-fc493d1808b7"
+            ],
+            "source_ref": "indicator--00001761-0963-5c89-b673-9d8e5ba4801f",
+            "target_ref": "ipv4-addr--0b2c98ab-53a2-51fa-b47d-ebb54979d81a"
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+            "created": "2017-01-20T00:00:00.000Z",
+            "definition_type": "tlp",
+            "name": "TLP:CLEAR",
+            "definition": {
+                "tlp": "clear"
+            }
+        },
+        {
+            "id": "indicator--0003a9d0-d933-59f3-802b-fa24fc5e2f32",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2010-11-12T03:57:30.000Z",
+            "modified": "2025-08-04T07:37:57.009Z",
+            "pattern_type": "stix",
+            "pattern_version": "2.1",
+            "pattern": "[domain-name:value = 'northracing.net']",
+            "name": "northracing.net",
+            "valid_from": "2025-06-11T02:08:14.364Z",
+            "valid_until": "2025-09-21T17:03:22.624Z",
+            "x_opencti_score": 50,
+            "x_opencti_detection": false,
+            "x_opencti_main_observable_type": "Domain-Name",
+            "x_opencti_observable_values": [
+                {
+                    "type": "Domain-Name",
+                    "value": "northracing.net",
+                    "hashes": null
+                }
+            ],
+            "labels": [
+                "2589",
+                "anchordns",
+                "cobaltstrike",
+                "financial",
+                "hyperv",
+                "malware",
+                "meterpreter",
+                "pos",
+                "splunk stream",
+                "test-nov",
+                "trickbot",
+                "windows",
+                "wizardspider"
+            ],
+            "external_references": [
+                {
+                    "source_name": "Microsoft Sentinel",
+                    "description": "Intel within the Microsoft platform.",
+                    "external_id": "98E50EEDF4B3A35446862770E8E76EA915F9517DF68DA7B41A26612EF5BB042F"
+                }
+            ],
+            "x_opencti_id": "a6e0df60-3065-484e-a18b-0d47a2ecc643",
+            "x_opencti_type": "Indicator",
+            "type": "indicator",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "Recorded Future",
+            "contact_information": "recordedfuture.com",
+            "created": "2022-01-22T19:05:28.315Z",
+            "modified": "2025-07-11T21:13:23.629Z",
+            "x_opencti_organization_type": "vendor",
+            "x_opencti_reliability": "A - Completely reliable",
+            "labels": [
+                "finance",
+                "insurance",
+                "small",
+                "test"
+            ],
+            "x_opencti_id": "c06cdbc0-8443-4f31-8d56-e63046b1c1bb",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--a6f20d4d-0360-59b6-ba22-3b48707828b1",
+            "created": "2024-02-28T09:56:44.341Z",
+            "definition_type": "pap",
+            "name": "pap:amber",
+            "definition": {
+                "pap": "pap:amber"
+            }
+        },
+        {
+            "id": "indicator--00001761-0963-5c89-b673-9d8e5ba4801f",
+            "spec_version": "2.1",
+            "revoked": true,
+            "confidence": 60,
+            "created": "2024-10-26T10:54:27.790Z",
+            "modified": "2025-08-04T07:37:56.891Z",
+            "pattern_type": "stix",
+            "pattern_version": "2.1",
+            "pattern": "[domain-name:value = 'criminaly.com']",
+            "name": "criminaly.com",
+            "valid_from": "2024-10-26T10:54:27.790Z",
+            "valid_until": "2025-06-16T07:21:09.304Z",
+            "x_opencti_score": 20,
+            "x_opencti_detection": false,
+            "x_opencti_main_observable_type": "Domain-Name",
+            "x_opencti_observable_values": [
+                {
+                    "type": "Domain-Name",
+                    "value": "criminaly.com",
+                    "hashes": null
+                }
+            ],
+            "labels": [
+                "2589",
+                "entertainment",
+                "finance",
+                "hyperv",
+                "splunk",
+                "splunk stream",
+                "test"
+            ],
+            "x_opencti_id": "b414b74b-cc02-4539-a92a-6afcc99b2708",
+            "x_opencti_type": "Indicator",
+            "type": "indicator",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--8cb00c79-ab20-5ed4-b37d-337241b96a29"
+            ],
+            "object_marking_refs": [
+                "marking-definition--a6f20d4d-0360-59b6-ba22-3b48707828b1",
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da",
+            "created": "2017-01-20T00:00:00.000Z",
+            "definition_type": "tlp",
+            "name": "TLP:GREEN",
+            "definition": {
+                "tlp": "green"
+            }
+        },
+        {
+            "id": "indicator--0005fb02-bea6-5c73-9d2b-d9c3e79b93ac",
+            "spec_version": "2.1",
+            "revoked": true,
+            "confidence": 60,
+            "created": "2024-10-11T16:49:24.709Z",
+            "modified": "2025-08-04T07:37:56.975Z",
+            "pattern_type": "stix",
+            "pattern_version": "2.1",
+            "pattern": "[ipv4-addr:value = '78.153.130.24']",
+            "name": "78.153.130.24",
+            "description": "Triggered risk rules:\n\n|Rule|Risk Rule Severity|Risk Score Severity|\n|--|--|--|\n|Historically Linked to Intrusion Method|Unusual|5-24|\n|Historical Suspected C&C Server|Unusual|5-24|\n|Recently Reported C&C Server|Malicious|65-89|",
+            "valid_from": "2024-10-11T16:49:24.709Z",
+            "valid_until": "2025-05-05T11:57:47.677Z",
+            "x_opencti_score": 20,
+            "x_opencti_detection": false,
+            "x_opencti_main_observable_type": "IPv4-Addr",
+            "x_opencti_observable_values": [
+                {
+                    "type": "IPv4-Addr",
+                    "value": "78.153.130.24",
+                    "hashes": null
+                }
+            ],
+            "labels": [
+                "2589",
+                "apache struts",
+                "entertainment",
+                "finance",
+                "hyperv",
+                "splunk stream",
+                "test-nov"
+            ],
+            "external_references": [
+                {
+                    "source_name": "Microsoft Sentinel",
+                    "description": "Intel within the Microsoft platform.",
+                    "external_id": "92B0F4682270445182CD256982748966E434EBEB4BEA034E8EA69867719D6A1A"
+                }
+            ],
+            "x_opencti_id": "8165d7df-6fe8-41ab-ace6-8f8443fa7531",
+            "x_opencti_type": "Indicator",
+            "type": "indicator",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da"
+            ]
+        },
+        {
+            "id": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "The MITRE Corporation",
+            "created": "2023-08-20T09:50:04.212Z",
+            "modified": "2025-05-28T20:30:13.361Z",
+            "x_opencti_organization_type": "other",
+            "x_opencti_reliability": "B - Usually reliable",
+            "x_opencti_id": "bf567425-223f-49d6-8462-85a84f3e0963",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd",
+            "created": "2017-06-01T00:00:00.000Z",
+            "definition_type": "statement",
+            "name": "Copyright 2015-2025, The MITRE Corporation. MITRE ATT&CK and ATT&CK are registered trademarks of The MITRE Corporation.",
+            "definition": {
+                "statement": "copyright 2015-2025, the mitre corporation. mitre att&ck and att&ck are registered trademarks of the mitre corporation."
+            }
+        },
+        {
+            "id": "attack-pattern--5824a365-0699-58d4-aded-ae9d9a0fb42b",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2024-04-25T11:14:20.436Z",
+            "modified": "2025-06-30T06:59:43.054Z",
+            "name": "T1027.013",
+            "description": "Adversaries may encrypt or encode files to obfuscate strings, bytes, and other specific patterns to impede detection. Encrypting and/or encoding file content aims to conceal malicious artifacts within a file used in an intrusion. Many other techniques, such as [Software Packing](https://attack.mitre.org/techniques/T1027/002), [Steganography](https://attack.mitre.org/techniques/T1027/003), and [Embedded Payloads](https://attack.mitre.org/techniques/T1027/009), share this same broad objective. Encrypting and/or encoding files could lead to a lapse in detection of static signatures, only for this malicious content to be revealed (i.e., [Deobfuscate/Decode Files or Information](https://attack.mitre.org/techniques/T1140)) at the time of execution/use.\n\nThis type of file obfuscation can be applied to many file artifacts present on victim hosts, such as malware log/configuration and payload files.(Citation: File obfuscation) Files can be encrypted with a hardcoded or user-supplied key, as well as otherwise obfuscated using standard encoding/compression schemes such as Base64.\n\nThe entire content of a file may be obfuscated, or just specific functions or values (such as C2 addresses). Encryption and encoding may also be applied in redundant layers for additional protection.\n\nFor example, adversaries may abuse password-protected Word documents or self-extracting (SFX) archives as a method of encrypting/encoding a file such as a [Phishing](https://attack.mitre.org/techniques/T1566) payload. These files typically function by attaching the intended archived content to a decompressor stub that is executed when the file is invoked (e.g., [User Execution](https://attack.mitre.org/techniques/T1204)).(Citation: SFX - Encrypted/Encoded File) \n\nAdversaries may also abuse file-specific as well as custom encoding schemes. For example, Byte Order Mark (BOM) headers in text files may be abused to manipulate and obfuscate file content until [Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059) execution.",
+            "aliases": [
+                "Obfuscated Files or Information: Encrypted/Encoded File",
+                "Encrypted/Encoded File"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_id": "T1027.013",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--6ed6a5aa-20be-412e-abac-89ad392f6529"
+                },
+                {
+                    "source_name": "SFX - Encrypted/Encoded File",
+                    "description": "Jai Minton. (2023, March 31). How Falcon OverWatch Investigates Malicious Self-Extracting Archives, Decoy Files and Their Hidden Payloads. Retrieved March 29, 2024.",
+                    "url": "https://www.crowdstrike.com/blog/self-extracting-archives-decoy-files-and-their-hidden-payloads/"
+                },
+                {
+                    "source_name": "File obfuscation",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://www.crowdstrike.com/blog/shlayer-malvertising-campaigns-still-using-flash-update-disguise/"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1027/013",
+                    "external_id": "T1027.013"
+                }
+            ],
+            "x_opencti_id": "46f3cbbe-5fe5-40d2-b4c6-57c84cf4fd03",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "relationship--2bfd48fb-f2e8-42b4-b369-673f04dc5d0a",
+            "spec_version": "2.1",
+            "relationship_type": "based-on",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2024-04-16T13:28:16.813Z",
+            "modified": "2024-12-16T09:44:52.317Z",
+            "x_opencti_id": "8ae111ec-e998-4964-9470-a74310df6e16",
+            "x_opencti_type": "based-on",
+            "type": "relationship",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--be669b67-e9bb-5a5d-900b-c56f5b2a69f7"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ],
+            "source_ref": "indicator--1f9e2eea-f743-517c-8ff0-069d5abaa305",
+            "target_ref": "file--0001271e-ef98-5233-a64d-a7b7b7e217b1"
+        },
+        {
+            "id": "file--0001271e-ef98-5233-a64d-a7b7b7e217b1",
+            "spec_version": "2.1",
+            "name": "JohnJohn",
+            "x_opencti_additional_names": [
+                "JohnJohn"
+            ],
+            "hashes": {
+                "SHA-256": "65b015eddd543de467ffe8f0a2dfc1e2a270b9ba7fb752348dd000f8f8c88635"
+            },
+            "x_opencti_id": "89704457-1eaa-4421-8c02-891b231e6b30",
+            "x_opencti_type": "StixFile",
+            "type": "file",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "indicator--1f9e2eea-f743-517c-8ff0-069d5abaa305",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2024-04-16T13:28:16.812Z",
+            "modified": "2025-07-09T15:44:57.724Z",
+            "pattern_type": "stix",
+            "pattern_version": "2.1",
+            "pattern": "[file:hashes.'SHA-256' = '65b015eddd543de467ffe8f0a2dfc1e2a270b9ba7fb752348dd000f8f8c88635']",
+            "name": "65b015eddd543de467ffe8f0a2dfc1e2a270b9ba7fb752348dd000f8f8c88635",
+            "valid_from": "2025-07-09T15:44:57.248Z",
+            "valid_until": "2026-04-26T02:54:41.805Z",
+            "x_opencti_score": 50,
+            "x_opencti_detection": false,
+            "x_opencti_main_observable_type": "StixFile",
+            "x_opencti_observable_values": [
+                {
+                    "type": "StixFile",
+                    "value": null,
+                    "hashes": [
+                        {
+                            "algorithm": "SHA-256",
+                            "hash": "65b015eddd543de467ffe8f0a2dfc1e2a270b9ba7fb752348dd000f8f8c88635"
+                        }
+                    ]
+                }
+            ],
+            "labels": [
+                "hyperv"
+            ],
+            "x_opencti_id": "8c802c8c-23e3-4625-a8bf-23c6138956d1",
+            "x_opencti_type": "Indicator",
+            "type": "indicator",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--be669b67-e9bb-5a5d-900b-c56f5b2a69f7"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "identity--eb481938-f652-5a05-b1a5-9323d3d958bb",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "ESET",
+            "contact_information": "eset.com",
+            "created": "2024-03-22T12:07:23.015Z",
+            "modified": "2025-06-20T09:43:14.831Z",
+            "x_opencti_organization_type": "vendor",
+            "x_opencti_reliability": "A - Completely reliable",
+            "x_opencti_id": "176167eb-dda0-467f-8683-23ffb9cb59a0",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "id": "software--c6dea06c-c413-5a4a-bb58-b95de10f8cb8",
+            "spec_version": "2.1",
+            "x_opencti_score": 50,
+            "name": "software test",
+            "cpe": "45",
+            "x_opencti_id": "c272b160-c7f5-4a92-a51c-971682f614e4",
+            "x_opencti_type": "Software",
+            "type": "software",
+            "x_opencti_created_by_ref": "identity--eb481938-f652-5a05-b1a5-9323d3d958bb",
+            "x_opencti_labels": [
+                "angelique-3"
+            ],
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "relationship--c321d70e-c7da-4b4c-b29d-aa1996a228c2",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can check for the presence of ESET and Kaspersky security software.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:07:40.526Z",
+            "modified": "2024-03-22T14:27:56.175Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "08f76fef-5da0-47c2-8ed6-b3966a0b2f6a",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--21a5b9ae-fefb-5537-8775-080b43c422b8"
+        },
+        {
+            "id": "relationship--e5a09146-fc34-432e-81cc-ad29b3988298",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can collect and send the local IP address, RDP information, and the network adapter physical address as a part of its C2 beacon.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:07:40.400Z",
+            "modified": "2024-03-22T14:25:41.688Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "0e5bdf82-9f6f-4f9e-8c3d-bb0d042b7d5f",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--64e4d0b4-c714-5405-aa23-f86a97588a3c"
+        },
+        {
+            "id": "relationship--61966fad-667f-4db8-bc08-9e6946ab654c",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can use parent PID spoofing to elevate privileges.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.324Z",
+            "modified": "2024-03-22T13:57:15.535Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "87846ba7-75c5-48e5-bd32-84d42b21335b",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--1619390b-fc8a-5af7-a7b6-252fa8aded0a"
+        },
+        {
+            "id": "relationship--f20a8b5a-4d6f-4952-a3f2-fa93cfded1c5",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "The [PipeMon](https://attack.mitre.org/software/S0501) communication module can use a custom protocol based on TLS over TCP.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:27:37.560Z",
+            "modified": "2024-03-22T13:31:34.766Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "ff1df060-de11-47b4-a698-4de6cc8164cf",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--9c64897c-8026-562d-ac7e-7ac84532975f"
+        },
+        {
+            "id": "relationship--a4a78020-bfa5-45e3-9944-202a3194fe6e",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T15:01:02.103Z",
+            "modified": "2024-10-16T15:22:02.456Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "0ec20d0d-768c-4e4f-af5d-f33df90a5e80",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "x_opencti_granted_refs": [
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "intrusion-set--8d84d50f-147b-5e81-921c-940f6f6d7e14",
+            "target_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d"
+        },
+        {
+            "id": "relationship--55cff434-e71d-4426-b60a-d58dfef29ce1",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can attempt to gain administrative privileges using token impersonation.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.348Z",
+            "modified": "2024-03-22T12:31:14.767Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "5208c120-b882-4981-a0ca-bc166b9b2309",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--0b75beed-9a14-5c11-a84d-58bf05894394"
+        },
+        {
+            "id": "intrusion-set--8d84d50f-147b-5e81-921c-940f6f6d7e14",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 50,
+            "created": "2017-05-31T21:32:08.682Z",
+            "modified": "2025-01-29T13:21:43.854Z",
+            "name": "Winnti Group",
+            "description": "[Winnti Group](https://attack.mitre.org/groups/G0044) is a threat group with Chinese origins that has been active since at least 2010. The group has heavily targeted the gaming industry, but it has also expanded the scope of its targeting.(Citation: Kaspersky Winnti April 2013)(Citation: Kaspersky Winnti June 2015)(Citation: Novetta Winnti April 2015) Some reporting suggests a number of other groups, including [Axiom](https://attack.mitre.org/groups/G0001), [APT17](https://attack.mitre.org/groups/G0025), and [Ke3chang](https://attack.mitre.org/groups/G0004), are closely linked to [Winnti Group](https://attack.mitre.org/groups/G0044).(Citation: 401 TRG Winnti Umbrella May 2018)",
+            "aliases": [
+                "Blackfly"
+            ],
+            "labels": [
+                "adha: actor of interest"
+            ],
+            "external_references": [
+                {
+                    "source_name": "401 TRG Winnti Umbrella May 2018",
+                    "description": "Hegel, T. (2018, May 3). Burning Umbrella: An Intelligence Report on the Winnti Umbrella and Associated State-Sponsored Attackers. Retrieved July 8, 2018.",
+                    "url": "https://401trg.github.io/pages/burning-umbrella.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/groups/G0044",
+                    "external_id": "G0044"
+                },
+                {
+                    "source_name": "Kaspersky Winnti June 2015",
+                    "description": "Tarakanov, D. (2015, June 22). Games are over: Winnti is now targeting pharmaceutical companies. Retrieved January 14, 2016.",
+                    "url": "https://securelist.com/games-are-over/70991/"
+                },
+                {
+                    "source_name": "Novetta Winnti April 2015",
+                    "description": "Novetta Threat Research Group. (2015, April 7). Winnti Analysis. Retrieved February 8, 2017.",
+                    "url": "https://web.archive.org/web/20150412223949/http://www.novetta.com/wp-content/uploads/2015/04/novetta_winntianalysis.pdf"
+                },
+                {
+                    "source_name": "Kaspersky Winnti April 2013",
+                    "description": "Kaspersky Lab's Global Research and Analysis Team. (2013, April 11). Winnti. More than just a game. Retrieved February 8, 2017.",
+                    "url": "https://securelist.com/winnti-more-than-just-a-game/37029/"
+                },
+                {
+                    "source_name": "Symantec Suckfly March 2016",
+                    "description": "DiMaggio, J. (2016, March 15). Suckfly: Revealing the secret life of your code signing certificates. Retrieved August 3, 2016.",
+                    "url": "http://www.symantec.com/connect/blogs/suckfly-revealing-secret-life-your-code-signing-certificates"
+                }
+            ],
+            "x_opencti_id": "b6f9c9cd-9366-4c0f-9b22-e1f6396e1ae2",
+            "x_opencti_type": "Intrusion-Set",
+            "type": "intrusion-set",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "x_opencti_granted_refs": [
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--1619390b-fc8a-5af7-a7b6-252fa8aded0a",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-02-18T18:22:41.448Z",
+            "modified": "2025-02-21T19:20:28.860Z",
+            "name": "Parent PID Spoofing - T1134.004",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may spoof the parent process identifier (PPID) of a new process to evade process-monitoring defenses or to elevate privileges. New processes are typically spawned directly from their parent, or calling, process unless explicitly specified. One way of explicitly assigning the PPID of a new process is via the `CreateProcess` API call, which supports a parameter that defines the PPID to use.(Citation: DidierStevens SelectMyParent Nov 2009) This functionality is used by Windows features such as User Account Control (UAC) to correctly set the PPID after a requested elevated process is spawned by SYSTEM (typically via `svchost.exe` or `consent.exe`) rather than the current user context.(Citation: Microsoft UAC Nov 2018)\n\nAdversaries may abuse these mechanisms to evade defenses, such as those blocking processes spawning directly from Office documents, and analysis targeting unusual/potentially malicious parent-child process relationships, such as spoofing the PPID of [PowerShell](https://attack.mitre.org/techniques/T1059/001)/[Rundll32](https://attack.mitre.org/techniques/T1218/011) to be `explorer.exe` rather than an Office document delivered as part of [Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001).(Citation: CounterCept PPID Spoofing Dec 2018) This spoofing could be executed via [Visual Basic](https://attack.mitre.org/techniques/T1059/005) within a malicious Office document or any code that can perform [Native API](https://attack.mitre.org/techniques/T1106).(Citation: CTD PPID Spoofing Macro Mar 2019)(Citation: CounterCept PPID Spoofing Dec 2018)\n\nExplicitly assigning the PPID may also enable elevated privileges given appropriate access rights to the parent process. For example, an adversary in a privileged user context (i.e. administrator) may spawn a new process and assign the parent as a process running as SYSTEM (such as `lsass.exe`), causing the new process to be elevated via the inherited access token.(Citation: XPNSec PPID Nov 2017)",
+            "aliases": [
+                "Access Token Manipulation: Parent PID Spoofing",
+                "Parent PID Spoofing"
+            ],
+            "x_mitre_platforms": [
+                "Windows"
+            ],
+            "x_mitre_permissions_required": [
+                "Administrator",
+                "User"
+            ],
+            "x_mitre_detection": "Look for inconsistencies between the various fields that store PPID information, such as the EventHeader ProcessId from data collected via Event Tracing for Windows (ETW), Creator Process ID/Name from Windows event logs, and the ProcessID and ParentProcessID (which are also produced from ETW and other utilities such as Task Manager and Process Explorer). The ETW provided EventHeader ProcessId identifies the actual parent process.(Citation: CounterCept PPID Spoofing Dec 2018)\n\nMonitor and analyze API calls to <code>CreateProcess</code>/<code>CreateProcessA</code>, specifically those from user/potentially malicious processes and with parameters explicitly assigning PPIDs (ex: the Process Creation Flags of 0x8XXX, indicating that the process is being created with extended startup information(Citation: Microsoft Process Creation Flags May 2018)). Malicious use of <code>CreateProcess</code>/<code>CreateProcessA</code> may also be proceeded by a call to <code>UpdateProcThreadAttribute</code>, which may be necessary to update process creation attributes.(Citation: Secuirtyinbits Ataware3 May 2019) This may generate false positives from normal UAC elevation behavior, so compare to a system baseline/understanding of normal system activity if possible.",
+            "x_mitre_id": "T1134.004",
+            "labels": [
+                "entertainment",
+                "finance",
+                "mto-finance",
+                "parent pid spoofing - t1134.004",
+                "t1134.004"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                },
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "privilege-escalation",
+                    "x_opencti_order": 5
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--d643454a-ddeb-4d21-bc6f-11cdece07964"
+                },
+                {
+                    "source_name": "CTD PPID Spoofing Macro Mar 2019",
+                    "description": "Tafani-Dereeper, C. (2019, March 12). Building an Office macro to spoof parent processes and command line arguments. Retrieved June 3, 2019.",
+                    "url": "https://blog.christophetd.fr/building-an-office-macro-to-spoof-process-parent-and-command-line/"
+                },
+                {
+                    "source_name": "DidierStevens SelectMyParent Nov 2009",
+                    "description": "Stevens, D. (2009, November 22). Quickpost: SelectMyParent or Playing With the Windows Process Tree. Retrieved June 3, 2019.",
+                    "url": "https://blog.didierstevens.com/2009/11/22/quickpost-selectmyparent-or-playing-with-the-windows-process-tree/"
+                },
+                {
+                    "source_name": "Secuirtyinbits Ataware3 May 2019",
+                    "description": "Secuirtyinbits . (2019, May 14). Parent PID Spoofing (Stage 2) Ataware Ransomware Part 3. Retrieved June 6, 2019.",
+                    "url": "https://www.securityinbits.com/malware-analysis/parent-pid-spoofing-stage-2-ataware-ransomware-part-3"
+                },
+                {
+                    "source_name": "Microsoft Process Creation Flags May 2018",
+                    "description": "Schofield, M. & Satran, M. (2018, May 30). Process Creation Flags. Retrieved June 4, 2019.",
+                    "url": "https://docs.microsoft.com/windows/desktop/ProcThread/process-creation-flags"
+                },
+                {
+                    "source_name": "Microsoft UAC Nov 2018",
+                    "description": "Montemayor, D. et al.. (2018, November 15). How User Account Control works. Retrieved June 3, 2019.",
+                    "url": "https://docs.microsoft.com/windows/security/identity-protection/user-account-control/how-user-account-control-works"
+                },
+                {
+                    "source_name": "CounterCept PPID Spoofing Dec 2018",
+                    "description": "Loh, I. (2018, December 21). Detecting Parent PID Spoofing. Retrieved June 3, 2019.",
+                    "url": "https://www.countercept.com/blog/detecting-parent-pid-spoofing/"
+                },
+                {
+                    "source_name": "XPNSec PPID Nov 2017",
+                    "description": "Chester, A. (2017, November 20). Alternative methods of becoming SYSTEM. Retrieved June 4, 2019.",
+                    "url": "https://blog.xpnsec.com/becoming-system/"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1134/004",
+                    "external_id": "T1134.004"
+                }
+            ],
+            "x_opencti_id": "b50d4c5e-a3d1-422d-a11a-0b7314738620",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--0b75beed-9a14-5c11-a84d-58bf05894394",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-02-18T16:48:56.582Z",
+            "modified": "2025-04-17T08:55:58.631Z",
+            "name": "Access Token Manipulation: Create Process with Token",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may create a new process with an existing token to escalate privileges and bypass access controls. Processes can be created with the token and resulting security context of another user using features such as `CreateProcessWithTokenW` and `runas`.(Citation: Microsoft RunAs)\n\nCreating processes with a token not associated with the current user may require the credentials of the target user, specific privileges to impersonate that user, or access to the token to be used. For example, the token could be duplicated via [Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001) or created via [Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003) before being used to create a process.\n\nWhile this technique is distinct from [Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001), the techniques can be used in conjunction where a token is duplicated and then used to create a new process.",
+            "aliases": [
+                "T1134.002",
+                "Create Process with Token - T1134.002",
+                "Create Process with Token"
+            ],
+            "x_mitre_platforms": [
+                "Windows"
+            ],
+            "x_mitre_detection": "If an adversary is using a standard command-line shell (i.e. [Windows Command Shell](https://attack.mitre.org/techniques/T1059/003)), analysts may detect token manipulation by auditing command-line activity. Specifically, analysts should look for use of the <code>runas</code> command or similar artifacts. Detailed command-line logging is not enabled by default in Windows.(Citation: Microsoft Command-line Logging)\n\nIf an adversary is using a payload that calls the Windows token APIs directly, analysts may detect token manipulation only through careful analysis of user activity, examination of running processes, and correlation with other endpoint and network behavior.\n\nAnalysts can also monitor for use of Windows APIs such as <code>CreateProcessWithTokenW</code> and correlate activity with other suspicious behavior to reduce false positives that may be due to normal benign use by users and administrators.",
+            "x_mitre_id": "T1134.002",
+            "labels": [
+                "create process with token - t1134.002",
+                "entertainment",
+                "finance",
+                "mto-finance",
+                "t1134.002"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                },
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "privilege-escalation",
+                    "x_opencti_order": 5
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--3836ba58-ddbd-412a-bd82-381a3e3b296f"
+                },
+                {
+                    "source_name": "Microsoft RunAs",
+                    "description": "Microsoft. (2016, August 31). Runas. Retrieved October 1, 2021.",
+                    "url": "https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/cc771525(v=ws.11)"
+                },
+                {
+                    "source_name": "Microsoft Command-line Logging",
+                    "description": "Mathers, B. (2017, March 7). Command line process auditing. Retrieved April 21, 2017.",
+                    "url": "https://technet.microsoft.com/en-us/windows-server-docs/identity/ad-ds/manage/component-updates/command-line-process-auditing"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1134/002",
+                    "external_id": "T1134.002"
+                }
+            ],
+            "x_opencti_id": "611fe3a6-c70e-4b00-bc19-6244824b1269",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--21a5b9ae-fefb-5537-8775-080b43c422b8",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-02-21T21:16:18.066Z",
+            "modified": "2025-06-20T07:28:59.659Z",
+            "name": "Security Software Discovery",
+            "description": "Adversaries may attempt to get a listing of security software, configurations, defensive tools, and sensors that are installed on a system or in a cloud environment. This may include things such as cloud monitoring agents and anti-virus. Adversaries may use the information from [Security Software Discovery](https://attack.mitre.org/techniques/T1518/001) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nExample commands that can be used to obtain security software information are [netsh](https://attack.mitre.org/software/S0108), `reg query` with [Reg](https://attack.mitre.org/software/S0075), `dir` with [cmd](https://attack.mitre.org/software/S0106), and [Tasklist](https://attack.mitre.org/software/S0057), but other indicators of discovery behavior may be more specific to the type of software or security system the adversary is looking for. It is becoming more common to see macOS malware perform checks for LittleSnitch and KnockKnock software.\n\nAdversaries may also utilize the [Cloud API](https://attack.mitre.org/techniques/T1059/009) to discover cloud-native security software installed on compute infrastructure, such as the AWS CloudWatch agent, Azure VM Agent, and Google Cloud Monitor agent. These agents  may collect  metrics and logs from the VM, which may be centrally aggregated in a cloud-based monitoring platform.",
+            "aliases": [
+                "T1518.001",
+                "Security Software Discovery - T1518.001"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS",
+                "IaaS",
+                "Azure AD",
+                "Office 365",
+                "SaaS",
+                "Google Workspace"
+            ],
+            "x_mitre_permissions_required": [
+                "User"
+            ],
+            "x_mitre_detection": "System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as lateral movement, based on the information obtained.\n\nMonitor processes and command-line arguments for actions that could be taken to gather system and network information. Remote access tools with built-in features may interact directly with the Windows API to gather information. Information may also be acquired through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001).\n\nIn cloud environments, additionally monitor logs for the usage of APIs that may be used to gather information about security software configurations within the environment.",
+            "x_mitre_id": "T1518.001",
+            "labels": [
+                "entertainment",
+                "finance",
+                "mto-finance",
+                "security software discovery - t1518.001",
+                "t1518.001",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "discovery",
+                    "x_opencti_order": 8
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/581.html",
+                    "external_id": "CAPEC-581"
+                },
+                {
+                    "source_name": "DescribeSecurityGroups - Amazon Elastic Compute Cloud",
+                    "description": "Amazon Web Services, Inc. . (2022). DescribeSecurityGroups. Retrieved January 28, 2022.",
+                    "url": "https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1518/001",
+                    "external_id": "T1518.001"
+                },
+                {
+                    "source_name": "Expel IO Evil in AWS",
+                    "description": "A. Randazzo, B. Manahan and S. Lipton. (2020, April 28). Finding Evil in AWS. Retrieved June 25, 2020.",
+                    "url": "https://expel.io/blog/finding-evil-in-aws/"
+                }
+            ],
+            "x_opencti_id": "7d45cc2a-cc9e-47f2-b9e3-e5eda5fadb22",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--9c64897c-8026-562d-ac7e-7ac84532975f",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-05-31T21:31:10.728Z",
+            "modified": "2025-05-27T13:52:00.403Z",
+            "name": "Non-Application Layer Protocol - T1095",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may use an OSI non-application layer protocol for communication between host and C2 server or among infected hosts within a network. The list of possible protocols is extensive.(Citation: Wikipedia OSI) Specific examples include use of network layer protocols, such as the Internet Control Message Protocol (ICMP), transport layer protocols, such as the User Datagram Protocol (UDP), session layer protocols, such as Socket Secure (SOCKS), as well as redirected/tunneled protocols, such as Serial over LAN (SOL).\n\nICMP communication between hosts is one example.(Citation: Cisco Synful Knock Evolution) Because ICMP is part of the Internet Protocol Suite, it is required to be implemented by all IP-compatible hosts.(Citation: Microsoft ICMP) However, it is not as commonly monitored as other Internet Protocols such as TCP or UDP and may be used by adversaries to hide communications.",
+            "aliases": [
+                "T1095",
+                "Non-Application Layer Protocol"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_detection": "Analyze network traffic for ICMP messages or other protocols that contain abnormal data or are not normally seen within or exiting the network.(Citation: Cisco Blog Legacy Device Attacks)\n\nAnalyze network data for uncommon data flows (e.g., a client sending significantly more data than it receives from a server). Processes utilizing the network that do not normally have network communication or have never been seen before are suspicious. Analyze packet contents to detect communications that do not follow the expected protocol behavior for the port that is being used.(Citation: University of Birmingham C2) \n\nMonitor and investigate API calls to functions associated with enabling and/or utilizing alternative communication channels.",
+            "x_mitre_id": "T1095",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "non-application layer protocol - t1095",
+                "t1095",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "command-and-control",
+                    "x_opencti_order": 11
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--1e129b5e-2391-4eac-a539-b6b1f19f6294"
+                },
+                {
+                    "source_name": "Wikipedia OSI",
+                    "description": "Wikipedia. (n.d.). List of network protocols (OSI model). Retrieved December 4, 2014.",
+                    "url": "http://en.wikipedia.org/wiki/List_of_network_protocols_%28OSI_model%29"
+                },
+                {
+                    "source_name": "Microsoft ICMP",
+                    "description": "Microsoft. (n.d.). Internet Control Message Protocol (ICMP) Basics. Retrieved December 1, 2014.",
+                    "url": "http://support.microsoft.com/KB/170292"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1095",
+                    "external_id": "T1095"
+                },
+                {
+                    "source_name": "Cisco Synful Knock Evolution",
+                    "description": "Graham Holmes. (2015, October 8). Evolution of attacks on Cisco IOS devices. Retrieved October 19, 2020.",
+                    "url": "https://blogs.cisco.com/security/evolution-of-attacks-on-cisco-ios-devices"
+                },
+                {
+                    "source_name": "Cisco Blog Legacy Device Attacks",
+                    "description": "Omar Santos. (2020, October 19). Attackers Continue to Target Legacy Devices. Retrieved October 20, 2020.",
+                    "url": "https://community.cisco.com/t5/security-blogs/attackers-continue-to-target-legacy-devices/ba-p/4169954"
+                },
+                {
+                    "source_name": "University of Birmingham C2",
+                    "description": "Gardiner, J.,  Cova, M., Nagaraja, S. (2014, February). Command & Control Understanding, Denying and Detecting. Retrieved April 20, 2016.",
+                    "url": "https://arxiv.org/ftp/arxiv/papers/1408/1408.1136.pdf"
+                }
+            ],
+            "x_opencti_id": "d0cf09e3-d828-4c6b-8509-e9ec393f9be7",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--64e4d0b4-c714-5405-aa23-f86a97588a3c",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-05-31T21:30:27.342Z",
+            "modified": "2025-07-07T14:10:01.456Z",
+            "name": "System Network Configuration Discovery",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may look for details about the network configuration and settings, such as IP and/or MAC addresses, of systems they access or through information discovery of remote systems. Several operating system administration utilities exist that can be used to gather this information. Examples include [Arp](https://attack.mitre.org/software/S0099), [ipconfig](https://attack.mitre.org/software/S0100)/[ifconfig](https://attack.mitre.org/software/S0101), [nbtstat](https://attack.mitre.org/software/S0102), and [route](https://attack.mitre.org/software/S0103).\n\nAdversaries may also leverage a [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) on network devices to gather information about configurations and settings, such as IP addresses of configured interfaces and static/dynamic routes (e.g. `show ip route`, `show ip interface`).(Citation: US-CERT-TA18-106A)(Citation: Mandiant APT41 Global Intrusion )\n\nAdversaries may use the information from [System Network Configuration Discovery](https://attack.mitre.org/techniques/T1016) during automated discovery to shape follow-on behaviors, including determining certain access within the target network and what actions to do next.",
+            "aliases": [
+                "T1016",
+                "System Network Configuration Discovery - T1016"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_detection": "System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as Lateral Movement, based on the information obtained.\n\nMonitor processes and command-line arguments for actions that could be taken to gather system and network information. Remote access tools with built-in features may interact directly with the Windows API to gather information. Further, {{LinkById|T1059.008} commands may also be used to gather system and network information with built-in features native to the network device platform.  Monitor CLI activity for unexpected or unauthorized use  commands being run by non-standard users from non-standard locations.  Information may also be acquired through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001).",
+            "x_mitre_id": "T1016",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "system network configuration discovery - t1016",
+                "t1016",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "discovery",
+                    "x_opencti_order": 8
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1016",
+                    "external_id": "T1016"
+                },
+                {
+                    "source_name": "Mandiant APT41 Global Intrusion",
+                    "description": "Gyler, C.,Perez D.,Jones, S.,Miller, S.. (2021, February 25). This is Not a Test: APT41 Initiates Global Intrusion Campaign Using Multiple Exploits. Retrieved February 17, 2022.",
+                    "url": "https://www.mandiant.com/resources/apt41-initiates-global-intrusion-campaign-using-multiple-exploits"
+                },
+                {
+                    "source_name": "US-CERT-TA18-106A",
+                    "description": "US-CERT. (2018, April 20). Alert (TA18-106A) Russian State-Sponsored Cyber Actors Targeting Network Infrastructure Devices. Retrieved October 19, 2020.",
+                    "url": "https://www.us-cert.gov/ncas/alerts/TA18-106A"
+                }
+            ],
+            "x_opencti_id": "078cfe69-9d6f-4589-be78-a33fb800a876",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "relationship--6d4c0301-d402-49a4-ae49-be7b3267832c",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) has used call to `LoadLibrary` to load its installer. [PipeMon](https://attack.mitre.org/software/S0501) loads its modules using reflective loading or custom shellcode.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.150Z",
+            "modified": "2024-03-07T14:18:00.650Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "1dcce631-d2e4-400a-b1f5-afc6bf66c155",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--dbcc14aa-4b59-5ce5-a9bd-edcc077965cf"
+        },
+        {
+            "id": "relationship--b09eede4-161a-4c45-a2bf-c0f3e0518b24",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) modules are stored on disk with seemingly benign names including use of a file extension associated with a popular word processor.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:27:37.431Z",
+            "modified": "2024-03-07T14:13:43.110Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "21e90d0a-b246-445c-a0ca-6a89974d8b5c",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--141cb6c4-5036-566f-a534-24dccb94a337"
+        },
+        {
+            "id": "relationship--b7c3cf23-8dc3-464f-b316-60e58d05b0eb",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can establish persistence by registering a malicious DLL as an alternative Print Processor which is loaded when the print spooler service starts.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.386Z",
+            "modified": "2024-03-07T14:10:23.822Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "aaf9eefa-6b03-447b-9de6-821be0167642",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--e467b67d-259e-55b3-8e93-8da8a4796da8"
+        },
+        {
+            "id": "relationship--a84bd41b-2ec6-4fef-bab0-1a240a7a77db",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) has stored its encrypted payload in the Registry under `HKLM\\SOFTWARE\\Microsoft\\Print\\Components\\`.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2023-03-26T19:41:33.592Z",
+            "modified": "2024-03-07T14:07:59.909Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "77e5f7b7-655f-4603-8dcf-a5cf6125a987",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--de0dfb5a-6c01-57e0-be8d-1996b22c0c70"
+        },
+        {
+            "id": "relationship--3b77ea62-b2d8-4bbc-be46-2ceadc346583",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can decrypt password-protected executables.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:27:37.469Z",
+            "modified": "2024-03-07T14:01:01.937Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "4b298ba4-5d29-4934-bc53-bea4bbaeedce",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--e8a8f23a-c1d2-5f4b-8356-d31b2a0c8065"
+        },
+        {
+            "id": "relationship--03e0f7b3-fcaa-42b9-87b5-1450517f9dd7",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) communications are RC4 encrypted.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:27:37.524Z",
+            "modified": "2024-03-07T13:33:28.967Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "397a4668-44d5-4d04-9995-a20192be734b",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--dddfcbea-f665-55cb-ae75-dab028a1ef70"
+        },
+        {
+            "id": "relationship--d99813dd-2ce4-4e3d-9858-840e84575cda",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) installer can use UAC bypass techniques to install the payload.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.293Z",
+            "modified": "2024-03-07T13:23:56.499Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "33ba0a3b-005a-40d0-a0a3-a904303a7d2d",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--4bd0ecc3-ea17-531d-8b98-7a3e921c346b"
+        },
+        {
+            "id": "relationship--e83a7069-6d6c-4a5e-b2a7-b0bf9ed9d225",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "The [PipeMon](https://attack.mitre.org/software/S0501) installer has modified the Registry key `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Print\\Environments\\Windows x64\\Print Processors` to install [PipeMon](https://attack.mitre.org/software/S0501) as a Print Processor.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-10-05T19:54:22.903Z",
+            "modified": "2024-03-07T13:14:48.242Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "6618b72f-b213-409c-865f-dbbebb605e3d",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--4d19d68e-c8b4-5fdc-b942-0f87a338e605"
+        },
+        {
+            "id": "relationship--ffd2904f-2c23-4af9-8d47-b8798f6dff0e",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) has modified the Registry to store its encrypted payload.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T13:40:23.074Z",
+            "modified": "2024-03-07T12:41:35.855Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "9f9124e6-52df-4d32-b321-292378bbea88",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--67efc969-1bc4-544f-ab77-715dd734644c"
+        },
+        {
+            "id": "relationship--2de23073-92d4-49dc-850f-5b6298dd4b7d",
+            "spec_version": "2.1",
+            "relationship_type": "uses",
+            "description": "[PipeMon](https://attack.mitre.org/software/S0501) can collect and send OS version and computer name as a part of its C2 beacon.(Citation: ESET PipeMon May 2020)",
+            "start_time": "2020-05-21T00:00:00.000Z",
+            "stop_time": "2020-05-21T00:00:00.000Z",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2020-08-24T14:07:40.464Z",
+            "modified": "2024-10-16T15:21:55.725Z",
+            "external_references": [
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "acd3d983-8ce8-4fe1-9587-bb89398f85b5",
+            "x_opencti_type": "uses",
+            "type": "relationship",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "x_opencti_granted_refs": [
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6"
+            ],
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ],
+            "source_ref": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "target_ref": "attack-pattern--fb5adb10-bb73-5267-a0a8-7f5339fcd4fe"
+        },
+        {
+            "id": "attack-pattern--de0dfb5a-6c01-57e0-be8d-1996b22c0c70",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 95,
+            "created": "2023-03-23T19:55:25.546Z",
+            "modified": "2025-03-04T20:10:22.114Z",
+            "name": "Fileless Storage",
+            "description": "Adversaries may store data in \"fileless\" formats to conceal malicious activity from defenses. Fileless storage can be broadly defined as any format other than a file. Common examples of non-volatile fileless storage in Windows systems include the Windows Registry, event logs, or WMI repository.(Citation: Microsoft Fileless)(Citation: SecureList Fileless) In Linux systems, shared memory directories such as `/dev/shm`, `/run/shm`, `/var/run`, and `/var/lock` may also be considered fileless storage, as files written to these directories are mapped directly to RAM and not stored on the disk.(Citation: Elastic Binary Executed from Shared Memory Directory)(Citation: Akami Frog4Shell 2024)(Citation: Aquasec Muhstik Malware 2024)\n\nSimilar to fileless in-memory behaviors such as [Reflective Code Loading](https://attack.mitre.org/techniques/T1620) and [Process Injection](https://attack.mitre.org/techniques/T1055), fileless data storage may remain undetected by anti-virus and other endpoint security tools that can only access specific file formats from disk storage. Leveraging fileless storage may also allow adversaries to bypass the protections offered by read-only file systems in Linux.(Citation: Sysdig Fileless Malware 23022)\n\nAdversaries may use fileless storage to conceal various types of stored data, including payloads/shellcode (potentially being used as part of [Persistence](https://attack.mitre.org/tactics/TA0003)) and collected data not yet exfiltrated from the victim (e.g., [Local Data Staging](https://attack.mitre.org/techniques/T1074/001)). Adversaries also often encrypt, encode, splice, or otherwise obfuscate this fileless data when stored.\n\nSome forms of fileless storage activity may indirectly create artifacts in the file system, but in central and otherwise difficult to inspect formats such as the WMI (e.g., `%SystemRoot%\\System32\\Wbem\\Repository`) or Registry (e.g., `%SystemRoot%\\System32\\Config`) physical files.(Citation: Microsoft Fileless)",
+            "aliases": [
+                "Obfuscated Files or Information: Fileless Storage"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux"
+            ],
+            "x_mitre_id": "T1027.011",
+            "labels": [
+                "mto-finance"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--c2d42686-ad53-4f1e-9bb4-7e5262d0be8d"
+                },
+                {
+                    "source_name": "Akami Frog4Shell 2024",
+                    "description": "Ori David. (2024, February 1). Frog4Shell \u2014 FritzFrog Botnet Adds One-Days to Its Arsenal. Retrieved September 24, 2024.",
+                    "url": "https://www.akamai.com/blog/security-research/fritzfrog-botnet-new-capabilities-log4shell"
+                },
+                {
+                    "source_name": "Sysdig Fileless Malware 23022",
+                    "description": "Nicholas Lang. (2022, May 3). Fileless malware mitigation. Retrieved September 24, 2024.",
+                    "url": "https://sysdig.com/blog/containers-read-only-fileless-malware/"
+                },
+                {
+                    "source_name": "Elastic Binary Executed from Shared Memory Directory",
+                    "description": "Elastic. (n.d.). Binary Executed from Shared Memory Directory. Retrieved September 24, 2024.",
+                    "url": "https://www.elastic.co/guide/en/security/7.17/prebuilt-rule-7-16-3-binary-executed-from-shared-memory-directory.html"
+                },
+                {
+                    "source_name": "AlienVault",
+                    "description": "Nitzan Yaakov. (2024, June 4). Muhstik Malware Targets Message Queuing Services Applications. Retrieved September 24, 2024.",
+                    "url": "https://www.aquasec.com/blog/muhstik-malware-targets-message-queuing-services-applications/"
+                },
+                {
+                    "source_name": "Microsoft Fileless",
+                    "description": "Microsoft. (2023, February 6). Fileless threats. Retrieved March 23, 2023.",
+                    "url": "https://learn.microsoft.com/microsoft-365/security/intelligence/fileless-threats"
+                },
+                {
+                    "source_name": "SecureList Fileless",
+                    "description": "Legezo, D. (2022, May 4). A new secret stash for \u201cfileless\u201d malware. Retrieved March 23, 2023.",
+                    "url": "https://securelist.com/a-new-secret-stash-for-fileless-malware/106393/"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1027/011",
+                    "external_id": "T1027.011"
+                }
+            ],
+            "x_opencti_id": "0d4bf1a6-b31e-4bb8-8232-98abafeb87e4",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--4d19d68e-c8b4-5fdc-b942-0f87a338e605",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2024-02-26T15:54:44.861Z",
+            "modified": "2024-05-10T15:02:35.804Z",
+            "name": "Print Processors",
+            "description": "Adversaries may abuse print processors to run malicious DLLs during system boot for persistence and/or privilege escalation. Print processors are DLLs that are loaded by the print spooler service, `spoolsv.exe`, during boot.(Citation: Microsoft Intro Print Processors)\n\nAdversaries may abuse the print spooler service by adding print processors that load malicious DLLs at startup. A print processor can be installed through the `AddPrintProcessor` API call with an account that has `SeLoadDriverPrivilege` enabled. Alternatively, a print processor can be registered to the print spooler service by adding the `HKLM\\SYSTEM\\\\[CurrentControlSet or ControlSet001]\\Control\\Print\\Environments\\\\[Windows architecture: e.g., Windows x64]\\Print Processors\\\\[user defined]\\Driver` Registry key that points to the DLL.\n\nFor the malicious print processor to be correctly installed, the payload must be located in the dedicated system print-processor directory, that can be found with the `GetPrintProcessorDirectory` API call, or referenced via a relative path from this directory.(Citation: Microsoft AddPrintProcessor May 2018) After the print processors are installed, the print spooler service, which starts during boot, must be restarted in order for them to run.(Citation: ESET PipeMon May 2020)\n\nThe print spooler service runs under SYSTEM level permissions, therefore print processors installed by an adversary may run under elevated privileges.",
+            "aliases": [
+                "T1547.012"
+            ],
+            "x_mitre_platforms": [
+                "windows",
+                "Windows"
+            ],
+            "x_mitre_permissions_required": [
+                "Administrator",
+                "SYSTEM"
+            ],
+            "x_mitre_detection": "Monitor process API calls to <code>AddPrintProcessor</code> and <code>GetPrintProcessorDirectory</code>. New print processor DLLs are written to the print processor directory. Also monitor Registry writes to <code>HKLM\\SYSTEM\\ControlSet001\\Control\\Print\\Environments\\\\[Windows architecture]\\Print Processors\\\\[user defined]\\\\Driver</code> or <code>HKLM\\SYSTEM\\CurrentControlSet\\Control\\Print\\Environments\\\\[Windows architecture]\\Print Processors\\\\[user defined]\\Driver</code> as they pertain to print processor installations.\n\nMonitor for abnormal DLLs that are loaded by spoolsv.exe. Print processors that do not correlate with known good software or patching may be suspicious.",
+            "x_mitre_id": "T1547.012",
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "persistence",
+                    "x_opencti_order": 4
+                },
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "privilege-escalation",
+                    "x_opencti_order": 5
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Microsoft Intro Print Processors",
+                    "description": "Microsoft. (2023, June 26). Introduction to print processors. Retrieved September 27, 2023.",
+                    "url": "https://learn.microsoft.com/windows-hardware/drivers/print/introduction-to-print-processors"
+                },
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                },
+                {
+                    "source_name": "Microsoft AddPrintProcessor May 2018",
+                    "description": "Microsoft. (2018, May 31). AddPrintProcessor function. Retrieved October 5, 2020.",
+                    "url": "https://docs.microsoft.com/en-us/windows/win32/printdocs/addprintprocessor"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1547/012",
+                    "external_id": "T1547.012"
+                }
+            ],
+            "x_opencti_id": "3c433edf-0c3a-4ba0-83e5-61a770a4745d",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--67efc969-1bc4-544f-ab77-715dd734644c",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-05-31T21:31:23.587Z",
+            "modified": "2025-06-30T05:19:29.193Z",
+            "name": "Modify Registry",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may interact with the Windows Registry to hide configuration information within Registry keys, remove information as part of cleaning up, or as part of other techniques to aid in persistence and execution.\n\nAccess to specific areas of the Registry depends on account permissions, some requiring administrator-level access. The built-in Windows command-line utility [Reg](https://attack.mitre.org/software/S0075) may be used for local or remote Registry modification. (Citation: Microsoft Reg) Other tools may also be used, such as a remote access tool, which may contain functionality to interact with the Registry through the Windows API.\n\nRegistry modifications may also include actions to hide keys, such as prepending key names with a null character, which will cause an error and/or be ignored when read via [Reg](https://attack.mitre.org/software/S0075) or other utilities using the Win32 API. (Citation: Microsoft Reghide NOV 2006) Adversaries may abuse these pseudo-hidden keys to conceal payloads/commands used to maintain persistence. (Citation: TrendMicro POWELIKS AUG 2014) (Citation: SpectorOps Hiding Reg Jul 2017)\n\nThe Registry of a remote system may be modified to aid in execution of files as part of lateral movement. It requires the remote Registry service to be running on the target system. (Citation: Microsoft Remote) Often [Valid Accounts](https://attack.mitre.org/techniques/T1078) are required, along with access to the remote system's [SMB/Windows Admin Shares](https://attack.mitre.org/techniques/T1021/002) for RPC communication.",
+            "aliases": [
+                "T1112",
+                "Modify Registry - T1112"
+            ],
+            "x_mitre_platforms": [
+                "Windows"
+            ],
+            "x_mitre_permissions_required": [
+                "Administrator",
+                "User"
+            ],
+            "x_mitre_detection": "Modifications to the Registry are normal and occur throughout typical use of the Windows operating system. Consider enabling Registry Auditing on specific keys to produce an alertable event (Event ID 4657) whenever a value is changed (though this may not trigger when values are created with Reghide or other evasive methods). (Citation: Microsoft 4657 APR 2017) Changes to Registry entries that load software on Windows startup that do not correlate with known software, patch cycles, etc., are suspicious, as are additions or changes to files within the startup folder. Changes could also include new services and modification of existing binary paths to point to malicious files. If a change to a service-related entry occurs, then it will likely be followed by a local or remote service start or restart to execute the file.\n\nMonitor processes and command-line arguments for actions that could be taken to change or delete information in the Registry. Remote access tools with built-in features may interact directly with the Windows API to gather information. The Registry may also be modified through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001), which may require additional logging features to be configured in the operating system to collect necessary information for analysis.\n\nMonitor for processes, command-line arguments, and API calls associated with concealing Registry keys, such as Reghide. (Citation: Microsoft Reghide NOV 2006) Inspect and cleanup malicious hidden Registry entries using Native Windows API calls and/or tools such as Autoruns (Citation: SpectorOps Hiding Reg Jul 2017) and RegDelNull (Citation: Microsoft RegDelNull July 2016).",
+            "x_mitre_id": "T1112",
+            "labels": [
+                "enrich_ipinfo",
+                "entertainment",
+                "finance",
+                "insurance",
+                "logistics",
+                "modify registry - t1112",
+                "mto-finance",
+                "siem",
+                "t1112",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--f9f146b9-5434-47fb-822b-c21baaebe7b1"
+                },
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/203.html",
+                    "external_id": "CAPEC-203"
+                },
+                {
+                    "source_name": "TrendMicro POWELIKS AUG 2014",
+                    "description": "Santos, R. (2014, August 1). POWELIKS: Malware Hides In Windows Registry. Retrieved August 9, 2018.",
+                    "url": "https://blog.trendmicro.com/trendlabs-security-intelligence/poweliks-malware-hides-in-windows-registry/"
+                },
+                {
+                    "source_name": "Microsoft RegDelNull July 2016",
+                    "description": "Russinovich, M. & Sharkey, K. (2016, July 4). RegDelNull v1.11. Retrieved August 10, 2018.",
+                    "url": "https://docs.microsoft.com/en-us/sysinternals/downloads/regdelnull"
+                },
+                {
+                    "source_name": "Microsoft Reghide NOV 2006",
+                    "description": "Russinovich, M. & Sharkey, K. (2006, January 10). Reghide. Retrieved August 9, 2018.",
+                    "url": "https://docs.microsoft.com/sysinternals/downloads/reghide"
+                },
+                {
+                    "source_name": "SpectorOps Hiding Reg Jul 2017",
+                    "description": "Reitz, B. (2017, July 14). Hiding Registry keys with PSReflect. Retrieved August 9, 2018.",
+                    "url": "https://posts.specterops.io/hiding-registry-keys-with-psreflect-b18ec5ac8353"
+                },
+                {
+                    "source_name": "Microsoft 4657 APR 2017",
+                    "description": "Miroshnikov, A. & Hall, J. (2017, April 18). 4657(S): A registry value was modified. Retrieved August 9, 2018.",
+                    "url": "https://docs.microsoft.com/windows/security/threat-protection/auditing/event-4657"
+                },
+                {
+                    "source_name": "Microsoft Remote",
+                    "description": "Microsoft. (n.d.). Enable the Remote Registry Service. Retrieved May 1, 2015.",
+                    "url": "https://technet.microsoft.com/en-us/library/cc754820.aspx"
+                },
+                {
+                    "source_name": "Microsoft Reg",
+                    "description": "Microsoft. (2012, April 17). Reg. Retrieved May 1, 2015.",
+                    "url": "https://technet.microsoft.com/en-us/library/cc732643.aspx"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1112",
+                    "external_id": "T1112"
+                }
+            ],
+            "x_opencti_id": "cd304231-7545-4dde-a9f7-808df9d0884f",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "identity--80a9c5fe-b2bf-53aa-bf79-2123e9eb856c",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "Orange Cyberdefense",
+            "description": "Orange Cyberdefense is the expert cybersecurity business unit of the Orange Group, providing consulting, solutions and services to organizations around the globe.",
+            "created": "2024-06-24T07:12:18.357Z",
+            "modified": "2025-01-29T07:06:52.370Z",
+            "x_opencti_id": "13c5cc50-99eb-45a7-80bc-93089f54054b",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "id": "attack-pattern--e8a8f23a-c1d2-5f4b-8356-d31b2a0c8065",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-12-14T16:46:06.044Z",
+            "modified": "2025-07-01T07:17:26.170Z",
+            "name": "Deobfuscate/Decode Files or Information",
+            "description": "Adversaries may use [Obfuscated Files or Information](https://attack.mitre.org/techniques/T1027) to hide artifacts of an intrusion from analysis. They may require separate mechanisms to decode or deobfuscate that information depending on how they intend to use it. Methods for doing that include built-in functionality of malware or by using utilities present on the system.\n\nOne such example is the use of [certutil](https://attack.mitre.org/software/S0160) to decode a remote access tool portable executable file that has been hidden inside a certificate file.(Citation: Malwarebytes Targeted Attack against Saudi Arabia) Another example is using the Windows `copy /b` command to reassemble binary fragments into a malicious payload.(Citation: Carbon Black Obfuscation Sept 2016)\n\nSometimes a user's action may be required to open it for deobfuscation or decryption as part of [User Execution](https://attack.mitre.org/techniques/T1204). The user may also be required to input a password to open a password protected compressed/encrypted file that was provided by the adversary. (Citation: Volexity PowerDuke November 2016)",
+            "aliases": [
+                "Deobfuscate/Decode Files or Information - T1140",
+                "Deobfuscate / Decode Files or Information",
+                "T1140"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_permissions_required": [
+                "User"
+            ],
+            "x_mitre_detection": "Detecting the action of deobfuscating or decoding files or information may be difficult depending on the implementation. If the functionality is contained within malware and uses the Windows API, then attempting to detect malicious behavior before or after the action may yield better results than attempting to perform analysis on loaded libraries or API calls. If scripts are used, then collecting the scripts for analysis may be necessary. Perform process and command-line monitoring to detect potentially malicious behavior related to scripts and system utilities such as [certutil](https://attack.mitre.org/software/S0160).\n\nMonitor the execution file paths and command-line arguments for common archive file applications and extensions, such as those for Zip and RAR archive tools, and correlate with other suspicious behavior to reduce false positives from normal user and administrator behavior.",
+            "x_mitre_id": "T1140",
+            "labels": [
+                "deobfuscate/decode files or information - t1140",
+                "enrich_ipinfo",
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "t1140",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--324acf46-dcf7-4628-a8d1-e2fc0390f24f"
+                },
+                {
+                    "source_name": "Carbon Black Obfuscation Sept 2016",
+                    "description": "Tedesco, B. (2016, September 23). Security Alert Summary. Retrieved February 12, 2018.",
+                    "url": "https://www.carbonblack.com/2016/09/23/security-advisory-variants-well-known-adware-families-discovered-include-sophisticated-obfuscation-techniques-previously-associated-nation-state-attacks/"
+                },
+                {
+                    "source_name": "Malwarebytes Targeted Attack against Saudi Arabia",
+                    "description": "Malwarebytes Labs. (2017, March 27). New targeted attack against Saudi Arabia Government. Retrieved July 3, 2017.",
+                    "url": "https://blog.malwarebytes.com/cybercrime/social-engineering-cybercrime/2017/03/new-targeted-attack-saudi-arabia-government/"
+                },
+                {
+                    "source_name": "Volexity PowerDuke November 2016",
+                    "description": "Adair, S.. (2016, November 9). PowerDuke: Widespread Post-Election Spear Phishing Campaigns Targeting Think Tanks and NGOs. Retrieved January 11, 2017.",
+                    "url": "https://www.volexity.com/blog/2016/11/09/powerduke-post-election-spear-phishing-campaigns-targeting-think-tanks-and-ngos/"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1140",
+                    "external_id": "T1140"
+                }
+            ],
+            "x_opencti_id": "a12faa15-5b5a-46ab-802d-368a37e5b66a",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--80a9c5fe-b2bf-53aa-bf79-2123e9eb856c",
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "type": "marking-definition",
+            "spec_version": "2.1",
+            "id": "marking-definition--27e105a1-8612-5988-8bd5-3f4a2a32333b",
+            "created": "2017-06-01T00:00:00.000Z",
+            "definition_type": "statement",
+            "name": "copyright 2015-2021, the mitre corporation. mitre att&ck and att&ck are registered trademarks of the mitre corporation.",
+            "definition": {
+                "statement": "copyright 2015-2021, the mitre corporation. mitre att&ck and att&ck are registered trademarks of the mitre corporation."
+            }
+        },
+        {
+            "id": "attack-pattern--fb5adb10-bb73-5267-a0a8-7f5339fcd4fe",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-05-31T21:31:04.307Z",
+            "modified": "2025-06-20T07:34:00.785Z",
+            "name": "System Information Discovery",
+            "description": "An adversary may attempt to get detailed information about the operating system and hardware, including version, patches, hotfixes, service packs, and architecture. Adversaries may use the information from [System Information Discovery](https://attack.mitre.org/techniques/T1082) during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.\n\nTools such as [Systeminfo](https://attack.mitre.org/software/S0096) can be used to gather detailed system information. If running with privileged access, a breakdown of system data can be gathered through the `systemsetup` configuration tool on macOS. As an example, adversaries with user-level access can execute the `df -aH` command to obtain currently mounted disks and associated freely available space. Adversaries may also leverage a [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) on network devices to gather detailed system information (e.g. `show version`).(Citation: US-CERT-TA18-106A) [System Information Discovery](https://attack.mitre.org/techniques/T1082) combined with information gathered from other forms of discovery and reconnaissance can drive payload development and concealment.(Citation: OSX.FairyTale)(Citation: 20 macOS Common Tools and Techniques)\n\nInfrastructure as a Service (IaaS) cloud providers such as AWS, GCP, and Azure allow access to instance and virtual machine information via APIs. Successful authenticated API calls can return data such as the operating system platform and status of a particular instance or the model view of a virtual machine.(Citation: Amazon Describe Instance)(Citation: Google Instances Resource)(Citation: Microsoft Virutal Machine API)",
+            "aliases": [
+                "T1082",
+                "System Information Discovery - T1082"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS",
+                "IaaS",
+                "iOS",
+                "Android"
+            ],
+            "x_mitre_permissions_required": [
+                "User"
+            ],
+            "x_mitre_detection": "System and network discovery techniques normally occur throughout an operation as an adversary learns the environment. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities based on the information obtained.\n\nMonitor processes and command-line arguments for actions that could be taken to gather system and network information. Remote access tools with built-in features may interact directly with the Windows API to gather information. Further, [Network Device CLI](https://attack.mitre.org/techniques/T1059/008) commands may also be used to gather  detailed system information with built-in features native to the network device platform.  Monitor CLI activity for unexpected or unauthorized use  commands being run by non-standard users from non-standard locations. Information may also be acquired through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001).\n\nIn cloud-based systems, native logging can be used to identify access to certain APIs and dashboards that may contain system information. Depending on how the environment is used, that data alone may not be useful due to benign use during normal operations.",
+            "x_mitre_id": "T1082",
+            "labels": [
+                "drs_csa_taxii_sim",
+                "entertainment",
+                "finance",
+                "insurance",
+                "logistics",
+                "mto-finance",
+                "system information discovery - t1082",
+                "t1082",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "discovery",
+                    "x_opencti_order": 8
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/312.html",
+                    "external_id": "CAPEC-312"
+                },
+                {
+                    "source_name": "OSX.FairyTale",
+                    "description": "Phile Stokes. (2018, September 20). On the Trail of OSX.FairyTale | Adware Playing at Malware. Retrieved August 24, 2021.",
+                    "url": "https://www.sentinelone.com/blog/trail-osx-fairytale-adware-playing-malware/"
+                },
+                {
+                    "source_name": "Microsoft Virutal Machine API",
+                    "description": "Microsoft. (2019, March 1). Virtual Machines - Get. Retrieved October 8, 2019.",
+                    "url": "https://docs.microsoft.com/en-us/rest/api/compute/virtualmachines/get"
+                },
+                {
+                    "source_name": "Google Instances Resource",
+                    "description": "Google. (n.d.). Rest Resource: instance. Retrieved March 3, 2020.",
+                    "url": "https://cloud.google.com/compute/docs/reference/rest/v1/instances"
+                },
+                {
+                    "source_name": "Amazon Describe Instance",
+                    "description": "Amazon. (n.d.). describe-instance-information. Retrieved March 3, 2020.",
+                    "url": "https://docs.aws.amazon.com/cli/latest/reference/ssm/describe-instance-information.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1082",
+                    "external_id": "T1082"
+                },
+                {
+                    "source_name": "US-CERT-TA18-106A",
+                    "description": "US-CERT. (2018, April 20). Alert (TA18-106A) Russian State-Sponsored Cyber Actors Targeting Network Infrastructure Devices. Retrieved October 19, 2020.",
+                    "url": "https://www.us-cert.gov/ncas/alerts/TA18-106A"
+                },
+                {
+                    "source_name": "20 macOS Common Tools and Techniques",
+                    "description": "Phil Stokes. (2021, February 16). 20 Common Tools & Techniques Used by macOS Threat Actors & Malware. Retrieved August 23, 2021.",
+                    "url": "https://labs.sentinelone.com/20-common-tools-techniques-used-by-macos-threat-actors-malware/"
+                }
+            ],
+            "x_opencti_id": "80eceb59-1887-4871-b7da-f8301feef759",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd",
+                "marking-definition--27e105a1-8612-5988-8bd5-3f4a2a32333b"
+            ]
+        },
+        {
+            "id": "attack-pattern--dbcc14aa-4b59-5ce5-a9bd-edcc077965cf",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2017-05-31T21:31:40.542Z",
+            "modified": "2025-05-14T14:46:30.244Z",
+            "name": "Shared Modules",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may execute malicious payloads via loading shared modules. Shared modules are executable files that are loaded into processes to provide access to reusable code, such as specific custom functions or invoking OS API functions (i.e., [Native API](https://attack.mitre.org/techniques/T1106)).\n\nAdversaries may use this functionality as a way to execute arbitrary payloads on a victim system. For example, adversaries can modularize functionality of their malware into shared objects that perform various functions such as managing C2 network communications or execution of specific actions on objective.\n\nThe Linux & macOS module loader can load and execute shared objects from arbitrary local paths. This functionality resides in `dlfcn.h` in functions such as `dlopen` and `dlsym`. Although macOS can execute `.so` files, common practice uses `.dylib` files.(Citation: Apple Dev Dynamic Libraries)(Citation: Linux Shared Libraries)(Citation: RotaJakiro 2021 netlab360 analysis)(Citation: Unit42 OceanLotus 2017)\n\nThe Windows module loader can be instructed to load DLLs from arbitrary local paths and arbitrary Universal Naming Convention (UNC) network paths. This functionality resides in `NTDLL.dll` and is part of the Windows [Native API](https://attack.mitre.org/techniques/T1106) which is called from functions like `LoadLibrary` at run time.(Citation: Microsoft DLL)",
+            "aliases": [
+                "Shared Modules - T1129"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_permissions_required": [
+                "User"
+            ],
+            "x_mitre_detection": "Monitoring DLL module loads may generate a significant amount of data and may not be directly useful for defense unless collected under specific circumstances, since benign use of Windows modules load functions are common and may be difficult to distinguish from malicious behavior. Legitimate software will likely only need to load routine, bundled DLL modules or Windows system DLLs such that deviation from known module loads may be suspicious. Limiting DLL module loads to `%SystemRoot%` and `%ProgramFiles%` directories will protect against module loads from unsafe paths. \n\nCorrelation of other events with behavior surrounding module loads using API monitoring and suspicious DLLs written to disk will provide additional context to an event that may assist in determining if it is due to malicious behavior.",
+            "x_mitre_id": "T1129",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "shared modules - t1129",
+                "t1129",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "execution",
+                    "x_opencti_order": 3
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--f2d025b8-5ea7-4f8c-bdcd-df1b017adb3d"
+                },
+                {
+                    "source_name": "Linux Shared Libraries",
+                    "description": "Wheeler, D. (2003, April 11). Shared Libraries. Retrieved September 7, 2023.",
+                    "url": "https://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html"
+                },
+                {
+                    "source_name": "Microsoft DLL",
+                    "description": "Microsoft. (2023, April 28). What is a DLL. Retrieved September 7, 2023.",
+                    "url": "https://learn.microsoft.com/troubleshoot/windows-client/deployment/dynamic-link-library"
+                },
+                {
+                    "source_name": "Unit42 OceanLotus 2017",
+                    "description": "Erye Hernandez and Danny Tsechansky. (2017, June 22). The New and Improved macOS Backdoor from OceanLotus. Retrieved September 8, 2023.",
+                    "url": "https://unit42.paloaltonetworks.com/unit42-new-improved-macos-backdoor-oceanlotus/"
+                },
+                {
+                    "source_name": "Malpedia",
+                    "description": "Alex Turing, Hui Wang. (2021, April 28). RotaJakiro: A long live secret backdoor with 0 VT detection. Retrieved June 14, 2023.",
+                    "url": "https://blog.netlab.360.com/stealth_rotajakiro_backdoor_en/"
+                },
+                {
+                    "source_name": "Apple Doco Archive Dynamic Libraries",
+                    "description": "Apple Inc.. (2012, July 23). Overview of Dynamic Libraries. Retrieved March 24, 2021.",
+                    "url": "https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/DynamicLibraries/100-Articles/OverviewOfDynamicLibraries.html"
+                },
+                {
+                    "source_name": "Wikipedia Windows Library Files",
+                    "description": "Wikipedia. (2017, January 31). Microsoft Windows library files. Retrieved February 13, 2017.",
+                    "url": "https://en.wikipedia.org/wiki/Microsoft_Windows_library_files"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1129",
+                    "external_id": "T1129"
+                }
+            ],
+            "x_opencti_id": "455d6a38-4987-46e0-af17-48de4b214cad",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "attack-pattern--dddfcbea-f665-55cb-ae75-dab028a1ef70",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-03-16T15:45:17.032Z",
+            "modified": "2025-06-20T07:34:00.785Z",
+            "name": "Encrypted Channel: Symmetric Cryptography",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may employ a known symmetric encryption algorithm to conceal command and control traffic rather than relying on any inherent protections provided by a communication protocol. Symmetric encryption algorithms use the same key for plaintext encryption and ciphertext decryption. Common symmetric encryption algorithms include AES, DES, 3DES, Blowfish, and RC4.",
+            "aliases": [
+                "T1573.001",
+                "Symmetric Cryptography",
+                "Symmetric Cryptography - T1573.001",
+                "Encrypted Channel"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS"
+            ],
+            "x_mitre_detection": "With symmetric encryption, it may be possible to obtain the algorithm and key from samples and use them to decode network traffic to detect malware communications signatures.\n\nIn general, analyze network data for uncommon data flows (e.g., a client sending significantly more data than it receives from a server). Processes utilizing the network that do not normally have network communication or have never been seen before are suspicious. Analyze packet contents to detect communications that do not follow the expected protocol behavior for the port that is being used.(Citation: University of Birmingham C2)",
+            "x_mitre_id": "T1573.001",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "symmetric cryptography - t1573.001",
+                "t1573.001",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "command-and-control",
+                    "x_opencti_order": 11
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1573/001",
+                    "external_id": "T1573.001"
+                },
+                {
+                    "source_name": "University of Birmingham C2",
+                    "description": "Gardiner, J.,  Cova, M., Nagaraja, S. (2014, February). Command & Control Understanding, Denying and Detecting. Retrieved April 20, 2016.",
+                    "url": "https://arxiv.org/ftp/arxiv/papers/1408/1408.1136.pdf"
+                }
+            ],
+            "x_opencti_id": "616af59d-1c03-45e5-9364-619bc376472f",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--e467b67d-259e-55b3-8e93-8da8a4796da8",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-01-17T19:13:50.402Z",
+            "modified": "2025-07-07T14:09:58.099Z",
+            "name": "T1543.003",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may create or modify Windows services to repeatedly execute malicious payloads as part of persistence. When Windows boots up, it starts programs or applications called services that perform background system functions.(Citation: TechNet Services) Windows service configuration information, including the file path to the service's executable or recovery programs/commands, is stored in the Windows Registry.\n\nAdversaries may install a new service or modify an existing service to execute at startup in order to persist on a system. Service configurations can be set or modified using system utilities (such as sc.exe), by directly modifying the Registry, or by interacting directly with the Windows API. \n\nAdversaries may also use services to install and execute malicious drivers. For example, after dropping a driver file (ex: `.sys`) to disk, the payload can be loaded and registered via [Native API](https://attack.mitre.org/techniques/T1106) functions such as `CreateServiceW()` (or manually via functions such as `ZwLoadDriver()` and `ZwSetValueKey()`), by creating the required service Registry values (i.e. [Modify Registry](https://attack.mitre.org/techniques/T1112)), or by using command-line utilities such as `PnPUtil.exe`.(Citation: Symantec W.32 Stuxnet Dossier)(Citation: Crowdstrike DriveSlayer February 2022)(Citation: Unit42 AcidBox June 2020) Adversaries may leverage these drivers as [Rootkit](https://attack.mitre.org/techniques/T1014)s to hide the presence of malicious activity on a system. Adversaries may also load a signed yet vulnerable driver onto a compromised machine (known as \"Bring Your Own Vulnerable Driver\" (BYOVD)) as part of [Exploitation for Privilege Escalation](https://attack.mitre.org/techniques/T1068).(Citation: ESET InvisiMole June 2020)(Citation: Unit42 AcidBox June 2020)\n\nServices may be created with administrator privileges but are executed under SYSTEM privileges, so an adversary may also use a service to escalate privileges. Adversaries may also directly start services through [Service Execution](https://attack.mitre.org/techniques/T1569/002). To make detection analysis more challenging, malicious services may also incorporate [Masquerade Task or Service](https://attack.mitre.org/techniques/T1036/004) (ex: using a service and/or payload name related to a legitimate OS or benign software component).",
+            "aliases": [
+                "Windows Service",
+                "Windows Service - T1543.003",
+                "Create or Modify System Process: Windows Service"
+            ],
+            "x_mitre_platforms": [
+                "Windows"
+            ],
+            "x_mitre_detection": "Monitor processes and command-line arguments for actions that could create or modify services. Command-line invocation of tools capable of adding or modifying services may be unusual, depending on how systems are typically used in a particular environment. Services may also be modified through Windows system management tools such as [Windows Management Instrumentation](https://attack.mitre.org/techniques/T1047) and [PowerShell](https://attack.mitre.org/techniques/T1059/001), so additional logging may need to be configured to gather the appropriate data. Remote access tools with built-in features may also interact directly with the Windows API to perform these functions outside of typical system utilities. Collect service utility execution and service binary path arguments used for analysis. Service binary paths may even be changed to execute commands or scripts.  \n\nLook for changes to service Registry entries that do not correlate with known software, patch cycles, etc. Service information is stored in the Registry at <code>HKLM\\SYSTEM\\CurrentControlSet\\Services</code>. Changes to the binary path and the service startup type changed from manual or disabled to automatic, if it does not typically do so, may be suspicious. Tools such as Sysinternals Autoruns may also be used to detect system service changes that could be attempts at persistence.(Citation: TechNet Autoruns)  \n\nCreation of new services may generate an alterable event (ex: Event ID 4697 and/or 7045 (Citation: Microsoft 4697 APR 2017)(Citation: Microsoft Windows Event Forwarding FEB 2018)). New, benign services may be created during installation of new software.\n\nSuspicious program execution through services may show up as outlier processes that have not been seen before when compared against historical data. Look for abnormal process call trees from known services and for execution of other commands that could relate to Discovery or other adversary techniques. Data and events should not be viewed in isolation, but as part of a chain of behavior that could lead to other activities, such as network connections made for Command and Control, learning details about the environment through Discovery, and Lateral Movement.",
+            "x_mitre_id": "T1543.003",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "mto-finance",
+                "t1543.003",
+                "test",
+                "windows service - t1543.003"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "persistence",
+                    "x_opencti_order": 4
+                },
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "privilege-escalation",
+                    "x_opencti_order": 5
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--5406ccab-d39d-478b-8b48-7c56e70bfc87"
+                },
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/551.html",
+                    "external_id": "CAPEC-551"
+                },
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/550.html",
+                    "external_id": "CAPEC-550"
+                },
+                {
+                    "source_name": "capec",
+                    "url": "https://capec.mitre.org/data/definitions/478.html",
+                    "external_id": "CAPEC-478"
+                },
+                {
+                    "source_name": "Crowdstrike DriveSlayer February 2022",
+                    "description": "Thomas, W. et al. (2022, February 25). CrowdStrike Falcon Protects from New Wiper Malware Used in Ukraine Cyberattacks. Retrieved March 25, 2022.",
+                    "url": "https://www.crowdstrike.com/blog/how-crowdstrike-falcon-protects-against-wiper-malware-used-in-ukraine-attacks/"
+                },
+                {
+                    "source_name": "Unit42 AcidBox June 2020",
+                    "description": "Reichel, D. and Idrizovic, E. (2020, June 17). AcidBox: Rare Malware Repurposing Turla Group Exploit Targeted Russian Organizations. Retrieved March 16, 2021.",
+                    "url": "https://unit42.paloaltonetworks.com/acidbox-rare-malware/"
+                },
+                {
+                    "source_name": "Symantec W.32 Stuxnet Dossier",
+                    "description": "Nicolas Falliere, Liam O Murchu, Eric Chien, W32.Stuxnet Dossier, 2010--11, Symantec",
+                    "url": "https://www.wired.com/images_blogs/threatlevel/2010/11/w32_stuxnet_dossier.pdf",
+                    "external_id": "REF-699"
+                },
+                {
+                    "source_name": "Microsoft 4697 APR 2017",
+                    "description": "Miroshnikov, A. & Hall, J. (2017, April 18). 4697(S): A service was installed in the system. Retrieved August 7, 2018.",
+                    "url": "https://docs.microsoft.com/windows/security/threat-protection/auditing/event-4697"
+                },
+                {
+                    "source_name": "ESET InvisiMole June 2020",
+                    "description": "Hromcova, Z. and Cherpanov, A. (2020, June). INVISIMOLE: THE HIDDEN PART OF THE STORY. Retrieved July 16, 2020.",
+                    "url": "https://www.welivesecurity.com/wp-content/uploads/2020/06/ESET_InvisiMole.pdf"
+                },
+                {
+                    "source_name": "Microsoft Windows Event Forwarding FEB 2018",
+                    "description": "Hardy, T. & Hall, J. (2018, February 15). Use Windows Event Forwarding to help with intrusion detection. Retrieved August 7, 2018.",
+                    "url": "https://docs.microsoft.com/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1543/003",
+                    "external_id": "T1543.003"
+                },
+                {
+                    "source_name": "TechNet Services",
+                    "description": "Microsoft. (n.d.). Services. Retrieved June 7, 2016.",
+                    "url": "https://technet.microsoft.com/en-us/library/cc772408.aspx"
+                },
+                {
+                    "source_name": "TechNet Autoruns",
+                    "description": "Russinovich, M. (2016, January 4). Autoruns for Windows v13.51. Retrieved June 6, 2016.",
+                    "url": "https://technet.microsoft.com/en-us/sysinternals/bb963902"
+                }
+            ],
+            "x_opencti_id": "1ba8d3cb-edda-481a-8ee9-915f80bda738",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "attack-pattern--141cb6c4-5036-566f-a534-24dccb94a337",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-02-10T20:43:10.239Z",
+            "modified": "2025-06-30T06:59:57.410Z",
+            "name": "T1036.005",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may match or approximate the name or location of legitimate files or resources when naming/placing them. This is done for the sake of evading defenses and observation. This may be done by placing an executable in a commonly trusted directory (ex: under System32) or giving it the name of a legitimate, trusted program (ex: svchost.exe). In containerized environments, this may also be done by creating a resource in a namespace that matches the naming convention of a container pod or cluster. Alternatively, a file or container image name given may be a close approximation to legitimate programs/images or something innocuous.\n\nAdversaries may also use the same icon of the file they are trying to mimic.",
+            "aliases": [
+                "Match Legitimate Name or Location - T1036.005",
+                "Match Legitimate Name or Location",
+                "Masquerading: Match Legitimate Name or Location"
+            ],
+            "x_mitre_platforms": [
+                "Windows",
+                "Linux",
+                "macOS",
+                "Containers"
+            ],
+            "x_mitre_detection": "Collect file hashes; file names that do not match their expected hash are suspect. Perform file monitoring; files with known names but in unusual locations are suspect. Likewise, files that are modified outside of an update or patch are suspect.\n\nIf file names are mismatched between the file name on disk and that of the binary's PE metadata, this is a likely indicator that a binary was renamed after it was compiled. Collecting and comparing disk and resource filenames for binaries by looking to see if the InternalName, OriginalFilename, and/or ProductName match what is expected could provide useful leads, but may not always be indicative of malicious activity. (Citation: Elastic Masquerade Ball) Do not focus on the possible names a file could have, but instead on the command-line arguments that are known to be used and are distinct because it will have a better rate of detection.(Citation: Twitter ItsReallyNick Masquerading Update)\n\nIn containerized environments, use image IDs and layer hashes to compare images instead of relying only on their names.(Citation: Docker Images) Monitor for the unexpected creation of new resources within your cluster in Kubernetes, especially those created by atypical users.",
+            "x_mitre_id": "T1036.005",
+            "labels": [
+                "entertainment",
+                "finance",
+                "insurance",
+                "match legitimate name or location - t1036.005",
+                "mto-finance",
+                "t1036.005",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Elastic Masquerade Ball",
+                    "description": "Ewing, P. (2016, October 31). How to Hunt: The Masquerade Ball. Retrieved October 31, 2016.",
+                    "url": "https://www.elastic.co/blog/how-hunt-masquerade-ball"
+                },
+                {
+                    "source_name": "Docker Images",
+                    "description": "Docker. (n.d.). Docker Images. Retrieved April 6, 2021.",
+                    "url": "https://docs.docker.com/engine/reference/commandline/images/"
+                },
+                {
+                    "source_name": "Twitter ItsReallyNick Masquerading Update",
+                    "description": "Carr, N.. (2018, October 25). Nick Carr Status Update Masquerading. Retrieved April 22, 2019.",
+                    "url": "https://twitter.com/ItsReallyNick/status/1055321652777619457"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1036/005",
+                    "external_id": "T1036.005"
+                }
+            ],
+            "x_opencti_id": "6de8ac6d-401e-49dd-9512-4b2c2b082a7f",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "attack-pattern--4bd0ecc3-ea17-531d-8b98-7a3e921c346b",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-01-30T14:24:34.977Z",
+            "modified": "2025-06-30T06:59:57.995Z",
+            "name": "T1548.002",
+            "description": "[SOURCE - MISP Project Galaxies - mitre-attack-pattern] Adversaries may bypass UAC mechanisms to elevate process privileges on system. Windows User Account Control (UAC) allows a program to elevate its privileges (tracked as integrity levels ranging from low to high) to perform a task under administrator-level permissions, possibly by prompting the user for confirmation. The impact to the user ranges from denying the operation under high enforcement to allowing the user to perform the action if they are in the local administrators group and click through the prompt or allowing them to enter an administrator password to complete the action.(Citation: TechNet How UAC Works)\n\nIf the UAC protection level of a computer is set to anything but the highest level, certain Windows programs can elevate privileges or execute some elevated [Component Object Model](https://attack.mitre.org/techniques/T1559/001) objects without prompting the user through the UAC notification box.(Citation: TechNet Inside UAC)(Citation: MSDN COM Elevation) An example of this is use of [Rundll32](https://attack.mitre.org/techniques/T1218/011) to load a specifically crafted DLL which loads an auto-elevated [Component Object Model](https://attack.mitre.org/techniques/T1559/001) object and performs a file operation in a protected directory which would typically require elevated access. Malicious software may also be injected into a trusted process to gain elevated privileges without prompting a user.(Citation: Davidson Windows)\n\nMany methods have been discovered to bypass UAC. The Github readme page for UACME contains an extensive list of methods(Citation: Github UACMe) that have been discovered and implemented, but may not be a comprehensive list of bypasses. Additional bypass methods are regularly discovered and some used in the wild, such as:\n\n* `eventvwr.exe` can auto-elevate and execute a specified binary or script.(Citation: enigma0x3 Fileless UAC Bypass)(Citation: Fortinet Fareit)\n\nAnother bypass is possible through some lateral movement techniques if credentials for an account with administrator privileges are known, since UAC is a single system security mechanism, and the privilege or integrity of a process running on one system will be unknown on remote systems and default to high integrity.(Citation: SANS UAC Bypass)",
+            "aliases": [
+                "Abuse Elevation Control Mechanism: Bypass User Account Control",
+                "Bypass User Account Control - T1548.002",
+                "Bypass User Account Control"
+            ],
+            "x_mitre_platforms": [
+                "Windows"
+            ],
+            "x_mitre_permissions_required": [
+                "User",
+                "Administrator"
+            ],
+            "x_mitre_detection": "There are many ways to perform UAC bypasses when a user is in the local administrator group on a system, so it may be difficult to target detection on all variations. Efforts should likely be placed on mitigation and collecting enough information on process launches and actions that could be performed before and after a UAC bypass is performed. Monitor process API calls for behavior that may be indicative of [Process Injection](https://attack.mitre.org/techniques/T1055) and unusual loaded DLLs through [DLL Search Order Hijacking](https://attack.mitre.org/techniques/T1574/001), which indicate attempts to gain access to higher privileged processes.\n\nSome UAC bypass methods rely on modifying specific, user-accessible Registry settings. For example:\n\n* The <code>eventvwr.exe</code> bypass uses the <code>[HKEY_CURRENT_USER]\\Software\\Classes\\mscfile\\shell\\open\\command</code> Registry key.(Citation: enigma0x3 Fileless UAC Bypass)\n\n* The <code>sdclt.exe</code> bypass uses the <code>[HKEY_CURRENT_USER]\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\control.exe</code> and <code>[HKEY_CURRENT_USER]\\Software\\Classes\\exefile\\shell\\runas\\command\\isolatedCommand</code> Registry keys.(Citation: enigma0x3 sdclt app paths)(Citation: enigma0x3 sdclt bypass)\n\nAnalysts should monitor these Registry settings for unauthorized changes.",
+            "x_mitre_id": "T1548.002",
+            "labels": [
+                "bypass user account control - t1548.002",
+                "entertainment",
+                "finance",
+                "mto-finance",
+                "t1548.002",
+                "test"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "defense-evasion",
+                    "x_opencti_order": 6
+                },
+                {
+                    "kill_chain_name": "mitre-attack",
+                    "phase_name": "privilege-escalation",
+                    "x_opencti_order": 5
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/attack-pattern--85949e07-45fc-47b1-8d01-354beb4754d8"
+                },
+                {
+                    "source_name": "Github UACMe",
+                    "description": "UACME Project. (2016, June 16). UACMe. Retrieved July 26, 2016.",
+                    "url": "https://github.com/hfiref0x/UACME"
+                },
+                {
+                    "source_name": "Fortinet Fareit",
+                    "description": "Salvio, J., Joven, R. (2016, December 16). Malicious Macro Bypasses UAC to Elevate Privilege for Fareit Malware. Retrieved December 27, 2016.",
+                    "url": "https://blog.fortinet.com/2016/12/16/malicious-macro-bypasses-uac-to-elevate-privilege-for-fareit-malware"
+                },
+                {
+                    "source_name": "TechNet Inside UAC",
+                    "description": "Russinovich, M. (2009, July). User Account Control: Inside Windows 7 User Account Control. Retrieved July 26, 2016.",
+                    "url": "https://technet.microsoft.com/en-US/magazine/2009.07.uac.aspx"
+                },
+                {
+                    "source_name": "enigma0x3 sdclt bypass",
+                    "description": "Nelson, M. (2017, March 17). \"Fileless\" UAC Bypass Using sdclt.exe. Retrieved May 25, 2017.",
+                    "url": "https://enigma0x3.net/2017/03/17/fileless-uac-bypass-using-sdclt-exe/"
+                },
+                {
+                    "source_name": "enigma0x3 sdclt app paths",
+                    "description": "Nelson, M. (2017, March 14). Bypassing UAC using App Paths. Retrieved May 25, 2017.",
+                    "url": "https://enigma0x3.net/2017/03/14/bypassing-uac-using-app-paths/"
+                },
+                {
+                    "source_name": "enigma0x3 Fileless UAC Bypass",
+                    "description": "Nelson, M. (2016, August 15). \"Fileless\" UAC Bypass using eventvwr.exe and Registry Hijacking. Retrieved December 27, 2016.",
+                    "url": "https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/"
+                },
+                {
+                    "source_name": "MSDN COM Elevation",
+                    "description": "Microsoft. (n.d.). The COM Elevation Moniker. Retrieved July 26, 2016.",
+                    "url": "https://msdn.microsoft.com/en-us/library/ms679687.aspx"
+                },
+                {
+                    "source_name": "SANS UAC Bypass",
+                    "description": "Medin, T. (2013, August 8). PsExec UAC Bypass. Retrieved June 3, 2016.",
+                    "url": "http://pen-testing.sans.org/blog/pen-testing/2013/08/08/psexec-uac-bypass"
+                },
+                {
+                    "source_name": "TechNet How UAC Works",
+                    "description": "Lich, B. (2016, May 31). How User Account Control Works. Retrieved June 3, 2016.",
+                    "url": "https://technet.microsoft.com/en-us/itpro/windows/keep-secure/how-user-account-control-works"
+                },
+                {
+                    "source_name": "Davidson Windows",
+                    "description": "Davidson, L. (n.d.). Windows 7 UAC whitelist. Retrieved November 12, 2014.",
+                    "url": "http://www.pretentiousname.com/misc/win7_uac_whitelist2.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T1548/002",
+                    "external_id": "T1548.002"
+                }
+            ],
+            "x_opencti_id": "c1924e43-a2fa-4d6c-a0db-230b8156c5e8",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "relationship--cb3b6c7d-1918-4df8-86d2-1c16f8ed85c5",
+            "spec_version": "2.1",
+            "relationship_type": "based-on",
+            "revoked": false,
+            "confidence": 100,
+            "lang": "en",
+            "created": "2024-02-15T18:05:28.616Z",
+            "modified": "2024-12-16T09:44:55.114Z",
+            "x_opencti_id": "582c1738-fbc8-4a3c-88c5-4d2a3c6898de",
+            "x_opencti_type": "based-on",
+            "type": "relationship",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6",
+                "identity--939ba930-2302-5081-9837-4127f96999ab",
+                "identity--67fabb23-c547-5c4a-b253-9d9a8548c466",
+                "identity--f2aa7711-75e7-5828-9bec-ddb6da15c829",
+                "identity--32753afa-41ef-5974-94d3-fc493d1808b7"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ],
+            "source_ref": "indicator--e8aab561-12be-5ae0-bbd5-48bc1d8bd317",
+            "target_ref": "ipv4-addr--0b2c98ab-53a2-51fa-b47d-ebb54979d81a"
+        },
+        {
+            "id": "indicator--e8aab561-12be-5ae0-bbd5-48bc1d8bd317",
+            "spec_version": "2.1",
+            "revoked": true,
+            "confidence": 100,
+            "created": "2024-02-15T18:05:28.615Z",
+            "modified": "2025-07-10T08:59:41.036Z",
+            "pattern_type": "stix",
+            "pattern_version": "2.1",
+            "pattern": "[ipv4-addr:value = '185.234.216.64']",
+            "name": "185.234.216.64",
+            "description": "Triggered risk rules:\n\n|Rule|Risk Rule Severity|Risk Score Severity|\n|--|--|--|\n|Historical Honeypot Sighting|Unusual|5-24|\n|Historically Linked to Intrusion Method|Unusual|5-24|\n|Historical Suspected C&C Server|Unusual|5-24|\n|Historical Multicategory Blocklist|Unusual|5-24|\n|Historically Reported as a Defanged IP|Unusual|5-24|\n|Historical Malware Delivery|Unusual|5-24|\n|Historical Phishing Host|Unusual|5-24|\n|Historically Reported in Threat List|Unusual|5-24|\n|Historically Reported C&C Server|Suspicious|25-64|\n|Recently Linked to Intrusion Method|Suspicious|25-64|\n|Previously Validated C&C Server|Suspicious|25-64|\n|Recent Suspected C&C Server|Suspicious|25-64|\n|Recently Reported C&C Server|Malicious|65-89|",
+            "valid_from": "2025-07-10T08:59:05.581Z",
+            "valid_until": "2025-07-10T08:59:06.581000Z",
+            "x_opencti_score": 20,
+            "x_opencti_detection": false,
+            "x_opencti_main_observable_type": "IPv4-Addr",
+            "x_opencti_observable_values": [
+                {
+                    "type": "IPv4-Addr",
+                    "value": "185.234.216.64",
+                    "hashes": null
+                }
+            ],
+            "labels": [
+                "hyperv"
+            ],
+            "x_opencti_id": "5d1c6ae1-55a4-4340-b4db-ca8c523b71aa",
+            "x_opencti_type": "Indicator",
+            "type": "indicator",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6",
+                "identity--939ba930-2302-5081-9837-4127f96999ab",
+                "identity--67fabb23-c547-5c4a-b253-9d9a8548c466",
+                "identity--f2aa7711-75e7-5828-9bec-ddb6da15c829",
+                "identity--32753afa-41ef-5974-94d3-fc493d1808b7"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "ipv4-addr--0b2c98ab-53a2-51fa-b47d-ebb54979d81a",
+            "spec_version": "2.1",
+            "x_opencti_description": "Possible PoshC2 IP",
+            "x_opencti_score": 6,
+            "value": "185.234.216.64",
+            "x_opencti_id": "6c6b20a0-5015-401e-83ce-9fe28ac362ae",
+            "x_opencti_type": "IPv4-Addr",
+            "type": "ipv4-addr",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+                "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6",
+                "identity--939ba930-2302-5081-9837-4127f96999ab",
+                "identity--67fabb23-c547-5c4a-b253-9d9a8548c466",
+                "identity--f2aa7711-75e7-5828-9bec-ddb6da15c829",
+                "identity--32753afa-41ef-5974-94d3-fc493d1808b7"
+            ],
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        },
+        {
+            "id": "identity--180d3ffd-a014-54ff-a817-211dddd29059",
+            "spec_version": "2.1",
+            "identity_class": "organization",
+            "name": "Malpedia",
+            "description": "The primary goal of Malpedia is to provide a resource for rapid identification and actionable context when investigating malware. Openness to curated contributions shall ensure an accountable level of quality in order to foster meaningful and reproducible research.",
+            "contact_information": "malpedia.caad.fkie.fraunhofer.de",
+            "created": "2023-08-20T10:28:20.059Z",
+            "modified": "2025-06-26T14:50:32.604Z",
+            "x_opencti_id": "6b3e9078-7858-4b94-a01d-dbf26db8f8cf",
+            "x_opencti_type": "Organization",
+            "type": "identity"
+        },
+        {
+            "id": "malware--3ce1c75d-7bd5-5685-86ca-7c6663f588dc",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2023-08-21T09:30:04.053Z",
+            "modified": "2024-12-16T09:44:57.820Z",
+            "name": "nmass malware",
+            "description": "It's .NET Rat with harcoded key",
+            "aliases": [
+                "win.nmass"
+            ],
+            "is_family": true,
+            "samples": [
+                {
+                    "id": "89704457-1eaa-4421-8c02-891b231e6b30"
+                },
+                {
+                    "id": "ff8163dd-2c9b-45bc-b519-b15596bcd081"
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Malpedia",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://malpedia.caad.fkie.fraunhofer.de/details/win.nmass"
+                },
+                {
+                    "source_name": "Malpedia",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://sebdraven.medium.com/a-net-rat-target-mongolia-9c1439c39bc2"
+                }
+            ],
+            "x_opencti_id": "d9fc2c5f-2503-4bf9-914d-7caaff2eed43",
+            "x_opencti_type": "Malware",
+            "type": "malware",
+            "created_by_ref": "identity--180d3ffd-a014-54ff-a817-211dddd29059",
+            "x_opencti_granted_refs": [
+                "identity--523fd331-9628-52ad-a2e5-078bef5165ae"
+            ],
+            "object_marking_refs": [
+                "marking-definition--f88d31f6-486f-44da-b317-01333bde0b82"
+            ],
+            "sample_refs": [
+                "file--4fa15a30-9df4-54f5-96ab-cc4ea03e0cc3",
+                "file--0001271e-ef98-5233-a64d-a7b7b7e217b1"
+            ]
+        },
+        {
+            "id": "attack-pattern--0040f898-6262-5e32-acb0-cb333e59887f",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-05-21T17:43:26.506Z",
+            "modified": "2024-12-10T16:52:24.307Z",
+            "name": "Manipulation of Control",
+            "description": "Adversaries may manipulate physical process control within the industrial environment. Methods of manipulating control can include changes to set point values, tags, or other parameters. Adversaries may manipulate control systems devices or possibly leverage their own, to communicate with and command physical control processes. The duration of manipulation may be temporary or longer sustained, depending on operator detection.   \n\nMethods of Manipulation of Control include: \n\n* Man-in-the-middle  \n* Spoof command message \n* Changing setpoints  \n\nA Polish student used a remote controller device to interface with the Lodz city tram system in Poland. (Citation: John Bill May 2017) (Citation: Shelley Smith February 2008) (Citation: Bruce Schneier January 2008) Using this remote, the student was able to capture and replay legitimate tram signals. As a consequence, four trams were derailed and twelve people injured due to resulting emergency stops. (Citation: Shelley Smith February 2008) The track controlling commands issued may have also resulted in tram collisions, a further risk to those on board and nearby the areas of impact. (Citation: Bruce Schneier January 2008)",
+            "x_mitre_platforms": [
+                "None"
+            ],
+            "x_mitre_id": "T0831",
+            "labels": [
+                "balloonfly"
+            ],
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "mitre-ics-attack",
+                    "phase_name": "impact",
+                    "x_opencti_order": 0
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Shelley Smith February 2008",
+                    "description": "Shelley Smith 2008, February 12 Teen Hacker in Poland Plays Trains and Derails City Tram System Retrieved. 2019/10/17",
+                    "url": "https://inhomelandsecurity.com/teen_hacker_in_poland_plays_tr/"
+                },
+                {
+                    "source_name": "John Bill May 2017",
+                    "description": "John Bill 2017, May 12 Hacked Cyber Security Railways Retrieved. 2019/10/17",
+                    "url": "https://www.londonreconnections.com/2017/hacked-cyber-security-railways/"
+                },
+                {
+                    "source_name": "Bruce Schneier January 2008",
+                    "description": "Bruce Schneier 2008, January 17 Hacking Polish Trams Retrieved. 2019/10/17",
+                    "url": "https://www.schneier.com/blog/archives/2008/01/hacking_the_pol.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/techniques/T0831",
+                    "external_id": "T0831"
+                }
+            ],
+            "x_opencti_id": "a8d1d386-79b3-4da7-a5e7-a5a3a32a8acc",
+            "x_opencti_type": "Attack-Pattern",
+            "type": "attack-pattern",
+            "created_by_ref": "identity--f11b0831-e7e6-5214-9431-ccf054e53e94",
+            "object_marking_refs": [
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "malware--346c2c0d-1eee-58a2-b569-057e6819891d",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2020-08-24T13:15:51.706Z",
+            "modified": "2025-01-20T07:58:46.994Z",
+            "name": "PipeMon",
+            "description": "Malpedia entry for win.pipemon",
+            "aliases": [
+                "win.pipemon"
+            ],
+            "malware_types": [
+                "backdoor"
+            ],
+            "is_family": true,
+            "kill_chain_phases": [
+                {
+                    "kill_chain_name": "lockheed-martin-cyber-kill-chain",
+                    "phase_name": "installation",
+                    "x_opencti_order": 0
+                }
+            ],
+            "external_references": [
+                {
+                    "source_name": "Sekoia.io",
+                    "url": "https://app.sekoia.io/intelligence/objects/malware--757e25f8-944e-40d9-8091-be04464cd1d2"
+                },
+                {
+                    "source_name": "Malpedia",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://twitter.com/ESETresearch/status/1506904404225630210"
+                },
+                {
+                    "source_name": "Malpedia",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://malpedia.caad.fkie.fraunhofer.de/details/win.pipemon"
+                },
+                {
+                    "source_name": "Malpedia",
+                    "description": "Reference found in the Malpedia library",
+                    "url": "https://cocomelonc.github.io/malware/2023/05/22/malware-tricks-29.html"
+                },
+                {
+                    "source_name": "mitre-attack",
+                    "url": "https://attack.mitre.org/software/S0501",
+                    "external_id": "S0501"
+                },
+                {
+                    "source_name": "ESET PipeMon May 2020",
+                    "description": "Tartare, M. et al. (2020, May 21). No \u201cGame over\u201d for the Winnti Group. Retrieved August 24, 2020.",
+                    "url": "https://www.welivesecurity.com/2020/05/21/no-game-over-winnti-group/"
+                }
+            ],
+            "x_opencti_id": "196ffed8-5fcc-4a4a-851b-4f625cdfe409",
+            "x_opencti_type": "Malware",
+            "type": "malware",
+            "created_by_ref": "identity--180d3ffd-a014-54ff-a817-211dddd29059",
+            "object_marking_refs": [
+                "marking-definition--f88d31f6-486f-44da-b317-01333bde0b82",
+                "marking-definition--608d7dcb-0237-5e3e-9fb0-8d879f80f5dd"
+            ]
+        },
+        {
+            "id": "identity--523fd331-9628-52ad-a2e5-078bef5165ae",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 60,
+            "created": "2024-08-08T11:08:39.551Z",
+            "modified": "2025-06-20T12:18:56.212Z",
+            "name": "\"AUTOSTRADA WIELKOPOLSKA II\" SP\u00d3\u0141KA AKCYJNA",
+            "x_opencti_reliability": "C - Fairly reliable",
+            "x_opencti_id": "e5b1ee6c-0744-499e-9516-4a65f4e3b978",
+            "x_opencti_type": "Organization",
+            "type": "identity",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--34098fce-860f-48ae-8e50-ebd3cc5e41da"
+            ]
+        },
+        {
+            "id": "identity--a26a3295-a252-5a0c-945d-bbf7d5c545c6",
+            "spec_version": "2.1",
+            "revoked": false,
+            "confidence": 100,
+            "created": "2024-03-24T07:51:36.841Z",
+            "modified": "2024-04-03T02:43:12.117Z",
+            "name": "Air Europa",
+            "x_opencti_id": "99962a68-9bbc-4bf7-808d-be95d5d0fa1b",
+            "x_opencti_type": "Organization",
+            "type": "identity",
+            "created_by_ref": "identity--b2a8fbec-b4fb-563c-a052-7b5b4ab23070",
+            "object_marking_refs": [
+                "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+            ]
+        }
+    ]
+}

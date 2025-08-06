@@ -18,7 +18,8 @@ public class ParserTest extends IntegrationTest {
   @Test
   public void testParse() throws Exception {
     try (FileInputStream fis =
-        new FileInputStream("src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
+        //new FileInputStream("src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
+        new FileInputStream("src/test/resources/stix/bundles/2025-08-04t19_28_29.749z_tlp_all_(exportfilestix2)_report-eset pipemon may 2020_full.json")) {
       String contents = IOUtils.toString(fis, StandardCharsets.UTF_8);
       Parser parser = new Parser();
       Bundle b = parser.parseBundle(contents);
