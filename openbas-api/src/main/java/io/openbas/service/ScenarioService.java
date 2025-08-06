@@ -1085,7 +1085,7 @@ public class ScenarioService {
     scenario.setSeverity(Scenario.SEVERITY.high);
     scenario.setMainFocus("incident-response");
     // TODO Set tags
-    scenario.setTags(Set.of(tagRepository.findByName("opencti").get()));
+    scenario.getTags().add(tagRepository.findByName("opencti").get());
 
     Instant start = securityAssessment.getPeriodStart();
     Instant end = securityAssessment.getPeriodEnd();
