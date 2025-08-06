@@ -916,6 +916,7 @@ public class ScenarioService {
 
         SecurityAssessment securityAssessment =
             securityAssessmentRepository.findByExternalId(id).orElse(new SecurityAssessment());
+        //Si le stix a ete utilisé dans lassitent scenario donc ca genere erreur, remove partie assitent
         Scenario scenario;
         if (securityAssessment.getScenario() == null) {
           scenario = new Scenario();
@@ -972,6 +973,10 @@ public class ScenarioService {
 
         // Create Scenario using SecurityAssessment
         scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
+
+        // TODO Set tags based in labels
+        scenario.getTags().add(tagRepository.findByName("opencti").get());
+
         // Creation injects based attack patterns from stix
         InjectAssistantInput input = new InjectAssistantInput();
         List<String> attackPatternIds =
@@ -1084,8 +1089,6 @@ public class ScenarioService {
     scenario.setDescription(securityAssessment.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
     scenario.setMainFocus("incident-response");
-    // TODO Set tags
-    scenario.getTags().add(tagRepository.findByName("opencti").get());
 
     Instant start = securityAssessment.getPeriodStart();
     Instant end = securityAssessment.getPeriodEnd();
