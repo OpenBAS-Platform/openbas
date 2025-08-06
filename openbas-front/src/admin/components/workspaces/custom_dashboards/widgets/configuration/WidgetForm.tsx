@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 
 import Dialog from '../../../../../../components/common/dialog/Dialog';
@@ -24,11 +24,12 @@ const ActionsComponent: FunctionComponent<{
 }> = ({ disabled, onCancel, onSubmit, editing }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const { formState: { errors } } = useFormContext();
 
   return (
     <>
       <Button onClick={onCancel}>{t('Cancel')}</Button>
-      <Button color="secondary" onClick={onSubmit} disabled={disabled}>
+      <Button color="secondary" onClick={onSubmit} disabled={disabled || Object.keys(errors).length > 0}>
         {editing ? t('Update') : t('Create')}
       </Button>
     </>
@@ -71,10 +72,10 @@ const WidgetForm: FunctionComponent<Props> = ({
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
-      field: z.string().min(1, { message: t('Should not be empty') }),
-      timeRange: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
-      start: z.string().optional(), // z.string().min(1, { message: t('Should not be empty') }),
-      end: z.string().optional(), // z.string().min(1, { message: t('Should not be empty') }),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(), // z.string().min(1, { message: t('Should not be empty') }),
+      end: z.string().optional().nullable(), // z.string().min(1, { message: t('Should not be empty') }),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
@@ -89,6 +90,10 @@ const WidgetForm: FunctionComponent<Props> = ({
       mode: z.literal('structural'),
       title: z.string().optional(),
       field: z.string().min(1, { message: t('Should not be empty') }),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
       limit: z.number()
@@ -105,6 +110,10 @@ const WidgetForm: FunctionComponent<Props> = ({
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       sorts: z.array(z.object({
         direction: z.literal('ASC').or(z.literal('DESC')),
         fieldName: z.string(),
@@ -121,7 +130,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     }),
   ]);
 
-  const {
+  /* const {
     control,
     handleSubmit,
     watch,
@@ -136,7 +145,28 @@ const WidgetForm: FunctionComponent<Props> = ({
       }),
     ),
     defaultValues: initialValues,
+  }); */
+
+  const methods = useForm<WidgetInputWithoutLayout>({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      zodImplement<WidgetInputWithoutLayout>().with({
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path']),
+        widget_config: widgetConfigSchema,
+      }),
+    ),
+    defaultValues: initialValues,
   });
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    setValue,
+    formState: { errors, isDirty, isSubmitting },
+  } = methods;
+
+  console.log(errors);
 
   const widgetType = watch('widget_type');
 
@@ -238,49 +268,52 @@ const WidgetForm: FunctionComponent<Props> = ({
   };
 
   return (
-    <form id="widgetCreationForm">
-      <Dialog
-        className="noDrag"
-        open={open}
-        handleClose={onClose}
-        title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
-        actions={(
-          <ActionsComponent
-            disabled={!isLastStep()}
-            onCancel={onCancel}
-            onSubmit={handleSubmitWithoutPropagation}
-            editing={editing}
-          />
-        )}
-      >
-        <>
-          {activeStep === 0 && (
-            <Controller
-              control={control}
-              name="widget_type"
-              render={({ field: { value, onChange } }) => (
-                <WidgetTypeSelection
-                  value={value}
-                  onChange={(type) => {
-                    onChange(type);
-                    nextStep();
-                  }}
-                />
-              )}
+    <FormProvider {...methods}>
+      <form id="widgetCreationForm">
+        <Dialog
+          className="noDrag"
+          open={open}
+          handleClose={onClose}
+          title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
+          actions={(
+            <ActionsComponent
+              disabled={!isLastStep()}
+              onCancel={onCancel}
+              onSubmit={handleSubmitWithoutPropagation}
+              editing={editing}
             />
           )}
-          {activeStep === 1
-            && getSeriesComponent(widgetType)}
-          {activeStep === 2 && (
-            <WidgetConfigurationParameters
-              widgetType={widgetType}
-              control={control}
-              setValue={setValue}
-            />
-          )}
-        </>
-      </Dialog>
-    </form>
+        >
+          <>
+            {activeStep === 0 && (
+              <Controller
+                control={control}
+                name="widget_type"
+                render={({ field: { value, onChange } }) => (
+                  <WidgetTypeSelection
+                    value={value}
+                    onChange={(type) => {
+                      onChange(type);
+                      nextStep();
+                    }}
+                  />
+                )}
+              />
+            )}
+            {activeStep === 1
+              && getSeriesComponent(widgetType)}
+            {activeStep === 2 && (
+              <WidgetConfigurationParameters
+                widgetType={widgetType}
+                control={control}
+                setValue={setValue}
+              />
+            )}
+          </>
+        </Dialog>
+      </form>
+    </FormProvider>
+
   );
 };
 

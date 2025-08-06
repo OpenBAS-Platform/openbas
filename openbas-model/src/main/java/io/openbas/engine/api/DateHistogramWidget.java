@@ -20,12 +20,6 @@ public class DateHistogramWidget extends HistogramWidget {
   List<DateHistogramSeries> series = new ArrayList<>();
   @NotNull
   private HistogramInterval interval = HistogramInterval.day;
-  private String start; // Date or $custom_dashboard_start
-
-  private String end; // Date or $custom_dashboard_end
-  @NotNull
-  private CustomDashboardTimeRange timeRange;
-
 
   @Data
   public static class DateHistogramSeries {

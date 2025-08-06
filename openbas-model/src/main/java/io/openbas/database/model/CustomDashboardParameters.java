@@ -46,6 +46,7 @@ public class CustomDashboardParameters implements Base {
 
   @Column(name = "custom_dashboards_parameter_type", nullable = false)
   @NotNull
+  @Enumerated(EnumType.STRING)
   @JsonProperty("custom_dashboards_parameter_type")
   private CustomDashboardParameterType type;
 
