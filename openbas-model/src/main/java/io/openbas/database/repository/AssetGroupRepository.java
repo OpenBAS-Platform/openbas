@@ -3,6 +3,8 @@ package io.openbas.database.repository;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.raw.RawAssetGroupDynamicFilter;
+import io.openbas.database.raw.RawAssetGroupIndexing;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -187,4 +189,14 @@ public interface AssetGroupRepository
       nativeQuery = true)
   List<Object[]> findAllByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT ag.asset_group_id, ag.asset_group_name, ag.asset_group_updated_at, ag.asset_group_created_at "
+              + "FROM asset_groups ag "
+              + "WHERE ag.asset_group_updated_at > :from ORDER BY ag.asset_group_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
+      nativeQuery = true)
+  List<RawAssetGroupIndexing> findForIndexing(@Param("from") Instant from);
 }

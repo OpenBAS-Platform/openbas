@@ -92,6 +92,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
+      case 'base_asset_group_side':
         searchAssetGroupAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });

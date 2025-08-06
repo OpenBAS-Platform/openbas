@@ -354,9 +354,14 @@ public interface ExerciseRepository
   @Query(
       value =
           "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, "
-              + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags "
+              + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
+              + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as exercise_assets, "
+              + "array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as exercise_asset_groups "
               + "FROM exercises ex "
               + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+              + "LEFT JOIN injects inj ON ex.exercise_id = inj.inject_exercise "
+              + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
+              + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
               + "WHERE ex.exercise_updated_at > :from "
               + "GROUP BY ex.exercise_id ORDER BY ex.exercise_updated_at ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE

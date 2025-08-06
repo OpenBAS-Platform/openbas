@@ -27,6 +27,10 @@ public interface RawInjectIndexing {
 
   Set<String> getInject_tags();
 
+  Set<String> getInject_assets();
+
+  Set<String> getInject_asset_groups();
+
   String getInject_status_name();
 
   String getInject_scenario();
