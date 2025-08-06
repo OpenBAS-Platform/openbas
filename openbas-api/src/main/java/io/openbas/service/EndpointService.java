@@ -105,6 +105,7 @@ public class EndpointService {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
     endpoint.setIps(EndpointMapper.setIps(input.getIps()));
+    endpoint.setSeenIp(EndpointMapper.setIps(input.getIps()));
     endpoint.setMacAddresses(EndpointMapper.setMacAddresses(input.getMacAddresses()));
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     endpoint.setEoL(input.isEol());
