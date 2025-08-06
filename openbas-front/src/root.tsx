@@ -21,8 +21,6 @@ import ErrorHandler from './utils/error/ErrorHandler';
 import { useAppDispatch } from './utils/hooks';
 import { UserContext } from './utils/hooks/useAuth';
 import { PermissionsProvider } from './utils/permissions/PermissionsProvider';
-import ProtectedRoute from './utils/permissions/ProtectedRoute';
-import { ACTIONS, SUBJECTS } from './utils/permissions/types';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const IndexPrivate = lazy(() => import('./private/Index'));
