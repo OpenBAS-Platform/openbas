@@ -235,7 +235,9 @@ public class Scenario implements Base {
   @JsonProperty("scenario_lessons_anonymized")
   private boolean lessonsAnonymized = false;
 
-  @Transient private final ResourceType resourceType = ResourceType.SCENARIO;
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SCENARIO;
 
   // -- LESSONS --
 

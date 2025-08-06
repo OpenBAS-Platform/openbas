@@ -260,7 +260,9 @@ public class Payload implements Base {
     return Objects.hash(id);
   }
 
-  @Transient private final ResourceType resourceType = ResourceType.PAYLOAD;
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.PAYLOAD;
 
   public Payload() {}
 

@@ -29,6 +29,13 @@ public interface Base {
     return true;
   }
 
+  /**
+   * Used to link a class to an RBAC ResourceType which is useful when managing permission on the
+   * stream
+   *
+   * @return
+   */
+  @JsonIgnore
   default ResourceType getResourceType() {
     return ResourceType.UNKNOWN;
   }

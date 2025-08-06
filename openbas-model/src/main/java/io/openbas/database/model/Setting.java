@@ -1,10 +1,12 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import java.util.Objects;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -30,7 +32,9 @@ public class Setting implements Base {
   @JsonProperty("setting_value")
   private String value;
 
-  @Transient private final ResourceType resourceType = ResourceType.PLATFORM_SETTING;
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.PLATFORM_SETTING;
 
   public Setting(String key, String value) {
     this.key = key;

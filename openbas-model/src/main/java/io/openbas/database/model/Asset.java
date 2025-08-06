@@ -18,6 +18,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -83,7 +84,9 @@ public class Asset implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  @Transient private final ResourceType resourceType = ResourceType.ASSET;
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.ASSET;
 
   @Override
   public int hashCode() {
