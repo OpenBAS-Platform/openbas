@@ -1,9 +1,12 @@
 package io.openbas.rest.inject.service;
 
+import static java.util.Collections.emptyList;
+
 import io.openbas.database.helper.InjectorContractRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.injectors.manual.ManualContract;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.UnprocessableContentException;
@@ -12,6 +15,7 @@ import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
+import io.openbas.service.TagRuleService;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +32,10 @@ public class InjectAssistantService {
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final InjectorContractService injectorContractService;
+  private final InjectService injectService;
+  private final TagRuleService tagRuleService;
   private final AttackPatternRepository attackPatternRepository;
+  private final TagRepository tagRepository;
   private final InjectRepository injectRepository;
   private final InjectorContractRepositoryHelper injectorContractRepositoryHelper;
 
@@ -92,6 +99,14 @@ public class InjectAssistantService {
     inject.setEnabled(enabled);
     inject.setContent(
         InjectorContractContentUtils.getDynamicInjectorContractFieldsForInject(injectorContract));
+    inject.getTags().add(tagRepository.findByName("opencti").get());
+    // verify if inject is not manual/sms/emails...
+    if (injectService.canApplyAssetGroupToInject(inject)) {
+      // add default asset groups
+      inject.setAssetGroups(
+          this.tagRuleService.applyTagRuleToInjectCreation(
+              inject.getTags().stream().map(Tag::getId).toList(), emptyList()));
+    }
     return inject;
   }
 
@@ -163,8 +178,7 @@ public class InjectAssistantService {
   private Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
     if (endpoints.isEmpty())
-      return Map.of(
-          "Windows:x86_64", Collections.emptyList(), "Linux:x86_64", Collections.emptyList());
+      return Map.of("Windows:x86_64", emptyList(), "Linux:x86_64", emptyList());
 
     return endpoints.stream()
         .collect(
@@ -242,7 +256,7 @@ public class InjectAssistantService {
     if (knownInjectorContracts == null
         || platformArchitecturePairs == null
         || platformArchitecturePairs.isEmpty()) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     Set<Endpoint.PLATFORM_TYPE> platforms = new HashSet<>();
@@ -329,7 +343,7 @@ public class InjectAssistantService {
             .toList();
     if (assetsFromGroup.isEmpty()) {
       // No endpoints in the asset group, return empty result
-      return new ContractResultForAssetGroup(Collections.emptyList(), "");
+      return new ContractResultForAssetGroup(emptyList(), "");
     }
     Map<String, List<Endpoint>> groupedAssets =
         this.groupEndpointsByPlatformAndArchitecture(assetsFromGroup);
