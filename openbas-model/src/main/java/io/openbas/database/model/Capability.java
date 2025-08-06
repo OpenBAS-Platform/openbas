@@ -15,7 +15,8 @@ public enum Capability {
   BYPASS(null, pair(null, null)),
 
   // Assesment
-  CREATE_ASSESSMENT(null,
+  CREATE_ASSESSMENT(
+      null,
       pair(ResourceType.SCENARIO, Action.CREATE),
       pair(ResourceType.SIMULATION, Action.CREATE),
       pair(ResourceType.SCENARIO, Action.DUPLICATE),
