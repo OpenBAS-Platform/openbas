@@ -16,6 +16,8 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTargets from '../../../../components/ItemTargets';
 import { useHelper } from '../../../../store';
 import { type TagRuleOutput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
@@ -137,11 +139,14 @@ const TagRules = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && (
-        <TagRuleCreate
-          onCreate={result => setTagRules([...tagRules, result])}
-        />
-      )}
+      {userAdmin
+        && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+            <TagRuleCreate
+              onCreate={result => setTagRules([...tagRules, result])}
+            />
+          </Can>
+        )}
     </>
   );
 };

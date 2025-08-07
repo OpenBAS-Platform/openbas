@@ -19,6 +19,8 @@ import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader.js';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
@@ -329,9 +331,11 @@ const Documents = () => {
             ))}
       </List>
       {userAdmin && (
-        <CreateDocument
-          onCreate={handleCreateDocuments}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+          <CreateDocument
+            onCreate={handleCreateDocuments}
+          />
+        </Can>
       )}
     </>
   );

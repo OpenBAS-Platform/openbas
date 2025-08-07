@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteLessonsTemplateCategory, updateLessonsTemplateCategory } from '../../../../../actions/Lessons';
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
@@ -7,6 +7,8 @@ import Drawer from '../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../components/i18n';
 import { type LessonsTemplateCategory } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import { AbilityContext } from '../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import LessonsTemplateCategoryForm, { type LessonsTemplateCategoryInputForm } from './LessonsTemplateCategoryForm';
 
 interface Props {
@@ -21,6 +23,7 @@ const LessonsTemplateCategoryPopover: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const initialValues = {
     lessons_template_category_name: lessonsTemplateCategory.lessons_template_category_name,
@@ -59,10 +62,12 @@ const LessonsTemplateCategoryPopover: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: handleOpenEdit,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.LESSONS_LEARNED),
     },
     {
       label: 'Delete',
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.DELETE, SUBJECTS.LESSONS_LEARNED),
     },
   ];
 

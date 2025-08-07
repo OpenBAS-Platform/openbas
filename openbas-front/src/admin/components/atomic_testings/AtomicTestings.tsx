@@ -13,6 +13,8 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import { type AtomicTestingInput, type FilterGroup, type InjectResultOverviewOutput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import { TeamContext } from '../common/Context';
 import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
@@ -72,19 +74,23 @@ const AtomicTestings = () => {
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}
       />
+      {/* TODO : delete userAdmin when no longer needed */}
       {userAdmin && (
-        <>
-          <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
-          <TeamContext.Provider value={teamContextForAtomicTesting()}>
-            <CreateInject
-              title={t('Create a new atomic test')}
-              onCreateInject={onCreateAtomicTesting}
-              isAtomic
-              open={openCreateDrawer}
-              handleClose={() => setOpenCreateDrawer(false)}
-            />
-          </TeamContext.Provider>
-        </>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.ATOMIC_TESTING}>
+          <>
+            <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
+            <TeamContext.Provider value={teamContextForAtomicTesting()}>
+              <CreateInject
+                title={t('Create a new atomic test')}
+                onCreateInject={onCreateAtomicTesting}
+                isAtomic
+                open={openCreateDrawer}
+                handleClose={() => setOpenCreateDrawer(false)}
+              />
+            </TeamContext.Provider>
+          </>
+        </Can>
+
       )}
     </>
   );

@@ -9,6 +9,8 @@ import { deleteKillChainPhase, updateKillChainPhase } from '../../../../actions/
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import KillChainPhaseForm from './KillChainPhaseForm';
 
 class KillChainPhasePopover extends Component {
@@ -78,14 +80,16 @@ class KillChainPhasePopover extends Component {
     );
     return (
       <>
-        <IconButton
-          color="primary"
-          onClick={this.handlePopoverOpen.bind(this)}
-          aria-haspopup="true"
-          size="large"
-        >
-          <MoreVert />
-        </IconButton>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <IconButton
+            color="primary"
+            onClick={this.handlePopoverOpen.bind(this)}
+            aria-haspopup="true"
+            size="large"
+          >
+            <MoreVert />
+          </IconButton>
+        </Can>
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}

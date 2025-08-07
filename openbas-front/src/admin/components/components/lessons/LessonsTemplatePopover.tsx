@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteLessonsTemplate, updateLessonsTemplate } from '../../../../actions/Lessons';
@@ -8,6 +8,8 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type LessonsTemplate, type LessonsTemplateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import LessonsTemplateForm from './LessonsTemplateForm';
 
 interface Props { lessonsTemplate: LessonsTemplate }
@@ -17,6 +19,7 @@ const LessonsTemplatePopover: FunctionComponent<Props> = ({ lessonsTemplate }) =
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const ability = useContext(AbilityContext);
 
   const initialValues = {
     lessons_template_name: lessonsTemplate.lessons_template_name,
@@ -49,10 +52,13 @@ const LessonsTemplatePopover: FunctionComponent<Props> = ({ lessonsTemplate }) =
     {
       label: 'Update',
       action: handleOpenEdit,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.LESSONS_LEARNED),
+
     },
     {
       label: 'Delete',
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.DELETE, SUBJECTS.LESSONS_LEARNED),
     },
   ];
 

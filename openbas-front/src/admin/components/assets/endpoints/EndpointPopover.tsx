@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint } from '../../../../actions/assets/endpoint-actions';
@@ -7,6 +7,8 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import { type EndpointOutput, type EndpointOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointUpdate from './EndpointUpdate';
 
 export interface EndpointPopoverProps {
@@ -39,6 +41,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const [edition, setEdition] = useState(false);
   const handleOpenEdit = () => setEdition(true);
@@ -85,6 +88,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   if (onUpdate) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ASSETS),
   });
   if (onRemoveFromContext && removeFromContextLabel) entries.push({
     label: removeFromContextLabel,
@@ -97,6 +101,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   if (onDelete) entries.push({
     label: 'Delete',
     action: () => handleDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.ASSETS),
   });
 
   return entries.length > 0 && (
