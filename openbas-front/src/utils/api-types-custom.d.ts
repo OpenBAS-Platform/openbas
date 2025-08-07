@@ -30,6 +30,19 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
 export type FlatConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.FlatSeries[];
   widget_configuration_type: 'flat';
+  end?: string;
+  start?: string;
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
+  date_attribute: string;
 };
 export type ListConfiguration = BaseWidgetConfiguration & {
   perspective: ApiTypes.ListPerspective;

@@ -25,15 +25,6 @@ public abstract class HistogramWidget extends WidgetConfiguration {
   @JsonProperty("display_legend")
   private boolean displayLegend;
 
-  @Nullable
-  private String start; // Date or $custom_dashboard_start
-
-  @Nullable
-  private String end; // Date or $custom_dashboard_end
-  @NotNull
-  @JsonProperty("time_range")
-  private CustomDashboardTimeRange timeRange;
-
   HistogramWidget(String mode) {
     super(
         "temporal".equals(mode)

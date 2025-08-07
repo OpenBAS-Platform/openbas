@@ -391,8 +391,21 @@ public class ElasticService implements EngineService {
 
   // region query
   public long count(RawUserAuth user, CountRuntime runtime) {
+    FlatConfiguration widgetConfig = runtime.getConfig();
+    Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Query dateRangeQuery =
+        DateRangeQuery.of(
+                d -> d.field(widgetConfig.getDateAttribute()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
+            ._toRangeQuery()
+            ._toQuery();
+
     try {
-      Query query =
+      Query countQuery =
           buildQuery(
               user,
               null,
@@ -403,8 +416,15 @@ public class ElasticService implements EngineService {
                   .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
+      Query query = null;
+      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+        query = queryBuilder.must(countQuery).build()._toQuery();
+      } else {
+        query = queryBuilder.must(dateRangeQuery, countQuery).build()._toQuery();
+      }
+      Query finalQuery = query;
       return elasticClient
-          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(finalQuery))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -435,8 +455,6 @@ public class ElasticService implements EngineService {
     } else {
       query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     }
-
-    //Query query = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
 
     String aggregationKey = "term_histogram";
     try {
@@ -558,88 +576,7 @@ public class ElasticService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    /*String timeRangeParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("timeRange")).findFirst().get().getKey();
-    String startDateParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("startDate")).findFirst().get().getKey();
-    String endDateParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("endDate")).findFirst().get().getKey();
-    String dashboardTimeRange = parameters.get(timeRangeParameterId);
-    String widgetTimeRange = widgetConfig.getTimeRange().name();
-    Instant start = Instant.now();
-    Instant end = Instant.now();*/
 
-    /*switch (widgetTimeRange) {
-      case "ALL_TIME":
-        start = Instant.parse("2016-01-01T00:00:00Z");
-        break;
-      case "LAST_DAY":
-        start = Instant.now().minus(24, ChronoUnit.HOURS);
-        break;
-      case "LAST_WEEK":
-        start = Instant.now().minus(7, ChronoUnit.DAYS);
-        break;
-      case "LAST_MONTH":
-        start = Instant.now().minus(30, ChronoUnit.DAYS);
-        break;
-      case "LAST_QUARTER":
-        start = Instant.now().minus(90, ChronoUnit.DAYS);
-        break;
-      case "LAST_SEMESTER":
-        start = Instant.now().minus(180, ChronoUnit.DAYS);
-        break;
-      case "LAST_YEAR":
-        start = Instant.now().minus(360, ChronoUnit.DAYS);
-        break;
-      case "CUSTOM":
-        if (!widgetConfig.getStart().isEmpty()) {
-          start = Instant.parse(parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
-        }
-        if (!widgetConfig.getEnd().isEmpty()) {
-          end = Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
-        }
-        break;
-      default:
-        if (!hasText(dashboardTimeRange)) {
-          throw new RuntimeException("Dashboard timerange is not set");
-        }
-        switch (dashboardTimeRange) {
-          case "ALL_TIME":
-            start = Instant.parse("2016-01-01T00:00:00Z");
-            break;
-          case "LAST_DAY":
-            start = Instant.now().minus(24, ChronoUnit.HOURS);
-            break;
-          case "LAST_WEEK":
-            start = Instant.now().minus(7, ChronoUnit.DAYS);
-            break;
-          case "LAST_MONTH":
-            start = Instant.now().minus(30, ChronoUnit.DAYS);
-            break;
-          case "LAST_QUARTER":
-            start = Instant.now().minus(90, ChronoUnit.DAYS);
-            break;
-          case "LAST_SEMESTER":
-            start = Instant.now().minus(180, ChronoUnit.DAYS);
-            break;
-          case "LAST_YEAR":
-            start = Instant.now().minus(360, ChronoUnit.DAYS);
-            break;
-          case "CUSTOM":
-            if (parameters.get(startDateParameterId) != null) {
-              start = Instant.parse(parameters.get(startDateParameterId));
-            }
-            if (parameters.get(endDateParameterId) != null) {
-              end = Instant.parse(parameters.get(endDateParameterId));
-            }
-            break;
-          default:
-        }
-        ;
-    }*/
-
-    /*Instant finalStart = start;
-    Instant finalEnd = end;*/
     Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
     Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
@@ -656,7 +593,6 @@ public class ElasticService implements EngineService {
     } else {
       query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     }
-    //Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
     bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
     bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
@@ -701,24 +637,7 @@ public class ElasticService implements EngineService {
                                         .keyed(false))),
             Void.class);
       }
-      /*SearchResponse<Void> response =
-          elasticClient.search(
-              b ->
-                  b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(0)
-                      .query(finalQuery)
-                      .aggregations(
-                          aggregationKey,
-                          a ->
-                              a.dateHistogram(
-                                  h ->
-                                      h.field(widgetConfig.getField())
-                                          .minDocCount(0)
-                                          .format(widgetConfig.getInterval().format)
-                                          .calendarInterval(widgetConfig.getInterval().esType)
-                                          .extendedBounds(extendedBounds)
-                                          .keyed(false))),
-              Void.class);*/
+
       assert response != null;
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
