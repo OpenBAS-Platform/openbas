@@ -33,17 +33,20 @@ public class V4_17__Update_structural_widgets extends BaseJavaMigration {
       ObjectNode config = mapper.readValue(widgetConfig, ObjectNode.class);
       String widgetId = results.getString("widget_id");
       if (config != null) {
-        String mode = config.get("mode").asText();
+        String widgetConfigurationType = config.get("widget_configuration_type").asText();
         String nullValue = null;
-        if (mode.equals("structural")) {
-          config.put("time_range", "ALL_TIME");
-          config.put("start", nullValue);
-          config.put("end", nullValue);
-          config.put("date_attribute", "base_updated_at");
+        if (widgetConfigurationType != null) {
+          if (widgetConfigurationType.equals("structural-histogram") || widgetConfigurationType.equals(
+              "list") || widgetConfigurationType.equals("flat")) {
+            config.put("time_range", "ALL_TIME");
+            config.put("start", nullValue);
+            config.put("end", nullValue);
+            config.put("date_attribute", "base_updated_at");
+          }
+          statement.setString(1, mapper.writeValueAsString(config));
+          statement.setString(2, widgetId);
+          statement.addBatch();
         }
-        statement.setString(1, mapper.writeValueAsString(config));
-        statement.setString(2, widgetId);
-        statement.addBatch();
       }
     }
 
