@@ -26,11 +26,13 @@ import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -46,6 +48,7 @@ import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
 public class OpenSearchService implements EngineService {
+
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
   private final OpenSearchDriver driver;
@@ -58,11 +61,11 @@ public class OpenSearchService implements EngineService {
   /**
    * Constructor for the opensearch engine
    *
-   * @param searchEngine the context of the engine
-   * @param driver the driver
+   * @param searchEngine             the context of the engine
+   * @param driver                   the driver
    * @param indexingStatusRepository the repository for the indexing status
-   * @param engineConfig the config of the engine
-   * @param commonSearchService the common search service
+   * @param engineConfig             the config of the engine
+   * @param commonSearchService      the common search service
    * @throws Exception in case of an issue during the initialization of the opensearchclient
    */
   public OpenSearchService(
@@ -83,8 +86,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Convert a field to a FieldValue
    *
-   * @param field the field
-   * @param value the value
+   * @param field      the field
+   * @param value      the value
    * @param parameters the map of parameters
    * @return the FieldValue
    */
@@ -112,8 +115,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Query an engine using the filter, parameters and definition
    *
-   * @param filter the filter
-   * @param parameters the parameters
+   * @param filter               the filter
+   * @param parameters           the parameters
    * @param definitionParameters the map of parameters
    * @return the query
    */
@@ -269,8 +272,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Build the query from filter
    *
-   * @param groupFilter the filter
-   * @param parameters the parameters to use
+   * @param groupFilter          the filter
+   * @param parameters           the parameters to use
    * @param definitionParameters the definition of the parameters
    * @return the query generated
    */
@@ -296,10 +299,10 @@ public class OpenSearchService implements EngineService {
   /**
    * Build the query
    *
-   * @param user the user auth to use
-   * @param search the search to use
-   * @param groupFilter the filter to use
-   * @param parameters the parameters to use
+   * @param user                 the user auth to use
+   * @param search               the search to use
+   * @param groupFilter          the filter to use
+   * @param parameters           the parameters to use
    * @param definitionParameters the definition parameters to use
    * @return the query built
    */
@@ -337,7 +340,7 @@ public class OpenSearchService implements EngineService {
    * Resolve the ids of the representative
    *
    * @param user the user to use
-   * @param ids the ids to check
+   * @param ids  the ids to check
    * @return a map of ids
    */
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
@@ -368,7 +371,9 @@ public class OpenSearchService implements EngineService {
 
   // region indexing
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models) {
     models.forEach(
         model -> {
@@ -419,7 +424,9 @@ public class OpenSearchService implements EngineService {
         });
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public void bulkDelete(List<String> ids) {
     try {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
@@ -448,7 +455,10 @@ public class OpenSearchService implements EngineService {
   // endregion
 
   // region query
-  /** {@inheritDoc} */
+
+  /**
+   * {@inheritDoc}
+   */
   public long count(RawUserAuth user, CountRuntime runtime) {
     try {
       Query query =
@@ -471,7 +481,9 @@ public class OpenSearchService implements EngineService {
     return 0;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public EsSeries termHistogram(
       RawUserAuth user,
       StructuralHistogramWidget widgetConfig,
@@ -529,10 +541,10 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for string type
    *
-   * @param user the user to use
-   * @param config the config for a structural histogram
+   * @param user      the user to use
+   * @param config    the config for a structural histogram
    * @param aggregate the aggregate
-   * @param field the field
+   * @param field     the field
    * @return the series to use
    */
   private EsSeries termHistogramSTerms(
@@ -567,7 +579,7 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for double type
    *
-   * @param config the config to use
+   * @param config    the config to use
    * @param aggregate the aggregate to use
    * @return a series
    */
@@ -588,7 +600,7 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for long type
    *
-   * @param config the config to use
+   * @param config    the config to use
    * @param aggregate the aggregate to use
    * @return a series
    */
@@ -606,7 +618,9 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName(), data);
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -616,7 +630,9 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public EsSeries dateHistogram(
       RawUserAuth user,
       DateHistogramWidget widgetConfig,
@@ -630,7 +646,7 @@ public class OpenSearchService implements EngineService {
     Instant endInstant = Instant.parse(end);
     Query dateRangeQuery =
         RangeQuery.of(
-                d -> d.field(widgetConfig.getField()).gt(JsonData.of(start)).lt(JsonData.of(end)))
+                d -> d.field(widgetConfig.getDateAttribute()).gt(JsonData.of(start)).lt(JsonData.of(end)))
             .toQuery();
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
@@ -652,7 +668,7 @@ public class OpenSearchService implements EngineService {
                           a ->
                               a.dateHistogram(
                                   h ->
-                                      h.field(widgetConfig.getField())
+                                      h.field(widgetConfig.getDateAttribute())
                                           .minDocCount(0)
                                           .format(widgetConfig.getInterval().format)
                                           .calendarInterval(widgetConfig.getInterval().openType)
@@ -675,7 +691,9 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName());
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -685,7 +703,9 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
     Filters.FilterGroup searchFilters = runtime.getWidget().getPerspective().getFilter();
     String entityName =
@@ -756,7 +776,9 @@ public class OpenSearchService implements EngineService {
     return model.get().getModel();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public ListConfiguration createListConfiguration(
       String entityName, Map<String, List<String>> filterValueMap) {
     // Create filters
@@ -815,7 +837,9 @@ public class OpenSearchService implements EngineService {
     return List.of();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void cleanUpIndex(String model) throws IOException {
     driver.cleanUpIndex(model, openSearchClient);
