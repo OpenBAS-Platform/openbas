@@ -39,8 +39,8 @@ const MenuItemOnboarding: FunctionComponent<OnboardingMenuProps> = ({
 
   useEffect(() => {
     if (!onboarding) {
-      setProgress(0);
-      setTotal(onboardingConfig?.flatMap(i => i.items).length);
+      setProgress(1);
+      setTotal((onboardingConfig?.flatMap(i => i.items).length ?? 0) + 1);
     } else {
       setProgress((onboarding.progress ?? []).filter(i => i.completed || i.skipped).length + 1);
       setTotal((onboarding.progress ?? []).length + 1);
