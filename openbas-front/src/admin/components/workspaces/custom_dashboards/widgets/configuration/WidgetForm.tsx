@@ -134,23 +134,6 @@ const WidgetForm: FunctionComponent<Props> = ({
     }),
   ]);
 
-  /* const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    setValue,
-  } = useForm<WidgetInputWithoutLayout>({
-    mode: 'onTouched',
-    resolver: zodResolver(
-      zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
-        widget_config: widgetConfigSchema,
-      }),
-    ),
-    defaultValues: initialValues,
-  }); */
-
   const methods = useForm<WidgetInputWithoutLayout>({
     mode: 'onTouched',
     resolver: zodResolver(
