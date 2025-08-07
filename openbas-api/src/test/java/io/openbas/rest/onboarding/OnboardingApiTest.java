@@ -1,8 +1,8 @@
 package io.openbas.rest.onboarding;
 
+import static io.openbas.api.onboarding.OnboardingApi.ONBOARDING_URI;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.rest.asset.endpoint.EndpointApi.ENDPOINT_URI;
-import static io.openbas.api.onboarding.OnboardingApi.ONBOARDING_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
 import static io.openbas.utils.UserOnboardingProgressUtils.TECHNICAL_SETUP;
@@ -20,8 +20,8 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.User;
-import io.openbas.api.onboarding.output.OnboardingCategoryDTO;
 import io.openbas.service.UserService;
+import io.openbas.utils.OnboardingConfig.OnboardingCategoryDTO;
 import io.openbas.utils.fixtures.composers.onboarding.UserOnboardingProgressComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
