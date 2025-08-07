@@ -71,18 +71,32 @@ public class InjectorContractContentUtils {
           continue;
         }
 
-//        if (CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)) continue;
-//        JsonNode valueNode;
-//
-//        if (EXPECTATIONS_KEY.equals(key)) {
-//          valueNode = field.get(PREDEFINED_EXPECTATIONS_FIELD);
-//        } else {
-//          valueNode = field.get(DEFAULT_VALUE_FIELD);
-//        }
-//
-//        if (valueNode == null || valueNode.isNull() || valueNode.isEmpty()) {
-//          continue;
-//        }
+        //        if (CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)) continue;
+        //        JsonNode valueNode;
+        //
+        //        if (EXPECTATIONS_KEY.equals(key)) {
+        //          valueNode = field.get(PREDEFINED_EXPECTATIONS_FIELD);
+        //        } else {
+        //          valueNode = field.get(DEFAULT_VALUE_FIELD);
+        //        }
+        //
+        //        if (valueNode == null || valueNode.isNull() || valueNode.isEmpty()) {
+        //          continue;
+        //        }
+
+        //        JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
+        //        if (cardinalityValueNode != null
+        //            && !cardinalityValueNode.isNull()
+        //            && !cardinalityValueNode.asText().isEmpty()) {
+        //          String cardinality = cardinalityValueNode.asText();
+        //          if (ContractCardinality.Multiple.name().equals(cardinality)) {
+        //            injectContent.set(key, valueNode);
+        //          } else if (valueNode.has(0)) {
+        //            injectContent.set(key, valueNode.get(0));
+        //          }
+        //        } else {
+        //          injectContent.set(key, valueNode);
+        //        }
 
         if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
