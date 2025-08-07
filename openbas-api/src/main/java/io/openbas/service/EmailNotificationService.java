@@ -56,7 +56,7 @@ public class EmailNotificationService {
     String templatePath =
         String.format(
             "classpath:email/notification_template_%s_%s_%s.html",
-            rule.getResourceType().name().toLowerCase(),
+            rule.getNotificationResourceType().name().toLowerCase(),
             rule.getTrigger().name().toLowerCase(),
             "en");
 

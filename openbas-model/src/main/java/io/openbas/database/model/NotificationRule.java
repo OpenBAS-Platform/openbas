@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -29,7 +30,7 @@ public class NotificationRule implements Base {
   @JsonProperty("notification_resource_type")
   @NotNull
   @Enumerated(EnumType.STRING)
-  private NotificationRuleResourceType resourceType;
+  private NotificationRuleResourceType notificationResourceType;
 
   @Column(name = "notification_resource_id")
   @JsonProperty("notification_resource_id")
@@ -60,4 +61,8 @@ public class NotificationRule implements Base {
   @ManyToOne(fetch = FetchType.LAZY)
   @Queryable(searchable = true, filterable = true, path = "owner.id")
   private User owner;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.NOTIFICATION_RULE;
 }
