@@ -242,6 +242,7 @@ const AssetGroups = () => {
                   divider
                   secondaryAction={(
                     <AssetGroupPopover
+                      inline
                       assetGroup={assetGroup}
                       onUpdate={onUpdateList}
                       onDelete={result => setAssetGroups(assetGroups.filter(ag => (ag.asset_group_id !== result)))}
