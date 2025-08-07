@@ -54,9 +54,7 @@ public class PermissionService {
     switch (action) {
       case READ:
         return grantService.hasReadGrant(resourceId, user);
-      case WRITE:
-        return grantService.hasWriteGrant(resourceId, user);
-      case DELETE:
+      case WRITE, DELETE:
         return grantService.hasWriteGrant(resourceId, user);
       case LAUNCH:
         return grantService.hasLaunchGrant(resourceId, user);
