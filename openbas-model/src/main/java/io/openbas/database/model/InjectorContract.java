@@ -183,7 +183,7 @@ public class InjectorContract implements Base {
   public static final String CONTRACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE =
       "mandatoryConditionValue";
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
-  public static final String PRE_DEFINED_EXPECTATIONS = "predefinedExpectations";
+  public static final String PREDEFINED_EXPECTATIONS = "predefinedExpectations";
 
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
   public static final String CONTRACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
