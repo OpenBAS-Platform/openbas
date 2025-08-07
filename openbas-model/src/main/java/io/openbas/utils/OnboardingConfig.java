@@ -1,14 +1,20 @@
-package io.openbas.service.onboarding;
+package io.openbas.utils;
 
 import static io.openbas.utils.UserOnboardingProgressUtils.*;
 
-import io.openbas.api.onboarding.output.OnboardingCategoryDTO;
-import io.openbas.api.onboarding.output.OnboardingItemDTO;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class OnboardingConfig {
 
   private OnboardingConfig() {}
+
+  public record OnboardingCategoryDTO(
+      @NotBlank String category, @NotBlank String icon, @NotNull List<OnboardingItemDTO> items) {}
+
+  public record OnboardingItemDTO(
+      @NotBlank String uri, @NotBlank String labelKey, @NotBlank String videoLink) {}
 
   public static final String TECHNICAL_SETUP_ICON = "dns";
   public static final String TABLE_TOP_SETUP_ICON = "people";
