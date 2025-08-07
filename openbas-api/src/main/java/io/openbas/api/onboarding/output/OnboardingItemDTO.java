@@ -1,4 +1,4 @@
-package io.openbas.rest.onboarding.output;
+package io.openbas.api.onboarding.output;
 
 import jakarta.validation.constraints.NotBlank;
 

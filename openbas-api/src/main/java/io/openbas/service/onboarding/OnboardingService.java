@@ -1,4 +1,4 @@
-package io.openbas.rest.onboarding;
+package io.openbas.service.onboarding;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.utils.UserOnboardingProgressUtils.initializeDefaults;

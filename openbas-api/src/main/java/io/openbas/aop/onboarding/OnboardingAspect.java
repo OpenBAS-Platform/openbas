@@ -1,6 +1,6 @@
 package io.openbas.aop.onboarding;
 
-import io.openbas.rest.onboarding.OnboardingService;
+import io.openbas.service.onboarding.OnboardingService;
 import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
