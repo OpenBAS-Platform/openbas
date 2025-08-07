@@ -4960,6 +4960,7 @@ export interface RoleInput {
   /** @uniqueItems true */
   role_capabilities?: (
     | "BYPASS"
+    | "CREATE_ASSESSMENT"
     | "ACCESS_ATOMIC_TESTING"
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
@@ -5769,6 +5770,7 @@ export interface User {
   /** @uniqueItems true */
   user_capabilities?: (
     | "BYPASS"
+    | "CREATE_ASSESSMENT"
     | "ACCESS_ATOMIC_TESTING"
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"

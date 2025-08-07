@@ -5,5 +5,7 @@ public enum Action {
   WRITE,
   LAUNCH,
   DELETE,
-  SEARCH
+  SEARCH,
+  CREATE,
+  DUPLICATE
 }

@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PermissionService {
 
+  private static final EnumSet<ResourceType> RESOURCES_OPEN =
+      EnumSet.of(ResourceType.PLAYER, ResourceType.TEAM);
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
   private final GrantService grantService;
@@ -34,6 +36,10 @@ public class PermissionService {
 
     // Scenario and simulation are  only accessible by GRANT
     if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
+      // creation and duplication are managed using capa
+      if (Action.CREATE.equals(action) || Action.DUPLICATE.equals(action)) {
+        return hasCapaPermission(user, resourceType, action);
+      }
       return hasGrantPermission(user, resourceId, resourceType, action);
     } else {
       return hasCapaPermission(user, resourceType, action);
@@ -53,7 +59,7 @@ public class PermissionService {
     switch (action) {
       case READ:
         return grantService.hasReadGrant(resourceId, user);
-      case WRITE:
+      case WRITE, DELETE:
         return grantService.hasWriteGrant(resourceId, user);
       case LAUNCH:
         return grantService.hasLaunchGrant(resourceId, user);
@@ -72,9 +78,7 @@ public class PermissionService {
       return true;
     }
 
-    // we authorize team and player READ to all the users
-    if (Action.READ.equals(action)
-        && (ResourceType.TEAM.equals(resourceType) || ResourceType.PLAYER.equals(resourceType))) {
+    if (RESOURCES_OPEN.contains(resourceType) && Action.READ.equals(action)) {
       return true;
     }
 

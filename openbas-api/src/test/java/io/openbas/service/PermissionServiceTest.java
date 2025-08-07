@@ -54,6 +54,14 @@ public class PermissionServiceTest extends IntegrationTest {
   }
 
   @Test
+  public void test_hasPermission_delete_WHEN_has_write_grant() {
+    User user = getUser(USER_ID, false);
+    when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(true);
+    assertTrue(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SIMULATION, Action.DELETE));
+  }
+
+  @Test
   public void test_hasPermission_launch_WHEN_has_launch_grant() {
     User user = getUser(USER_ID, false);
     when(grantService.hasLaunchGrant(RESOURCE_ID, user)).thenReturn(true);
@@ -117,6 +125,30 @@ public class PermissionServiceTest extends IntegrationTest {
     User user = getUser(USER_ID, false);
     assertFalse(
         permissionService.hasPermission(user, RESOURCE_ID, ResourceType.TEAM, Action.WRITE));
+  }
+
+  @Test
+  public void test_hasPermission_create_WHEN_has_create_capa() {
+    User user = getUser(USER_ID, false);
+    user.setGroups(List.of(getGroup(Capability.CREATE_ASSESSMENT)));
+    assertTrue(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SCENARIO, Action.CREATE));
+  }
+
+  @Test
+  public void test_hasPermission_duplicate_WHEN_has_create_capa() {
+    User user = getUser(USER_ID, false);
+    user.setGroups(List.of(getGroup(Capability.CREATE_ASSESSMENT)));
+    assertTrue(
+        permissionService.hasPermission(
+            user, RESOURCE_ID, ResourceType.SCENARIO, Action.DUPLICATE));
+  }
+
+  @Test
+  public void test_hasPermission_create_WHEN_has_no_capa() {
+    User user = getUser(USER_ID, false);
+    assertFalse(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SCENARIO, Action.CREATE));
   }
 
   private User getUser(final String id, final boolean isAdmin) {
