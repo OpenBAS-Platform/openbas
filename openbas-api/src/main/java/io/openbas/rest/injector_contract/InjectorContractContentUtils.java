@@ -1,7 +1,11 @@
 package io.openbas.rest.injector_contract;
 
-import static io.openbas.database.model.InjectorContract.*;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_CARDINALITY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC;
 import static io.openbas.database.model.InjectorContract.DEFAULT_VALUE_FIELD;
+import static io.openbas.database.model.InjectorContract.PRE_DEFINE_EXPECTATIONS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,6 +64,12 @@ public class InjectorContractContentUtils {
 
       for (JsonNode field : fieldsNode) {
         String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
+
+        if (CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS.equals(key)) {
+          injectContent.set(key, field.get(PRE_DEFINE_EXPECTATIONS));
+          continue;
+        }
+
         if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
           JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
