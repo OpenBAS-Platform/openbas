@@ -92,7 +92,6 @@ const RoleForm: FC<RoleFormProps> = ({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100%',
           gap: activeTab === 'Overview' ? theme.spacing(2) : 0,
         }}
       >

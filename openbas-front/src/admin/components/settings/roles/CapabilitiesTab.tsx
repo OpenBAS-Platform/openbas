@@ -1,9 +1,11 @@
-import { SecurityOutlined } from '@mui/icons-material';
+import { LocalPoliceOutlined } from '@mui/icons-material';
 import { Box, Checkbox, Divider } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FC } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
+import { useFormatter } from '../../../../components/i18n';
 import { type RoleCreateInput } from './RoleForm';
 
 interface Capability {
@@ -19,16 +21,19 @@ interface CapabilitiesTabProps {
   depth?: number;
 }
 
-const useStyles = makeStyles()(() => ({
-  capability_name: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 4,
-  },
-}));
-
 const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capabilities, capability, depth = 0 }) => {
-  const { classes } = useStyles();
+  const { t } = useFormatter();
+  const theme = useTheme();
+
+  const { classes } = makeStyles()(() => ({
+    capability_name: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      margin: theme.spacing(1),
+    },
+  }))();
+
   const { control } = useFormContext<RoleCreateInput>();
   const selected = useWatch({
     control,
@@ -99,10 +104,17 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capabilities, capability, d
 
   return (
     <>
-      <Box ml={depth * 2} display="flex" alignItems="center" gap={1} justifyContent="space-between">
+      <Box
+        ml={depth * 2}
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <div className={classes.capability_name}>
-          <SecurityOutlined sx={{ opacity: capability.checkable ? 1 : 0.5 }} />
-          <p>{capability.name}</p>
+          <LocalPoliceOutlined sx={{ opacity: capability.checkable ? 1 : 0.5 }} />
+          <>
+            {t(capability.name)}
+          </>
         </div>
         {capability.checkable && capability.value
           && (
@@ -111,6 +123,10 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capabilities, capability, d
               control={control}
               render={({ field }) => (
                 <Checkbox
+                  sx={{
+                    m: 0,
+                    p: 0,
+                  }}
                   checked={selected.includes(capability.value)}
                   onChange={e => field.onChange(toggle(e.target.checked, capability, capabilities))}
                 />
@@ -125,7 +141,7 @@ const CapabilitiesTab: FC<CapabilitiesTabProps> = ({ capabilities, capability, d
         <CapabilitiesTab
           key={child.name}
           capability={child}
-          depth={depth + 1}
+          depth={depth + 2}
           capabilities={capabilities}
         />
       ))}
