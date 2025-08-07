@@ -86,7 +86,7 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
     <Drawer
       open={open}
       handleClose={() => setOpen(false)}
-      title={t('Create a notification rule')}
+      title={editing ? t('Update a notification rule') : t('Create a notification rule')}
     >
       {
         editing

@@ -96,6 +96,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
               onClick={edition ? handleOpenDelete : handleClose}
               style={{ marginRight: theme.spacing(1) }}
               disabled={isSubmitting}
+              color={edition ? 'error' : 'primary'}
             >
               {edition ? t('Delete') : t('Cancel')}
             </Button>
