@@ -1,10 +1,12 @@
-package io.openbas.rest.onboarding;
+package io.openbas.api.onboarding;
 
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.database.model.UserOnboardingProgress;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.onboarding.output.OnboardingCategoryDTO;
+import io.openbas.api.onboarding.output.OnboardingCategoryDTO;
+import io.openbas.service.onboarding.OnboardingConfig;
+import io.openbas.service.onboarding.OnboardingService;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
