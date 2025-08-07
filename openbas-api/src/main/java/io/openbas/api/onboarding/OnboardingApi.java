@@ -4,9 +4,8 @@ import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.database.model.UserOnboardingProgress;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.api.onboarding.output.OnboardingCategoryDTO;
-import io.openbas.service.onboarding.OnboardingConfig;
 import io.openbas.service.onboarding.OnboardingService;
+import io.openbas.utils.OnboardingConfig;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ public class OnboardingApi extends RestBehavior {
   }
 
   @GetMapping(ONBOARDING_URI + "/config")
-  public List<OnboardingCategoryDTO> getOnboardingConfig() {
+  public List<OnboardingConfig.OnboardingCategoryDTO> getOnboardingConfig() {
     return OnboardingConfig.getOnboardingConfig();
   }
 
