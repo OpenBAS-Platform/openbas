@@ -1,9 +1,9 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { type OrganizationHelper, type TagHelper, type UserHelper } from '../../../../actions/helper';
 import { deletePlayer, updatePlayer } from '../../../../actions/User';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
@@ -12,6 +12,8 @@ import { useHelper } from '../../../../store';
 import { type PlayerInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { countryOption, type Option, organizationOption, tagOptions } from '../../../../utils/Option';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { TeamContext } from '../../common/Context';
 import { type PlayerInputForm, type UserStore } from './Player';
 import PlayerForm from './PlayerForm';
@@ -33,6 +35,8 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
+
   const { userAdmin, organizationsMap, tagsMap } = useHelper(
     (
       helper: UserHelper & OrganizationHelper & TagHelper,
@@ -50,20 +54,10 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(openEditOnInit);
   const [openRemove, setOpenRemove] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
-  // Popover
-  const handlePopoverOpen = (event: ReactMouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
 
   // Edition
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
@@ -91,7 +85,6 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   // Deletion
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
 
   const handleCloseDelete = () => setOpenDelete(false);
@@ -111,7 +104,6 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   // Remove
   const handleOpenRemove = () => {
     setOpenRemove(true);
-    handlePopoverClose();
   };
 
   const handleCloseRemove = () => setOpenRemove(false);
@@ -132,26 +124,28 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   };
   const canDelete = user.user_email !== 'admin@openbas.io' && (userAdmin || !user.user_admin);
   const canUpdateEmail = user.user_email !== 'admin@openbas.io' && (userAdmin || !user.user_admin);
+
+  // Button Popover
+  const entries = [];
+  if (onUpdate) entries.push({
+    label: t('Update'),
+    action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+  });
+  if (teamId) entries.push({
+    label: t('Remove from the team'),
+    action: () => handleOpenRemove(),
+  });
+  if (canDelete) entries.push({
+    label: t('Delete'),
+    action: () => handleOpenDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.TEAMS_AND_PLAYERS),
+  });
+
   return (
     <div>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {teamId && (
-          <MenuItem onClick={handleOpenRemove}>
-            {t('Remove from the team')}
-          </MenuItem>
-        )}
-        {canDelete && (
-          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
-        )}
-      </Menu>
+      <ButtonPopover entries={entries} variant="icon" />
+
       <DialogDelete
         open={openDelete}
         handleClose={handleCloseDelete}

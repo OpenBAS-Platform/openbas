@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteRole, updateRole } from '../../../../actions/roles/roles-actions';
 import { type RoleInput, type RoleResult } from '../../../../actions/roles/roles-helper';
@@ -8,6 +8,8 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type RoleOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import RoleForm from './RoleForm';
 
 export interface RolePopoverProps {
@@ -20,6 +22,7 @@ const RolePopover: FunctionComponent<RolePopoverProps> = ({ onDelete, onUpdate, 
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
@@ -49,10 +52,12 @@ const RolePopover: FunctionComponent<RolePopoverProps> = ({ onDelete, onUpdate, 
   if (onUpdate) entries.push({
     label: t('Update'),
     action: () => handleUpdate(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
   });
   if (onDelete) entries.push({
     label: t('Delete'),
     action: () => handleDelete(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
   });
 
   const onSubmit = (data: RoleInput) => {

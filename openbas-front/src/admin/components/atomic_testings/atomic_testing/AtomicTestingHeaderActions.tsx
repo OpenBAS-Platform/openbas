@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router';
 import { launchAtomicTesting, relaunchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
@@ -129,7 +131,9 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
   return (
     <>
       <Box display="flex" flexDirection="row" alignItems="center">
-        {getActionButton(injectResultOverview)}
+        <Can I={ACTIONS.LAUNCH} a={SUBJECTS.ATOMIC_TESTING}>
+          {getActionButton(injectResultOverview)}
+        </Can>
         <AtomicTestingPopover
           atomic={injectResultOverview}
           actions={['Export', 'Update', 'Duplicate', 'Delete']}

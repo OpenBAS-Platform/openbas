@@ -1,9 +1,9 @@
-import { MoreVert } from '@mui/icons-material';
-import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, useState } from 'react';
+import { Drawer as MuiDrawer } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
@@ -11,6 +11,8 @@ import { emptyFilterGroup } from '../../../../components/common/queryable/filter
 import { useFormatter } from '../../../../components/i18n';
 import { type AssetGroup, type AssetGroupInput, type AssetGroupOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
@@ -52,8 +54,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const ability = useContext(AbilityContext);
 
   const initialValues = (({
     asset_group_name,
@@ -72,7 +73,6 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
 
   const handleEdit = () => {
     setEdition(true);
-    setAnchorEl(null);
   };
   const submitEdit = (data: AssetGroupInput) => {
     dispatch(updateAssetGroup(assetGroup.asset_group_id, data)).then(
@@ -97,7 +97,6 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
 
   const handleManage = () => {
     setSelected(true);
-    setAnchorEl(null);
   };
   const sumitManage = (endpointIds: string[]) => {
     return dispatch(updateAssetsOnAssetGroup(assetGroup.asset_group_id, { asset_group_assets: endpointIds }));
@@ -108,7 +107,6 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
 
   const handleDelete = () => {
     setDeletion(true);
-    setAnchorEl(null);
   };
   const submitDelete = () => {
     dispatch(deleteAssetGroup(assetGroup.asset_group_id)).then(
@@ -121,48 +119,31 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
     );
   };
 
+  // Button Popover
+  const entries = [];
+  if (actions.includes('update')) entries.push({
+    label: 'Update',
+    action: () => handleEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ASSETS),
+  });
+  if (actions.includes('manage-asset')) entries.push({
+    label: 'Manage assets',
+    action: () => handleManage(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ASSETS),
+  });
+  if (actions.includes('remove') && onRemoveAssetGroupFromList) entries.push({
+    label: removeAssetGroupFromListMessage,
+    action: () => onRemoveAssetGroupFromList(assetGroup.asset_group_id),
+  });
+  if (actions.includes('delete')) entries.push({
+    label: 'Delete',
+    action: () => handleDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.ASSETS),
+  });
+
   return (
     <>
-      <IconButton
-        color="primary"
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        aria-haspopup="true"
-        size="large"
-        disabled={disabled}
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        {actions.includes('update') && (
-          <MenuItem onClick={handleEdit}>
-            {t('Update')}
-          </MenuItem>
-        )}
-        {actions.includes('manage-asset') && (
-          <MenuItem onClick={handleManage}>
-            {t('Manage assets')}
-          </MenuItem>
-        )}
-        {actions.includes('remove') && onRemoveAssetGroupFromList && (
-          <MenuItem onClick={() => onRemoveAssetGroupFromList(assetGroup.asset_group_id)}>
-            {t(removeAssetGroupFromListMessage)}
-          </MenuItem>
-        )}
-        {actions.includes('delete') && (
-          <MenuItem
-            onClick={handleDelete}
-          >
-            {t('Delete')}
-          </MenuItem>
-        )}
-      </Menu>
+      <ButtonPopover disabled={disabled} entries={entries} variant={inline ? 'icon' : 'toggle'} />
 
       <DialogDelete
         open={deletion}

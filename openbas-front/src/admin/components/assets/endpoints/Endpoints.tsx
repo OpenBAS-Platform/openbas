@@ -31,6 +31,9 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import useAuth from '../../../../utils/hooks/useAuth';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
 import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
 import EndpointCreation from './EndpointCreation';
@@ -165,7 +168,9 @@ const Endpoints = () => {
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderEndpoints />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+              <ImportUploaderEndpoints />
+            </Can>
           </ToggleButtonGroup>
         )}
       />
@@ -239,7 +244,12 @@ const Endpoints = () => {
               })
         }
       </List>
-      {userAdmin && <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />}
+      {userAdmin
+        && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+            <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />
+          </Can>
+        )}
     </>
   );
 };
