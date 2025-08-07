@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -36,6 +37,11 @@ public class InjectorContract implements Base {
   @JsonProperty("injector_contract_id")
   @NotBlank
   private String id;
+
+  @Column(name = "injector_contract_external_id", unique = true)
+  @JsonProperty("injector_contract_external_id")
+  @Nullable
+  private String externalId;
 
   @Column(name = "injector_contract_labels")
   @JsonProperty("injector_contract_labels")

@@ -1,6 +1,10 @@
 package io.openbas.rest;
 
+import static io.openbas.rest.cve.CveApi.CVE_API;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.CveInputFixture.CVE_EXTERNAL_ID;
+import static io.openbas.utils.fixtures.CveInputFixture.createDefaultCveCreateInput;
+import static java.time.Instant.now;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,16 +12,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Collector;
 import io.openbas.database.model.Cve;
 import io.openbas.database.repository.CveRepository;
+import io.openbas.rest.collector.service.CollectorService;
+import io.openbas.rest.cve.form.CVEBulkInsertInput;
 import io.openbas.rest.cve.form.CveCreateInput;
 import io.openbas.rest.cve.form.CveUpdateInput;
+import io.openbas.utils.fixtures.CollectorFixture;
+import io.openbas.utils.fixtures.composers.CollectorComposer;
 import io.openbas.utils.fixtures.composers.CveComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,13 +39,23 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("CVE API Integration Tests")
 class CveApiTest extends IntegrationTest {
 
-  private static final String CVE_URI = "/api/cves";
-
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
+  private Collector collector;
 
   @Autowired private CveComposer cveComposer;
+  @Autowired private CollectorComposer collectorComposer;
+  @Autowired private CollectorService collectorService;
   @Autowired private CveRepository cveRepository;
+
+  @BeforeAll
+  void init() {
+    collector =
+        collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector("CS"))
+            .persist()
+            .get();
+  }
 
   @BeforeEach
   void setUp() {
@@ -52,12 +72,12 @@ class CveApiTest extends IntegrationTest {
     void shouldCreateNewCve() throws Exception {
       CveCreateInput input = new CveCreateInput();
       input.setExternalId("CVE-2025-1234");
-      input.setCvss(new BigDecimal("5.2"));
+      input.setCvssV31(new BigDecimal("5.2"));
       input.setDescription("Test summary for CVE creation");
 
       String response =
           mvc.perform(
-                  post(CVE_URI)
+                  post(CVE_API)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(asJsonString(input)))
               .andExpect(status().isOk())
@@ -73,13 +93,13 @@ class CveApiTest extends IntegrationTest {
     void shouldFetchCveById() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5678");
-      cve.setCvss(new BigDecimal("8.9"));
+      cve.setCvssV31(new BigDecimal("8.9"));
       cve.setDescription("Test CVE");
 
       cveComposer.forCve(cve).persist();
 
       String response =
-          mvc.perform(get(CVE_URI + "/" + cve.getId()))
+          mvc.perform(get(CVE_API + "/" + cve.getId()))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -93,7 +113,7 @@ class CveApiTest extends IntegrationTest {
     void shouldUpdateCve() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5679");
-      cve.setCvss(new BigDecimal("4.5"));
+      cve.setCvssV31(new BigDecimal("4.5"));
       cve.setDescription("Old description");
       cveComposer.forCve(cve).persist();
 
@@ -101,7 +121,7 @@ class CveApiTest extends IntegrationTest {
       updateInput.setDescription("Updated Summary");
 
       mvc.perform(
-              put(CVE_URI + "/" + cve.getId())
+              put(CVE_API + "/" + cve.getId())
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(updateInput)))
           .andExpect(status().isOk())
@@ -117,15 +137,43 @@ class CveApiTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("Should bulk insert multiple CVEs")
+    void shouldBulkInsertCVEs() throws Exception {
+      // -- PREPARE -
+      CveCreateInput input = createDefaultCveCreateInput();
+      CVEBulkInsertInput inputs = new CVEBulkInsertInput();
+      inputs.setSourceIdentifier(collector.getId());
+      inputs.setLastModifiedDateFetched(now());
+      inputs.setLastIndex(1234);
+      inputs.setInitialDatasetCompleted(false);
+      inputs.setCves(List.of(input));
+
+      // -- EXECUTE --
+
+      mvc.perform(
+              post(CVE_API + "/bulk")
+                  .content(asJsonString(inputs))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+
+      // -- ASSERT --
+      Assertions.assertTrue(cveRepository.findByExternalId(CVE_EXTERNAL_ID).isPresent());
+    }
+
+    @Test
     @DisplayName("Should delete a CVE")
     void shouldDeleteCve() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2025-5679");
-      cve.setCvss(new BigDecimal("7.5"));
+      cve.setCvssV31(new BigDecimal("7.5"));
       cve.setDescription("To be deleted");
       cveComposer.forCve(cve).persist();
 
-      mvc.perform(delete(CVE_URI + "/" + cve.getExternalId())).andExpect(status().isOk());
+      mvc.perform(delete(CVE_API + "/" + cve.getExternalId())).andExpect(status().isOk());
 
       Assertions.assertFalse(cveRepository.findById(cve.getExternalId()).isPresent());
     }
@@ -135,13 +183,13 @@ class CveApiTest extends IntegrationTest {
     void shouldReturnCvesOnSearch() throws Exception {
       Cve cve = new Cve();
       cve.setExternalId("CVE-2024-5679");
-      cve.setCvss(new BigDecimal("4.5"));
+      cve.setCvssV31(new BigDecimal("4.5"));
       cve.setDescription("Cve 1");
       cveComposer.forCve(cve).persist();
 
       Cve cve1 = new Cve();
       cve1.setExternalId("CVE-2025-5671");
-      cve1.setCvss(new BigDecimal("1.8"));
+      cve1.setCvssV31(new BigDecimal("1.8"));
       cve1.setDescription("Cve 2");
       cveComposer.forCve(cve1).persist();
 
@@ -151,7 +199,7 @@ class CveApiTest extends IntegrationTest {
 
       String response =
           mvc.perform(
-                  post(CVE_URI + "/search")
+                  post(CVE_API + "/search")
                       .content(asJsonString(input))
                       .contentType(MediaType.APPLICATION_JSON)
                       .accept(MediaType.APPLICATION_JSON))

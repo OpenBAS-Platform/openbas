@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { InjectResultOverviewOutput, InjectTarget } from '../../../../../utils/api-types';
 import {
   type ExpectationResultType,
-  expectationResultTypes,
+  ExpectationType,
   type InjectExpectationsStore,
 } from '../../../common/injects/expectations/Expectation';
 import ExecutionStatusDetail from '../../../common/injects/status/ExecutionStatusDetail';
@@ -59,7 +59,7 @@ const TargetResultsDetail = ({ inject, target }: Props) => {
 
     const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
     Object.keys(groupedByType)
-      .toSorted((a, b) => expectationResultTypes.indexOf(a as ExpectationResultType) - expectationResultTypes.indexOf(b as ExpectationResultType))
+      .toSorted((a, b) => Object.keys(ExpectationType).indexOf(a as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b as ExpectationResultType))
       .forEach((key) => {
         sortedGroupedResults[key] = groupedByType[key].toSorted((a, b) => {
           if (a.inject_expectation_name && b.inject_expectation_name) {

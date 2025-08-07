@@ -110,7 +110,7 @@ public class InjectService {
     inject.setUser(this.userService.currentUser());
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
-    inject.setTags(iterableToSet(tagService.tags(input.getTagIds())));
+    inject.setTags(tagService.tagSet(input.getTagIds()));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
             .map(i -> i.toDocument(documentService.document(i.getDocumentId()), inject))

@@ -12,6 +12,7 @@ import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.service.LoadService;
@@ -30,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ScenarioToExerciseServiceTest {
+class ScenarioToExerciseServiceTest extends IntegrationTest {
 
   @Autowired private ScenarioToExerciseService scenarioToExerciseService;
   @Autowired private LoadService loadService;

@@ -31,6 +31,9 @@ public interface InjectorContractRepository
   Optional<InjectorContract> findById(@NotNull String id);
 
   @NotNull
+  Optional<InjectorContract> findByIdOrExternalId(String id, String externalId);
+
+  @NotNull
   List<InjectorContract> findInjectorContractsByInjector(@NotNull Injector injector);
 
   @NotNull

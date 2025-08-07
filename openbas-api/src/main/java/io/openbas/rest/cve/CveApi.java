@@ -4,10 +4,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.rest.cve.form.CveCreateInput;
-import io.openbas.rest.cve.form.CveOutput;
-import io.openbas.rest.cve.form.CveSimple;
-import io.openbas.rest.cve.form.CveUpdateInput;
+import io.openbas.rest.cve.form.*;
 import io.openbas.rest.cve.service.CveService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.mapper.CveMapper;
@@ -16,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
@@ -59,6 +57,14 @@ public class CveApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public CveSimple createCve(@Valid @RequestBody CveCreateInput input) {
     return cveMapper.toCveSimple(cveService.createCve(input));
+  }
+
+  @Secured(ROLE_ADMIN)
+  @Operation(summary = "Bulk insert CVEs")
+  @LogExecutionTime
+  @PostMapping(CVE_API + "/bulk")
+  public void bulkInsertCVEsForCollector(@Valid @RequestBody @NotNull CVEBulkInsertInput input) {
+    this.cveService.bulkUpsertCVEs(input);
   }
 
   @Secured(ROLE_ADMIN)

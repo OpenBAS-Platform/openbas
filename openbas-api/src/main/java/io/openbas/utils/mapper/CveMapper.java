@@ -30,7 +30,7 @@ public class CveMapper {
     return CveSimple.builder()
         .id(cve.getId())
         .externalId(cve.getExternalId())
-        .cvss(cve.getCvss())
+        .cvssV31(cve.getCvssV31())
         .published(cve.getPublished())
         .build();
   }
@@ -42,7 +42,7 @@ public class CveMapper {
     return CveOutput.builder()
         .id(cve.getId())
         .externalId(cve.getExternalId())
-        .cvss(cve.getCvss())
+        .cvssV31(cve.getCvssV31())
         .published(cve.getPublished())
         .sourceIdentifier(cve.getSourceIdentifier())
         .description(cve.getDescription())

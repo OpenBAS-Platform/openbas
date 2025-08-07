@@ -7,6 +7,8 @@ public class ExecutorHelper {
   public static final String WINDOWS_LOCATION_PATH = "$PWD.Path";
   public static final String UNIX_LOCATION_PATH = "$(pwd)";
   public static final String IMPLANT_BASE_NAME = "implant-";
+  public static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
+  public static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
   private ExecutorHelper() {}
 

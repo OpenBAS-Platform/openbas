@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawGrant;
@@ -16,7 +17,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class GrantServiceTest {
+public class GrantServiceTest extends IntegrationTest {
 
   private static final String USER_ID = "userid";
   private static final String RESOURCE_ID = "resourceid";

@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Capability;
 import io.openbas.database.repository.RoleRepository;
 import java.util.Set;
@@ -12,7 +13,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class RoleServiceTest {
+public class RoleServiceTest extends IntegrationTest {
 
   @Mock RoleRepository roleRepository;
 
