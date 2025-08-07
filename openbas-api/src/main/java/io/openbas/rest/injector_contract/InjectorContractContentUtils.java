@@ -57,8 +57,8 @@ public class InjectorContractContentUtils {
       InjectorContract injectorContract) {
     ObjectNode convertedContent = injectorContract.getConvertedContent();
 
-    if (convertedContent.has("fields") && convertedContent.get("fields").isArray()) {
-      ArrayNode fieldsArray = (ArrayNode) convertedContent.get("fields");
+    if (convertedContent.has(FIELDS) && convertedContent.get(FIELDS).isArray()) {
+      ArrayNode fieldsArray = (ArrayNode) convertedContent.get(FIELDS);
       ArrayNode fieldsNode = fieldsArray.deepCopy();
       ObjectNode injectContent = new ObjectMapper().createObjectNode();
 
@@ -66,9 +66,23 @@ public class InjectorContractContentUtils {
         String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
 
         if (CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS.equals(key)) {
-          injectContent.set(key, field.get(PRE_DEFINE_EXPECTATIONS));
+          JsonNode expectationsNode = field.get(PRE_DEFINE_EXPECTATIONS);
+          injectContent.set(key, expectationsNode);
           continue;
         }
+
+//        if (CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)) continue;
+//        JsonNode valueNode;
+//
+//        if (EXPECTATIONS_KEY.equals(key)) {
+//          valueNode = field.get(PREDEFINED_EXPECTATIONS_FIELD);
+//        } else {
+//          valueNode = field.get(DEFAULT_VALUE_FIELD);
+//        }
+//
+//        if (valueNode == null || valueNode.isNull() || valueNode.isEmpty()) {
+//          continue;
+//        }
 
         if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
             && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
@@ -81,7 +95,7 @@ public class InjectorContractContentUtils {
                 && !cardinalityValueNode.isNull()
                 && !cardinalityValueNode.asText().isEmpty()) {
               String cardinality = cardinalityValueNode.asText();
-              if (cardinality.equals(ContractCardinality.Multiple.name())) {
+              if (ContractCardinality.Multiple.name().equals(cardinality)) {
                 injectContent.set(key, defaultValueNode);
               } else if (defaultValueNode.has(0)) {
                 injectContent.set(key, defaultValueNode.get(0));
