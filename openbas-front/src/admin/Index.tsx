@@ -18,6 +18,7 @@ import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import LeftBar from './components/nav/LeftBar';
 import TopBar from './components/nav/TopBar';
+import OnboardingRenderer from './components/onboarding/OnboardingRenderer';
 import InjectIndex from './components/simulations/simulation/injects/InjectIndex';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -91,6 +92,7 @@ const Index = () => {
         <LeftBar />
         <Box component="main" sx={boxSx}>
           <div className={classes.toolbar} />
+          <OnboardingRenderer />
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />

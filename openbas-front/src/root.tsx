@@ -6,8 +6,7 @@ import { Navigate, Route, Routes } from 'react-router';
 
 import { fetchMe, fetchPlatformParameters } from './actions/Application';
 import { type LoggedHelper } from './actions/helper';
-import EnterpriseEditionAgreementDialog
-  from './admin/components/common/entreprise_edition/EnterpriseEditionAgreementDialog';
+import EnterpriseEditionAgreementDialog from './admin/components/common/entreprise_edition/EnterpriseEditionAgreementDialog';
 import ConnectedIntlProvider from './components/AppIntlProvider';
 import ConnectedThemeProvider from './components/AppThemeProvider';
 import EnterpriseEditionProvider from './components/EnterpriseEditionProvider';
