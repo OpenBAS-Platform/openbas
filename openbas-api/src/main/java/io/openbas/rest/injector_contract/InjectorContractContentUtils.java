@@ -1,7 +1,11 @@
 package io.openbas.rest.injector_contract;
 
-import static io.openbas.database.model.InjectorContract.*;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_CARDINALITY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC;
 import static io.openbas.database.model.InjectorContract.DEFAULT_VALUE_FIELD;
+import static io.openbas.database.model.InjectorContract.PREDEFINED_EXPECTATIONS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectorContract;
-import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injector_contract.outputs.InjectorContractContentOutputElement;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -19,6 +22,7 @@ public class InjectorContractContentUtils {
 
   public static final String OUTPUTS = "outputs";
   public static final String FIELDS = "fields";
+  public static final String MULTIPLE = "n";
 
   private InjectorContractContentUtils() {}
 
@@ -53,33 +57,43 @@ public class InjectorContractContentUtils {
       InjectorContract injectorContract) {
     ObjectNode convertedContent = injectorContract.getConvertedContent();
 
-    if (convertedContent.has("fields") && convertedContent.get("fields").isArray()) {
-      ArrayNode fieldsArray = (ArrayNode) convertedContent.get("fields");
+    if (convertedContent.has(FIELDS) && convertedContent.get(FIELDS).isArray()) {
+      ArrayNode fieldsArray = (ArrayNode) convertedContent.get(FIELDS);
       ArrayNode fieldsNode = fieldsArray.deepCopy();
       ObjectNode injectContent = new ObjectMapper().createObjectNode();
 
       for (JsonNode field : fieldsNode) {
         String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
-        if (!CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)
-            && field.hasNonNull(DEFAULT_VALUE_FIELD)) {
-          JsonNode defaultValueNode = field.get(DEFAULT_VALUE_FIELD);
-          if (defaultValueNode != null
-              && !defaultValueNode.isNull()
-              && !defaultValueNode.isEmpty()) {
-            JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
-            if (cardinalityValueNode != null
-                && !cardinalityValueNode.isNull()
-                && !cardinalityValueNode.asText().isEmpty()) {
-              String cardinality = cardinalityValueNode.asText();
-              if (cardinality.equals(ContractCardinality.Multiple.name())) {
-                injectContent.set(key, defaultValueNode);
-              } else if (defaultValueNode.has(0)) {
-                injectContent.set(key, defaultValueNode.get(0));
-              }
-            } else {
-              injectContent.set(key, defaultValueNode);
-            }
+
+        if (CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC.contains(key)) {
+          continue;
+        }
+
+        JsonNode valueNode;
+
+        // For expectation field, we should use predefinedExpectations
+        if (CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS.equals(key)) {
+          valueNode = field.get(PREDEFINED_EXPECTATIONS);
+        } else {
+          valueNode = field.get(DEFAULT_VALUE_FIELD);
+        }
+
+        if (valueNode == null || valueNode.isNull() || valueNode.isEmpty()) {
+          continue;
+        }
+
+        JsonNode cardinalityValueNode = field.get(CONTRACT_ELEMENT_CONTENT_CARDINALITY);
+        if (cardinalityValueNode != null
+            && !cardinalityValueNode.isNull()
+            && !cardinalityValueNode.asText().isEmpty()) {
+          String cardinality = cardinalityValueNode.asText();
+          if (MULTIPLE.equals(cardinality)) {
+            injectContent.set(key, valueNode);
+          } else if (valueNode.has(0)) {
+            injectContent.set(key, valueNode.get(0));
           }
+        } else {
+          injectContent.set(key, valueNode);
         }
       }
 
