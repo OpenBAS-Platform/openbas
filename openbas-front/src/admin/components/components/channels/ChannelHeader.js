@@ -5,11 +5,17 @@ import { makeStyles } from 'tss-react/mui';
 import { useHelper } from '../../../../store';
 import ChannelPopover from './ChannelPopover';
 
-const useStyles = makeStyles()(() => ({
-  container: { width: '100%' },
+const useStyles = makeStyles()(theme => ({
+  container: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+  },
   title: {
     float: 'left',
     textTransform: 'uppercase',
+    margin: 0,
   },
 }));
 

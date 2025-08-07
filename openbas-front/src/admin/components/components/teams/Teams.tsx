@@ -18,6 +18,8 @@ import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type SearchPaginationInput, type Team } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -251,7 +253,11 @@ const Teams = () => {
           />
         )}
       </Drawer>
-      {userAdmin && (<CreateTeam onCreate={result => setTeams([result, ...teams])} />)}
+      {userAdmin && (
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+          <CreateTeam onCreate={result => setTeams([result, ...teams])} />
+        </Can>
+      )}
     </>
   );
 };

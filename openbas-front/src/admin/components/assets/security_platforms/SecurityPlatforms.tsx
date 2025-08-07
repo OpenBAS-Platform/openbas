@@ -18,6 +18,8 @@ import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type SearchPaginationInput, type SecurityPlatform } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { isNotEmptyField } from '../../../../utils/utils';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
@@ -223,7 +225,12 @@ const SecurityPlatforms = () => {
               );
             })}
       </List>
-      {userAdmin && <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />}
+      {userAdmin
+        && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.SECURITY_PLATFORMS}>
+            <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />
+          </Can>
+        )}
     </>
   );
 };

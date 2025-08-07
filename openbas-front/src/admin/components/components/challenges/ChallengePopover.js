@@ -20,6 +20,8 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChallengeForm from './ChallengeForm';
 
 const Transition = forwardRef((props, ref) => (
@@ -96,21 +98,27 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
   )(challenge);
   return (
     <>
-      <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
-        <MoreVert />
-      </IconButton>
+      <Can I={ACTIONS.MANAGE || ACTIONS.DELETE} a={SUBJECTS.CHALLENGES}>
+        <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
+          <MoreVert />
+        </IconButton>
+      </Can>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHALLENGES}>
+          <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        </Can>
         {onRemoveChallenge && (
           <MenuItem onClick={handleOpenRemove}>
             {t('Remove from the inject')}
           </MenuItem>
         )}
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        <Can I={ACTIONS.DELETE} a={SUBJECTS.CHALLENGES}>
+          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        </Can>
       </Menu>
       <Dialog
         open={openDelete}

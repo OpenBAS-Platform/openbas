@@ -29,6 +29,8 @@ import { useHelper } from '../../../store';
 import { type Payload, type SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePayload from './CreatePayload';
 import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
@@ -264,7 +266,9 @@ const Payloads = () => {
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderPayloads />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+              <ImportUploaderPayloads />
+            </Can>
           </ToggleButtonGroup>
         )}
       />
@@ -351,9 +355,11 @@ const Payloads = () => {
               );
             })}
       </List>
-      <CreatePayload
-        onCreate={(result: Payload) => setPayloads([result, ...payloads])}
-      />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+        <CreatePayload
+          onCreate={(result: Payload) => setPayloads([result, ...payloads])}
+        />
+      </Can>
       <Drawer
         open={selectedPayload !== null}
         handleClose={() => setSelectedPayload(null)}

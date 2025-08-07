@@ -1,14 +1,16 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, type PopoverProps } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Channel, type ChannelUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ChannelForm from './ChannelForm';
 
 const useStyles = makeStyles()(() => ({
@@ -21,29 +23,20 @@ const useStyles = makeStyles()(() => ({
 interface Props { channel: Channel }
 
 const ChannelPopover: FunctionComponent<Props> = ({ channel }) => {
-  const [anchorEl, setAnchorEl] = useState<PopoverProps['anchorEl']>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  const handlePopoverOpen = (event: ReactMouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
+  const ability = useContext(AbilityContext);
 
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
 
   const onSubmitEdit = async (data: ChannelUpdateInput) => {
@@ -63,25 +56,24 @@ const ChannelPopover: FunctionComponent<Props> = ({ channel }) => {
     channel_description: channel.channel_description,
   };
 
+  // Button Popover
+  const entries = [{
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.CHANNELS),
+  }, {
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.CHANNELS),
+  }];
+
   return (
     <div>
-      <IconButton
-        color="primary"
-        classes={{ root: classes.button }}
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
-      </Menu>
+      <ButtonPopover
+        entries={entries}
+        variant="icon"
+      />
+
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}

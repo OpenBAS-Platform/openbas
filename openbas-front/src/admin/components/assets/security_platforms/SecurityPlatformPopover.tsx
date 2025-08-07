@@ -1,14 +1,15 @@
-import { MoreVert } from '@mui/icons-material';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteSecurityPlatform, updateSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type SecurityPlatform, type SecurityPlatformInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import SecurityPlatformForm from './SecurityPlatformForm';
 
 type SecurityPlatformStoreWithType = SecurityPlatform & { type: string };
@@ -37,8 +38,7 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const ability = useContext(AbilityContext);
 
   const initialValues = (({
     asset_name,
@@ -61,7 +61,6 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
 
   const handleEdit = () => {
     setEdition(true);
-    setAnchorEl(null);
   };
   const submitEdit = (data: SecurityPlatformInput) => {
     dispatch(updateSecurityPlatform(securityPlatform.asset_id, data)).then(
@@ -86,7 +85,6 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
 
   const handleDelete = () => {
     setDeletion(true);
-    setAnchorEl(null);
   };
   const submitDelete = () => {
     dispatch(deleteSecurityPlatform(securityPlatform.asset_id)).then(
@@ -99,33 +97,23 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
     setDeletion(false);
   };
 
+  // Button Popover
+  const entries = [];
+  if (onUpdate) entries.push({
+    label: t('Update'),
+    action: () => handleEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.SECURITY_PLATFORMS),
+  });
+  if (onDelete) entries.push({
+    label: t('Delete'),
+    action: () => handleDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.SECURITY_PLATFORMS),
+  });
+
   return (
     <>
-      <IconButton
-        color="primary"
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        aria-label={`securityPlatform menu for ${securityPlatform.asset_name}`}
-        aria-haspopup="true"
-        size="large"
-        disabled={disabled}
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        <MenuItem onClick={handleEdit}>
-          {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleDelete}>
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} disabled={disabled} variant="icon" />
+
       {inline ? (
         <Dialog
           open={edition}

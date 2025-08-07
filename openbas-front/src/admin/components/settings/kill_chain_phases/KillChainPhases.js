@@ -10,6 +10,8 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/queryable/Page';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateKillChainPhase from './CreateKillChainPhase';
 import KillChainPhasePopover from './KillChainPhasePopover';
@@ -192,9 +194,11 @@ const KillChainPhases = () => {
             </ListItem>
           ))}
         </List>
-        <CreateKillChainPhase
-          onCreate={result => setKillChainPhases([result, ...killChainPhases])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateKillChainPhase
+            onCreate={result => setKillChainPhases([result, ...killChainPhases])}
+          />
+        </Can>
       </div>
       <TaxonomiesMenu />
     </div>

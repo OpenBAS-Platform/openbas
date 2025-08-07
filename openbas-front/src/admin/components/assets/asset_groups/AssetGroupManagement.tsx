@@ -15,6 +15,8 @@ import { useHelper } from '../../../../store';
 import { type AssetGroup, type Endpoint, type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import EndpointsList from '../endpoints/EndpointsList';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
@@ -153,11 +155,13 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
       />
       {userAdmin
         && (
-          <AssetGroupAddEndpoints
-            assetGroupId={assetGroup?.asset_group_id}
-            assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-            onUpdate={onUpdateList}
-          />
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+            <AssetGroupAddEndpoints
+              assetGroupId={assetGroup?.asset_group_id}
+              assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+              onUpdate={onUpdateList}
+            />
+          </Can>
         )}
     </>
   );

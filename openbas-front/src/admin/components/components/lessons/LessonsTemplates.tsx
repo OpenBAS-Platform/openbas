@@ -16,6 +16,8 @@ import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
 
 const useStyles = makeStyles()(() => ({
@@ -139,7 +141,11 @@ const LessonsTemplates = () => {
               );
             })}
       </List>
-      {userAdmin && <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />}
+      {userAdmin && (
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
+          <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />
+        </Can>
+      )}
     </>
   );
 };

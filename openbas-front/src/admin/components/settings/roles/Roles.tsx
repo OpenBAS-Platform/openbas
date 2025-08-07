@@ -10,6 +10,8 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
 import type { RoleOutput, SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import SecurityMenu from '../SecurityMenu';
 import CreateRole from './CreateRole';
 import RolePopover from './RolePopover';
@@ -72,7 +74,9 @@ const Roles = () => {
           disableFilters
         />
         <RolesList roles={roles} queryableHelpers={queryableHelpers} loading={loading} secondaryAction={secondaryAction} />
-        <CreateRole onCreate={(result: RoleOutput) => setRoles([...roles, result])} />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateRole onCreate={(result: RoleOutput) => setRoles([...roles, result])} />
+        </Can>
 
       </div>
       <SecurityMenu />

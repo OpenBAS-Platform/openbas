@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
@@ -13,6 +13,8 @@ import type {
   InjectResultOutput,
   InjectResultOverviewOutput,
 } from '../../../../utils/api-types';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { download } from '../../../../utils/utils';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
@@ -34,6 +36,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const navigate = useNavigate();
+  const ability = useContext(AbilityContext);
 
   // Duplicate
   const [duplicate, setDuplicate] = useState(false);
@@ -89,10 +92,12 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ATOMIC_TESTING),
   });
   if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ATOMIC_TESTING),
   });
   if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({
     label: t('inject_export_json_single'),
@@ -101,6 +106,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.ATOMIC_TESTING),
   });
 
   return (

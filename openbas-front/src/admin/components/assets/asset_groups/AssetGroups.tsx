@@ -25,6 +25,8 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { computeBannerSettings } from '../../../../public/components/systembanners/utils';
 import { useHelper } from '../../../../store';
 import { type AssetGroup, type AssetGroupOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import AssetGroupCreation from './AssetGroupCreation';
 import AssetGroupManagement from './AssetGroupManagement';
 import AssetGroupPopover from './AssetGroupPopover';
@@ -244,6 +246,7 @@ const AssetGroups = () => {
                   divider
                   secondaryAction={(
                     <AssetGroupPopover
+                      inline
                       assetGroup={assetGroup}
                       onUpdate={onUpdateList}
                       onDelete={result => setAssetGroups(assetGroups.filter(ag => (ag.asset_group_id !== result)))}
@@ -287,7 +290,12 @@ const AssetGroups = () => {
               ))
         }
       </List>
-      {userAdmin && <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />}
+      {userAdmin
+        && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+            <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />
+          </Can>
+        )}
       <MuiDrawer
         open={selectedAssetGroupId !== undefined}
         keepMounted={false}

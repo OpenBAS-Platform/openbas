@@ -17,6 +17,8 @@ import { type Organization } from '../../../utils/api-types';
 import { exportData } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { truncate } from '../../../utils/String';
 import TagsFilter from '../common/filters/TagsFilter';
@@ -254,7 +256,12 @@ const Organizations = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && <CreateOrganization />}
+      {userAdmin
+        && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+            <CreateOrganization />
+          </Can>
+        )}
     </>
   );
 };

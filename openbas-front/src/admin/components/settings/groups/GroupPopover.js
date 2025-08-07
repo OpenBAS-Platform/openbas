@@ -11,6 +11,8 @@ import { storeHelper } from '../../../../actions/Schema';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import GroupForm from './GroupForm';
 import GroupManageRoles from './GroupManageRoles.js';
 import GroupManageUsers from './GroupManageUsers';
@@ -236,14 +238,17 @@ class GroupPopover extends Component {
     );
     return (
       <>
-        <IconButton
-          color="primary"
-          onClick={this.handlePopoverOpen.bind(this)}
-          aria-haspopup="true"
-          size="large"
-        >
-          <MoreVert />
-        </IconButton>
+
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <IconButton
+            color="primary"
+            onClick={this.handlePopoverOpen.bind(this)}
+            aria-haspopup="true"
+            size="large"
+          >
+            <MoreVert />
+          </IconButton>
+        </Can>
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}
