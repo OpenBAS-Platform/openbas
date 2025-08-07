@@ -1,9 +1,9 @@
-package io.openbas.rest.onboarding;
+package io.openbas.service.onboarding;
 
 import static io.openbas.utils.UserOnboardingProgressUtils.*;
 
-import io.openbas.rest.onboarding.output.OnboardingCategoryDTO;
-import io.openbas.rest.onboarding.output.OnboardingItemDTO;
+import io.openbas.api.onboarding.output.OnboardingCategoryDTO;
+import io.openbas.api.onboarding.output.OnboardingItemDTO;
 import java.util.List;
 
 public class OnboardingConfig {

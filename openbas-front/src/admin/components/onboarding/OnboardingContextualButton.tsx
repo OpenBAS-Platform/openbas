@@ -9,7 +9,7 @@ import OnboardingVideoPlayer from './OnboardingVideoPlayer';
 
 const estimateLabelWidth = (label: string) => {
   const charWidth = 8;
-  const padding = 36;
+  const padding = 26;
   return label.length * charWidth + padding;
 };
 
