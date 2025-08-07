@@ -5,7 +5,7 @@ import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTEN
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_NOT_DYNAMIC;
 import static io.openbas.database.model.InjectorContract.DEFAULT_VALUE_FIELD;
-import static io.openbas.database.model.InjectorContract.PRE_DEFINE_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.PRE_DEFINED_EXPECTATIONS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -66,7 +66,7 @@ public class InjectorContractContentUtils {
         String key = field.get(CONTRACT_ELEMENT_CONTENT_KEY).asText();
 
         if (CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS.equals(key)) {
-          JsonNode expectationsNode = field.get(PRE_DEFINE_EXPECTATIONS);
+          JsonNode expectationsNode = field.get(PRE_DEFINED_EXPECTATIONS);
           injectContent.set(key, expectationsNode);
           continue;
         }

@@ -2,7 +2,7 @@ package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
-import static io.openbas.database.model.InjectorContract.PRE_DEFINE_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.PRE_DEFINED_EXPECTATIONS;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
@@ -166,11 +166,11 @@ public class AtomicTestingService {
                 .toList();
         if (!contractElements.isEmpty()) {
           JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PRE_DEFINE_EXPECTATIONS).isNull()
-              && !contractElement.get(PRE_DEFINE_EXPECTATIONS).isEmpty()) {
+          if (!contractElement.get(PRE_DEFINED_EXPECTATIONS).isNull()
+              && !contractElement.get(PRE_DEFINED_EXPECTATIONS).isEmpty()) {
             finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
             ArrayNode predefinedExpectations = mapper.createArrayNode();
-            StreamSupport.stream(contractElement.get(PRE_DEFINE_EXPECTATIONS).spliterator(), false)
+            StreamSupport.stream(contractElement.get(PRE_DEFINED_EXPECTATIONS).spliterator(), false)
                 .forEach(
                     predefinedExpectation -> {
                       ObjectNode newExpectation = predefinedExpectation.deepCopy();
