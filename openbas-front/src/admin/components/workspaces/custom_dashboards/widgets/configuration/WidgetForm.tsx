@@ -67,6 +67,10 @@ const WidgetForm: FunctionComponent<Props> = ({
         name: z.string().optional(),
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
     }),
     // DateHistogramConfiguration
     z.object({
@@ -74,8 +78,8 @@ const WidgetForm: FunctionComponent<Props> = ({
       title: z.string().optional(),
       date_attribute: z.string().min(1, { message: t('Should not be empty') }),
       time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
-      start: z.string().optional().nullable(), // z.string().min(1, { message: t('Should not be empty') }),
-      end: z.string().optional().nullable(), // z.string().min(1, { message: t('Should not be empty') }),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
@@ -151,7 +155,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     mode: 'onTouched',
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path']),
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -163,10 +167,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     watch,
     reset,
     setValue,
-    formState: { errors, isDirty, isSubmitting },
   } = methods;
-
-  console.log(errors);
 
   const widgetType = watch('widget_type');
 

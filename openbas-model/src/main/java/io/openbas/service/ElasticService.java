@@ -400,8 +400,21 @@ public class ElasticService implements EngineService {
 
   // region query
   public long count(RawUserAuth user, CountRuntime runtime) {
+    FlatConfiguration widgetConfig = runtime.getConfig();
+    Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Query dateRangeQuery =
+        DateRangeQuery.of(
+                d -> d.field(widgetConfig.getDateAttribute()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
+            ._toRangeQuery()
+            ._toQuery();
+
     try {
-      Query query =
+      Query countQuery =
           buildQuery(
               user,
               null,
@@ -412,8 +425,15 @@ public class ElasticService implements EngineService {
                   .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
+      Query query = null;
+      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+        query = queryBuilder.must(countQuery).build()._toQuery();
+      } else {
+        query = queryBuilder.must(dateRangeQuery, countQuery).build()._toQuery();
+      }
+      Query finalQuery = query;
       return elasticClient
-          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(finalQuery))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -565,6 +585,7 @@ public class ElasticService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+
     Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
     Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
@@ -625,6 +646,7 @@ public class ElasticService implements EngineService {
                                         .keyed(false))),
             Void.class);
       }
+
       assert response != null;
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();

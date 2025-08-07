@@ -1261,24 +1261,11 @@ export type DateHistogramWidget = UtilRequiredKeys<
   WidgetConfiguration,
   "widget_configuration_type"
 > & {
-  date_attribute: string;
   display_legend?: boolean;
-  end?: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
   mode: string;
   series: DateHistogramSeries[];
   stacked?: boolean;
-  start?: string;
-  time_range:
-    | "DEFAULT"
-    | "ALL_TIME"
-    | "CUSTOM"
-    | "LAST_DAY"
-    | "LAST_WEEK"
-    | "LAST_MONTH"
-    | "LAST_QUARTER"
-    | "LAST_SEMESTER"
-    | "LAST_YEAR";
 };
 
 export interface DetectionRemediation {
@@ -5477,9 +5464,7 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
   WidgetConfiguration,
   "widget_configuration_type"
 > & {
-  date_attribute: string;
   display_legend?: boolean;
-  end?: string;
   field: string;
   /**
    * @format int32
@@ -5489,17 +5474,6 @@ export type StructuralHistogramWidget = UtilRequiredKeys<
   mode: string;
   series: StructuralHistogramSeries[];
   stacked?: boolean;
-  start?: string;
-  time_range:
-    | "DEFAULT"
-    | "ALL_TIME"
-    | "CUSTOM"
-    | "LAST_DAY"
-    | "LAST_WEEK"
-    | "LAST_MONTH"
-    | "LAST_QUARTER"
-    | "LAST_SEMESTER"
-    | "LAST_YEAR";
 };
 
 export interface Tag {

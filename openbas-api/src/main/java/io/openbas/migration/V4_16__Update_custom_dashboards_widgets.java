@@ -19,7 +19,7 @@ public class V4_16__Update_custom_dashboards_widgets extends BaseJavaMigration {
     ObjectMapper mapper = new ObjectMapper();
 
     select.executeUpdate(
-        "UPDATE custom_dashboards_parameters SET custom_dashboards_parameter_type = 'simulation' WHERE custom_dashboards_parameter_name = 'simulation';");
+        "UPDATE custom_dashboards_parameters SET custom_dashboards_parameter_type = 'simulation';");
 
     ResultSet results =
         select.executeQuery(
@@ -36,16 +36,18 @@ public class V4_16__Update_custom_dashboards_widgets extends BaseJavaMigration {
       ObjectNode config = mapper.readValue(widgetConfig, ObjectNode.class);
       String widgetId = results.getString("widget_id");
       if (config != null) {
-        String mode = config.get("mode").asText();
-        if (mode.equals("temporal")) {
-          config.put("time_range", "CUSTOM");
-          String dateAttribute = config.get("field").asText();
-          config.put("date_attribute", dateAttribute);
-          config.remove("field");
+        String widgetConfigurationType = config.get("widget_configuration_type").asText();
+        if (widgetConfigurationType != null) {
+          if (widgetConfigurationType.equals("temporal-histogram")) {
+            config.put("time_range", "CUSTOM");
+            String dateAttribute = config.get("field").asText();
+            config.put("date_attribute", dateAttribute);
+            config.remove("field");
+          }
+          statement.setString(1, mapper.writeValueAsString(config));
+          statement.setString(2, widgetId);
+          statement.addBatch();
         }
-        statement.setString(1, mapper.writeValueAsString(config));
-        statement.setString(2, widgetId);
-        statement.addBatch();
       }
     }
 

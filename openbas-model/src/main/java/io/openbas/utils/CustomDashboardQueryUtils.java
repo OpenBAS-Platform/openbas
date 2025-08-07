@@ -3,6 +3,7 @@ package io.openbas.utils;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.engine.api.HistogramWidget;
+import io.openbas.engine.api.WidgetConfiguration;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,17 +16,14 @@ public class CustomDashboardQueryUtils {
   private CustomDashboardQueryUtils() {
   }
 
-  public static Instant calcStartDate(Map<String, String> parameters, HistogramWidget widgetConfig,
+  public static Instant calcStartDate(Map<String, String> parameters, WidgetConfiguration widgetConfig,
       Map<String, CustomDashboardParameters> definitionParameters) {
     String timeRangeParameterId = definitionParameters.entrySet().stream()
         .filter(entry -> entry.getValue().getType().name.equals("timeRange")).findFirst().get().getKey();
     String startDateParameterId = definitionParameters.entrySet().stream()
         .filter(entry -> entry.getValue().getType().name.equals("startDate")).findFirst().get().getKey();
-    /*String endDateParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("endDate")).findFirst().get().getKey();*/
     String dashboardTimeRange = parameters.get(timeRangeParameterId);
     String widgetTimeRange = widgetConfig.getTimeRange().name();
-    //Instant return Instant.now();
     switch (widgetTimeRange) {
       case "ALL_TIME":
         return Instant.parse("2016-01-01T00:00:00Z");
@@ -72,10 +70,6 @@ public class CustomDashboardQueryUtils {
             if (parameters.get(startDateParameterId) != null) {
               return Instant.parse(parameters.get(startDateParameterId));
             }
-            /*if (parameters.get(endDateParameterId) != null) {
-              end = Instant.parse(parameters.get(endDateParameterId));
-            }*/
-
           default:
 
         }
@@ -83,7 +77,7 @@ public class CustomDashboardQueryUtils {
     return Instant.now();
   }
 
-  public static Instant calcEndDate(Map<String, String> parameters, HistogramWidget widgetConfig,
+  public static Instant calcEndDate(Map<String, String> parameters, WidgetConfiguration widgetConfig,
       Map<String, CustomDashboardParameters> definitionParameters) {
 
     String timeRangeParameterId = definitionParameters.entrySet().stream()
