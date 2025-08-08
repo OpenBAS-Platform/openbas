@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -141,6 +142,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_updated_at")
   @NotNull
   @Queryable(filterable = true, sortable = true)
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   // -- RELATION --
@@ -174,6 +176,12 @@ public class Scenario implements Base {
   @JsonProperty("scenario_teams")
   private List<Team> teams = new ArrayList<>();
 
+  // UpdatedAt now used to sync object with ES
+  public void setTeams(List<Team> teams) {
+    this.updatedAt = now();
+    this.teams = teams;
+  }
+
   @OneToMany(
       mappedBy = "scenario",
       fetch = FetchType.LAZY,
@@ -197,6 +205,12 @@ public class Scenario implements Base {
   @JsonProperty("scenario_tags")
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
+
+  // UpdatedAt now used to sync object with ES
+  public void setTags(Set<Tag> tags) {
+    this.updatedAt = now();
+    this.tags = tags;
+  }
 
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
