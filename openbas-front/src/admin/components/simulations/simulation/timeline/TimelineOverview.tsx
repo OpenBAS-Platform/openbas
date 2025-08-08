@@ -213,7 +213,7 @@ const TimelineOverview = () => {
           {processedInjects.length > 0 ? (
             <List style={{ paddingTop: 0 }}>
               {processedInjects.map((inject: InjectStore) => (
-                <ListItem key={inject.inject_id} secondaryAction={<PreviewOutlined />}>
+                <ListItem key={inject.inject_id}>
                   <ListItemButton
                     dense
                     classes={{ root: classes.item }}
