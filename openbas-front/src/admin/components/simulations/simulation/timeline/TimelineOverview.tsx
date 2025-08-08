@@ -1,4 +1,3 @@
-import { PreviewOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
