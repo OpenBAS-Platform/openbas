@@ -31,7 +31,6 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
-import useAuth from '../../../../utils/hooks/useAuth';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';

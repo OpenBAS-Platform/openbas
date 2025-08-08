@@ -12,7 +12,7 @@ import {
   Slide,
 } from '@mui/material';
 import * as R from 'ramda';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
@@ -20,7 +20,7 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
-import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChallengeForm from './ChallengeForm';
 
@@ -34,6 +34,8 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
 
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
+
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
@@ -98,11 +100,11 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
   )(challenge);
   return (
     <>
-      <Can I={ACTIONS.MANAGE || ACTIONS.DELETE} a={SUBJECTS.CHALLENGES}>
+      {(ability.can(ACTIONS.MANAGE, SUBJECTS.CHALLENGES) || ability.can(ACTIONS.DELETE, SUBJECTS.CHALLENGES) || onRemoveChallenge) && (
         <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
           <MoreVert />
         </IconButton>
-      </Can>
+      )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
