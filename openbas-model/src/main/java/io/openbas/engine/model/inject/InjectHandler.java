@@ -92,6 +92,10 @@ public class InjectHandler implements Handler<EsInject> {
                 dependencies.addAll(inject.getInject_asset_groups());
                 esInject.setBase_asset_group_side(inject.getInject_asset_groups());
               }
+              if (!isEmpty(inject.getInject_teams())) {
+                dependencies.addAll(inject.getInject_teams());
+                esInject.setBase_team_side(inject.getInject_teams());
+              }
               esInject.setBase_dependencies(dependencies);
               return esInject;
             })

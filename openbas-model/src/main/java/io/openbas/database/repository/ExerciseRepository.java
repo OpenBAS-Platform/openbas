@@ -355,10 +355,12 @@ public interface ExerciseRepository
       value =
           "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, "
               + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
+              + "array_agg(ete.team_id) FILTER ( WHERE ete.team_id IS NOT NULL ) as exercise_teams, "
               + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as exercise_assets, "
               + "array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as exercise_asset_groups "
               + "FROM exercises ex "
               + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
+              + "LEFT JOIN exercises_teams ete ON ete.exercise_id = ex.exercise_id "
               + "LEFT JOIN injects inj ON ex.exercise_id = inj.inject_exercise "
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "

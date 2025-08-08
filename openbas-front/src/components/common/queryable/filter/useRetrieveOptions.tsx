@@ -98,6 +98,7 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'inject_teams':
+      case 'base_team_side':
         searchTeamByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });

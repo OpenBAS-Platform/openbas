@@ -113,6 +113,11 @@ const useSearchOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'base_team_side':
+        searchTeamsAsOption(search, contextId, true).then((response) => {
+          setOptions(response.data);
+        });
+        break;
       case 'finding_inject_id':
         searchInjectLinkedToFindingsAsOption(search, contextId).then((response) => {
           setOptions(response.data);

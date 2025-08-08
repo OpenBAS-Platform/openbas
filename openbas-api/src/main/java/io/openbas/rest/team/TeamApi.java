@@ -238,13 +238,18 @@ public class TeamApi extends RestBehavior {
   @GetMapping(TEAM_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return teamRepository
-        .findAllBySimulationOrScenarioIdAndName(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+      @RequestParam(required = false) final String simulationOrScenarioId,
+      @RequestParam(required = false) final boolean isAllInjects) {
+    return isAllInjects
+        ? teamRepository.findAllTeamsForInjectsSimulationsAndScenarios().stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList()
+        : teamRepository
+            .findAllBySimulationOrScenarioIdAndName(
+                StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
   }
 
   @PostMapping(TEAM_URI + "/options")
