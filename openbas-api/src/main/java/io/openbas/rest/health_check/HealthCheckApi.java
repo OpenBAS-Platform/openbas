@@ -1,5 +1,6 @@
 package io.openbas.rest.health_check;
 
+import io.openbas.aop.RBAC;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.HealthCheckService;
 import io.openbas.service.exception.HealthCheckFailureException;
@@ -38,6 +39,7 @@ public class HealthCheckApi extends RestBehavior {
   }
 
   @GetMapping(HEALTH_CHECK_URI)
+  @RBAC(skipRBAC = true) // No RBAC check for health check endpoint
   @Operation(
       summary = "Run an healthcheck ",
       description = "Tries to connect to dependencies (DB/Minio/RabbitMQ)")

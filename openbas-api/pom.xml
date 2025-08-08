@@ -48,6 +48,12 @@
     <dependencies>
         <dependency>
             <groupId>io.openbas</groupId>
+            <artifactId>openbas-api-annotation-processors</artifactId>
+            <version>1.18.9</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
             <version>1.18.9</version>
         </dependency>

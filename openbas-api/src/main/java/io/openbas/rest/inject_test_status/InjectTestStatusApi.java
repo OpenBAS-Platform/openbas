@@ -3,6 +3,7 @@ package io.openbas.rest.inject_test_status;
 import static io.openbas.database.specification.InjectSpecification.testable;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.Inject;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
@@ -35,18 +36,21 @@ public class InjectTestStatusApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/{injectId}/test")
+  @RBAC(skipRBAC = true)
   public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/test/{testId}")
+  @RBAC(skipRBAC = true)
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping("/api/injects/test/{testId}")
+  @RBAC(skipRBAC = true)
   public void deleteInjectTest(@PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
   }
@@ -56,6 +60,7 @@ public class InjectTestStatusApi extends RestBehavior {
       tags = {"Injects", "Tests"})
   @Transactional(rollbackFor = Exception.class)
   @PostMapping("/api/injects/test")
+  @RBAC(skipRBAC = true)
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
       @RequestBody @Valid final InjectBulkProcessingInput input) {

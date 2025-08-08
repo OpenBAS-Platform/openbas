@@ -4,6 +4,9 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.contextual;
 import static io.openbas.rest.atomic_testing.AtomicTestingApi.ATOMIC_TESTING_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -27,6 +30,7 @@ public class AtomicTestingTeamApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(ATOMIC_TESTING_URI + "/teams/search")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ATOMIC_TESTING)
   @Transactional(readOnly = true)
   public Page<TeamOutput> searchTeams(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {

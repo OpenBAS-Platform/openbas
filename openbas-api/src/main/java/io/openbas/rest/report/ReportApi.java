@@ -2,6 +2,7 @@ package io.openbas.rest.report;
 
 import static io.openbas.database.model.User.ROLE_USER;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
@@ -28,18 +29,30 @@ public class ReportApi extends RestBehavior {
   private final InjectService injectService;
 
   @GetMapping("/api/reports/{reportId}")
+  @RBAC(
+      resourceId = "#reportId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isObserver()")
   public Report report(@PathVariable String reportId) {
     return this.reportService.report(UUID.fromString(reportId));
   }
 
   @GetMapping("/api/exercises/{exerciseId}/reports")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Report> exerciseReports(@PathVariable String exerciseId) {
     return this.reportService.reportsFromExercise(exerciseId);
   }
 
   @PostMapping("/api/exercises/{exerciseId}/reports")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report createExerciseReport(
@@ -51,6 +64,10 @@ public class ReportApi extends RestBehavior {
   }
 
   @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}/inject-comments")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report updateReportInjectComment(
@@ -65,6 +82,10 @@ public class ReportApi extends RestBehavior {
   }
 
   @PutMapping("/api/exercises/{exerciseId}/reports/{reportId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report updateExerciseReport(
@@ -77,6 +98,10 @@ public class ReportApi extends RestBehavior {
   }
 
   @DeleteMapping("/api/exercises/{exerciseId}/reports/{reportId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseReport(@PathVariable String exerciseId, @PathVariable String reportId) {

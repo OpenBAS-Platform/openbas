@@ -5,7 +5,6 @@ import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluati
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
 import {
@@ -17,6 +16,7 @@ import {
   emptyLessonsCategories,
   fetchLessonsCategories,
   fetchLessonsQuestions,
+  fetchScenarioLessonsTemplates,
   fetchScenarioTeams,
   updateLessonsCategory,
   updateLessonsCategoryTeams,
@@ -73,14 +73,14 @@ const ScenarioLessons = () => {
       objectives: helper.getScenarioObjectives(scenarioId),
       lessonsCategories: helper.getScenarioLessonsCategories(scenarioId),
       lessonsQuestions: helper.getScenarioLessonsQuestions(scenarioId),
-      lessonsTemplates: helper.getLessonsTemplates(),
+      lessonsTemplates: helper.getScenarioLessonsTemplates(scenarioId),
       teamsMap: helper.getTeamsMap(),
       teams: helper.getScenarioTeams(scenarioId),
       usersMap: helper.getUsersMap(),
     };
   });
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
+    dispatch(fetchScenarioLessonsTemplates(scenarioId));
     dispatch(fetchPlayers());
     dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(scenarioId));
@@ -128,7 +128,7 @@ const ScenarioLessons = () => {
     onDeleteObjective: (objectiveId: string) => dispatch(deleteScenarioObjective(scenarioId, objectiveId)),
     // Evaluation
     onAddEvaluation: (objectiveId: string, data: EvaluationInput) => dispatch(addScenarioEvaluation(scenarioId, objectiveId, data)),
-    onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => dispatch(updateScenarioEvaluation(objectiveId, evaluationId, data)),
+    onUpdateEvaluation: (objectiveId: string, evaluationId: string, data: EvaluationInput) => dispatch(updateScenarioEvaluation(scenarioId, objectiveId, evaluationId, data)),
     onFetchEvaluation: (objectiveId: string) => dispatch(fetchScenarioEvaluations(scenarioId, objectiveId)),
   };
 

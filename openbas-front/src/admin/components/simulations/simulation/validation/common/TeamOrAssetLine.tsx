@@ -3,14 +3,14 @@ import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchAssetGroups } from '../../../../../../actions/asset_groups/assetgroup-action';
+import { fetchExerciseAssetGroups } from '../../../../../../actions/asset_groups/assetgroup-action';
 import { type AssetGroupsHelper } from '../../../../../../actions/asset_groups/assetgroup-helper';
 import { type EndpointHelper } from '../../../../../../actions/assets/asset-helper';
-import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-actions';
+import { fetchExerciseEndpoints } from '../../../../../../actions/assets/endpoint-actions';
 import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';
 import { fetchExerciseArticles } from '../../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../../actions/channels/article-helper';
-import { fetchChannels } from '../../../../../../actions/channels/channel-action';
+import { fetchExerciseChannels } from '../../../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
 import { type Contract } from '../../../../../../actions/contract/contract';
 import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
@@ -76,12 +76,12 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
     };
   });
   useDataLoader(() => {
-    dispatch(fetchChannels());
+    dispatch(fetchExerciseChannels(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
-    dispatch(fetchEndpoints());
-    dispatch(fetchAssetGroups());
+    dispatch(fetchExerciseEndpoints(exerciseId));
+    dispatch(fetchExerciseAssetGroups(exerciseId));
   });
 
   const team: Team = teamsMap[id];

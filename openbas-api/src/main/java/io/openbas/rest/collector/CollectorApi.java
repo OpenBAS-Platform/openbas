@@ -2,7 +2,10 @@ package io.openbas.rest.collector;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Collector;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -31,6 +34,7 @@ public class CollectorApi extends RestBehavior {
   private final FileService fileService;
 
   @GetMapping("/api/collectors")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
   public Iterable<Collector> collectors() {
     return collectorRepository.findAll();
   }
@@ -57,12 +61,20 @@ public class CollectorApi extends RestBehavior {
 
   @GetMapping("/api/collectors/{collectorId}")
   @Secured(ROLE_ADMIN)
+  @RBAC(
+      resourceId = "#collectorId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PLATFORM_SETTING)
   public Collector getCollector(@PathVariable String collectorId) {
     return collectorService.collector(collectorId);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/collectors/{collectorId}")
+  @RBAC(
+      resourceId = "#collectorId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public Collector updateCollector(
       @PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
@@ -81,6 +93,7 @@ public class CollectorApi extends RestBehavior {
       value = "/api/collectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public Collector registerCollector(
       @Valid @RequestPart("input") CollectorCreateInput input,
