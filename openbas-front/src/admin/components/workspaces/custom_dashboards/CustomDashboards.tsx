@@ -16,6 +16,8 @@ import type { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import type { CustomDashboard, SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
@@ -164,9 +166,11 @@ const CustomDashboards = () => {
               })
         }
       </List>
-      <CustomDashboardCreation
-        onCreate={(result: CustomDashboard) => setCustomDashboards([result, ...customDashboards])}
-      />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.DASHBOARDS}>
+        <CustomDashboardCreation
+          onCreate={(result: CustomDashboard) => setCustomDashboards([result, ...customDashboards])}
+        />
+      </Can>
     </>
   );
 };
