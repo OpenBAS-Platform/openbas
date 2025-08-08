@@ -239,8 +239,8 @@ public class TeamApi extends RestBehavior {
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId,
-      @RequestParam(required = false) final boolean isAllInjects) {
-    return isAllInjects
+      @RequestParam(required = false) final boolean isForAllInjects) {
+    return isForAllInjects
         ? teamRepository.findAllTeamsForInjectsSimulationsAndScenarios().stream()
             .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
             .toList()

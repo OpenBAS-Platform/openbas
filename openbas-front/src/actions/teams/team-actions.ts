@@ -59,11 +59,11 @@ export const deleteTeam = (teamId: Team['team_id']) => (dispatch: Dispatch) => {
   return delReferential(uri, 'teams', teamId)(dispatch);
 };
 
-export const searchTeamsAsOption = (searchText: string = '', simulationOrScenarioId: string = '', isAllInjects = false) => {
+export const searchTeamsAsOption = (searchText: string = '', simulationOrScenarioId: string = '', isForAllInjects = false) => {
   const params = {
     searchText,
     simulationOrScenarioId,
-    isAllInjects,
+    isForAllInjects,
   };
   return simpleCall(`${TEAMS_URI}/options`, { params });
 };

@@ -144,10 +144,11 @@ public interface TeamRepository
 
   @Query(
       value =
-          "SELECT DISTINCT t FROM teams t"
-              + "INNER JOIN injects_teams it ON t.team_id = it.team_id "
-              + "INNER JOIN exercises_teams et ON t.team_id = et.team_id "
-              + "INNER JOIN scenarios_teams st ON t.team_id = st.team_id ",
+          "SELECT DISTINCT t.team_id, t.team_name, t.team_description, t.team_created_at, t.team_updated_at, t.team_organization, t.team_contextual "
+              + "FROM teams t "
+              + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
+              + "LEFT JOIN exercises_teams et ON t.team_id = et.team_id "
+              + "LEFT JOIN scenarios_teams st ON t.team_id = st.team_id",
       nativeQuery = true)
   List<Team> findAllTeamsForInjectsSimulationsAndScenarios();
 

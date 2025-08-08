@@ -64,6 +64,14 @@ public interface EndpointRepository
 
   @Query(
       value =
+          "SELECT DISTINCT e.* "
+              + "FROM assets e "
+              + "INNER JOIN injects_assets ia ON e.asset_id = ia.asset_id",
+      nativeQuery = true)
+  List<Endpoint> findAllEndpointsForInjectsSimulationsAndScenarios();
+
+  @Query(
+      value =
           """
     SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
     FROM assets a
