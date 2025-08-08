@@ -48,6 +48,10 @@ public class SimulationHandler implements Handler<EsSimulation> {
                 dependencies.addAll(simulation.getExercise_asset_groups());
                 esSimulation.setBase_asset_group_side(simulation.getExercise_asset_groups());
               }
+              if (!isEmpty(simulation.getExercise_teams())) {
+                dependencies.addAll(simulation.getExercise_teams());
+                esSimulation.setBase_team_side(simulation.getExercise_teams());
+              }
               esSimulation.setBase_dependencies(dependencies);
               return esSimulation;
             })

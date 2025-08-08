@@ -31,6 +31,8 @@ public interface RawInjectIndexing {
 
   Set<String> getInject_asset_groups();
 
+  Set<String> getInject_teams();
+
   String getInject_status_name();
 
   String getInject_scenario();

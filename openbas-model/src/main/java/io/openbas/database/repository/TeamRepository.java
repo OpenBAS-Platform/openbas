@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Team;
 import io.openbas.database.raw.RawTeam;
+import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -140,4 +141,23 @@ public interface TeamRepository
           + "   OR i.scenario.id = :simulationOrScenarioId)"
           + " ) AND (:name IS NULL OR lower(t.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
   List<Team> findAllBySimulationOrScenarioIdAndName(String simulationOrScenarioId, String name);
+
+  @Query(
+      value =
+          "SELECT DISTINCT t FROM teams t"
+              + "INNER JOIN injects_teams it ON t.team_id = it.team_id "
+              + "INNER JOIN exercises_teams et ON t.team_id = et.team_id "
+              + "INNER JOIN scenarios_teams st ON t.team_id = st.team_id ",
+      nativeQuery = true)
+  List<Team> findAllTeamsForInjectsSimulationsAndScenarios();
+
+  @Query(
+      value =
+          "SELECT t.team_id, t.team_name, t.team_updated_at, t.team_created_at "
+              + "FROM teams t "
+              + "WHERE t.team_updated_at > :from ORDER BY t.team_updated_at LIMIT "
+              + Constants.INDEXING_RECORD_SET_SIZE
+              + ";",
+      nativeQuery = true)
+  List<RawTeam> findForIndexing(@Param("from") Instant from);
 }

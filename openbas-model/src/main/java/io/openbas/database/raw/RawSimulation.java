@@ -50,6 +50,8 @@ public interface RawSimulation {
 
   Set<String> getExercise_asset_groups();
 
+  Set<String> getExercise_teams();
+
   Set<String> getExercise_users();
 
   Set<String> getLessons_answers();

@@ -25,10 +25,12 @@ public interface ScenarioRepository
       value =
           "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at, "
               + "array_agg(st.tag_id) FILTER ( WHERE st.tag_id IS NOT NULL ) as scenario_tags, "
+              + "array_agg(ste.team_id) FILTER ( WHERE ste.team_id IS NOT NULL ) as scenario_teams, "
               + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as scenario_assets, "
               + "array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as scenario_asset_groups "
               + "FROM scenarios s "
               + "LEFT JOIN scenarios_tags st ON st.scenario_id = s.scenario_id "
+              + "LEFT JOIN scenarios_teams ste ON ste.scenario_id = s.scenario_id "
               + "LEFT JOIN injects inj ON s.scenario_id = inj.inject_scenario "
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
