@@ -137,7 +137,7 @@ const TimelineOverview = () => {
         <Typography variant="h4">{t('Processed injects')}</Typography>
         <Paper variant="outlined">
           {pendingInjects.length > 0 ? (
-            <List style={{ paddingTop: 0 }}>
+            <List style={{ paddingTop: theme.spacing(0) }}>
               {pendingInjects.map((inject: InjectStore) => {
                 return (
                   <ListItem
