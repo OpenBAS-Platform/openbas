@@ -160,13 +160,18 @@ public class EndpointApi extends RestBehavior {
   @GetMapping(ENDPOINT_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return endpointRepository
-        .findAllBySimulationOrScenarioIdAndName(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+      @RequestParam(required = false) final String simulationOrScenarioId,
+      @RequestParam(required = false) final boolean isForAllInjects) {
+    return isForAllInjects
+        ? endpointRepository.findAllEndpointsForInjectsSimulationsAndScenarios().stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList()
+        : endpointRepository
+            .findAllBySimulationOrScenarioIdAndName(
+                StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
+            .stream()
+            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+            .toList();
   }
 
   @LogExecutionTime

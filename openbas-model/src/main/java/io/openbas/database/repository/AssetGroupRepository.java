@@ -158,6 +158,14 @@ public interface AssetGroupRepository
 
   @Query(
       value =
+          "SELECT ag.* "
+              + "FROM asset_groups ag "
+              + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id",
+      nativeQuery = true)
+  List<AssetGroup> findAllAssetGroupsForInjectsSimulationsAndScenarios();
+
+  @Query(
+      value =
           """
     SELECT DISTINCT ag.asset_group_id AS id, ag.asset_group_name AS label
     FROM asset_groups ag

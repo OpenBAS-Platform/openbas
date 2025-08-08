@@ -92,8 +92,12 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
-      case 'base_asset_group_side':
         searchAssetGroupAsOption(search, contextId).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_asset_group_side':
+        searchAssetGroupAsOption(search, contextId, true).then((response) => {
           setOptions(response.data);
         });
         break;
@@ -103,8 +107,12 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_assets':
-      case 'base_endpoint_side':
         searchEndpointAsOption(search, contextId).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_endpoint_side':
+        searchEndpointAsOption(search, contextId, true).then((response) => {
           setOptions(response.data);
         });
         break;
