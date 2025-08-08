@@ -1,6 +1,6 @@
 import { AttachmentOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
@@ -11,6 +11,8 @@ import ItemBoolean from '../../../../../../components/ItemBoolean';
 import ItemTags from '../../../../../../components/ItemTags';
 import { useHelper } from '../../../../../../store';
 import { type Document } from '../../../../../../utils/api-types';
+import { AbilityContext, Can } from '../../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../../utils/permissions/types';
 import DocumentPopover from '../../../../components/documents/DocumentPopover';
 import DocumentType from '../../../../components/documents/DocumentType';
 
@@ -37,6 +39,7 @@ const InjectDocumentsList = ({ readOnly, hasAttachments }: Props) => {
   const { t } = useFormatter();
   const { control } = useFormContext();
   const { classes } = useStyles();
+  const ability = useContext(AbilityContext);
 
   const [sortedDocuments, setSortedDocuments] = useState<(Document & { document_attached: boolean })[]>([]);
   const { documentsMap } = useHelper((helper: DocumentHelper) => ({ documentsMap: helper.getDocumentsMap() }));
@@ -153,12 +156,14 @@ const InjectDocumentsList = ({ readOnly, hasAttachments }: Props) => {
           </ListItem>
         ))}
       </List>
+      {/* <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}> */}
       <MultipleFileLoader
         initialDocumentIds={injectDocuments.map(d => d.document_id)}
         handleAddDocuments={addDocuments}
         hasAttachments={hasAttachments}
-        disabled={readOnly}
+        disabled={readOnly || !ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)}
       />
+      {/* </Can> */}
     </>
   );
 };

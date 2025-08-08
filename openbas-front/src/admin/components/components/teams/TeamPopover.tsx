@@ -1,5 +1,5 @@
 import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { type OrganizationHelper, type TagHelper } from '../../../../actions/helper';

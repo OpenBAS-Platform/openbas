@@ -2,7 +2,7 @@ import { FiberManualRecord, MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -18,7 +18,7 @@ import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
-import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import DocumentForm from './DocumentForm';
 
@@ -43,6 +43,7 @@ const DocumentPopover = (props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
 
@@ -224,17 +225,18 @@ const DocumentPopover = (props) => {
 
   return (
     <div>
-      <Can I={ACTIONS.MANAGE || ACTIONS.DELETE} a={SUBJECTS.DOCUMENTS}>
-        <IconButton
-          color="primary"
-          onClick={handlePopoverOpen}
-          aria-haspopup="true"
-          size="large"
-          disabled={disabled}
-        >
-          <MoreVert />
-        </IconButton>
-      </Can>
+      {(ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS) || ability.can(ACTIONS.DELETE, SUBJECTS.DOCUMENTS) || onToggleAttach || onRemoveDocument)
+        && (
+          <IconButton
+            color="primary"
+            onClick={handlePopoverOpen}
+            aria-haspopup="true"
+            size="large"
+            disabled={disabled}
+          >
+            <MoreVert />
+          </IconButton>
+        )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
