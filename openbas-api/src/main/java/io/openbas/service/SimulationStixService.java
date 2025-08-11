@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.types.BaseType;
@@ -23,47 +24,42 @@ public class SimulationStixService {
   private final AttackPatternService attackPatternService;
   private final ResultUtils resultUtils;
 
-  public ObjectBase getCoverageForEntity(ObjectBase entity, Exercise exercise) {
-    ObjectBase result = new ObjectBase();
-    Map<String, BaseType<?>> properties = new HashMap<>();
-    result.setProperties(properties);
+  public List<ObjectBase> getCoverageForSimulation(Exercise exercise) {
+    List<ObjectBase> objects = new ArrayList<>();
 
-    // standard properties
-    properties.put("id", new Identifier("security-coverage--" + exercise.getId()));
-    properties.put("created", new Timestamp(exercise.getCreatedAt()));
-    properties.put("modified", new Timestamp(Instant.now()));
-    properties.put(
-        "security_assessment_ref", new Identifier(exercise.getSecurityAssessment().getId()));
-    properties.put("coverage_context_ref", entity.getProperties().get("id"));
+    for (StixRefToExternalRef stixRef : exercise.getSecurityAssessment().getAttackPatternRefs()) {
+      ObjectBase result = new ObjectBase();
+      Map<String, BaseType<?>> properties = new HashMap<>();
+      result.setProperties(properties);
 
-    String type = (String) entity.getProperties().get("type").getValue();
-    switch (type) {
-      case "vulnerability":
-        break;
-      case "attack-pattern":
-        properties.put("coverage", getAttackPatternCoverage(entity, exercise));
-        break;
-      default:
-        throw new UnsupportedOperationException(
-            "could not process coverage for entity" + entity.getProperties().get("id").getValue());
+      // standard properties
+      properties.put(
+          "id", new Identifier("security-coverage--" + exercise.getPersistentSecurityCoverageId()));
+      properties.put("created", new Timestamp(exercise.getCreatedAt()));
+      properties.put("modified", new Timestamp(Instant.now()));
+      properties.put(
+          "security_assessment_ref", new Identifier(exercise.getSecurityAssessment().getId()));
+      properties.put("coverage_context_ref", new Identifier(stixRef.getStixRef()));
+
+      properties.put("coverage", getAttackPatternCoverage(stixRef.getExternalRef(), exercise));
+
+      if (properties.containsKey("coverage")
+          && properties.get("coverage") != null
+          && !((Map<String, BaseType<?>>) properties.get("coverage").getValue()).isEmpty()) {
+        properties.put("covered", new io.openbas.stix.types.Boolean(true));
+      } else {
+        properties.put("covered", new io.openbas.stix.types.Boolean(false));
+      }
+
+      objects.add(result);
     }
 
-    if (properties.containsKey("coverage")
-        && properties.get("coverage") != null
-        && !((Map<String, BaseType<?>>) properties.get("coverage").getValue()).isEmpty()) {
-      properties.put("covered", new io.openbas.stix.types.Boolean(true));
-    } else {
-      properties.put("covered", new io.openbas.stix.types.Boolean(false));
-    }
-
-    return result;
+    return objects;
   }
 
-  private BaseType<?> getAttackPatternCoverage(ObjectBase entity, Exercise exercise) {
-    String attackPatternExternalId = (String) entity.getProperties().get("x_mitre_id").getValue();
+  private BaseType<?> getAttackPatternCoverage(String externalRef, Exercise exercise) {
     List<AttackPattern> apList =
-        attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
-            Set.of(attackPatternExternalId));
+        attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(Set.of(externalRef));
     Optional<AttackPattern> ap = apList.stream().findFirst();
     if (ap.isEmpty()) {
       return uncovered();

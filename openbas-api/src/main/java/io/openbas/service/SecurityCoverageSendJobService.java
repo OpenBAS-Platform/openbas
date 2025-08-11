@@ -39,6 +39,6 @@ public class SecurityCoverageSendJobService {
 
   public List<SecurityCoverageSendJob> getPendingSecurityCoverageSendJobs() {
     return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore(
-        "PENDING", Instant.now().minus(15, ChronoUnit.MINUTES));
+        "PENDING", Instant.now().minus(1, ChronoUnit.MINUTES));
   }
 }

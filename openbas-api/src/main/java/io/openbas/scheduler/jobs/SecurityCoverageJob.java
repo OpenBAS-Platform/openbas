@@ -2,6 +2,8 @@ package io.openbas.scheduler.jobs;
 
 import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.service.SecurityCoverageSendJobService;
+import io.openbas.service.SecurityCoverageService;
+import io.openbas.stix.objects.Bundle;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +16,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SecurityCoverageJob implements Job {
   private final SecurityCoverageSendJobService securityCoverageSendJobService;
+  private final SecurityCoverageService securityCoverageService;
 
   @Override
   @Transactional // ensure a transaction context to help lock rows
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
+    Bundle bundle = securityCoverageService.createBundleFromSendJobs(jobs);
   }
 }

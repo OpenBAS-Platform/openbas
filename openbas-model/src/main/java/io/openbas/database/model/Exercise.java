@@ -288,6 +288,12 @@ public class Exercise implements Base {
   @JsonProperty("exercise_variables")
   private List<Variable> variables = new ArrayList<>();
 
+  @JsonIgnore
+  @Setter(value = AccessLevel.NONE)
+  @Getter
+  @Column(name = "exercise_persistent_security_coverage_id")
+  private String persistentSecurityCoverageId;
+
   // region transient
   @JsonProperty("exercise_injects_statistics")
   public Map<String, Long> getInjectStatistics() {
