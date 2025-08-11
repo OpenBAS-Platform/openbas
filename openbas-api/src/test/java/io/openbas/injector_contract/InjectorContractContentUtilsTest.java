@@ -7,11 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.utils.fixtures.InjectorContractFixture;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 
 public class InjectorContractContentUtilsTest {
@@ -31,8 +35,21 @@ public class InjectorContractContentUtilsTest {
 
     assertNotNull(result);
     assertTrue(result.has("expectations"));
-    assertEquals("Prevention", result.get("expectations").get(0).get("expectation_name").asText());
-    assertEquals(predefinedExpectations.size(), result.get("expectations").size());
+
+    JsonNode expectations = result.get("expectations");
+    assertEquals(predefinedExpectations.size(), expectations.size());
+
+    Set<String> expectedNames =
+        StreamSupport.stream(predefinedExpectations.spliterator(), false)
+            .map(e -> e.get("expectation_name").asText())
+            .collect(Collectors.toSet());
+
+    Set<String> actualNames =
+        StreamSupport.stream(expectations.spliterator(), false)
+            .map(e -> e.get("expectation_name").asText())
+            .collect(Collectors.toSet());
+
+    assertEquals(expectedNames, actualNames);
   }
 
   @Test
