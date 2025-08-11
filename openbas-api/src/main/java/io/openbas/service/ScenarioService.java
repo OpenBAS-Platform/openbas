@@ -908,6 +908,9 @@ public class ScenarioService {
 
         // Create Scenario using SecurityAssessment
         scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
+        scenario
+            .getTags()
+            .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
         // Creation injects based attack patterns from stix
         createdInjectsForScenario(securityAssessment, scenario);
@@ -1023,10 +1026,6 @@ public class ScenarioService {
 
     String cron = getCronExpression(securityAssessment.getScheduling(), start);
     scenario.setRecurrence(cron);
-
-    scenario
-        .getTags()
-        .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
     return scenarioRepository.save(scenario);
   }
