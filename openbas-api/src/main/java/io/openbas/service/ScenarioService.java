@@ -881,120 +881,130 @@ public class ScenarioService {
   }
 
   public List<String> generateScenarioFromSTIXBundle(MultipartFile file) throws IOException {
-
-    List<String> createdScenarios = new ArrayList<>();
-
     if (file == null || file.isEmpty()) {
       return emptyList();
     }
 
     ObjectMapper mapper = new ObjectMapper();
     JsonNode root = mapper.readTree(file.getInputStream());
-
     ArrayNode objects = (ArrayNode) root.get("objects");
     if (objects == null) {
       throw new IllegalArgumentException("No objects in STIX bundle");
     }
 
     // Extract attack-patterns and their MITRE IDs
-    Map<String, String> stixIdToMitreId = new HashMap<>();
-
-    for (JsonNode obj : objects) {
-      if ("attack-pattern".equals(obj.path("type").asText())) {
-        String stixId = obj.path("id").asText();
-        String mitreId = obj.path("x_mitre_id").asText(null);
-        if (mitreId != null) {
-          stixIdToMitreId.put(stixId, mitreId);
-        }
-      }
-    }
+    Map<String, String> stixIdToMitreId = extractAttackPatterns(objects);
+    List<String> createdScenarios = new ArrayList<>();
 
     for (JsonNode obj : objects) { // Maybe we could have varoius security assestemnt
       if ("x-security-assessment".equals(obj.path("type").asText())) {
-
         String id = obj.path("id").asText();
+        SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
+        Scenario scenario = getOrCreateScenario(securityAssessment);
 
-        SecurityAssessment securityAssessment =
-            securityAssessmentRepository.findByExternalId(id).orElse(new SecurityAssessment());
-        Scenario scenario;
-        if (securityAssessment.getScenario() == null) {
-          scenario = new Scenario();
-        } else {
-          scenario =
-              scenarioRepository
-                  .findById(securityAssessment.getScenario().getId())
-                  .orElse(new Scenario());
-        }
-
-        if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
-
-        securityAssessment.setExternalId(id);
-        securityAssessment.setName(obj.path("name").asText());
-        securityAssessment.setDescription(obj.path("description").asText());
-        securityAssessment.setSecurityCoverageSubmissionUrl(
-            obj.path("security_coverage_submission_url").asText());
-
-        securityAssessment.setScheduling(obj.path("scheduling").asText());
-
-        if (obj.hasNonNull("period_start")) {
-          securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
-        }
-        if (obj.hasNonNull("period_end")) {
-          securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
-        }
-
-        String threatContextRef = obj.path("threat_context_ref").asText(null);
-        securityAssessment.setThreatContextRef(threatContextRef);
-
-        // Attack pattern refs -> convert to MITRE IDs
-        JsonNode attacksNode = obj.path("attack_pattern_refs");
-        if (attacksNode != null && attacksNode.isArray()) {
-          List<String> mitreIds = new ArrayList<>();
-          for (JsonNode ref : attacksNode) {
-            String stixRef = ref.asText();
-            String mitreId = stixIdToMitreId.get(stixRef);
-            if (mitreId != null) {
-              mitreIds.add(mitreId);
-            }
-          }
-          securityAssessment.setAttackPatternRefs(mitreIds.toArray(new String[0]));
-        } else {
-          securityAssessment.setAttackPatternRefs(new String[0]);
-        }
-
-        // Add vulnerabilities
-        // Add labels as upsert tags
-
-        // if security assessment exists before then check if any scenario was referenced in other
-        // case create a scenario
+        updateSecurityAssessmentFromJson(obj, scenario, securityAssessment, stixIdToMitreId);
         securityAssessment.setScenario(scenario);
         SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
         // Create Scenario using SecurityAssessment
         scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
 
-        // TODO Set tags based in labels
-        scenario.getTags().add(tagRepository.findByName("opencti").get());
-
         // Creation injects based attack patterns from stix
-        InjectAssistantInput input = new InjectAssistantInput();
-        List<String> attackPatternIds =
-            attackPatternService
-                .getAttackPatternsByExternalIdsThrowIfMissing(
-                    Arrays.stream(securityAssessment.getAttackPatternRefs())
-                        .collect(Collectors.toSet()))
-                .stream()
-                .map(AttackPattern::getId)
-                .toList();
-        input.setAttackPatternIds(attackPatternIds); // TODO Add ttps to placeholders
-        injectAssistantService.generateInjectsForScenario(scenario, input);
+        createdInjectsForScenario(securityAssessment, scenario);
 
-        // Send back ttps ids
         createdScenarios.add(scenario.getId());
       }
     }
 
     return createdScenarios;
+  }
+
+  private void updateSecurityAssessmentFromJson(
+      JsonNode obj,
+      Scenario scenario,
+      SecurityAssessment securityAssessment,
+      Map<String, String> stixIdToMitreId) {
+    if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
+
+    securityAssessment.setExternalId(obj.path("id").asText());
+    securityAssessment.setName(obj.path("name").asText());
+    securityAssessment.setDescription(obj.path("description").asText());
+    securityAssessment.setSecurityCoverageSubmissionUrl(
+        obj.path("security_coverage_submission_url").asText());
+
+    securityAssessment.setScheduling(obj.path("scheduling").asText());
+
+    if (obj.hasNonNull("period_start")) {
+      securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
+    }
+    if (obj.hasNonNull("period_end")) {
+      securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
+    }
+
+    String threatContextRef = obj.path("threat_context_ref").asText(null);
+    securityAssessment.setThreatContextRef(threatContextRef);
+
+    // Attack pattern refs -> convert to MITRE IDs
+    securityAssessment.setAttackPatternRefs(
+        resolveMitreIds(obj.path("attack_pattern_refs"), stixIdToMitreId));
+
+    // Add vulnerabilities
+    // TODO Add labels as upsert tags
+  }
+
+  private SecurityAssessment getOrCreateSecurityAssessment(String externalId) {
+    return securityAssessmentRepository
+        .findByExternalId(externalId)
+        .orElseGet(SecurityAssessment::new);
+  }
+
+  private Scenario getOrCreateScenario(SecurityAssessment sa) {
+    if (sa.getScenario() != null) {
+      return scenarioRepository.findById(sa.getScenario().getId()).orElseGet(Scenario::new);
+    }
+    return new Scenario();
+  }
+
+  private String[] resolveMitreIds(JsonNode attackRefs, Map<String, String> stixToMitre) {
+    if (attackRefs != null && attackRefs.isArray()) {
+      List<String> mitreIds = new ArrayList<>();
+      for (JsonNode ref : attackRefs) {
+        String mitreId = stixToMitre.get(ref.asText());
+        if (mitreId != null) {
+          mitreIds.add(mitreId);
+        }
+      }
+      return mitreIds.toArray(new String[0]);
+    }
+    return new String[0];
+  }
+
+  private void createdInjectsForScenario(SecurityAssessment securityAssessment, Scenario scenario) {
+    InjectAssistantInput input = new InjectAssistantInput();
+    List<String> attackPatternIds =
+        attackPatternService
+            .getAttackPatternsByExternalIdsThrowIfMissing(
+                Arrays.stream(securityAssessment.getAttackPatternRefs())
+                    .collect(Collectors.toSet()))
+            .stream()
+            .map(AttackPattern::getId)
+            .toList();
+    input.setAttackPatternIds(attackPatternIds); // TODO Add ttps to placeholders
+    injectAssistantService.generateInjectsForScenario(scenario, input);
+  }
+
+  private Map<String, String> extractAttackPatterns(ArrayNode objects) {
+    Map<String, String> stixToMitre = new HashMap<>();
+    for (JsonNode obj : objects) {
+      if ("attack-pattern".equals(obj.path("type").asText())) {
+        String stixId = obj.path("id").asText();
+        String mitreId = obj.path("x_mitre_id").asText(null);
+        if (mitreId != null) {
+          stixToMitre.put(stixId, mitreId);
+        }
+      }
+    }
+    return stixToMitre;
   }
 
   private Scenario createScenarioFromSecurityAssessment(
@@ -1013,6 +1023,10 @@ public class ScenarioService {
 
     String cron = getCronExpression(securityAssessment.getScheduling(), start);
     scenario.setRecurrence(cron);
+
+    scenario
+        .getTags()
+        .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
     return scenarioRepository.save(scenario);
   }
