@@ -1,5 +1,11 @@
 package io.openbas.injector_contract;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_CARDINALITY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.PREDEFINED_EXPECTATIONS;
+import static io.openbas.rest.injector_contract.InjectorContractContentUtils.FIELDS;
+import static io.openbas.rest.injector_contract.InjectorContractContentUtils.MULTIPLE;
 import static io.openbas.rest.injector_contract.InjectorContractContentUtils.getDynamicInjectorContractFieldsForInject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,13 +26,7 @@ import org.junit.jupiter.api.Test;
 
 public class InjectorContractContentUtilsTest {
 
-  public static final String EXPECTATIONS = "expectations";
   public static final String EXPECTATION_NAME = "expectation_name";
-  public static final String FIELDS = "fields";
-  public static final String PREDEFINED_EXPECTATIONS = "predefinedExpectations";
-  public static final String CARDINALITY = "cardinality";
-  public static final String KEY = "key";
-  public static final String MULTIPLE = "n";
   public static final String PREVENTION = "Prevention";
   public static final String DETECTION = "Detection";
 
@@ -38,15 +38,17 @@ public class InjectorContractContentUtilsTest {
     predefinedExpectations.add(createExpectation(PREVENTION));
     predefinedExpectations.add(createExpectation(DETECTION));
 
-    ObjectNode content = createContentWithField(EXPECTATIONS, MULTIPLE, predefinedExpectations);
+    ObjectNode content =
+        createContentWithField(
+            CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS, MULTIPLE, predefinedExpectations);
 
     InjectorContract contract = InjectorContractFixture.createInjectorContract(content);
     ObjectNode result = getDynamicInjectorContractFieldsForInject(contract);
 
     assertNotNull(result);
-    assertTrue(result.has(EXPECTATIONS));
+    assertTrue(result.has(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS));
 
-    JsonNode expectations = result.get(EXPECTATIONS);
+    JsonNode expectations = result.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
     assertEquals(predefinedExpectations.size(), expectations.size());
 
     // Compare added expectations
@@ -67,13 +69,15 @@ public class InjectorContractContentUtilsTest {
   public void shouldNotAddExpectationsWhenPredefinedExpectationsAreEmpty() {
     ArrayNode emptyExpectations = mapper.createArrayNode(); // empty array
 
-    ObjectNode content = createContentWithField(EXPECTATIONS, MULTIPLE, emptyExpectations);
+    ObjectNode content =
+        createContentWithField(
+            CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS, MULTIPLE, emptyExpectations);
 
     InjectorContract contract = InjectorContractFixture.createInjectorContract(content);
     ObjectNode result = getDynamicInjectorContractFieldsForInject(contract);
 
     assertNotNull(result);
-    assertFalse(result.has(EXPECTATIONS));
+    assertFalse(result.has(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS));
   }
 
   @Test
@@ -89,8 +93,8 @@ public class InjectorContractContentUtilsTest {
   private ObjectNode createContentWithField(
       String key, String cardinality, ArrayNode predefinedExpectations) {
     ObjectNode field = mapper.createObjectNode();
-    field.put(KEY, key);
-    field.put(CARDINALITY, cardinality);
+    field.put(CONTRACT_ELEMENT_CONTENT_KEY, key);
+    field.put(CONTRACT_ELEMENT_CONTENT_CARDINALITY, cardinality);
     field.set(PREDEFINED_EXPECTATIONS, predefinedExpectations);
 
     ArrayNode fieldsArray = mapper.createArrayNode();
