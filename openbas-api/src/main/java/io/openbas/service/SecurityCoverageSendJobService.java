@@ -4,6 +4,8 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.database.repository.SecurityCoverageSendJobRepository;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,5 +35,9 @@ public class SecurityCoverageSendJobService {
     if (!jobs.isEmpty()) {
       securityCoverageSendJobRepository.saveAll(jobs);
     }
+  }
+
+  public List<SecurityCoverageSendJob> getPendingSecurityCoverageSendJobs() {
+    return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore("PENDING", Instant.now().minus(15, ChronoUnit.MINUTES));
   }
 }
