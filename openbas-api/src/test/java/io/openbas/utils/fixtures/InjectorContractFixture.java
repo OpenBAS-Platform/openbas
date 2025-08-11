@@ -97,6 +97,15 @@ public class InjectorContractFixture {
     return injectorContract;
   }
 
+  public static InjectorContract createInjectorContract(ObjectNode convertedContent) {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setId(UUID.randomUUID().toString());
+    injectorContract.setConvertedContent(convertedContent);
+    injectorContract.setCreatedAt(Instant.now());
+    injectorContract.setUpdatedAt(Instant.now());
+    return injectorContract;
+  }
+
   public static InjectorContract createInjectorContract(Map<String, String> labels)
       throws JsonProcessingException {
     String content = "{\"fields\": []}";
