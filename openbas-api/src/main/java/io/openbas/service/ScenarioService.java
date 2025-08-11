@@ -916,7 +916,6 @@ public class ScenarioService {
 
         SecurityAssessment securityAssessment =
             securityAssessmentRepository.findByExternalId(id).orElse(new SecurityAssessment());
-        //Si le stix a ete utilisé dans lassitent scenario donc ca genere erreur, remove partie assitent
         Scenario scenario;
         if (securityAssessment.getScenario() == null) {
           scenario = new Scenario();
@@ -980,9 +979,13 @@ public class ScenarioService {
         // Creation injects based attack patterns from stix
         InjectAssistantInput input = new InjectAssistantInput();
         List<String> attackPatternIds =
-            attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
-                Arrays.stream(securityAssessment.getAttackPatternRefs())
-                    .collect(Collectors.toSet())).stream().map(AttackPattern::getId).toList();
+            attackPatternService
+                .getAttackPatternsByExternalIdsThrowIfMissing(
+                    Arrays.stream(securityAssessment.getAttackPatternRefs())
+                        .collect(Collectors.toSet()))
+                .stream()
+                .map(AttackPattern::getId)
+                .toList();
         input.setAttackPatternIds(attackPatternIds); // TODO Add ttps to placeholders
         injectAssistantService.generateInjectsForScenario(scenario, input);
 
@@ -992,94 +995,6 @@ public class ScenarioService {
     }
 
     return createdScenarios;
-  }
-
-  public List<String> extractTTPsFromSTIXBundle(String scenarioId, MultipartFile file)
-      throws IOException {
-    Scenario scenario = scenario(scenarioId);
-
-    if (file == null || file.isEmpty()) {
-      return emptyList();
-    }
-
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode root = mapper.readTree(file.getInputStream());
-
-    ArrayNode objects = (ArrayNode) root.get("objects");
-    if (objects == null) {
-      throw new IllegalArgumentException("No objects in STIX bundle");
-    }
-
-    // Extract attack-patterns and their MITRE IDs
-    Map<String, String> stixIdToMitreId = new HashMap<>();
-
-    for (JsonNode obj : objects) {
-      if ("attack-pattern".equals(obj.path("type").asText())) {
-        String stixId = obj.path("id").asText();
-        String mitreId = obj.path("x_mitre_id").asText(null);
-        if (mitreId != null) {
-          stixIdToMitreId.put(stixId, mitreId);
-        }
-      }
-    }
-
-    SecurityAssessment securityAssessment;
-
-    for (JsonNode obj : objects) {
-      if ("x-security-assessment".equals(obj.path("type").asText())) {
-
-        securityAssessment = new SecurityAssessment();
-        String id = obj.path("id").asText();
-
-        securityAssessment.setExternalId(id);
-        securityAssessment.setName(obj.path("name").asText());
-        securityAssessment.setDescription(obj.path("description").asText());
-        securityAssessment.setSecurityCoverageSubmissionUrl(
-            obj.path("security_coverage_submission_url").asText());
-
-        securityAssessment.setScheduling(obj.path("scheduling").asText());
-
-        if (obj.hasNonNull("period_start")) {
-          securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
-        }
-        if (obj.hasNonNull("period_end")) {
-          securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
-        }
-
-        String threatContextRef = obj.path("threat_context_ref").asText(null);
-        securityAssessment.setThreatContextRef(threatContextRef);
-
-        // Attack pattern refs -> convert to MITRE IDs
-        JsonNode attacksNode = obj.path("attack_pattern_refs");
-        if (attacksNode != null && attacksNode.isArray()) {
-          List<String> mitreIds = new ArrayList<>();
-          for (JsonNode ref : attacksNode) {
-            String stixRef = ref.asText();
-            String mitreId = stixIdToMitreId.get(stixRef);
-            if (mitreId != null) {
-              mitreIds.add(mitreId);
-            }
-          }
-          securityAssessment.setAttackPatternRefs(mitreIds.toArray(new String[0]));
-        } else {
-          securityAssessment.setAttackPatternRefs(new String[0]);
-        }
-
-        // Add vulnerabilities
-
-        securityAssessment.setScenario(scenario);
-        SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
-
-        // Create Scenario using SecurityAssessment
-        createScenarioFromSecurityAssessment(scenario, savedSecurity);
-
-        // Send back ttps ids
-        return attackPatternService.getAttackPatternsByExternalIdsThrowIfMissing(
-            Arrays.stream(securityAssessment.getAttackPatternRefs()).collect(Collectors.toSet())).stream().map(AttackPattern::getId).toList();
-      }
-    }
-
-    return emptyList();
   }
 
   private Scenario createScenarioFromSecurityAssessment(

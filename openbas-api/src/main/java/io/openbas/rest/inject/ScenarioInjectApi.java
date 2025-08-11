@@ -103,16 +103,6 @@ public class ScenarioInjectApi extends RestBehavior {
     return scenarioService.generateScenarioFromSTIXBundle(file);
   }
 
-  @Transactional(rollbackFor = Exception.class)
-  @PostMapping(SCENARIO_URI + "/{scenarioId}/extract-ttps-from-stix-bundle")
-  public List<String> extractTTPsFromSTIXBundle(
-      @PathVariable @NotBlank final String scenarioId,
-      @RequestPart("file") @Nullable MultipartFile file)
-      throws IOException {
-    List<String> strings = scenarioService.extractTTPsFromSTIXBundle(scenarioId, file);
-    return strings;
-  }
-
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject duplicateInjectForScenario(

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 
-import {  importStix } from '../../../actions/scenarios/scenario-actions';
+import { importStix } from '../../../actions/scenarios/scenario-actions';
 import ImportUploader from '../../../components/common/ImportUploader';
 import { useAppDispatch } from '../../../utils/hooks';
 

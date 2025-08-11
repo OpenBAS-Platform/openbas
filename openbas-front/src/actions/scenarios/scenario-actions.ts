@@ -245,13 +245,3 @@ export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) =
   const input = { new_tags: newTagIds };
   return simplePostCall(uri, input);
 };
-
-// STIX
-
-export const extractTTPsFromSTIXBundle = (scenarioId: string, files: File[]) => {
-  const formData = new FormData();
-  files.forEach((file) => {
-    formData.append('file', file);
-  });
-  return simplePostCall(`${SCENARIO_URI}/${scenarioId}/extract-ttps-from-stix-bundle`, formData);
-};

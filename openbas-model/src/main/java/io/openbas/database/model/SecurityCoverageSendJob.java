@@ -1,17 +1,12 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "security_coverage_send_job")
@@ -36,9 +31,7 @@ public class SecurityCoverageSendJob implements Base {
   private String status = "PENDING";
 
   @OneToOne
-  @JoinColumn(
-      name = "security_coverage_send_job_simulation",
-      nullable = false)
+  @JoinColumn(name = "security_coverage_send_job_simulation", nullable = false)
   @JsonProperty("security_coverage_send_job_simulation")
   private Exercise simulation;
 
