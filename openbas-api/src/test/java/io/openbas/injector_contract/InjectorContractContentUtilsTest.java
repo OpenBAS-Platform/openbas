@@ -20,49 +20,60 @@ import org.junit.jupiter.api.Test;
 
 public class InjectorContractContentUtilsTest {
 
+  public static final String EXPECTATIONS = "expectations";
+  public static final String EXPECTATION_NAME = "expectation_name";
+  public static final String FIELDS = "fields";
+  public static final String PREDEFINED_EXPECTATIONS = "predefinedExpectations";
+  public static final String CARDINALITY = "cardinality";
+  public static final String KEY = "key";
+  public static final String MULTIPLE = "n";
+  public static final String PREVENTION = "Prevention";
+  public static final String DETECTION = "Detection";
+
   private static final ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void shouldAddExpectationsWhenPredefinedExpectationsExistent() {
     ArrayNode predefinedExpectations = mapper.createArrayNode();
-    predefinedExpectations.add(createExpectation("Prevention"));
-    predefinedExpectations.add(createExpectation("Detection"));
+    predefinedExpectations.add(createExpectation(PREVENTION));
+    predefinedExpectations.add(createExpectation(DETECTION));
 
-    ObjectNode content = createContentWithField("expectations", "n", predefinedExpectations);
+    ObjectNode content = createContentWithField(EXPECTATIONS, MULTIPLE, predefinedExpectations);
 
     InjectorContract contract = InjectorContractFixture.createInjectorContract(content);
     ObjectNode result = getDynamicInjectorContractFieldsForInject(contract);
 
     assertNotNull(result);
-    assertTrue(result.has("expectations"));
+    assertTrue(result.has(EXPECTATIONS));
 
-    JsonNode expectations = result.get("expectations");
+    JsonNode expectations = result.get(EXPECTATIONS);
     assertEquals(predefinedExpectations.size(), expectations.size());
 
-    Set<String> expectedNames =
+    // Compare added expectations
+    Set<String> expectedExpectations =
         StreamSupport.stream(predefinedExpectations.spliterator(), false)
-            .map(e -> e.get("expectation_name").asText())
+            .map(e -> e.get(EXPECTATION_NAME).asText())
             .collect(Collectors.toSet());
 
-    Set<String> actualNames =
+    Set<String> actualExpectations =
         StreamSupport.stream(expectations.spliterator(), false)
-            .map(e -> e.get("expectation_name").asText())
+            .map(e -> e.get(EXPECTATION_NAME).asText())
             .collect(Collectors.toSet());
 
-    assertEquals(expectedNames, actualNames);
+    assertEquals(expectedExpectations, actualExpectations);
   }
 
   @Test
   public void shouldNotAddExpectationsWhenPredefinedExpectationsAreEmpty() {
     ArrayNode emptyExpectations = mapper.createArrayNode(); // empty array
 
-    ObjectNode content = createContentWithField("expectations", "n", emptyExpectations);
+    ObjectNode content = createContentWithField(EXPECTATIONS, MULTIPLE, emptyExpectations);
 
     InjectorContract contract = InjectorContractFixture.createInjectorContract(content);
     ObjectNode result = getDynamicInjectorContractFieldsForInject(contract);
 
     assertNotNull(result);
-    assertFalse(result.has("expectations"));
+    assertFalse(result.has(EXPECTATIONS));
   }
 
   @Test
@@ -78,22 +89,22 @@ public class InjectorContractContentUtilsTest {
   private ObjectNode createContentWithField(
       String key, String cardinality, ArrayNode predefinedExpectations) {
     ObjectNode field = mapper.createObjectNode();
-    field.put("key", key);
-    field.put("cardinality", cardinality);
-    field.set("predefinedExpectations", predefinedExpectations);
+    field.put(KEY, key);
+    field.put(CARDINALITY, cardinality);
+    field.set(PREDEFINED_EXPECTATIONS, predefinedExpectations);
 
     ArrayNode fieldsArray = mapper.createArrayNode();
     fieldsArray.add(field);
 
     ObjectNode content = mapper.createObjectNode();
-    content.set("fields", fieldsArray);
+    content.set(FIELDS, fieldsArray);
 
     return content;
   }
 
   private ObjectNode createExpectation(String name) {
     ObjectNode expectation = mapper.createObjectNode();
-    expectation.put("expectation_name", name);
+    expectation.put(EXPECTATION_NAME, name);
     return expectation;
   }
 }
