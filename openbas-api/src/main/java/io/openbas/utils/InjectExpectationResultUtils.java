@@ -175,7 +175,7 @@ public class InjectExpectationResultUtils {
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
       @NotNull List<ResultDistribution> distribution) {
     public double getAverageScore() {
-      if(distribution.isEmpty()) {
+      if (distribution.isEmpty()) {
         return 0;
       }
 

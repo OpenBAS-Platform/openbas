@@ -2,15 +2,11 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.array.ListArrayType;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.converter.StixRefToExternalRefConverter;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;
-
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;

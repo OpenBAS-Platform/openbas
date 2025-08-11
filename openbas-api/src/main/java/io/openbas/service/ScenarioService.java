@@ -972,7 +972,9 @@ public class ScenarioService {
     List<String> attackPatternIds =
         attackPatternService
             .getAttackPatternsByExternalIdsThrowIfMissing(
-                securityAssessment.getAttackPatternRefs().stream().map(StixRefToExternalRef::getExternalRef).collect(Collectors.toSet()))
+                securityAssessment.getAttackPatternRefs().stream()
+                    .map(StixRefToExternalRef::getExternalRef)
+                    .collect(Collectors.toSet()))
             .stream()
             .map(AttackPattern::getId)
             .toList();

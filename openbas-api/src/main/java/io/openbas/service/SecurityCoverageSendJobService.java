@@ -5,10 +5,10 @@ import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.database.repository.SecurityCoverageSendJobRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class SecurityCoverageSendJobService {
   private final SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
 
-  public void createOrUpdateJobsForSimulation(List<Exercise> exercises) {
+  public void createOrUpdateJobsForSimulation(Set<Exercise> exercises) {
     List<SecurityCoverageSendJob> jobs = new ArrayList<>();
     for (Exercise exercise : exercises) {
       Optional<SecurityCoverageSendJob> scsj =
@@ -38,6 +38,7 @@ public class SecurityCoverageSendJobService {
   }
 
   public List<SecurityCoverageSendJob> getPendingSecurityCoverageSendJobs() {
-    return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore("PENDING", Instant.now().minus(15, ChronoUnit.MINUTES));
+    return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore(
+        "PENDING", Instant.now().minus(15, ChronoUnit.MINUTES));
   }
 }

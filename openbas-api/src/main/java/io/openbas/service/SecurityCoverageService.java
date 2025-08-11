@@ -5,11 +5,10 @@ import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.types.Identifier;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityCoverageService {
@@ -20,11 +19,7 @@ public class SecurityCoverageService {
       if (sa == null) {
         continue;
       }
-
     }
-    return new Bundle(
-            new Identifier("bundle--" + UUID.randomUUID()),
-            objects
-    );
+    return new Bundle(new Identifier("bundle--" + UUID.randomUUID()), objects);
   }
 }
