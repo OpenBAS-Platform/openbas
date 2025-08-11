@@ -166,10 +166,7 @@ public class InjectApi extends RestBehavior {
       })
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.SEARCH,
-      resourceType = ResourceType.INJECT)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @PreAuthorize("isInjectObserver(#injectId)")
   public Page<InjectTarget> injectTargetSearch(
       @PathVariable String injectId,
@@ -206,10 +203,7 @@ public class InjectApi extends RestBehavior {
       })
   @LogExecutionTime
   @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.SEARCH,
-      resourceType = ResourceType.INJECT)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @PreAuthorize("isInjectObserver(#injectId)")
   public List<FilterUtilsJpa.Option> targetOptions(
       @PathVariable String injectId,
@@ -245,7 +239,7 @@ public class InjectApi extends RestBehavior {
       })
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/targets/{targetType}/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECT)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public List<FilterUtilsJpa.Option> targetOptionsById(
       @PathVariable String targetType, @RequestBody final List<String> ids) {
     TargetType injectTargetTypeEnum;
@@ -487,7 +481,7 @@ public class InjectApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT_URI + "/findings/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECT)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String sourceId) {

@@ -34,7 +34,7 @@ public class CollectorApi extends RestBehavior {
   private final FileService fileService;
 
   @GetMapping("/api/collectors")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.COLLECTOR)
   public Iterable<Collector> collectors() {
     return collectorRepository.findAll();
   }
@@ -64,7 +64,7 @@ public class CollectorApi extends RestBehavior {
   @RBAC(
       resourceId = "#collectorId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.COLLECTOR)
   public Collector getCollector(@PathVariable String collectorId) {
     return collectorService.collector(collectorId);
   }
@@ -74,7 +74,7 @@ public class CollectorApi extends RestBehavior {
   @RBAC(
       resourceId = "#collectorId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.COLLECTOR)
   @Transactional(rollbackOn = Exception.class)
   public Collector updateCollector(
       @PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
@@ -93,7 +93,7 @@ public class CollectorApi extends RestBehavior {
       value = "/api/collectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.COLLECTOR)
   @Transactional(rollbackOn = Exception.class)
   public Collector registerCollector(
       @Valid @RequestPart("input") CollectorCreateInput input,

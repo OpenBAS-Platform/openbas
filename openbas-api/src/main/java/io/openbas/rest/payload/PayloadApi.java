@@ -98,7 +98,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {

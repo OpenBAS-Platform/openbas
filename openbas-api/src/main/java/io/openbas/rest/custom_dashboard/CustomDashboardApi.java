@@ -31,7 +31,7 @@ public class CustomDashboardApi extends RestBehavior {
   // -- CRUD --
 
   @PostMapping
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<CustomDashboard> createCustomDashboard(
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
     return ResponseEntity.ok(

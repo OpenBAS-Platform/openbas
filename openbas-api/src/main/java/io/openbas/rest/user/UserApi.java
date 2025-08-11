@@ -221,7 +221,7 @@ public class UserApi extends RestBehavior {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of users")})
   @Secured(ROLE_ADMIN)
   @GetMapping("/api/users")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.USER)
   public List<RawUser> users() {
     return userRepository.rawAll();
   }
@@ -231,7 +231,7 @@ public class UserApi extends RestBehavior {
       summary = "Search users")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of users")})
   @PostMapping(USER_URI + "/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.USER)
   public Page<UserOutput> users(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return this.userCriteriaBuilderService.userPagination(searchPaginationInput);
@@ -240,7 +240,7 @@ public class UserApi extends RestBehavior {
   @Operation(description = "Find a list of users based on their ids", summary = "Find users")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of users")})
   @PostMapping(USER_URI + "/find")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.USER)
   @Transactional(readOnly = true)
   public List<UserOutput> findUsers(
       @RequestBody @Valid @NotNull @Parameter(description = "List of ids")
@@ -250,10 +250,7 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}/password")
-  @RBAC(
-      resourceId = "#userId",
-      actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
   @Operation(description = "Change the password of a user", summary = "Change password")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The modified user")})
@@ -267,7 +264,7 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/users")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
   @Operation(description = "Create a new user", summary = "Create user")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The new user")})
@@ -277,10 +274,7 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}")
-  @RBAC(
-      resourceId = "#userId",
-      actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
   @Operation(description = "Update a user", summary = "Update user")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The modified user")})
@@ -299,10 +293,7 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/users/{userId}")
-  @RBAC(
-      resourceId = "#userId",
-      actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(resourceId = "#userId", actionPerformed = Action.DELETE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
   @Operation(description = "Delete a user", summary = "Delete user")
   @ApiResponses(value = {@ApiResponse(responseCode = "200")})

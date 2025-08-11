@@ -83,13 +83,13 @@ public class GroupApi extends RestBehavior {
   }
 
   @GetMapping("/api/groups")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.USER_GROUP)
   public Iterable<Group> groups() {
     return groupRepository.findAll();
   }
 
   @PostMapping("/api/groups/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.USER_GROUP)
   public Page<Group> users(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<Group> specification, Pageable pageable) ->
@@ -102,14 +102,14 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   public Group group(@PathVariable String groupId) {
     return groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group createGroup(@Valid @RequestBody GroupCreateInput input) {
     Group group = new Group();
@@ -124,7 +124,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group updateGroupUsers(
       @PathVariable String groupId, @Valid @RequestBody GroupUpdateUsersInput input) {
@@ -153,7 +153,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Operation(
       description = "Update roles associated to a group",
       summary = "Update roles associated to a group")
@@ -188,7 +188,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group updateGroupInformation(
       @PathVariable String groupId, @Valid @RequestBody GroupCreateInput input) {
@@ -204,7 +204,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
     if (input.getExerciseId() == null && input.getScenarioId() == null) {
@@ -258,7 +258,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group groupOrganization(
       @PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
@@ -277,7 +277,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   public Group deleteGroupOrganization(
       @PathVariable String groupId, @PathVariable String organizationId) {
     Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
@@ -291,8 +291,8 @@ public class GroupApi extends RestBehavior {
   @DeleteMapping("/api/grants/{grantId}")
   @RBAC(
       resourceId = "#grantId",
-      actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public void deleteGrant(@PathVariable String grantId) {
     grantRepository.deleteById(grantId);
@@ -303,7 +303,7 @@ public class GroupApi extends RestBehavior {
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public void deleteGroup(@PathVariable String groupId) {
     groupRepository.deleteById(groupId);

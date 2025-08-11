@@ -137,7 +137,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @RBAC(
       resourceId = "#exerciseId",
-      actionPerformed = Action.SEARCH,
+      actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)

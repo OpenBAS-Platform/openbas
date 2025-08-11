@@ -49,7 +49,7 @@ public class ScenarioExerciseApi {
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
   @RBAC(
       resourceId = "#scenarioId",
-      actionPerformed = Action.SEARCH,
+      actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<ExerciseSimple> scenarioExercises(

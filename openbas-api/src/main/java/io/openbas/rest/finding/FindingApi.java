@@ -30,7 +30,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.FINDING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.FINDING)
   public ResponseEntity<Finding> createFinding(
       @RequestBody @Valid @NotNull final FindingInput input) {
     return ResponseEntity.ok(

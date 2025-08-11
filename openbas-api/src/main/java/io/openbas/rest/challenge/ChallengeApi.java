@@ -47,7 +47,7 @@ public class ChallengeApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/challenges/find")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.CHALLENGE)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.CHALLENGE)
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public List<Challenge> findEndpoints(
       @RequestBody @Valid @NotNull final List<String> challengeIds) {
@@ -90,7 +90,7 @@ public class ChallengeApi extends RestBehavior {
 
   @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.CHALLENGE)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();

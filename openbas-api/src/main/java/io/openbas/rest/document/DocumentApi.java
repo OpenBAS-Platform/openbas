@@ -132,7 +132,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @PostMapping(DOCUMENT_API + "/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.DOCUMENT)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.DOCUMENT)
   @Transactional(rollbackOn = Exception.class)
   public Document upsertDocument(
       @Valid @RequestPart("input") DocumentCreateInput input,

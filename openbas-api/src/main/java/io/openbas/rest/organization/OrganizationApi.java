@@ -55,7 +55,7 @@ public class OrganizationApi extends RestBehavior {
   }
 
   @GetMapping(ORGANIZATION_URI)
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
   @PreAuthorize("isObserver()")
   public Iterable<RawOrganization> organizations() {
     OpenBASPrincipal currentUser = currentUser();
@@ -70,7 +70,7 @@ public class OrganizationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ORGANIZATION_URI)
-  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ORGANIZATION)
   @Transactional(rollbackOn = Exception.class)
   public Organization createOrganization(@Valid @RequestBody OrganizationCreateInput input) {
     Organization organization = new Organization();
@@ -84,7 +84,7 @@ public class OrganizationApi extends RestBehavior {
   @RBAC(
       resourceId = "#organizationId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ORGANIZATION)
   public Organization updateOrganization(
       @PathVariable String organizationId, @Valid @RequestBody OrganizationUpdateInput input) {
     checkOrganizationAccess(userRepository, organizationId);
@@ -101,7 +101,7 @@ public class OrganizationApi extends RestBehavior {
   @RBAC(
       resourceId = "#organizationId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ORGANIZATION)
   public void deleteOrganization(@PathVariable String organizationId) {
     checkOrganizationAccess(userRepository, organizationId);
     organizationRepository.deleteById(organizationId);
@@ -110,7 +110,7 @@ public class OrganizationApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ORGANIZATION_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -122,7 +122,7 @@ public class OrganizationApi extends RestBehavior {
   }
 
   @PostMapping(ORGANIZATION_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.organizationRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

@@ -489,7 +489,7 @@ public class ExerciseApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/options")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.exerciseRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
@@ -778,8 +778,8 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @LogExecutionTime
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   @PostMapping(EXERCISE_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public Page<ExerciseSimple> exercises(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();

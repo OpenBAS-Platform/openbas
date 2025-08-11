@@ -33,13 +33,13 @@ public class InjectorContractApi extends RestBehavior {
   private final InjectorContractService injectorContractService;
 
   @GetMapping(INJECTOR_CONTRACT_URL)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.INJECTOR_CONTRACT)
   public Iterable<RawInjectorsContrats> injectContracts() {
     return injectorContractService.getAllRawInjectContracts();
   }
 
   @PostMapping(INJECTOR_CONTRACT_URL + "/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR_CONTRACT)
   public Page<? extends InjectorContractBaseOutput> injectorContracts(
       @RequestBody @Valid final InjectorContractSearchPaginationInput input) {
     if (input.isIncludeFullDetails()) {
@@ -60,14 +60,14 @@ public class InjectorContractApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorContractId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract injectorContract(@PathVariable String injectorContractId) {
     return injectorContractService.getSingleInjectorContract(injectorContractId);
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECTOR_CONTRACT_URL)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract createInjectorContract(
       @Valid @RequestBody InjectorContractAddInput input) {
     return injectorContractService.createNewInjectorContract(input);
@@ -78,7 +78,7 @@ public class InjectorContractApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorContractId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract updateInjectorContract(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateInput input) {
@@ -90,7 +90,7 @@ public class InjectorContractApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorContractId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract updateInjectorContractMapping(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateMappingInput input) {
@@ -102,7 +102,7 @@ public class InjectorContractApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorContractId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public void deleteInjectorContract(@PathVariable String injectorContractId) {
     this.injectorContractService.deleteInjectorContract(injectorContractId);
   }

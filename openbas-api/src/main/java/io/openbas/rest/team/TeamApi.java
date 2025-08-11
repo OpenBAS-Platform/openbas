@@ -118,7 +118,7 @@ public class TeamApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/teams/find")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
@@ -166,7 +166,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PostMapping("/api/teams/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   @ApiResponses(

@@ -95,7 +95,7 @@ public class ChannelApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/channels")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.CHANNEL)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHANNEL)
   @Transactional(rollbackOn = Exception.class)
   public Channel createChannel(@Valid @RequestBody ChannelCreateInput input) {
     Channel channel = new Channel();

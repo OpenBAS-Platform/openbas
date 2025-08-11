@@ -104,7 +104,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PostMapping(PLAYER_URI + "/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLAYER)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {

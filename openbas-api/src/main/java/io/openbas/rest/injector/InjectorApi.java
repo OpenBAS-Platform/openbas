@@ -77,7 +77,7 @@ public class InjectorApi extends RestBehavior {
   private final InjectStatusService injectStatusService;
 
   @GetMapping("/api/injectors")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public Iterable<Injector> injectors() {
     return injectorRepository.findAll();
   }
@@ -86,7 +86,7 @@ public class InjectorApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR)
   public Collection<JsonNode> injectorInjectTypes(@PathVariable String injectorId) {
     Injector injector =
         injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
@@ -187,7 +187,7 @@ public class InjectorApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR)
   public Injector updateInjector(
       @PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
     Injector injector =
@@ -209,7 +209,7 @@ public class InjectorApi extends RestBehavior {
   @RBAC(
       resourceId = "#injectorId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.INJECTOR)
   public Injector injector(@PathVariable String injectorId) {
     return injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
   }
@@ -219,7 +219,7 @@ public class InjectorApi extends RestBehavior {
       value = "/api/injectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.INJECTOR)
   @Transactional(rollbackOn = Exception.class)
   public InjectorRegistration registerInjector(
       @Valid @RequestPart("input") InjectorCreateInput input,
@@ -405,7 +405,7 @@ public class InjectorApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT0R_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -417,7 +417,7 @@ public class InjectorApi extends RestBehavior {
   }
 
   @PostMapping(INJECT0R_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.injectorRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

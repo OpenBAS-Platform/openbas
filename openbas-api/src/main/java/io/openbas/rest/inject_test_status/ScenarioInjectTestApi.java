@@ -37,7 +37,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test/search")
   @RBAC(
       resourceId = "#scenarioId",
-      actionPerformed = Action.SEARCH,
+      actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
   public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
       @PathVariable @NotBlank String scenarioId,

@@ -48,7 +48,7 @@ public class PlatformSettingsApi extends RestBehavior {
   }
 
   @GetMapping()
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(skipRBAC = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of settings")})
   @Operation(summary = "List settings", description = "Return the settings")
   public PlatformSettings settings() {

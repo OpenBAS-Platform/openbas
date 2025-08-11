@@ -42,13 +42,13 @@ public class KillChainPhaseApi extends RestBehavior {
   private final KillChainPhaseRepository killChainPhaseRepository;
 
   @GetMapping("/api/kill_chain_phases")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.KILL_CHAIN_PHASE)
   public Iterable<KillChainPhase> killChainPhases() {
     return killChainPhaseRepository.findAll();
   }
 
   @PostMapping("/api/kill_chain_phases/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.KILL_CHAIN_PHASE)
   public Page<KillChainPhase> killChainPhases(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -62,7 +62,7 @@ public class KillChainPhaseApi extends RestBehavior {
   @RBAC(
       resourceId = "#killChainPhaseId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.KILL_CHAIN_PHASE)
   public KillChainPhase killChainPhase(@PathVariable String killChainPhaseId) {
     return killChainPhaseRepository
         .findById(killChainPhaseId)
@@ -74,7 +74,7 @@ public class KillChainPhaseApi extends RestBehavior {
   @RBAC(
       resourceId = "#killChainPhaseId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.KILL_CHAIN_PHASE)
   @Transactional(rollbackOn = Exception.class)
   public KillChainPhase updateKillChainPhase(
       @PathVariable String killChainPhaseId, @Valid @RequestBody KillChainPhaseUpdateInput input) {
@@ -89,7 +89,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.KILL_CHAIN_PHASE)
   @Transactional(rollbackOn = Exception.class)
   public KillChainPhase createKillChainPhase(@Valid @RequestBody KillChainPhaseCreateInput input) {
     KillChainPhase killChainPhase = new KillChainPhase();
@@ -99,7 +99,7 @@ public class KillChainPhaseApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.KILL_CHAIN_PHASE)
   @Transactional(rollbackOn = Exception.class)
   public Iterable<KillChainPhase> upsertKillChainPhases(
       @Valid @RequestBody KillChainPhaseUpsertInput input) {
@@ -141,7 +141,7 @@ public class KillChainPhaseApi extends RestBehavior {
   @RBAC(
       resourceId = "#killChainPhaseId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.KILL_CHAIN_PHASE)
   public void deleteKillChainPhase(@PathVariable String killChainPhaseId) {
     killChainPhaseRepository.deleteById(killChainPhaseId);
   }
@@ -149,7 +149,7 @@ public class KillChainPhaseApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(KILL_CHAIN_PHASE_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.KILL_CHAIN_PHASE)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -161,7 +161,7 @@ public class KillChainPhaseApi extends RestBehavior {
   }
 
   @PostMapping(KILL_CHAIN_PHASE_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.KILL_CHAIN_PHASE)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.killChainPhaseRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

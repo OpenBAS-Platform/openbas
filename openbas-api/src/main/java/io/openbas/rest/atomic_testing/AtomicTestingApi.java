@@ -65,7 +65,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @PostMapping()
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ATOMIC_TESTING)
   @Transactional(rollbackFor = Exception.class)
   public InjectResultOverviewOutput createAtomicTesting(
       @Valid @RequestBody AtomicTestingInput input) {

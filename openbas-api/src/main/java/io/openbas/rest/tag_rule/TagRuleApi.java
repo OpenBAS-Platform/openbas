@@ -50,7 +50,7 @@ public class TagRuleApi extends RestBehavior {
   @RBAC(
       resourceId = "#tagRuleId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.TAG_RULE)
   @Operation(description = "Get TagRule by Id", summary = "Get TagRule")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The TagRule")})
   public TagRuleOutput findTagRule(
@@ -60,7 +60,7 @@ public class TagRuleApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TAG_RULE)
   @Operation(description = "Get All TagRules", summary = "Get TagRules")
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of all TagRules")})
@@ -74,7 +74,7 @@ public class TagRuleApi extends RestBehavior {
   @RBAC(
       resourceId = "#tagRuleId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Delete TagRule", description = "TagRule needs to exists")
   @ApiResponses(
@@ -90,7 +90,7 @@ public class TagRuleApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
-  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
@@ -109,7 +109,7 @@ public class TagRuleApi extends RestBehavior {
   @RBAC(
       resourceId = "#tagRuleId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Update TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
@@ -126,7 +126,7 @@ public class TagRuleApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI + "/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG_RULE)
   @Operation(
       description = "Search TagRules corresponding to search criteria",
       summary = "Search TagRules")

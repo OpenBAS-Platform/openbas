@@ -46,7 +46,7 @@ public class RoleApi {
   @RBAC(
       resourceId = "#roleId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.GROUP_ROLE)
   @Operation(description = "Get Role by Id", summary = "Get Role")
   @ApiResponses(
       value = {
@@ -63,7 +63,7 @@ public class RoleApi {
 
   @LogExecutionTime
   @GetMapping(RoleApi.ROLE_URI)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.GROUP_ROLE)
   @Operation(description = "Get All Roles", summary = "Get Roles")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of all Roles")})
   public List<RoleOutput> roles() {
@@ -76,7 +76,7 @@ public class RoleApi {
   @RBAC(
       resourceId = "#roleId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Delete Role", description = "Role needs to exists")
   @ApiResponses(
@@ -92,7 +92,7 @@ public class RoleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI)
-  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create Role")
   @ApiResponses(
@@ -111,7 +111,7 @@ public class RoleApi {
   @RBAC(
       resourceId = "#roleId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Update Role", description = "Role needs to exists")
   @ApiResponses(
@@ -128,7 +128,7 @@ public class RoleApi {
 
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI + "/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.GROUP_ROLE)
   @Operation(
       description = "Search Roles corresponding to search criteria",
       summary = "Search Roles")

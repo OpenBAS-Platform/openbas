@@ -66,7 +66,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI + "/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SECURITY_PLATFORM)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public SecurityPlatform upsertSecurityPlatform(

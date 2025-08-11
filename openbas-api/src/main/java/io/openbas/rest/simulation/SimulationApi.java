@@ -25,13 +25,13 @@ public class SimulationApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping("/options")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public List<Option> optionsByName(@RequestParam(required = false) final String searchText) {
     return this.simulationService.findAllAsOptions(searchText);
   }
 
   @PostMapping("/options")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public List<Option> optionsById(@RequestBody final List<String> ids) {
     return this.simulationService.findAllByIdsAsOptions(ids);
   }

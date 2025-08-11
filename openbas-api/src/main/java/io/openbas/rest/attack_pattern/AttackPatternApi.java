@@ -54,13 +54,13 @@ public class AttackPatternApi extends RestBehavior {
   private final KillChainPhaseRepository killChainPhaseRepository;
 
   @GetMapping("/api/attack_patterns")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ATTACK_PATTERN)
   public List<RawAttackPattern> attackPatterns() {
     return attackPatternRepository.rawAll();
   }
 
   @PostMapping("/api/attack_patterns/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ATTACK_PATTERN)
   public Page<AttackPattern> attackPatterns(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -86,7 +86,7 @@ public class AttackPatternApi extends RestBehavior {
   @RBAC(
       resourceId = "#attackPatternId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ATTACK_PATTERN)
   public AttackPattern attackPattern(@PathVariable String attackPatternId) {
     return attackPatternRepository
         .findById(attackPatternId)
@@ -95,7 +95,7 @@ public class AttackPatternApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/attack_patterns")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
   public AttackPattern createAttackPattern(@Valid @RequestBody AttackPatternCreateInput input) {
     AttackPattern attackPattern = new AttackPattern();
@@ -111,7 +111,7 @@ public class AttackPatternApi extends RestBehavior {
   @RBAC(
       resourceId = "#attackPatternId",
       actionPerformed = Action.READ,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ATTACK_PATTERN)
   public Iterable<InjectorContract> injectorContracts(@PathVariable String attackPatternId) {
     attackPatternRepository.findById(attackPatternId).orElseThrow(ElementNotFoundException::new);
     return injectorContractRepository.findAll(
@@ -123,7 +123,7 @@ public class AttackPatternApi extends RestBehavior {
   @RBAC(
       resourceId = "#attackPatternId",
       actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
   public AttackPattern updateAttackPattern(
       @NotBlank @PathVariable final String attackPatternId,
@@ -198,7 +198,7 @@ public class AttackPatternApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/attack_patterns/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
   public Iterable<AttackPattern> upsertAttackPatterns(
       @Valid @RequestBody AttackPatternUpsertInput input) {
@@ -220,7 +220,7 @@ public class AttackPatternApi extends RestBehavior {
   @RBAC(
       resourceId = "#attackPatternId",
       actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+      resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
   public void deleteAttackPattern(@PathVariable String attackPatternId) {
     attackPatternRepository.deleteById(attackPatternId);
@@ -229,7 +229,7 @@ public class AttackPatternApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ATTACK_PATTERN_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ATTACK_PATTERN)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -241,7 +241,7 @@ public class AttackPatternApi extends RestBehavior {
   }
 
   @PostMapping(ATTACK_PATTERN_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ATTACK_PATTERN)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.attackPatternRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

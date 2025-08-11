@@ -51,7 +51,7 @@ public class TagApi extends RestBehavior {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "All the existing tags")})
   @Operation(description = "Get the list of tags", summary = "Get tags")
   @GetMapping("/api/tags")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG)
   public Iterable<Tag> tags() {
     return tagRepository.findAll();
   }
@@ -64,7 +64,7 @@ public class TagApi extends RestBehavior {
       })
   @Operation(description = "Search tags corresponding to the criteria", summary = "Search tags")
   @PostMapping("/api/tags/search")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG)
   public Page<Tag> tags(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<Tag> specification, Pageable pageable) ->
@@ -75,10 +75,7 @@ public class TagApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/tags/{tagId}")
-  @RBAC(
-      resourceId = "#tagId",
-      actionPerformed = Action.WRITE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(resourceId = "#tagId", actionPerformed = Action.WRITE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated tag")})
   @Operation(description = "Update a tag", summary = "Update tag")
@@ -90,7 +87,7 @@ public class TagApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/tags")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The created tag")})
   @Operation(description = "Create a tag", summary = "Create tag")
@@ -102,7 +99,7 @@ public class TagApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/tags/upsert")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The upserted tag")})
   @Operation(description = "Upsert a tag", summary = "Upsert tag")
@@ -112,10 +109,7 @@ public class TagApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/tags/{tagId}")
-  @RBAC(
-      resourceId = "#tagId",
-      actionPerformed = Action.DELETE,
-      resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(resourceId = "#tagId", actionPerformed = Action.DELETE, resourceType = ResourceType.TAG)
   @ApiResponses(value = {@ApiResponse(responseCode = "200")})
   @Operation(description = "Delete a tag", summary = "Delete tag")
   public void deleteTag(@PathVariable @Schema(description = "ID of the tag") String tagId) {
@@ -125,7 +119,7 @@ public class TagApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(TAG_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG)
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of tags corresponding")})
   @Operation(
@@ -142,7 +136,7 @@ public class TagApi extends RestBehavior {
   }
 
   @PostMapping(TAG_URI + "/options")
-  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG)
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of tags corresponding")})
   @Operation(

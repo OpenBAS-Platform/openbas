@@ -47,7 +47,7 @@ public class EndpointApi extends RestBehavior {
   private final EndpointMapper endpointMapper;
 
   @PostMapping(ENDPOINT_URI + "/agentless")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
@@ -56,7 +56,7 @@ public class EndpointApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
@@ -93,7 +93,7 @@ public class EndpointApi extends RestBehavior {
   }
 
   @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
@@ -102,7 +102,7 @@ public class EndpointApi extends RestBehavior {
 
   @Deprecated(since = "1.11.0")
   @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJobDepreacted(@PathVariable @NotBlank final String assetAgentJobId) {
@@ -144,7 +144,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   @Transactional(readOnly = true)
   public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
     return this.endpointService.endpoints(endpointIds);

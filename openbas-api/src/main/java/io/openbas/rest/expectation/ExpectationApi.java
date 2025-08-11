@@ -158,7 +158,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Bulk Update Inject Expectation",
       description = "Bulk Update Inject expectation from an external source, e.g., EDR collector.")
   @PutMapping(INJECTS_EXPECTATIONS_URI + "/bulk")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void updateInjectExpectation(
       @Valid @RequestBody @NotNull InjectExpectationBulkUpdateInput inputs) {
