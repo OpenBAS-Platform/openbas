@@ -31,6 +31,7 @@ public class InjectorContractContentUtilsTest {
     assertNotNull(result);
     assertTrue(result.has("expectations"));
     assertEquals("Prevention", result.get("expectations").get(0).get("expectation_name").asText());
+    assertEquals(1, result.get("expectations"));
   }
 
   @Test
