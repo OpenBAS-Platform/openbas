@@ -1,8 +1,11 @@
 package io.openbas.utils.fixtures;
 
+import io.openbas.database.model.Group;
 import io.openbas.database.model.User;
 import io.openbas.rest.user.form.login.LoginUserInput;
 import io.openbas.rest.user.form.login.ResetUserInput;
+
+import java.util.List;
 import java.util.UUID;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
@@ -37,6 +40,16 @@ public class UserFixture {
 
   public static User getUser() {
     return getUser("Firstname", "Lastname", EMAIL);
+  }
+
+  public static User getUser(List<Group> groups) {
+    return getUser("Firstname", "Lastname", EMAIL, groups);
+  }
+
+  public static User getUser(String firstName, String lastName, String email, List<Group> groups) {
+    User user = getUser(firstName, lastName, email);
+    user.setGroups(groups);
+    return user;
   }
 
   public static User getUser(String firstName, String lastName, String email) {

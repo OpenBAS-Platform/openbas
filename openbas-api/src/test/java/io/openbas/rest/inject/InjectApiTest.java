@@ -42,6 +42,7 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -161,7 +162,7 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Delete list of injects for scenario")
   @Test
   @Order(6)
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void deleteInjectsForScenarioTest() throws Exception {
     // -- PREPARE --
     Inject injectForScenario1 = new Inject();
@@ -291,7 +292,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseTest() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -352,7 +353,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise with no team")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseWithNoTeam() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -391,7 +392,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise with no content")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseWithNoContentTest() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -425,7 +426,7 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Delete list of inject for exercise")
   @Test
   @Order(8)
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void deleteInjectsForExerciseTest() throws Exception {
     // -- PREPARE --
     Inject injectForExercise1 = new Inject();

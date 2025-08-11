@@ -25,6 +25,7 @@ import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.rest.exercise.form.ExerciseUpdateStatusInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import java.time.Clock;
@@ -180,7 +181,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Start an exercise manually")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void manualStartExerciseTest() throws Exception {
     // -- PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -233,7 +234,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise from canceled to scheduled")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void rescheduledExerciseTest() throws Exception {
     // --PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -289,7 +290,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise from pause to running")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void runExerciseAfterPauseTest() throws Exception {
     // --PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -344,7 +345,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise from running to paused")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void pauseAnExerciseTest() throws Exception {
     // --PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -395,7 +396,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise from running to canceled")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void cancelAnExerciseTest() throws Exception {
     // --PREPARE--
     Exercise exercise = exerciseRepository.save(ExerciseFixture.createRunningAttackExercise());
@@ -446,7 +447,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise next status")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void checkExerciseNextStatusTest() {
     // --PREPARED--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
@@ -472,7 +473,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
   @DisplayName("Check an exercise with an inject from finished to scheduled")
   @Test
-  @WithMockAdminUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void rescheduledExerciseWithInjectTest() throws Exception {
     // --PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();

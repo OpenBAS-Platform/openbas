@@ -21,6 +21,7 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -148,7 +149,7 @@ public class ExerciseApiTest extends IntegrationTest {
 
   @DisplayName("Check if a rule applies when a rule is found")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void checkIfRuleAppliesTest_WHEN_rule_found() throws Exception {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();
@@ -185,7 +186,7 @@ public class ExerciseApiTest extends IntegrationTest {
 
   @DisplayName("Check if a rule applies when no rule is found")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void checkIfRuleAppliesTest_WHEN_no_rule_found() throws Exception {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();

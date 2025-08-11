@@ -1,5 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
+import io.openbas.database.model.Role;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
@@ -17,6 +18,7 @@ public class UserComposer extends ComposerBase<User> {
     private final User user;
     private OrganizationComposer.Composer organizationComposer;
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
+    private final List<GroupComposer.Composer> groupComposers = new ArrayList<>();
 
     public Composer(User user) {
       this.user = user;
@@ -36,6 +38,12 @@ public class UserComposer extends ComposerBase<User> {
       return this;
     }
 
+    public Composer withGroup(GroupComposer.Composer groupComposer) {
+      groupComposers.add(groupComposer);
+      this.user.getGroups().add(groupComposer.get());
+      return this;
+    }
+
     public Composer withId(String id) {
       this.user.setId(id);
       return this;
@@ -47,6 +55,7 @@ public class UserComposer extends ComposerBase<User> {
       if (organizationComposer != null) {
         organizationComposer.persist();
       }
+      this.groupComposers.forEach(GroupComposer.Composer::persist);
       userRepository.save(user);
       return this;
     }
@@ -58,6 +67,7 @@ public class UserComposer extends ComposerBase<User> {
         organizationComposer.delete();
       }
       this.tagComposers.forEach(TagComposer.Composer::delete);
+      this.groupComposers.forEach(GroupComposer.Composer::delete);
       return this;
     }
 

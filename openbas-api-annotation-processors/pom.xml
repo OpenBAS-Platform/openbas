@@ -13,6 +13,10 @@
     <name>OpenBAS API annotation processor</name>
     <description>Custom annotation processors for OpenBAS API</description>
 
+    <properties>
+        <maven.compiler.annotationProcessorProfile>Annotation processor disabled profile</maven.compiler.annotationProcessorProfile>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -27,6 +31,10 @@
                     <annotationProcessorPaths combine.self="override">
                         <!-- Empty or only include other processors needed -->
                     </annotationProcessorPaths>
+                    <annotationProcessors>
+                        <annotationProcessor>!lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
+                        <annotationProcessor>!io.openbas.processors.RBACEnforcementProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
         </plugins>

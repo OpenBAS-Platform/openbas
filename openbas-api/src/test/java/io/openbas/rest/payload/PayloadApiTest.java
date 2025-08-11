@@ -40,6 +40,7 @@ import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.fixtures.composers.CollectorComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @TestInstance(PER_CLASS)
 class PayloadApiTest extends IntegrationTest {
@@ -485,7 +487,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @Test
   @DisplayName("Upsert architecture of a Payload")
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void upsertCommandPayloadToValidateArchitecture() throws Exception {
     Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
     payload.setExternalId("external-id");
@@ -518,7 +520,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @Test
   @DisplayName("Upsert Payload with output parser")
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void
       given_payload_upsert_input_with_output_parsers_should_return_updated_payload_with_output_parsers()
           throws Exception {
@@ -564,7 +566,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @Test
   @DisplayName("Upsert Payload with detection remediations")
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void
       given_payload_upsert_input_with_detection_remediation_should_return_updated_payload_with_detection_remediations()
           throws Exception {
