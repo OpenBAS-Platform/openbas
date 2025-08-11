@@ -1,14 +1,14 @@
 import { HelpOutlineOutlined, RotateLeftOutlined } from '@mui/icons-material';
 import { Button, IconButton, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import SwitchFieldController from '../../../../../components/fields/SwitchFieldController';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Article, Variable } from '../../../../../utils/api-types';
 import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
-import { AbilityContext } from '../../../../../utils/permissions/PermissionsProvider';
+import { Can } from '../../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
@@ -43,7 +43,6 @@ const InjectContentForm = ({
   const { t } = useFormatter();
   const theme = useTheme();
   const { control, setValue, getValues } = useFormContext();
-  const ability = useContext(AbilityContext);
 
   const injectorContractFields = injectorContractContent.fields;
   const fieldsMap = new Map<string, ContractElement>();
@@ -90,11 +89,15 @@ const InjectContentForm = ({
           />
         )}
       />
-      <InjectAddAssetGroups
-        disabled={fieldsMap.get('asset-group')?.readOnly || readOnly || !ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)}
-        assetGroupIds={injectAssetGroupIds}
-        onSubmit={onAssetGroupChange}
-      />
+
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.ASSETS}>
+        <InjectAddAssetGroups
+          disabled={fieldsMap.get('asset-group')?.readOnly || readOnly}
+          assetGroupIds={injectAssetGroupIds}
+          onSubmit={onAssetGroupChange}
+        />
+      </Can>
+
     </div>
   );
 
