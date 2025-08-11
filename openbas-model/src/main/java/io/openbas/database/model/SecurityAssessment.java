@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.StixRefToExternalRefConverter;
 import jakarta.persistence.*;
@@ -68,12 +69,12 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_threat_context_ref")
   private String threatContextRef;
 
-  @Convert(converter = StixRefToExternalRefConverter.class)
+  @Type(JsonType.class)
   @Column(name = "security_assessment_attack_pattern_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_attack_pattern_refs")
   private List<StixRefToExternalRef> attackPatternRefs;
 
-  @Convert(converter = StixRefToExternalRefConverter.class)
+  @Type(JsonType.class)
   @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_vulnerabilities_refs")
   private List<StixRefToExternalRef> vulnerabilitiesRefs;
