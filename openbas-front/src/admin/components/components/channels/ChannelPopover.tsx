@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { makeStyles } from 'tss-react/mui';
 
 import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
@@ -13,19 +12,11 @@ import { AbilityContext } from '../../../../utils/permissions/PermissionsProvide
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ChannelForm from './ChannelForm';
 
-const useStyles = makeStyles()(() => ({
-  button: {
-    float: 'left',
-    margin: '-10px 0 0 5px',
-  },
-}));
-
 interface Props { channel: Channel }
 
 const ChannelPopover: FunctionComponent<Props> = ({ channel }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

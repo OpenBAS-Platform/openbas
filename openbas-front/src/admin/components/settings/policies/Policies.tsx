@@ -10,8 +10,6 @@ import { useHelper } from '../../../../store';
 import { type PlatformSettings, type PolicyInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { Can } from '../../../../utils/permissions/PermissionsProvider';
-import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
 
