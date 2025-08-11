@@ -4,6 +4,8 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static io.openbas.utils.pagination.SortUtilsRuntime.toSortRuntime;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.config.OpenBASPrincipal;
+import io.openbas.config.SessionHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.SpecificationUtils;
@@ -39,6 +41,7 @@ public class FullTextSearchService<T extends Base> {
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
   private Map<Class<T>, List<String>> searchListByClassMap;
+  private Map<Class<T>, Boolean> grantsFilteringByClassMap;
 
   @PostConstruct
   @SuppressWarnings("unchecked")
@@ -70,6 +73,23 @@ public class FullTextSearchService<T extends Base> {
             List.of("name", "id"),
             (Class<T>) Exercise.class,
             List.of("name", "id"));
+
+    this.grantsFilteringByClassMap =
+        Map.of(
+            (Class<T>) Asset.class,
+            false,
+            (Class<T>) AssetGroup.class,
+            false,
+            (Class<T>) User.class,
+            false,
+            (Class<T>) Team.class,
+            false,
+            (Class<T>) Organization.class,
+            false,
+            (Class<T>) Scenario.class,
+            true,
+            (Class<T>) Exercise.class,
+            true);
   }
 
   public Page<FullTextSearchResult> fullTextSearch(
@@ -90,6 +110,8 @@ public class FullTextSearchService<T extends Base> {
             .orElseThrow(
                 () -> new IllegalArgumentException(clazz + " is not handle by full text search"));
 
+    OpenBASPrincipal principal = SessionHelper.currentUser();
+
     JpaSpecificationExecutor<T> repository = repositoryMap.get(clazzT);
 
     String finalSearchTerm = getFinalSearchTerm(searchPaginationInput.getTextSearch());
@@ -98,7 +120,12 @@ public class FullTextSearchService<T extends Base> {
             repository::findAll,
             searchPaginationInput,
             clazzT,
-            SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT)))
+            SpecificationUtils.fullTextSearch(
+                finalSearchTerm,
+                searchListByClassMap.get(clazzT),
+                grantsFilteringByClassMap.get(clazzT),
+                principal.getId(),
+                principal.isAdmin()))
         .map(this::transform);
   }
 
@@ -192,12 +219,18 @@ public class FullTextSearchService<T extends Base> {
     Map<Class<T>, FullTextSearchCountResult> results = new HashMap<>();
     String finalSearchTerm = getFinalSearchTerm(searchTerm);
 
+    OpenBASPrincipal principal = SessionHelper.currentUser();
+
     repositoryMap.forEach(
         (className, repository) -> {
           long count =
               repository.count(
                   SpecificationUtils.fullTextSearch(
-                      finalSearchTerm, searchListByClassMap.get(className)));
+                      finalSearchTerm,
+                      searchListByClassMap.get(className),
+                      grantsFilteringByClassMap.get(className),
+                      principal.getId(),
+                      principal.isAdmin()));
           results.put(className, new FullTextSearchCountResult(className.getSimpleName(), count));
         });
 
