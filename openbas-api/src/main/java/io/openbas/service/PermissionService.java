@@ -12,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PermissionService {
 
+  // TODO: today settings are necessary to login -> review that
   private static final EnumSet<ResourceType> RESOURCES_OPEN =
-      EnumSet.of(ResourceType.PLAYER, ResourceType.TEAM);
+      EnumSet.of(ResourceType.PLAYER, ResourceType.TEAM, ResourceType.PLATFORM_SETTING);
+
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(ResourceType.SCENARIO, ResourceType.SIMULATION);
   private final GrantService grantService;
