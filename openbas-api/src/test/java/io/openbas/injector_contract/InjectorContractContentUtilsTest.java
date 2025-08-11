@@ -13,10 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.utils.fixtures.InjectorContractFixture;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 public class InjectorContractContentUtilsTest {
 
   private static final ObjectMapper mapper = new ObjectMapper();
