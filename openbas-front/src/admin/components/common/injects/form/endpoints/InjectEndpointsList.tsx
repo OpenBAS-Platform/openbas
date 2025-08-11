@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { findEndpoints } from '../../../../../../actions/assets/endpoint-actions';
 import type { EndpointOutput } from '../../../../../../utils/api-types';
-import { AbilityContext } from '../../../../../../utils/permissions/PermissionsProvider';
+import { Can } from '../../../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../../../utils/permissions/types';
 import EndpointPopover from '../../../../assets/endpoints/EndpointPopover';
 import EndpointsList from '../../../../assets/endpoints/EndpointsList';
@@ -17,7 +17,6 @@ interface Props {
 }
 const InjectEndpointsList = ({ name, platforms = [], architectures, disabled = false }: Props) => {
   const { control, setValue } = useFormContext();
-  const ability = useContext(AbilityContext);
 
   const endpointIds = useWatch({
     control,
@@ -52,13 +51,15 @@ const InjectEndpointsList = ({ name, platforms = [], architectures, disabled = f
           />
         )}
       />
-      <InjectAddEndpoints
-        endpointIds={endpointIds}
-        onSubmit={onEndpointChange}
-        platforms={platforms}
-        payloadArch={architectures}
-        disabled={disabled || !ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)}
-      />
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}>
+        <InjectAddEndpoints
+          endpointIds={endpointIds}
+          onSubmit={onEndpointChange}
+          platforms={platforms}
+          payloadArch={architectures}
+          disabled={disabled}
+        />
+      </Can>
     </>
   );
 };
