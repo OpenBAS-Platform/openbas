@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -170,6 +171,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_created_at")
   @JsonProperty("exercise_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Getter
@@ -212,7 +214,7 @@ public class Exercise implements Base {
   @ArraySchema(schema = @Schema(type = "string"))
   private List<Team> teams = new ArrayList<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTeams(List<Team> teams) {
     this.updatedAt = now();
     this.teams = teams;
@@ -257,7 +259,7 @@ public class Exercise implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTags(Set<Tag> tags) {
     this.updatedAt = now();
     this.tags = tags;

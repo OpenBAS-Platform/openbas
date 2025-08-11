@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -100,6 +101,7 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_created_at")
   @JsonProperty("inject_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Getter
@@ -115,7 +117,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_all_teams")
   private boolean allTeams;
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setAllTeams(boolean allTeams) {
     this.updatedAt = now();
     this.allTeams = allTeams;
@@ -186,7 +188,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTags(Set<Tag> tags) {
     this.updatedAt = now();
     this.tags = tags;
@@ -204,7 +206,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true, path = "teams.id")
   private List<Team> teams = new ArrayList<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTeams(List<Team> teams) {
     this.updatedAt = now();
     this.teams = teams;
@@ -222,7 +224,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true, path = "assets.id")
   private List<Asset> assets = new ArrayList<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setAssets(List<Asset> assets) {
     this.updatedAt = now();
     this.assets = assets;
@@ -240,7 +242,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true, path = "assetGroups.id")
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setAssetGroups(List<AssetGroup> assetGroups) {
     this.updatedAt = now();
     this.assetGroups = assetGroups;

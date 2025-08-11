@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -136,6 +137,7 @@ public class Scenario implements Base {
   @Column(name = "scenario_created_at")
   @JsonProperty("scenario_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Column(name = "scenario_updated_at")
@@ -176,7 +178,7 @@ public class Scenario implements Base {
   @JsonProperty("scenario_teams")
   private List<Team> teams = new ArrayList<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTeams(List<Team> teams) {
     this.updatedAt = now();
     this.teams = teams;
@@ -206,7 +208,7 @@ public class Scenario implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
-  // UpdatedAt now used to sync object with ES
+  // UpdatedAt now used to sync with linked object
   public void setTags(Set<Tag> tags) {
     this.updatedAt = now();
     this.tags = tags;
