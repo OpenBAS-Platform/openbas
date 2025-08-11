@@ -132,7 +132,7 @@ public class NotificationRuleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(NOTIFICATION_RULE_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.NOTIFICATION_RULE)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.NOTIFICATION_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create NotificationRule", description = "Create a NotificationRule")
   @ApiResponses(

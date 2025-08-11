@@ -92,7 +92,7 @@ public class RoleApi {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create Role")
   @ApiResponses(

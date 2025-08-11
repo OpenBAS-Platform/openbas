@@ -66,7 +66,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {

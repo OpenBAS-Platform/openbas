@@ -54,7 +54,7 @@ public class AssetGroupApi extends RestBehavior {
   private final AssetGroupRepository assetGroupRepository;
 
   @PostMapping(ASSET_GROUP_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.ASSET)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {

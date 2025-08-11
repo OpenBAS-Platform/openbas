@@ -43,7 +43,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SECURITY_PLATFORM)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SECURITY_PLATFORM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public SecurityPlatform createSecurityPlatform(

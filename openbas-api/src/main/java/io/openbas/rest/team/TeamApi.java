@@ -148,7 +148,7 @@ public class TeamApi extends RestBehavior {
   }
 
   @PostMapping(TEAM_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.TEAM)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TEAM)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The created team")})

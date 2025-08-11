@@ -68,7 +68,7 @@ public class ScenarioApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SCENARIO)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Scenario input cannot be null");

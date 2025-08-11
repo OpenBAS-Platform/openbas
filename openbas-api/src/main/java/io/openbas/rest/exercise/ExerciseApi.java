@@ -16,7 +16,6 @@ import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
-import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
@@ -360,7 +359,7 @@ public class ExerciseApi extends RestBehavior {
 
   // region exercises
   @PostMapping(EXERCISE_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SIMULATION)
   public Exercise createExercise(@Valid @RequestBody CreateExerciseInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
@@ -380,7 +379,7 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}")
   @RBAC(
       resourceId = "#exerciseId",
-      actionPerformed = Action.WRITE,
+      actionPerformed = Action.DUPLICATE,
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackFor = Exception.class)
   public Exercise duplicateExercise(@PathVariable @NotBlank final String exerciseId) {

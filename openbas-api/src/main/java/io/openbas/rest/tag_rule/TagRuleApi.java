@@ -90,7 +90,7 @@ public class TagRuleApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(

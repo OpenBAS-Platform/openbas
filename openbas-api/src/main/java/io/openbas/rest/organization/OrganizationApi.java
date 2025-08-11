@@ -70,7 +70,7 @@ public class OrganizationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ORGANIZATION_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLATFORM_SETTING)
   @Transactional(rollbackOn = Exception.class)
   public Organization createOrganization(@Valid @RequestBody OrganizationCreateInput input) {
     Organization organization = new Organization();

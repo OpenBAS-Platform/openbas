@@ -39,7 +39,7 @@ public class LessonsTemplateApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_TEMPLATE_URI)
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.LESSON_LEARNED)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.LESSON_LEARNED)
   @Transactional(rollbackOn = Exception.class)
   public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateInput input) {
     LessonsTemplate lessonsTemplate = new LessonsTemplate();
