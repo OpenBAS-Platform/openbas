@@ -2,10 +2,14 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.converter.StixRefToExternalRefConverter;
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.List;
+
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -64,15 +68,15 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_threat_context_ref")
   private String threatContextRef;
 
-  @Type(StringArrayType.class)
-  @Column(name = "security_assessment_attack_pattern_refs", columnDefinition = "text[]")
+  @Convert(converter = StixRefToExternalRefConverter.class)
+  @Column(name = "security_assessment_attack_pattern_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_attack_pattern_refs")
-  private String[] attackPatternRefs;
+  private List<StixRefToExternalRef> attackPatternRefs;
 
-  @Type(StringArrayType.class)
-  @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "text[]")
+  @Convert(converter = StixRefToExternalRefConverter.class)
+  @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_vulnerabilities_refs")
-  private String[] vulnerabilitiesRefs;
+  private List<StixRefToExternalRef> vulnerabilitiesRefs;
 
   @OneToOne
   @JoinColumn(name = "security_assessment_scenario")

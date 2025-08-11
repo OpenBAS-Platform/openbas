@@ -173,7 +173,20 @@ public class InjectExpectationResultUtils {
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
-      @NotNull List<ResultDistribution> distribution) {}
+      @NotNull List<ResultDistribution> distribution) {
+    public double getAverageScore() {
+      if(distribution.isEmpty()) {
+        return 0;
+      }
+
+      double score = 0;
+      for (ResultDistribution distribution : distribution) {
+        score += distribution.value();
+      }
+
+      return score / distribution.size();
+    }
+  }
 
   public record ResultDistribution(
       @NotNull String id, @NotNull String label, @NotNull Integer value) {}

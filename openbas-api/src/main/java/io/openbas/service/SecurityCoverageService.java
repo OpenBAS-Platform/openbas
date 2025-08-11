@@ -21,7 +21,6 @@ public class SecurityCoverageService {
         continue;
       }
 
-
     }
     return new Bundle(
             new Identifier("bundle--" + UUID.randomUUID()),

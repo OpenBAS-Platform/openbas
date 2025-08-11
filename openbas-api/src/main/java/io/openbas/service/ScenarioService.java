@@ -893,7 +893,7 @@ public class ScenarioService {
     }
 
     // Extract attack-patterns and their MITRE IDs
-    Map<String, String> stixIdToMitreId = extractAttackPatterns(objects);
+    List<StixRefToExternalRef> stixIdToMitreId = extractAttackPatterns(objects);
     List<String> createdScenarios = new ArrayList<>();
 
     for (JsonNode obj : objects) { // Maybe we could have varoius security assestemnt
@@ -926,7 +926,7 @@ public class ScenarioService {
       JsonNode obj,
       Scenario scenario,
       SecurityAssessment securityAssessment,
-      Map<String, String> stixIdToMitreId) {
+      List<StixRefToExternalRef> stixIdToMitreId) {
     if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
 
     securityAssessment.setExternalId(obj.path("id").asText());
@@ -948,8 +948,7 @@ public class ScenarioService {
     securityAssessment.setThreatContextRef(threatContextRef);
 
     // Attack pattern refs -> convert to MITRE IDs
-    securityAssessment.setAttackPatternRefs(
-        resolveMitreIds(obj.path("attack_pattern_refs"), stixIdToMitreId));
+    securityAssessment.setAttackPatternRefs(stixIdToMitreId);
 
     // Add vulnerabilities
     // TODO Add labels as upsert tags
@@ -968,27 +967,12 @@ public class ScenarioService {
     return new Scenario();
   }
 
-  private String[] resolveMitreIds(JsonNode attackRefs, Map<String, String> stixToMitre) {
-    if (attackRefs != null && attackRefs.isArray()) {
-      List<String> mitreIds = new ArrayList<>();
-      for (JsonNode ref : attackRefs) {
-        String mitreId = stixToMitre.get(ref.asText());
-        if (mitreId != null) {
-          mitreIds.add(mitreId);
-        }
-      }
-      return mitreIds.toArray(new String[0]);
-    }
-    return new String[0];
-  }
-
   private void createdInjectsForScenario(SecurityAssessment securityAssessment, Scenario scenario) {
     InjectAssistantInput input = new InjectAssistantInput();
     List<String> attackPatternIds =
         attackPatternService
             .getAttackPatternsByExternalIdsThrowIfMissing(
-                Arrays.stream(securityAssessment.getAttackPatternRefs())
-                    .collect(Collectors.toSet()))
+                securityAssessment.getAttackPatternRefs().stream().map(StixRefToExternalRef::getExternalRef).collect(Collectors.toSet()))
             .stream()
             .map(AttackPattern::getId)
             .toList();
@@ -996,14 +980,15 @@ public class ScenarioService {
     injectAssistantService.generateInjectsForScenario(scenario, input);
   }
 
-  private Map<String, String> extractAttackPatterns(ArrayNode objects) {
-    Map<String, String> stixToMitre = new HashMap<>();
+  private List<StixRefToExternalRef> extractAttackPatterns(ArrayNode objects) {
+    List<StixRefToExternalRef> stixToMitre = new ArrayList<>();
     for (JsonNode obj : objects) {
       if ("attack-pattern".equals(obj.path("type").asText())) {
         String stixId = obj.path("id").asText();
         String mitreId = obj.path("x_mitre_id").asText(null);
         if (mitreId != null) {
-          stixToMitre.put(stixId, mitreId);
+          StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
+          stixToMitre.add(stixRef);
         }
       }
     }
