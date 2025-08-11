@@ -22,6 +22,7 @@ public class InjectorContractContentUtilsTest {
   public void shouldAddExpectationsWhenPredefinedExpectationsExistent() {
     ArrayNode predefinedExpectations = mapper.createArrayNode();
     predefinedExpectations.add(createExpectation("Prevention"));
+    predefinedExpectations.add(createExpectation("Detection"));
 
     ObjectNode content = createContentWithField("expectations", "n", predefinedExpectations);
 
@@ -31,7 +32,7 @@ public class InjectorContractContentUtilsTest {
     assertNotNull(result);
     assertTrue(result.has("expectations"));
     assertEquals("Prevention", result.get("expectations").get(0).get("expectation_name").asText());
-    assertEquals(1, result.get("expectations").size());
+    assertEquals(predefinedExpectations.size(), result.get("expectations").size());
   }
 
   @Test
