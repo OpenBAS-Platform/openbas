@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserOnboardingStepStatus {
 
-  @Column(name = "step", nullable = false)
+  @Column(name = "user_onboarding_status_step", nullable = false)
   private String step;
 
-  @Column(name = "completed", nullable = false)
+  @Column(name = "user_onboarding_status_completed", nullable = false)
   private boolean completed;
 
-  @Column(name = "skipped", nullable = false)
+  @Column(name = "user_onboarding_status_skipped", nullable = false)
   private boolean skipped;
 }

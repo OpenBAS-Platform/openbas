@@ -23,11 +23,11 @@ public class V4_16__User_Onboarding_Enable extends BaseJavaMigration {
                 onboarding_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                 onboarding_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
               );
-              CREATE TABLE user_onboarding_steps (
-                onboarding_id UUID NOT NULL REFERENCES user_onboarding_progresses(onboarding_id) ON DELETE CASCADE,
-                step TEXT NOT NULL,
-                completed BOOLEAN NOT NULL DEFAULT FALSE,
-                skipped BOOLEAN NOT NULL DEFAULT FALSE
+              CREATE TABLE user_onboarding_status (
+                user_onboarding_status_onboarding_id UUID NOT NULL REFERENCES user_onboarding_progresses(onboarding_id) ON DELETE CASCADE,
+                user_onboarding_status_step TEXT NOT NULL,
+                user_onboarding_status_completed BOOLEAN NOT NULL DEFAULT FALSE,
+                user_onboarding_status_skipped BOOLEAN NOT NULL DEFAULT FALSE
               );
               """);
     }

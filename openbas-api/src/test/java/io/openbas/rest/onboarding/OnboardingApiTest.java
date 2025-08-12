@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.api.onboarding.dto.StepsInput;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.User;
 import io.openbas.service.UserService;
@@ -104,12 +105,14 @@ class OnboardingApiTest extends IntegrationTest {
     this.userOnboardingProgressComposer
         .forUserOnboardingProgress(createDefaultUserOnboardingProgress(user))
         .persist();
+    StepsInput input = new StepsInput();
+    input.setSteps(List.of(ENDPOINT_SETUP));
 
     // -- EXECUTE --
     String response =
         mvc.perform(
                 put(ONBOARDING_URI + "/skipped")
-                    .content(asJsonString(List.of(ENDPOINT_SETUP)))
+                    .content(asJsonString(input))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -148,10 +151,7 @@ class OnboardingApiTest extends IntegrationTest {
                 .content(asJsonString(endpointInput))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+        .andExpect(status().is2xxSuccessful());
 
     String response =
         mvc.perform(get(ONBOARDING_URI))

@@ -47,7 +47,7 @@ public class OnboardingService {
     }
   }
 
-  public UserOnboardingProgress skippedSkipped(@NotNull final List<String> steps) {
+  public UserOnboardingProgress skipSteps(@NotNull final List<String> steps) {
     User user = userService.currentUser();
     UserOnboardingProgress progress = getOrDefault(user);
 

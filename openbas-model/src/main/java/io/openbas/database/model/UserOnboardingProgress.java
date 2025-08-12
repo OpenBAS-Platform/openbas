@@ -34,8 +34,8 @@ public class UserOnboardingProgress implements Base {
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
-      name = "user_onboarding_steps",
-      joinColumns = @JoinColumn(name = "onboarding_id"))
+      name = "user_onboarding_status",
+      joinColumns = @JoinColumn(name = "user_onboarding_status_onboarding_id"))
   @NotNull
   private List<UserOnboardingStepStatus> progress = new ArrayList<>();
 
