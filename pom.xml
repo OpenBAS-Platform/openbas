@@ -108,7 +108,6 @@
                             <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                    <parameters>true</parameters>
                 </configuration>
             </plugin>
             <plugin>
@@ -134,7 +133,6 @@
     </build>
 
     <modules>
-        <module>openbas-api-annotation-processors</module>
         <module>openbas-model</module>
         <module>openbas-framework</module>
         <module>openbas-api</module>
