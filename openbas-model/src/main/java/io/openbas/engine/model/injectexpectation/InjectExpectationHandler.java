@@ -82,7 +82,7 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               }
               if (hasText(injectExpectation.getTeam_id())) {
                 dependencies.add(injectExpectation.getTeam_id());
-                esInjectExpectation.setBase_team_side(injectExpectation.getTeam_id());
+                esInjectExpectation.setBase_teams_side(injectExpectation.getTeam_id());
               }
               if (hasText(injectExpectation.getAgent_id())) {
                 dependencies.add(injectExpectation.getAgent_id());
@@ -90,11 +90,12 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               }
               if (hasText(injectExpectation.getAsset_id())) {
                 dependencies.add(injectExpectation.getAsset_id());
-                esInjectExpectation.setBase_asset_side(injectExpectation.getAsset_id());
+                esInjectExpectation.setBase_assets_side(injectExpectation.getAsset_id());
               }
               if (hasText(injectExpectation.getAsset_group_id())) {
                 dependencies.add(injectExpectation.getAsset_group_id());
-                esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
+                esInjectExpectation.setBase_asset_groups_side(
+                    injectExpectation.getAsset_group_id());
               }
               if (!isEmpty(injectExpectation.getAttack_pattern_ids())) {
                 dependencies.addAll(injectExpectation.getAttack_pattern_ids());

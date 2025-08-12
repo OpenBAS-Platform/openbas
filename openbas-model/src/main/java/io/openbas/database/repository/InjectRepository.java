@@ -48,7 +48,7 @@ public interface InjectRepository
               + "array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as inject_asset_groups, "
               + "array_agg(ite.team_id) FILTER ( WHERE ite.team_id IS NOT NULL ) || "
               + "array_agg(et.team_id) FILTER ( WHERE et.team_id IS NOT NULL ) || "
-              + "array_agg(st.team_id) FILTER ( WHERE st.team_id IS NOT NULL ) as inject_teams "
+              + "array_agg(st.team_id) FILTER ( WHERE st.team_id IS NOT NULL ) as inject_teams " // The deduplication is not done here but in the Set<String> of RawInjectIndexing
               + "FROM injects f "
               + "LEFT JOIN injects_statuses ins ON ins.status_inject = f.inject_id "
               + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "

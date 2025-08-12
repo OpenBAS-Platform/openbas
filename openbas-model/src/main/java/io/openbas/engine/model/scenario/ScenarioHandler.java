@@ -33,7 +33,14 @@ public class ScenarioHandler implements Handler<EsScenario> {
               // Base
               esScenario.setBase_id(scenario.getScenario_id());
               esScenario.setBase_created_at(scenario.getScenario_created_at());
-              esScenario.setBase_updated_at(scenario.getScenario_updated_at());
+
+              if (scenario.getInject_updated_at() != null
+                  && scenario.getInject_updated_at().isAfter(scenario.getScenario_updated_at())) {
+                esScenario.setBase_updated_at(scenario.getInject_updated_at());
+              } else {
+                esScenario.setBase_updated_at(scenario.getScenario_updated_at());
+              }
+
               esScenario.setBase_representative(scenario.getScenario_name());
               esScenario.setBase_restrictions(buildRestrictions(scenario.getScenario_id()));
               // Specific
@@ -45,15 +52,15 @@ public class ScenarioHandler implements Handler<EsScenario> {
               }
               if (!isEmpty(scenario.getScenario_assets())) {
                 dependencies.addAll(scenario.getScenario_assets());
-                esScenario.setBase_endpoint_side(scenario.getScenario_assets());
+                esScenario.setBase_assets_side(scenario.getScenario_assets());
               }
               if (!isEmpty(scenario.getScenario_asset_groups())) {
                 dependencies.addAll(scenario.getScenario_asset_groups());
-                esScenario.setBase_asset_group_side(scenario.getScenario_asset_groups());
+                esScenario.setBase_asset_groups_side(scenario.getScenario_asset_groups());
               }
               if (!isEmpty(scenario.getScenario_teams())) {
                 dependencies.addAll(scenario.getScenario_teams());
-                esScenario.setBase_team_side(scenario.getScenario_teams());
+                esScenario.setBase_teams_side(scenario.getScenario_teams());
               }
               esScenario.setBase_dependencies(dependencies);
               return esScenario;

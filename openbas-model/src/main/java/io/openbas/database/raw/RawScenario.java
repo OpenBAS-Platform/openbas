@@ -13,6 +13,8 @@ public interface RawScenario {
 
   Instant getScenario_updated_at();
 
+  Instant getInject_updated_at();
+
   public String getScenario_subtitle();
 
   public Set<String> getScenario_tags();

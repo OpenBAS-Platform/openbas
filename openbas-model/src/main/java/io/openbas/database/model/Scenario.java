@@ -168,6 +168,12 @@ public class Scenario implements Base {
   @Getter(NONE)
   private Set<Inject> injects = new HashSet<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setInjects(Set<Inject> injects) {
+    this.updatedAt = now();
+    this.injects = injects;
+  }
+
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(

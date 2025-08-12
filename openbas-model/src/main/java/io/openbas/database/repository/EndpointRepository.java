@@ -68,7 +68,7 @@ public interface EndpointRepository
               + "FROM assets e "
               + "INNER JOIN injects_assets ia ON e.asset_id = ia.asset_id",
       nativeQuery = true)
-  List<Endpoint> findAllEndpointsForInjectsSimulationsAndScenarios();
+  List<Endpoint> findAllEndpointsForAtomicTestingsSimulationsAndScenarios();
 
   @Query(
       value =

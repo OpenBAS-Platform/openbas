@@ -45,11 +45,11 @@ export const fetchEndpoint = (endpointId: string) => (dispatch: Dispatch) => {
   return getReferential(endpoint, uri)(dispatch);
 };
 
-export const searchEndpointAsOption = (searchText: string = '', simulationOrScenarioId: string = '', isForAllInjects = false) => {
+export const searchEndpointAsOption = (searchText: string = '', simulationOrScenarioId: string = '', inputFilterOption: string = '') => {
   const params = {
     searchText,
     simulationOrScenarioId,
-    isForAllInjects,
+    inputFilterOption,
   };
   return simpleCall(`${ENDPOINT_URI}/options`, { params });
 };

@@ -36,6 +36,7 @@ import io.openbas.schema.PropertySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,10 +76,11 @@ public class ElasticService implements EngineService {
     if (propertyField == null) {
       throw new RuntimeException("Unknown field: " + field);
     }
-    // Add subtype in PropertySchema if we want to manage attributes other than Set<String>
-    // Because at the moment, we have only Set<String> for all filters attributes
     if (propertyField.getType().isAssignableFrom(String.class)
-        || propertyField.getType().isAssignableFrom(Set.class)) {
+        || (propertyField.getType().isAssignableFrom(Set.class)
+            && propertyField.getSubtype() instanceof ParameterizedType
+            && String.class.equals(
+                ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));

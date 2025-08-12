@@ -146,11 +146,11 @@ public interface TeamRepository
       value =
           "SELECT DISTINCT t.team_id, t.team_name, t.team_description, t.team_created_at, t.team_updated_at, t.team_organization, t.team_contextual "
               + "FROM teams t "
-              + "LEFT JOIN injects_teams it ON t.team_id = it.team_id "
-              + "LEFT JOIN exercises_teams et ON t.team_id = et.team_id "
-              + "LEFT JOIN scenarios_teams st ON t.team_id = st.team_id",
+              + "WHERE EXISTS (SELECT 1 FROM injects_teams it WHERE it.team_id = t.team_id) "
+              + "OR EXISTS (SELECT 1 FROM exercises_teams et WHERE et.team_id = t.team_id) "
+              + "OR EXISTS (SELECT 1 FROM scenarios_teams st WHERE st.team_id = t.team_id);",
       nativeQuery = true)
-  List<Team> findAllTeamsForInjectsSimulationsAndScenarios();
+  List<Team> findAllTeamsForAtomicTestingsSimulationsAndScenarios();
 
   @Query(
       value =

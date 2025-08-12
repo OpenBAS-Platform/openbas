@@ -21,6 +21,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.AlreadyExistingException;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
@@ -30,6 +31,7 @@ import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InputFilterOptions;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -239,17 +241,27 @@ public class TeamApi extends RestBehavior {
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId,
-      @RequestParam(required = false) final boolean isForAllInjects) {
-    return isForAllInjects
-        ? teamRepository.findAllTeamsForInjectsSimulationsAndScenarios().stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList()
-        : teamRepository
-            .findAllBySimulationOrScenarioIdAndName(
-                StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-            .stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList();
+      @RequestParam(required = false) final String inputFilterOption) {
+    try {
+      InputFilterOptions injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
+      return switch (injectFilterOptionEnum) {
+        case ALL_INJECTS ->
+            teamRepository.findAllTeamsForAtomicTestingsSimulationsAndScenarios().stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
+        case SIMULATION_OR_SCENARIO_ID ->
+            teamRepository
+                .findAllBySimulationOrScenarioIdAndName(
+                    StringUtils.trimToNull(simulationOrScenarioId),
+                    StringUtils.trimToNull(searchText))
+                .stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
+      };
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(
+          String.format("Invalid input filter option %s", inputFilterOption));
+    }
   }
 
   @PostMapping(TEAM_URI + "/options")

@@ -353,7 +353,7 @@ public interface ExerciseRepository
 
   @Query(
       value =
-          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, "
+          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, inj.inject_updated_at, "
               + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
               + "array_agg(ete.team_id) FILTER ( WHERE ete.team_id IS NOT NULL ) as exercise_teams, "
               + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as exercise_assets, "
@@ -365,7 +365,8 @@ public interface ExerciseRepository
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
               + "WHERE ex.exercise_updated_at > :from "
-              + "GROUP BY ex.exercise_id ORDER BY ex.exercise_updated_at ASC LIMIT "
+              + "OR inj.inject_updated_at > :from  "
+              + "GROUP BY ex.exercise_id, ex.exercise_updated_at, inj.inject_updated_at ORDER BY GREATEST(ex.exercise_updated_at, inj.inject_updated_at) ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)

@@ -13,10 +13,12 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.*;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.HttpReqRespUtils;
+import io.openbas.utils.InputFilterOptions;
 import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -161,17 +163,27 @@ public class EndpointApi extends RestBehavior {
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId,
-      @RequestParam(required = false) final boolean isForAllInjects) {
-    return isForAllInjects
-        ? endpointRepository.findAllEndpointsForInjectsSimulationsAndScenarios().stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList()
-        : endpointRepository
-            .findAllBySimulationOrScenarioIdAndName(
-                StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-            .stream()
-            .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-            .toList();
+      @RequestParam(required = false) final String inputFilterOption) {
+    try {
+      InputFilterOptions injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
+      return switch (injectFilterOptionEnum) {
+        case ALL_INJECTS ->
+            endpointRepository.findAllEndpointsForAtomicTestingsSimulationsAndScenarios().stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
+        case SIMULATION_OR_SCENARIO_ID ->
+            endpointRepository
+                .findAllBySimulationOrScenarioIdAndName(
+                    StringUtils.trimToNull(simulationOrScenarioId),
+                    StringUtils.trimToNull(searchText))
+                .stream()
+                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                .toList();
+      };
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(
+          String.format("Invalid input filter option %s", inputFilterOption));
+    }
   }
 
   @LogExecutionTime

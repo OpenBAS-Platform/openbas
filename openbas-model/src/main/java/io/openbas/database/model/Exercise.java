@@ -203,6 +203,12 @@ public class Exercise implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   private List<Inject> injects = new ArrayList<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setInjects(List<Inject> injects) {
+    this.updatedAt = now();
+    this.injects = injects;
+  }
+
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(

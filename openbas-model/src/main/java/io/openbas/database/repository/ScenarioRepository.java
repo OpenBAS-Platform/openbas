@@ -23,7 +23,7 @@ public interface ScenarioRepository
 
   @Query(
       value =
-          "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at, "
+          "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at, inj.inject_updated_at, "
               + "array_agg(st.tag_id) FILTER ( WHERE st.tag_id IS NOT NULL ) as scenario_tags, "
               + "array_agg(ste.team_id) FILTER ( WHERE ste.team_id IS NOT NULL ) as scenario_teams, "
               + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as scenario_assets, "
@@ -35,7 +35,8 @@ public interface ScenarioRepository
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
               + "WHERE s.scenario_updated_at > :from "
-              + "GROUP BY s.scenario_id ORDER BY s.scenario_updated_at ASC LIMIT "
+              + "OR inj.inject_updated_at > :from  "
+              + "GROUP BY s.scenario_id, s.scenario_updated_at, inj.inject_updated_at ORDER BY GREATEST(s.scenario_updated_at, inj.inject_updated_at) ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)

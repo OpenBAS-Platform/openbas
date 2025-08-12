@@ -162,7 +162,7 @@ public interface AssetGroupRepository
               + "FROM asset_groups ag "
               + "INNER JOIN injects_asset_groups iag ON ag.asset_group_id = iag.asset_group_id",
       nativeQuery = true)
-  List<AssetGroup> findAllAssetGroupsForInjectsSimulationsAndScenarios();
+  List<AssetGroup> findAllAssetGroupsForAtomicTestingsSimulationsAndScenarios();
 
   @Query(
       value =

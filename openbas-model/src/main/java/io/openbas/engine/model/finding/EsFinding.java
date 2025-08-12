@@ -40,7 +40,7 @@ public class EsFinding extends EsBase {
   @EsQueryable(keyword = true)
   private String base_scenario_side; // Must finish by _side
 
-  @Queryable(label = "endpoint", filterable = true, dynamicValues = true)
+  @Queryable(label = "asset", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
-  private String base_endpoint_side; // Must finish by _side
+  private String base_assets_side; // Must finish by _side
 }

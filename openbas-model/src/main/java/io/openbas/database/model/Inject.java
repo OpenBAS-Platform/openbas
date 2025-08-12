@@ -117,12 +117,6 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_all_teams")
   private boolean allTeams;
 
-  // UpdatedAt now used to sync with linked object
-  public void setAllTeams(boolean allTeams) {
-    this.updatedAt = now();
-    this.allTeams = allTeams;
-  }
-
   @Getter
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "inject_exercise")
@@ -147,6 +141,12 @@ public class Inject implements Base, Injection {
       cascade = CascadeType.ALL)
   @JsonProperty("inject_depends_on")
   private List<InjectDependency> dependsOn = new ArrayList<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setDependsOn(List<InjectDependency> dependsOn) {
+    this.updatedAt = now();
+    this.dependsOn = dependsOn;
+  }
 
   @Getter
   @Column(name = "inject_depends_duration")
@@ -175,6 +175,12 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_status")
   @Queryable(filterable = true, sortable = true)
   private InjectStatus status;
+
+  // UpdatedAt now used to sync with linked object
+  public void setStatus(InjectStatus status) {
+    this.updatedAt = now();
+    this.status = status;
+  }
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter

@@ -31,6 +31,8 @@ public interface RawInjectIndexing {
 
   Set<String> getInject_asset_groups();
 
+  // Set used here to avoid duplication because a concatenation of 3 tables is done in the request
+  // InjectRepository.findForIndexing()
   Set<String> getInject_teams();
 
   String getInject_status_name();
