@@ -21,6 +21,11 @@ export const SUBJECTS = {
   LESSONS_LEARNED: 'LESSONS_LEARNED',
   SECURITY_PLATFORMS: 'SECURITY_PLATFORMS',
   PLATFORM_SETTINGS: 'PLATFORM_SETTINGS',
+  RESOURCE: 'RESOURCE',
 } as const;
 
+type ResourceSubject = { scenario_id: string };
+
 export type Subjects = typeof SUBJECTS[keyof typeof SUBJECTS];
+
+export type SubjectsType = Subjects | ResourceSubject;

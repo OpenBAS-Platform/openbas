@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { type UserHelper } from '../../../../actions/helper';
@@ -11,6 +11,8 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import ScenarioUpdate from './ScenarioUpdate';
 
@@ -34,6 +36,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const permissions = useScenarioPermissions(scenario.scenario_id);
+  const ability = useContext(AbilityContext);
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
@@ -78,13 +81,19 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     link.click();
   };
 
+  // console.log('MANAGE', scenario.scenario_id, ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id));
+  // console.log('ACCESS', scenario.scenario_id, ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenario.scenario_id));
+
   // Button Popover
   const entries = [];
-  if (actions.includes('Update')) entries.push({
-    label: 'Update',
-    action: () => handleOpenEdit(),
-    disabled: !permissions.canWrite,
-  });
+  if (actions.includes('Update')) {
+    entries.push({
+      label: 'Update',
+      action: () => handleOpenEdit(),
+      disabled: !permissions.canWrite,
+    //  userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id),
+    });
+  }
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),

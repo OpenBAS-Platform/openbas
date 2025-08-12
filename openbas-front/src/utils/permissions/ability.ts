@@ -5,12 +5,12 @@ import {
 } from '@casl/ability';
 
 import parseCapability, { parseGrant } from './parserRbac';
-import { type Actions, type Subjects } from './types';
+import { type Actions, type SubjectsType } from './types';
 
-export type AppAbility = MongoAbility<[Actions, Subjects]>;
+export type AppAbility = MongoAbility<[Actions, SubjectsType]>;
 
 // TODO : Delete isAdmin when we remove this logic
-export function defineAbilityFromCapabilities(capabilities: string[], grants: Record<string, string>, isAdmin: boolean): (AppAbility) {
+export function defineAbility(capabilities: string[], grants: Record<string, string>, isAdmin: boolean): (AppAbility) {
   const { can, rules } = new AbilityBuilder<AppAbility>(createMongoAbility);
   if (isAdmin) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,10 +37,12 @@ export function defineAbilityFromCapabilities(capabilities: string[], grants: Re
   for (const grant of Object.entries(grants)) {
     const parsedGrant = parseGrant(grant);
     if (parsedGrant) {
-      const [action, subject, conditions] = parsedGrant;
-      can(action, subject, conditions);
+      const [action, subject, id] = parsedGrant;
+      can(action, subject, id);
     }
   }
+
+  console.log(JSON.stringify(rules));
 
   return createMongoAbility(rules);
 }

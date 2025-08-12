@@ -21,7 +21,7 @@ const ROLE_TO_ACTION: Record<string, Actions> = {
   OBSERVER: ACTIONS.ACCESS,
 };
 
-type ParsedGrant = [Actions, Subjects, { id: string }];
+type ParsedGrant = [Actions, Subjects, string ];
 
 export function parseGrant([id, role]: [string, string]): ParsedGrant | null {
   const action = ROLE_TO_ACTION[role];
@@ -29,5 +29,5 @@ export function parseGrant([id, role]: [string, string]): ParsedGrant | null {
     return null;
   }
   // Use resource as a generic subject for grants
-  return [action, 'RESOURCE' as Subjects, { id }];
+  return [action, SUBJECTS.RESOURCE, id];
 }

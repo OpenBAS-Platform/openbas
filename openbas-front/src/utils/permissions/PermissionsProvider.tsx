@@ -2,7 +2,7 @@ import { createContextualCan } from '@casl/react';
 import type React from 'react';
 import { createContext, useMemo } from 'react';
 
-import { type AppAbility, defineAbilityFromCapabilities } from './ability';
+import { type AppAbility, defineAbility } from './ability';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AbilityContext = createContext<AppAbility>({} as AppAbility);
@@ -17,7 +17,7 @@ type PermissionsProviderProps = {
 
 // TODO : Delete isAdmin when we remove this logic
 export const PermissionsProvider = ({ capabilities, grants, isAdmin, children }: PermissionsProviderProps) => {
-  const ability = useMemo(() => defineAbilityFromCapabilities(capabilities, grants, isAdmin), [capabilities, isAdmin]);
+  const ability = useMemo(() => defineAbility(capabilities, grants, isAdmin), [capabilities, isAdmin]);
   return (
     <AbilityContext.Provider value={ability}>
       {children}
