@@ -2,12 +2,12 @@ package io.openbas.rest.onboarding;
 
 import static io.openbas.rest.user.MeApi.ME_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.User;
 import io.openbas.database.model.UserOnboardingStatus;
@@ -66,10 +66,11 @@ class MeApiOnboardingTest extends IntegrationTest {
 
     // -- ASSERT --
     assertNotNull(response);
-    String widgetEnable = JsonPath.read(response, "$.user_onboarding_widget_enable");
-    assertEquals("DISABLED", widgetEnable);
-    String contextualHelpEnable =
-        JsonPath.read(response, "$.user_onboarding_contextual_help_enable");
-    assertEquals("DISABLED", contextualHelpEnable);
+
+    assertThatJson(response).inPath("$.user_onboarding_widget_enable").isEqualTo("DISABLED");
+
+    assertThatJson(response)
+        .inPath("$.user_onboarding_contextual_help_enable")
+        .isEqualTo("DISABLED");
   }
 }

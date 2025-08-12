@@ -1,6 +1,7 @@
 import type { Dispatch } from 'redux';
 
 import { getReferential, putReferential, simpleCall } from '../../utils/Action';
+import { type StepsInput } from '../../utils/api-types';
 import { useronboardingprogress } from './onboarding-schema';
 
 const ONBOARDING_URI = '/api/onboarding';
@@ -14,5 +15,6 @@ export const getOnboardingConfig = () => {
 };
 
 export const skippedCategory = (steps: string[]) => (dispatch: Dispatch) => {
-  return putReferential(useronboardingprogress, ONBOARDING_URI + '/skipped', steps)(dispatch);
+  const input: StepsInput = { steps: steps };
+  return putReferential(useronboardingprogress, ONBOARDING_URI + '/skipped', input)(dispatch);
 };
