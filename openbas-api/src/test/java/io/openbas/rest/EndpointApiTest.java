@@ -1,6 +1,7 @@
 package io.openbas.rest;
 
 import static io.openbas.rest.asset.endpoint.EndpointApi.ENDPOINT_URI;
+import static io.openbas.utils.InputFilterOptions.SIMULATION_OR_SCENARIO;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.AgentFixture.createAgent;
 import static io.openbas.utils.fixtures.EndpointFixture.*;
@@ -340,6 +341,7 @@ class EndpointApiTest extends IntegrationTest {
                     .queryParam("searchText", searchText)
                     .queryParam(
                         "simulationOrScenarioId", simulationOrScenarioId ? exercise.getId() : null)
+                    .queryParam("inputFilterOption", SIMULATION_OR_SCENARIO.name())
                     .accept(MediaType.APPLICATION_JSON))
             .andReturn()
             .getResponse()

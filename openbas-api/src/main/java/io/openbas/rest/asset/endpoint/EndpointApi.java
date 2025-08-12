@@ -171,7 +171,7 @@ public class EndpointApi extends RestBehavior {
             endpointRepository.findAllEndpointsForAtomicTestingsSimulationsAndScenarios().stream()
                 .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
                 .toList();
-        case SIMULATION_OR_SCENARIO_ID ->
+        case SIMULATION_OR_SCENARIO ->
             endpointRepository
                 .findAllBySimulationOrScenarioIdAndName(
                     StringUtils.trimToNull(simulationOrScenarioId),

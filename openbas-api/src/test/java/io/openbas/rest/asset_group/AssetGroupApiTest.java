@@ -1,6 +1,7 @@
 package io.openbas.rest.asset_group;
 
 import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
+import static io.openbas.utils.InputFilterOptions.SIMULATION_OR_SCENARIO;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.AssetGroupFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
@@ -354,6 +355,7 @@ class AssetGroupApiTest extends IntegrationTest {
                     .queryParam("searchText", searchText)
                     .queryParam(
                         "simulationOrScenarioId", simulationOrScenarioId ? exercise.getId() : null)
+                    .queryParam("inputFilterOption", SIMULATION_OR_SCENARIO.name())
                     .accept(MediaType.APPLICATION_JSON))
             .andReturn()
             .getResponse()

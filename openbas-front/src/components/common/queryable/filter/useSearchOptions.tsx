@@ -92,7 +92,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
-        searchAssetGroupAsOption(search, contextId, 'SIMULATION_OR_SCENARIO_ID').then((response) => {
+        searchAssetGroupAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -107,7 +107,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_assets':
-        searchEndpointAsOption(search, contextId, 'SIMULATION_OR_SCENARIO_ID').then((response) => {
+        searchEndpointAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -117,7 +117,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_teams':
-        searchTeamsAsOption(search, contextId, 'SIMULATION_OR_SCENARIO_ID').then((response) => {
+        searchTeamsAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
           setOptions(response.data);
         });
         break;
