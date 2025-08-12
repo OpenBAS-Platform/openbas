@@ -16,6 +16,7 @@ import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.*;
+import io.openbas.stix.parsing.ParsingException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Nullable;
@@ -99,7 +100,7 @@ public class ScenarioInjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(SCENARIO_URI + "/generate-scenario-from-stix-bundle")
   public List<String> generateScenarioFromSTIXBundle(
-      @RequestPart("file") @Nullable MultipartFile file) throws IOException {
+      @RequestPart("file") @Nullable MultipartFile file) throws IOException, ParsingException {
     return scenarioService.generateScenarioFromSTIXBundle(file);
   }
 

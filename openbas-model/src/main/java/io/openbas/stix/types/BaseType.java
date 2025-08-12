@@ -1,8 +1,7 @@
 package io.openbas.stix.types;
 
-import java.util.Objects;
-
 import io.openbas.stix.parsing.StixSerialisable;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter

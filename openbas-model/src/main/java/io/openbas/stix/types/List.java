@@ -2,7 +2,6 @@ package io.openbas.stix.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class List<T extends BaseType<?>> extends BaseType<java.util.List<T>> {
   public List(java.util.List<T> value) {

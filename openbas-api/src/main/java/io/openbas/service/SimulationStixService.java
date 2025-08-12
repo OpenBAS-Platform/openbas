@@ -39,7 +39,8 @@ public class SimulationStixService {
       properties.put("created", new Timestamp(exercise.getCreatedAt()));
       properties.put("modified", new Timestamp(Instant.now()));
       properties.put(
-          "security_assessment_ref", new Identifier(exercise.getSecurityAssessment().getExternalId()));
+          "security_assessment_ref",
+          new Identifier(exercise.getSecurityAssessment().getExternalId()));
       properties.put("coverage_context_ref", new Identifier(stixRef.getStixRef()));
 
       properties.put("coverage", getAttackPatternCoverage(stixRef.getExternalRef(), exercise));

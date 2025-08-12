@@ -2,7 +2,6 @@ package io.openbas.stix.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.Instant;
 
 public class Timestamp extends BaseType<Instant> {

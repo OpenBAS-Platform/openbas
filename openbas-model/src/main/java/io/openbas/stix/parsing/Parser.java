@@ -10,11 +10,10 @@ import io.openbas.stix.types.Integer;
 import io.openbas.stix.types.enums.HashingAlgorithms;
 import io.openbas.stix.types.inner.ExternalReference;
 import io.openbas.stix.types.inner.KillChainPhase;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class Parser {
@@ -74,7 +73,7 @@ public class Parser {
             externalReference.setHashes(
                 (Hashes) parseProperty("hashes", propertyNode.get("hashes")));
           }
-          if(propertyNode.has("url")) {
+          if (propertyNode.has("url")) {
             externalReference.setUrl(propertyNode.get("url").asText());
           }
           return new Complex<>(externalReference);
@@ -82,7 +81,7 @@ public class Parser {
           KillChainPhase killChainPhase = new KillChainPhase();
           killChainPhase.setKillChainName(propertyNode.get("kill_chain_name").asText());
           killChainPhase.setPhaseName(propertyNode.get("phase_name").asText());
-          if(propertyNode.has("x_opencti_order")) {
+          if (propertyNode.has("x_opencti_order")) {
             killChainPhase.setXOpenCtiOrder(propertyNode.get("x_opencti_order").asInt());
           }
           return new Complex<>(killChainPhase);

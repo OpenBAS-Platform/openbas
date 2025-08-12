@@ -12,12 +12,16 @@ import lombok.Setter;
 public class ExternalReference {
   @JsonProperty("source_name")
   private String sourceName;
+
   @JsonProperty("description")
   private String description;
+
   @JsonProperty("hashes")
   private Hashes hashes;
+
   @JsonProperty("url")
   private String url;
+
   @JsonProperty("external_id")
   private String externalId;
 }

@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -44,6 +45,10 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.rest.team.output.TeamOutput;
+import io.openbas.stix.objects.Bundle;
+import io.openbas.stix.objects.ObjectBase;
+import io.openbas.stix.parsing.Parser;
+import io.openbas.stix.parsing.ParsingException;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.mapper.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -127,6 +132,8 @@ public class ScenarioService {
   private final LessonsCategoryRepository lessonsCategoryRepository;
   private final SecurityAssessmentRepository securityAssessmentRepository;
   private final TagRepository tagRepository;
+  private final Parser stixParser;
+  private final ObjectMapper objectMapper;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -880,25 +887,22 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public List<String> generateScenarioFromSTIXBundle(MultipartFile file) throws IOException {
+  public List<String> generateScenarioFromSTIXBundle(MultipartFile file)
+      throws IOException, ParsingException {
     if (file == null || file.isEmpty()) {
       return emptyList();
     }
 
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode root = mapper.readTree(file.getInputStream());
-    ArrayNode objects = (ArrayNode) root.get("objects");
-    if (objects == null) {
-      throw new IllegalArgumentException("No objects in STIX bundle");
-    }
+    JsonNode root = objectMapper.readTree(file.getInputStream());
+    Bundle bundle = stixParser.parseBundle(root.toString());
 
     // Extract attack-patterns and their MITRE IDs
-    List<StixRefToExternalRef> stixIdToMitreId = extractAttackPatterns(objects);
+    List<StixRefToExternalRef> stixIdToMitreId = extractAttackPatterns(bundle.getObjects());
     List<String> createdScenarios = new ArrayList<>();
 
-    for (JsonNode obj : objects) { // Maybe we could have varoius security assestemnt
-      if ("x-security-assessment".equals(obj.path("type").asText())) {
-        String id = obj.path("id").asText();
+    for (ObjectBase obj : bundle.getObjects()) { // Maybe we could have varoius security assestemnt
+      if ("x-security-assessment".equals(obj.getProperties().get("type").getValue())) {
+        String id = (String) obj.getProperties().get("id").getValue();
         SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
         Scenario scenario = getOrCreateScenario(securityAssessment);
 
@@ -923,28 +927,33 @@ public class ScenarioService {
   }
 
   private void updateSecurityAssessmentFromJson(
-      JsonNode obj,
+      ObjectBase obj,
       Scenario scenario,
       SecurityAssessment securityAssessment,
-      List<StixRefToExternalRef> stixIdToMitreId) {
+      List<StixRefToExternalRef> stixIdToMitreId)
+      throws ParsingException, JsonProcessingException {
     if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
 
-    securityAssessment.setExternalId(obj.path("id").asText());
-    securityAssessment.setName(obj.path("name").asText());
-    securityAssessment.setDescription(obj.path("description").asText());
+    securityAssessment.setExternalId((String) obj.getProperties().get("id").getValue());
+    securityAssessment.setName((String) obj.getProperties().get("name").getValue());
+    securityAssessment.setDescription((String) obj.getProperties().get("description").getValue());
     securityAssessment.setSecurityCoverageSubmissionUrl(
-        obj.path("security_coverage_submission_url").asText());
+        (String) obj.getProperties().get("security_coverage_submission_url").getValue());
 
-    securityAssessment.setScheduling(obj.path("scheduling").asText());
+    securityAssessment.setScheduling((String) obj.getProperties().get("scheduling").getValue());
 
-    if (obj.hasNonNull("period_start")) {
-      securityAssessment.setPeriodStart(Instant.parse(obj.path("period_start").asText()));
+    if (obj.getProperties().containsKey("period_start")
+        && obj.getProperties().get("period_start") != null) {
+      securityAssessment.setPeriodStart(
+          Instant.parse((String) obj.getProperties().get("period_start").getValue()));
     }
-    if (obj.hasNonNull("period_end")) {
-      securityAssessment.setPeriodEnd(Instant.parse(obj.path("period_end").asText()));
+    if (obj.getProperties().containsKey("period_end")
+        && obj.getProperties().get("period_end") != null) {
+      securityAssessment.setPeriodEnd(
+          Instant.parse((String) obj.getProperties().get("period_end").getValue()));
     }
 
-    String threatContextRef = obj.path("threat_context_ref").asText(null);
+    String threatContextRef = (String) obj.getProperties().get("threat_context_ref").getValue();
     securityAssessment.setThreatContextRef(threatContextRef);
 
     // Attack pattern refs -> convert to MITRE IDs
@@ -982,12 +991,12 @@ public class ScenarioService {
     injectAssistantService.generateInjectsForScenario(scenario, input);
   }
 
-  private List<StixRefToExternalRef> extractAttackPatterns(ArrayNode objects) {
+  private List<StixRefToExternalRef> extractAttackPatterns(List<ObjectBase> objects) {
     List<StixRefToExternalRef> stixToMitre = new ArrayList<>();
-    for (JsonNode obj : objects) {
-      if ("attack-pattern".equals(obj.path("type").asText())) {
-        String stixId = obj.path("id").asText();
-        String mitreId = obj.path("x_mitre_id").asText(null);
+    for (ObjectBase obj : objects) {
+      if ("attack-pattern".equals(obj.getProperties().get("type").getValue())) {
+        String stixId = (String) obj.getProperties().get("id").getValue();
+        String mitreId = (String) obj.getProperties().get("x_mitre_id").getValue();
         if (mitreId != null) {
           StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
           stixToMitre.add(stixRef);

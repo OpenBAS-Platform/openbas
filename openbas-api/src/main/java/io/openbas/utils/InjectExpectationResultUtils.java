@@ -184,7 +184,12 @@ public class InjectExpectationResultUtils {
         numberExpectations += distribution.value();
       }
 
-      double numberSuccess = distribution.stream().filter(d -> Objects.equals(d.id, ExpectationType.SUCCESS_ID)).findFirst().get().value();
+      double numberSuccess =
+          distribution.stream()
+              .filter(d -> Objects.equals(d.id, ExpectationType.SUCCESS_ID))
+              .findFirst()
+              .get()
+              .value();
 
       return numberSuccess / numberExpectations;
     }

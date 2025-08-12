@@ -3,7 +3,6 @@ package io.openbas.stix.parsing;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.stix.objects.Bundle;
@@ -14,7 +13,6 @@ import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
 import net.javacrumbs.jsonunit.core.Option;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -30,13 +28,14 @@ public class ParserTest extends IntegrationTest {
   public void testParse() throws Exception {
     try (FileInputStream fis =
         // new FileInputStream("src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
-        new FileInputStream(
-            "src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
+        new FileInputStream("src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
       String contents = IOUtils.toString(fis, StandardCharsets.UTF_8);
       Parser parser = new Parser();
       Bundle b = parser.parseBundle(contents);
 
-      assertThatJson(b.toStix(mapper).toString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(contents);
+      assertThatJson(b.toStix(mapper).toString())
+          .when(Option.IGNORING_ARRAY_ORDER)
+          .isEqualTo(contents);
     }
   }
 
@@ -44,7 +43,9 @@ public class ParserTest extends IntegrationTest {
   public void testListtoStix() throws Exception {
     List<StixString> list = new List<>(java.util.List.of(new StixString("Heyooo")));
 
-    assertThatJson(list.toStix(mapper).toPrettyString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo("[\"Heyooo\"]");
+    assertThatJson(list.toStix(mapper).toPrettyString())
+        .when(Option.IGNORING_ARRAY_ORDER)
+        .isEqualTo("[\"Heyooo\"]");
   }
 
   @Test
@@ -54,16 +55,20 @@ public class ParserTest extends IntegrationTest {
     externalReference.setExternalId("abcde");
     List<?> list = new List<>(java.util.List.of(new Complex<>(externalReference)));
 
-    assertThatJson(list.toStix(mapper).toPrettyString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo("[{\"source_name\":\"Heyooo\", \"external_id\":\"abcde\"}]");
+    assertThatJson(list.toStix(mapper).toPrettyString())
+        .when(Option.IGNORING_ARRAY_ORDER)
+        .isEqualTo("[{\"source_name\":\"Heyooo\", \"external_id\":\"abcde\"}]");
   }
 
   @Test
   public void testDictToStix() throws Exception {
     Map<String, BaseType<?>> map = new HashMap<>();
-    map.put("test key",  new StixString("test value"));
+    map.put("test key", new StixString("test value"));
     io.openbas.stix.types.Dictionary dict = new Dictionary(map);
 
-    assertThatJson(dict.toStix(mapper).toPrettyString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo("{\"test key\":\"test value\"}");
+    assertThatJson(dict.toStix(mapper).toPrettyString())
+        .when(Option.IGNORING_ARRAY_ORDER)
+        .isEqualTo("{\"test key\":\"test value\"}");
   }
 
   @Test

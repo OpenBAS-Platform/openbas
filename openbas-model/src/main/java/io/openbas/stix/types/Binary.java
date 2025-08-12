@@ -2,7 +2,6 @@ package io.openbas.stix.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.json.Json;
 
 public class Binary extends BaseType<java.lang.String> {
 

@@ -32,7 +32,8 @@ public class Bundle implements StixSerialisable {
     ObjectNode node = mapper.createObjectNode();
     node.set("id", getId().toStix(mapper));
     node.set("type", mapper.valueToTree(getType()));
-    node.set("objects", mapper.valueToTree(getObjects().stream().map(ob -> ob.toStix(mapper)).toList()));
+    node.set(
+        "objects", mapper.valueToTree(getObjects().stream().map(ob -> ob.toStix(mapper)).toList()));
     return node;
   }
 }
