@@ -51,9 +51,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
   });
   const entities = series.map(v => getBaseEntities(v.filter)).flat();
 
-  const { setError, clearErrors, formState } = useFormContext();
-
-  console.log(formState.errors);
+  const { setError, clearErrors } = useFormContext();
 
   useEffect(() => {
     if (widgetTimeRange === 'CUSTOM' && !startDate) {
@@ -241,7 +239,6 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
         && (
           <Controller
             control={control}
-            // name="widget_config.field"
             name={mode === 'temporal' ? 'widget_config.date_attribute' : 'widget_config.field'}
             render={({ field, fieldState }) => {
               return (
@@ -255,7 +252,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
                   renderInput={params => (
                     <TextField
                       {...params}
-                      label={mode === 'temporal' ? t('Date attribute') : t('Field')}
+                      label={mode === 'temporal' ? t('Date attribute') : t('Breakdown by')}
                       variant="standard"
                       fullWidth
                       sx={{ mt: 2 }}
@@ -334,6 +331,7 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
       <Controller
         control={control}
         name="widget_config.time_range"
+        defaultValue="DEFAULT"
         render={({ field, fieldState }) => (
           <TextField
             {...field}

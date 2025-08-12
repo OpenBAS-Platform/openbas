@@ -5,6 +5,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
@@ -26,6 +27,7 @@ import io.openbas.engine.query.EsSeriesData;
 import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
 import jakarta.annotation.Resource;
+import io.openbas.utils.CustomDashboardQueryUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -472,8 +474,18 @@ public class OpenSearchService implements EngineService {
    * {@inheritDoc}
    */
   public long count(RawUserAuth user, CountRuntime runtime) {
+    FlatConfiguration widgetConfig = runtime.getConfig();
+    Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Query dateRangeQuery = RangeQuery.of(
+        d -> d.field(widgetConfig.getDateAttribute()).gt(JsonData.of(finalStart)).lt(JsonData.of(finalEnd))
+    ).toQuery();
     try {
-      Query query =
+      Query countQuery =
           buildQuery(
               user,
               null,
@@ -484,8 +496,15 @@ public class OpenSearchService implements EngineService {
                   .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
+      Query query = null;
+      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+        query = queryBuilder.must(countQuery).build().toQuery();
+      } else {
+        query = queryBuilder.must(dateRangeQuery, countQuery).build().toQuery();
+      }
+      Query finalQuery = query;
       return openSearchClient
-          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(finalQuery))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -502,7 +521,20 @@ public class OpenSearchService implements EngineService {
       StructuralHistogramSeries config,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    Query query = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Query dateRangeQuery = RangeQuery.of(
+        d -> d.field(widgetConfig.getDateAttribute()).gt(JsonData.of(finalStart)).lt(JsonData.of(finalEnd))
+    ).toQuery();
+    Query filterQuery = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
+    Query query = null;
+    if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+      query = queryBuilder.must(filterQuery).build().toQuery();
+    } else {
+      query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
+    }
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
@@ -652,41 +684,69 @@ public class OpenSearchService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
-    Instant startInstant = Instant.parse(start);
-    String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
-    Instant endInstant = Instant.parse(end);
+    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
         RangeQuery.of(
-                d -> d.field(widgetConfig.getDateAttribute()).gt(JsonData.of(start)).lt(JsonData.of(end)))
+                d -> d.field(widgetConfig.getDateAttribute()).gt(JsonData.of(finalStart)).lt(JsonData.of(finalEnd)))
             .toQuery();
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
-    Query query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
+
+    Query query = null;
+    if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+      query = queryBuilder.must(filterQuery).build().toQuery();
+    } else {
+      query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
+    }
+
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
+    bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
+    bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
     ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
     try {
       String aggregationKey = "date_histogram";
-      SearchResponse<Void> response =
-          openSearchClient.search(
-              b ->
-                  b.index(engineConfig.getIndexPrefix() + "*")
-                      .size(0)
-                      .query(query)
-                      .aggregations(
-                          aggregationKey,
-                          a ->
-                              a.dateHistogram(
-                                  h ->
-                                      h.field(widgetConfig.getDateAttribute())
-                                          .minDocCount(0)
-                                          .format(widgetConfig.getInterval().format)
-                                          .calendarInterval(widgetConfig.getInterval().openType)
-                                          .extendedBounds(extendedBounds)
-                                          .keyed(false))),
-              Void.class);
+      Query finalQuery = query;
+      SearchResponse<Void> response = null;
+      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+        response =
+            openSearchClient.search(
+                b ->
+                    b.index(engineConfig.getIndexPrefix() + "*")
+                        .size(0)
+                        .query(finalQuery)
+                        .aggregations(
+                            aggregationKey,
+                            a ->
+                                a.dateHistogram(
+                                    h ->
+                                        h.field(widgetConfig.getDateAttribute())
+                                            .minDocCount(0)
+                                            .format(widgetConfig.getInterval().format)
+                                            .calendarInterval(widgetConfig.getInterval().openType)
+                                            .keyed(false))),
+                Void.class);
+      } else {
+        response =
+            openSearchClient.search(
+                b ->
+                    b.index(engineConfig.getIndexPrefix() + "*")
+                        .size(0)
+                        .query(finalQuery)
+                        .aggregations(
+                            aggregationKey,
+                            a ->
+                                a.dateHistogram(
+                                    h ->
+                                        h.field(widgetConfig.getDateAttribute())
+                                            .minDocCount(0)
+                                            .format(widgetConfig.getInterval().format)
+                                            .calendarInterval(widgetConfig.getInterval().openType)
+                                            .extendedBounds(extendedBounds)
+                                            .keyed(false))),
+                Void.class);
+      }
+      assert response != null;
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
       List<EsSeriesData> data =

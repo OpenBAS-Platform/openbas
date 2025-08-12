@@ -251,6 +251,7 @@ const ListWidgetParameters = (props: Props) => {
       <Controller
         control={props.control}
         name="widget_config.time_range"
+        defaultValue="DEFAULT"
         render={({ field, fieldState }) => (
           <TextField
             {...field}

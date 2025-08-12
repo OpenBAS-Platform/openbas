@@ -53,6 +53,9 @@ const SimulationAnalysis = () => {
                 hidden: false,
               };
             }
+            if ('timeRange' === p.custom_dashboards_parameter_type) {
+              params[p.custom_dashboards_parameter_id] = 'ALL_TIME';
+            }
           });
           setCustomDashboardParameters(params);
 

@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
 
@@ -9,19 +9,15 @@ interface Props {
   handleTimeRange: (data: string) => void;
   handleStartDate: (data: string) => void;
   handleEndDate: (data: string) => void;
-  defaultTimeRange: string | undefined;
-  defaultStartDate: string | undefined;
-  defaultEndDate: string | undefined;
+  timeRangeValue: string | undefined;
+  startDateValue: string | undefined;
+  endDateValue: string | undefined;
 }
 
-const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleStartDate, handleEndDate, defaultTimeRange, defaultStartDate, defaultEndDate }) => {
+const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleStartDate, handleEndDate, timeRangeValue, startDateValue, endDateValue }) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
-
-  const [timeRangeValue, setTimeRangeValue] = useState<string | undefined>(defaultTimeRange);
-  const [startDateValue, setStartDateValue] = useState<string | undefined>(defaultStartDate);
-  const [endDateValue, setEndDateValue] = useState<string | undefined>(defaultEndDate);
 
   const timeRangeItems = [
     {
@@ -77,7 +73,6 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
           variant="outlined"
           value={timeRangeValue}
           onChange={(event: SelectChangeEvent) => {
-            setTimeRangeValue(event.target.value);
             handleTimeRange(event.target.value);
           }}
         >
@@ -96,7 +91,6 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
               value={startDateValue ? new Date(startDateValue) : null}
               maxDate={new Date(new Date(endDateValue ?? '').setUTCHours(24, 0, 0, 0))}
               onChange={(startDate) => {
-                setStartDateValue(startDate?.toISOString());
                 handleStartDate(new Date(new Date(startDate!).setUTCHours(24, 0, 0, 0)).toISOString());
               }}
               slotProps={{
@@ -112,7 +106,6 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
               value={endDateValue ? new Date(endDateValue) : null}
               minDate={new Date(new Date(startDateValue ?? '').setUTCHours(24, 0, 0, 0))}
               onChange={(endDate) => {
-                setEndDateValue(endDate?.toISOString());
                 handleEndDate(new Date(new Date(endDate!).setUTCHours(24, 0, 0, 0)).toISOString());
               }}
               slotProps={{
