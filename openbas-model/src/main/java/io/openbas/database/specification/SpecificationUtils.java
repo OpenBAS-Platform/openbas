@@ -17,6 +17,9 @@ public class SpecificationUtils {
    *
    * @param searchTerm the search term
    * @param properties the properties to check
+   * @param grantsFilterName the name of the entity field to fetch the grant for
+   * @param userId ID of the user performing the search
+   * @param isAdmin true id the user performing the search has admin privileges
    */
   public static <T extends Base> Specification<T> fullTextSearch(
       @NotBlank final String searchTerm,
@@ -38,7 +41,7 @@ public class SpecificationUtils {
 
       Predicate searchPredicate = cb.or(listOfPredicates.toArray(new Predicate[0]));
 
-      // If filterUngranted is false, return just the search predicate
+      // If the user is an admin or there is no grant system associated
       if (isAdmin || StringUtils.isBlank(grantsFilterName)) {
         return searchPredicate;
       }
