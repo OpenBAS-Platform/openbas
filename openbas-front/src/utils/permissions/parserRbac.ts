@@ -16,7 +16,7 @@ export default function parseCapability(cap: string): [Actions, Subjects] | null
 }
 
 const ROLE_TO_ACTION: Record<string, Actions> = {
-  LAUNCHER: ACTIONS.ACCESS,
+  LAUNCHER: ACTIONS.LAUNCH,
   PLANNER: ACTIONS.MANAGE,
   OBSERVER: ACTIONS.ACCESS,
 };
