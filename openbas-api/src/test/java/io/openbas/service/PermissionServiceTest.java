@@ -139,6 +139,7 @@ public class PermissionServiceTest extends IntegrationTest {
   public void test_hasPermission_duplicate_WHEN_has_create_capa() {
     User user = getUser(USER_ID, false);
     user.setGroups(List.of(getGroup(Capability.CREATE_ASSESSMENT)));
+    when(grantService.hasReadGrant(RESOURCE_ID, user)).thenReturn(true);
     assertTrue(
         permissionService.hasPermission(
             user, RESOURCE_ID, ResourceType.SCENARIO, Action.DUPLICATE));
