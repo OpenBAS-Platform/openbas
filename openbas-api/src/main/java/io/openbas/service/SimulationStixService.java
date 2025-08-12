@@ -35,10 +35,11 @@ public class SimulationStixService {
       // standard properties
       properties.put(
           "id", new Identifier("security-coverage--" + exercise.getPersistentSecurityCoverageId()));
+      properties.put("type", new StixString("security-coverage"));
       properties.put("created", new Timestamp(exercise.getCreatedAt()));
       properties.put("modified", new Timestamp(Instant.now()));
       properties.put(
-          "security_assessment_ref", new Identifier(exercise.getSecurityAssessment().getId()));
+          "security_assessment_ref", new Identifier(exercise.getSecurityAssessment().getExternalId()));
       properties.put("coverage_context_ref", new Identifier(stixRef.getStixRef()));
 
       properties.put("coverage", getAttackPatternCoverage(stixRef.getExternalRef(), exercise));
@@ -84,7 +85,7 @@ public class SimulationStixService {
     Map<String, BaseType<?>> coverageValues = new HashMap<>();
     for (InjectExpectationResultUtils.ExpectationResultsByType result : coverageResults) {
       coverageValues.put(
-          result.type().name(), new StixString(String.valueOf(result.getAverageScore())));
+          result.type().name(), new StixString(String.valueOf(result.getSuccessRate())));
     }
 
     return new io.openbas.stix.types.Dictionary(coverageValues);

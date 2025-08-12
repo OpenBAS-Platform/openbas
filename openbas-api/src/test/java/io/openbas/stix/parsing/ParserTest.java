@@ -36,7 +36,7 @@ public class ParserTest extends IntegrationTest {
       Parser parser = new Parser();
       Bundle b = parser.parseBundle(contents);
 
-      assertThatJson(b.toStix(mapper).toPrettyString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(contents);
+      assertThatJson(b.toStix(mapper).toString()).when(Option.IGNORING_ARRAY_ORDER).isEqualTo(contents);
     }
   }
 

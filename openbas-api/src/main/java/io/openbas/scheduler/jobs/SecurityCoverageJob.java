@@ -1,5 +1,7 @@
 package io.openbas.scheduler.jobs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.service.SecurityCoverageSendJobService;
 import io.openbas.service.SecurityCoverageService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class SecurityCoverageJob implements Job {
   private final SecurityCoverageSendJobService securityCoverageSendJobService;
   private final SecurityCoverageService securityCoverageService;
+  private final ObjectMapper mapper;
 
   @Override
   @Transactional // ensure a transaction context to help lock rows
@@ -24,5 +27,6 @@ public class SecurityCoverageJob implements Job {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
     Bundle bundle = securityCoverageService.createBundleFromSendJobs(jobs);
+    JsonNode n = bundle.toStix(mapper);
   }
 }

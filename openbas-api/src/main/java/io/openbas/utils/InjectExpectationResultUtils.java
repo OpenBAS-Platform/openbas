@@ -174,17 +174,19 @@ public class InjectExpectationResultUtils {
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
       @NotNull List<ResultDistribution> distribution) {
-    public double getAverageScore() {
+    public double getSuccessRate() {
       if (distribution.isEmpty()) {
         return 0;
       }
 
-      double score = 0;
+      double numberExpectations = 0;
       for (ResultDistribution distribution : distribution) {
-        score += distribution.value();
+        numberExpectations += distribution.value();
       }
 
-      return score / distribution.size();
+      double numberSuccess = distribution.stream().filter(d -> Objects.equals(d.id, ExpectationType.SUCCESS_ID)).findFirst().get().value();
+
+      return numberSuccess / numberExpectations;
     }
   }
 
