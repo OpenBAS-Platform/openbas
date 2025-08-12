@@ -5,6 +5,7 @@ import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static io.openbas.helper.UserHelper.getUsersByType;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
+import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +24,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -97,7 +97,7 @@ public class Exercise implements Base {
 
   @Column(name = "exercise_launch_order", insertable = false, updatable = false)
   @JsonIgnore
-  @Setter(AccessLevel.NONE)
+  @Setter(NONE)
   private Long launchOrder;
 
   @Column(name = "exercise_end_date")
@@ -161,9 +161,16 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("exercise_scenario")
-  @Schema(type = "string")
   @Queryable(filterable = true, dynamicValues = true)
+  @Schema(type = "string")
+  @Setter(NONE)
   private Scenario scenario;
+
+  public void setScenario(Scenario scenario) {
+    scenario.setUpdatedAt(now());
+    this.scenario = scenario;
+    this.setUpdatedAt(now());
+  }
 
   // -- AUDIT --
 

@@ -42,6 +42,13 @@ const SimulationAnalysis = () => {
             if ('simulation' === p.custom_dashboards_parameter_type) {
               params[p.custom_dashboards_parameter_id] = exerciseId;
             }
+            if ('scenario' === p.custom_dashboards_parameter_type) {
+              if (exercise.exercise_scenario) {
+                params[p.custom_dashboards_parameter_id] = exercise.exercise_scenario;
+              } else {
+                params[p.custom_dashboards_parameter_id] = '';
+              }
+            }
           });
           setCustomDashboardParameters(params);
 

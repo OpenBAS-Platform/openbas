@@ -18,6 +18,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class CustomDashboardParameters implements Base {
 
   public enum CustomDashboardParameterType {
+    scenario("scenario", true),
     simulation("simulation", true);
 
     public final String name;
