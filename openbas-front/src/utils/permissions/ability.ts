@@ -12,11 +12,11 @@ export type AppAbility = MongoAbility<[Actions, Subjects]>;
 // TODO : Delete isAdmin when we remove this logic
 export function defineAbilityFromCapabilities(capabilities: string[], grants: Record<string, string>, isAdmin: boolean): (AppAbility) {
   const { can, rules } = new AbilityBuilder<AppAbility>(createMongoAbility);
-  // if (isAdmin) {
-  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //   // @ts-expect-error
-  //   can('manage', 'all');
-  // }
+  if (isAdmin) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    can('manage', 'all');
+  }
   for (const cap of capabilities) {
     if (cap === 'BYPASS') {
       // We ignore ts here to accept lowercase which are CASL default keys
