@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -250,7 +251,16 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_exercises")
+  @Setter(NONE)
   private List<Exercise> exercises;
+
+  public void setExercises(List<Exercise> exercises) {
+    for (Exercise exercise : exercises) {
+      exercise.setUpdatedAt(now());
+    }
+    this.exercises = exercises;
+    this.setUpdatedAt(now());
+  }
 
   @Getter
   @Column(name = "scenario_lessons_anonymized")

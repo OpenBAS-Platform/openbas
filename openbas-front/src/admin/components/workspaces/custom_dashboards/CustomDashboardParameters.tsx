@@ -1,9 +1,12 @@
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext } from 'react';
 
+import ScenarioField from '../../../../components/fields/ScenarioField';
 import SimulationField from '../../../../components/fields/SimulationField';
 import { CustomDashboardContext } from './CustomDashboardContext';
 
 const CustomDashboardParameters: FunctionComponent = () => {
+  const theme = useTheme();
   const { customDashboard, customDashboardParameters, setCustomDashboardParameters } = useContext(CustomDashboardContext);
 
   const getParameterValue = (parameterId: string) => {
@@ -19,11 +22,26 @@ const CustomDashboardParameters: FunctionComponent = () => {
   };
 
   return (
-    <>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 300px))',
+      gap: theme.spacing(2),
+    }}
+    >
       {(customDashboard?.custom_dashboard_parameters ?? []).map((p) => {
-        if (p.custom_dashboards_parameter_type === 'simulation') {
+        if (p.custom_dashboards_parameter_type === 'scenario') {
           return (
-            <div key={p.custom_dashboards_parameter_id} style={{ width: 350 }}>
+            <div key={p.custom_dashboards_parameter_id}>
+              <ScenarioField
+                label={p.custom_dashboards_parameter_name}
+                value={getParameterValue(p.custom_dashboards_parameter_id)}
+                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
+              />
+            </div>
+          );
+        } else if (p.custom_dashboards_parameter_type === 'simulation') {
+          return (
+            <div key={p.custom_dashboards_parameter_id}>
               <SimulationField
                 label={p.custom_dashboards_parameter_name}
                 value={getParameterValue(p.custom_dashboards_parameter_id)}
@@ -35,7 +53,7 @@ const CustomDashboardParameters: FunctionComponent = () => {
           return (<></>);
         }
       })}
-    </>
+    </div>
   );
 };
 

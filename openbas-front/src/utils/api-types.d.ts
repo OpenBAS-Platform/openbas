@@ -1042,14 +1042,14 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
 }
 
 /** Payload to create a CVE */

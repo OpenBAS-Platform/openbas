@@ -6,6 +6,7 @@ import { type FunctionComponent, useMemo } from 'react';
 import { FormProvider, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import SelectFieldController, { createItems, type Item } from '../../../../components/fields/SelectFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboardInput, type CustomDashboardParametersInput } from '../../../../utils/api-types';
@@ -35,7 +36,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
   const parametersSchema = z.object({
     custom_dashboards_parameter_id: z.string().optional(),
     custom_dashboards_parameter_name: z.string().min(1, { message: t('Should not be empty') }),
-    custom_dashboards_parameter_type: z.literal('simulation'),
+    custom_dashboards_parameter_type: z.enum(['scenario', 'simulation']),
   });
 
   const validationSchema = useMemo(
@@ -64,11 +65,11 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
     name: 'custom_dashboard_parameters',
   });
 
-  const items: CustomDashboardParametersInput['custom_dashboards_parameter_type'][] = ['simulation'];
+  const items: Item<CustomDashboardParametersInput['custom_dashboards_parameter_type']>[] = createItems(['scenario', 'simulation']);
   const handleAddParameter = (type: CustomDashboardParametersInput['custom_dashboards_parameter_type']) => {
     if (type) {
       append({
-        custom_dashboards_parameter_name: type,
+        custom_dashboards_parameter_name: '',
         custom_dashboards_parameter_type: type,
       });
     }
@@ -108,7 +109,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
           <IconButton
             color="secondary"
             aria-label="Add"
-            onClick={() => handleAddParameter(items[0])} // For now, we handle just one type
+            onClick={() => handleAddParameter(items[0].value)}
             size="small"
           >
             <Add fontSize="small" />
@@ -130,13 +131,11 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
               required
               noHelperText
             />
-            <TextFieldController
+            <SelectFieldController
               name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
               label={t('Parameter Type')}
-              variant="standard"
+              items={items}
               required
-              disabled
-              noHelperText
             />
             <Tooltip title={t('Delete')}>
               <IconButton color="error" onClick={() => remove(index)}>
