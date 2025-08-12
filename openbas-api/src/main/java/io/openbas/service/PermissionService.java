@@ -14,7 +14,13 @@ public class PermissionService {
 
   // TODO: today settings are necessary to login -> review that
   private static final EnumSet<ResourceType> RESOURCES_OPEN =
-      EnumSet.of(ResourceType.PLAYER, ResourceType.TEAM, ResourceType.PLATFORM_SETTING);
+      EnumSet.of(ResourceType.PLAYER,
+              ResourceType.TEAM,
+              ResourceType.PLATFORM_SETTING,
+              ResourceType.CVE,
+              ResourceType.TAG,
+              ResourceType.ATTACK_PATTERN,
+              ResourceType.KILL_CHAIN_PHASE);
 
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(
@@ -35,6 +41,12 @@ public class PermissionService {
     // if for some reason we are not able to identify the resource we only allow admin
     if (ResourceType.UNKNOWN.equals(resourceType)) {
       return user.isAdmin();
+    }
+
+    //for inject the permssion will be based on the parent's (scenario/simulation/test) permission
+    if(ResourceType.INJECT.equals(resourceType)) {
+
+
     }
 
     // Scenario and simulation are  only accessible by GRANT
