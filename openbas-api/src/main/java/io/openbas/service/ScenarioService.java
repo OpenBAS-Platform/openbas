@@ -1023,6 +1023,7 @@ public class ScenarioService {
     String cron = getCronExpression(securityAssessment.getScheduling(), start);
     scenario.setRecurrence(cron);
 
+    injectService.deleteAll(scenario.getInjects());
     return scenarioRepository.save(scenario);
   }
 
