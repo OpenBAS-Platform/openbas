@@ -43,7 +43,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
     }
     if (!(payloadType == 'Command' || payloadType == 'Executable')) {
       setValue('payload_execution_arch', 'ALL_ARCHITECTURES'); // Automatically set arch to 'all'
-    } else if (!disabledPayloadType && payloadType === 'Executable') {
+    } else if (!disabledPayloadType && payloadType === 'Executable' && getValues('payload_execution_arch') === 'ALL_ARCHITECTURES') {
       setValue('payload_execution_arch', '');
     }
   }, [payloadType]);

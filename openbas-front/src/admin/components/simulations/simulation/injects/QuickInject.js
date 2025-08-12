@@ -239,6 +239,15 @@ class QuickInject extends Component {
     };
   }
 
+  contractVariables() {
+    const defaultVars = [];
+    try {
+      return JSON.parse(this.props.injectorContract.injector_contract_content)?.variables ?? defaultVars;
+    } catch (_e) {
+      return defaultVars;
+    }
+  }
+
   componentDidMount() {
     const { exerciseId } = this.props;
     this.props.fetchDocuments();
@@ -1424,7 +1433,7 @@ class QuickInject extends Component {
           variables={this.props.exerciseVariables}
           open={openVariables}
           handleClose={this.handleCloseVariables.bind(this)}
-          injectorContract={injectorContract}
+          variablesFromInjectorContract={this.contractVariables()}
         />
       </div>
     );
