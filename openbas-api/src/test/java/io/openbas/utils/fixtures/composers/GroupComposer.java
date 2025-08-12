@@ -31,6 +31,7 @@ public class GroupComposer extends ComposerBase<Group> {
 
     public GroupComposer.Composer withGrant(GrantComposer.Composer grantComposer) {
       this.grantComposers.add(grantComposer);
+      grantComposer.get().setGroup(group);
       this.group.getGrants().add(grantComposer.get());
       return this;
     }
@@ -39,11 +40,13 @@ public class GroupComposer extends ComposerBase<Group> {
     public GroupComposer.Composer persist() {
       roleComposers.forEach(RoleComposer.Composer::persist);
       groupRepository.save(this.group);
+      grantComposers.forEach(GrantComposer.Composer::persist);
       return this;
     }
 
     @Override
     public GroupComposer.Composer delete() {
+      grantComposers.forEach(GrantComposer.Composer::delete);
       groupRepository.delete(this.group);
       roleComposers.forEach(RoleComposer.Composer::delete);
       return this;
