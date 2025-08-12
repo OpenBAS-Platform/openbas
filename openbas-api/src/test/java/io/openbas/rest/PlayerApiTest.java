@@ -22,7 +22,6 @@ import io.openbas.utils.fixtures.OrganizationFixture;
 import io.openbas.utils.fixtures.PlayerFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.servlet.ServletException;
 import java.util.List;

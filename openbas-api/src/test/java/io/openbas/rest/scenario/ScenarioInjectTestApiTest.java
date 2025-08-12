@@ -25,7 +25,6 @@ import io.openbas.utils.fixtures.composers.ScenarioComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import org.junit.jupiter.api.*;

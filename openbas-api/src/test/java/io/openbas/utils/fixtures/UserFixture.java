@@ -4,7 +4,6 @@ import io.openbas.database.model.Group;
 import io.openbas.database.model.User;
 import io.openbas.rest.user.form.login.LoginUserInput;
 import io.openbas.rest.user.form.login.ResetUserInput;
-
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;

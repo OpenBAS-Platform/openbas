@@ -3,7 +3,6 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Grant;
 import io.openbas.database.model.Group;
 import io.openbas.database.model.Role;
-
 import java.util.List;
 
 public class GroupFixture {

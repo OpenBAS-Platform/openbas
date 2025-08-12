@@ -1,6 +1,5 @@
 package io.openbas.utils.fixtures.composers;
 
-import io.openbas.database.model.Role;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;

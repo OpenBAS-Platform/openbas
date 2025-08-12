@@ -25,7 +25,6 @@ import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.rest.exercise.form.ExerciseUpdateStatusInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import java.time.Clock;

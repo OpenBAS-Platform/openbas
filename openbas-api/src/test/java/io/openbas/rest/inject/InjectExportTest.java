@@ -392,7 +392,8 @@ public class InjectExportTest extends IntegrationTest {
       @Test
       @DisplayName("When lacking OBSERVER grant on exercise, return NOT FOUND")
       @WithMockUserFullPermissions // FIXME: Temporary workaround for grant issue
-      @Disabled // FIXME: this test requires a 404 to be thrown, but the backend currently returns 401
+      @Disabled // FIXME: this test requires a 404 to be thrown, but the backend currently returns
+      // 401
       public void whenLackingOBSERVERGrantOnExerciseReturnNotFound() throws Exception {
         List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
 

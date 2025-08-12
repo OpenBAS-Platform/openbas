@@ -39,7 +39,6 @@ import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.fixtures.composers.CollectorComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 @TestInstance(PER_CLASS)
 class PayloadApiTest extends IntegrationTest {
