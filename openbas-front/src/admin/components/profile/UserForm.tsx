@@ -12,7 +12,7 @@ import TextFieldController from '../../../components/fields/TextFieldController'
 import { useFormatter } from '../../../components/i18n';
 import type { UpdateProfileInput, User } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
-import { langItems, onboardingItems, themeItems } from '../utils/OptionItems';
+import { langItems, themeItems } from '../utils/OptionItems';
 
 interface UserFormProps {
   onSubmit: (data: UpdateProfileInput) => void;
@@ -74,7 +74,6 @@ const UserForm: FunctionComponent<UserFormProps> = ({
         <CountryFieldController name="user_country" label={t('Country')} />
         <SelectFieldController name="user_theme" label={t('Theme')} items={themeItems(t)} />
         <SelectFieldController name="user_lang" label={t('Language')} items={langItems(t)} />
-        <SelectFieldController name="user_onboarding_enable" label={t('enable_onboarding')} items={onboardingItems(t)} />
         <div>
           <Button
             variant="contained"

@@ -37,7 +37,6 @@ const ParametersOnboardingForm: FunctionComponent<ParametersOnboardingFormForms>
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-
   const theme = useTheme();
   const methods = useForm<SettingsOnboardingUpdateInput>({
     mode: 'onTouched',
@@ -52,13 +51,12 @@ const ParametersOnboardingForm: FunctionComponent<ParametersOnboardingFormForms>
   const { handleSubmit, reset } = methods;
 
   const watchedValues = useWatch({ control: methods.control });
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      handleSubmit(onSubmit)();
-    }, 150); // save on flight with debounce
+  const deps = JSON.stringify(watchedValues);
 
-    return () => clearTimeout(timeout);
-  }, [watchedValues]);
+  useEffect(() => {
+    const t = setTimeout(() => handleSubmit(onSubmit)(), 300);
+    return () => clearTimeout(t);
+  }, [deps, methods, onSubmit]);
 
   const handleReset = async () => {
     dispatch(fetchDefaultPlatformParameters())

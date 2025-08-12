@@ -30,6 +30,8 @@ const OnboardingProgressSidebar: React.FC<Props> = ({ onCloseSidebar }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const [progress, setProgress] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const [onboardingConfig, setOnboardingConfig] = useState<OnboardingCategoryDTO[]>();
   const [_, setDisplayOnboardingWelcome] = useLocalStorage<boolean>(ONBOARDING_WELCOME_DIALOG_KEY, true);
 
@@ -42,6 +44,16 @@ const OnboardingProgressSidebar: React.FC<Props> = ({ onCloseSidebar }) => {
   useEffect(() => {
     getOnboardingConfig().then(result => setOnboardingConfig(result.data));
   }, []);
+
+  useEffect(() => {
+    if (!onboarding) {
+      setProgress(1);
+      setTotal((onboardingConfig?.flatMap(i => i.items).length ?? 0) + 1);
+    } else {
+      setProgress((onboarding.progress ?? []).filter(i => i.completed || i.skipped).length + 1);
+      setTotal((onboarding.progress ?? []).length + 1);
+    }
+  }, [onboarding, onboardingConfig]);
 
   const completed = (item: OnboardingItemDTO) => {
     if (!onboarding) return false;
@@ -79,7 +91,7 @@ const OnboardingProgressSidebar: React.FC<Props> = ({ onCloseSidebar }) => {
         >
           <div>
             <Typography variant="body2" fontWeight="bold">
-              {t('onboarding_almost_ready')}
+              { progress < total ? t('onboarding_almost_ready') : t('onboarding_ready')}
             </Typography>
             <Typography variant="caption">
               {t('onboarding_finish_setup')}

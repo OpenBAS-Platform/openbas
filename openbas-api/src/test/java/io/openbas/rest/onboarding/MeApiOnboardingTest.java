@@ -1,6 +1,5 @@
 package io.openbas.rest.onboarding;
 
-import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.rest.user.MeApi.ME_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,7 +48,7 @@ class MeApiOnboardingTest extends IntegrationTest {
     input.setOnboardingWidgetEnable(UserOnboardingStatus.DISABLED);
     input.setOnboardingContextualHelpEnable(UserOnboardingStatus.DISABLED);
 
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     assertTrue(UserOnboardingStatus.DEFAULT.equals(user.getOnboardingWidgetEnable()));
     assertTrue(UserOnboardingStatus.DEFAULT.equals(user.getOnboardingContextualHelpEnable()));
 

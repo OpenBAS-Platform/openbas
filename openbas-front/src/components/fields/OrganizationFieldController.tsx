@@ -1,6 +1,5 @@
 import { AddOutlined, DomainOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
-import * as R from 'ramda';
 import { type FunctionComponent, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -47,10 +46,11 @@ const OrganizationFieldController: FunctionComponent<Props> = ({ name, label }) 
 
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = async (data: OrganizationCreateInput) => {
-    const inputValues = R.pipe(
-      R.assoc('organization_tags', R.pluck('id', data.organization_tags)),
-    )(data);
+  const handleSubmit = async (data: Omit<OrganizationCreateInput, 'organization_tags'> & { organization_tags: Option[] }) => {
+    const inputValues = {
+      ...data,
+      organization_tags: (data.organization_tags ?? []).map(t => t.id),
+    };
 
     dispatch(addOrganization(inputValues)).then((result: {
       result: string;
