@@ -15,7 +15,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
-@Table(name = "user_onboarding_progress")
+@Table(name = "user_onboarding_progresses")
 @EntityListeners(ModelBaseListener.class)
 public class UserOnboardingProgress implements Base {
 

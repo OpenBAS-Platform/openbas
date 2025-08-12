@@ -124,13 +124,8 @@ public class MeApi extends RestBehavior {
   @Secured(ROLE_USER)
   @PutMapping(ME_URI + "/onboarding")
   public User updateOnboarding(@Valid @RequestBody UpdateOnboardingInput input) {
-    User user =
-        userRepository
-            .findById(currentUser().getId())
-            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
-    user.setOnboardingWidgetEnable(input.getOnboardingWidgetEnable());
-    user.setOnboardingContextualHelpEnable(input.getOnboardingContextualHelpEnable());
-    return userRepository.save(user);
+    return this.userService.updateOnboarding(
+        input.getOnboardingWidgetEnable(), input.getOnboardingContextualHelpEnable());
   }
 
   @Secured(ROLE_USER)

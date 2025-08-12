@@ -1,7 +1,6 @@
 package io.openbas.rest.onboarding;
 
 import static io.openbas.api.onboarding.OnboardingApi.ONBOARDING_URI;
-import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.rest.asset.endpoint.EndpointApi.ENDPOINT_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
@@ -101,7 +100,7 @@ class OnboardingApiTest extends IntegrationTest {
   @DisplayName("Given specific steps should skipped them")
   void given_specific_steps_should_skipped_them() throws Exception {
     // -- PREPARE --
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     this.userOnboardingProgressComposer
         .forUserOnboardingProgress(createDefaultUserOnboardingProgress(user))
         .persist();
@@ -135,7 +134,7 @@ class OnboardingApiTest extends IntegrationTest {
   @DisplayName("Given endpoint creation should complete step")
   void given_endpoint_creation_should_complete_step() throws Exception {
     // -- PREPARE --
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     this.userOnboardingProgressComposer
         .forUserOnboardingProgress(createDefaultUserOnboardingProgress(user))
         .persist();

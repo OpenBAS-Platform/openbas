@@ -6,9 +6,9 @@ import { makeStyles } from 'tss-react/mui';
 
 import { countryOptions } from '../../utils/Option';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   icon: {
-    paddingTop: 4,
+    paddingTop: theme.spacing(1),
     display: 'inline-block',
   },
   text: {

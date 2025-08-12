@@ -1,6 +1,5 @@
 package io.openbas.service.onboarding;
 
-import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.utils.UserOnboardingProgressUtils.initializeDefaults;
 import static java.time.Instant.now;
 
@@ -25,7 +24,7 @@ public class OnboardingService {
   // -- CRUD --
 
   public UserOnboardingProgress userOnboardingProgress() {
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     return getOrDefault(user);
   }
 
@@ -38,7 +37,7 @@ public class OnboardingService {
   // -- ACTION --
 
   public void completeStep(@NotBlank final String step) {
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     UserOnboardingProgress progress = getOrDefault(user);
 
     UserOnboardingStepStatus stepStatus = progress.getProgressMap().get(step);
@@ -49,7 +48,7 @@ public class OnboardingService {
   }
 
   public UserOnboardingProgress skippedSkipped(@NotNull final List<String> steps) {
-    User user = userService.user(currentUser().getId());
+    User user = userService.currentUser();
     UserOnboardingProgress progress = getOrDefault(user);
 
     List<UserOnboardingStepStatus> stepStatuses =
