@@ -8,16 +8,22 @@ import TimeRangeFilters from './TimeRangeFilters';
 const CustomDashboardParameters: FunctionComponent = () => {
   const { customDashboard, customDashboardParameters, setCustomDashboardParameters } = useContext(CustomDashboardContext);
 
-  const getParameterValue = (parameterId: string) => {
+  const getParameterValue = (parameterId: string | undefined) => {
     if (!customDashboard) return undefined;
-    return customDashboardParameters[parameterId];
+    if (parameterId) {
+      return customDashboardParameters[parameterId];
+    } else {
+      return undefined;
+    }
   };
-  const handleParameters = (parameterId: string, value: string) => {
+  const handleParameters = (parameterId: string | undefined, value: string) => {
     if (!customDashboard) return;
-    setCustomDashboardParameters(prev => ({
-      ...prev,
-      [parameterId]: value,
-    }));
+    if (parameterId) {
+      setCustomDashboardParameters(prev => ({
+        ...prev,
+        [parameterId]: value,
+      }));
+    }
   };
 
   const parameters: CustomDashboardParametersType[] = [];
@@ -49,15 +55,15 @@ const CustomDashboardParameters: FunctionComponent = () => {
       })}
 
       <TimeRangeFilters
-        defaultTimeRange={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id)}
+        timeRangeValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id)}
         handleTimeRange={(data) => {
           handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id, data);
         }}
-        defaultStartDate={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'startDate')?.custom_dashboards_parameter_id)}
+        startDateValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'startDate')?.custom_dashboards_parameter_id)}
         handleStartDate={(data) => {
           handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'startDate')?.custom_dashboards_parameter_id, data);
         }}
-        defaultEndDate={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id)}
+        endDateValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id)}
         handleEndDate={(data) => {
           handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id, data);
         }}
