@@ -10,10 +10,13 @@ import io.openbas.stix.types.Integer;
 import io.openbas.stix.types.enums.HashingAlgorithms;
 import io.openbas.stix.types.inner.ExternalReference;
 import io.openbas.stix.types.inner.KillChainPhase;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
+@Service
 public class Parser {
   public Bundle parseBundle(java.lang.String source)
       throws JsonProcessingException, ParsingException {
@@ -71,11 +74,17 @@ public class Parser {
             externalReference.setHashes(
                 (Hashes) parseProperty("hashes", propertyNode.get("hashes")));
           }
+          if(propertyNode.has("url")) {
+            externalReference.setUrl(propertyNode.get("url").asText());
+          }
           return new Complex<>(externalReference);
         } else if (propertyNode.has("kill_chain_name")) {
           KillChainPhase killChainPhase = new KillChainPhase();
           killChainPhase.setKillChainName(propertyNode.get("kill_chain_name").asText());
           killChainPhase.setPhaseName(propertyNode.get("phase_name").asText());
+          if(propertyNode.has("x_opencti_order")) {
+            killChainPhase.setXOpenCtiOrder(propertyNode.get("x_opencti_order").asInt());
+          }
           return new Complex<>(killChainPhase);
         } else {
           Map<java.lang.String, BaseType<?>> properties = new HashMap<>();

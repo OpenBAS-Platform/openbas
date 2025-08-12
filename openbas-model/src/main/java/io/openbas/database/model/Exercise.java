@@ -291,7 +291,7 @@ public class Exercise implements Base {
   @JsonIgnore
   @Setter(value = AccessLevel.NONE)
   @Getter
-  @Column(name = "exercise_persistent_security_coverage_id")
+  @Column(name = "exercise_persistent_security_coverage_id", insertable = false, updatable = false)
   private String persistentSecurityCoverageId;
 
   // region transient

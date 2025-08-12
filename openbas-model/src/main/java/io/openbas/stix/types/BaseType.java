@@ -1,10 +1,12 @@
 package io.openbas.stix.types;
 
 import java.util.Objects;
+
+import io.openbas.stix.parsing.StixSerialisable;
 import lombok.Getter;
 
 @Getter
-public abstract class BaseType<T> {
+public abstract class BaseType<T> implements StixSerialisable {
   private final T value;
 
   public BaseType(T value) {

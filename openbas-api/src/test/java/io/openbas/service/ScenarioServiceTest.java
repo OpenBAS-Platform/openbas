@@ -15,6 +15,8 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
+import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
@@ -47,6 +49,10 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private InjectAssistantService injectAssistantService;
+  @Autowired private AttackPatternService attackPatternService;
+  @Autowired private TagRepository tagRepository;
+  @Autowired private SecurityAssessmentRepository securityAssessmentRepository;
 
   @Mock Ee eeService;
   @Mock GrantService grantService;
@@ -89,8 +95,12 @@ class ScenarioServiceTest extends IntegrationTest {
             injectDuplicateService,
             tagRuleService,
             injectService,
+            injectAssistantService,
+            attackPatternService,
             injectRepository,
-            lessonsCategoryRepository);
+            lessonsCategoryRepository,
+            securityAssessmentRepository,
+            tagRepository);
   }
 
   void setUpWithMockRepository() {
@@ -114,8 +124,12 @@ class ScenarioServiceTest extends IntegrationTest {
             injectDuplicateService,
             tagRuleService,
             injectService,
+            injectAssistantService,
+            attackPatternService,
             injectRepository,
-            lessonsCategoryRepository);
+            lessonsCategoryRepository,
+            securityAssessmentRepository,
+            tagRepository);
   }
 
   @AfterAll
