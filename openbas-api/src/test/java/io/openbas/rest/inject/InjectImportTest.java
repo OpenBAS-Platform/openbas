@@ -82,7 +82,6 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private ArticleService articleService;
   @Autowired private InjectorFixture injectorFixture;
-
   @MockBean private Ee eeService;
 
   @BeforeEach

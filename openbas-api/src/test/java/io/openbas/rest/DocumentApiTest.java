@@ -41,12 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 class DocumentApiTest extends IntegrationTest {
 
   @Resource protected ObjectMapper mapper;
-
-  @Autowired private MockMvc mvc;
-
   @Autowired DocumentComposer documentComposer;
   @Autowired ChallengeComposer challengeComposer;
   @Autowired PayloadComposer payloadComposer;
+  @Autowired private MockMvc mvc;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private ChallengeRepository challengeRepository;
 
@@ -60,6 +58,34 @@ class DocumentApiTest extends IntegrationTest {
   void afterAll() {
     challengeComposer.reset();
     documentComposer.reset();
+  }
+
+  private Document getDocumentWithChallenge() {
+
+    ChallengeComposer.Composer challenge =
+        challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge());
+
+    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
+    return documentComposer
+        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+        .withInMemoryFile(badCoffeeFileContent)
+        .withChallenge(challenge)
+        .persist()
+        .get();
+  }
+
+  private Document getDocumentWithPayload() {
+
+    PayloadComposer.Composer payload =
+        payloadComposer.forPayload(PayloadFixture.createDefaultExecutable());
+
+    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
+    return documentComposer
+        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+        .withInMemoryFile(badCoffeeFileContent)
+        .withPayloadExecutable(payload)
+        .persist()
+        .get();
   }
 
   @Nested
@@ -114,33 +140,5 @@ class DocumentApiTest extends IntegrationTest {
 
       assertThatJson(response).when(IGNORING_ARRAY_ORDER).isEqualTo(relationJson);
     }
-  }
-
-  private Document getDocumentWithChallenge() {
-
-    ChallengeComposer.Composer challenge =
-        challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge());
-
-    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
-    return documentComposer
-        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
-        .withInMemoryFile(badCoffeeFileContent)
-        .withChallenge(challenge)
-        .persist()
-        .get();
-  }
-
-  private Document getDocumentWithPayload() {
-
-    PayloadComposer.Composer payload =
-        payloadComposer.forPayload(PayloadFixture.createDefaultExecutable());
-
-    BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
-    return documentComposer
-        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
-        .withInMemoryFile(badCoffeeFileContent)
-        .withPayloadExecutable(payload)
-        .persist()
-        .get();
   }
 }
