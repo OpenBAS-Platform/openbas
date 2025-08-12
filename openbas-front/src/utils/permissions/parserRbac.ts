@@ -14,3 +14,20 @@ export default function parseCapability(cap: string): [Actions, Subjects] | null
 
   return [action, subject as Subjects];
 }
+
+const ROLE_TO_ACTION: Record<string, Actions> = {
+  LAUNCHER: ACTIONS.ACCESS,
+  PLANNER: ACTIONS.MANAGE,
+  OBSERVER: ACTIONS.ACCESS,
+};
+
+type ParsedGrant = [Actions, Subjects, { id: string }];
+
+export function parseGrant([id, role]: [string, string]): ParsedGrant | null {
+  const action = ROLE_TO_ACTION[role];
+  if (!action) {
+    return null;
+  }
+  // Use resource as a generic subject for grants
+  return [action, 'RESOURCE' as Subjects, { id }];
+}
