@@ -3,6 +3,7 @@ package io.openbas.rest.search;
 import static io.openbas.search.FullTextSearchApi.GLOBAL_SEARCH_URI;
 import static io.openbas.service.UserService.buildAuthenticationToken;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -10,6 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetRepository;
@@ -35,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -248,6 +252,12 @@ public class FullTextSearchTest extends IntegrationTest {
             List.of(assetForTest.getId()),
             "Full text search 'Asset' returns all assets - user with capabilities"),
         Arguments.of(
+            "Asset",
+            Capability.BYPASS,
+            1,
+            List.of(assetForTest.getId()),
+            "Full text search 'Asset' returns all assets - user with bypass capabilities"),
+        Arguments.of(
             "DoesNotExist",
             Capability.ACCESS_ASSETS,
             0,
@@ -269,7 +279,7 @@ public class FullTextSearchTest extends IntegrationTest {
 
   @ParameterizedTest(name = "{4}")
   @MethodSource("searchAssetTestCases")
-  void given_user_without_capability_search_input_should_return_expected_result(
+  void given_user_with_specific_capability_and_search_input_should_return_expected_result(
       String searchTerm,
       Capability capability,
       int expectedCount,
@@ -307,5 +317,57 @@ public class FullTextSearchTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.content.size()").value(expectedCount))
         .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(expectedIds.toArray())));
+  }
+
+  @ParameterizedTest(name = "{4}")
+  @MethodSource("searchAssetTestCases")
+  void given_user_with_specific_capability_and_search_input_should_return_expected_count(
+      String searchTerm,
+      Capability capability,
+      int expectedCount,
+      List<String> expectedIds,
+      String testDisplayName)
+      throws Exception {
+    // -- PREPARE --
+    FullTextSearchApi.SearchTerm term = new FullTextSearchApi.SearchTerm();
+    term.setSearchTerm(searchTerm);
+
+    GroupComposer.Composer groupComposed =
+        groupComposer
+            .forGroup(GroupFixture.createGroup())
+            .withRole(
+                roleComposer.forRole(
+                    RoleFixture.getRole(capability == null ? Set.of() : Set.of(capability))));
+
+    this.testUser =
+        userComposer
+            .forUser(
+                UserFixture.getUser(
+                    "Firstname", "Lastname", UUID.randomUUID() + "@unittests.invalid"))
+            .withGroup(groupComposed)
+            .persist()
+            .get();
+
+    Authentication auth = buildAuthenticationToken(this.testUser);
+
+    // -- EXECUTE --
+    ResultActions result =
+        mvc.perform(
+                post(GLOBAL_SEARCH_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(term))
+                    .with(authentication(auth)))
+            .andExpect(status().is2xxSuccessful());
+
+    if (expectedCount == 0) {
+      // either the key does not exist or the count must be 0
+      String responseContent = result.andReturn().getResponse().getContentAsString();
+      JsonNode root = new ObjectMapper().readTree(responseContent);
+      if (root.has(Asset.class.getName())) {
+        result.andExpect(jsonPath("$['" + Asset.class.getName() + "'].count").value(0));
+      }
+    } else {
+      result.andExpect(jsonPath("$['" + Asset.class.getName() + "'].count").value(expectedCount));
+    }
   }
 }

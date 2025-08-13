@@ -43,7 +43,7 @@ public class FullTextSearchService<T extends Base> {
 
   private Map<Class<T>, List<String>> searchListByClassMap;
   private Map<Class<T>, String> grantsFilterNameByClassMap;
-  private Map<Class<T>, Capability> capaByClassMap;
+  private Map<Class<T>, Optional<Capability>> capaByClassMap;
 
   @PostConstruct
   @SuppressWarnings("unchecked")
@@ -79,19 +79,19 @@ public class FullTextSearchService<T extends Base> {
     this.capaByClassMap =
         Map.of(
             (Class<T>) Asset.class,
-            Capability.ACCESS_ASSETS,
+            Capability.of(ResourceType.ASSET, Action.SEARCH),
             (Class<T>) AssetGroup.class,
-            Capability.ACCESS_ASSETS,
+            Capability.of(ResourceType.ASSET_GROUP, Action.SEARCH),
             (Class<T>) User.class,
-            Capability.BYPASS, // Fully opened for now
+            Capability.of(ResourceType.USER, Action.SEARCH),
             (Class<T>) Team.class,
-            Capability.BYPASS, // Fully opened for now
+            Capability.of(ResourceType.TEAM, Action.SEARCH),
             (Class<T>) Organization.class,
-            Capability.ACCESS_PLATFORM_SETTINGS,
+            Capability.of(ResourceType.ORGANIZATION, Action.SEARCH),
             (Class<T>) Scenario.class,
-            Capability.BYPASS, // Managed by grant system
+            Capability.of(ResourceType.SCENARIO, Action.SEARCH),
             (Class<T>) Exercise.class,
-            Capability.BYPASS); // Managed by grant system
+            Capability.of(ResourceType.SIMULATION, Action.SEARCH));
 
     // If the grant system isn't available for a resource, StringUtils.EMPTY is used as default
     // value
@@ -151,15 +151,17 @@ public class FullTextSearchService<T extends Base> {
                 () -> new IllegalArgumentException(clazz + " is not handle by full text search"));
 
     OpenBASPrincipal principal = SessionHelper.currentUser();
-    // Check if the principal had the right to search this class
-    if (!principal.isAdmin() && capaByClassMap.get(clazzT) != Capability.BYPASS) {
+    // Check if the principal has the right to search this class
+    Capability capaForClass = capaByClassMap.get(clazzT).orElse(Capability.BYPASS);
+    if (!principal.isAdmin() && capaForClass != Capability.BYPASS) {
       User u =
           userRepository
               .findById(principal.getId())
               .orElseThrow(
                   () -> new IllegalArgumentException("User not found: " + principal.getId()));
 
-      if (!u.getCapabilities().contains(capaByClassMap.get(clazzT))) {
+      if (!u.getCapabilities().contains(Capability.BYPASS)
+          && !u.getCapabilities().contains(capaForClass)) {
         return generateEmptyResult(searchPaginationInput);
       }
     }
@@ -292,8 +294,11 @@ public class FullTextSearchService<T extends Base> {
                   () -> new IllegalArgumentException("User not found: " + principal.getId()));
 
       classesToSearch = new HashSet<>();
-      for (Map.Entry<Class<T>, Capability> entry : capaByClassMap.entrySet()) {
-        if (u.getCapabilities().contains(entry.getValue())) {
+      for (Map.Entry<Class<T>, Optional<Capability>> entry : capaByClassMap.entrySet()) {
+        Capability capaForClass = entry.getValue().orElse(Capability.BYPASS);
+        if (u.getCapabilities().contains(Capability.BYPASS)
+            || u.getCapabilities().contains(capaForClass)
+            || Capability.BYPASS.equals(capaForClass)) {
           classesToSearch.add(entry.getKey());
         }
       }
