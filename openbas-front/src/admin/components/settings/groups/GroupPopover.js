@@ -33,7 +33,7 @@ const TabPanel = (props) => {
           }}
           sx={{ p: 3 }}
         >
-          <Typography>{children}</Typography>
+          {children}
         </Box>
       )}
     </div>
@@ -328,7 +328,7 @@ class GroupPopover extends Component {
             </Tabs>
             <TabPanel value={this.state.tabSelect} index={0}>
               <Table selectable={false} size="small">
-                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+                <TableHead>
                   <TableRow>
                     <TableCell>{t('Scenario')}</TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
@@ -342,7 +342,7 @@ class GroupPopover extends Component {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody displayRowCheckbox={false}>
+                <TableBody>
                   {this.props.scenarios.map((scenario) => {
                     const grantPlanner = R.find(
                       g => g.grant_scenario === scenario.scenario_id

@@ -33,7 +33,7 @@ export function defineAbility(capabilities: string[], grants: Record<string, str
     }
   }
 
-  // To use casl for grant : ability.can(ACTIONS.ACCESS, 'RESOURCE', '', { id: scenario.scenario_id }),
+  // To use casl for grant : ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id),,
   for (const grant of Object.entries(grants)) {
     const parsedGrant = parseGrant(grant);
     if (parsedGrant) {
@@ -41,8 +41,5 @@ export function defineAbility(capabilities: string[], grants: Record<string, str
       can(action, subject, id);
     }
   }
-
-  console.log(JSON.stringify(rules));
-
   return createMongoAbility(rules);
 }

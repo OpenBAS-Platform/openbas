@@ -81,9 +81,6 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     link.click();
   };
 
-  // console.log('MANAGE', scenario.scenario_id, ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id));
-  // console.log('ACCESS', scenario.scenario_id, ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenario.scenario_id));
-
   // Button Popover
   const entries = [];
   if (actions.includes('Update')) {
@@ -91,7 +88,6 @@ const ScenarioPopover: FunctionComponent<Props> = ({
       label: 'Update',
       action: () => handleOpenEdit(),
       disabled: !permissions.canWrite,
-    //  userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id),
     });
   }
   if (actions.includes('Duplicate')) entries.push({
