@@ -93,10 +93,12 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   if (onRemoveFromContext && removeFromContextLabel) entries.push({
     label: removeFromContextLabel,
     action: () => onRemoveFromContext(endpoint.asset_id),
+    userRight: true,
   });
   if ((assetGroupId && endpoint.is_static)) entries.push({
     label: 'Remove from the asset group',
     action: () => handleRemoveFromAssetGroup(),
+    userRight: true,
   });
   if (onDelete) entries.push({
     label: 'Delete',
