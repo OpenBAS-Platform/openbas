@@ -2,15 +2,18 @@ package io.openbas.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Action;
 import io.openbas.database.model.Capability;
 import io.openbas.database.model.Group;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Role;
 import io.openbas.database.model.User;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.fixtures.UserFixture;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,6 +30,7 @@ public class PermissionServiceTest extends IntegrationTest {
   private static final String USER_ID = "userid";
 
   @Mock private GrantService grantService;
+  @Mock private InjectService injectService;
 
   @InjectMocks private PermissionService permissionService;
 
@@ -150,6 +154,32 @@ public class PermissionServiceTest extends IntegrationTest {
     User user = getUser(USER_ID, false);
     assertFalse(
         permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SCENARIO, Action.CREATE));
+  }
+
+  @Test
+  public void test_hasPermission_write_inject_WHEN_has_write_grant() {
+    String injectId = "injectId";
+    Inject inject = mock(Inject.class);
+    when(inject.getParentResourceId()).thenReturn(RESOURCE_ID);
+    when(inject.getParentResourceType()).thenReturn(ResourceType.SIMULATION);
+    when(injectService.inject(injectId)).thenReturn(inject);
+
+    User user = getUser(USER_ID, false);
+    when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(true);
+    assertTrue(permissionService.hasPermission(user, injectId, ResourceType.INJECT, Action.WRITE));
+  }
+
+  @Test
+  public void test_hasPermission_write_inject_WHEN_has_no_grant() {
+    String injectId = "injectId";
+    Inject inject = mock(Inject.class);
+    when(inject.getParentResourceId()).thenReturn(RESOURCE_ID);
+    when(inject.getParentResourceType()).thenReturn(ResourceType.SIMULATION);
+    when(injectService.inject(injectId)).thenReturn(inject);
+
+    User user = getUser(USER_ID, false);
+    when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(false);
+    assertFalse(permissionService.hasPermission(user, injectId, ResourceType.INJECT, Action.WRITE));
   }
 
   private User getUser(final String id, final boolean isAdmin) {

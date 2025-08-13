@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -41,6 +42,10 @@ public class TagRule implements Base {
   @Queryable(filterable = true, path = "assetGroups.name")
   @JsonProperty("tag_rule_asset_groups")
   private List<AssetGroup> assetGroups = new ArrayList<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.TAG_RULE;
 
   @JsonIgnore
   @Override

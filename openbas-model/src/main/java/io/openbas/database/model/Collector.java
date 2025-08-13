@@ -71,6 +71,10 @@ public class Collector implements Base {
   @Type(JsonType.class)
   private ObjectNode state;
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.COLLECTOR;
+
   @JsonIgnore
   @Override
   public boolean isUserHasAccess(User user) {

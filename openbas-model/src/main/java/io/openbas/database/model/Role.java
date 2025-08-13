@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -41,6 +43,10 @@ public class Role implements Base {
   @Enumerated(EnumType.STRING)
   @Column(name = "capability")
   private Set<Capability> capabilities = new HashSet<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.GROUP_ROLE;
 
   @Queryable(sortable = true)
   @Column(name = "role_created_at")
