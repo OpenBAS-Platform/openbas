@@ -7,6 +7,8 @@ const articleContextForExercise = (exerciseId: Exercise['exercise_id']) => {
   const dispatch = useAppDispatch();
   return {
     previewArticleUrl: (article: FullArticleStore) => `/channels/${exerciseId}/${article.article_fullchannel?.channel_id}?preview=true`,
+    fetchChannelsUrl: () => `/exercise/${exerciseId}/channels`,
+    fetchDocumentsUrl: () => `/exercise/${exerciseId}/documents`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addExerciseArticle(exerciseId, data)),
     onUpdateArticle: (article: Article, data: ArticleUpdateInput) => dispatch(
       updateExerciseArticle(exerciseId, article.article_id, data),

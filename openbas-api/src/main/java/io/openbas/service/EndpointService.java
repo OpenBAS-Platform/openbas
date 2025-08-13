@@ -639,6 +639,14 @@ public class EndpointService {
         platform, upgradeName, adminToken, installationDir, serviceNameOrPrefix);
   }
 
+  public List<Endpoint> endpointsForScenario(String scenarioId) {
+    return this.endpointRepository.findDistinctByInjectsScenarioId(scenarioId);
+  }
+
+  public List<Endpoint> endpointsForSimulation(String simulationId) {
+    return this.endpointRepository.findDistinctByInjectsExerciseId(simulationId);
+  }
+
   // -- OPTIONS --
   public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
       String searchText, String sourceId, Pageable pageable) {

@@ -38,8 +38,8 @@ export const deleteAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => 
   return delReferential(uri, assetGroup.key, assetGroupId)(dispatch);
 };
 
-export const fetchAssetGroups = () => (dispatch: Dispatch) => {
-  return getReferential(arrayOfAssetGroups, ASSET_GROUP_URI)(dispatch);
+export const fetchAssetGroups = (uri = ASSET_GROUP_URI) => (dispatch: Dispatch) => {
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
 };
 export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
@@ -82,4 +82,18 @@ export const searchAssetGroupLinkedToFindingsAsOption = (searchText: string = ''
 
 export const searchAssetGroupByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${ASSET_GROUP_URI}/options`, ids);
+};
+
+// -- EXERCISES --
+
+export const fetchExerciseAssetGroups = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/asset_groups`;
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
+};
+
+// -- SCENARIOS --
+
+export const fetchScenarioAssetGroups = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/asset_groups`;
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
 };

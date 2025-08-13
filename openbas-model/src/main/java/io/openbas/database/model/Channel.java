@@ -93,6 +93,10 @@ public class Channel implements Base {
   @Transient
   private final ResourceType resourceType = ResourceType.CHANNEL;
 
+  @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private List<Article> articles;
+
   @Override
   public String getId() {
     return id;

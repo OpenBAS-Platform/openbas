@@ -7,6 +7,8 @@ const articleContextForScenario = (scenarioId: Scenario['scenario_id']) => {
   const dispatch = useAppDispatch();
   return {
     previewArticleUrl: (article: FullArticleStore) => `/channels/${scenarioId}/${article.article_fullchannel?.channel_id}?preview=true`,
+    fetchChannelsUrl: () => `/scenario/${scenarioId}/channels`,
+    fetchDocumentsUrl: () => `/scenario/${scenarioId}/documents`,
     onAddArticle: (data: ArticleCreateInput) => dispatch(addScenarioArticle(scenarioId, data)),
     onUpdateArticle: (article: Article, data: ArticleUpdateInput) => dispatch(
       updateScenarioArticle(scenarioId, article.article_id, data),

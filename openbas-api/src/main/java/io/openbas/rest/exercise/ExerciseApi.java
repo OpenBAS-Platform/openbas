@@ -21,6 +21,7 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
 import io.openbas.rest.custom_dashboard.CustomDashboardService;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.exercise.exports.ExportOptions;
@@ -96,12 +97,16 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region services
+  private final AssetGroupService assetGroupService;
+  private final EndpointService endpointService;
   private final FileService fileService;
   private final InjectService injectService;
   private final ExerciseService exerciseService;
   private final TeamService teamService;
   private final ExportService exportService;
   private final ActionMetricCollector actionMetricCollector;
+  private final ChannelService channelService;
+  private final DocumentService documentService;
 
   // endregion
 
@@ -903,4 +908,42 @@ public class ExerciseApi extends RestBehavior {
   }
 
   // endregion
+
+  // region asset groups, endpoints, documents and channels
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/asset_groups")
+  @Operation(
+      summary =
+          "Get asset groups. Can only be called if the user has access to the given simulation.",
+      description = "Get all asset groups used by injects for a given simulation")
+  @PreAuthorize("isObserver()")
+  public List<AssetGroup> assetGroups(@PathVariable String exerciseId) {
+    return this.assetGroupService.assetGroupsForSimulation(exerciseId);
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/channels")
+  @Operation(
+      summary = "Get channels. Can only be called if the user has access to the given simulation.",
+      description = "Get all channels used by articles for a given simulation")
+  @PreAuthorize("isObserver()")
+  public Iterable<Channel> channels(@PathVariable String exerciseId) {
+    return this.channelService.channelsForSimulation(exerciseId);
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/endpoints")
+  @Operation(
+      summary = "Get endpoints. Can only be called if the user has access to the given simulation.",
+      description = "Get all endpoints used by injects for a given simulation")
+  @PreAuthorize("isObserver()")
+  public List<Endpoint> endpoints(@PathVariable String exerciseId) {
+    return this.endpointService.endpointsForSimulation(exerciseId);
+  }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/documents")
+  @Operation(
+      summary = "Get documents. Can only be called if the user has access to the given simulation.",
+      description = "Get all documents used by injects for a given simulation")
+  public List<Document> documents(@PathVariable String exerciseId) {
+    return this.documentService.documentsForSimulation(exerciseId);
+  }
+  // end region
 }

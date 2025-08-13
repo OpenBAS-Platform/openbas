@@ -84,4 +84,18 @@ public interface DocumentRepository
   @NotNull
   @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
   Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
+
+  @Query(
+      "SELECT DISTINCT d FROM Document d "
+          + "LEFT JOIN d.articles a "
+          + "LEFT JOIN d.injectDocuments i "
+          + "WHERE a.scenario.id = :scenarioId OR i.inject.scenario.id = :scenarioId")
+  List<Document> findAllDistinctByScenarioId(@Param("scenarioId") String scenarioId);
+
+  @Query(
+      "SELECT DISTINCT d FROM Document d "
+          + "LEFT JOIN d.articles a "
+          + "LEFT JOIN d.injectDocuments i "
+          + "WHERE a.exercise.id = :simulationId OR i.inject.exercise.id = :simulationId")
+  List<Document> findAllDistinctBySimulationId(@Param("simulationId") String simulationId);
 }

@@ -49,6 +49,10 @@ const useStyles = makeStyles()(() => ({
 interface Props { articles: Article[] }
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {
+  // Context
+  const { previewArticleUrl, fetchChannelsUrl, fetchDocumentsUrl } = useContext(ArticleContext);
+  const { permissions } = useContext(PermissionsContext);
+
   // Standard hooks
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
@@ -60,8 +64,8 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
     documentsMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchChannels());
-    dispatch(fetchDocuments());
+    dispatch(fetchChannels(fetchChannelsUrl()));
+    dispatch(fetchDocuments(fetchDocumentsUrl()));
   });
 
   // Creation
@@ -89,10 +93,6 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       || channels.map(o => o.id).includes(n.article_fullchannel?.channel_id ?? ''),
     filtering.filterAndSort(fullArticles),
   );
-
-  // Context
-  const { previewArticleUrl } = useContext(ArticleContext);
-  const { permissions } = useContext(PermissionsContext);
 
   return (
     <div>

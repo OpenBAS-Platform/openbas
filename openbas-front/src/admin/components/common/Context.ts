@@ -16,6 +16,8 @@ export type PermissionsContextType = {
 
 export type ArticleContextType = {
   previewArticleUrl: (article: FullArticleStore) => string;
+  fetchChannelsUrl: () => string;
+  fetchDocumentsUrl: () => string;
   onAddArticle: (data: ArticleCreateInput) => Promise<{ result: string }>;
   onUpdateArticle: (article: Article, data: ArticleUpdateInput) => string;
   onDeleteArticle: (article: Article) => string;
@@ -166,6 +168,12 @@ export const ArticleContext = createContext<ArticleContextType>({
     return '';
   },
   previewArticleUrl(_article: FullArticleStore): string {
+    return '';
+  },
+  fetchChannelsUrl(): string {
+    return '';
+  },
+  fetchDocumentsUrl(): string {
     return '';
   },
 });

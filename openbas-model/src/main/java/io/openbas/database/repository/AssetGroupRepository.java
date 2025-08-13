@@ -40,6 +40,10 @@ public interface AssetGroupRepository
 
   Optional<AssetGroup> findByExternalReference(String externalReference);
 
+  List<AssetGroup> findDistinctByInjectsScenarioId(String scenarioId);
+
+  List<AssetGroup> findDistinctByInjectsExerciseId(String scenarioId);
+
   /**
    * Returns the raw asset group having the ids passed in parameter
    *
