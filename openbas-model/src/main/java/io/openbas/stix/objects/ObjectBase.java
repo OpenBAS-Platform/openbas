@@ -12,6 +12,14 @@ import lombok.Setter;
 public class ObjectBase implements StixSerialisable {
   @Getter @Setter private Map<String, BaseType<?>> properties;
 
+  public BaseType<?> getProperty(String name) {
+    return properties.get(name);
+  }
+
+  public boolean hasProperty(String name) {
+    return properties.containsKey(name);
+  }
+
   @Override
   public JsonNode toStix(ObjectMapper mapper) {
     ObjectNode node = mapper.createObjectNode();

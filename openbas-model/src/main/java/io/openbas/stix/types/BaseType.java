@@ -14,9 +14,11 @@ public abstract class BaseType<T> implements StixSerialisable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    BaseType<?> baseType = (BaseType<?>) o;
-    return Objects.equals(value, baseType.value);
+    if (o.getClass() == this.getClass()) {
+      BaseType<?> that = (BaseType<?>) o;
+      return this.value.equals(that.value);
+    }
+    return Objects.equals(value, o);
   }
 
   @Override

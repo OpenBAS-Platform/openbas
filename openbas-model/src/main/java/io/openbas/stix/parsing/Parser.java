@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.types.*;
+import io.openbas.stix.types.Dictionary;
 import io.openbas.stix.types.Integer;
 import io.openbas.stix.types.enums.HashingAlgorithms;
 import io.openbas.stix.types.inner.ExternalReference;
@@ -37,14 +38,7 @@ public class Parser {
   private ObjectBase parseObject(JsonNode propertyNode)
       throws JsonProcessingException, ParsingException {
     ObjectBase object = new ObjectBase();
-    Map<java.lang.String, BaseType<?>> properties = new HashMap<>();
-    Iterator<Map.Entry<java.lang.String, JsonNode>> iterator = propertyNode.fields();
-    while (iterator.hasNext()) {
-      Map.Entry<java.lang.String, JsonNode> entry = iterator.next();
-      properties.put(entry.getKey(), parseProperty(entry.getKey(), entry.getValue()));
-    }
-
-    object.setProperties(properties);
+    object.setProperties(jsonObjectToPropertyMap(propertyNode));
     return object;
   }
 
@@ -86,13 +80,7 @@ public class Parser {
           }
           return new Complex<>(killChainPhase);
         } else {
-          Map<java.lang.String, BaseType<?>> properties = new HashMap<>();
-          Iterator<Map.Entry<java.lang.String, JsonNode>> iterator = propertyNode.fields();
-          while (iterator.hasNext()) {
-            Map.Entry<java.lang.String, JsonNode> entry = iterator.next();
-            properties.put(entry.getKey(), parseProperty(entry.getKey(), entry.getValue()));
-          }
-          return new io.openbas.stix.types.Dictionary(properties);
+          return new Dictionary(jsonObjectToPropertyMap(propertyNode));
         }
       case ARRAY:
         List<BaseType<?>> list = new ArrayList<>();
@@ -106,7 +94,8 @@ public class Parser {
         if (propertyName.endsWith("_hex")) {
           return new Hex(propertyNode.asText());
         }
-        if (propertyName.endsWith("_id")
+        if (propertyName.equals("id")
+            || propertyName.endsWith("_id")
             || propertyName.endsWith("_ref")
             || propertyName.endsWith("_refs")) {
           return new Identifier(propertyNode.asText());
@@ -127,5 +116,16 @@ public class Parser {
       default:
         throw new ParsingException("Invalid STIX: not a STIX property");
     }
+  }
+
+  private Map<String, BaseType<?>> jsonObjectToPropertyMap(JsonNode propertyNode)
+      throws JsonProcessingException, ParsingException {
+    Map<String, BaseType<?>> properties = new HashMap<>();
+    Iterator<Map.Entry<String, JsonNode>> iterator = propertyNode.fields();
+    while (iterator.hasNext()) {
+      Map.Entry<String, JsonNode> entry = iterator.next();
+      properties.put(entry.getKey(), parseProperty(entry.getKey(), entry.getValue()));
+    }
+    return properties;
   }
 }

@@ -49,6 +49,7 @@ import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
 import io.openbas.stix.parsing.ParsingException;
+import io.openbas.stix.types.Identifier;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.mapper.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -896,68 +897,73 @@ public class ScenarioService {
     JsonNode root = objectMapper.readTree(file.getInputStream());
     Bundle bundle = stixParser.parseBundle(root.toString());
 
-    // Extract attack-patterns and their MITRE IDs
-    List<StixRefToExternalRef> stixIdToMitreId = extractAttackPatterns(bundle.getObjects());
     List<String> createdScenarios = new ArrayList<>();
 
-    for (ObjectBase obj : bundle.getObjects()) { // Maybe we could have varoius security assestemnt
-      if ("x-security-assessment".equals(obj.getProperties().get("type").getValue())) {
-        String id = (String) obj.getProperties().get("id").getValue();
-        SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
-        Scenario scenario = getOrCreateScenario(securityAssessment);
+    for (ObjectBase obj :
+        bundle.findByType(
+            "x-security-assessment")) { // Maybe we could have varoius security assestemnt
+      String id = (String) obj.getProperty("id").getValue();
+      SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
+      Scenario scenario = getOrCreateScenario(securityAssessment);
+      ;
 
-        updateSecurityAssessmentFromJson(obj, scenario, securityAssessment, stixIdToMitreId);
-        securityAssessment.setScenario(scenario);
-        SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
+      updateSecurityAssessmentFromStix(obj, bundle, scenario, securityAssessment);
+      securityAssessment.setScenario(scenario);
+      SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
-        // Create Scenario using SecurityAssessment
-        scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
-        scenario
-            .getTags()
-            .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
+      // Create Scenario using SecurityAssessment
+      scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
+      scenario
+          .getTags()
+          .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
-        // Creation injects based attack patterns from stix
-        createdInjectsForScenario(securityAssessment, scenario);
+      // Creation injects based attack patterns from stix
+      createdInjectsForScenario(securityAssessment, scenario);
 
-        createdScenarios.add(scenario.getId());
-      }
+      createdScenarios.add(scenario.getId());
     }
-
     return createdScenarios;
   }
 
-  private void updateSecurityAssessmentFromJson(
-      ObjectBase obj,
+  private void updateSecurityAssessmentFromStix(
+      ObjectBase stixAssessmentObj,
+      Bundle bundle,
       Scenario scenario,
-      SecurityAssessment securityAssessment,
-      List<StixRefToExternalRef> stixIdToMitreId)
+      SecurityAssessment securityAssessment)
       throws ParsingException, JsonProcessingException {
     if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
 
-    securityAssessment.setExternalId((String) obj.getProperties().get("id").getValue());
-    securityAssessment.setName((String) obj.getProperties().get("name").getValue());
-    securityAssessment.setDescription((String) obj.getProperties().get("description").getValue());
+    securityAssessment.setExternalId((String) stixAssessmentObj.getProperty("id").getValue());
+    securityAssessment.setName((String) stixAssessmentObj.getProperty("name").getValue());
+    securityAssessment.setDescription(
+        (String) stixAssessmentObj.getProperty("description").getValue());
     securityAssessment.setSecurityCoverageSubmissionUrl(
-        (String) obj.getProperties().get("security_coverage_submission_url").getValue());
+        (String) stixAssessmentObj.getProperty("security_coverage_submission_url").getValue());
 
-    securityAssessment.setScheduling((String) obj.getProperties().get("scheduling").getValue());
+    securityAssessment.setScheduling(
+        (String) stixAssessmentObj.getProperty("scheduling").getValue());
 
-    if (obj.getProperties().containsKey("period_start")
-        && obj.getProperties().get("period_start") != null) {
+    if (stixAssessmentObj.hasProperty("period_start")
+        && stixAssessmentObj.getProperty("period_start") != null) {
       securityAssessment.setPeriodStart(
-          Instant.parse((String) obj.getProperties().get("period_start").getValue()));
+          Instant.parse((String) stixAssessmentObj.getProperty("period_start").getValue()));
     }
-    if (obj.getProperties().containsKey("period_end")
-        && obj.getProperties().get("period_end") != null) {
+    if (stixAssessmentObj.hasProperty("period_end")
+        && stixAssessmentObj.getProperty("period_end") != null) {
       securityAssessment.setPeriodEnd(
-          Instant.parse((String) obj.getProperties().get("period_end").getValue()));
+          Instant.parse((String) stixAssessmentObj.getProperty("period_end").getValue()));
     }
 
-    String threatContextRef = (String) obj.getProperties().get("threat_context_ref").getValue();
+    String threatContextRef =
+        (String) stixAssessmentObj.getProperty("threat_context_ref").getValue();
     securityAssessment.setThreatContextRef(threatContextRef);
 
     // Attack pattern refs -> convert to MITRE IDs
-    securityAssessment.setAttackPatternRefs(stixIdToMitreId);
+    securityAssessment.setAttackPatternRefs(
+        extractAttackPatterns(
+            bundle.findByIds(
+                (List<Identifier>)
+                    stixAssessmentObj.getProperty("attack_pattern_refs").getValue())));
 
     // Add vulnerabilities
     // TODO Add labels as upsert tags
@@ -994,13 +1000,11 @@ public class ScenarioService {
   private List<StixRefToExternalRef> extractAttackPatterns(List<ObjectBase> objects) {
     List<StixRefToExternalRef> stixToMitre = new ArrayList<>();
     for (ObjectBase obj : objects) {
-      if ("attack-pattern".equals(obj.getProperties().get("type").getValue())) {
-        String stixId = (String) obj.getProperties().get("id").getValue();
-        String mitreId = (String) obj.getProperties().get("x_mitre_id").getValue();
-        if (mitreId != null) {
-          StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
-          stixToMitre.add(stixRef);
-        }
+      String stixId = (String) obj.getProperty("id").getValue();
+      String mitreId = (String) obj.getProperty("x_mitre_id").getValue();
+      if (mitreId != null) {
+        StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
+        stixToMitre.add(stixRef);
       }
     }
     return stixToMitre;
