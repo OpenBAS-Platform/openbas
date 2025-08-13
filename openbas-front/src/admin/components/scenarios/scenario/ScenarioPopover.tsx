@@ -80,13 +80,11 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Update')) {
-    entries.push({
-      label: 'Update',
-      action: () => handleOpenEdit(),
-      disabled: !permissions.canWrite,
-    });
-  }
+  if (actions.includes('Update')) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    disabled: !permissions.canWrite,
+  });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
