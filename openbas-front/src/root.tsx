@@ -60,7 +60,7 @@ const Root = () => {
     );
   }
   return (
-    <PermissionsProvider capabilities={me.user_capabilities} isAdmin={me.user_admin}>
+    <PermissionsProvider capabilities={me.user_capabilities} grants={me.user_grants} isAdmin={me.user_admin}>
       <UserContext.Provider
         value={{
           me,
