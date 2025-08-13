@@ -19,7 +19,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-@Aspect
+//@Aspect // Disabled Aspect annotation for now
 @Component
 @RequiredArgsConstructor
 @Slf4j

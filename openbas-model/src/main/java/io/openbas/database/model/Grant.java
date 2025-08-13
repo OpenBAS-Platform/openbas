@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
@@ -66,19 +65,15 @@ public class Grant implements Base {
   @Schema(type = "string")
   private Group group;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "grant_exercise")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("grant_exercise")
+  @JoinColumn(name = "grant_resource")
+  @JsonProperty("grant_resource")
   @Schema(type = "string")
-  private Exercise exercise;
+  private String resourceId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "grant_scenario")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("grant_scenario")
+  @Column(name = "resource_type")
+  @JsonProperty("grant_resource_type")
   @Schema(type = "string")
-  private Scenario scenario;
+  private String resourceType;
 
   @Override
   public boolean isUserHasAccess(User user) {
@@ -96,12 +91,5 @@ public class Grant implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
-  }
-
-  @JsonIgnore
-  public String getResourceId() {
-    return this.getScenario() != null
-        ? this.getScenario().getId()
-        : this.getExercise() != null ? this.getExercise().getId() : null;
   }
 }

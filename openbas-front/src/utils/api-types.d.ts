@@ -2395,11 +2395,10 @@ export interface GlobalScoreBySimulationEndDate {
 }
 
 export interface Grant {
-  grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
   grant_name: "OBSERVER" | "LAUNCHER" | "PLANNER";
-  grant_scenario?: string;
+  grant_resource?: string;
   listened?: boolean;
 }
 
@@ -2432,9 +2431,8 @@ export interface GroupCreateInput {
 }
 
 export interface GroupGrantInput {
-  grant_exercise?: string;
   grant_name?: "OBSERVER" | "LAUNCHER" | "PLANNER";
-  grant_scenario?: string;
+  grant_resource?: string;
 }
 
 export interface GroupUpdateRolesInput {

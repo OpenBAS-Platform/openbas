@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -189,9 +190,11 @@ public class Exercise implements Base {
   private CustomDashboard customDashboard;
 
   @Getter
-  @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+  @OneToMany
+  @JoinColumn(name = "grant_resource", referencedColumnName = "exercise_id",
+          insertable = false, updatable = false)
   @JsonIgnore
-  private List<Grant> grants = new ArrayList<>();
+  private List<Grant> grants;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)

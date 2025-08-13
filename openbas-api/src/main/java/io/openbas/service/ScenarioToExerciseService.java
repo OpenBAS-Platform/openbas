@@ -74,7 +74,7 @@ public class ScenarioToExerciseService {
                   Grant grant = new Grant();
                   grant.setName(scenarioGrant.getName());
                   grant.setGroup(scenarioGrant.getGroup());
-                  grant.setExercise(exerciseSaved);
+                  grant.setResourceId(exerciseSaved.getId());
                   return this.grantRepository.save(grant);
                 })
             .toList();

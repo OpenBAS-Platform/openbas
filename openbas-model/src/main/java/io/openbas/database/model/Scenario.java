@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -153,9 +154,12 @@ public class Scenario implements Base {
   @Schema(type = "string")
   private CustomDashboard customDashboard;
 
-  @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
+  @Getter
+  @OneToMany
+  @JoinColumn(name = "grant_resource", referencedColumnName = "scenario_id",
+          insertable = false, updatable = false)
   @JsonIgnore
-  private List<Grant> grants = new ArrayList<>();
+  private List<Grant> grants;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
