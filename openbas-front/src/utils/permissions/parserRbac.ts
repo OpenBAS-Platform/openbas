@@ -15,19 +15,33 @@ export default function parseCapability(cap: string): [Actions, Subjects] | null
   return [action, subject as Subjects];
 }
 
-const ROLE_TO_ACTION: Record<string, Actions> = {
-  LAUNCHER: ACTIONS.LAUNCH,
-  PLANNER: ACTIONS.MANAGE,
-  OBSERVER: ACTIONS.ACCESS,
+const ROLE_TO_ACTION: Record<string, Actions[]> = {
+  LAUNCHER: [ACTIONS.LAUNCH, ACTIONS.MANAGE, ACTIONS.ACCESS],
+  PLANNER: [ACTIONS.MANAGE, ACTIONS.ACCESS],
+  OBSERVER: [ACTIONS.ACCESS],
 };
 
-type ParsedGrant = [Actions, Subjects, string ];
+type ParsedGrantByAction = [Actions, Subjects, string[] ] [];
 
-export function parseGrant([id, role]: [string, string]): ParsedGrant | null {
-  const action = ROLE_TO_ACTION[role];
-  if (!action) {
-    return null;
+export function parseGrants(grants: Record<string, string>): ParsedGrantByAction | null {
+  const grouped: Record<string, string[]> = {};
+
+  for (const [id, role] of Object.entries(grants)) {
+    const actions = ROLE_TO_ACTION[role];
+    if (!actions) {
+      return null;
+    }
+    for (const action of actions) {
+      if (!grouped[action]) {
+        grouped[action] = [];
+      }
+      grouped[action].push(id);
+    }
   }
-  // Use resource as a generic subject for grants
-  return [action, SUBJECTS.RESOURCE, id];
+
+  // Use "RESOURCE" as a generic subject for grants
+  return Object.entries(grouped).map(([action, ids]) => [
+    action as Actions,
+    SUBJECTS.RESOURCE, ids,
+  ]);
 }

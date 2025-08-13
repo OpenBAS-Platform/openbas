@@ -4,7 +4,7 @@ import {
   type MongoAbility,
 } from '@casl/ability';
 
-import parseCapability, { parseGrant } from './parserRbac';
+import parseCapability, { parseGrants } from './parserRbac';
 import { type Actions, type SubjectsType } from './types';
 
 export type AppAbility = MongoAbility<[Actions, SubjectsType]>;
@@ -33,13 +33,13 @@ export function defineAbility(capabilities: string[], grants: Record<string, str
     }
   }
 
-  // To use casl for grant : ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id),,
-  for (const grant of Object.entries(grants)) {
-    const parsedGrant = parseGrant(grant);
-    if (parsedGrant) {
-      const [action, subject, id] = parsedGrant;
-      can(action, subject, id);
+  // To use casl for grant : ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenario.scenario_id)
+  const parsedGrants = parseGrants(grants);
+  if (parsedGrants) {
+    for (const [action, subject, conditions] of parsedGrants) {
+      can(action, subject, conditions);
     }
   }
+
   return createMongoAbility(rules);
 }
