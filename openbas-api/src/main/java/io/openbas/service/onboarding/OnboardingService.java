@@ -23,8 +23,7 @@ public class OnboardingService {
 
   // -- CRUD --
 
-  public UserOnboardingProgress userOnboardingProgress() {
-    User user = userService.currentUser();
+  public UserOnboardingProgress userOnboardingProgress(@NotNull final User user) {
     return getOrDefault(user);
   }
 
@@ -36,8 +35,7 @@ public class OnboardingService {
 
   // -- ACTION --
 
-  public void completeStep(@NotBlank final String step) {
-    User user = userService.currentUser();
+  public void completeStep(@NotNull final User user, @NotBlank final String step) {
     UserOnboardingProgress progress = getOrDefault(user);
 
     UserOnboardingStepStatus stepStatus = progress.getProgressMap().get(step);
@@ -47,8 +45,8 @@ public class OnboardingService {
     }
   }
 
-  public UserOnboardingProgress skipSteps(@NotNull final List<String> steps) {
-    User user = userService.currentUser();
+  public UserOnboardingProgress skipSteps(
+      @NotNull final User user, @NotNull final List<String> steps) {
     UserOnboardingProgress progress = getOrDefault(user);
 
     List<UserOnboardingStepStatus> stepStatuses =

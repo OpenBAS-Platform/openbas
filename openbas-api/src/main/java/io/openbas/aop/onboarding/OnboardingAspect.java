@@ -1,5 +1,6 @@
 package io.openbas.aop.onboarding;
 
+import io.openbas.service.UserService;
 import io.openbas.service.onboarding.OnboardingService;
 import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class OnboardingAspect {
 
   private final OnboardingService onboardingService;
+  private final UserService userService;
 
   @AfterReturning("@annotation(io.openbas.aop.onboarding.Onboarding)")
   public void handleOnboardingStep(JoinPoint joinPoint) {
@@ -26,7 +28,7 @@ public class OnboardingAspect {
 
       Onboarding onboarding = method.getAnnotation(Onboarding.class);
       String step = onboarding.step();
-      onboardingService.completeStep(step);
+      onboardingService.completeStep(userService.currentUser(), step);
     } catch (Exception e) {
       log.error("[OnboardingAspect] Failed to process onboarding step", e);
     }
