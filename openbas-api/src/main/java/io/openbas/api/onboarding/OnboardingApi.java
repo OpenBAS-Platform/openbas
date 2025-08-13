@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import io.openbas.api.onboarding.dto.StepsInput;
 import io.openbas.database.model.UserOnboardingProgress;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.UserService;
 import io.openbas.service.onboarding.OnboardingService;
 import io.openbas.utils.OnboardingConfig;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,12 +27,13 @@ public class OnboardingApi extends RestBehavior {
   public static final String ONBOARDING_URI = "/api/onboarding";
 
   private final OnboardingService onboardingService;
+  private final UserService userService;
 
   @GetMapping(ONBOARDING_URI)
   @Transactional(readOnly = true)
   @Operation(summary = "Returns the onboarding progress for the authenticated user.")
   public UserOnboardingProgress getOnboardingProgress() {
-    return onboardingService.userOnboardingProgress();
+    return onboardingService.userOnboardingProgress(userService.currentUser());
   }
 
   @GetMapping(ONBOARDING_URI + "/config")
@@ -45,6 +47,6 @@ public class OnboardingApi extends RestBehavior {
           "Marks one or more onboarding steps as skipped for the current user and returns the updated progress.")
   @PutMapping(ONBOARDING_URI + "/skipped")
   public UserOnboardingProgress skippedCategory(@RequestBody @NotNull final StepsInput input) {
-    return this.onboardingService.skipSteps(input.getSteps());
+    return this.onboardingService.skipSteps(userService.currentUser(), input.getSteps());
   }
 }
