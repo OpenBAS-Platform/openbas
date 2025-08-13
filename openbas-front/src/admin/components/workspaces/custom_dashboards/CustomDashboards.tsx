@@ -1,5 +1,5 @@
 import { AnalyticsOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { type CSSProperties, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -20,6 +20,7 @@ import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
+import ImportUploaderCustomDashboard from './ImportUploaderCustomDashboard';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -96,6 +97,11 @@ const CustomDashboards = () => {
         entityPrefix="custom_dashboard"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
+        topBarButtons={(
+          <ToggleButtonGroup value="fake" exclusive>
+            <ImportUploaderCustomDashboard />
+          </ToggleButtonGroup>
+        )}
       />
       <List>
         <ListItem
