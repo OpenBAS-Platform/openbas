@@ -24,8 +24,4 @@ export const SUBJECTS = {
   RESOURCE: 'RESOURCE',
 } as const;
 
-type ResourceSubject = { scenario_id: string };
-
 export type Subjects = typeof SUBJECTS[keyof typeof SUBJECTS];
-
-export type SubjectsType = Subjects | ResourceSubject;

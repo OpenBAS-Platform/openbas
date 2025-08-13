@@ -5,9 +5,9 @@ import {
 } from '@casl/ability';
 
 import parseCapability, { parseGrants } from './parserRbac';
-import { type Actions, type SubjectsType } from './types';
+import { type Actions, type Subjects } from './types';
 
-export type AppAbility = MongoAbility<[Actions, SubjectsType]>;
+export type AppAbility = MongoAbility<[Actions, Subjects]>;
 
 // TODO : Delete isAdmin when we remove this logic
 export function defineAbility(capabilities: string[], grants: Record<string, string>, isAdmin: boolean): (AppAbility) {
