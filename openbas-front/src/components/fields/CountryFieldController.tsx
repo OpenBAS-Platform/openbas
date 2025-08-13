@@ -14,7 +14,7 @@ const useStyles = makeStyles()(theme => ({
   text: {
     display: 'inline-block',
     flexGrow: 1,
-    marginLeft: 10,
+    marginLeft: theme.spacing(1),
   },
   autoCompleteIndicator: { display: 'none' },
 }));
