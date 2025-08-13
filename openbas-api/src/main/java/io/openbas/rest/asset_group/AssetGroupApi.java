@@ -178,7 +178,7 @@ public class AssetGroupApi extends RestBehavior {
               .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
               .distinct()
               .toList();
-      case SIMULATION_OR_SCENARIO ->
+      case SIMULATION_OR_SCENARIO, ATOMIC_TESTING ->
           assetGroupRepository
               .findAllBySimulationOrScenarioIdAndName(
                   StringUtils.trimToNull(simulationOrScenarioId),

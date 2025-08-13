@@ -263,7 +263,7 @@ public class TeamApi extends RestBehavior {
           teamRepository.findAllTeamsForAtomicTestingsSimulationsAndScenarios().stream()
               .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
               .toList();
-      case SIMULATION_OR_SCENARIO ->
+      case SIMULATION_OR_SCENARIO, ATOMIC_TESTING ->
           teamRepository
               .findAllBySimulationOrScenarioIdAndName(
                   StringUtils.trimToNull(simulationOrScenarioId),
