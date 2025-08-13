@@ -86,20 +86,16 @@ const ParametersOnboardingForm: FunctionComponent<ParametersOnboardingFormForms>
             gap: theme.spacing(2),
           }}
         >
-          <Box ml={2} mr={2}>
-            <Typography gutterBottom variant="subtitle1">{t('onboarding')}</Typography>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography variant="body2">{t('onboarding_process')}</Typography>
-              <Button type="button" variant="text" size="small" onClick={handleReset} sx={{ marginRight: theme.spacing(1) }}>{t('Reset')}</Button>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography variant="body2">{t('onboarding_display_widget')}</Typography>
-              <SwitchFieldController name="platform_onboarding_widget_enable" label="" />
-            </Box>
+          <Box ml={2} mr={2} display="flex" alignItems="center" justifyContent="space-between">
+            <Typography gutterBottom variant="subtitle1">{t('onboarding_process')}</Typography>
+            <Button type="button" variant="text" size="small" onClick={handleReset} sx={{ marginRight: theme.spacing(1) }}>{t('Reset')}</Button>
+          </Box>
+          <Box ml={2} mr={2} display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="body2">{t('onboarding_display_widget')}</Typography>
+            <SwitchFieldController name="platform_onboarding_widget_enable" label="" />
           </Box>
           <Divider />
           <Box ml={2} mr={2}>
-            <Typography variant="subtitle1">{t('onboarding_contextual_buttons')}</Typography>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Typography variant="body2">{t('onboarding_display_contextual_buttons')}</Typography>
               <SwitchFieldController name="platform_onboarding_contextual_help_enable" label="" />

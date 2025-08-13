@@ -14,15 +14,15 @@ import useDataLoader from '../../utils/hooks/useDataLoader';
 import { type Option } from '../../utils/Option';
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   icon: {
-    paddingTop: 4,
+    paddingTop: theme.spacing(1),
     display: 'inline-block',
   },
   text: {
     display: 'inline-block',
     flexGrow: 1,
-    marginLeft: 10,
+    marginLeft: theme.spacing(1),
   },
   autoCompleteIndicator: { display: 'none' },
 }));

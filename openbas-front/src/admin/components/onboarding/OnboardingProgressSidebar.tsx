@@ -93,9 +93,12 @@ const OnboardingProgressSidebar: React.FC<Props> = ({ onCloseSidebar }) => {
             <Typography variant="body2" fontWeight="bold">
               { progress < total ? t('onboarding_almost_ready') : t('onboarding_ready')}
             </Typography>
-            <Typography variant="caption">
-              {t('onboarding_finish_setup')}
-            </Typography>
+            { progress < total
+              && (
+                <Typography variant="caption">
+                  {t('onboarding_finish_setup')}
+                </Typography>
+              )}
           </div>
         </Box>
         <Divider />
