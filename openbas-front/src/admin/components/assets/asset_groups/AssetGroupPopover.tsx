@@ -134,6 +134,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   if (actions.includes('remove') && onRemoveAssetGroupFromList) entries.push({
     label: removeAssetGroupFromListMessage,
     action: () => onRemoveAssetGroupFromList(assetGroup.asset_group_id),
+    userRight: true,
   });
   if (actions.includes('delete')) entries.push({
     label: 'Delete',

@@ -102,6 +102,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({
     label: t('inject_export_json_single'),
     action: () => handleOpenExport(),
+    userRight: true,
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',

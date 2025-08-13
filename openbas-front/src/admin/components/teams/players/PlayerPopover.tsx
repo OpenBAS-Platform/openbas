@@ -135,6 +135,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   if (teamId) entries.push({
     label: t('Remove from the team'),
     action: () => handleOpenRemove(),
+    userRight: true,
   });
   if (canDelete) entries.push({
     label: t('Delete'),

@@ -157,14 +157,17 @@ const FileLoader: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: handleOpen,
+      userRight: true,
     },
     {
       label: 'Download',
       action: () => handleDownload(selectedDocument?.document_id),
+      userRight: true,
     },
     {
       label: 'Remove',
       action: handleRemove,
+      userRight: true,
     },
   ];
 

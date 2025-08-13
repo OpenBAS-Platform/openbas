@@ -8,7 +8,7 @@ export interface PopoverEntry {
   label: string;
   action: () => void | Dispatch<SetStateAction<boolean>>;
   disabled?: boolean;
-  userRight?: boolean;
+  userRight: boolean;
 }
 
 export type VariantButtonPopover = 'toggle' | 'icon';
@@ -33,7 +33,7 @@ const ButtonPopover: FunctionComponent<Props> = ({
 
   return (
     <>
-      {variant === 'toggle' && !entries.every(entry => entry.userRight === false)
+      {variant === 'toggle' && !entries.every(entry => !entry.userRight)
         && (
           <ToggleButton
             value="popover"
@@ -49,7 +49,7 @@ const ButtonPopover: FunctionComponent<Props> = ({
             <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
           </ToggleButton>
         )}
-      {variant === 'icon' && !entries.every(entry => entry.userRight === false)
+      {variant === 'icon' && !entries.every(entry => !entry.userRight)
         && (
           <IconButton
             value="popover"
@@ -70,8 +70,7 @@ const ButtonPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        {entries.map((entry) => {
-          if (entry.userRight === false) return null;
+        {entries.filter(entry => entry.userRight).map((entry) => {
           return (
             <MenuItem
               key={entry.label}
