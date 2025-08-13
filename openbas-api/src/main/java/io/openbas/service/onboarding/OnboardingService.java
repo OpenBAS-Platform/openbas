@@ -52,7 +52,7 @@ public class OnboardingService {
     List<UserOnboardingStepStatus> stepStatuses =
         steps.stream().map(s -> progress.getProgressMap().get(s)).toList();
     if (!stepStatuses.isEmpty()) {
-      stepStatuses.forEach(s -> s.setSkipped(true));
+      stepStatuses.stream().filter(s -> !s.isCompleted()).forEach(s -> s.setSkipped(true));
       user.setOnboardingProgress(progress);
       userService.updateUser(user);
     }
