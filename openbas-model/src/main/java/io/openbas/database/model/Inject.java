@@ -257,6 +257,10 @@ public class Inject implements Base, Injection {
 
   @Getter @Setter @Transient private boolean isListened = true;
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.INJECT;
+
   // region transient
   @Transient
   public String getHeader() {
@@ -463,5 +467,19 @@ public class Inject implements Base, Injection {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @JsonIgnore
+  public String getParentResourceId() {
+    return this.getScenario() != null
+        ? this.getScenario().getId()
+        : this.getExercise() != null ? this.getExercise().getId() : this.getId();
+  }
+
+  @JsonIgnore
+  public ResourceType getParentResourceType() {
+    return this.getScenario() != null
+        ? ResourceType.SCENARIO
+        : this.getExercise() != null ? ResourceType.SIMULATION : ResourceType.ATOMIC_TESTING;
   }
 }

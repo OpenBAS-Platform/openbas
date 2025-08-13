@@ -61,6 +61,10 @@ public class Tag implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.TAG;
+
   @JsonIgnore
   @Override
   public boolean isUserHasAccess(User user) {
