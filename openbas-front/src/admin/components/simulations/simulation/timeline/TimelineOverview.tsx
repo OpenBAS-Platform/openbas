@@ -1,4 +1,3 @@
-import { PreviewOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
@@ -137,7 +136,7 @@ const TimelineOverview = () => {
         <Typography variant="h4">{t('Processed injects')}</Typography>
         <Paper variant="outlined">
           {pendingInjects.length > 0 ? (
-            <List style={{ paddingTop: 0 }}>
+            <List style={{ paddingTop: theme.spacing(0) }}>
               {pendingInjects.map((inject: InjectStore) => {
                 return (
                   <ListItem
@@ -213,7 +212,7 @@ const TimelineOverview = () => {
           {processedInjects.length > 0 ? (
             <List style={{ paddingTop: 0 }}>
               {processedInjects.map((inject: InjectStore) => (
-                <ListItem key={inject.inject_id} secondaryAction={<PreviewOutlined />}>
+                <ListItem key={inject.inject_id}>
                   <ListItemButton
                     dense
                     classes={{ root: classes.item }}
