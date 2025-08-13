@@ -1,6 +1,9 @@
 package io.openbas.rest.custom_dashboard;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.rest.helper.RestBehavior;
@@ -28,6 +31,7 @@ public class CustomDashboardApi extends RestBehavior {
   // -- CRUD --
 
   @PostMapping
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<CustomDashboard> createCustomDashboard(
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
     return ResponseEntity.ok(
@@ -36,23 +40,33 @@ public class CustomDashboardApi extends RestBehavior {
   }
 
   @GetMapping
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<List<CustomDashboardOutput>> customDashboards() {
     return ResponseEntity.ok(this.customDashboardService.customDashboards());
   }
 
   @PostMapping("/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Page<CustomDashboard>> customDashboards(
       @RequestBody @NotNull @Valid final SearchPaginationInput searchPaginationInput) {
     return ResponseEntity.ok(this.customDashboardService.customDashboards(searchPaginationInput));
   }
 
   @GetMapping("/{customDashboardId}")
+  @RBAC(
+      resourceId = "#customDashboardId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<CustomDashboard> customDashboard(
       @PathVariable @NotBlank final String customDashboardId) {
     return ResponseEntity.ok(this.customDashboardService.customDashboard(customDashboardId));
   }
 
   @PutMapping("/{customDashboardId}")
+  @RBAC(
+      resourceId = "#customDashboardId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<CustomDashboard> updateCustomDashboard(
       @PathVariable @NotBlank final String customDashboardId,
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
@@ -64,6 +78,10 @@ public class CustomDashboardApi extends RestBehavior {
   }
 
   @DeleteMapping("/{customDashboardId}")
+  @RBAC(
+      resourceId = "#customDashboardId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Void> deleteCustomDashboard(
       @PathVariable @NotBlank final String customDashboardId) {
     this.customDashboardService.deleteCustomDashboard(customDashboardId);
@@ -73,12 +91,14 @@ public class CustomDashboardApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping("/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.DASHBOARD)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return this.customDashboardService.findAllAsOptions(searchText);
   }
 
   @PostMapping("/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.DASHBOARD)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return this.customDashboardService.findAllByIdsAsOptions(ids);
   }

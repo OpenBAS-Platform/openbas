@@ -22,7 +22,26 @@ public enum ResourceType {
   PLATFORM_SETTING,
   LESSON_LEARNED,
   CHALLENGE,
-  UNKNOWN;
+  INJECT,
+  JOB,
+  TAG,
+  TAG_RULE,
+  KILL_CHAIN_PHASE,
+  ATTACK_PATTERN,
+  ASSET_GROUP,
+  CVE,
+  USER_GROUP,
+  INJECTOR,
+  INJECTOR_CONTRACT,
+  MAPPER,
+  GROUP_ROLE,
+  ORGANIZATION,
+  COLLECTOR,
+
+  // Special resource types
+  UNKNOWN,
+  SIMULATION_OR_SCENARIO, // Used to represent either a simulation or a scenario.
+  SKIP_RBAC; // Used to skip RBAC checks.
 
   public static ResourceType fromString(@NotNull String name) {
     try {

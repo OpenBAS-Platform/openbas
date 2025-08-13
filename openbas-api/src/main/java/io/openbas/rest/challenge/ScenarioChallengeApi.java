@@ -5,7 +5,10 @@ import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH
 import static io.openbas.rest.challenge.ChallengeHelper.resolveChallengeIds;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.InjectSpecification;
@@ -29,6 +32,10 @@ public class ScenarioChallengeApi extends RestBehavior {
 
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @GetMapping(SCENARIO_URI + "/{scenarioId}/challenges")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(readOnly = true)
   public Iterable<ChallengeOutput> scenarioChallenges(
       @PathVariable @NotBlank final String scenarioId) {

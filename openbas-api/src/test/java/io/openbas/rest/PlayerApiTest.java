@@ -22,7 +22,7 @@ import io.openbas.utils.fixtures.OrganizationFixture;
 import io.openbas.utils.fixtures.PlayerFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.servlet.ServletException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -98,7 +98,7 @@ class PlayerApiTest extends IntegrationTest {
 
   @DisplayName("Given restricted user, should not allow creation of player")
   @Test
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void given_restrictedUser_should_notAllowPlayerCreation() {
     // -- PREPARE --
     PlayerInput playerInput = buildPlayerInput();
@@ -199,7 +199,7 @@ class PlayerApiTest extends IntegrationTest {
 
   @DisplayName("Given restricted user, should not allow updating a player")
   @Test
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void given_restrictedUser_should_notAllowPlayerUpdate() {
     // -- PREPARE --
     PlayerInput playerInput = buildPlayerInput();

@@ -3,7 +3,10 @@ package io.openbas.rest.tag_rule;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag_rule.form.TagRuleInput;
 import io.openbas.rest.tag_rule.form.TagRuleMapper;
@@ -44,6 +47,10 @@ public class TagRuleApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
+  @RBAC(
+      resourceId = "#tagRuleId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.TAG_RULE)
   @Operation(description = "Get TagRule by Id", summary = "Get TagRule")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The TagRule")})
   public TagRuleOutput findTagRule(
@@ -53,6 +60,7 @@ public class TagRuleApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TAG_RULE)
   @Operation(description = "Get All TagRules", summary = "Get TagRules")
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of all TagRules")})
@@ -63,6 +71,10 @@ public class TagRuleApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
+  @RBAC(
+      resourceId = "#tagRuleId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Delete TagRule", description = "TagRule needs to exists")
   @ApiResponses(
@@ -78,6 +90,7 @@ public class TagRuleApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
@@ -93,6 +106,10 @@ public class TagRuleApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
+  @RBAC(
+      resourceId = "#tagRuleId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.TAG_RULE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Update TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
@@ -109,6 +126,7 @@ public class TagRuleApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TAG_RULE)
   @Operation(
       description = "Search TagRules corresponding to search criteria",
       summary = "Search TagRules")

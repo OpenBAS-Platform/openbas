@@ -42,6 +42,7 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -72,6 +73,7 @@ import org.springframework.util.ResourceUtils;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 @ExtendWith(MockitoExtension.class)
+@Transactional
 class InjectApiTest extends IntegrationTest {
 
   static Exercise EXERCISE;
@@ -148,20 +150,11 @@ class InjectApiTest extends IntegrationTest {
     AGENT = agentRepository.save(agent);
   }
 
-  @AfterAll
-  void afterAll() {
-    this.scenarioRepository.delete(SCENARIO);
-    this.exerciseRepository.delete(EXERCISE);
-    this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
-    this.teamRepository.delete(TEAM);
-    this.agentRepository.delete(AGENT);
-  }
-
   // BULK DELETE
   @DisplayName("Delete list of injects for scenario")
   @Test
   @Order(6)
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void deleteInjectsForScenarioTest() throws Exception {
     // -- PREPARE --
     Inject injectForScenario1 = new Inject();
@@ -177,14 +170,15 @@ class InjectApiTest extends IntegrationTest {
     InjectDocument injectDocument4 = new InjectDocument();
     injectDocument4.setInject(createdInject);
     injectDocument4.setDocument(DOCUMENT2);
-    createdInject.setDocuments(List.of(injectDocument4));
+    createdInject.setDocuments(new ArrayList<>(List.of(injectDocument4)));
+    createdInject = injectRepository.save(injectForScenario1);
 
     injectExpectationRepository.save(
         InjectExpectationFixture.createArticleInjectExpectation(TEAM, createdInject));
 
     // -- ASSERT --
     assertTrue(
-        injectRepository.existsById(createdInject.getId()),
+        injectRepository.existsByIdWithoutLoading(createdInject.getId()),
         "The inject should exist from the database");
     assertFalse(
         injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
@@ -291,7 +285,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseTest() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -352,7 +346,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise with no team")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseWithNoTeam() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -391,7 +385,7 @@ class InjectApiTest extends IntegrationTest {
 
   @DisplayName("Execute an email inject for exercise with no content")
   @Test
-  @WithMockPlannerUser
+  @WithMockAdminUser
   void executeEmailInjectForExerciseWithNoContentTest() throws Exception {
     // -- PREPARE --
     InjectorContract injectorContract =
@@ -425,7 +419,7 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Delete list of inject for exercise")
   @Test
   @Order(8)
-  @WithMockPlannerUser
+  @WithMockUserFullPermissions
   void deleteInjectsForExerciseTest() throws Exception {
     // -- PREPARE --
     Inject injectForExercise1 = new Inject();
@@ -457,8 +451,8 @@ class InjectApiTest extends IntegrationTest {
     injectDocument3.setInject(createdInject2);
     injectDocument3.setDocument(DOCUMENT1);
 
-    createdInject1.setDocuments(List.of(injectDocument1, injectDocument2));
-    createdInject2.setDocuments(List.of(injectDocument3));
+    createdInject1.setDocuments(new ArrayList<>(List.of(injectDocument1, injectDocument2)));
+    createdInject2.setDocuments(new ArrayList<>(List.of(injectDocument3)));
 
     injectRepository.save(createdInject1);
     injectRepository.save(createdInject2);

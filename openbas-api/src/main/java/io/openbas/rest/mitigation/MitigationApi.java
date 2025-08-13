@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Mitigation;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -49,11 +50,19 @@ public class MitigationApi extends RestBehavior {
   }
 
   @GetMapping("/api/mitigations")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public Iterable<Mitigation> mitigations() {
     return mitigationRepository.findAll();
   }
 
   @PostMapping("/api/mitigations/search")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public Page<Mitigation> mitigations(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -64,12 +73,20 @@ public class MitigationApi extends RestBehavior {
   }
 
   @GetMapping("/api/mitigations/{mitigationId}")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public Mitigation mitigation(@PathVariable String mitigationId) {
     return mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   @Transactional(rollbackOn = Exception.class)
   public Mitigation createMitigation(@Valid @RequestBody MitigationCreateInput input) {
     Mitigation mitigation = new Mitigation();
@@ -80,6 +97,10 @@ public class MitigationApi extends RestBehavior {
   }
 
   @GetMapping("/api/mitigations/{mitigationId}/attack_patterns")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public Iterable<AttackPattern> injectorContracts(@PathVariable String mitigationId) {
     mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
     return attackPatternRepository.findAll(
@@ -88,6 +109,10 @@ public class MitigationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/mitigations/{mitigationId}")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public Mitigation updateMitigation(
       @NotBlank @PathVariable final String mitigationId,
       @Valid @RequestBody MitigationUpdateInput input) {
@@ -138,15 +163,22 @@ public class MitigationApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations/upsert")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   @Transactional(rollbackOn = Exception.class)
-  public Iterable<Mitigation> upsertKillChainPhases(
-      @Valid @RequestBody MitigationUpsertInput input) {
+  public Iterable<Mitigation> upsertMitigation(@Valid @RequestBody MitigationUpsertInput input) {
     List<MitigationCreateInput> mitigations = input.getMitigations();
     return new ArrayList<>(upsertMitigations(mitigations));
   }
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mitigations/{mitigationId}")
+  @RBAC(
+      skipRBAC =
+          true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
+  // yet
   public void deleteMitigation(@PathVariable String mitigationId) {
     mitigationRepository.deleteById(mitigationId);
   }

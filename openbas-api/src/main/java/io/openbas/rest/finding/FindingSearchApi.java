@@ -3,7 +3,10 @@ package io.openbas.rest.finding;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Finding;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.AggregatedFindingOutput;
@@ -36,6 +39,7 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.FINDING)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -61,6 +65,7 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -90,6 +95,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -119,6 +128,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -150,6 +163,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
+  @RBAC(
+      resourceId = "#endpointId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.ASSET)
   @ApiResponse(
       responseCode = "200",
       content =

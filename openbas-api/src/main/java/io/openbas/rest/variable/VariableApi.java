@@ -4,9 +4,8 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Scenario;
-import io.openbas.database.model.Variable;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -34,6 +33,10 @@ public class VariableApi extends RestBehavior {
   // -- EXERCISES --
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/variables")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Variable createVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
@@ -47,12 +50,20 @@ public class VariableApi extends RestBehavior {
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/variables")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Variable> variablesFromExercise(@PathVariable @NotBlank final String exerciseId) {
     return this.variableService.variablesFromExercise(exerciseId);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/variables/{variableId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Variable updateVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
@@ -65,6 +76,10 @@ public class VariableApi extends RestBehavior {
   }
 
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/variables/{variableId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
@@ -77,6 +92,10 @@ public class VariableApi extends RestBehavior {
   // -- SCENARIOS --
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/variables")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Variable createVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -89,12 +108,20 @@ public class VariableApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/variables")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Variable> variablesFromScenario(@PathVariable @NotBlank final String scenarioId) {
     return this.variableService.variablesFromScenario(scenarioId);
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/variables/{variableId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Variable updateVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -107,6 +134,10 @@ public class VariableApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/variables/{variableId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,

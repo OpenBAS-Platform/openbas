@@ -3,6 +3,7 @@ package io.openbas.rest.log;
 import static io.openbas.utils.LogUtils.*;
 import static java.util.logging.Level.*;
 
+import io.openbas.aop.RBAC;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.log.form.LogDetailsInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +40,7 @@ public class LogApi extends RestBehavior {
             description = "Invalid level",
             content = @Content(mediaType = "application/json"))
       })
+  @RBAC(skipRBAC = true)
   public ResponseEntity<String> logDetails(
       @Parameter(
               description = "Details of the log message, including level, message, and stacktrace.",

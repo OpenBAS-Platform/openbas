@@ -4,6 +4,9 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.*;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -27,6 +30,10 @@ public class ScenarioTeamApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/teams/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Page<TeamOutput> teams(

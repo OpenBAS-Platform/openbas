@@ -4,7 +4,10 @@ import static io.openbas.database.specification.InjectSpecification.testable;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
@@ -32,6 +35,10 @@ public class ScenarioInjectTestApi extends RestBehavior {
   private final InjectService injectService;
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
       @PathVariable @NotBlank String scenarioId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -41,12 +48,17 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(SCENARIO_URI + "/injects/test/{testId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SCENARIO)
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank final String scenarioId, @PathVariable @NotBlank String injectId) {
@@ -55,6 +67,10 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/test/{testId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteInjectTest(
       @PathVariable @NotBlank final String scenarioId, @PathVariable String testId) {
@@ -66,6 +82,10 @@ public class ScenarioInjectTestApi extends RestBehavior {
       tags = {"Injects", "Tests"})
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SCENARIO)
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(

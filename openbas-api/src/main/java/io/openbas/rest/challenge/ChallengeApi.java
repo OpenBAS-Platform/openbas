@@ -6,6 +6,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openbas.database.repository.*;
@@ -37,6 +38,7 @@ public class ChallengeApi extends RestBehavior {
   private final ChallengeService challengeService;
 
   @GetMapping("/api/challenges")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.CHALLENGE)
   public Iterable<Challenge> challenges() {
     return fromIterable(challengeRepository.findAll()).stream()
         .map(challengeService::enrichChallengeWithExercisesOrScenarios)
@@ -45,6 +47,7 @@ public class ChallengeApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/challenges/find")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.CHALLENGE)
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public List<Challenge> findEndpoints(
       @RequestBody @Valid @NotNull final List<String> challengeIds) {
@@ -53,6 +56,10 @@ public class ChallengeApi extends RestBehavior {
 
   @PreAuthorize("isPlanner()")
   @PutMapping("/api/challenges/{challengeId}")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public Challenge updateChallenge(
       @PathVariable String challengeId, @Valid @RequestBody ChallengeInput input) {
@@ -83,6 +90,7 @@ public class ChallengeApi extends RestBehavior {
 
   @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();
@@ -106,12 +114,20 @@ public class ChallengeApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public void deleteChallenge(@PathVariable String challengeId) {
     challengeRepository.deleteById(challengeId);
   }
 
   @PostMapping("/api/challenges/{challengeId}/try")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHALLENGE)
   public ChallengeResult tryChallenge(
       @PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input)
       throws InputValidationException {

@@ -1,6 +1,9 @@
 package io.openbas.rest.expectation;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationBulkUpdateInput;
@@ -27,6 +30,7 @@ public class ExpectationApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(EXPECTATIONS_URI + "/{expectationId}")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody final ExpectationUpdateInput input) {
@@ -35,6 +39,7 @@ public class ExpectationApi extends RestBehavior {
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(EXPECTATIONS_URI + "/{expectationId}/{sourceId}/delete")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
@@ -46,6 +51,7 @@ public class ExpectationApi extends RestBehavior {
       description =
           "Retrieves inject expectations of agents installed on an asset. If an expiration time is provided, it will return all expectations not expired within this timeframe independently of their results. Otherwise, it will return all expectations without any result.")
   @GetMapping(INJECTS_EXPECTATIONS_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectExpectationsNotFilledOrNotExpired(
       @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
     if (expirationTime == null) {
@@ -70,6 +76,7 @@ public class ExpectationApi extends RestBehavior {
       description =
           "Retrieves inject expectations that have not seen any result yet of agents installed on an asset for a given source ID.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/{sourceId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -85,6 +92,7 @@ public class ExpectationApi extends RestBehavior {
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/assets/{sourceId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId,
       @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
@@ -101,6 +109,7 @@ public class ExpectationApi extends RestBehavior {
   }
 
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
     return injectExpectationService.preventionExpectationsNotFill().stream().toList();
   }
@@ -110,12 +119,14 @@ public class ExpectationApi extends RestBehavior {
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID and type Prevention.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention/{sourceId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
   }
 
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
     return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
@@ -125,6 +136,7 @@ public class ExpectationApi extends RestBehavior {
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID and type detection.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection/{sourceId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
@@ -134,6 +146,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Update Inject Expectation",
       description = "Update Inject expectation from an external source, e.g., EDR collector.")
   @PutMapping(INJECTS_EXPECTATIONS_URI + "/{expectationId}")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
@@ -145,6 +158,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Bulk Update Inject Expectation",
       description = "Bulk Update Inject expectation from an external source, e.g., EDR collector.")
   @PutMapping(INJECTS_EXPECTATIONS_URI + "/bulk")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void updateInjectExpectation(
       @Valid @RequestBody @NotNull InjectExpectationBulkUpdateInput inputs) {

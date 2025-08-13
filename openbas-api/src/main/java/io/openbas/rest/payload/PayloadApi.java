@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -46,6 +47,7 @@ public class PayloadApi extends RestBehavior {
   private final PayloadExportService payloadExportService;
 
   @PostMapping(PAYLOAD_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PAYLOAD)
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -55,11 +57,16 @@ public class PayloadApi extends RestBehavior {
   }
 
   @GetMapping(PAYLOAD_URI + "/{payloadId}")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD)
   public Payload payload(@PathVariable String payloadId) {
     return payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
   }
 
   @PostMapping(PAYLOAD_URI)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
@@ -67,6 +74,10 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PutMapping(PAYLOAD_URI + "/{payloadId}")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(
@@ -76,6 +87,10 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/{payloadId}/duplicate")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.DUPLICATE,
+      resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload duplicatePayload(@NotBlank @PathVariable final String payloadId) {
@@ -83,6 +98,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/upsert")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
@@ -90,6 +106,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/export")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD)
   public void payloadsExport(
       @RequestBody @Valid final PayloadExportRequestInput payloadExportRequestInput,
       HttpServletResponse response)
@@ -102,6 +119,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/import")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   @PreAuthorize("isPlanner()")
   public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
@@ -122,11 +140,16 @@ public class PayloadApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.PAYLOAD)
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
   }
 
   @PostMapping(PAYLOAD_URI + "/deprecate")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   @Secured(ROLE_ADMIN)
   @Transactional(rollbackOn = Exception.class)
   public void deprecateNonProcessedPayloadsByCollector(

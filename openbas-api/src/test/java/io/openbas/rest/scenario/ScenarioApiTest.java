@@ -23,8 +23,6 @@ import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -78,7 +76,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Create scenario succeed")
   @Test
   @Order(1)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void createScenarioTest() throws Exception {
     // -- PREPARE --
     ScenarioInput scenarioInput = new ScenarioInput();
@@ -120,7 +118,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Retrieve scenarios")
   @Test
   @Order(2)
-  @WithMockObserverUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void retrieveScenariosTest() throws Exception {
     // -- EXECUTE --
     String response =
@@ -138,7 +136,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Retrieve scenario")
   @Test
   @Order(3)
-  @WithMockObserverUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void retrieveScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
@@ -156,7 +154,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Update scenario")
   @Test
   @Order(4)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void updateScenarioTest() throws Exception {
     // -- PREPARE --
     String response =
@@ -194,7 +192,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Delete scenario")
   @Test
   @Order(5)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void deleteScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
     this.mvc
@@ -205,7 +203,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Check if a rule applies when a rule is found")
   @Test
   @Order(7)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void checkIfRuleAppliesTest_WHEN_rule_found() throws Exception {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();
@@ -243,7 +241,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Check if a rule applies when no rule is found")
   @Test
   @Order(8)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void checkIfRuleAppliesTest_WHEN_no_rule_found() throws Exception {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();

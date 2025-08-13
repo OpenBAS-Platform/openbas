@@ -5,6 +5,9 @@ import static io.openbas.database.specification.TeamSpecification.contextual;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -28,6 +31,10 @@ public class ExerciseTeamApi extends RestBehavior {
   private final TeamService teamService;
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/teams/search")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Page<TeamOutput> searchTeams(
