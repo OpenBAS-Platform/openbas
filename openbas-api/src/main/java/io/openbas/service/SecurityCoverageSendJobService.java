@@ -41,4 +41,9 @@ public class SecurityCoverageSendJobService {
     return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore(
         "PENDING", Instant.now().minus(1, ChronoUnit.MINUTES));
   }
+
+  public void consumeJob(SecurityCoverageSendJob job) {
+    job.setStatus("SENT");
+    securityCoverageSendJobRepository.save(job);
+  }
 }

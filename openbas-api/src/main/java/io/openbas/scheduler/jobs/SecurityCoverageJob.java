@@ -26,7 +26,11 @@ public class SecurityCoverageJob implements Job {
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
-    Bundle bundle = securityCoverageService.createBundleFromSendJobs(jobs);
-    JsonNode n = bundle.toStix(mapper);
+    for (SecurityCoverageSendJob securityCoverageSendJob : jobs) {
+      Bundle bundle = securityCoverageService.createBundleFromSendJobs(List.of(securityCoverageSendJob));
+      JsonNode n = bundle.toStix(mapper);
+      // send bundle
+      securityCoverageSendJobService.consumeJob(securityCoverageSendJob);
+    }
   }
 }
