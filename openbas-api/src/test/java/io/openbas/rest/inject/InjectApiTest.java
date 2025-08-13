@@ -42,7 +42,6 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
-import io.openbas.utils.mockUser.WithMockUserFullPermissions;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -154,7 +153,7 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Delete list of injects for scenario")
   @Test
   @Order(6)
-  @WithMockUserFullPermissions
+  @WithMockAdminUser
   void deleteInjectsForScenarioTest() throws Exception {
     // -- PREPARE --
     Inject injectForScenario1 = new Inject();
@@ -419,7 +418,7 @@ class InjectApiTest extends IntegrationTest {
   @DisplayName("Delete list of inject for exercise")
   @Test
   @Order(8)
-  @WithMockUserFullPermissions
+  @WithMockAdminUser
   void deleteInjectsForExerciseTest() throws Exception {
     // -- PREPARE --
     Inject injectForExercise1 = new Inject();
