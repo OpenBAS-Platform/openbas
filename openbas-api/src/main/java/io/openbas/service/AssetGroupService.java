@@ -54,7 +54,7 @@ public class AssetGroupService {
 
   public List<AssetGroup> assetGroupsForSimulation(@NotBlank final String simulationId) {
     List<AssetGroup> assetGroups =
-        fromIterable(this.assetGroupRepository.findDistinctByInjectsExerciseId(simulationId));
+        fromIterable(this.assetGroupRepository.findDistinctByInjectsSimulationId(simulationId));
     return computeDynamicAssets(assetGroups);
   }
 
