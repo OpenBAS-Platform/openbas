@@ -1,11 +1,12 @@
 import { type FunctionComponent, useCallback, useContext, useState } from 'react';
 
-import { deleteCustomDashboard, updateCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
+import { deleteCustomDashboard, exportCustomDashboard, updateCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboard, type CustomDashboardInput } from '../../../../utils/api-types';
+import { download } from '../../../../utils/utils';
 import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CustomDashboardForm from './CustomDashboardForm';
@@ -45,6 +46,11 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
     [customDashboard.custom_dashboard_id, onUpdate],
   );
 
+  const submitExport = async () => {
+    const { data } = await exportCustomDashboard(customDashboard.custom_dashboard_id);
+    download(JSON.stringify(data, null, 2), `dashboard-${customDashboard.custom_dashboard_id}.json`, 'application/json');
+  };
+
   const submitDelete = useCallback(async () => {
     try {
       await deleteCustomDashboard(customDashboard.custom_dashboard_id);
@@ -59,6 +65,10 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
       label: t('Update'),
       action: () => toggleModal('edit'),
       userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DASHBOARDS),
+    },
+    {
+      label: t('Export'),
+      action: () => submitExport(),
     },
     {
       label: t('Delete'),
