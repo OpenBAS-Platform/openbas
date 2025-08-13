@@ -11,9 +11,7 @@ public interface RawScenario {
 
   Instant getScenario_created_at();
 
-  Instant getScenario_updated_at();
-
-  Instant getInject_updated_at();
+  Instant getScenario_injects_updated_at();
 
   public String getScenario_subtitle();
 

@@ -33,13 +33,7 @@ public class ScenarioHandler implements Handler<EsScenario> {
               // Base
               esScenario.setBase_id(scenario.getScenario_id());
               esScenario.setBase_created_at(scenario.getScenario_created_at());
-
-              if (scenario.getInject_updated_at() != null
-                  && scenario.getInject_updated_at().isAfter(scenario.getScenario_updated_at())) {
-                esScenario.setBase_updated_at(scenario.getInject_updated_at());
-              } else {
-                esScenario.setBase_updated_at(scenario.getScenario_updated_at());
-              }
+              esScenario.setBase_updated_at(scenario.getScenario_injects_updated_at());
 
               esScenario.setBase_representative(scenario.getScenario_name());
               esScenario.setBase_restrictions(buildRestrictions(scenario.getScenario_id()));

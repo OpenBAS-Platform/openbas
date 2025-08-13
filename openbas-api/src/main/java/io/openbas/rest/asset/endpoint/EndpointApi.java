@@ -164,26 +164,36 @@ public class EndpointApi extends RestBehavior {
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId,
       @RequestParam(required = false) final String inputFilterOption) {
+    // For backwards compatible
+    if (inputFilterOption == null || inputFilterOption.isEmpty()) {
+      return endpointRepository
+          .findAllBySimulationOrScenarioIdAndName(
+              StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
+          .stream()
+          .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+          .toList();
+    }
+    InputFilterOptions injectFilterOptionEnum;
     try {
-      InputFilterOptions injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
-      return switch (injectFilterOptionEnum) {
-        case ALL_INJECTS ->
-            endpointRepository.findAllEndpointsForAtomicTestingsSimulationsAndScenarios().stream()
-                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-                .toList();
-        case SIMULATION_OR_SCENARIO ->
-            endpointRepository
-                .findAllBySimulationOrScenarioIdAndName(
-                    StringUtils.trimToNull(simulationOrScenarioId),
-                    StringUtils.trimToNull(searchText))
-                .stream()
-                .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-                .toList();
-      };
+      injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
     } catch (IllegalArgumentException e) {
       throw new BadRequestException(
           String.format("Invalid input filter option %s", inputFilterOption));
     }
+    return switch (injectFilterOptionEnum) {
+      case ALL_INJECTS ->
+          endpointRepository.findAllEndpointsForAtomicTestingsSimulationsAndScenarios().stream()
+              .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+              .toList();
+      case SIMULATION_OR_SCENARIO ->
+          endpointRepository
+              .findAllBySimulationOrScenarioIdAndName(
+                  StringUtils.trimToNull(simulationOrScenarioId),
+                  StringUtils.trimToNull(searchText))
+              .stream()
+              .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+              .toList();
+    };
   }
 
   @LogExecutionTime

@@ -29,15 +29,7 @@ public class SimulationHandler implements Handler<EsSimulation> {
               // Base
               esSimulation.setBase_id(simulation.getExercise_id());
               esSimulation.setBase_created_at(simulation.getExercise_created_at());
-
-              if (simulation.getInject_updated_at() != null
-                  && simulation
-                      .getInject_updated_at()
-                      .isAfter(simulation.getExercise_updated_at())) {
-                esSimulation.setBase_updated_at(simulation.getInject_updated_at());
-              } else {
-                esSimulation.setBase_updated_at(simulation.getExercise_updated_at());
-              }
+              esSimulation.setBase_updated_at(simulation.getExercise_injects_updated_at());
 
               esSimulation.setBase_representative(simulation.getExercise_name());
               esSimulation.setBase_restrictions(buildRestrictions(simulation.getExercise_id()));

@@ -353,20 +353,24 @@ public interface ExerciseRepository
 
   @Query(
       value =
-          "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_updated_at, ex.exercise_created_at, inj.inject_updated_at, "
-              + "array_agg(et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
-              + "array_agg(ete.team_id) FILTER ( WHERE ete.team_id IS NOT NULL ) as exercise_teams, "
-              + "array_agg(ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as exercise_assets, "
-              + "array_agg(iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as exercise_asset_groups "
+          "WITH exercise_data AS ("
+              + "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_created_at, "
+              + "GREATEST(ex.exercise_updated_at, max(inj.inject_updated_at)) as exercise_injects_updated_at, "
+              + "array_agg(DISTINCT et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
+              + "array_agg(DISTINCT ete.team_id) FILTER ( WHERE ete.team_id IS NOT NULL ) as exercise_teams, "
+              + "array_agg(DISTINCT ia.asset_id) FILTER ( WHERE ia.asset_id IS NOT NULL ) as exercise_assets, "
+              + "array_agg(DISTINCT iag.asset_group_id) FILTER ( WHERE iag.asset_group_id IS NOT NULL ) as exercise_asset_groups "
               + "FROM exercises ex "
               + "LEFT JOIN exercises_tags et ON et.exercise_id = ex.exercise_id "
               + "LEFT JOIN exercises_teams ete ON ete.exercise_id = ex.exercise_id "
               + "LEFT JOIN injects inj ON ex.exercise_id = inj.inject_exercise "
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
-              + "WHERE ex.exercise_updated_at > :from "
-              + "OR inj.inject_updated_at > :from  "
-              + "GROUP BY ex.exercise_id, ex.exercise_updated_at, inj.inject_updated_at ORDER BY GREATEST(ex.exercise_updated_at, inj.inject_updated_at) ASC LIMIT "
+              + "GROUP BY ex.exercise_id, ex.exercise_name, ex.exercise_created_at, ex.exercise_updated_at"
+              + ") "
+              + "SELECT * FROM exercise_data ed "
+              + "WHERE ed.exercise_injects_updated_at > :from "
+              + "ORDER BY ed.exercise_injects_updated_at ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)

@@ -5,11 +5,11 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import AssetPlatformFragment from '../../../../../../../../../components/common/list/fragments/AssetPlatformFragment';
-import AssetTagsFragment from '../../../../../../../../../components/common/list/fragments/AssetTagsFragment';
 import EndpointActiveFragment from '../../../../../../../../../components/common/list/fragments/EndpointActiveFragment';
 import EndpointAgentsPrivilegeFragment
   from '../../../../../../../../../components/common/list/fragments/EndpointAgentsPrivilegeFragment';
 import EndpointArchFragment from '../../../../../../../../../components/common/list/fragments/EndpointArchFragment';
+import TagsFragment from '../../../../../../../../../components/common/list/fragments/TagsFragment';
 import VulnerableEndpointActionFragment
   from '../../../../../../../../../components/common/list/fragments/VulnerableEndpointActionFragment';
 import { buildSearchPagination } from '../../../../../../../../../components/common/queryable/QueryableUtils';
@@ -73,7 +73,7 @@ const VulnerableEndpointListElement = (props: Props) => {
       case EndpointListItemFragments.VULNERABLE_ENDPOINT_ACTION:
         return (endpoint: EsVulnerableEndpoint) => <VulnerableEndpointActionFragment action={endpoint.vulnerable_endpoint_action} />;
       case EndpointListItemFragments.BASE_TAGS_SIDE:
-        return (endpoint: EsVulnerableEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side ?? []} />;
+        return (endpoint: EsVulnerableEndpoint) => <TagsFragment tags={endpoint.base_tags_side ?? []} />;
       default: return (endpoint: EsVulnerableEndpoint) => {
         const key = column as keyof typeof endpoint;
         const text = endpoint[key]?.toString() || '';

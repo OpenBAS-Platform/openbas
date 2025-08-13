@@ -38,7 +38,7 @@ public interface RawSimulation {
 
   Instant getExercise_updated_at();
 
-  Instant getInject_updated_at();
+  Instant getExercise_injects_updated_at();
 
   String getScenario_id();
 
