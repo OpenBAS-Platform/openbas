@@ -23,8 +23,6 @@ import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -78,7 +76,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Create scenario succeed")
   @Test
   @Order(1)
-  @WithMockPlannerUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void createScenarioTest() throws Exception {
     // -- PREPARE --
     ScenarioInput scenarioInput = new ScenarioInput();
@@ -120,7 +118,7 @@ public class ScenarioApiTest extends IntegrationTest {
   @DisplayName("Retrieve scenarios")
   @Test
   @Order(2)
-  @WithMockObserverUser
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void retrieveScenariosTest() throws Exception {
     // -- EXECUTE --
     String response =

@@ -73,6 +73,7 @@ import org.springframework.util.ResourceUtils;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
 @ExtendWith(MockitoExtension.class)
+@Transactional
 class InjectApiTest extends IntegrationTest {
 
   static Exercise EXERCISE;
@@ -149,15 +150,6 @@ class InjectApiTest extends IntegrationTest {
     AGENT = agentRepository.save(agent);
   }
 
-  @AfterAll
-  void afterAll() {
-    this.scenarioRepository.delete(SCENARIO);
-    this.exerciseRepository.delete(EXERCISE);
-    this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
-    this.teamRepository.delete(TEAM);
-    this.agentRepository.delete(AGENT);
-  }
-
   // BULK DELETE
   @DisplayName("Delete list of injects for scenario")
   @Test
@@ -178,14 +170,15 @@ class InjectApiTest extends IntegrationTest {
     InjectDocument injectDocument4 = new InjectDocument();
     injectDocument4.setInject(createdInject);
     injectDocument4.setDocument(DOCUMENT2);
-    createdInject.setDocuments(List.of(injectDocument4));
+    createdInject.setDocuments(new ArrayList<>(List.of(injectDocument4)));
+    createdInject = injectRepository.save(injectForScenario1);
 
     injectExpectationRepository.save(
         InjectExpectationFixture.createArticleInjectExpectation(TEAM, createdInject));
 
     // -- ASSERT --
     assertTrue(
-        injectRepository.existsById(createdInject.getId()),
+        injectRepository.existsByIdWithoutLoading(createdInject.getId()),
         "The inject should exist from the database");
     assertFalse(
         injectRepository.findByScenarioId(SCENARIO.getId()).isEmpty(),
@@ -458,8 +451,8 @@ class InjectApiTest extends IntegrationTest {
     injectDocument3.setInject(createdInject2);
     injectDocument3.setDocument(DOCUMENT1);
 
-    createdInject1.setDocuments(List.of(injectDocument1, injectDocument2));
-    createdInject2.setDocuments(List.of(injectDocument3));
+    createdInject1.setDocuments(new ArrayList<>(List.of(injectDocument1, injectDocument2)));
+    createdInject2.setDocuments(new ArrayList<>(List.of(injectDocument3)));
 
     injectRepository.save(createdInject1);
     injectRepository.save(createdInject2);
