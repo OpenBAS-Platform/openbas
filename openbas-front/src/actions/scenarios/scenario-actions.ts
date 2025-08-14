@@ -1,22 +1,7 @@
 import { type Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import {
-  type InjectsImportInput,
-  type LessonsCategoryCreateInput,
-  type LessonsCategoryTeamsInput,
-  type LessonsCategoryUpdateInput,
-  type LessonsInput,
-  type LessonsQuestionCreateInput,
-  type LessonsQuestionUpdateInput,
-  type Scenario,
-  type ScenarioInput,
-  type ScenarioRecurrenceInput,
-  type ScenarioTeamPlayersEnableInput,
-  type SearchPaginationInput,
-  type Team,
-  type UpdateScenarioInput,
-} from '../../utils/api-types';
+import { type InjectsImportInput, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsInput, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type Scenario, type ScenarioInput, type ScenarioRecurrenceInput, type ScenarioTeamPlayersEnableInput, type SearchPaginationInput, type Team, type UpdateScenarioInput } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
 import { arrayOfScenarios, scenario } from './scenario-schema';
@@ -64,9 +49,17 @@ export const importScenario = (formData: FormData) => (dispatch: Dispatch) => {
   return postReferential(null, uri, formData)(dispatch);
 };
 
-export const importStix = (formData: FormData) => (dispatch: Dispatch) => {
+export const importStix = (stixJson: string) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/generate-scenario-from-stix-bundle`;
-  return postReferential(null, uri, formData)(dispatch);
+
+  return fetch(uri, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: stixJson,
+  }).then(async (res) => {
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
+  });
 };
 
 export const duplicateScenario = (scenarioId: string) => (dispatch: Dispatch) => {

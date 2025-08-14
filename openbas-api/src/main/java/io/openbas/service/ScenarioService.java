@@ -13,7 +13,6 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -88,7 +87,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -888,20 +886,16 @@ public class ScenarioService {
     scenario.setObjectives(duplicatedObjectives);
   }
 
-  public List<String> generateScenarioFromSTIXBundle(MultipartFile file)
+  public List<String> generateScenarioFromSTIXBundle(String stixJson)
       throws IOException, ParsingException {
-    if (file == null || file.isEmpty()) {
-      return emptyList();
-    }
-
-    JsonNode root = objectMapper.readTree(file.getInputStream());
+    JsonNode root = objectMapper.readTree(stixJson);
     Bundle bundle = stixParser.parseBundle(root.toString());
 
     List<String> createdScenarios = new ArrayList<>();
 
     for (ObjectBase obj :
         bundle.findByType(
-            "x-security-assessment")) { // Maybe we could have varoius security assestemnt
+            "x-security-assessment")) { // Maybe we could have various security assestments
       String id = (String) obj.getProperty("id").getValue();
       SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
       Scenario scenario = getOrCreateScenario(securityAssessment);
@@ -931,7 +925,7 @@ public class ScenarioService {
       Scenario scenario,
       SecurityAssessment securityAssessment)
       throws ParsingException, JsonProcessingException {
-    if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com");
+    if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com"); // TODO change
 
     securityAssessment.setExternalId((String) stixAssessmentObj.getProperty("id").getValue());
     securityAssessment.setName((String) stixAssessmentObj.getProperty("name").getValue());

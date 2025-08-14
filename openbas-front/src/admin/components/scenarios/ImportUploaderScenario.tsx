@@ -10,7 +10,13 @@ const ImportUploaderScenario = () => {
   const navigate = useNavigate();
 
   const handleUpload = async (formData: FormData) => {
-    await dispatch(importStix(formData)).then((result: { [x: string]: string }) => {
+    const file = formData.get('file');
+
+    if (!file || !(file instanceof File)) { return; }
+
+    const content = await file.text();
+
+    await dispatch(importStix(content)).then((result: { [x: string]: string }) => {
       if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
         navigate(0);
       }

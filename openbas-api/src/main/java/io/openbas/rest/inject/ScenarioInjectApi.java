@@ -4,8 +4,11 @@ import static io.openbas.database.specification.InjectSpecification.fromScenario
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
-import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
+import io.openbas.database.model.Base;
+import io.openbas.database.model.Inject;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.repository.InjectDocumentRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectAssistantInput;
@@ -15,24 +18,26 @@ import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
-import io.openbas.service.*;
+import io.openbas.service.InjectSearchService;
+import io.openbas.service.ScenarioService;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -98,10 +103,12 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  @PostMapping(SCENARIO_URI + "/generate-scenario-from-stix-bundle")
-  public List<String> generateScenarioFromSTIXBundle(
-      @RequestPart("file") @Nullable MultipartFile file) throws IOException, ParsingException {
-    return scenarioService.generateScenarioFromSTIXBundle(file);
+  @PostMapping(
+      value = SCENARIO_URI + "/generate-scenario-from-stix-bundle",
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  public List<String> generateScenarioFromSTIXBundle(@RequestBody String stixJson)
+      throws IOException, ParsingException {
+    return scenarioService.generateScenarioFromSTIXBundle(stixJson);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
