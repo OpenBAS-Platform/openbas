@@ -4,12 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.UUID;
+
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_18__Add_parameters_to_custom_dashboards extends BaseJavaMigration {
+public class V4_19__Add_parameters_to_custom_dashboards extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
