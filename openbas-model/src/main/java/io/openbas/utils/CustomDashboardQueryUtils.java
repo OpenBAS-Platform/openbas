@@ -50,9 +50,6 @@ public class CustomDashboardQueryUtils {
           return Instant.parse(
               parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
-      /*if (!widgetConfig.getEnd().isEmpty()) {
-        end = Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
-      }*/
 
       default:
         if (!hasText(dashboardTimeRange)) {

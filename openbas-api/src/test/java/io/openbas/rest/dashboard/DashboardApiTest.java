@@ -279,7 +279,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createDefaultCustomDashboard()))
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
               .persist()
               .get();
 
@@ -291,10 +291,23 @@ class DashboardApiTest extends IntegrationTest {
       // completes before the data is available in the system
       Thread.sleep(1000);
 
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+
       String response =
           mvc.perform(
                   post(DASHBOARD_URI + "/count/" + widget.getId())
-                      .contentType(MediaType.APPLICATION_JSON))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -311,7 +324,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createDefaultCustomDashboard()))
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
               .persist()
               .get();
 
@@ -323,10 +336,23 @@ class DashboardApiTest extends IntegrationTest {
       // completes before the data is available in the system
       Thread.sleep(1000);
 
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+
       String response =
           mvc.perform(
                   post(DASHBOARD_URI + "/count/" + widget.getId())
-                      .contentType(MediaType.APPLICATION_JSON))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -351,7 +377,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEndpointAndFilter())
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createDefaultCustomDashboard()))
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
               .persist()
               .get();
 
@@ -363,10 +389,23 @@ class DashboardApiTest extends IntegrationTest {
       // completes before the data is available in the system
       Thread.sleep(1000);
 
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+
       String response =
           mvc.perform(
                   post(DASHBOARD_URI + "/count/" + widget.getId())
-                      .contentType(MediaType.APPLICATION_JSON))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
