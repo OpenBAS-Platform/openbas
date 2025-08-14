@@ -47,7 +47,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
       @PathVariable String exerciseId, @Valid @RequestBody ObjectiveInput input) {
@@ -64,7 +63,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Objective updateObjective(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -80,7 +78,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
   }
@@ -113,7 +110,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
       @PathVariable String exerciseId,
@@ -142,7 +138,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Evaluation updateEvaluation(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -168,7 +163,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);
   }

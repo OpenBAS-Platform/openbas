@@ -15,8 +15,14 @@ public enum Capability {
   BYPASS(null, pair(null, null)),
 
   // Assesment
+  // FIXME : split capabilities to review
   CREATE_ASSESSMENT(
       null,
+      pair(ResourceType.SCENARIO, Action.READ),
+      pair(ResourceType.NOTIFICATION_RULE, Action.SEARCH),
+      pair(ResourceType.SIMULATION, Action.READ),
+      pair(ResourceType.SCENARIO, Action.SEARCH),
+      pair(ResourceType.SIMULATION, Action.SEARCH),
       pair(ResourceType.SCENARIO, Action.CREATE),
       pair(ResourceType.SIMULATION, Action.CREATE),
       pair(ResourceType.SCENARIO, Action.DUPLICATE),

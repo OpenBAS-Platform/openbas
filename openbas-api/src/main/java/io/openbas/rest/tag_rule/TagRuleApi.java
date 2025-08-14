@@ -1,6 +1,5 @@
 package io.openbas.rest.tag_rule;
 
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;

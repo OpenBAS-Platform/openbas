@@ -1,6 +1,5 @@
 package io.openbas.rest.role;
 
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;

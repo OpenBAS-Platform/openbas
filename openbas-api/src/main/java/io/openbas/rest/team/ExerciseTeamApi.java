@@ -34,7 +34,6 @@ public class ExerciseTeamApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(readOnly = true)
   public Page<TeamOutput> searchTeams(
       @PathVariable @NotBlank final String exerciseId,

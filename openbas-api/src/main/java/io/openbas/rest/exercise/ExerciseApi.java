@@ -143,7 +143,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Log updateLog(
       @PathVariable String exerciseId,
@@ -160,7 +159,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public void deleteLog(@PathVariable String exerciseId, @PathVariable String logId) {
     logRepository.deleteById(logId);
@@ -218,7 +216,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Iterable<TeamOutput> removeExerciseTeams(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
     return this.exerciseService.removeTeams(exerciseId, input.getTeamIds());
@@ -230,7 +227,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Iterable<TeamOutput> replaceExerciseTeams(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
     return this.exerciseService.replaceTeams(exerciseId, input.getTeamIds());
@@ -251,7 +247,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Exercise enableExerciseTeamPlayers(
       @PathVariable String exerciseId,
       @PathVariable String teamId,
@@ -279,7 +274,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Exercise disableExerciseTeamPlayers(
       @PathVariable String exerciseId,
       @PathVariable String teamId,
@@ -303,7 +297,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Exercise addExerciseTeamPlayers(
       @PathVariable String exerciseId,
       @PathVariable String teamId,
@@ -333,7 +326,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise removeExerciseTeamPlayers(
       @PathVariable String exerciseId,
@@ -392,7 +384,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseInformation(
       @PathVariable String exerciseId, @Valid @RequestBody UpdateExerciseInput input) {
@@ -415,7 +406,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   @Deprecated(since = "1.16.0")
   public Exercise deprecatedUpdateExerciseStart(
@@ -429,7 +419,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseStart(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
@@ -450,7 +439,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseTags(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTagsInput input) {
@@ -466,7 +454,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseLogos(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateLogoInput input) {
@@ -480,7 +467,7 @@ public class ExerciseApi extends RestBehavior {
   // -- OPTION --
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/findings/options")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String scenarioId) {
@@ -502,7 +489,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseLessons(
       @PathVariable String exerciseId, @Valid @RequestBody LessonsInput input) {
@@ -517,7 +503,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public void deleteExercise(@PathVariable String exerciseId) {
     exerciseRepository.deleteById(exerciseId);
@@ -627,7 +612,7 @@ public class ExerciseApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/global-scores")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(
       @Valid @RequestBody ExercisesGlobalScoresInput input) {
     return exerciseService.getExercisesGlobalScores(input);
@@ -649,7 +634,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
     Exercise exercise =
@@ -680,7 +664,6 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackFor = Exception.class)
   public Exercise changeExerciseStatus(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStatusInput input) {
@@ -871,7 +854,7 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/import")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SIMULATION)
   public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
     importService.handleFileImport(file, null, null);
   }

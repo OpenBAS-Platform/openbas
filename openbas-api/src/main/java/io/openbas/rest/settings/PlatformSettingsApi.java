@@ -1,6 +1,5 @@
 package io.openbas.rest.settings;
 
-
 import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
 import io.openbas.database.model.Action;

@@ -404,7 +404,6 @@ public class InjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public Inject updateInject(
       @PathVariable String exerciseId,
       @PathVariable String injectId,

@@ -42,7 +42,6 @@ public class SimulationChallengeApi extends RestBehavior {
   private final ChallengeService challengeService;
   private final ExerciseService exerciseService;
 
-  
   @GetMapping(EXERCISE_URI + "/{exerciseId}/challenges")
   @RBAC(
       resourceId = "#exerciseId",

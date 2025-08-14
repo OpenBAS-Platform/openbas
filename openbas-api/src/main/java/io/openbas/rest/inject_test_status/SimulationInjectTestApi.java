@@ -70,10 +70,7 @@ public class SimulationInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/injects/test/{testId}")
-  @RBAC(
-      resourceId = "#testId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }

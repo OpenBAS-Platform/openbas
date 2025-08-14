@@ -47,7 +47,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
       @PathVariable String scenarioId, @Valid @RequestBody ObjectiveInput input) {
@@ -64,7 +63,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public Objective updateObjective(
       @PathVariable String scenarioId,
       @PathVariable String objectiveId,
@@ -80,7 +78,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public void deleteObjective(@PathVariable String scenarioId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
   }
@@ -113,7 +110,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
       @PathVariable String scenarioId,
@@ -142,7 +138,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public Evaluation updateEvaluation(
       @PathVariable String scenarioId,
       @PathVariable String objectiveId,
@@ -168,7 +163,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public void deleteEvaluation(@PathVariable String scenarioId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);
   }
