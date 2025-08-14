@@ -22,9 +22,7 @@ import io.openbas.rest.custom_dashboard.form.WidgetInput;
 import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.fixtures.composers.WidgetComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-
 import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,14 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class CustomDashboardWidgetApiTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private WidgetRepository repository;
-  @Autowired
-  private WidgetComposer widgetComposer;
-  @Autowired
-  private CustomDashboardComposer customDashboardComposer;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private WidgetRepository repository;
+  @Autowired private WidgetComposer widgetComposer;
+  @Autowired private CustomDashboardComposer customDashboardComposer;
 
   WidgetComposer.Composer createWidgetComposer() {
     return this.widgetComposer
@@ -134,10 +128,10 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     mockMvc
         .perform(
             put(CUSTOM_DASHBOARDS_URI
-                + "/"
-                + customDashboard.getId()
-                + "/widgets/"
-                + widget.getId())
+                    + "/"
+                    + customDashboard.getId()
+                    + "/widgets/"
+                    + widget.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(widget)))
         .andExpect(status().isOk())

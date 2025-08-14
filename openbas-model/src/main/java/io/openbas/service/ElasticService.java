@@ -38,14 +38,12 @@ import io.openbas.utils.CustomDashboardQueryUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
@@ -405,11 +403,16 @@ public class ElasticService implements EngineService {
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
 
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
-    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Instant finalStart =
+        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd =
+        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
         DateRangeQuery.of(
-                d -> d.field(widgetConfig.getDateAttribute()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
+                d ->
+                    d.field(widgetConfig.getDateAttribute())
+                        .gt(String.valueOf(finalStart))
+                        .lt(String.valueOf(finalEnd)))
             ._toRangeQuery()
             ._toQuery();
 
@@ -449,15 +452,21 @@ public class ElasticService implements EngineService {
       Map<String, CustomDashboardParameters> definitionParameters) {
 
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
-    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Instant finalStart =
+        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd =
+        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
         DateRangeQuery.of(
-                d -> d.field(widgetConfig.getDateAttribute()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
+                d ->
+                    d.field(widgetConfig.getDateAttribute())
+                        .gt(String.valueOf(finalStart))
+                        .lt(String.valueOf(finalEnd)))
             ._toRangeQuery()
             ._toQuery();
 
-    Query filterQuery = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
+    Query filterQuery =
+        buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
     Query query = null;
     if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
       query = queryBuilder.must(filterQuery).build()._toQuery();
@@ -586,11 +595,16 @@ public class ElasticService implements EngineService {
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
 
-    Instant finalStart = CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
-    Instant finalEnd = CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Instant finalStart =
+        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd =
+        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
     Query dateRangeQuery =
         DateRangeQuery.of(
-                d -> d.field(widgetConfig.getDateAttribute()).gt(String.valueOf(finalStart)).lt(String.valueOf(finalEnd)))
+                d ->
+                    d.field(widgetConfig.getDateAttribute())
+                        .gt(String.valueOf(finalStart))
+                        .lt(String.valueOf(finalEnd)))
             ._toRangeQuery()
             ._toQuery();
     Query filterQuery =
@@ -611,40 +625,42 @@ public class ElasticService implements EngineService {
       Query finalQuery = query;
       SearchResponse<Void> response = null;
       if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
-        response = elasticClient.search(
-            b ->
-                b.index(engineConfig.getIndexPrefix() + "*")
-                    .size(0)
-                    .query(finalQuery)
-                    .aggregations(
-                        aggregationKey,
-                        a ->
-                            a.dateHistogram(
-                                h ->
-                                    h.field(widgetConfig.getDateAttribute())
-                                        .minDocCount(0)
-                                        .format(widgetConfig.getInterval().format)
-                                        .calendarInterval(widgetConfig.getInterval().esType)
-                                        .keyed(false))),
-            Void.class);
+        response =
+            elasticClient.search(
+                b ->
+                    b.index(engineConfig.getIndexPrefix() + "*")
+                        .size(0)
+                        .query(finalQuery)
+                        .aggregations(
+                            aggregationKey,
+                            a ->
+                                a.dateHistogram(
+                                    h ->
+                                        h.field(widgetConfig.getDateAttribute())
+                                            .minDocCount(0)
+                                            .format(widgetConfig.getInterval().format)
+                                            .calendarInterval(widgetConfig.getInterval().esType)
+                                            .keyed(false))),
+                Void.class);
       } else {
-        response = elasticClient.search(
-            b ->
-                b.index(engineConfig.getIndexPrefix() + "*")
-                    .size(0)
-                    .query(finalQuery)
-                    .aggregations(
-                        aggregationKey,
-                        a ->
-                            a.dateHistogram(
-                                h ->
-                                    h.field(widgetConfig.getDateAttribute())
-                                        .minDocCount(0)
-                                        .format(widgetConfig.getInterval().format)
-                                        .calendarInterval(widgetConfig.getInterval().esType)
-                                        .extendedBounds(extendedBounds)
-                                        .keyed(false))),
-            Void.class);
+        response =
+            elasticClient.search(
+                b ->
+                    b.index(engineConfig.getIndexPrefix() + "*")
+                        .size(0)
+                        .query(finalQuery)
+                        .aggregations(
+                            aggregationKey,
+                            a ->
+                                a.dateHistogram(
+                                    h ->
+                                        h.field(widgetConfig.getDateAttribute())
+                                            .minDocCount(0)
+                                            .format(widgetConfig.getInterval().format)
+                                            .calendarInterval(widgetConfig.getInterval().esType)
+                                            .extendedBounds(extendedBounds)
+                                            .keyed(false))),
+                Void.class);
       }
 
       assert response != null;
@@ -740,7 +756,7 @@ public class ElasticService implements EngineService {
   /**
    * Create a list configuration for the given entity name and filter value map.
    *
-   * @param entityName     the name of the entity to filter on
+   * @param entityName the name of the entity to filter on
    * @param filterValueMap a map of filter
    * @return a ListConfiguration object
    */

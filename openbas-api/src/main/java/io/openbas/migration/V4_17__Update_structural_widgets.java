@@ -2,13 +2,12 @@ package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V4_17__Update_structural_widgets extends BaseJavaMigration {
@@ -18,9 +17,7 @@ public class V4_17__Update_structural_widgets extends BaseJavaMigration {
     Statement select = context.getConnection().createStatement();
     ObjectMapper mapper = new ObjectMapper();
 
-    ResultSet results =
-        select.executeQuery(
-            "SELECT widget_config,widget_id FROM widgets;");
+    ResultSet results = select.executeQuery("SELECT widget_config,widget_id FROM widgets;");
 
     PreparedStatement statement =
         context
@@ -36,8 +33,9 @@ public class V4_17__Update_structural_widgets extends BaseJavaMigration {
         String widgetConfigurationType = config.get("widget_configuration_type").asText();
         String nullValue = null;
         if (widgetConfigurationType != null) {
-          if (widgetConfigurationType.equals("structural-histogram") || widgetConfigurationType.equals(
-              "list") || widgetConfigurationType.equals("flat")) {
+          if (widgetConfigurationType.equals("structural-histogram")
+              || widgetConfigurationType.equals("list")
+              || widgetConfigurationType.equals("flat")) {
             config.put("time_range", "ALL_TIME");
             config.put("start", nullValue);
             config.put("end", nullValue);

@@ -7,7 +7,6 @@ import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +30,14 @@ public class WidgetFixture {
     return widget;
   }
 
-  public static Widget creatTemporalWidgetWithTimeRange(CustomDashboardTimeRange timeRange,
-      String dateAttribute, HistogramInterval interval, String entityName) {
+  public static Widget creatTemporalWidgetWithTimeRange(
+      CustomDashboardTimeRange timeRange,
+      String dateAttribute,
+      HistogramInterval interval,
+      String entityName) {
     Widget widget = new Widget();
     widget.setType(VERTICAL_BAR_CHART);
-    //series
+    // series
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     DateHistogramWidget.DateHistogramSeries series = new DateHistogramWidget.DateHistogramSeries();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
@@ -59,13 +61,14 @@ public class WidgetFixture {
     return widget;
   }
 
-  public static Widget creatStructuralWidgetWithTimeRange(CustomDashboardTimeRange timeRange,
-      String dateAttribute, String field, String entityName) {
+  public static Widget creatStructuralWidgetWithTimeRange(
+      CustomDashboardTimeRange timeRange, String dateAttribute, String field, String entityName) {
     Widget widget = new Widget();
     widget.setType(DONUT);
-    //series
+    // series
     StructuralHistogramWidget widgetConfig = new StructuralHistogramWidget();
-    StructuralHistogramWidget.StructuralHistogramSeries series = new StructuralHistogramWidget.StructuralHistogramSeries();
+    StructuralHistogramWidget.StructuralHistogramSeries series =
+        new StructuralHistogramWidget.StructuralHistogramSeries();
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setMode(Filters.FilterMode.and);
     Filters.Filter filter = new Filters.Filter();
@@ -86,7 +89,6 @@ public class WidgetFixture {
     widget.setLayout(widgetLayout);
     return widget;
   }
-
 
   public static Widget createNumberWidgetWithEntity(String entityName) {
     Widget widget = new Widget();
@@ -141,8 +143,8 @@ public class WidgetFixture {
     return widget;
   }
 
-  public static Widget createNumberWidgetWithEntityAndTimeRange(String entityName, CustomDashboardTimeRange timeRange,
-      String dateAttribute) {
+  public static Widget createNumberWidgetWithEntityAndTimeRange(
+      String entityName, CustomDashboardTimeRange timeRange, String dateAttribute) {
     Widget widget = new Widget();
     widget.setType(WidgetType.NUMBER);
     // series

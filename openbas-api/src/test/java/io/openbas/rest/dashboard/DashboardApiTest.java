@@ -18,7 +18,6 @@ import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,30 +36,18 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("Dashboard API tests")
 class DashboardApiTest extends IntegrationTest {
 
-  @Autowired
-  private EngineService engineService;
-  @Autowired
-  private EngineContext engineContext;
-  @Autowired
-  private EndpointComposer endpointComposer;
-  @Autowired
-  private InjectExpectationComposer injectExpectationComposer;
-  @Autowired
-  private WidgetComposer widgetComposer;
-  @Autowired
-  private CustomDashboardComposer customDashboardComposer;
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private EntityManager entityManager;
-  @Autowired
-  private ExerciseComposer exerciseComposer;
-  @Autowired
-  private InjectComposer injectComposer;
-  @Autowired
-  private FindingComposer findingComposer;
-  @Autowired
-  private CustomDashboardParameterComposer customDashboardParameterComposer;
+  @Autowired private EngineService engineService;
+  @Autowired private EngineContext engineContext;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private InjectExpectationComposer injectExpectationComposer;
+  @Autowired private WidgetComposer widgetComposer;
+  @Autowired private CustomDashboardComposer customDashboardComposer;
+  @Autowired private MockMvc mvc;
+  @Autowired private EntityManager entityManager;
+  @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private FindingComposer findingComposer;
+  @Autowired private CustomDashboardParameterComposer customDashboardParameterComposer;
 
   @BeforeEach
   void setup() throws IOException {
@@ -392,29 +378,50 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Count entities with date range filter.")
     void countEntitiesWithDateRangeFilter() throws Exception {
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(183,
-              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  "Endpoint 1",
+                  Endpoint.PLATFORM_TYPE.Windows))
           .persist();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(183,
-              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  "Endpoint 2",
+                  Endpoint.PLATFORM_TYPE.Windows))
           .persist();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(60,
-              ChronoUnit.DAYS), Instant.now().minus(60, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Windows))
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(60, ChronoUnit.DAYS),
+                  Instant.now().minus(60, ChronoUnit.DAYS),
+                  "Endpoint 3",
+                  Endpoint.PLATFORM_TYPE.Windows))
           .persist();
 
-      Widget widget = widgetComposer
-          .forWidget(
-              WidgetFixture.createNumberWidgetWithEntityAndTimeRange("endpoint", CustomDashboardTimeRange.LAST_QUARTER,
-                  "base_created_at"))
-          .withCustomDashboard(customDashboardComposer.forCustomDashboard(
-              CustomDashboardFixture.createCustomDashboardWithParams()))
-          .persist()
-          .get();
+      Widget widget =
+          widgetComposer
+              .forWidget(
+                  WidgetFixture.createNumberWidgetWithEntityAndTimeRange(
+                      "endpoint", CustomDashboardTimeRange.LAST_QUARTER, "base_created_at"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
+              .persist()
+              .get();
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
-      String timeRangeParameterId = parameters.stream()
-          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
-          .toString();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
 
       Map<String, String> input = new HashMap<>();
       input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_SEMESTER));
@@ -448,32 +455,65 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for temporal widgets.")
     void fetchSeriesForTemporalWidgets() throws Exception {
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(180,
-              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
-          .persist().get();
-
-      Widget widget = widgetComposer
-          .forWidget(
-              WidgetFixture.creatTemporalWidgetWithTimeRange(CustomDashboardTimeRange.LAST_QUARTER, "base_created_at",
-                  HistogramInterval.month, "endpoint"))
-          .withCustomDashboard(
-              customDashboardComposer.forCustomDashboard(CustomDashboardFixture.createCustomDashboardWithParams()))
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 1",
+                  Endpoint.PLATFORM_TYPE.Windows))
+          .persist()
+          .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(180, ChronoUnit.DAYS),
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  "Endpoint 2",
+                  Endpoint.PLATFORM_TYPE.Windows))
+          .persist()
+          .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 3",
+                  Endpoint.PLATFORM_TYPE.Linux))
+          .persist()
+          .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 4",
+                  Endpoint.PLATFORM_TYPE.MacOS))
           .persist()
           .get();
 
+      Widget widget =
+          widgetComposer
+              .forWidget(
+                  WidgetFixture.creatTemporalWidgetWithTimeRange(
+                      CustomDashboardTimeRange.LAST_QUARTER,
+                      "base_created_at",
+                      HistogramInterval.month,
+                      "endpoint"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
+              .persist()
+              .get();
+
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
-      String timeRangeParameterId = parameters.stream()
-          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
-          .toString();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
 
       Map<String, String> input = new HashMap<>();
       input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
@@ -502,28 +542,56 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for structural widgets.")
     void fetchSeriesForStructuralWidgets() throws Exception {
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(180,
-              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
-          .persist().get();
-      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
-              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
-          .persist().get();
-
-      Widget widget = widgetComposer
-          .forWidget(
-              WidgetFixture.creatStructuralWidgetWithTimeRange(CustomDashboardTimeRange.LAST_QUARTER, "base_created_at",
-                  "endpoint_platform",
-                  "endpoint"))
-          .withCustomDashboard(
-              customDashboardComposer.forCustomDashboard(CustomDashboardFixture.createCustomDashboardWithParams()))
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 1",
+                  Endpoint.PLATFORM_TYPE.Windows))
           .persist()
           .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(180, ChronoUnit.DAYS),
+                  Instant.now().minus(183, ChronoUnit.DAYS),
+                  "Endpoint 2",
+                  Endpoint.PLATFORM_TYPE.Windows))
+          .persist()
+          .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 3",
+                  Endpoint.PLATFORM_TYPE.Linux))
+          .persist()
+          .get();
+      endpointComposer
+          .forEndpoint(
+              EndpointFixture.createEndpointWithCreationAndUpdate(
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  Instant.now().minus(83, ChronoUnit.DAYS),
+                  "Endpoint 4",
+                  Endpoint.PLATFORM_TYPE.MacOS))
+          .persist()
+          .get();
+
+      Widget widget =
+          widgetComposer
+              .forWidget(
+                  WidgetFixture.creatStructuralWidgetWithTimeRange(
+                      CustomDashboardTimeRange.LAST_QUARTER,
+                      "base_created_at",
+                      "endpoint_platform",
+                      "endpoint"))
+              .withCustomDashboard(
+                  customDashboardComposer.forCustomDashboard(
+                      CustomDashboardFixture.createCustomDashboardWithParams()))
+              .persist()
+              .get();
 
       // force persistence
       entityManager.flush();
@@ -534,9 +602,13 @@ class DashboardApiTest extends IntegrationTest {
       Thread.sleep(1000);
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
-      String timeRangeParameterId = parameters.stream()
-          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
-          .toString();
+      String timeRangeParameterId =
+          parameters.stream()
+              .filter(
+                  param ->
+                      param.getType()
+                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+              .toString();
 
       Map<String, String> input = new HashMap<>();
       input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));

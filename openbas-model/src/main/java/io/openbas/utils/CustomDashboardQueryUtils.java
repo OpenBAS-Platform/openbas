@@ -1,27 +1,33 @@
 package io.openbas.utils;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import io.openbas.database.model.CustomDashboardParameters;
-import io.openbas.engine.api.HistogramWidget;
-import io.openbas.engine.api.WidgetConfiguration;
+import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.database.model.CustomDashboardParameters;
+import io.openbas.engine.api.WidgetConfiguration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
-import static org.springframework.util.StringUtils.hasText;
-
 public class CustomDashboardQueryUtils {
 
-  private CustomDashboardQueryUtils() {
-  }
+  private CustomDashboardQueryUtils() {}
 
-  public static Instant calcStartDate(Map<String, String> parameters, WidgetConfiguration widgetConfig,
+  public static Instant calcStartDate(
+      Map<String, String> parameters,
+      WidgetConfiguration widgetConfig,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    String timeRangeParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("timeRange")).findFirst().get().getKey();
-    String startDateParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("startDate")).findFirst().get().getKey();
+    String timeRangeParameterId =
+        definitionParameters.entrySet().stream()
+            .filter(entry -> entry.getValue().getType().name.equals("timeRange"))
+            .findFirst()
+            .get()
+            .getKey();
+    String startDateParameterId =
+        definitionParameters.entrySet().stream()
+            .filter(entry -> entry.getValue().getType().name.equals("startDate"))
+            .findFirst()
+            .get()
+            .getKey();
     String dashboardTimeRange = parameters.get(timeRangeParameterId);
     String widgetTimeRange = widgetConfig.getTimeRange().name();
     switch (widgetTimeRange) {
@@ -41,11 +47,12 @@ public class CustomDashboardQueryUtils {
         return Instant.now().minus(360, ChronoUnit.DAYS);
       case "CUSTOM":
         if (!widgetConfig.getStart().isEmpty()) {
-          return Instant.parse(parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
+          return Instant.parse(
+              parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
-        /*if (!widgetConfig.getEnd().isEmpty()) {
-          end = Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
-        }*/
+      /*if (!widgetConfig.getEnd().isEmpty()) {
+        end = Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
+      }*/
 
       default:
         if (!hasText(dashboardTimeRange)) {
@@ -71,26 +78,36 @@ public class CustomDashboardQueryUtils {
               return Instant.parse(parameters.get(startDateParameterId));
             }
           default:
-
         }
     }
     return Instant.now();
   }
 
-  public static Instant calcEndDate(Map<String, String> parameters, WidgetConfiguration widgetConfig,
+  public static Instant calcEndDate(
+      Map<String, String> parameters,
+      WidgetConfiguration widgetConfig,
       Map<String, CustomDashboardParameters> definitionParameters) {
 
-    String timeRangeParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("timeRange")).findFirst().get().getKey();
+    String timeRangeParameterId =
+        definitionParameters.entrySet().stream()
+            .filter(entry -> entry.getValue().getType().name.equals("timeRange"))
+            .findFirst()
+            .get()
+            .getKey();
     String widgetTimeRange = widgetConfig.getTimeRange().name();
     String dashboardTimeRange = parameters.get(timeRangeParameterId);
-    String endDateParameterId = definitionParameters.entrySet().stream()
-        .filter(entry -> entry.getValue().getType().name.equals("endDate")).findFirst().get().getKey();
+    String endDateParameterId =
+        definitionParameters.entrySet().stream()
+            .filter(entry -> entry.getValue().getType().name.equals("endDate"))
+            .findFirst()
+            .get()
+            .getKey();
 
     switch (widgetTimeRange) {
       case "CUSTOM":
         if (!widgetConfig.getEnd().isEmpty()) {
-          return Instant.parse(parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
+          return Instant.parse(
+              parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
         }
       case "DEFAULT":
         if (!hasText(dashboardTimeRange)) {

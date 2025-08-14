@@ -4,7 +4,6 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.utils.mapper.EndpointMapper;
-
 import java.time.Instant;
 import java.util.List;
 
@@ -58,8 +57,8 @@ public class EndpointFixture {
     return endpoint;
   }
 
-  public static Endpoint createEndpointWithCreationAndUpdate(Instant creationDate, Instant updateDate, String name,
-      Endpoint.PLATFORM_TYPE platform) {
+  public static Endpoint createEndpointWithCreationAndUpdate(
+      Instant creationDate, Instant updateDate, String name, Endpoint.PLATFORM_TYPE platform) {
     Endpoint endpoint = new Endpoint();
     endpoint.setCreatedAt(creationDate);
     endpoint.setUpdatedAt(updateDate);
