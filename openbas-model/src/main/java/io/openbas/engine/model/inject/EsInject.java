@@ -3,6 +3,7 @@ package io.openbas.engine.model.inject;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
@@ -68,4 +69,13 @@ public class EsInject extends EsBase {
   @Queryable(label = "teams", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
   private Set<String> base_teams_side; // Must finish by _side
+
+  // -- SIDE DENORMALIZED --
+  // like side but directly names instead of ids in the Set
+  // Don't forget to keep track of updated_at values in the SQL query indexing for those attributes
+  // denormalized
+
+  @Queryable(label = "platforms", filterable = true, refEnumClazz = Endpoint.PLATFORM_TYPE.class)
+  @EsQueryable(keyword = true)
+  private Set<String> base_platforms_side_denormalized;
 }

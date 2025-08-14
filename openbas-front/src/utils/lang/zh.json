@@ -184,6 +184,7 @@
   "base_inject_contract_side": "注入合同",
   "base_inject_side": "注射",
   "base_kill_chain_phases_side": "杀戮链阶段",
+  "base_platforms_side_denormalized": "平台",
   "base_representative": "代表性",
   "base_scenario_side": "场景",
   "base_simulation_side": "模拟",

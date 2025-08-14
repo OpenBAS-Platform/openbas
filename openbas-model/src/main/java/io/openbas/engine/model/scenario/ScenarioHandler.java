@@ -43,6 +43,7 @@ public class ScenarioHandler implements Handler<EsScenario> {
               esScenario.setBase_representative(scenario.getScenario_name());
               esScenario.setBase_restrictions(buildRestrictions(scenario.getScenario_id()));
               // Specific
+              esScenario.setBase_platforms_side_denormalized(scenario.getScenario_platforms());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
               if (!isEmpty(scenario.getScenario_tags())) {

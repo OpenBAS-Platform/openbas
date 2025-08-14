@@ -38,6 +38,7 @@ public class SimulationHandler implements Handler<EsSimulation> {
               esSimulation.setBase_restrictions(
                   buildRestrictions(simulation.getExercise_id(), simulation.getScenario_id()));
               // Specific
+              esSimulation.setBase_platforms_side_denormalized(simulation.getExercise_platforms());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
               if (!isEmpty(simulation.getExercise_tags())) {

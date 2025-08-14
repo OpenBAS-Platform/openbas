@@ -184,6 +184,7 @@
   "base_inject_contract_side": "Contrats d'inject",
   "base_inject_side": "Injects",
   "base_kill_chain_phases_side": "Phases de Kill chain",
+  "base_platforms_side_denormalized": "Plates-formes",
   "base_representative": "Représentation",
   "base_scenario_side": "Scénario",
   "base_simulation_side": "Simulations",

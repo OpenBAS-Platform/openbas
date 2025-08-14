@@ -17,6 +17,8 @@ public interface RawInjectIndexing {
 
   Instant getInjector_contract_updated_at();
 
+  Set<String> getInject_platforms();
+
   Set<String> getInject_attack_patterns();
 
   Set<String> getInject_children();
