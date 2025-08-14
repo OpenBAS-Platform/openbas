@@ -10,7 +10,7 @@ import {
   type UpdateScenarioInput,
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useScenarioPermissions from '../../../../utils/Scenario';
+import useScenarioPermissions from '../../../../utils/scenarioPermissions';
 import ScenarioForm from '../ScenarioForm';
 
 interface Props {

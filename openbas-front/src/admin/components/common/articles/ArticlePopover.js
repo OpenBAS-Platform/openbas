@@ -77,7 +77,7 @@ const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
     <Fragment>
       <IconButton
         color="primary"
-        disabled={!permissions.canWrite || disabled}
+        disabled={!permissions.canManage || disabled}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
         size="large"

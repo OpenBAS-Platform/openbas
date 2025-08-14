@@ -28,46 +28,46 @@ export const usePermissions = (exerciseId, fullExercise) => {
   });
   if ((!fullExercise && !exercise) || !me) {
     return {
-      canRead: false,
-      canWrite: false,
-      canPlay: false,
-      canReadBypassStatus: false,
-      canWriteBypassStatus: false,
-      canPlayBypassStatus: false,
+      canAccess: false,
+      canManage: false,
+      canLaunch: false,
+      canAccessBypassStatus: false,
+      canManageBypassStatus: false,
+      canLaunchBypassStatus: false,
       readOnly: true,
       readOnlyBypassStatus: true,
       isLoggedIn: !R.isEmpty(logged),
       isRunning: false,
     };
   }
-  const canReadBypassStatus = logged.admin
+  const canAccessBypassStatus = logged.admin
     || (exercise || fullExercise).exercise_observers?.includes(me.user_id);
-  const canRead = logged.admin
+  const canAccess = logged.admin
     || (exercise || fullExercise).exercise_status === 'FINISHED'
     || (exercise || fullExercise).exercise_status === 'CANCELED'
     || (exercise || fullExercise).exercise_observers?.includes(me.user_id);
-  const canWriteBypassStatus = logged.admin
+  const canManageBypassStatus = logged.admin
     || (exercise || fullExercise).exercise_planners?.includes(me.user_id);
-  const canWrite = logged.admin
+  const canManage = logged.admin
     || (exercise || fullExercise).exercise_status === 'FINISHED'
     || (exercise || fullExercise).exercise_status === 'CANCELED'
     || (exercise || fullExercise).exercise_planners?.includes(me.user_id);
-  const canPlayBypassStatus = logged.admin
+  const canLaunchBypassStatus = logged.admin
     || (exercise || fullExercise).exercise_users?.includes(me.user_id);
-  const canPlay = logged.admin
+  const canLaunch = logged.admin
     || (exercise || fullExercise).exercise_status === 'FINISHED'
     || (exercise || fullExercise).exercise_status === 'CANCELED'
     || (exercise || fullExercise).exercise_users?.includes(me.user_id);
   const isRunning = (exercise || fullExercise).exercise_status === 'RUNNING';
   return {
-    canRead,
-    canWrite,
-    canPlay,
-    canReadBypassStatus,
-    canWriteBypassStatus,
-    canPlayBypassStatus,
-    readOnly: !canWrite,
-    readOnlyBypassStatus: !canWriteBypassStatus,
+    canAccess,
+    canManage,
+    canLaunch,
+    canAccessBypassStatus,
+    canManageBypassStatus,
+    canLaunchBypassStatus,
+    readOnly: !canManage,
+    readOnlyBypassStatus: !canManageBypassStatus,
     isLoggedIn: !R.isEmpty(logged),
     isRunning,
   };

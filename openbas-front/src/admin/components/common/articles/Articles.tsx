@@ -97,7 +97,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Media pressure')}
       </Typography>
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <CreateArticle
           openCreate={openCreate}
           handleOpenCreate={handleOpenCreate}

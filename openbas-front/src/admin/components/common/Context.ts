@@ -44,7 +44,8 @@ import { type UserStore } from '../teams/players/Player';
 export type PermissionsContextType = {
   permissions: {
     readOnly: boolean;
-    canWrite: boolean;
+    canManage: boolean;
+    canLaunch: boolean;
     isRunning: boolean;
   };
 };
@@ -187,7 +188,8 @@ export type ViewLessonContextType = {
 
 export const PermissionsContext = createContext<PermissionsContextType>({
   permissions: {
-    canWrite: false,
+    canManage: false,
+    canLaunch: false,
     readOnly: false,
     isRunning: false,
   },

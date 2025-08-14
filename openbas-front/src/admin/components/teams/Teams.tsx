@@ -19,7 +19,7 @@ const Teams = () => {
   const permissionsContext: PermissionsContextType = {
     permissions: {
       readOnly: false,
-      canWrite: false,
+      canManage: user.user_is_planner || false, // TODO : update with CASL
       isRunning: false,
     },
   };
