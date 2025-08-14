@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import AssetPlatformFragment from '../../../../../../../../../components/common/list/fragments/AssetPlatformFragment';
-import AssetTagsFragment from '../../../../../../../../../components/common/list/fragments/AssetTagsFragment';
 import EndpointArchFragment from '../../../../../../../../../components/common/list/fragments/EndpointArchFragment';
 import InverseBooleanFragment from '../../../../../../../../../components/common/list/fragments/InverseBooleanFragment';
+import TagsFragment from '../../../../../../../../../components/common/list/fragments/TagsFragment';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { ENDPOINT_BASE_URL } from '../../../../../../../../../constants/BaseUrls';
 import { type EsEndpoint } from '../../../../../../../../../utils/api-types';
@@ -39,7 +39,7 @@ const EndpointListElement = (props: Props) => {
       case EndpointListItemFragments.ENDPOINT_ARCH:
         return (endpoint: EsEndpoint) => <EndpointArchFragment arch={endpoint.endpoint_arch} />;
       case EndpointListItemFragments.BASE_TAGS_SIDE:
-        return (endpoint: EsEndpoint) => <AssetTagsFragment tags={endpoint.base_tags_side ?? []} />;
+        return (endpoint: EsEndpoint) => <TagsFragment tags={endpoint.base_tags_side ?? []} />;
       case EndpointListItemFragments.ENDPOINT_IS_EOL:
         return (endpoint: EsEndpoint) => <InverseBooleanFragment bool={endpoint.endpoint_is_eol} />;
       default: return (endpoint: EsEndpoint) => {

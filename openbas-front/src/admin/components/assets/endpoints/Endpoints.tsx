@@ -16,10 +16,10 @@ import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
 import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
-import AssetTagsFragment from '../../../../components/common/list/fragments/AssetTagsFragment';
 import EndpointActiveFragment from '../../../../components/common/list/fragments/EndpointActiveFragment';
 import EndpointAgentsPrivilegeFragment from '../../../../components/common/list/fragments/EndpointAgentsPrivilegeFragment';
 import EndpointArchFragment from '../../../../components/common/list/fragments/EndpointArchFragment';
+import TagsFragment from '../../../../components/common/list/fragments/TagsFragment';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -142,7 +142,7 @@ const Endpoints = () => {
       field: EndpointListItemFragments.ASSET_TAGS,
       label: 'Tags',
       isSortable: false,
-      value: (endpoint: EndpointOutput) => <AssetTagsFragment tags={endpoint.asset_tags} />,
+      value: (endpoint: EndpointOutput) => <TagsFragment tags={endpoint.asset_tags} />,
     },
   ];
 

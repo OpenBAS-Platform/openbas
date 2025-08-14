@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -169,6 +171,7 @@ public class Exercise implements Base {
   @Column(name = "exercise_created_at")
   @JsonProperty("exercise_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Getter
@@ -176,6 +179,7 @@ public class Exercise implements Base {
   @JsonProperty("exercise_updated_at")
   @NotNull
   @Queryable(filterable = true, sortable = true)
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   // -- RELATION --
@@ -199,6 +203,12 @@ public class Exercise implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   private List<Inject> injects = new ArrayList<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setInjects(List<Inject> injects) {
+    this.updatedAt = now();
+    this.injects = injects;
+  }
+
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -209,6 +219,12 @@ public class Exercise implements Base {
   @JsonProperty("exercise_teams")
   @ArraySchema(schema = @Schema(type = "string"))
   private List<Team> teams = new ArrayList<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setTeams(List<Team> teams) {
+    this.updatedAt = now();
+    this.teams = teams;
+  }
 
   @Getter
   @OneToMany(
@@ -248,6 +264,12 @@ public class Exercise implements Base {
   @JsonProperty("exercise_tags")
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setTags(Set<Tag> tags) {
+    this.updatedAt = now();
+    this.tags = tags;
+  }
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter

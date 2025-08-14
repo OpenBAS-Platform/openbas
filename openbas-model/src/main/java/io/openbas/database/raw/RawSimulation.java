@@ -38,13 +38,21 @@ public interface RawSimulation {
 
   Instant getExercise_updated_at();
 
+  Instant getExercise_injects_updated_at();
+
   String getScenario_id();
 
   String getExercise_custom_dashboard();
 
   Set<String> getExercise_reply_to();
 
-  List<String> getExercise_tags();
+  Set<String> getExercise_tags();
+
+  Set<String> getExercise_assets();
+
+  Set<String> getExercise_asset_groups();
+
+  Set<String> getExercise_teams();
 
   Set<String> getExercise_users();
 

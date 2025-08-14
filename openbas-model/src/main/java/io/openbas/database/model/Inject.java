@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -99,6 +101,7 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_created_at")
   @JsonProperty("inject_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Getter
@@ -106,6 +109,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, sortable = true)
   @JsonProperty("inject_updated_at")
   @NotNull
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @Getter
@@ -138,6 +142,12 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_depends_on")
   private List<InjectDependency> dependsOn = new ArrayList<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setDependsOn(List<InjectDependency> dependsOn) {
+    this.updatedAt = now();
+    this.dependsOn = dependsOn;
+  }
+
   @Getter
   @Column(name = "inject_depends_duration")
   @JsonProperty("inject_depends_duration")
@@ -166,6 +176,12 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, sortable = true)
   private InjectStatus status;
 
+  // UpdatedAt now used to sync with linked object
+  public void setStatus(InjectStatus status) {
+    this.updatedAt = now();
+    this.status = status;
+  }
+
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
@@ -177,6 +193,12 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_tags")
   @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setTags(Set<Tag> tags) {
+    this.updatedAt = now();
+    this.tags = tags;
+  }
 
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
@@ -190,6 +212,12 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true, path = "teams.id")
   private List<Team> teams = new ArrayList<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setTeams(List<Team> teams) {
+    this.updatedAt = now();
+    this.teams = teams;
+  }
+
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
@@ -202,6 +230,12 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true, path = "assets.id")
   private List<Asset> assets = new ArrayList<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setAssets(List<Asset> assets) {
+    this.updatedAt = now();
+    this.assets = assets;
+  }
+
   @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
@@ -213,6 +247,12 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_asset_groups")
   @Queryable(filterable = true, dynamicValues = true, path = "assetGroups.id")
   private List<AssetGroup> assetGroups = new ArrayList<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setAssetGroups(List<AssetGroup> assetGroups) {
+    this.updatedAt = now();
+    this.assetGroups = assetGroups;
+  }
 
   // CascadeType.ALL is required here because of complex relationships
   @ArraySchema(schema = @Schema(type = "string"))

@@ -23,7 +23,9 @@ import java.util.*;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -94,12 +96,14 @@ public class InjectorContract implements Base {
   @Column(name = "injector_contract_created_at")
   @JsonProperty("injector_contract_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Column(name = "injector_contract_updated_at")
   @JsonProperty("injector_contract_updated_at")
   @NotNull
   @Queryable(sortable = true)
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -122,6 +126,12 @@ public class InjectorContract implements Base {
   @JsonProperty("injector_contract_attack_patterns")
   @Queryable(searchable = true, filterable = true, path = "attackPatterns.externalId")
   private List<AttackPattern> attackPatterns = new ArrayList<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setAttackPatterns(List<AttackPattern> attackPatterns) {
+    this.updatedAt = now();
+    this.attackPatterns = attackPatterns;
+  }
 
   @Column(name = "injector_contract_atomic_testing")
   @JsonProperty("injector_contract_atomic_testing")

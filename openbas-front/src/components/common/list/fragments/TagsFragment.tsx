@@ -2,8 +2,8 @@ import ItemTags from '../../../ItemTags';
 
 type Props = { tags?: string[] };
 
-const AssetTagsFragment = (props: Props) => {
+const TagsFragment = (props: Props) => {
   return (<ItemTags variant="list" tags={props.tags ?? []} />);
 };
 
-export default AssetTagsFragment;
+export default TagsFragment;

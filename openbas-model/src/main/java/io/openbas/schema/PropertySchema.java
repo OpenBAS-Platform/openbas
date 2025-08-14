@@ -6,6 +6,7 @@ import static org.springframework.util.StringUtils.hasText;
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class PropertySchema {
   private final String jsonName;
 
   @NotNull private final Class<?> type;
+  private final Type subtype;
 
   private final boolean unicity;
   private final boolean mandatory;

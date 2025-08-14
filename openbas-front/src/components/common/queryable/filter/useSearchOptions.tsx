@@ -81,6 +81,7 @@ const useSearchOptions = () => {
       case 'team_tags':
       case 'finding_tags':
       case 'user_tags':
+      case 'base_tags_side':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });
@@ -91,7 +92,12 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
-        searchAssetGroupAsOption(search, contextId).then((response) => {
+        searchAssetGroupAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_asset_groups_side':
+        searchAssetGroupAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -102,12 +108,22 @@ const useSearchOptions = () => {
         break;
       case 'inject_assets':
       case 'base_endpoint_side':
-        searchEndpointAsOption(search, contextId).then((response) => {
+        searchEndpointAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_assets_side':
+        searchEndpointAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;
       case 'inject_teams':
-        searchTeamsAsOption(search, contextId).then((response) => {
+        searchTeamsAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_teams_side':
+        searchTeamsAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;

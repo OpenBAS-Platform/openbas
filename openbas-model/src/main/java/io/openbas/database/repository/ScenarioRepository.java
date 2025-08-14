@@ -23,9 +23,24 @@ public interface ScenarioRepository
 
   @Query(
       value =
-          "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at "
-              + "FROM scenarios s "
-              + "WHERE s.scenario_updated_at > :from ORDER BY s.scenario_updated_at LIMIT "
+          "WITH scenario_data AS ("
+              + "    SELECT s.scenario_id, s.scenario_name, s.scenario_created_at,"
+              + "           GREATEST(s.scenario_updated_at, max(inj.inject_updated_at)) as scenario_injects_updated_at,"
+              + "           array_agg(DISTINCT st.tag_id) FILTER (WHERE st.tag_id IS NOT NULL) as scenario_tags,"
+              + "           array_agg(DISTINCT ste.team_id) FILTER (WHERE ste.team_id IS NOT NULL) as scenario_teams,"
+              + "           array_agg(DISTINCT ia.asset_id) FILTER (WHERE ia.asset_id IS NOT NULL) as scenario_assets,"
+              + "           array_agg(DISTINCT iag.asset_group_id) FILTER (WHERE iag.asset_group_id IS NOT NULL) as scenario_asset_groups"
+              + "    FROM scenarios s"
+              + "             LEFT JOIN scenarios_tags st ON st.scenario_id = s.scenario_id"
+              + "             LEFT JOIN scenarios_teams ste ON ste.scenario_id = s.scenario_id"
+              + "             LEFT JOIN injects inj ON s.scenario_id = inj.inject_scenario"
+              + "             LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id"
+              + "             LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id"
+              + "    GROUP BY s.scenario_id, s.scenario_name, s.scenario_created_at, s.scenario_updated_at"
+              + ") "
+              + "SELECT * FROM scenario_data sd "
+              + "WHERE sd.scenario_injects_updated_at > :from "
+              + "ORDER BY sd.scenario_injects_updated_at ASC LIMIT "
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)

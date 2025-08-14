@@ -1724,6 +1724,10 @@ export interface EsFinding {
 
 export interface EsInject {
   /** @uniqueItems true */
+  base_asset_groups_side?: string[];
+  /** @uniqueItems true */
+  base_assets_side?: string[];
+  /** @uniqueItems true */
   base_attack_patterns_children_side?: string[];
   /** @uniqueItems true */
   base_attack_patterns_side?: string[];
@@ -1741,6 +1745,10 @@ export interface EsInject {
   base_restrictions?: string[];
   base_scenario_side?: string;
   base_simulation_side?: string;
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @uniqueItems true */
+  base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
   inject_status?: string;
@@ -1781,6 +1789,10 @@ export interface EsInjectExpectation {
 }
 
 export interface EsScenario {
+  /** @uniqueItems true */
+  base_asset_groups_side?: string[];
+  /** @uniqueItems true */
+  base_assets_side?: string[];
   /** @format date-time */
   base_created_at?: string;
   base_dependencies?: string[];
@@ -1788,8 +1800,13 @@ export interface EsScenario {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @uniqueItems true */
+  base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  name?: string;
 }
 
 export interface EsSearch {
@@ -1816,6 +1833,10 @@ export interface EsSeriesData {
 }
 
 export interface EsSimulation {
+  /** @uniqueItems true */
+  base_asset_groups_side?: string[];
+  /** @uniqueItems true */
+  base_assets_side?: string[];
   /** @format date-time */
   base_created_at?: string;
   base_dependencies?: string[];
@@ -1823,8 +1844,13 @@ export interface EsSimulation {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_tags_side?: string[];
+  /** @uniqueItems true */
+  base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  name?: string;
 }
 
 export interface EsTag {

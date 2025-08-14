@@ -16,10 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -88,6 +85,7 @@ public class SchemaUtils {
         PropertySchema.builder()
             .name(field.getName())
             .type(field.getType())
+            .subtype(field.getGenericType())
             .multiple(
                 field.getType().isArray() || Collection.class.isAssignableFrom(field.getType()));
 
@@ -118,6 +116,7 @@ public class SchemaUtils {
         PropertySchema.builder()
             .name(method.getName())
             .type(method.getReturnType())
+            .subtype(method.getGenericReturnType())
             .multiple(
                 method.getReturnType().isArray()
                     || Collection.class.isAssignableFrom(method.getReturnType()));

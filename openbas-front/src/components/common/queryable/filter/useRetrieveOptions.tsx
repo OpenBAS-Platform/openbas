@@ -79,23 +79,27 @@ const useRetrieveOptions = () => {
       case 'team_tags':
       case 'finding_tags':
       case 'user_tags':
+      case 'base_tags_side':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'finding_asset_groups':
       case 'inject_asset_groups':
+      case 'base_asset_groups_side':
         searchAssetGroupByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'finding_assets':
       case 'inject_assets':
+      case 'base_assets_side':
         searchEndpointByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'inject_teams':
+      case 'base_teams_side':
         searchTeamByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });

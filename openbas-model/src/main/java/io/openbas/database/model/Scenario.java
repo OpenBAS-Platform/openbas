@@ -23,6 +23,8 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -135,12 +137,14 @@ public class Scenario implements Base {
   @Column(name = "scenario_created_at")
   @JsonProperty("scenario_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Column(name = "scenario_updated_at")
   @JsonProperty("scenario_updated_at")
   @NotNull
   @Queryable(filterable = true, sortable = true)
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   // -- RELATION --
@@ -164,6 +168,12 @@ public class Scenario implements Base {
   @Getter(NONE)
   private Set<Inject> injects = new HashSet<>();
 
+  // UpdatedAt now used to sync with linked object
+  public void setInjects(Set<Inject> injects) {
+    this.updatedAt = now();
+    this.injects = injects;
+  }
+
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -173,6 +183,12 @@ public class Scenario implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_teams")
   private List<Team> teams = new ArrayList<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setTeams(List<Team> teams) {
+    this.updatedAt = now();
+    this.teams = teams;
+  }
 
   @OneToMany(
       mappedBy = "scenario",
@@ -197,6 +213,12 @@ public class Scenario implements Base {
   @JsonProperty("scenario_tags")
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
+
+  // UpdatedAt now used to sync with linked object
+  public void setTags(Set<Tag> tags) {
+    this.updatedAt = now();
+    this.tags = tags;
+  }
 
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)

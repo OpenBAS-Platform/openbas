@@ -14,11 +14,13 @@ import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InputFilterOptions;
 import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @Secured(ROLE_USER)
 public class AssetGroupApi extends RestBehavior {
 
@@ -152,13 +156,57 @@ public class AssetGroupApi extends RestBehavior {
   @GetMapping(ASSET_GROUP_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return assetGroupRepository
-        .findAllBySimulationOrScenarioIdAndName(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+      @RequestParam(required = false) final String simulationOrScenarioId,
+      @RequestParam(required = false) final String inputFilterOption) {
+    List<FilterUtilsJpa.Option> options = List.of();
+    InputFilterOptions injectFilterOptionEnum;
+    try {
+      injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
+    } catch (Exception e) {
+      if (StringUtils.isEmpty(inputFilterOption)) {
+        log.warn("InputFilterOption is null, fall back to backwards compatible case");
+        if (StringUtils.isNotEmpty(simulationOrScenarioId)) {
+          injectFilterOptionEnum = InputFilterOptions.SIMULATION_OR_SCENARIO;
+        } else {
+          injectFilterOptionEnum = InputFilterOptions.ATOMIC_TESTING;
+        }
+      } else {
+        throw new BadRequestException(
+            String.format("Invalid input filter option %s", inputFilterOption));
+      }
+    }
+    switch (injectFilterOptionEnum) {
+      case ALL_INJECTS:
+        {
+          options =
+              assetGroupRepository
+                  .findAllAssetGroupsForAtomicTestingsSimulationsAndScenarios()
+                  .stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .distinct()
+                  .toList();
+          break;
+        }
+      case SIMULATION_OR_SCENARIO:
+        {
+          if (StringUtils.isEmpty(simulationOrScenarioId)) {
+            throw new BadRequestException("Missing simulation or scenario id");
+          }
+        }
+      case ATOMIC_TESTING:
+        {
+          options =
+              assetGroupRepository
+                  .findAllBySimulationOrScenarioIdAndName(
+                      StringUtils.trimToNull(simulationOrScenarioId),
+                      StringUtils.trimToNull(searchText))
+                  .stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .toList();
+          break;
+        }
+    }
+    return options;
   }
 
   @LogExecutionTime
