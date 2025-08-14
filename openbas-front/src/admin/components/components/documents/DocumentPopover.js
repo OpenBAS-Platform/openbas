@@ -2,7 +2,7 @@ import { FiberManualRecord, MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -18,6 +18,8 @@ import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import DocumentForm from './DocumentForm';
 
 const entityPaths = {
@@ -41,6 +43,7 @@ const DocumentPopover = (props) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const { document, disabled, onRemoveDocument, attached, onToggleAttach, inline, onUpdate, onDelete } = props;
 
@@ -219,26 +222,32 @@ const DocumentPopover = (props) => {
   const documentExercises = exerciseOptions(document.document_exercises, exercisesMap);
   const documentScenarios = scenarioOptions(document.document_scenarios, scenariosMap);
   const initialValues = R.pipe(R.assoc('document_tags', documentTags), R.assoc('document_exercises', documentExercises), R.assoc('document_scenarios', documentScenarios), R.pick(['document_name', 'document_description', 'document_type', 'document_tags', 'document_exercises', 'document_scenarios']))(document);
+
   return (
     <div>
-      <IconButton
-        color="primary"
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        size="large"
-        disabled={disabled}
-      >
-        <MoreVert />
-      </IconButton>
+      {(ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS) || ability.can(ACTIONS.DELETE, SUBJECTS.DOCUMENTS) || onToggleAttach || onRemoveDocument)
+        && (
+          <IconButton
+            color="primary"
+            onClick={handlePopoverOpen}
+            aria-haspopup="true"
+            size="large"
+            disabled={disabled}
+          >
+            <MoreVert />
+          </IconButton>
+        )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
         {onUpdate && (
-          <MenuItem onClick={handleOpenEdit}>
-            {t('Update')}
-          </MenuItem>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+            <MenuItem onClick={handleOpenEdit}>
+              {t('Update')}
+            </MenuItem>
+          </Can>
         )}
         {onToggleAttach && (
           <MenuItem onClick={handleToggleAttachement}>
@@ -251,9 +260,11 @@ const DocumentPopover = (props) => {
           </MenuItem>
         )}
         {!onRemoveDocument && (
-          <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
-            {t('Delete')}
-          </MenuItem>
+          <Can I={ACTIONS.DELETE} a={SUBJECTS.DOCUMENTS}>
+            <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
+              {t('Delete')}
+            </MenuItem>
+          </Can>
         )}
       </Menu>
 

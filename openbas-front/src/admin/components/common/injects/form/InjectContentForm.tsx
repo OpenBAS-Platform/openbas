@@ -8,6 +8,8 @@ import SwitchFieldController from '../../../../../components/fields/SwitchFieldC
 import { useFormatter } from '../../../../../components/i18n';
 import type { Article, Variable } from '../../../../../utils/api-types';
 import { type ContractElement, type InjectorContractConverted } from '../../../../../utils/api-types-custom';
+import { Can } from '../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
@@ -87,11 +89,15 @@ const InjectContentForm = ({
           />
         )}
       />
-      <InjectAddAssetGroups
-        disabled={fieldsMap.get('asset-group')?.readOnly || readOnly}
-        assetGroupIds={injectAssetGroupIds}
-        onSubmit={onAssetGroupChange}
-      />
+
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.ASSETS}>
+        <InjectAddAssetGroups
+          disabled={fieldsMap.get('asset-group')?.readOnly || readOnly}
+          assetGroupIds={injectAssetGroupIds}
+          onSubmit={onAssetGroupChange}
+        />
+      </Can>
+
     </div>
   );
 

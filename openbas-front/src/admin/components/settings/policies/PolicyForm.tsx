@@ -5,6 +5,8 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import MarkDownFieldController from '../../../../components/fields/MarkDownFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import { type PolicyInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 
 interface Props {
   onSubmit: SubmitHandler<PolicyInput>;
@@ -64,14 +66,16 @@ const PolicyForm: FunctionComponent<Props> = ({
           inArticle={false}
         />
         <div style={{ marginTop: 20 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-            disabled={!isDirty || isSubmitting}
-          >
-            {t('Update')}
-          </Button>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+            <Button
+              variant="contained"
+              color="secondary"
+              type="submit"
+              disabled={!isDirty || isSubmitting}
+            >
+              {t('Update')}
+            </Button>
+          </Can>
         </div>
       </form>
     </FormProvider>

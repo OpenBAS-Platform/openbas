@@ -1,11 +1,11 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Tooltip } from '@mui/material';
-import { type ReactElement, useState } from 'react';
+import { type ReactElement, useContext, useState } from 'react';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
 import useAI from '../../../../utils/hooks/useAI';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 
 const EETooltip = ({
   children,
@@ -17,10 +17,11 @@ const EETooltip = ({
   forAi?: boolean;
 }) => {
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
+
   const { openDialog: openEnterpriseEditionDialog } = useEnterpriseEdition();
   const [openEnableAI, setOpenEnableAI] = useState(false);
   const [openConfigAI, setOpenConfigAI] = useState(false);
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
   const { enabled, configured } = useAI();
   if (isEnterpriseEdition && (!forAi || (forAi && enabled && configured))) {
@@ -96,7 +97,7 @@ const EETooltip = ({
     <>
       <Tooltip title={title ? t(title) : undefined}>
         <span onClick={(e) => {
-          if (userAdmin) {
+          if (ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS)) {
             openEnterpriseEditionDialog();
           }
           e.preventDefault();

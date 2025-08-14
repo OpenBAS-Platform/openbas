@@ -21,8 +21,8 @@ public class Grant implements Base {
 
   public enum GRANT_TYPE {
     OBSERVER(1),
-    LAUNCHER(2),
-    PLANNER(3);
+    PLANNER(2),
+    LAUNCHER(3);
 
     private final int priority;
 

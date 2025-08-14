@@ -1,6 +1,5 @@
 package io.openbas.rest.user;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.UserSpecification.fromIds;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -47,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -219,7 +217,6 @@ public class UserApi extends RestBehavior {
 
   @Operation(description = "List all the users", summary = "List users")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of users")})
-  @Secured(ROLE_ADMIN)
   @GetMapping("/api/users")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.USER)
   public List<RawUser> users() {
@@ -248,7 +245,6 @@ public class UserApi extends RestBehavior {
     return this.userCriteriaBuilderService.find(fromIds(userIds));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}/password")
   @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
@@ -262,7 +258,6 @@ public class UserApi extends RestBehavior {
     return userRepository.save(user);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/users")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
@@ -272,7 +267,6 @@ public class UserApi extends RestBehavior {
     return userService.createUser(input, 1);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}")
   @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)
@@ -291,7 +285,6 @@ public class UserApi extends RestBehavior {
     return savedUser;
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/users/{userId}")
   @RBAC(resourceId = "#userId", actionPerformed = Action.DELETE, resourceType = ResourceType.USER)
   @Transactional(rollbackFor = Exception.class)

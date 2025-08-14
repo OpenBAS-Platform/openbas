@@ -19,6 +19,8 @@ import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader.js';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
@@ -71,10 +73,9 @@ const Documents = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
-  const { exercisesMap, scenariosMap, userAdmin } = useHelper(helper => ({
+  const { exercisesMap, scenariosMap } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
-    userAdmin: helper.getMeAdmin(),
   }));
   useDataLoader(() => {
     dispatch(fetchExercises());
@@ -200,7 +201,6 @@ const Documents = () => {
                 secondaryAction={(
                   <DocumentPopover
                     document={document}
-                    disabled={!userAdmin}
                     onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
                     onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
                     scenariosAndExercisesFetched
@@ -328,11 +328,11 @@ const Documents = () => {
               </ListItem>
             ))}
       </List>
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
         <CreateDocument
           onCreate={handleCreateDocuments}
         />
-      )}
+      </Can>
     </>
   );
 };

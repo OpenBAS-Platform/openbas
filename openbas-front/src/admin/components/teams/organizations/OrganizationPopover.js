@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import { deleteOrganization, updateOrganization } from '../../../../actions/Organization';
 import inject18n from '../../../../components/i18n';
 import { tagOptions } from '../../../../utils/Option';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import OrganizationForm from './OrganizationForm';
 
 const Transition = forwardRef((props, ref) => (
@@ -82,14 +84,16 @@ class OrganizationPopover extends Component {
     )(organization);
     return (
       <div>
-        <IconButton
-          onClick={this.handlePopoverOpen.bind(this)}
-          aria-haspopup="true"
-          size="large"
-          color="primary"
-        >
-          <MoreVert />
-        </IconButton>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <IconButton
+            onClick={this.handlePopoverOpen.bind(this)}
+            aria-haspopup="true"
+            size="large"
+            color="primary"
+          >
+            <MoreVert />
+          </IconButton>
+        </Can>
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}

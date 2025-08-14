@@ -27,7 +27,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,6 @@ public class SimulationChallengeApi extends RestBehavior {
   private final ChallengeService challengeService;
   private final ExerciseService exerciseService;
 
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @GetMapping(EXERCISE_URI + "/{exerciseId}/challenges")
   @RBAC(
       resourceId = "#exerciseId",

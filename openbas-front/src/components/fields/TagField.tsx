@@ -11,6 +11,8 @@ import TagForm from '../../admin/components/settings/tags/TagForm';
 import { useHelper } from '../../store';
 import { type Tag } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
+import { Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles()(() => ({
@@ -48,13 +50,7 @@ const TagField: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   // Fetching data
-  const { tags, userAdmin }: {
-    tags: [Tag];
-    userAdmin: boolean;
-  } = useHelper((helper: TagHelper & UserHelper) => ({
-    tags: helper.getTags(),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { tags }: { tags: [Tag] } = useHelper((helper: TagHelper & UserHelper) => ({ tags: helper.getTags() }));
   const dispatch = useAppDispatch();
 
   // Handle tag creation
@@ -152,7 +148,7 @@ const TagField: FunctionComponent<Props> = ({
         )}
         classes={{ clearIndicator: classes.autoCompleteIndicator }}
       />
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
         <Dialog
           open={tagCreation}
           onClose={handleCloseTagCreation}
@@ -166,7 +162,7 @@ const TagField: FunctionComponent<Props> = ({
             />
           </DialogContent>
         </Dialog>
-      )}
+      </Can>
     </div>
   );
 };

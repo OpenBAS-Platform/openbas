@@ -10,6 +10,8 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/queryable/Page';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
@@ -149,9 +151,11 @@ const Tags = () => {
             </ListItem>
           ))}
         </List>
-        <CreateTag
-          onCreate={result => setTags([result, ...tags])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateTag
+            onCreate={result => setTags([result, ...tags])}
+          />
+        </Can>
       </div>
       <TaxonomiesMenu />
     </div>

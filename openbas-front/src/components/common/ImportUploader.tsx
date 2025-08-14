@@ -3,8 +3,6 @@ import { Button, CircularProgress, type CircularProgressProps, IconButton, Toggl
 import { type ChangeEvent, type FunctionComponent, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { type UserHelper } from '../../actions/helper';
-import { useHelper } from '../../store';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles()(theme => ({ buttonImport: { borderColor: theme.palette.divider } }));
@@ -34,7 +32,6 @@ const ImportUploader: FunctionComponent<Props> = ({
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [upload, setUpload] = useState(false);
   const handleOpenUpload = () => uploadRef.current && uploadRef.current.click();
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const onUpload = async (file: File) => {
     setUpload(true);
@@ -85,7 +82,7 @@ const ImportUploader: FunctionComponent<Props> = ({
           aria-label="import"
           size="small"
           onClick={handleOpenUpload}
-          disabled={!userAdmin || disabled}
+          disabled={disabled}
         >
           <Tooltip
             title={t(title)}
@@ -104,7 +101,7 @@ const ImportUploader: FunctionComponent<Props> = ({
         >
           <Button
             onClick={handleOpenUpload}
-            disabled={!userAdmin || disabled}
+            disabled={disabled}
             size="small"
             variant="outlined"
             color="inherit"

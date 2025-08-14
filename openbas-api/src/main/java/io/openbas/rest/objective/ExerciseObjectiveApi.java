@@ -19,7 +19,6 @@ import io.openbas.rest.objective.form.ObjectiveInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,7 +38,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
     return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
   }
@@ -49,7 +47,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
       @PathVariable String exerciseId, @Valid @RequestBody ObjectiveInput input) {
@@ -66,7 +63,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Objective updateObjective(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -82,7 +78,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
   }
@@ -95,7 +90,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Evaluation getEvaluation(
       @PathVariable String exerciseId, @PathVariable String evaluationId) {
     return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
@@ -106,7 +100,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Evaluation> getEvaluations(
       @PathVariable String exerciseId, @PathVariable String objectiveId) {
     return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
@@ -117,7 +110,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
       @PathVariable String exerciseId,
@@ -146,7 +138,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Evaluation updateEvaluation(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -172,7 +163,6 @@ public class ExerciseObjectiveApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);
   }

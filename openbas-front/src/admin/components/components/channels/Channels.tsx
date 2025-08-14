@@ -15,6 +15,8 @@ import { useHelper } from '../../../../store';
 import { type Channel } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ChannelIcon from './ChannelIcon';
 import CreateChannel from './CreateChannel';
@@ -99,13 +101,7 @@ const Channels = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin }: {
-    channels: Channel[];
-    userAdmin: boolean;
-  } = useHelper((helper: ChannelsHelper & UserHelper) => ({
-    channels: helper.getChannels(),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { channels }: { channels: Channel[] } = useHelper((helper: ChannelsHelper & UserHelper) => ({ channels: helper.getChannels() }));
   useDataLoader(() => {
     dispatch(fetchChannels());
   });
@@ -222,7 +218,10 @@ const Channels = () => {
           </ListItemButton>
         ))}
       </List>
-      {userAdmin && <CreateChannel />}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHANNELS}>
+        <CreateChannel />
+      </Can>
+
     </>
   );
 };

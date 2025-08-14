@@ -15,6 +15,8 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import TagsFilter from '../../common/filters/TagsFilter';
 import ChallengePopover from './ChallengePopover';
@@ -284,7 +286,9 @@ const Challenges = () => {
           );
         })}
       </List>
-      <CreateChallenge />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHALLENGES}>
+        <CreateChallenge />
+      </Can>
     </>
   );
 };

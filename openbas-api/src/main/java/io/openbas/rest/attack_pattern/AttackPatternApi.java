@@ -1,6 +1,5 @@
 package io.openbas.rest.attack_pattern;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.AttackPatternSpecification.byName;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
@@ -93,7 +92,6 @@ public class AttackPatternApi extends RestBehavior {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/attack_patterns")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
@@ -118,7 +116,6 @@ public class AttackPatternApi extends RestBehavior {
         InjectorContractSpecification.fromAttackPattern(attackPatternId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/attack_patterns/{attackPatternId}")
   @RBAC(
       resourceId = "#attackPatternId",
@@ -196,7 +193,6 @@ public class AttackPatternApi extends RestBehavior {
     return fromIterable(this.attackPatternRepository.saveAll(upserted));
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/attack_patterns/upsert")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ATTACK_PATTERN)
   @Transactional(rollbackOn = Exception.class)
@@ -215,7 +211,6 @@ public class AttackPatternApi extends RestBehavior {
     return upserted;
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/attack_patterns/{attackPatternId}")
   @RBAC(
       resourceId = "#attackPatternId",

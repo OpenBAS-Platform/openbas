@@ -2,7 +2,6 @@ package io.openbas.rest.injector;
 
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.EndpointService.JFROG_BASE;
@@ -45,7 +44,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -182,7 +180,6 @@ public class InjectorApi extends RestBehavior {
     return injectorRepository.save(injector);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/injectors/{injectorId}")
   @RBAC(
       resourceId = "#injectorId",
@@ -204,7 +201,6 @@ public class InjectorApi extends RestBehavior {
         input.getPayloads());
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping("/api/injectors/{injectorId}")
   @RBAC(
       resourceId = "#injectorId",
@@ -214,7 +210,6 @@ public class InjectorApi extends RestBehavior {
     return injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(
       value = "/api/injectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},

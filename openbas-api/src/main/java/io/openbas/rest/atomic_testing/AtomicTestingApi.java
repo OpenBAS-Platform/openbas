@@ -19,13 +19,11 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(AtomicTestingApi.ATOMIC_TESTING_URI)
-@PreAuthorize("isAdmin()")
 @RequiredArgsConstructor
 public class AtomicTestingApi extends RestBehavior {
 
@@ -49,7 +47,6 @@ public class AtomicTestingApi extends RestBehavior {
       resourceId = "#injectId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ATOMIC_TESTING)
-  @PreAuthorize("isInjectObserver(#injectId)")
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
@@ -128,7 +125,6 @@ public class AtomicTestingApi extends RestBehavior {
       resourceId = "#injectId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ATOMIC_TESTING)
-  @PreAuthorize("isInjectObserver(#injectId)")
   public List<InjectExpectation> findTargetResult(
       @PathVariable String injectId,
       @PathVariable String targetId,
@@ -161,7 +157,6 @@ public class AtomicTestingApi extends RestBehavior {
       resourceId = "#injectId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ATOMIC_TESTING)
-  @PreAuthorize("isInjectObserver(#injectId)")
   public List<InjectExpectation> findTargetResultMerged(
       @PathVariable String injectId,
       @PathVariable String targetId,
