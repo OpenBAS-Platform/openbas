@@ -55,9 +55,6 @@ const Scenarios = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
-
   // Headers
   const headers = useMemo(() => [
     {
@@ -275,14 +272,12 @@ const Scenarios = () => {
               })
         }
       </List>
-      {userAdmin && (
-        <ScenarioCreation
-          onCreate={(result: Scenario) => {
-            setScenarios([result, ...scenarios]);
-            fetchStatistics();
-          }}
-        />
-      )}
+      <ScenarioCreation
+        onCreate={(result: Scenario) => {
+          setScenarios([result, ...scenarios]);
+          fetchStatistics();
+        }}
+      />
     </>
   );
 };

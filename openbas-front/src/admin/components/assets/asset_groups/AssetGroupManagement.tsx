@@ -68,10 +68,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { assetGroup, userAdmin } = useHelper((helper: AssetGroupsHelper & UserHelper) => ({
-    assetGroup: helper.getAssetGroup(assetGroupId),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { assetGroup } = useHelper((helper: AssetGroupsHelper & UserHelper) => ({ assetGroup: helper.getAssetGroup(assetGroupId) }));
   useDataLoader(() => {
     dispatch(fetchAssetGroup(assetGroupId));
   });
@@ -140,29 +137,24 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
       <EndpointsList
         endpoints={endpoints}
         loading={loading}
-        renderActions={(endpoint: EndpointOutput) => userAdmin
-          ? (
-              <EndpointPopover
-                inline
-                agentless={endpoint.asset_agents.length === 0}
-                endpoint={endpoint}
-                assetGroupId={assetGroup?.asset_group_id}
-                assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-                onRemoveEndpointFromAssetGroup={onRemoveEndpointFromList}
-              />
-            )
-          : <span> &nbsp; </span>}
-      />
-      {userAdmin
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-            <AssetGroupAddEndpoints
-              assetGroupId={assetGroup?.asset_group_id}
-              assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-              onUpdate={onUpdateList}
-            />
-          </Can>
+        renderActions={(endpoint: EndpointOutput) => (
+          <EndpointPopover
+            inline
+            agentless={endpoint.asset_agents.length === 0}
+            endpoint={endpoint}
+            assetGroupId={assetGroup?.asset_group_id}
+            assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+            onRemoveEndpointFromAssetGroup={onRemoveEndpointFromList}
+          />
         )}
+      />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+        <AssetGroupAddEndpoints
+          assetGroupId={assetGroup?.asset_group_id}
+          assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+          onUpdate={onUpdateList}
+        />
+      </Can>
     </>
   );
 };

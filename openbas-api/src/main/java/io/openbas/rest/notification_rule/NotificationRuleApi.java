@@ -1,6 +1,5 @@
 package io.openbas.rest.notification_rule;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
@@ -25,8 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +52,6 @@ public class NotificationRuleApi {
     this.userService = userService;
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @GetMapping(NOTIFICATION_RULE_URI + "/{notificationRuleId}")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.NOTIFICATION_RULE)
@@ -70,7 +66,6 @@ public class NotificationRuleApi {
         .orElse(null);
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @GetMapping(NOTIFICATION_RULE_URI + "/resource/{resourceId}")
   @RBAC(
@@ -93,7 +88,6 @@ public class NotificationRuleApi {
         .collect(Collectors.toList());
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @GetMapping(NOTIFICATION_RULE_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.NOTIFICATION_RULE)
@@ -108,7 +102,6 @@ public class NotificationRuleApi {
         .toList();
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(NOTIFICATION_RULE_URI + "/{notificationRuleId}")
   @RBAC(
@@ -122,14 +115,13 @@ public class NotificationRuleApi {
         @ApiResponse(responseCode = "200", description = "NotificationRule deleted"),
         @ApiResponse(responseCode = "404", description = "NotificationRule not found")
       })
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteNotificationRule(
       @PathVariable @NotBlank @Schema(description = "ID of the notification rule")
           final String notificationRuleId) {
     notificationRuleService.deleteNotificationRule(notificationRuleId);
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(NOTIFICATION_RULE_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.NOTIFICATION_RULE)
@@ -147,7 +139,6 @@ public class NotificationRuleApi {
             notificationRuleMapper.toNotificationRule(input)));
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(NOTIFICATION_RULE_URI + "/{notificationRuleId}")
   @RBAC(
@@ -169,7 +160,6 @@ public class NotificationRuleApi {
         notificationRuleService.updateNotificationRule(notificationRuleId, input.getSubject()));
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(NOTIFICATION_RULE_URI + "/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.NOTIFICATION_RULE)

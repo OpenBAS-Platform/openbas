@@ -80,6 +80,11 @@ public class PermissionService {
       final String resourceId,
       @NotNull final ResourceType resourceType,
       @NotNull final Action action) {
+    Set<Capability> userCapabilities = user.getCapabilities();
+
+    if (userCapabilities.contains(Capability.BYPASS)) {
+      return true;
+    }
     // user can access search apis but the result will be filtered
     if (Action.SEARCH.equals(action)) {
       return true;

@@ -15,7 +15,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,7 +36,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsCategory> scenarioLessonsCategories(@PathVariable String scenarioId) {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromScenario(scenarioId));
   }
@@ -47,7 +45,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyScenarioLessonsTemplate(
       @PathVariable String scenarioId, @PathVariable String lessonsTemplateId) {
@@ -88,7 +86,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createScenarioLessonsCategory(
       @PathVariable String scenarioId, @Valid @RequestBody LessonsCategoryCreateInput input) {
@@ -105,7 +103,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyScenarioLessons(@PathVariable String scenarioId) {
     List<LessonsCategory> lessonsCategories =
@@ -127,7 +125,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategory(
       @PathVariable String scenarioId,
@@ -147,7 +145,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsCategory(
       @PathVariable String scenarioId, @PathVariable String lessonsCategoryId) {
@@ -159,7 +157,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategoryTeams(
       @PathVariable String scenarioId,
@@ -179,7 +177,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsQuestion> scenarioLessonsQuestions(@PathVariable String scenarioId) {
     return lessonsCategoryRepository
         .findAll(LessonsCategorySpecification.fromScenario(scenarioId))
@@ -198,7 +195,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<LessonsQuestion> scenarioLessonsCategoryQuestions(
       @PathVariable String scenarioId, @PathVariable String lessonsCategoryId) {
     return lessonsQuestionRepository.findAll(
@@ -211,7 +207,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public LessonsQuestion createScenarioLessonsQuestion(
       @PathVariable String scenarioId,
       @PathVariable String lessonsCategoryId,
@@ -233,7 +229,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public LessonsQuestion updateScenarioLessonsQuestion(
       @PathVariable String scenarioId,
       @PathVariable String lessonsQuestionId,
@@ -254,7 +250,7 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsQuestion(
       @PathVariable String scenarioId, @PathVariable String lessonsQuestionId) {

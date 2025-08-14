@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +30,6 @@ public class ScenarioStatisticApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Retrieve scenario statistics")
   public ScenarioStatistic getScenarioStatistics(@PathVariable @NotBlank final String scenarioId) {

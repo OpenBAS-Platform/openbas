@@ -1,6 +1,5 @@
 package io.openbas.rest.collector;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,7 +58,6 @@ public class CollectorApi extends RestBehavior {
   }
 
   @GetMapping("/api/collectors/{collectorId}")
-  @Secured(ROLE_ADMIN)
   @RBAC(
       resourceId = "#collectorId",
       actionPerformed = Action.READ,
@@ -69,7 +66,6 @@ public class CollectorApi extends RestBehavior {
     return collectorService.collector(collectorId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/collectors/{collectorId}")
   @RBAC(
       resourceId = "#collectorId",
@@ -88,7 +84,6 @@ public class CollectorApi extends RestBehavior {
         collector.getSecurityPlatform() != null ? collector.getSecurityPlatform().getId() : null);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(
       value = "/api/collectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},

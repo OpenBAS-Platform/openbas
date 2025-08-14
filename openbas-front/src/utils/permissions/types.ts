@@ -4,11 +4,13 @@ export const ACTIONS = {
   LAUNCH: 'LAUNCH',
   DELETE: 'DELETE',
   SEARCH: 'SEARCH',
+  CREATE: 'CREATE',
 } as const;
 
 export type Actions = typeof ACTIONS[keyof typeof ACTIONS];
 
 export const SUBJECTS = {
+  ASSESSMENT: 'ASSESSMENT',
   ATOMIC_TESTING: 'ATOMIC_TESTING',
   TEAMS_AND_PLAYERS: 'TEAMS_AND_PLAYERS',
   ASSETS: 'ASSETS',

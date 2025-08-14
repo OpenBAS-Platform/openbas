@@ -1,6 +1,5 @@
 package io.openbas.rest.executor;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.service.EndpointService.JFROG_BASE;
 import static io.openbas.service.EndpointService.SERVICE;
 import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
@@ -39,7 +38,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,7 +94,6 @@ public class ExecutorApi extends RestBehavior {
     return executorRepository.save(executor);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/executors/{executorId}")
   @RBAC(
       resourceId = "#executorId",
@@ -110,7 +107,6 @@ public class ExecutorApi extends RestBehavior {
         executor, executor.getType(), executor.getName(), executor.getPlatforms());
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(
       value = "/api/executors",
       produces = {MediaType.APPLICATION_JSON_VALUE},

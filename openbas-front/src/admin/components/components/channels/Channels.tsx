@@ -101,13 +101,7 @@ const Channels = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin }: {
-    channels: Channel[];
-    userAdmin: boolean;
-  } = useHelper((helper: ChannelsHelper & UserHelper) => ({
-    channels: helper.getChannels(),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { channels }: { channels: Channel[] } = useHelper((helper: ChannelsHelper & UserHelper) => ({ channels: helper.getChannels() }));
   useDataLoader(() => {
     dispatch(fetchChannels());
   });
@@ -224,12 +218,10 @@ const Channels = () => {
           </ListItemButton>
         ))}
       </List>
-      {userAdmin
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHANNELS}>
-            <CreateChannel />
-          </Can>
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHANNELS}>
+        <CreateChannel />
+      </Can>
+
     </>
   );
 };

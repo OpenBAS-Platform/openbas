@@ -37,12 +37,11 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
   const dispatch = useAppDispatch();
   const ability = useContext(AbilityContext);
 
-  const { userAdmin, organizationsMap, tagsMap } = useHelper(
+  const { organizationsMap, tagsMap } = useHelper(
     (
       helper: UserHelper & OrganizationHelper & TagHelper,
     ) => {
       return {
-        userAdmin: helper.getMeAdmin(),
         organizationsMap: helper.getOrganizationsMap(),
         tagsMap: helper.getTagsMap(),
       };
@@ -122,8 +121,6 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
     user_country: countryOption(user.user_country),
     user_tags: tagOptions(user.user_tags, tagsMap),
   };
-  const canDelete = user.user_email !== 'admin@openbas.io' && (userAdmin || !user.user_admin);
-  const canUpdateEmail = user.user_email !== 'admin@openbas.io' && (userAdmin || !user.user_admin);
 
   // Button Popover
   const entries = [];
@@ -137,7 +134,7 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
     action: () => handleOpenRemove(),
     userRight: true,
   });
-  if (canDelete) entries.push({
+  entries.push({
     label: t('Delete'),
     action: () => handleOpenDelete(),
     userRight: ability.can(ACTIONS.DELETE, SUBJECTS.TEAMS_AND_PLAYERS),
@@ -163,7 +160,6 @@ const PlayerPopover: FunctionComponent<PlayerPopoverProps> = ({
           handleClose={handleCloseEdit}
           onSubmit={onSubmitEdit}
           editing
-          canUpdateEmail={canUpdateEmail}
         />
       </Drawer>
       <MuiDialog

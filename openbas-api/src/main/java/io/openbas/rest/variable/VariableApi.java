@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Variable createVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestBody final VariableInput input) {
@@ -54,7 +52,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Variable> variablesFromExercise(@PathVariable @NotBlank final String exerciseId) {
     return this.variableService.variablesFromExercise(exerciseId);
   }
@@ -64,7 +61,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Variable updateVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String variableId,
@@ -80,7 +76,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteVariableForExercise(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String variableId) {
@@ -96,7 +91,7 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Variable createVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final VariableInput input) {
@@ -112,7 +107,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Variable> variablesFromScenario(@PathVariable @NotBlank final String scenarioId) {
     return this.variableService.variablesFromScenario(scenarioId);
   }
@@ -122,7 +116,7 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Variable updateVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId,
@@ -138,7 +132,7 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId) {

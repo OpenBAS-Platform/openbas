@@ -12,7 +12,6 @@ import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
 import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
@@ -29,7 +28,6 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { ENDPOINT_BASE_URL } from '../../../../constants/BaseUrls';
-import { useHelper } from '../../../../store';
 import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
@@ -72,8 +70,6 @@ const Endpoints = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
 
-  // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const availableFilterNames = [
     'endpoint_platform',
     'endpoint_arch',
@@ -198,18 +194,15 @@ const Endpoints = () => {
                   <ListItem
                     key={endpoint.asset_id}
                     divider
-                    secondaryAction={
-                      (userAdmin
-                        && (
-                          <EndpointPopover
-                            inline
-                            endpoint={{ ...endpoint }}
-                            agentless={endpoint.asset_agents?.length === 0}
-                            onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
-                            onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
-                          />
-                        ))
-                    }
+                    secondaryAction={(
+                      <EndpointPopover
+                        inline
+                        endpoint={{ ...endpoint }}
+                        agentless={endpoint.asset_agents?.length === 0}
+                        onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
+                        onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                      />
+                    )}
                     disablePadding
                   >
                     <ListItemButton
@@ -243,12 +236,9 @@ const Endpoints = () => {
               })
         }
       </List>
-      {userAdmin
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-            <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />
-          </Can>
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+        <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />
+      </Can>
     </>
   );
 };

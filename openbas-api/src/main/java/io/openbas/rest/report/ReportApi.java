@@ -43,7 +43,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Report> exerciseReports(@PathVariable String exerciseId) {
     return this.reportService.reportsFromExercise(exerciseId);
   }
@@ -53,7 +52,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report createExerciseReport(
       @PathVariable String exerciseId, @Valid @RequestBody ReportInput input) {
@@ -68,7 +66,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report updateReportInjectComment(
       @PathVariable String exerciseId,
@@ -86,7 +83,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Report updateExerciseReport(
       @PathVariable String exerciseId,
@@ -102,7 +98,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseReport(@PathVariable String exerciseId, @PathVariable String reportId) {
     Report report = this.reportService.report(UUID.fromString(reportId));

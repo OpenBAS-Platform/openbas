@@ -4,7 +4,6 @@ import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { searchTeams } from '../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../actions/teams/team-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -67,9 +66,6 @@ const Teams = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = [
@@ -253,11 +249,9 @@ const Teams = () => {
           />
         )}
       </Drawer>
-      {userAdmin && (
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
-          <CreateTeam onCreate={result => setTeams([result, ...teams])} />
-        </Can>
-      )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+        <CreateTeam onCreate={result => setTeams([result, ...teams])} />
+      </Can>
     </>
   );
 };

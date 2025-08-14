@@ -1,6 +1,5 @@
 package io.openbas.rest.kill_chain_phase;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.KillChainPhaseSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -69,7 +68,6 @@ public class KillChainPhaseApi extends RestBehavior {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/kill_chain_phases/{killChainPhaseId}")
   @RBAC(
       resourceId = "#killChainPhaseId",
@@ -87,7 +85,6 @@ public class KillChainPhaseApi extends RestBehavior {
     return killChainPhaseRepository.save(killchainPhase);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.KILL_CHAIN_PHASE)
   @Transactional(rollbackOn = Exception.class)
@@ -97,7 +94,6 @@ public class KillChainPhaseApi extends RestBehavior {
     return killChainPhaseRepository.save(killChainPhase);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/kill_chain_phases/upsert")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.KILL_CHAIN_PHASE)
   @Transactional(rollbackOn = Exception.class)
@@ -136,7 +132,6 @@ public class KillChainPhaseApi extends RestBehavior {
     return this.killChainPhaseRepository.saveAll(upserted);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/kill_chain_phases/{killChainPhaseId}")
   @RBAC(
       resourceId = "#killChainPhaseId",

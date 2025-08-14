@@ -19,14 +19,11 @@ import {
 } from 'mdi-material-ui';
 import { useContext } from 'react';
 
-import { type UserHelper } from '../../../actions/helper';
 import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
-import { useHelper } from '../../../store';
 import { AbilityContext } from '../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 
 const LeftBar = () => {
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   const ability = useContext(AbilityContext);
 
   const entries = [
@@ -206,7 +203,7 @@ const LeftBar = () => {
       ],
     },
     {
-      userRight: userAdmin,
+      userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS),
       items: [
         {
           path: `/admin/settings`,

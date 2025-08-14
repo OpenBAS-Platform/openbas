@@ -73,10 +73,9 @@ const Documents = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
-  const { exercisesMap, scenariosMap, userAdmin } = useHelper(helper => ({
+  const { exercisesMap, scenariosMap } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
-    userAdmin: helper.getMeAdmin(),
   }));
   useDataLoader(() => {
     dispatch(fetchExercises());
@@ -202,7 +201,6 @@ const Documents = () => {
                 secondaryAction={(
                   <DocumentPopover
                     document={document}
-                    disabled={!userAdmin}
                     onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
                     onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
                     scenariosAndExercisesFetched
@@ -330,13 +328,11 @@ const Documents = () => {
               </ListItem>
             ))}
       </List>
-      {userAdmin && (
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
-          <CreateDocument
-            onCreate={handleCreateDocuments}
-          />
-        </Can>
-      )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+        <CreateDocument
+          onCreate={handleCreateDocuments}
+        />
+      </Can>
     </>
   );
 };

@@ -83,15 +83,13 @@ const Organizations = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { organizations, tagsMap, userAdmin }: {
+  const { organizations, tagsMap }: {
     organizations: ReturnType<OrganizationHelper['getOrganizations']>;
     tagsMap: ReturnType<TagHelper['getTagsMap']>;
-    userAdmin: ReturnType<UserHelper['getMeAdmin']>;
   }
     = useHelper((helper: UserHelper & TagHelper & OrganizationHelper) => ({
       organizations: helper.getOrganizations(),
       tagsMap: helper.getTagsMap(),
-      userAdmin: helper.getMeAdmin(),
     }));
 
   useDataLoader(() => {
@@ -256,12 +254,10 @@ const Organizations = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
-            <CreateOrganization />
-          </Can>
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+        <CreateOrganization />
+      </Can>
+
     </>
   );
 };

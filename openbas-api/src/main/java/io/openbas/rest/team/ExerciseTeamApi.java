@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ public class ExerciseTeamApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  
   @Transactional(readOnly = true)
   public Page<TeamOutput> searchTeams(
       @PathVariable @NotBlank final String exerciseId,

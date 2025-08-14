@@ -1,6 +1,5 @@
 package io.openbas.rest.mapper;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -84,7 +83,6 @@ public class MapperApi extends RestBehavior {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.MAPPER)
   public ImportMapper createImportMapper(
@@ -92,7 +90,6 @@ public class MapperApi extends RestBehavior {
     return mapperService.createAndSaveImportMapper(importMapperAddInput);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(value = "/api/mappers/export")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   public void exportMappers(
@@ -133,7 +130,6 @@ public class MapperApi extends RestBehavior {
     mapperService.exportMappersCsv(targetType, input, response);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/import")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   public void importMappers(@RequestPart("file") @NotNull MultipartFile file)
@@ -147,7 +143,6 @@ public class MapperApi extends RestBehavior {
     }
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/{mapperId}")
   @RBAC(
       resourceId = "#mapperId",
@@ -158,7 +153,6 @@ public class MapperApi extends RestBehavior {
     return mapperService.getDuplicateImportMapper(mapperId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/mappers/{mapperId}")
   @RBAC(
       resourceId = "#mapperId",
@@ -170,7 +164,6 @@ public class MapperApi extends RestBehavior {
     return mapperService.updateImportMapper(mapperId, importMapperUpdateInput);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mappers/{mapperId}")
   @RBAC(
       resourceId = "#mapperId",

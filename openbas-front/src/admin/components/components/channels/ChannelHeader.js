@@ -22,10 +22,7 @@ const useStyles = makeStyles()(theme => ({
 const ChannelHeader = () => {
   const { classes } = useStyles();
   const { channelId } = useParams();
-  const { channel, userAdmin } = useHelper(helper => ({
-    channel: helper.getChannel(channelId),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { channel } = useHelper(helper => ({ channel: helper.getChannel(channelId) }));
   return (
     <div className={classes.container}>
       <Typography
@@ -35,7 +32,7 @@ const ChannelHeader = () => {
       >
         {channel.channel_name}
       </Typography>
-      {userAdmin && <ChannelPopover channel={channel} />}
+      <ChannelPopover channel={channel} />
     </div>
   );
 };

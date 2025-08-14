@@ -34,18 +34,15 @@ const LessonsTemplate = () => {
 
   // Datas
   const {
-    userAdmin,
     categories,
     questions,
   }: {
-    userAdmin: boolean;
     categories: LessonsTemplateCategory[];
     questions: LessonsTemplateQuestion[];
   } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
       questions: helper.getLessonsTemplateQuestions(),
-      userAdmin: helper.getMeAdmin(),
     };
   });
   useDataLoader(() => {
@@ -120,11 +117,9 @@ const LessonsTemplate = () => {
           );
         })}
       </GridLegacy>
-      {userAdmin && (
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
-          <CreateLessonsTemplateCategory lessonsTemplateId={lessonsTemplateId} />
-        </Can>
-      )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
+        <CreateLessonsTemplateCategory lessonsTemplateId={lessonsTemplateId} />
+      </Can>
     </>
   );
 };

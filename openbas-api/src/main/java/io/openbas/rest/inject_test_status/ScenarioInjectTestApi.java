@@ -22,7 +22,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +58,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank final String scenarioId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
@@ -71,7 +70,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteInjectTest(
       @PathVariable @NotBlank final String scenarioId, @PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
@@ -86,7 +85,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
       @PathVariable @NotBlank final String scenarioId,

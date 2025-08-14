@@ -386,7 +386,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/injectors/{injectorType}", produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getInjectorImage(@PathVariable String injectorType)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getInjectorImage(injectorType);
@@ -399,7 +399,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/injectors/id/{injectorId}", produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getInjectorImageFromId(
       @PathVariable String injectorId) throws IOException {
     Injector injector =
@@ -418,7 +418,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/collectors/{collectorType}",
       produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getCollectorImage(@PathVariable String collectorType)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getCollectorImage(collectorType);
@@ -447,7 +447,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/collectors/id/{collectorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getCollectorImageFromId(
       @PathVariable String collectorId) throws IOException {
     Collector collector =
@@ -464,10 +464,7 @@ public class DocumentApi extends RestBehavior {
   }
 
   @GetMapping(value = "/api/images/security_platforms/id/{assetId}/{theme}")
-  @RBAC(
-      resourceId = "#assetId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public void getSecurityPlatformImageFromId(
       @PathVariable String assetId, @PathVariable String theme, HttpServletResponse response)
       throws IOException {
@@ -487,7 +484,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/executors/icons/{executorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getExecutorIconImage(@PathVariable String executorId)
       throws IOException {
     Optional<InputStream> fileStream = fileService.getExecutorIconImage(executorId);
@@ -502,7 +499,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(
       value = "/api/images/executors/banners/{executorId}",
       produces = MediaType.IMAGE_PNG_VALUE)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.DOCUMENT)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getExecutorBannerImage(
       @PathVariable String executorId) throws IOException {
     Optional<InputStream> fileStream = fileService.getExecutorBannerImage(executorId);

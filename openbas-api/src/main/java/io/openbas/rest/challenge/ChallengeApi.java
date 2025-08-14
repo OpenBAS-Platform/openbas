@@ -1,6 +1,5 @@
 package io.openbas.rest.challenge;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.ChallengeSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -23,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -112,7 +110,6 @@ public class ChallengeApi extends RestBehavior {
     return challengeRepository.save(challenge);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
   @RBAC(
       resourceId = "#challengeId",

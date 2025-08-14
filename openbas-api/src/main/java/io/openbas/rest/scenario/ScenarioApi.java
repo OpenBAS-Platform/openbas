@@ -1,6 +1,5 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ScenarioSpecification.byName;
 import static io.openbas.database.specification.TeamSpecification.fromScenario;
@@ -43,7 +42,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -115,7 +113,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Scenario scenario(@PathVariable @NotBlank final String scenarioId) {
     return scenarioService.scenario(scenarioId);
   }
@@ -125,7 +122,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final UpdateScenarioInput input) {
@@ -147,7 +143,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
     this.scenarioService.deleteScenario(scenarioId);
   }
@@ -159,7 +154,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenarioTags(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTagsInput input) {
@@ -176,7 +170,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.SEARCH,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public void exportScenario(
       @PathVariable @NotBlank final String scenarioId,
       @RequestParam(required = false) final boolean isWithTeams,
@@ -192,7 +185,6 @@ public class ScenarioApi extends RestBehavior {
 
   @PostMapping(SCENARIO_URI + "/import")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.SCENARIO)
-  @Secured(ROLE_ADMIN)
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
   }
@@ -204,7 +196,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public List<TeamOutput> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
     return this.teamService.find(fromScenario(scenarioId));
   }
@@ -215,7 +206,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Iterable<TeamOutput> removeScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
@@ -228,7 +218,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public List<TeamOutput> replaceScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
@@ -241,7 +230,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario enableScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
@@ -256,7 +244,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario disableScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
@@ -270,7 +257,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario addScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
@@ -284,7 +270,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario removeScenarioTeamPlayers(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
@@ -303,7 +288,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenarioRecurrence(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioRecurrenceInput input) {
@@ -354,7 +338,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @Transactional(rollbackOn = Exception.class)
   public Scenario updateScenarioLessons(
       @PathVariable String scenarioId, @Valid @RequestBody LessonsInput input) {
@@ -368,7 +351,6 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Exercise createRunningExerciseFromScenario(
       @PathVariable @NotBlank final String scenarioId) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);

@@ -46,7 +46,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,7 +87,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(
       @PathVariable @NotBlank final String exerciseId) {
@@ -100,7 +98,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> exerciseInjectsSimple(
       @PathVariable @NotBlank final String exerciseId,
@@ -126,7 +123,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
     return injectRepository.findByExerciseId(exerciseId).stream()
         .sorted(Inject.executionComparator)
@@ -139,7 +135,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
@@ -153,7 +148,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
     return injectSearchService.getListOfInjectResults(exerciseId);
@@ -164,7 +158,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Inject exerciseInject(@PathVariable String exerciseId, @PathVariable String injectId) {
     return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
@@ -174,7 +167,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Team> exerciseInjectTeams(
       @PathVariable String exerciseId, @PathVariable String injectId) {
     return injectRepository
@@ -188,7 +180,6 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Iterable<Communication> exerciseInjectCommunications(
       @PathVariable String exerciseId, @PathVariable String injectId) {
     List<Communication> coms =
@@ -203,7 +194,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   @Transactional(rollbackFor = Exception.class)
   public Inject createInjectForExercise(
       @PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
@@ -217,7 +208,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public Inject duplicateInjectForExercise(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String injectId) {
@@ -231,7 +222,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public InjectStatus executeInject(
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestPart("input") DirectInjectInput input,
@@ -283,7 +274,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
     injectDocumentRepository.deleteDocumentsFromInject(injectId);
     injectRepository.deleteById(injectId);
@@ -294,7 +285,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public Inject updateInjectActivationForExercise(
       @PathVariable String exerciseId,
       @PathVariable String injectId,
@@ -307,7 +298,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public Inject updateInjectTrigger(
       @PathVariable String exerciseId, @PathVariable String injectId) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
@@ -322,7 +313,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public Inject setInjectStatus(
       @PathVariable String exerciseId,
       @PathVariable String injectId,
@@ -335,7 +326,7 @@ public class ExerciseInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  
   public Inject updateInjectTeams(
       @PathVariable String exerciseId,
       @PathVariable String injectId,

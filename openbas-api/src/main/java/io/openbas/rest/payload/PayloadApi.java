@@ -1,6 +1,5 @@
 package io.openbas.rest.payload;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -138,7 +137,6 @@ public class PayloadApi extends RestBehavior {
     outputStream.close();
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
   @RBAC(
       resourceId = "#payloadId",
@@ -150,7 +148,6 @@ public class PayloadApi extends RestBehavior {
 
   @PostMapping(PAYLOAD_URI + "/deprecate")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
-  @Secured(ROLE_ADMIN)
   @Transactional(rollbackOn = Exception.class)
   public void deprecateNonProcessedPayloadsByCollector(
       @Valid @RequestBody PayloadsDeprecateInput input) {

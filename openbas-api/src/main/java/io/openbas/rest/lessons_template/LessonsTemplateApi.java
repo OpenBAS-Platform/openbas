@@ -1,6 +1,5 @@
 package io.openbas.rest.lessons_template;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
@@ -22,7 +21,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,7 +35,6 @@ public class LessonsTemplateApi extends RestBehavior {
 
   // -- LESSONS TEMPLATES --
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_TEMPLATE_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.LESSON_LEARNED)
   @Transactional(rollbackOn = Exception.class)
@@ -61,7 +58,6 @@ public class LessonsTemplateApi extends RestBehavior {
         this.lessonsTemplateRepository::findAll, searchPaginationInput, LessonsTemplate.class);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -78,7 +74,6 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateRepository.save(lessonsTemplate);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -93,7 +88,6 @@ public class LessonsTemplateApi extends RestBehavior {
   public static final String LESSON_CATEGORY_URI =
       LESSON_TEMPLATE_URI + "/{lessonsTemplateId}/lessons_template_categories";
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_CATEGORY_URI)
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -124,7 +118,6 @@ public class LessonsTemplateApi extends RestBehavior {
         LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -144,7 +137,6 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -180,7 +172,6 @@ public class LessonsTemplateApi extends RestBehavior {
   public static final String LESSON_QUESTION_URI =
       LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}/lessons_template_questions";
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_QUESTION_URI)
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -211,7 +202,6 @@ public class LessonsTemplateApi extends RestBehavior {
         LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategoryId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
@@ -231,7 +221,6 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
   @RBAC(
       resourceId = "#lessonsTemplateId",
