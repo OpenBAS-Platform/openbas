@@ -35,14 +35,14 @@ export const widgetVisualizationTypes: {
     category: 'security-coverage',
     seriesLimit: 2,
     modes: ['structural'],
-    fields: ['base_attack_patterns_side'],
+    fields: ['base_attack_patterns_side', 'base_created_at', 'base_updated_at'],
     limit: false,
   },
   {
     category: 'attack-path',
     modes: ['structural'],
     seriesLimit: 2,
-    fields: ['base_attack_patterns_side'],
+    fields: ['base_attack_patterns_side', 'base_created_at', 'base_updated_at'],
     limit: false,
   },
   {

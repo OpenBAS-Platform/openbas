@@ -5,6 +5,7 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawCustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
@@ -38,6 +39,26 @@ public class CustomDashboardService {
    */
   @Transactional
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
+    CustomDashboardParameters customDashboardTimeRangeParameter = new CustomDashboardParameters();
+    customDashboardTimeRangeParameter.setName("Time range");
+    customDashboardTimeRangeParameter.setType(
+        CustomDashboardParameters.CustomDashboardParameterType.timeRange);
+    customDashboardTimeRangeParameter.setCustomDashboard(customDashboard);
+    CustomDashboardParameters customDashboardStartDateParameter = new CustomDashboardParameters();
+    customDashboardStartDateParameter.setName("Start date");
+    customDashboardStartDateParameter.setType(
+        CustomDashboardParameters.CustomDashboardParameterType.startDate);
+    customDashboardStartDateParameter.setCustomDashboard(customDashboard);
+    CustomDashboardParameters customDashboardEndDateParameter = new CustomDashboardParameters();
+    customDashboardEndDateParameter.setName("End date");
+    customDashboardEndDateParameter.setType(
+        CustomDashboardParameters.CustomDashboardParameterType.endDate);
+    customDashboardEndDateParameter.setCustomDashboard(customDashboard);
+    customDashboard.setParameters(
+        List.of(
+            customDashboardTimeRangeParameter,
+            customDashboardStartDateParameter,
+            customDashboardEndDateParameter));
     return this.customDashboardRepository.save(customDashboard);
   }
 

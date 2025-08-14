@@ -42,6 +42,9 @@ const SimulationAnalysis = () => {
             if ('simulation' === p.custom_dashboards_parameter_type) {
               params[p.custom_dashboards_parameter_id] = exerciseId;
             }
+            if ('timeRange' === p.custom_dashboards_parameter_type) {
+              params[p.custom_dashboards_parameter_id] = 'ALL_TIME';
+            }
           });
           setCustomDashboardParameters(params);
 

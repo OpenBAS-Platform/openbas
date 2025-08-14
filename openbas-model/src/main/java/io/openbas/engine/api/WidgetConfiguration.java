@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,7 @@ import lombok.Setter;
       name = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM)
 })
 public abstract class WidgetConfiguration {
+
   @Setter(NONE)
   @NotNull
   @JsonProperty("widget_configuration_type")
@@ -53,6 +55,17 @@ public abstract class WidgetConfiguration {
 
   @JsonProperty("title")
   private String title;
+
+  @Nullable private String start; // Date or $custom_dashboard_start
+
+  @Nullable private String end; // Date or $custom_dashboard_end
+
+  @NotNull
+  @JsonProperty("time_range")
+  private CustomDashboardTimeRange timeRange;
+
+  @JsonProperty("date_attribute")
+  private String dateAttribute;
 
   WidgetConfiguration(WidgetConfigurationType configurationType) {
     this.configurationType = configurationType;

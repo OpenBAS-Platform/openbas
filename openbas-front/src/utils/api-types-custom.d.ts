@@ -10,16 +10,39 @@ export type DateHistogramWidget = BaseWidgetConfiguration & {
   display_legend?: boolean;
   widget_configuration_type: 'temporal-histogram';
   stacked?: boolean;
-  end: string;
+  end?: string;
   mode: 'temporal';
-  field: string;
+  date_attribute: string;
   interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
   series: ApiTypes.DateHistogramSeries[];
-  start: string;
+  start?: string;
 };
 export type FlatConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.FlatSeries[];
   widget_configuration_type: 'flat';
+  end?: string;
+  start?: string;
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
+  date_attribute: string;
 };
 export type ListConfiguration = BaseWidgetConfiguration & {
   perspective: ApiTypes.ListPerspective;
@@ -27,6 +50,19 @@ export type ListConfiguration = BaseWidgetConfiguration & {
   sorts?: ApiTypes.EngineSortField[];
   limit?: number;
   widget_configuration_type: 'list';
+  end?: string;
+  start?: string;
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
+  date_attribute: string;
 };
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   widget_configuration_type: 'structural-histogram';
@@ -34,8 +70,21 @@ export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   stacked?: boolean;
   mode: 'structural';
   field: string;
+  date_attribute: string;
   series: ApiTypes.StructuralHistogramSeries[];
   limit?: number;
+  end?: string;
+  start?: string;
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
 };
 export type HistogramWidget = ApiTypes.BaseWidgetConfiguration &
   (
