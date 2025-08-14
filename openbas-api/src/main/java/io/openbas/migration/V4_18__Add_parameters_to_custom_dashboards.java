@@ -1,13 +1,12 @@
 package io.openbas.migration;
 
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.UUID;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V4_18__Add_parameters_to_custom_dashboards extends BaseJavaMigration {
@@ -16,7 +15,8 @@ public class V4_18__Add_parameters_to_custom_dashboards extends BaseJavaMigratio
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
 
-    ResultSet dashboardsResults = select.executeQuery("SELECT custom_dashboard_id FROM custom_dashboards;");
+    ResultSet dashboardsResults =
+        select.executeQuery("SELECT custom_dashboard_id FROM custom_dashboards;");
 
     PreparedStatement statementDashboard =
         context
@@ -43,6 +43,5 @@ public class V4_18__Add_parameters_to_custom_dashboards extends BaseJavaMigratio
       statementDashboard.addBatch();
     }
     statementDashboard.executeBatch();
-
   }
 }

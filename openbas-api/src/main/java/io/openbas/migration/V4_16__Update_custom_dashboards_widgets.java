@@ -2,13 +2,12 @@ package io.openbas.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V4_16__Update_custom_dashboards_widgets extends BaseJavaMigration {
@@ -21,9 +20,7 @@ public class V4_16__Update_custom_dashboards_widgets extends BaseJavaMigration {
     select.executeUpdate(
         "UPDATE custom_dashboards_parameters SET custom_dashboards_parameter_type = 'simulation';");
 
-    ResultSet results =
-        select.executeQuery(
-            "SELECT widget_config,widget_id FROM widgets;");
+    ResultSet results = select.executeQuery("SELECT widget_config,widget_id FROM widgets;");
 
     PreparedStatement statement =
         context
