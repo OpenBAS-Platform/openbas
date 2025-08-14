@@ -150,7 +150,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   if (managePlayers) entries.push({
     label: 'Manage players',
     action: () => managePlayers(),
-    userRight: true,
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
   });
   if (onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual) entries.push({
     label: 'Remove from the context',
