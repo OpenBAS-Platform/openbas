@@ -106,7 +106,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<AggregatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -139,7 +138,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<AggregatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,

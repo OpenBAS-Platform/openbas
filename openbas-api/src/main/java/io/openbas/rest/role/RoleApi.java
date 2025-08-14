@@ -1,6 +1,5 @@
 package io.openbas.rest.role;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
@@ -21,12 +20,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_ADMIN)
 @Tag(name = "Roles management", description = "Endpoints to manage Roles.")
 public class RoleApi {
 
@@ -70,7 +67,6 @@ public class RoleApi {
     return roleService.findAll().stream().map(roleMapper::toRoleOutput).toList();
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(RoleApi.ROLE_URI + "/{roleId}")
   @RBAC(
@@ -89,7 +85,6 @@ public class RoleApi {
     roleService.deleteRole(roleId);
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.GROUP_ROLE)
@@ -105,7 +100,6 @@ public class RoleApi {
         roleService.createRole(input.getName(), input.getCapabilities()));
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(RoleApi.ROLE_URI + "/{roleId}")
   @RBAC(

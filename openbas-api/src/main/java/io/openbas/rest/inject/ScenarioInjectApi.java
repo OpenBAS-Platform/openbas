@@ -27,7 +27,6 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +47,6 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId) {
@@ -60,7 +58,6 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
   public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId,
@@ -85,7 +82,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackFor = Exception.class)
   public Inject createInjectForScenario(
       @PathVariable @NotBlank final String scenarioId, @Valid @RequestBody InjectInput input) {
@@ -98,7 +95,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackFor = Exception.class)
   @Operation(
       summary = "Assistant to generate injects for scenario",
@@ -115,7 +112,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Inject duplicateInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId) {
@@ -128,7 +125,6 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Inject> scenarioInjects(@PathVariable @NotBlank final String scenarioId) {
     return this.injectRepository.findByScenarioId(scenarioId).stream()
         .sorted(Inject.executionComparator)
@@ -140,7 +136,6 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Inject scenarioInject(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId) {
@@ -155,7 +150,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Inject updateInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId,
@@ -187,7 +182,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Inject updateInjectActivationForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId,
@@ -201,7 +196,7 @@ public class ScenarioInjectApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteInjectForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String injectId) {

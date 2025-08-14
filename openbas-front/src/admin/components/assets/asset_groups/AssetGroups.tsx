@@ -6,8 +6,7 @@ import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
-import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { type LoggedHelper, type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type LoggedHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -128,9 +127,6 @@ const AssetGroups = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -290,12 +286,9 @@ const AssetGroups = () => {
               ))
         }
       </List>
-      {userAdmin
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-            <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />
-          </Can>
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
+        <AssetGroupCreation onCreate={result => setAssetGroups([result, ...assetGroups])} />
+      </Can>
       <MuiDrawer
         open={selectedAssetGroupId !== undefined}
         keepMounted={false}

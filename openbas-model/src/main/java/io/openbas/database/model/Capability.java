@@ -138,7 +138,8 @@ public enum Capability {
       pair(ResourceType.COLLECTOR, Action.SEARCH),
       pair(ResourceType.INJECTOR, Action.SEARCH),
       pair(ResourceType.INJECTOR_CONTRACT, Action.SEARCH),
-      pair(ResourceType.MAPPER, Action.SEARCH)),
+      pair(ResourceType.MAPPER, Action.SEARCH),
+      pair(ResourceType.ORGANIZATION, Action.SEARCH)),
   MANAGE_PLATFORM_SETTINGS(
       ACCESS_PLATFORM_SETTINGS,
       pair(ResourceType.PLATFORM_SETTING, Action.WRITE),

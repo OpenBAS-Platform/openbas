@@ -4,7 +4,6 @@ import { type CSSProperties, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { searchLessonsTemplates } from '../../../../actions/Lessons';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent.js';
@@ -14,7 +13,6 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import { useHelper } from '../../../../store';
 import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
@@ -39,11 +37,6 @@ const LessonsTemplates = () => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => {
-    return { userAdmin: helper.getMeAdmin() };
-  });
 
   // Headers
   const headers = [
@@ -141,11 +134,9 @@ const LessonsTemplates = () => {
               );
             })}
       </List>
-      {userAdmin && (
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
-          <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />
-        </Can>
-      )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
+        <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />
+      </Can>
     </>
   );
 };

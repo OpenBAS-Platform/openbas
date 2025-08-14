@@ -24,10 +24,7 @@ const LessonsTemplateHeader = () => {
   const { classes } = useStyles();
 
   const { lessonsTemplateId } = useParams() as { lessonsTemplateId: string };
-  const { lessonsTemplate, userAdmin } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => ({
-    lessonsTemplate: helper.getLessonsTemplate(lessonsTemplateId),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { lessonsTemplate } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => ({ lessonsTemplate: helper.getLessonsTemplate(lessonsTemplateId) }));
   return (
     <>
       <div className={classes.containerTitle}>
@@ -37,11 +34,9 @@ const LessonsTemplateHeader = () => {
         >
           {lessonsTemplate.lessons_template_name}
         </Typography>
-        {userAdmin && (
-          <div>
-            <LessonsTemplatePopover lessonsTemplate={lessonsTemplate} />
-          </div>
-        )}
+        <div>
+          <LessonsTemplatePopover lessonsTemplate={lessonsTemplate} />
+        </div>
       </div>
       <Typography variant="body2">
         {lessonsTemplate.lessons_template_description}

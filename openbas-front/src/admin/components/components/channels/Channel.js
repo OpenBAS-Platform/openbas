@@ -1,5 +1,6 @@
 import { GridLegacy, Paper, Skeleton, Typography } from '@mui/material';
 import * as R from 'ramda';
+import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -9,6 +10,8 @@ import { fetchDocuments } from '../../../../actions/Document';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChannelAddLogo from './ChannelAddLogo';
 import ChannelOverviewMicroblogging from './ChannelOverviewMicroblogging';
 import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
@@ -31,10 +34,11 @@ const Channel = () => {
   const { channelId } = useParams();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { channel, documentsMap, userAdmin } = useHelper(helper => ({
+  const ability = useContext(AbilityContext);
+
+  const { channel, documentsMap } = useHelper(helper => ({
     channel: helper.getChannel(channelId),
     documentsMap: helper.getDocumentsMap(),
-    userAdmin: helper.getMeAdmin(),
   }),
   );
   useDataLoader(() => {
@@ -79,7 +83,7 @@ const Channel = () => {
             <ChannelParametersForm
               onSubmit={submitUpdate}
               initialValues={initialValues}
-              disabled={!userAdmin}
+              disabled={!ability.can(ACTIONS.MANAGE, SUBJECTS.CHANNELS)}
             />
           </Paper>
           <Typography variant="h4">
@@ -109,11 +113,10 @@ const Channel = () => {
                     variant="rectangular"
                   />
                 )}
-                {userAdmin && (
-                  <ChannelAddLogo
-                    handleAddLogo={documentId => submitLogo(documentId, 'dark')}
-                  />
-                )}
+                <ChannelAddLogo
+                  handleAddLogo={documentId => submitLogo(documentId, 'dark')}
+                />
+
               </GridLegacy>
               <GridLegacy item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
@@ -137,11 +140,11 @@ const Channel = () => {
                     variant="rectangular"
                   />
                 )}
-                {userAdmin && (
+                <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHANNELS}>
                   <ChannelAddLogo
                     handleAddLogo={documentId => submitLogo(documentId, 'light')}
                   />
-                )}
+                </Can>
               </GridLegacy>
             </GridLegacy>
           </Paper>

@@ -1,6 +1,5 @@
 package io.openbas.rest.tag;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.TagSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -28,7 +27,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -73,7 +71,6 @@ public class TagApi extends RestBehavior {
         Tag.class);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/tags/{tagId}")
   @RBAC(resourceId = "#tagId", actionPerformed = Action.WRITE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
@@ -85,7 +82,6 @@ public class TagApi extends RestBehavior {
     return tagService.updateTag(tagId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/tags")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
@@ -97,7 +93,6 @@ public class TagApi extends RestBehavior {
     return tagRepository.save(tag);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/tags/upsert")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG)
   @Transactional(rollbackOn = Exception.class)
@@ -107,7 +102,6 @@ public class TagApi extends RestBehavior {
     return tagService.upsertTag(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/tags/{tagId}")
   @RBAC(resourceId = "#tagId", actionPerformed = Action.DELETE, resourceType = ResourceType.TAG)
   @ApiResponses(value = {@ApiResponse(responseCode = "200")})

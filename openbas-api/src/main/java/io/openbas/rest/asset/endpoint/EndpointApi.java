@@ -1,6 +1,5 @@
 package io.openbas.rest.asset.endpoint;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
@@ -54,7 +53,6 @@ public class EndpointApi extends RestBehavior {
     return this.endpointService.createEndpoint(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
@@ -150,7 +148,6 @@ public class EndpointApi extends RestBehavior {
     return this.endpointService.endpoints(endpointIds);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @RBAC(
       resourceId = "#endpointId",
@@ -164,7 +161,6 @@ public class EndpointApi extends RestBehavior {
         this.endpointService.updateEndpoint(endpointId, input));
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @RBAC(
       resourceId = "#endpointId",

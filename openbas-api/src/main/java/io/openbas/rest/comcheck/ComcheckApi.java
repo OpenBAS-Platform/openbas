@@ -16,7 +16,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -76,7 +75,6 @@ public class ComcheckApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public void deleteComcheck(@PathVariable String exerciseId, @PathVariable String comcheckId) {
     comcheckRepository.deleteById(comcheckId);

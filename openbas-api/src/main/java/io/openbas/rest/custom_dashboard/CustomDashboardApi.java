@@ -16,13 +16,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(CustomDashboardApi.CUSTOM_DASHBOARDS_URI)
 @RequiredArgsConstructor
-@PreAuthorize("isAdmin()")
 public class CustomDashboardApi extends RestBehavior {
 
   public static final String CUSTOM_DASHBOARDS_URI = "/api/custom-dashboards";

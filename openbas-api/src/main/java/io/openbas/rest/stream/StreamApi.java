@@ -19,11 +19,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -57,7 +57,7 @@ public class StreamApi extends RestBehavior {
     flux.next(message);
   }
 
-  @EventListener
+  @TransactionalEventListener
   public void listenDatabaseUpdate(BaseEvent event) {
     consumers.entrySet().stream()
         .parallel()

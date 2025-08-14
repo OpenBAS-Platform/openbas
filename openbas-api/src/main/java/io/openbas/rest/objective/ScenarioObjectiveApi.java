@@ -19,7 +19,6 @@ import io.openbas.rest.objective.form.ObjectiveInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,7 +38,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Objective> getMainObjectives(@PathVariable String scenarioId) {
     return objectiveRepository.findAll(ObjectiveSpecification.fromScenario(scenarioId));
   }
@@ -49,7 +47,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
       @PathVariable String scenarioId, @Valid @RequestBody ObjectiveInput input) {
@@ -66,7 +64,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Objective updateObjective(
       @PathVariable String scenarioId,
       @PathVariable String objectiveId,
@@ -82,7 +80,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteObjective(@PathVariable String scenarioId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
   }
@@ -95,7 +93,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Evaluation getEvaluation(
       @PathVariable String scenarioId, @PathVariable String evaluationId) {
     return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
@@ -106,7 +103,6 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Iterable<Evaluation> getEvaluations(
       @PathVariable String scenarioId, @PathVariable String objectiveId) {
     return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
@@ -117,7 +113,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
       @PathVariable String scenarioId,
@@ -146,7 +142,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public Evaluation updateEvaluation(
       @PathVariable String scenarioId,
       @PathVariable String objectiveId,
@@ -172,7 +168,7 @@ public class ScenarioObjectiveApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  
   public void deleteEvaluation(@PathVariable String scenarioId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);
   }

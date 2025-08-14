@@ -1,6 +1,5 @@
 package io.openbas.rest.injector_contract;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
@@ -19,7 +18,6 @@ import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -55,7 +53,6 @@ public class InjectorContractApi extends RestBehavior {
     }
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   @RBAC(
       resourceId = "#injectorContractId",
@@ -65,7 +62,6 @@ public class InjectorContractApi extends RestBehavior {
     return injectorContractService.getSingleInjectorContract(injectorContractId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECTOR_CONTRACT_URL)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract createInjectorContract(
@@ -73,7 +69,6 @@ public class InjectorContractApi extends RestBehavior {
     return injectorContractService.createNewInjectorContract(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   @RBAC(
       resourceId = "#injectorContractId",
@@ -85,7 +80,6 @@ public class InjectorContractApi extends RestBehavior {
     return injectorContractService.updateInjectorContract(injectorContractId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}/mapping")
   @RBAC(
       resourceId = "#injectorContractId",
@@ -97,7 +91,6 @@ public class InjectorContractApi extends RestBehavior {
     return injectorContractService.updateAttackPatternMappings(injectorContractId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
   @RBAC(
       resourceId = "#injectorContractId",
