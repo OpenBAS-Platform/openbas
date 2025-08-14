@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_16__User_Onboarding_Enable extends BaseJavaMigration {
+public class V4_17__User_Onboarding_Enable extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
