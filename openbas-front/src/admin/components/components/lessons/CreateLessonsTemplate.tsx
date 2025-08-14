@@ -2,7 +2,7 @@ import { type FunctionComponent, useState } from 'react';
 
 import { addLessonsTemplate } from '../../../../actions/Lessons';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
-import Dialog from '../../../../components/common/Dialog';
+import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
 import Drawer from '../../../../components/common/Drawer';
 import ListItemButtonCreate from '../../../../components/common/ListItemButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
@@ -52,13 +52,13 @@ const CreateLessonsTemplate: FunctionComponent<Props> = ({
         <ButtonCreate onClick={handleOpen} />
       )}
       {inline ? (
-        <Dialog
+        <FiligranDialog
           open={open}
           handleClose={handleClose}
           title={t('Create a new lessons learned template')}
         >
           <LessonsTemplateForm onSubmit={onSubmit} handleClose={handleClose} />
-        </Dialog>
+        </FiligranDialog>
       ) : (
         <Drawer
           open={open}

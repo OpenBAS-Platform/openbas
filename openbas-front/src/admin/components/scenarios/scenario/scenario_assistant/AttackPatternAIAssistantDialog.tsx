@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchAttackPatternsWithAIWebservice } from '../../../../../actions/AttackPattern';
-import Dialog from '../../../../../components/common/Dialog';
+import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
 import ImportUploader from '../../../../../components/common/ImportUploader';
 import { useFormatter } from '../../../../../components/i18n';
 
@@ -88,7 +88,7 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
   };
 
   return (
-    <Dialog
+    <FiligranDialog
       open={open}
       handleClose={onResetAndClose}
       title={t('ARIANE - AI Assistant')}
@@ -183,7 +183,7 @@ const AttackPatternAIAssistantDialog = ({ open, onClose, onAttackPatternIdsFind 
           </Button>
         </div>
       </div>
-    </Dialog>
+    </FiligranDialog>
   );
 };
 

@@ -4,11 +4,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 
 import io.openbas.aop.UserRoleDescription;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.settings.form.PolicyInput;
-import io.openbas.rest.settings.form.SettingsEnterpriseEditionUpdateInput;
-import io.openbas.rest.settings.form.SettingsPlatformWhitemarkUpdateInput;
-import io.openbas.rest.settings.form.SettingsUpdateInput;
-import io.openbas.rest.settings.form.ThemeInput;
+import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.service.PlatformSettingsService;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -49,6 +45,17 @@ public class PlatformSettingsApi extends RestBehavior {
   @Operation(summary = "List settings", description = "Return the settings")
   public PlatformSettings settings() {
     return platformSettingsService.findSettings();
+  }
+
+  @Secured(ROLE_ADMIN)
+  @GetMapping("/default")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "The list of default settings")})
+  @Operation(
+      summary = "List default settings",
+      description = "Return the settings with default values")
+  public PlatformSettings defaultSettings() {
+    return platformSettingsService.defaultValues();
   }
 
   @Secured(ROLE_ADMIN)
@@ -106,5 +113,14 @@ public class PlatformSettingsApi extends RestBehavior {
   @Operation(summary = "Update policies settings", description = "Update the policies settings")
   public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
     return platformSettingsService.updateSettingsPolicies(input);
+  }
+
+  @Secured(ROLE_ADMIN)
+  @PutMapping("/onboarding")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
+  @Operation(summary = "Update onboarding settings", description = "Update the onboarding settings")
+  public PlatformSettings updateSettingsOnboarding(
+      @Valid @RequestBody SettingsOnboardingUpdateInput input) {
+    return platformSettingsService.updateSettingsOnboarding(input);
   }
 }
