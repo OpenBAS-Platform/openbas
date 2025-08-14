@@ -49,7 +49,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyExerciseLessonsTemplate(
       @PathVariable String exerciseId, @PathVariable String lessonsTemplateId) {
@@ -90,7 +89,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createExerciseLessonsCategory(
       @PathVariable String exerciseId, @Valid @RequestBody LessonsCategoryCreateInput input) {
@@ -107,7 +105,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> resetExerciseLessonsAnswers(@PathVariable String exerciseId) {
     List<LessonsAnswer> lessonsAnswers =
@@ -139,7 +136,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyExerciseLessons(@PathVariable String exerciseId) {
     List<LessonsCategory> lessonsCategories =
@@ -161,7 +157,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategory(
       @PathVariable String exerciseId,
@@ -181,7 +176,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsCategory(
       @PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
@@ -193,7 +187,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategoryTeams(
       @PathVariable String exerciseId,
@@ -243,7 +236,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public LessonsQuestion createExerciseLessonsQuestion(
       @PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId,
@@ -265,7 +257,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   public LessonsQuestion updateExerciseLessonsQuestion(
       @PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId,
@@ -286,7 +277,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsQuestion(
       @PathVariable String exerciseId, @PathVariable String lessonsQuestionId) {
@@ -298,7 +288,6 @@ public class ExerciseLessonsApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  
   @Transactional(rollbackOn = Exception.class)
   public void sendExerciseLessons(
       @PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {

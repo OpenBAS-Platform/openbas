@@ -1,6 +1,5 @@
 package io.openbas.rest.notification_rule;
 
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
@@ -68,10 +67,7 @@ public class NotificationRuleApi {
 
   @LogExecutionTime
   @GetMapping(NOTIFICATION_RULE_URI + "/resource/{resourceId}")
-  @RBAC(
-      resourceId = "#resourceId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.NOTIFICATION_RULE)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.NOTIFICATION_RULE)
   @Operation(
       description = "Get NotificationRule by resource id for the current user",
       summary = "Get NotificationRule by resource id")
@@ -115,7 +111,6 @@ public class NotificationRuleApi {
         @ApiResponse(responseCode = "200", description = "NotificationRule deleted"),
         @ApiResponse(responseCode = "404", description = "NotificationRule not found")
       })
-  
   public void deleteNotificationRule(
       @PathVariable @NotBlank @Schema(description = "ID of the notification rule")
           final String notificationRuleId) {

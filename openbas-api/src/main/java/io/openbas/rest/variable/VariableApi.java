@@ -91,7 +91,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public Variable createVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final VariableInput input) {
@@ -116,7 +115,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public Variable updateVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId,
@@ -132,7 +130,6 @@ public class VariableApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public void deleteVariableForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String variableId) {

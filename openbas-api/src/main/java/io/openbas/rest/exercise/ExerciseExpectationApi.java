@@ -26,7 +26,6 @@ public class ExerciseExpectationApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  
   public List<InjectExpectation> exerciseInjectExpectations(
       @PathVariable @NotBlank final String exerciseId) {
     return this.exerciseExpectationService.injectExpectations(exerciseId);

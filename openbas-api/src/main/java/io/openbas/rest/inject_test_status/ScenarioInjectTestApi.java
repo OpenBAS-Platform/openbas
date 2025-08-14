@@ -58,7 +58,6 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
-  
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank final String scenarioId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
@@ -70,7 +69,6 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public void deleteInjectTest(
       @PathVariable @NotBlank final String scenarioId, @PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
@@ -85,7 +83,6 @@ public class ScenarioInjectTestApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
-  
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
       @PathVariable @NotBlank final String scenarioId,

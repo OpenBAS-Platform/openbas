@@ -45,7 +45,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyScenarioLessonsTemplate(
       @PathVariable String scenarioId, @PathVariable String lessonsTemplateId) {
@@ -86,7 +85,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createScenarioLessonsCategory(
       @PathVariable String scenarioId, @Valid @RequestBody LessonsCategoryCreateInput input) {
@@ -103,7 +101,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyScenarioLessons(@PathVariable String scenarioId) {
     List<LessonsCategory> lessonsCategories =
@@ -125,7 +122,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategory(
       @PathVariable String scenarioId,
@@ -145,7 +141,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsCategory(
       @PathVariable String scenarioId, @PathVariable String lessonsCategoryId) {
@@ -157,7 +152,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateScenarioLessonsCategoryTeams(
       @PathVariable String scenarioId,
@@ -207,7 +201,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public LessonsQuestion createScenarioLessonsQuestion(
       @PathVariable String scenarioId,
       @PathVariable String lessonsCategoryId,
@@ -229,7 +222,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   public LessonsQuestion updateScenarioLessonsQuestion(
       @PathVariable String scenarioId,
       @PathVariable String lessonsQuestionId,
@@ -250,7 +242,6 @@ public class ScenarioLessonsApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
-  
   @Transactional(rollbackOn = Exception.class)
   public void deleteScenarioLessonsQuestion(
       @PathVariable String scenarioId, @PathVariable String lessonsQuestionId) {

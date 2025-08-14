@@ -30,7 +30,6 @@ public class ExerciseArticleApi extends RestBehavior {
   private final InjectRepository injectRepository;
   private final ArticleRepository articleRepository;
 
-  
   @GetMapping(EXERCISE_URI + "/{exerciseId}/articles")
   @RBAC(
       resourceId = "#exerciseId",
