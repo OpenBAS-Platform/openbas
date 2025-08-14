@@ -1844,6 +1844,7 @@ export interface EsSimulation {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   /** @uniqueItems true */
   base_tags_side?: string[];
   /** @uniqueItems true */
