@@ -9,6 +9,8 @@ public interface RawScenario {
 
   public String getScenario_name();
 
+  public String getScenario_recurrence();
+
   Instant getScenario_created_at();
 
   Instant getScenario_injects_updated_at();

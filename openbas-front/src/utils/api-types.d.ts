@@ -1816,6 +1816,7 @@ export interface EsScenario {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsSearch {
@@ -1861,6 +1862,7 @@ export interface EsSimulation {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsTag {
