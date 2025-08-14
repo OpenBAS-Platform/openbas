@@ -354,7 +354,7 @@ public interface ExerciseRepository
   @Query(
       value =
           "WITH exercise_data AS ("
-              + "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_created_at, "
+              + "SELECT ex.exercise_id, ex.exercise_name, ex.exercise_created_at, MAX(se.scenario_id) AS scenario_id, "
               + "GREATEST(ex.exercise_updated_at, max(inj.inject_updated_at)) as exercise_injects_updated_at, "
               + "array_agg(DISTINCT et.tag_id) FILTER ( WHERE et.tag_id IS NOT NULL ) as exercise_tags, "
               + "array_agg(DISTINCT ete.team_id) FILTER ( WHERE ete.team_id IS NOT NULL ) as exercise_teams, "
@@ -366,6 +366,7 @@ public interface ExerciseRepository
               + "LEFT JOIN injects inj ON ex.exercise_id = inj.inject_exercise "
               + "LEFT JOIN injects_assets ia ON ia.inject_id = inj.inject_id "
               + "LEFT JOIN injects_asset_groups iag ON iag.inject_id = inj.inject_id "
+              + "LEFT JOIN scenarios_exercises se ON ex.exercise_id = se.exercise_id "
               + "GROUP BY ex.exercise_id, ex.exercise_name, ex.exercise_created_at, ex.exercise_updated_at"
               + ") "
               + "SELECT * FROM exercise_data ed "

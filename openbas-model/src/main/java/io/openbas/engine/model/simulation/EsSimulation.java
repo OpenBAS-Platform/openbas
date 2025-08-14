@@ -15,7 +15,7 @@ public class EsSimulation extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */
 
-  @Queryable(label = "simulation name")
+  @Queryable(label = "simulation name", filterable = true)
   private String name;
 
   // -- SIDE --
@@ -35,4 +35,8 @@ public class EsSimulation extends EsBase {
   @Queryable(label = "teams", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
   private Set<String> base_teams_side; // Must finish by _side
+
+  @Queryable(label = "scenario", filterable = true, dynamicValues = true)
+  @EsQueryable(keyword = true)
+  private String base_scenario_side; // Must finish by _side
 }

@@ -1,7 +1,7 @@
 import { type FunctionComponent, useEffect } from 'react';
 
 import type { GroupOption } from '../../utils/Option';
-import { SIMULATIONS } from '../common/queryable/filter/constants';
+import { SCENARIOS } from '../common/queryable/filter/constants';
 import useSearchOptions from '../common/queryable/filter/useSearchOptions';
 import AutocompleteField from './AutocompleteField';
 
@@ -15,10 +15,10 @@ interface Props {
   defaultOptions?: GroupOption[];
 }
 
-const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
+const ScenarioField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
   const { options, searchOptions } = useSearchOptions();
   useEffect(() => {
-    searchOptions(SIMULATIONS, '', '', defaultOptions);
+    searchOptions(SCENARIOS, '', '', defaultOptions);
   }, []);
 
   return (
@@ -30,9 +30,9 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, cla
       required={required}
       error={error}
       options={options}
-      onInputChange={(search: string) => searchOptions(SIMULATIONS, search)}
+      onInputChange={(search: string) => searchOptions(SCENARIOS, search)}
     />
   );
 };
 
-export default SimulationField;
+export default ScenarioField;

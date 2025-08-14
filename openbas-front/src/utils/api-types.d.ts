@@ -1042,14 +1042,14 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
 }
 
 /** Payload to create a CVE */
@@ -1844,6 +1844,7 @@ export interface EsSimulation {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   /** @uniqueItems true */
   base_tags_side?: string[];
   /** @uniqueItems true */
