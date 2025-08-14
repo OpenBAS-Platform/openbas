@@ -9,6 +9,7 @@ import io.openbas.config.SessionHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.SpecificationUtils;
+import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotBlank;
@@ -38,6 +39,7 @@ public class FullTextSearchService<T extends Base> {
   private final OrganizationRepository organizationRepository;
   private final ScenarioRepository scenarioRepository;
   private final ExerciseRepository exerciseRepository;
+  private final UserService userService;
 
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
@@ -108,15 +110,15 @@ public class FullTextSearchService<T extends Base> {
             (Class<T>) Organization.class,
             StringUtils.EMPTY,
             (Class<T>) Scenario.class,
-            "scenario",
+            "scenario", // this is the name of the field on which to make a SQL join to the grants
             (Class<T>) Exercise.class,
-            "exercise");
+            "exercise"); // this is the name of the field on which to make a SQL join to the grants
 
     validateMapKeys();
   }
 
   /** Ensure that the map have all the same classes, in case we forget when adding a new class. */
-  public void validateMapKeys() {
+  private void validateMapKeys() {
     Set<Class<T>> keys1 = repositoryMap.keySet();
     Set<Class<T>> keys2 = searchListByClassMap.keySet();
     Set<Class<T>> keys3 = grantsFilterNameByClassMap.keySet();
@@ -154,12 +156,9 @@ public class FullTextSearchService<T extends Base> {
     // Check if the principal has the right to search this class
     Capability capaForClass = capaByClassMap.get(clazzT).orElse(Capability.BYPASS);
     if (!principal.isAdmin() && capaForClass != Capability.BYPASS) {
-      User u =
-          userRepository
-              .findById(principal.getId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("User not found: " + principal.getId()));
-
+      User u = userService.currentUser();
+      // We can't really use the PermissionService.hasPermission method here because it would
+      // require a mapping between classes and resourceType
       if (!u.getCapabilities().contains(Capability.BYPASS)
           && !u.getCapabilities().contains(capaForClass)) {
         return generateEmptyResult(searchPaginationInput);

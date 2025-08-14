@@ -47,7 +47,7 @@ public class SpecificationUtils {
       }
 
       // Add grant filtering
-      // Create subquery to find all scenario IDs the user can access
+      // Create subquery to find all resource IDs the user can access
       Subquery<String> accessibleResources = query.subquery(String.class);
       // We'll query from grants table
       Root<Grant> grantTable = accessibleResources.from(Grant.class);
