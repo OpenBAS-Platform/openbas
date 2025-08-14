@@ -2,7 +2,7 @@ import { PlayArrowOutlined } from '@mui/icons-material';
 import { Avatar, Button, Chip, GridLegacy, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { type Dispatch, type SetStateAction, useContext, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -24,6 +24,8 @@ import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
 import { type ExerciseSimple, type KillChainPhase, type Scenario as ScenarioType, type SearchPaginationInput } from '../../../../utils/api-types';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { isEmptyField } from '../../../../utils/utils';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 import SimulationList from '../../simulations/SimulationList';
@@ -49,6 +51,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const theme = useTheme();
   const { t } = useFormatter();
   const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
+  const ability = useContext(AbilityContext);
+
   // Fetching data
   const { scenario } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({ scenario: helper.getScenario(scenarioId) }));
   const areAnyExercisesInScenario = scenario.scenario_exercises?.length > 0;
@@ -238,27 +242,28 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Paper>
         </div>
       )}
-      {!areAnyExercisesInScenario && !scenario.scenario_recurrence && (
-        <div style={{
-          marginTop: 100,
-          textAlign: 'center',
-        }}
-        >
-          <div style={{ fontSize: 20 }}>
-            {t('This scenario has never run, schedule or run it now!')}
-          </div>
-          <Button
-            style={{ marginTop: 20 }}
-            startIcon={<PlayArrowOutlined />}
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={() => setOpenInstantiateSimulationAndStart(true)}
+      {!areAnyExercisesInScenario && !scenario.scenario_recurrence && ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, scenario.scenario_id)
+        && (
+          <div style={{
+            marginTop: 100,
+            textAlign: 'center',
+          }}
           >
-            {t('Launch simulation now')}
-          </Button>
-        </div>
-      )}
+            <div style={{ fontSize: 20 }}>
+              {t('This scenario has never run, schedule or run it now!')}
+            </div>
+            <Button
+              style={{ marginTop: 20 }}
+              startIcon={<PlayArrowOutlined />}
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => setOpenInstantiateSimulationAndStart(true)}
+            >
+              {t('Launch simulation now')}
+            </Button>
+          </div>
+        )}
       {!areAnyExercisesInScenario && scenario.scenario_recurrence && (
         <div style={{
           marginTop: 100,

@@ -59,7 +59,7 @@ const ExerciseReports: FunctionComponent<ReportListProps> = ({ exerciseId, exerc
   return (
     <ReportContext.Provider value={context}>
       <Reports reports={reports} navigateToReportPage={navigateToReportPage} />
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <>
           <Fab
             onClick={handleOpenCreate}

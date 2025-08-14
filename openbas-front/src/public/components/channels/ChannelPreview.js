@@ -42,7 +42,7 @@ const ChannelPreview = () => {
   if (channel) {
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -57,7 +57,7 @@ const ChannelPreview = () => {
             {t('Switch to player mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"
