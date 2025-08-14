@@ -3,6 +3,7 @@ package io.openbas.engine.model.inject;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
 import lombok.Getter;
@@ -18,7 +19,8 @@ public class EsInject extends EsBase {
   @Queryable(label = "inject title")
   private String inject_title;
 
-  @Queryable(label = "inject status")
+  @Queryable(label = "inject status", filterable = true, refEnumClazz = ExecutionStatus.class)
+  @EsQueryable(keyword = true)
   private String inject_status;
 
   // -- SIDE --

@@ -6,7 +6,13 @@ import { buildSearchPagination } from '../../../../../../../components/common/qu
 import SortHeadersComponentV2 from '../../../../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../../../../components/common/SortHeadersList';
-import { type EsBase, type EsEndpoint, type EsVulnerableEndpoint } from '../../../../../../../utils/api-types';
+import {
+  type EsBase,
+  type EsEndpoint,
+  type EsInject, type EsScenario,
+  type EsSimulation,
+  type EsVulnerableEndpoint,
+} from '../../../../../../../utils/api-types';
 import { type ListConfiguration, type Widget } from '../../../../../../../utils/api-types-custom';
 import buildStyles from './elements/ColumnStyles';
 import DefaultElementStyles from './elements/default/DefaultElementStyles';
@@ -14,6 +20,7 @@ import DefaultListElement from './elements/default/DefaultListElement';
 import EndpointElementSecondaryAction from './elements/endpoint/EndpointElementSecondaryAction';
 import EndpointElementStyles from './elements/endpoint/EndpointElementStyles';
 import EndpointListElement from './elements/endpoint/EndpointListElement';
+import InjectListElement from './elements/inject/InjectListElement';
 import VulnerableEndpointElementSecondaryAction
   from './elements/vulnerableendpoint/VulnerableEndpointElementSecondaryAction';
 import VulnerableEndpointListElement from './elements/vulnerableendpoint/VulnerableEndpointListElement';
@@ -64,6 +71,10 @@ const ListWidget = (props: Props) => {
     switch (element.base_entity) {
       case 'endpoint': return (<EndpointListElement element={element as EsEndpoint} columns={columns} />);
       case 'vulnerable-endpoint': return (<VulnerableEndpointListElement element={element as EsVulnerableEndpoint} columns={columns} />);
+      case 'inject':
+      case 'simulation':
+      case 'scenario':
+        return (<InjectListElement columns={columns} element={element as EsInject | EsSimulation | EsScenario} />);
       default: return (<DefaultListElement columns={columns} element={element} />);
     }
   };
@@ -72,6 +83,11 @@ const ListWidget = (props: Props) => {
     switch (element.base_entity) {
       case 'endpoint': return (<EndpointElementSecondaryAction element={element as EsEndpoint} />);
       case 'vulnerable-endpoint': return (<VulnerableEndpointElementSecondaryAction element={element as EsVulnerableEndpoint} />);
+        // TODO #3524
+      /* case 'inject':
+      case 'simulation':
+      case 'scenario':
+        return (<InjectElementSecondaryAction element={element as EsInject | EsSimulation | EsScenario} />); */
       default: return (<>&nbsp;</>);
     }
   };

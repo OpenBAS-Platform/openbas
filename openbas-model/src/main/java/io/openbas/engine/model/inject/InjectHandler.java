@@ -4,6 +4,7 @@ import static io.openbas.engine.EsUtils.buildRestrictions;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.raw.RawInjectIndexing;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.engine.Handler;
@@ -50,7 +51,11 @@ public class InjectHandler implements Handler<EsInject> {
                   buildRestrictions(inject.getInject_scenario(), inject.getInject_Exercise()));
               // Specific
               esInject.setInject_title(inject.getInject_title());
-              esInject.setInject_status(inject.getInject_status_name());
+              esInject.setInject_status(
+                  inject.getInject_status_name() != null
+                          && !inject.getInject_status_name().isBlank()
+                      ? inject.getInject_status_name()
+                      : ExecutionStatus.DRAFT.name());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
               if (hasText(inject.getInject_scenario())) {

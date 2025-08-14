@@ -38,6 +38,11 @@ import org.hibernate.annotations.UuidGenerator;
 })
 public class Scenario implements Base {
 
+  public enum RECURRENCE_STATUS {
+    SCHEDULED,
+    NOT_PLANNED,
+  }
+
   public enum SEVERITY {
     @JsonProperty("low")
     low,
