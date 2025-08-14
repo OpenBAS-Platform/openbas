@@ -40,14 +40,16 @@ public interface AssetGroupRepository
 
   Optional<AssetGroup> findByExternalReference(String externalReference);
 
-  @Query("SELECT ag FROM AssetGroup ag " +
-          "WHERE ag.id IN (SELECT DISTINCT ag2.id FROM AssetGroup ag2 " +
-          "JOIN ag2.injects i WHERE i.scenario.id = :scenarioId)")
+  @Query(
+      "SELECT ag FROM AssetGroup ag "
+          + "WHERE ag.id IN (SELECT DISTINCT ag2.id FROM AssetGroup ag2 "
+          + "JOIN ag2.injects i WHERE i.scenario.id = :scenarioId)")
   List<AssetGroup> findDistinctByInjectsScenarioId(String scenarioId);
 
-  @Query("SELECT ag FROM AssetGroup ag " +
-          "WHERE ag.id IN (SELECT DISTINCT ag2.id FROM AssetGroup ag2 " +
-          "JOIN ag2.injects i WHERE i.exercise.id = :simulationId)")
+  @Query(
+      "SELECT ag FROM AssetGroup ag "
+          + "WHERE ag.id IN (SELECT DISTINCT ag2.id FROM AssetGroup ag2 "
+          + "JOIN ag2.injects i WHERE i.exercise.id = :simulationId)")
   List<AssetGroup> findDistinctByInjectsSimulationId(String simulationId);
 
   /**

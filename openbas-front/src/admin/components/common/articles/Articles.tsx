@@ -7,9 +7,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type FullArticleStore } from '../../../../actions/channels/Article';
-import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import { fetchDocuments } from '../../../../actions/Document';
 import { type DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -50,7 +48,7 @@ interface Props { articles: Article[] }
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {
   // Context
-  const { previewArticleUrl, fetchChannelsUrl, fetchDocumentsUrl } = useContext(ArticleContext);
+  const { previewArticleUrl, fetchChannels, fetchDocuments } = useContext(ArticleContext);
   const { permissions } = useContext(PermissionsContext);
 
   // Standard hooks
@@ -64,8 +62,8 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
     documentsMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
-    dispatch(fetchChannels(fetchChannelsUrl()));
-    dispatch(fetchDocuments(fetchDocumentsUrl()));
+    dispatch(fetchChannels());
+    dispatch(fetchDocuments());
   });
 
   // Creation

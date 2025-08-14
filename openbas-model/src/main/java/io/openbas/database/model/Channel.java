@@ -93,6 +93,8 @@ public class Channel implements Base {
   @Transient
   private final ResourceType resourceType = ResourceType.CHANNEL;
 
+  // The following field is not accessed by our code but is necessary for the ORM mapping
+  // (findDistinctByArticlesExerciseId, findDistinctByArticlesScenarioId...).
   @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<Article> articles;

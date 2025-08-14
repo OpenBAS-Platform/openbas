@@ -8,14 +8,11 @@ import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiModelDeserializer;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 @EqualsAndHashCode(callSuper = true)
@@ -112,15 +109,14 @@ public class Endpoint extends Asset {
 
   // -- INJECT --
 
-  @ArraySchema(schema = @Schema(type = "string"))
+  @Getter
+  @Setter(AccessLevel.NONE)
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "injects_assets",
       joinColumns = @JoinColumn(name = "asset_id"),
       inverseJoinColumns = @JoinColumn(name = "inject_id"))
-  @JsonProperty("asset_injects")
   @JsonIgnore
-  @Queryable(filterable = true, dynamicValues = true, path = "injects.id")
   private List<Inject> injects = new ArrayList<>();
 
   public void setHostname(String hostname) {

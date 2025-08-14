@@ -38,8 +38,8 @@ export const deleteAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => 
   return delReferential(uri, assetGroup.key, assetGroupId)(dispatch);
 };
 
-export const fetchAssetGroups = (uri = ASSET_GROUP_URI) => (dispatch: Dispatch) => {
-  return getReferential(arrayOfAssetGroups, uri)(dispatch);
+export const fetchAssetGroups = () => (dispatch: Dispatch) => {
+  return getReferential(arrayOfAssetGroups, ASSET_GROUP_URI)(dispatch);
 };
 export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;

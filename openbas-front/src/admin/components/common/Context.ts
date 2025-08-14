@@ -3,7 +3,42 @@ import { createContext, type ReactElement } from 'react';
 import { type FullArticleStore } from '../../../actions/channels/Article';
 import { type InjectOutputType, type InjectStore } from '../../../actions/injects/Inject';
 import { type Page } from '../../../components/common/queryable/Page';
-import { type Article, type ArticleCreateInput, type ArticleUpdateInput, type Evaluation, type EvaluationInput, type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectsImportInput, type InjectTestStatusOutput, type LessonsAnswer, type LessonsAnswerCreateInput, type LessonsCategory, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestion, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type Objective, type ObjectiveInput, type PublicExercise, type PublicScenario, type Report, type ReportInput, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput, type Variable, type VariableInput } from '../../../utils/api-types';
+import {
+  type Article,
+  type ArticleCreateInput,
+  type ArticleUpdateInput,
+  type Channel,
+  type Evaluation,
+  type EvaluationInput,
+  type ImportTestSummary,
+  type Inject,
+  type InjectBulkProcessingInput,
+  type InjectBulkUpdateInputs,
+  type InjectsImportInput,
+  type InjectTestStatusOutput,
+  type LessonsAnswer,
+  type LessonsAnswerCreateInput,
+  type LessonsCategory,
+  type LessonsCategoryCreateInput,
+  type LessonsCategoryTeamsInput,
+  type LessonsCategoryUpdateInput,
+  type LessonsQuestion,
+  type LessonsQuestionCreateInput,
+  type LessonsQuestionUpdateInput,
+  type LessonsSendInput,
+  type Objective,
+  type ObjectiveInput,
+  type PublicExercise,
+  type PublicScenario,
+  type Report,
+  type ReportInput,
+  type SearchPaginationInput,
+  type Team,
+  type TeamCreateInput,
+  type TeamOutput,
+  type Variable,
+  type VariableInput,
+} from '../../../utils/api-types';
 import { type UserStore } from '../teams/players/Player';
 
 export type PermissionsContextType = {
@@ -16,8 +51,8 @@ export type PermissionsContextType = {
 
 export type ArticleContextType = {
   previewArticleUrl: (article: FullArticleStore) => string;
-  fetchChannelsUrl: () => string;
-  fetchDocumentsUrl: () => string;
+  fetchChannels: () => Promise<Channel[]>;
+  fetchDocuments: () => Promise<Document[]>;
   onAddArticle: (data: ArticleCreateInput) => Promise<{ result: string }>;
   onUpdateArticle: (article: Article, data: ArticleUpdateInput) => string;
   onDeleteArticle: (article: Article) => string;
@@ -158,6 +193,14 @@ export const PermissionsContext = createContext<PermissionsContextType>({
   },
 });
 export const ArticleContext = createContext<ArticleContextType>({
+  fetchChannels(): Promise<Channel[]> {
+    return new Promise<Channel[]>(() => {
+    });
+  },
+  fetchDocuments(): Promise<Document[]> {
+    return new Promise<Document[]>(() => {
+    });
+  },
   onAddArticle(_data: ArticleCreateInput): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
@@ -168,12 +211,6 @@ export const ArticleContext = createContext<ArticleContextType>({
     return '';
   },
   previewArticleUrl(_article: FullArticleStore): string {
-    return '';
-  },
-  fetchChannelsUrl(): string {
-    return '';
-  },
-  fetchDocumentsUrl(): string {
     return '';
   },
 });
