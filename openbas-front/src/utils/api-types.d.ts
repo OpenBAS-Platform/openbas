@@ -1704,10 +1704,10 @@ export interface EsEndpoint {
 }
 
 export interface EsFinding {
-  base_assets_side?: string;
   /** @format date-time */
   base_created_at?: string;
   base_dependencies?: string[];
+  base_endpoint_side?: string;
   base_entity?: string;
   base_id?: string;
   base_inject_side?: string;
@@ -1757,8 +1757,8 @@ export interface EsInject {
 
 export interface EsInjectExpectation {
   base_agent_side?: string;
-  base_asset_groups_side?: string;
-  base_assets_side?: string;
+  base_asset_group_side?: string;
+  base_asset_side?: string;
   /** @uniqueItems true */
   base_attack_patterns_side?: string[];
   /** @format date-time */
@@ -1770,7 +1770,7 @@ export interface EsInjectExpectation {
   base_representative?: string;
   base_restrictions?: string[];
   base_simulation_side?: string;
-  base_teams_side?: string;
+  base_team_side?: string;
   /** @format date-time */
   base_updated_at?: string;
   base_user_side?: string;
