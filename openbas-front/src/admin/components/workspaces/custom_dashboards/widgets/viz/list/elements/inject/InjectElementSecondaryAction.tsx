@@ -7,10 +7,10 @@ import { type EsInject, type EsScenario, type EsSimulation } from '../../../../.
 type Props = { element: EsInject | EsSimulation | EsScenario };
 
 const InjectElementSecondaryAction = (props: Props) => {
-  if (props.element instanceof EsScenario) {
+  if (props.element.base_entity === 'scenario') {
     const scenarioUrl = `${SCENARIO_BASE_URL}/${props.element.base_id}`;
     return (<Link to={scenarioUrl} className="noDrag"><KeyboardArrowRight color="action" /></Link>);
-  } else if (props.element instanceof EsSimulation) {
+  } else if (props.element.base_entity === 'simulation') {
     const simulationUrl = `${SIMULATION_BASE_URL}/${props.element.base_id}`;
     return (<Link to={simulationUrl} className="noDrag"><KeyboardArrowRight color="action" /></Link>);
   } else {

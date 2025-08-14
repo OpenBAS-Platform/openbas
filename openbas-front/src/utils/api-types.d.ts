@@ -1741,6 +1741,8 @@ export interface EsInject {
   base_inject_contract_side?: string;
   /** @uniqueItems true */
   base_kill_chain_phases_side?: string[];
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1798,6 +1800,8 @@ export interface EsScenario {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
@@ -1843,6 +1847,8 @@ export interface EsSimulation {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
