@@ -139,6 +139,7 @@ const WidgetForm: FunctionComponent<Props> = ({
     resolver: zodResolver(
       zodImplement<WidgetInputWithoutLayout>().with({
         widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
+        // @ts-expect-error: types assigned to properties are necessary for validation purposes
         widget_config: widgetConfigSchema,
       }),
     ),

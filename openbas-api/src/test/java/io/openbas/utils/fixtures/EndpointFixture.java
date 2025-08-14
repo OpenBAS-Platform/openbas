@@ -4,6 +4,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.utils.mapper.EndpointMapper;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -54,6 +55,20 @@ public class EndpointFixture {
     endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
     endpoint.setUpdatedAt(Instant.now());
+    return endpoint;
+  }
+
+  public static Endpoint createEndpointWithCreationAndUpdate(Instant creationDate, Instant updateDate, String name,
+      Endpoint.PLATFORM_TYPE platform) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setCreatedAt(creationDate);
+    endpoint.setUpdatedAt(updateDate);
+    endpoint.setName(name);
+    endpoint.setDescription("Endpoint description");
+    endpoint.setHostname("Windows Hostname");
+    endpoint.setIps(EndpointMapper.setIps(IPS));
+    endpoint.setPlatform(platform);
+    endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
     return endpoint;
   }
 
