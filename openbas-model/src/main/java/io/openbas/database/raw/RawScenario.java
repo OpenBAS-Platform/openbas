@@ -26,4 +26,6 @@ public interface RawScenario {
   public Set<String> getScenario_teams();
 
   public Set<String> getScenario_injects();
+
+  public Set<String> getScenario_platforms();
 }

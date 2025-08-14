@@ -56,6 +56,7 @@ public class InjectHandler implements Handler<EsInject> {
                           && !inject.getInject_status_name().isBlank()
                       ? inject.getInject_status_name()
                       : ExecutionStatus.DRAFT.name());
+              esInject.setBase_platforms_side_denormalized(inject.getInject_platforms());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
               if (hasText(inject.getInject_scenario())) {
