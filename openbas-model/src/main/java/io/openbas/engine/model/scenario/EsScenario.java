@@ -3,6 +3,7 @@ package io.openbas.engine.model.scenario;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.Scenario;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
 import lombok.Getter;
@@ -17,6 +18,13 @@ public class EsScenario extends EsBase {
 
   @Queryable(label = "scenario name")
   private String name;
+
+  @Queryable(
+      label = "scenario status",
+      filterable = true,
+      refEnumClazz = Scenario.RECURRENCE_STATUS.class)
+  @EsQueryable(keyword = true)
+  private String status;
 
   // -- SIDE --
 
