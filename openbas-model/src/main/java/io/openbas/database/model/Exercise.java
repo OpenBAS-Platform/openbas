@@ -167,7 +167,7 @@ public class Exercise implements Base {
   private Scenario scenario;
 
   public void setScenario(Scenario scenario) {
-    scenario.setUpdatedAt(now());
+    if (scenario != null) scenario.setUpdatedAt(now());
     this.scenario = scenario;
     this.setUpdatedAt(now());
   }
