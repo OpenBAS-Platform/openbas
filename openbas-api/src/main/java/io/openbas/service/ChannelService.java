@@ -16,6 +16,7 @@ import io.openbas.rest.channel.response.ChannelReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -152,5 +153,13 @@ public class ChannelService {
         ExpectationUtils.processByValidationType(
             isaNewExpectationResult, channelExpectations, parentExpectations, playerByTeam);
     injectExpectationExecutionRepository.saveAll(toUpdate);
+  }
+
+  public List<Channel> channelsForSimulation(@NotBlank final String simulationId) {
+    return fromIterable(this.channelRepository.findDistinctByArticlesExerciseId(simulationId));
+  }
+
+  public List<Channel> channelsForScenario(@NotBlank final String scenarioId) {
+    return fromIterable(this.channelRepository.findDistinctByArticlesScenarioId(scenarioId));
   }
 }

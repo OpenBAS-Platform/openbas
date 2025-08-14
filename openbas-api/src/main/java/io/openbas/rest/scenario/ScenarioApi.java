@@ -16,16 +16,14 @@ import io.openbas.database.model.*;
 import io.openbas.database.raw.RawPaginationScenario;
 import io.openbas.database.repository.*;
 import io.openbas.rest.custom_dashboard.CustomDashboardService;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.*;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.ImportService;
-import io.openbas.service.ScenarioService;
-import io.openbas.service.ScenarioToExerciseService;
-import io.openbas.service.TeamService;
+import io.openbas.service.*;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,6 +64,10 @@ public class ScenarioApi extends RestBehavior {
   private final ImportService importService;
   private final ScenarioService scenarioService;
   private final TeamService teamService;
+  private final AssetGroupService assetGroupService;
+  private final EndpointService endpointService;
+  private final ChannelService channelService;
+  private final DocumentService documentService;
 
   @PostMapping(SCENARIO_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
@@ -393,4 +395,42 @@ public class ScenarioApi extends RestBehavior {
         .rulesFound(this.scenarioService.checkIfTagRulesApplies(scenario, input.getNewTags()))
         .build();
   }
+
+  // region asset groups, endpoints, documents and channels
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/asset_groups")
+  @Operation(
+      summary =
+          "Get asset groups. Can only be called if the user has access to the given scenario.",
+      description = "Get all asset groups used by injects for a given scenario")
+  @PreAuthorize("isObserver()")
+  public List<AssetGroup> assetGroups(@PathVariable String scenarioId) {
+    return this.assetGroupService.assetGroupsForScenario(scenarioId);
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/channels")
+  @Operation(
+      summary = "Get channels. Can only be called if the user has access to the given scenario.",
+      description = "Get all channels used by articles for a given scenario")
+  @PreAuthorize("isObserver()")
+  public Iterable<Channel> channels(@PathVariable String scenarioId) {
+    return this.channelService.channelsForScenario(scenarioId);
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/endpoints")
+  @Operation(
+      summary = "Get endpoints. Can only be called if the user has access to the given scenario.",
+      description = "Get all endpoints used by injects for a given scenario")
+  @PreAuthorize("isObserver()")
+  public List<Endpoint> endpoints(@PathVariable String scenarioId) {
+    return this.endpointService.endpointsForScenario(scenarioId);
+  }
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/documents")
+  @Operation(
+      summary = "Get documents. Can only be called if the user has access to the given scenario.",
+      description = "Get all documents used by injects for a given scenario")
+  public List<Document> documents(@PathVariable String scenarioId) {
+    return this.documentService.documentsForScenario(scenarioId);
+  }
+  // end region
 }

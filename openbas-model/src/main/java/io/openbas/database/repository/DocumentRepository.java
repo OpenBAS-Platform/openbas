@@ -84,4 +84,60 @@ public interface DocumentRepository
   @NotNull
   @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
   Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT DISTINCT d.* FROM documents d "
+              + "WHERE d.document_id IN ("
+              + "  SELECT ad.document_id FROM articles_documents ad "
+              + "  JOIN articles a ON a.article_id = ad.article_id "
+              + "  WHERE a.article_scenario = :scenarioId "
+              + "  UNION "
+              + "  SELECT id.document_id FROM injects_documents id "
+              + "  JOIN injects i ON i.inject_id = id.inject_id "
+              + "  WHERE i.inject_scenario = :scenarioId "
+              + "  UNION "
+              + "  SELECT cd.document_id FROM challenges_documents cd "
+              + "  WHERE cd.challenge_id IN ("
+              + "    SELECT DISTINCT challenge_id FROM ("
+              + "      SELECT jsonb_array_elements_text(i.inject_content::jsonb->'challenges')::varchar as challenge_id "
+              + "      FROM injects i "
+              + "      WHERE i.inject_scenario = :scenarioId "
+              + "      AND i.inject_content IS NOT NULL "
+              + "      AND (i.inject_content::jsonb->'challenges') IS NOT NULL " // Check if key
+              // exists
+              + "      AND jsonb_typeof(i.inject_content::jsonb->'challenges') = 'array'"
+              + "    ) challenges"
+              + "  )"
+              + ")",
+      nativeQuery = true)
+  List<Document> findAllDistinctByScenarioId(@Param("scenarioId") String scenarioId);
+
+  @Query(
+      value =
+          "SELECT DISTINCT d.* FROM documents d "
+              + "WHERE d.document_id IN ("
+              + "  SELECT ad.document_id FROM articles_documents ad "
+              + "  JOIN articles a ON a.article_id = ad.article_id "
+              + "  WHERE a.article_exercise = :simulationId "
+              + "  UNION "
+              + "  SELECT id.document_id FROM injects_documents id "
+              + "  JOIN injects i ON i.inject_id = id.inject_id "
+              + "  WHERE i.inject_exercise = :simulationId "
+              + "  UNION "
+              + "  SELECT cd.document_id FROM challenges_documents cd "
+              + "  WHERE cd.challenge_id IN ("
+              + "    SELECT DISTINCT challenge_id FROM ("
+              + "      SELECT jsonb_array_elements_text(i.inject_content::jsonb->'challenges')::varchar as challenge_id "
+              + "      FROM injects i "
+              + "      WHERE i.inject_exercise = :simulationId "
+              + "      AND i.inject_content IS NOT NULL "
+              + "      AND (i.inject_content::jsonb->'challenges') IS NOT NULL " // Check if key
+              // exists
+              + "      AND jsonb_typeof(i.inject_content::jsonb->'challenges') = 'array'"
+              + "    ) challenges"
+              + "  )"
+              + ")",
+      nativeQuery = true)
+  List<Document> findAllDistinctBySimulationId(@Param("simulationId") String simulationId);
 }

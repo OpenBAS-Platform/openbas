@@ -24,8 +24,8 @@ export const deleteEndpoint = (assetId: Endpoint['asset_id']) => (dispatch: Disp
   return delReferential(uri, endpoint.key, assetId)(dispatch);
 };
 
-export const fetchEndpoints = () => (dispatch: Dispatch) => {
-  return getReferential(arrayOfEndpoints, ENDPOINT_URI)(dispatch);
+export const fetchEndpoints = (uri = ENDPOINT_URI) => (dispatch: Dispatch) => {
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
 };
 
 export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) => {
@@ -67,4 +67,18 @@ export const searchEndpointLinkedToFindingsAsOption = (searchText: string = '', 
 
 export const importEndpoints = (file: FormData, targetType: string) => {
   return simplePostCall(`/api/mappers/import/csv?targetType=` + targetType, file);
+};
+
+// -- EXERCISES --
+
+export const fetchExerciseEndpoints = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/endpoints`;
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
+};
+
+// -- SCENARIOS --
+
+export const fetchScenarioEndpoints = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/endpoints`;
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
 };

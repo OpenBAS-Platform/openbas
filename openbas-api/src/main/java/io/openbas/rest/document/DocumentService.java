@@ -102,4 +102,12 @@ public class DocumentService {
           }
         });
   }
+
+  public List<Document> documentsForScenario(String scenarioId) {
+    return this.documentRepository.findAllDistinctByScenarioId(scenarioId);
+  }
+
+  public List<Document> documentsForSimulation(String simulationId) {
+    return this.documentRepository.findAllDistinctBySimulationId(simulationId);
+  }
 }
