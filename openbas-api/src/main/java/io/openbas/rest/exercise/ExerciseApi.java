@@ -753,7 +753,7 @@ public class ExerciseApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(EXERCISE_URI)
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SIMULATION)
   public List<ExerciseSimple> exercises() {
     return exerciseService.exercises();
   }
