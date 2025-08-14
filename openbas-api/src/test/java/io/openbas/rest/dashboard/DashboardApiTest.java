@@ -1,30 +1,32 @@
 package io.openbas.rest.dashboard;
 
 import static io.openbas.rest.dashboard.DashboardApi.DASHBOARD_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Filters;
-import io.openbas.database.model.Widget;
+import io.openbas.database.model.*;
 import io.openbas.engine.EngineContext;
 import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
-import io.openbas.engine.api.EngineSortField;
-import io.openbas.engine.api.ListConfiguration;
-import io.openbas.engine.api.SortDirection;
+import io.openbas.engine.api.*;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.CustomDashboardFixture;
 import io.openbas.utils.fixtures.composers.*;
-import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,17 +38,30 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("Dashboard API tests")
 class DashboardApiTest extends IntegrationTest {
 
-  @Autowired private EngineService engineService;
-  @Autowired private EngineContext engineContext;
-  @Autowired private EndpointComposer endpointComposer;
-  @Autowired private WidgetComposer widgetComposer;
-  @Autowired private CustomDashboardComposer customDashboardComposer;
-  @Autowired private MockMvc mvc;
-  @Autowired private EntityManager entityManager;
-  @Autowired private ExerciseComposer exerciseComposer;
-  @Autowired private InjectComposer injectComposer;
-  @Autowired private FindingComposer findingComposer;
-  @Autowired private CustomDashboardParameterComposer customDashboardParameterComposer;
+  @Autowired
+  private EngineService engineService;
+  @Autowired
+  private EngineContext engineContext;
+  @Autowired
+  private EndpointComposer endpointComposer;
+  @Autowired
+  private InjectExpectationComposer injectExpectationComposer;
+  @Autowired
+  private WidgetComposer widgetComposer;
+  @Autowired
+  private CustomDashboardComposer customDashboardComposer;
+  @Autowired
+  private MockMvc mvc;
+  @Autowired
+  private EntityManager entityManager;
+  @Autowired
+  private ExerciseComposer exerciseComposer;
+  @Autowired
+  private InjectComposer injectComposer;
+  @Autowired
+  private FindingComposer findingComposer;
+  @Autowired
+  private CustomDashboardParameterComposer customDashboardParameterComposer;
 
   @BeforeEach
   void setup() throws IOException {
@@ -54,6 +69,7 @@ class DashboardApiTest extends IntegrationTest {
     widgetComposer.reset();
     exerciseComposer.reset();
     injectComposer.reset();
+    injectExpectationComposer.reset();
 
     // force reset elastic
     for (EsModel<?> model : engineContext.getModels()) {
@@ -371,6 +387,171 @@ class DashboardApiTest extends IntegrationTest {
               .getContentAsString();
 
       assertThatJson(response).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Count entities with date range filter.")
+    void countEntitiesWithDateRangeFilter() throws Exception {
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(183,
+              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+          .persist();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(183,
+              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+          .persist();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(60,
+              ChronoUnit.DAYS), Instant.now().minus(60, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Windows))
+          .persist();
+
+      Widget widget = widgetComposer
+          .forWidget(
+              WidgetFixture.createNumberWidgetWithEntityAndTimeRange("endpoint", CustomDashboardTimeRange.LAST_QUARTER,
+                  "base_created_at"))
+          .withCustomDashboard(customDashboardComposer.forCustomDashboard(
+              CustomDashboardFixture.createCustomDashboardWithParams()))
+          .persist()
+          .get();
+
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId = parameters.stream()
+          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+          .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_SEMESTER));
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      engineService.bulkProcessing(engineContext.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/count/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).isEqualTo(1);
+    }
+  }
+
+  @Nested
+  @DisplayName("When fetching series of entities")
+  class WhenFetchingEntitiesSeries {
+
+    @Test
+    @DisplayName("Fetch series for temporal widgets.")
+    void fetchSeriesForTemporalWidgets() throws Exception {
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(180,
+              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
+          .persist().get();
+
+      Widget widget = widgetComposer
+          .forWidget(
+              WidgetFixture.creatTemporalWidgetWithTimeRange(CustomDashboardTimeRange.LAST_QUARTER, "base_created_at",
+                  HistogramInterval.month, "endpoint"))
+          .withCustomDashboard(
+              customDashboardComposer.forCustomDashboard(CustomDashboardFixture.createCustomDashboardWithParams()))
+          .persist()
+          .get();
+
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId = parameters.stream()
+          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+          .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      engineService.bulkProcessing(engineContext.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/series/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).node("[0].data[0].value").isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Fetch series for structural widgets.")
+    void fetchSeriesForStructuralWidgets() throws Exception {
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(180,
+              ChronoUnit.DAYS), Instant.now().minus(183, ChronoUnit.DAYS), "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
+          .persist().get();
+      endpointComposer.forEndpoint(EndpointFixture.createEndpointWithCreationAndUpdate(Instant.now().minus(83,
+              ChronoUnit.DAYS), Instant.now().minus(83, ChronoUnit.DAYS), "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
+          .persist().get();
+
+      Widget widget = widgetComposer
+          .forWidget(
+              WidgetFixture.creatStructuralWidgetWithTimeRange(CustomDashboardTimeRange.LAST_QUARTER, "base_created_at",
+                  "endpoint_platform",
+                  "endpoint"))
+          .withCustomDashboard(
+              customDashboardComposer.forCustomDashboard(CustomDashboardFixture.createCustomDashboardWithParams()))
+          .persist()
+          .get();
+
+      // force persistence
+      entityManager.flush();
+      entityManager.clear();
+      engineService.bulkProcessing(engineContext.getModels().stream());
+      // elastic needs to process the data; it does so async, so the method above
+      // completes before the data is available in the system
+      Thread.sleep(1000);
+
+      List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
+      String timeRangeParameterId = parameters.stream()
+          .filter(param -> param.getType() == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+          .toString();
+
+      Map<String, String> input = new HashMap<>();
+      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+
+      String response =
+          mvc.perform(
+                  post(DASHBOARD_URI + "/series/" + widget.getId())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertThatJson(response).node("[0].data").isArray().size().isEqualTo(3);
     }
   }
 }
