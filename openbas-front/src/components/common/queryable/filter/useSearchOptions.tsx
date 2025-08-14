@@ -92,7 +92,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
-        searchAssetGroupAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
+        searchAssetGroupAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -107,7 +107,8 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_assets':
-        searchEndpointAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
+      case 'base_endpoint_side':
+        searchEndpointAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -117,7 +118,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_teams':
-        searchTeamsAsOption(search, contextId, 'SIMULATION_OR_SCENARIO').then((response) => {
+        searchTeamsAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
           setOptions(response.data);
         });
         break;

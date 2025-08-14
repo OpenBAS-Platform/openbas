@@ -69,7 +69,7 @@ public class EsInjectExpectation extends EsBase {
 
   @Queryable(label = "team")
   @EsQueryable(keyword = true)
-  private String base_teams_side; // Must finish by _side
+  private String base_team_side; // Must finish by _side
 
   @Queryable(
       label = "agent",
@@ -83,14 +83,14 @@ public class EsInjectExpectation extends EsBase {
       filterable = true,
       overrideOperators = {Filters.FilterOperator.empty, Filters.FilterOperator.not_empty})
   @EsQueryable(keyword = true)
-  private String base_assets_side; // Must finish by _side
+  private String base_asset_side; // Must finish by _side
 
   @Queryable(
       label = "asset group",
       filterable = true,
       overrideOperators = {Filters.FilterOperator.empty, Filters.FilterOperator.not_empty})
   @EsQueryable(keyword = true)
-  private String base_asset_groups_side; // Must finish by _side
+  private String base_asset_group_side; // Must finish by _side
 
   @Queryable(
       label = "attack patterns",

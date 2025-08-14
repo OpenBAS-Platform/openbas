@@ -170,9 +170,9 @@ public class EndpointApi extends RestBehavior {
     InputFilterOptions injectFilterOptionEnum;
     try {
       injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
-    } catch (IllegalArgumentException e) {
+    } catch (Exception e) {
       if (StringUtils.isEmpty(inputFilterOption)) {
-        log.warn("inputFilterOption is null, fall back to backwards compatible case");
+        log.warn("InputFilterOption is null, fall back to backwards compatible case");
         if (StringUtils.isNotEmpty(simulationOrScenarioId)) {
           injectFilterOptionEnum = InputFilterOptions.SIMULATION_OR_SCENARIO;
         } else {
@@ -196,7 +196,7 @@ public class EndpointApi extends RestBehavior {
       case SIMULATION_OR_SCENARIO:
         {
           if (StringUtils.isEmpty(simulationOrScenarioId)) {
-            throw new BadRequestException("missing simulation or scenario id");
+            throw new BadRequestException("Missing simulation or scenario id");
           }
         }
       case ATOMIC_TESTING:
@@ -212,7 +212,6 @@ public class EndpointApi extends RestBehavior {
           break;
         }
     }
-
     return options;
   }
 

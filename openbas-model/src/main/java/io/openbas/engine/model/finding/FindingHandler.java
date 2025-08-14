@@ -56,7 +56,7 @@ public class FindingHandler implements Handler<EsFinding> {
               }
               if (hasText(finding.getAsset_id())) {
                 dependencies.add(finding.getAsset_id());
-                esFinding.setBase_assets_side(finding.getAsset_id());
+                esFinding.setBase_endpoint_side(finding.getAsset_id());
               }
               esFinding.setBase_dependencies(dependencies);
               return esFinding;
