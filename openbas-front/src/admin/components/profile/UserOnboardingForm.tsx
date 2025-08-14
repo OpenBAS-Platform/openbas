@@ -73,7 +73,7 @@ const UserOnboardingForm: FunctionComponent<UserOnboardingFormProps> = ({
           <Button type="button" variant="text" size="small" onClick={handleReset}>{t('Reset')}</Button>
         </Box>
         <SelectFieldController name="user_onboarding_widget_enable" label={t('onboarding_display_widget')} items={onboardingItems(t)} />
-        <SelectFieldController name="user_onboarding_contextual_help_enable" label={t('onboarding_contextual_buttons')} items={onboardingItems(t)} />
+        <SelectFieldController name="user_onboarding_contextual_help_enable" label={t('onboarding_display_contextual_buttons')} items={onboardingItems(t)} />
         <div>
           <Button
             variant="contained"
