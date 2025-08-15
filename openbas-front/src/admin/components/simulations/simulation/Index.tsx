@@ -1,25 +1,22 @@
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
-import { type FunctionComponent, lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
-import { useLocalStorage } from 'usehooks-ts';
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
-import { seriesForSimulation } from '../../../../actions/simulations/simulation-customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
-import { type CustomDashboard, type Exercise, type Exercise as ExerciseType } from '../../../../utils/api-types';
+import { type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
-import { CustomDashboardContext } from '../../workspaces/custom_dashboards/CustomDashboardContext';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
@@ -27,7 +24,7 @@ import ExerciseHeader from './ExerciseHeader';
 const Simulation = lazy(() => import('./overview/SimulationComponent'));
 const Lessons = lazy(() => import('./lessons/SimulationLessons'));
 const SimulationFindings = lazy(() => import('./findings/SimulationFindings'));
-const SimulationAnalysis = lazy(() => import('./analysis/SimulationAnalysis'));
+const SimulationAnalysisWrapper = lazy(() => import('./analysis/SimulationAnalysisWrapper'));
 const SimulationDefinition = lazy(() => import('./SimulationDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
@@ -46,25 +43,6 @@ const useStyles = makeStyles()(() => ({
     alignItems: 'center',
   },
 }));
-
-const SimulationAnalysisComponent = () => {
-  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-  const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [parameters, setParameters] = useLocalStorage<Record<string, string>>('custom-dashboard-simulation-' + exerciseId, Object.fromEntries(new Map()));
-  const contextValue = useMemo(() => ({
-    customDashboard: customDashboardValue,
-    setCustomDashboard: setCustomDashboardValue,
-    series: (widgetId: string) => seriesForSimulation(exerciseId, widgetId),
-    customDashboardParameters: parameters,
-    setCustomDashboardParameters: setParameters,
-  }), [customDashboardValue, setCustomDashboardValue]);
-
-  return (
-    <CustomDashboardContext.Provider value={contextValue}>
-      <SimulationAnalysis />
-    </CustomDashboardContext.Provider>
-  );
-};
 
 const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercise }) => {
   const { t, fldt } = useFormatter();
@@ -204,7 +182,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
               <Route path="lessons" element={errorWrapper(Lessons)()} />
               <Route path="findings" element={errorWrapper(SimulationFindings)()} />
-              <Route path="analysis" element={errorWrapper(SimulationAnalysisComponent)()} />
+              <Route path="analysis" element={errorWrapper(SimulationAnalysisWrapper)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

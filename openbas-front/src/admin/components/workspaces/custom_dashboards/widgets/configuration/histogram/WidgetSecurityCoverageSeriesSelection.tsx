@@ -4,17 +4,14 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import { SIMULATIONS } from '../../../../../../../components/common/queryable/filter/constants';
 import SimulationField from '../../../../../../../components/fields/SimulationField';
 import { useFormatter } from '../../../../../../../components/i18n';
 import Loader from '../../../../../../../components/Loader';
 import type { DateHistogramSeries, InjectExpectation, StructuralHistogramSeries } from '../../../../../../../utils/api-types';
 import type { GroupOption } from '../../../../../../../utils/Option';
 import { CustomDashboardContext } from '../../../CustomDashboardContext';
-import {
-  extractGroupOptionsFromCustomDashboardParameters,
-  getSeries,
-  updateSimulationFilterOnSeries,
-} from '../../WidgetUtils';
+import { extractGroupOptionsFromCustomDashboardParameters, getSeries, updateSimulationFilterOnSeries } from '../../WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -130,7 +127,10 @@ const WidgetSecurityCoverageSeriesSelection: FunctionComponent<Props> = ({ value
         value={simulationId ?? ''}
         className={classes.allWidth}
         onChange={onSimulationChange}
-        defaultOptions={defaultSimulationOptions.get('base_simulation_side')}
+        searchOptionsConfig={{
+          filterKey: SIMULATIONS,
+          defaultValues: defaultSimulationOptions.get('base_simulation_side'),
+        }}
       />
     </div>
   );

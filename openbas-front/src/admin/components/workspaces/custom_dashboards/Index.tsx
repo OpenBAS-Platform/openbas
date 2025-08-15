@@ -10,9 +10,9 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { type CustomDashboard } from '../../../../utils/api-types';
-import { CustomDashboardContext } from './CustomDashboardContext';
+import { CustomDashboardContext, type ParameterOption } from './CustomDashboardContext';
 
-const CustomDashboard = lazy(() => import('./CustomDashboard'));
+const CustomDashboardWrapper = lazy(() => import('./CustomDashboardWrapper'));
 
 const CustomDashboardIndexComponent: FunctionComponent = () => {
   // Standard hooks
@@ -62,7 +62,7 @@ const CustomDashboardIndexComponent: FunctionComponent = () => {
         <Routes>
           <Route
             path=""
-            element={errorWrapper(CustomDashboard)({
+            element={errorWrapper(CustomDashboardWrapper)({
               customDashboard,
               readOnly: false,
             })}
@@ -78,7 +78,7 @@ const CustomDashboardIndexComponent: FunctionComponent = () => {
 const CustomDashboardIndex = () => {
   const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [parameters, setParameters] = useLocalStorage<Record<string, string>>('custom-dashboard-' + customDashboardId, Object.fromEntries(new Map()));
+  const [parameters, setParameters] = useLocalStorage<Record<string, ParameterOption>>('custom-dashboard-' + customDashboardId, Object.fromEntries(new Map()));
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,
