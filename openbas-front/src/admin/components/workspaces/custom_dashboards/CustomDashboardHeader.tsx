@@ -6,8 +6,14 @@ import { truncate } from '../../../../utils/String';
 import { CustomDashboardContext } from './CustomDashboardContext';
 import CustomDashboardParameters from './CustomDashboardParameters';
 import CustomDashboardPopover from './CustomDashboardPopover';
+import { useNavigate } from 'react-router';
 
 const CustomDashboardHeader: FunctionComponent = () => {
+  // Standard hooks
+  const { classes } = useStyles();
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
 
   const handleUpdate = useCallback(
@@ -45,6 +51,7 @@ const CustomDashboardHeader: FunctionComponent = () => {
         <CustomDashboardPopover
           customDashboard={customDashboard}
           onUpdate={handleUpdate}
+          onDelete={() => navigate('/admin/workspaces/custom_dashboards')}
         />
       </div>
       <CustomDashboardParameters />

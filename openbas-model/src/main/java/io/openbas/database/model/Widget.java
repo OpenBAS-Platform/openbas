@@ -8,6 +8,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.engine.api.WidgetConfiguration;
 import io.openbas.engine.api.WidgetType;
+import io.openbas.jsonapi.InnerRelationship;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "widgets")
 @EntityListeners(ModelBaseListener.class)
+@InnerRelationship
 public class Widget implements Base {
 
   @Id
