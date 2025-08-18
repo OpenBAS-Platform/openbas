@@ -83,3 +83,17 @@ export const searchAssetGroupLinkedToFindingsAsOption = (searchText: string = ''
 export const searchAssetGroupByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${ASSET_GROUP_URI}/options`, ids);
 };
+
+// -- SIMULATIONS --
+
+export const fetchSimulationAssetGroups = (simulationId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${simulationId}/asset_groups`;
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
+};
+
+// -- SCENARIOS --
+
+export const fetchScenarioAssetGroups = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/asset_groups`;
+  return getReferential(arrayOfAssetGroups, uri)(dispatch);
+};

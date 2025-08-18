@@ -4,8 +4,12 @@ import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchSimulationAssetGroups } from '../../../../../actions/asset_groups/assetgroup-action';
+import { fetchSimulationEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
+import { fetchSimulationChannels } from '../../../../../actions/channels/channel-action';
+import { fetchExerciseDocuments } from '../../../../../actions/documents/documents-actions';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
@@ -70,6 +74,10 @@ const ExerciseInjects: FunctionComponent = () => {
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));
     dispatch(fetchExerciseInjectExpectations(exerciseId));
+    dispatch(fetchSimulationEndpoints(exerciseId));
+    dispatch(fetchSimulationAssetGroups(exerciseId));
+    dispatch(fetchExerciseDocuments(exerciseId));
+    dispatch(fetchSimulationChannels(exerciseId));
   });
 
   const articleContext = articleContextForExercise(exerciseId);

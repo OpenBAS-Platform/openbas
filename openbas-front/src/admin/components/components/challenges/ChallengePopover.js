@@ -1,5 +1,16 @@
 import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Slide,
+} from '@mui/material';
 import * as R from 'ramda';
 import { forwardRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -16,8 +27,9 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline, disabled = false }) => {
+const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = false }) => {
   // utils
+
   const dispatch = useDispatch();
   const { t } = useFormatter();
   // states
@@ -25,6 +37,7 @@ const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline
   const [openRemove, setOpenRemove] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+
   // popover management
   const { tagsMap } = useHelper(helper => ({ tagsMap: helper.getTagsMap() }));
   const handlePopoverOpen = (event) => {
@@ -66,6 +79,7 @@ const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline
     onRemoveChallenge(challenge.challenge_id);
     handleCloseRemove();
   };
+
   // Rendering
   const challengeTags = tagOptions(challenge.challenge_tags, tagsMap);
   const initialValues = R.pipe(
@@ -133,7 +147,7 @@ const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline
               onSubmit={onSubmitEdit}
               handleClose={handleCloseEdit}
               initialValues={initialValues}
-              documentsIds={(documents || []).map(i => i.document_id)}
+              documentsIds={challenge.challenge_documents || []}
             />
           </DialogContent>
         </Dialog>
@@ -148,7 +162,7 @@ const ChallengePopover = ({ challenge, documents = [], onRemoveChallenge, inline
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
-            documentsIds={(documents || []).map(i => i.document_id)}
+            documentsIds={challenge.challenge_documents || []}
           />
         </Drawer>
       )}

@@ -32,3 +32,17 @@ export const fetchObserverChannel = (exerciseId, channelId) => (dispatch) => {
   const uri = `/api/observer/channels/${exerciseId}/${channelId}`;
   return getReferential(channelReader, uri)(dispatch);
 };
+
+// -- SIMULATIONS --
+
+export const fetchSimulationChannels = simulationId => (dispatch) => {
+  const uri = `/api/exercises/${simulationId}/channels`;
+  return getReferential(arrayOfChannels, uri)(dispatch);
+};
+
+// -- SCENARIOS --
+
+export const fetchScenarioChannels = scenarioId => (dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/channels`;
+  return getReferential(arrayOfChannels, uri)(dispatch);
+};
