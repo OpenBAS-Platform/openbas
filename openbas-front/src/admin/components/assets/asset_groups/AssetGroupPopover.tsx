@@ -144,7 +144,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
 
   return (
     <>
-      <ButtonPopover disabled={disabled} entries={entries} variant={inline ? 'icon' : 'toggle'} />
+      <ButtonPopover disabled={disabled} entries={entries} variant="icon" />
 
       <DialogDelete
         open={deletion}
