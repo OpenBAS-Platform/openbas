@@ -121,7 +121,7 @@ public enum Capability {
      ),
   MANAGE_SECURITY_PLATFORMS(
       ACCESS_SECURITY_PLATFORMS,
-      pair(ResourceType.SECURITY_PLATFORM, Action.WRITE),
+      pair(ResourceType.SECURITY_PLATFORM, Action.WRITE)
 ),
   DELETE_SECURITY_PLATFORMS(
       MANAGE_SECURITY_PLATFORMS,
