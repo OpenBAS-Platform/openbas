@@ -24,8 +24,8 @@ export const deleteEndpoint = (assetId: Endpoint['asset_id']) => (dispatch: Disp
   return delReferential(uri, endpoint.key, assetId)(dispatch);
 };
 
-export const fetchEndpoints = (uri = ENDPOINT_URI) => (dispatch: Dispatch) => {
-  return getReferential(arrayOfEndpoints, uri)(dispatch);
+export const fetchEndpoints = () => (dispatch: Dispatch) => {
+  return getReferential(arrayOfEndpoints, ENDPOINT_URI)(dispatch);
 };
 
 export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) => {
