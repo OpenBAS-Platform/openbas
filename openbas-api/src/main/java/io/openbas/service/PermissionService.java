@@ -1,6 +1,7 @@
 package io.openbas.service;
 
 import io.openbas.database.model.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.validation.constraints.NotNull;
 import java.util.EnumSet;
@@ -30,10 +31,11 @@ public class PermissionService {
           ResourceType.SCENARIO, ResourceType.SIMULATION, ResourceType.SIMULATION_OR_SCENARIO);
 
   private static final EnumSet<ResourceType> RESOURCES_USING_PARENT_PERMISSION =
-      EnumSet.of(ResourceType.INJECT);
+      EnumSet.of(ResourceType.INJECT, ResourceType.NOTIFICATION_RULE);
 
   private final GrantService grantService;
   private final InjectService injectService;
+  private final NotificationRuleService notificationRuleService;
 
   @Transactional
   public boolean hasPermission(
@@ -132,6 +134,17 @@ public class PermissionService {
       // parent action rule: anything non-READ becomes WRITE on the parent
       Action parentAction = (action == Action.READ) ? Action.READ : Action.WRITE;
       return new Target(inject.getParentResourceId(), inject.getParentResourceType(), parentAction);
+    }
+    if (resourceType == ResourceType.NOTIFICATION_RULE) {
+      NotificationRule notificationRule =
+          notificationRuleService
+              .findById(resourceId)
+              .orElseThrow(
+                  () ->
+                      new ElementNotFoundException(
+                          "NotificationRule not found with id:" + resourceId));
+      Action parentAction = Action.READ; // FIXME permission should be linked to userid
+      return new Target(notificationRule.getResourceId(), ResourceType.SCENARIO, parentAction);
     }
     return new Target(resourceId, resourceType, action);
   }
