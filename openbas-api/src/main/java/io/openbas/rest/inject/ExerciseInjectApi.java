@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -236,8 +237,12 @@ public class ExerciseInjectApi extends RestBehavior {
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
+    Exercise exercise =
+        this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     injectDocumentRepository.deleteDocumentsFromInject(injectId);
     injectRepository.deleteById(injectId);
+    exercise.setUpdatedAt(Instant.now());
+    this.exerciseRepository.save(exercise);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/activation")

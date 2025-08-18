@@ -41,7 +41,12 @@ const InjectListElement = (props: Props) => {
       case 'inject_status':
         return (esElement: EsInject | EsScenario | EsSimulation) => {
           const isInject = esElement.base_entity === 'inject';
-          const status = isInject ? esElement.inject_status : esElement.status;
+          let status;
+          if ('inject_status' in esElement) {
+            status = esElement.inject_status;
+          } else if ('status' in esElement) {
+            status = esElement.status;
+          }
           return (<ItemStatus isInject={isInject} status={status} label={t(status || '-')} variant="inList" />);
         };
       case 'base_platforms_side_denormalized':

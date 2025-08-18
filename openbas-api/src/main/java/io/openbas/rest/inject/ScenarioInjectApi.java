@@ -22,6 +22,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -168,5 +169,7 @@ public class ScenarioInjectApi extends RestBehavior {
     assert scenarioId.equals(scenario.getId());
     this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
     this.injectRepository.deleteById(injectId);
+    scenario.setUpdatedAt(Instant.now());
+    this.scenarioService.updateScenario(scenario);
   }
 }
