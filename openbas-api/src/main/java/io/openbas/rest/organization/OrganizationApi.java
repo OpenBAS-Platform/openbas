@@ -53,7 +53,6 @@ public class OrganizationApi extends RestBehavior {
 
   @GetMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
-  
   public Iterable<RawOrganization> organizations() {
     OpenBASPrincipal currentUser = currentUser();
     List<RawOrganization> organizations;

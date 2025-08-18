@@ -45,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-
 @RequiredArgsConstructor
 public class ScenarioApi extends RestBehavior {
 

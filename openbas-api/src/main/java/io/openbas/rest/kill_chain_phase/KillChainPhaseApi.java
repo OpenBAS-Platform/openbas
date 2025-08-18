@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-
 public class KillChainPhaseApi extends RestBehavior {
 
   public static final String KILL_CHAIN_PHASE_URI = "/api/kill_chain_phases";

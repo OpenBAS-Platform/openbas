@@ -46,7 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
 @RequiredArgsConstructor
 @UserRoleDescription
 @Tag(
@@ -72,7 +71,6 @@ public class TeamApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(TEAM_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
-  
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(summary = "List teams", description = "Return the teams")
   public Iterable<TeamSimple> getTeams() {
@@ -101,7 +99,6 @@ public class TeamApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/api/teams/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
-  
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(
@@ -116,7 +113,6 @@ public class TeamApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/api/teams/find")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
-  
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(description = "Find a list of teams based on their ids", summary = "Find teams")
@@ -126,7 +122,6 @@ public class TeamApi extends RestBehavior {
 
   @GetMapping("/api/teams/{teamId}")
   @RBAC(resourceId = "#teamId", actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
-  
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The team")})
   @Operation(description = "Get a team", summary = "Get team")
   public Team getTeam(@PathVariable @Schema(description = "ID of the team") String teamId) {
@@ -135,7 +130,6 @@ public class TeamApi extends RestBehavior {
 
   @GetMapping("/api/teams/{teamId}/players")
   @RBAC(resourceId = "#teamId", actionPerformed = Action.READ, resourceType = ResourceType.TEAM)
-  
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of players of the team")})
   @Operation(description = "Get the list of players of a team", summary = "Get team's players")

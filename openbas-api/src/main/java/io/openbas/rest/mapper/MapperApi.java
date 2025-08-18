@@ -62,7 +62,6 @@ public class MapperApi extends RestBehavior {
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
   private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
 
-  
   @PostMapping("/api/mappers/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.MAPPER)
   public Page<RawPaginationImportMapper> getImportMapper(
@@ -72,7 +71,6 @@ public class MapperApi extends RestBehavior {
         .map(RawPaginationImportMapper::new);
   }
 
-  
   @GetMapping("/api/mappers/{mapperId}")
   @RBAC(resourceId = "#mapperId", actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   public ImportMapper getImportMapperById(@PathVariable String mapperId) {
@@ -117,7 +115,6 @@ public class MapperApi extends RestBehavior {
   }
 
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
-  
   @PostMapping(value = "/api/mappers/export/csv")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   @LogExecutionTime
@@ -175,7 +172,6 @@ public class MapperApi extends RestBehavior {
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Import injects into an xls file")
-  
   public ImportPostSummary importXLSFile(@RequestPart("file") @NotNull MultipartFile file) {
     validateUploadedFile(file);
     return injectImportService.storeXlsFileForImport(file);
@@ -188,7 +184,6 @@ public class MapperApi extends RestBehavior {
       resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  
   public ImportTestSummary testImportXLSFile(
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportTestInput input) {
@@ -212,7 +207,6 @@ public class MapperApi extends RestBehavior {
   @Operation(
       description = "Import all datas from a specific target (endpoint,...) through a csv file")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
-  
   @PostMapping("/api/mappers/import/csv")
   @LogExecutionTime
   @Transactional(rollbackOn = Exception.class)

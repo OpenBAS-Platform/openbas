@@ -49,7 +49,6 @@ public class PlayerApi extends RestBehavior {
   @GetMapping(PLAYER_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
-  
   public Iterable<RawPlayer> players() {
     List<RawPlayer> players;
     OpenBASPrincipal currentUser = currentUser();

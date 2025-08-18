@@ -42,7 +42,6 @@ public class ExerciseImportApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  
   public ImportTestSummary dryRunImportXLSFile(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,
@@ -70,7 +69,6 @@ public class ExerciseImportApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Validate and import injects from an xls file")
-  
   public ImportTestSummary validateImportXLSFile(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,

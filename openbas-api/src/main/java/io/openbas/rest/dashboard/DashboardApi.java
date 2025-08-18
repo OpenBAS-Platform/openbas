@@ -1,6 +1,5 @@
 package io.openbas.rest.dashboard;
 
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.engine.model.EsBase;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
 @RequiredArgsConstructor
 public class DashboardApi extends RestBehavior {
 

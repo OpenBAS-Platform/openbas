@@ -1,6 +1,5 @@
 package io.openbas.rest.report;
 
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.rest.exercise.service.ExerciseService;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-
 public class ReportApi extends RestBehavior {
 
   private final ExerciseService exerciseService;

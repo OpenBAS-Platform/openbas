@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-
 public class AtomicTestingTeamApi extends RestBehavior {
 
   private final TeamService teamService;

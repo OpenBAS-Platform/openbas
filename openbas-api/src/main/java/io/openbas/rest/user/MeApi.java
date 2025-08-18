@@ -59,14 +59,12 @@ public class MeApi extends RestBehavior {
     this.tokenRepository = tokenRepository;
   }
 
-  
   @GetMapping("/api/logout")
   @RBAC(skipRBAC = true)
   public ResponseEntity<Object> logout() {
     return ResponseEntity.ok().build();
   }
 
-  
   @GetMapping("/api/me")
   @RBAC(skipRBAC = true)
   public User me() {
@@ -75,7 +73,6 @@ public class MeApi extends RestBehavior {
         .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
   }
 
-  
   @PutMapping("/api/me/profile")
   @RBAC(skipRBAC = true)
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
@@ -91,7 +88,6 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  
   @PutMapping("/api/me/information")
   @RBAC(skipRBAC = true)
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
@@ -105,7 +101,6 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  
   @PutMapping("/api/me/password")
   @RBAC(skipRBAC = true)
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input)
@@ -122,7 +117,6 @@ public class MeApi extends RestBehavior {
     }
   }
 
-  
   @PostMapping("/api/me/token/refresh")
   @RBAC(skipRBAC = true)
   @Transactional(rollbackOn = Exception.class)
@@ -141,7 +135,6 @@ public class MeApi extends RestBehavior {
     return tokenRepository.save(token);
   }
 
-  
   @GetMapping("/api/me/tokens")
   @RBAC(skipRBAC = true)
   public List<Token> tokens() {

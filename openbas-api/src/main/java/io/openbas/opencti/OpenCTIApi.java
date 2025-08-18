@@ -1,6 +1,5 @@
 package io.openbas.opencti;
 
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-
 public class OpenCTIApi {
 
   public static final String OPENCTI_URI = "/api/opencti/v1";

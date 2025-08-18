@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-
 public class EndpointApi extends RestBehavior {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
@@ -102,7 +101,6 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
-  
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(
         EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints());

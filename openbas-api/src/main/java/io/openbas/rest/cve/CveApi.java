@@ -1,6 +1,5 @@
 package io.openbas.rest.cve;
 
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
 @RequiredArgsConstructor
 @Tag(name = "CVE API", description = "Operations related to CVEs")
 public class CveApi extends RestBehavior {

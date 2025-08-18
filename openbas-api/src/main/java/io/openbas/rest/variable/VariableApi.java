@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-
 public class VariableApi extends RestBehavior {
 
   public static final String VARIABLE_URI = "/api/variables";

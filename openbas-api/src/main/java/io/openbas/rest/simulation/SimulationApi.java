@@ -1,6 +1,5 @@
 package io.openbas.rest.simulation;
 
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
 import io.openbas.database.model.ResourceType;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(SimulationApi.SIMULATION_URI)
 @RestController
 @RequiredArgsConstructor
-
 public class SimulationApi extends RestBehavior {
 
   public static final String SIMULATION_URI = "/api/simulations";

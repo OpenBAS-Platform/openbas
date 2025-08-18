@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-
 public class AssetGroupApi extends RestBehavior {
 
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
@@ -62,7 +61,6 @@ public class AssetGroupApi extends RestBehavior {
 
   @GetMapping(ASSET_GROUP_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET_GROUP)
-  
   public List<AssetGroup> assetGroups() {
     return this.assetGroupService.assetGroups();
   }
@@ -70,7 +68,6 @@ public class AssetGroupApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET_GROUP)
-  
   public Page<AssetGroupOutput> assetGroups(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);
@@ -107,7 +104,6 @@ public class AssetGroupApi extends RestBehavior {
 
   @PostMapping(ASSET_GROUP_URI + "/find")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET_GROUP)
-  
   @Transactional(readOnly = true)
   public List<AssetGroupOutput> findAssetGroups(
       @RequestBody @Valid @NotNull final List<String> assetGroupIds) {
@@ -119,7 +115,6 @@ public class AssetGroupApi extends RestBehavior {
       resourceId = "#assetGroupId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ASSET_GROUP)
-  
   public AssetGroup assetGroup(@PathVariable @NotBlank final String assetGroupId) {
     return this.assetGroupService.assetGroup(assetGroupId);
   }

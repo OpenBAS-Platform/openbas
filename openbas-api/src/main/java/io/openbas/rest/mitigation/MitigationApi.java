@@ -29,7 +29,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
 public class MitigationApi extends RestBehavior {
 
   private MitigationRepository mitigationRepository;

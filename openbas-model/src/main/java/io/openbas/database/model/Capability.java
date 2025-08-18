@@ -43,7 +43,11 @@ public enum Capability {
 
   // Teams & Players
   MANAGE_TEAMS_AND_PLAYERS(
-      null, pair(ResourceType.TEAM, Action.WRITE), pair(ResourceType.PLAYER, Action.CREATE)),
+      null,
+      pair(ResourceType.TEAM, Action.WRITE),
+      pair(ResourceType.TEAM, Action.CREATE),
+      pair(ResourceType.PLAYER, Action.WRITE),
+      pair(ResourceType.PLAYER, Action.CREATE)),
   DELETE_TEAMS_AND_PLAYERS(
       MANAGE_TEAMS_AND_PLAYERS,
       pair(ResourceType.TEAM, Action.DELETE),

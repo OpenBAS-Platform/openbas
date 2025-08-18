@@ -1,6 +1,5 @@
 package io.openbas.search;
 
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Base;
 import io.openbas.rest.helper.RestBehavior;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-
 public class FullTextSearchApi extends RestBehavior {
 
   public static final String GLOBAL_SEARCH_URI = "/api/fulltextsearch";

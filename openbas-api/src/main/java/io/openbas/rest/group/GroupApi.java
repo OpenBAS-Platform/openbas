@@ -33,7 +33,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
 public class GroupApi extends RestBehavior {
 
   private ExerciseRepository exerciseRepository;

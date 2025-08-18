@@ -1,6 +1,5 @@
 package io.openbas.rest.agent;
 
-
 import io.openbas.service.AgentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
