@@ -3,6 +3,7 @@ package io.openbas.utils.reflection;
 import static io.openbas.utils.reflection.FieldUtils.getAllFields;
 import static io.openbas.utils.reflection.FieldUtils.getField;
 
+import io.openbas.database.model.Base;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Id;
 import java.lang.reflect.Field;
@@ -11,7 +12,7 @@ public class ClazzUtils {
 
   private ClazzUtils() {}
 
-  public static Object instantiate(final Class<?> clazz) {
+  public static <T extends Base> T instantiate(final Class<T> clazz) {
     if (clazz == null) {
       throw new IllegalArgumentException("Cannot instantiate null class");
     }

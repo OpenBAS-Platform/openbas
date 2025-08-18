@@ -10,6 +10,7 @@ import static io.openbas.utils.reflection.RelationUtils.setInverseRelation;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Base;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
@@ -22,18 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class GenericJsonApiImporter {
+public class GenericJsonApiImporter<T extends Base> {
 
   private final EntityManager entityManager;
   @Resource private final ObjectMapper objectMapper;
 
   @Transactional
-  public Object upsert(JsonApiDocument<ResourceObject> doc, boolean withRels) {
+  public T upsert(JsonApiDocument<ResourceObject> doc, boolean withRels) {
     if (doc == null || doc.data() == null) {
       throw new IllegalArgumentException("Data is required to import document");
     }
     Map<String, ResourceObject> includedMap = toMap(doc.included());
-    Object entity = buildEntity(doc.data(), includedMap, new HashMap<>(), withRels);
+    Map<String, T> entityCache = new HashMap<>();
+    T entity = buildEntity(doc.data(), includedMap, entityCache, withRels);
 
     // merge/upsert
     return entityManager.merge(entity);
@@ -46,51 +48,58 @@ public class GenericJsonApiImporter {
     Map<String, ResourceObject> map = new LinkedHashMap<>();
     for (Object o : included) {
       ResourceObject ro = (ResourceObject) safeConvert(o, ResourceObject.class);
-      map.put(ro.id(), ro);
+      if (ro != null) map.put(ro.id(), ro);
     }
     return map;
   }
 
-  private Object buildEntity(
+  private T buildEntity(
       ResourceObject resource,
       Map<String, ResourceObject> includedMap,
-      Map<String, Object> cache,
+      Map<String, T> entityCache,
       boolean withRels) {
     // Sanity check
     if (resource == null) {
       return null;
     }
-    if (cache == null) {
-      cache = new HashMap<>();
+    if (entityCache == null) {
+      entityCache = new HashMap<>();
     }
 
     String id = resource.id();
     String type = resource.type();
 
-    if (cache.containsKey(id)) {
-      return cache.get(id);
+    if (entityCache.containsKey(id)) {
+      return entityCache.get(id);
     }
 
-    Class<?> clazz = classForTypeOrThrow(type);
+    Class<T> clazz = classForTypeOrThrow(type);
 
     // Instantiate or load
-    Object entity = null;
-    if (hasText(id)) {
+    T entity = null;
+
+    if (hasText(id) && !clazz.isAnnotationPresent(InnerRelationship.class)) {
       entity = entityManager.find(clazz, id);
     }
+    // Create new instance if not found.
     if (entity == null) {
       entity = instantiate(clazz);
+      // For @InnerRelationship, set ID to preserve reference
+      // (example: widget config linked to custom dashboard parameters)
+      if (clazz.isAnnotationPresent(InnerRelationship.class)) {
+        entity.setId(id);
+      }
     }
-    cache.put(id, entity);
+    entityCache.put(id, entity);
 
     // Populate
     applyAttributes(entity, resource.attributes());
-    applyRelationships(entity, resource.relationships(), includedMap, cache, withRels);
+    applyRelationships(entity, resource.relationships(), includedMap, entityCache, withRels);
 
     return entity;
   }
 
-  private void applyAttributes(Object entity, Map<String, Object> attributes) {
+  private void applyAttributes(T entity, Map<String, Object> attributes) {
     if (entity == null || attributes == null || attributes.isEmpty()) {
       return;
     }
@@ -109,7 +118,7 @@ public class GenericJsonApiImporter {
       Object entity,
       Map<String, Relationship> rels,
       Map<String, ResourceObject> includedMap,
-      Map<String, Object> cache,
+      Map<String, T> entityCache,
       boolean withRels) {
     if (!withRels) {
       return;
@@ -128,12 +137,11 @@ public class GenericJsonApiImporter {
 
       Relationship rel = e.getValue();
       if (isCollection(f)) {
-        @SuppressWarnings("unchecked")
         List<ResourceIdentifier> ids = rel.asMany();
 
         Collection<Object> target = instantiateCollection(f);
         for (ResourceIdentifier ri : ids) {
-          Object child = resolveOrBuildEntity(ri, includedMap, cache, withRels);
+          Object child = resolveOrBuildEntity(ri, includedMap, entityCache, withRels);
           if (child != null) {
             target.add(child);
             setInverseRelation(child, entity);
@@ -143,7 +151,8 @@ public class GenericJsonApiImporter {
 
       } else {
         ResourceIdentifier ri = rel.asOne();
-        Object child = (ri != null) ? resolveOrBuildEntity(ri, includedMap, cache, withRels) : null;
+        Object child =
+            (ri != null) ? resolveOrBuildEntity(ri, includedMap, entityCache, withRels) : null;
         setField(entity, f, child);
         if (child != null) {
           setInverseRelation(child, entity);
@@ -152,10 +161,10 @@ public class GenericJsonApiImporter {
     }
   }
 
-  private Object resolveOrBuildEntity(
+  private T resolveOrBuildEntity(
       ResourceIdentifier resourceIdentifier,
       Map<String, ResourceObject> includedMap,
-      Map<String, Object> cache,
+      Map<String, T> entityCache,
       boolean withRels) {
     if (resourceIdentifier == null) {
       return null;
@@ -167,33 +176,34 @@ public class GenericJsonApiImporter {
     // Available in the bundle
     ResourceObject included = includedMap.get(id);
     if (included != null) {
-      return buildEntity(included, includedMap, cache, withRels);
+      return buildEntity(included, includedMap, entityCache, withRels);
     }
 
     // Not present in the bundle, resolve it
-    Class<?> clazz = classForTypeOrThrow(type);
+    Class<T> clazz = classForTypeOrThrow(type);
     return hasText(id) ? entityManager.getReference(clazz, id) : null;
   }
 
-  private final Map<String, Class<?>> typeToClassCache = new HashMap<>();
+  private final Map<String, Class<T>> typeToClassCache = new HashMap<>();
 
-  private Class<?> classForTypeOrThrow(String type) {
+  @SuppressWarnings("unchecked")
+  private Class<T> classForTypeOrThrow(String type) {
     if (type == null || type.isBlank()) {
       throw new IllegalArgumentException("Type is required");
     }
 
-    Class<?> cached = typeToClassCache.get(type);
+    Class<T> cached = typeToClassCache.get(type);
     if (cached != null) {
       return cached;
     }
 
     for (EntityType<?> et : entityManager.getMetamodel().getEntities()) {
-      Class<?> javaType = et.getJavaType();
+      Class<T> javaType = (Class<T>) et.getJavaType();
       String resolved = resolveType(javaType);
       typeToClassCache.putIfAbsent(resolved, javaType);
     }
 
-    Class<?> found = typeToClassCache.get(type);
+    Class<T> found = typeToClassCache.get(type);
     if (found != null) {
       return found;
     }
