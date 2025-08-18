@@ -43,8 +43,8 @@ public enum Capability {
 
   // Teams & Players
   MANAGE_TEAMS_AND_PLAYERS(
-      null, pair(ResourceType.TEAM, Action.WRITE), pair(ResourceType.PLAYER, Action.WRITE)),
-  DELETE_TEAMS_AND_PLAYERS(
+      null, pair(ResourceType.TEAM, Action.WRITE), pair(ResourceType.PLAYER, Action.CREATE)),
+  DELETE_MANAGE_TEAMS_AND_PLAYERS(
       MANAGE_TEAMS_AND_PLAYERS,
       pair(ResourceType.TEAM, Action.DELETE),
       pair(ResourceType.PLAYER, Action.DELETE)),
@@ -62,7 +62,10 @@ public enum Capability {
       ACCESS_ASSETS,
       pair(ResourceType.ASSET, Action.WRITE),
       pair(ResourceType.ASSET_GROUP, Action.WRITE),
-      pair(ResourceType.JOB, Action.WRITE)),
+      pair(ResourceType.JOB, Action.WRITE),
+      pair(ResourceType.ASSET, Action.CREATE),
+      pair(ResourceType.ASSET_GROUP, Action.CREATE),
+      pair(ResourceType.JOB, Action.CREATE)),
   DELETE_ASSETS(
       MANAGE_ASSETS,
       pair(ResourceType.ASSET, Action.DELETE),
@@ -72,37 +75,55 @@ public enum Capability {
   // Payloads
   ACCESS_PAYLOADS(
       null, pair(ResourceType.PAYLOAD, Action.READ), pair(ResourceType.PAYLOAD, Action.SEARCH)),
-  MANAGE_PAYLOADS(ACCESS_PAYLOADS, pair(ResourceType.PAYLOAD, Action.WRITE)),
+  MANAGE_PAYLOADS(
+      ACCESS_PAYLOADS,
+      pair(ResourceType.PAYLOAD, Action.WRITE),
+      pair(ResourceType.PAYLOAD, Action.CREATE)),
   DELETE_PAYLOADS(MANAGE_PAYLOADS, pair(ResourceType.PAYLOAD, Action.DELETE)),
 
   // Dashboards
   ACCESS_DASHBOARDS(
       null, pair(ResourceType.DASHBOARD, Action.READ), pair(ResourceType.DASHBOARD, Action.SEARCH)),
-  MANAGE_DASHBOARDS(ACCESS_DASHBOARDS, pair(ResourceType.DASHBOARD, Action.WRITE)),
+  MANAGE_DASHBOARDS(
+      ACCESS_DASHBOARDS,
+      pair(ResourceType.DASHBOARD, Action.WRITE),
+      pair(ResourceType.DASHBOARD, Action.CREATE)),
   DELETE_DASHBOARDS(MANAGE_DASHBOARDS, pair(ResourceType.DASHBOARD, Action.DELETE)),
 
   // Findings
   ACCESS_FINDINGS(
       null, pair(ResourceType.FINDING, Action.READ), pair(ResourceType.FINDING, Action.SEARCH)),
-  MANAGE_FINDINGS(ACCESS_FINDINGS, pair(ResourceType.FINDING, Action.WRITE)),
+  MANAGE_FINDINGS(
+      ACCESS_FINDINGS,
+      pair(ResourceType.FINDING, Action.WRITE),
+      pair(ResourceType.FINDING, Action.CREATE)),
   DELETE_FINDINGS(MANAGE_FINDINGS, pair(ResourceType.FINDING, Action.DELETE)),
 
   // Documents
   ACCESS_DOCUMENTS(
       null, pair(ResourceType.DOCUMENT, Action.READ), pair(ResourceType.DOCUMENT, Action.SEARCH)),
-  MANAGE_DOCUMENTS(ACCESS_DOCUMENTS, pair(ResourceType.DOCUMENT, Action.WRITE)),
+  MANAGE_DOCUMENTS(
+      ACCESS_DOCUMENTS,
+      pair(ResourceType.DOCUMENT, Action.WRITE),
+      pair(ResourceType.DOCUMENT, Action.CREATE)),
   DELETE_DOCUMENTS(MANAGE_DOCUMENTS, pair(ResourceType.DOCUMENT, Action.DELETE)),
 
   // Channels
   ACCESS_CHANNELS(
       null, pair(ResourceType.CHANNEL, Action.READ), pair(ResourceType.CHANNEL, Action.SEARCH)),
-  MANAGE_CHANNELS(ACCESS_CHANNELS, pair(ResourceType.CHANNEL, Action.WRITE)),
+  MANAGE_CHANNELS(
+      ACCESS_CHANNELS,
+      pair(ResourceType.CHANNEL, Action.WRITE),
+      pair(ResourceType.CHANNEL, Action.CREATE)),
   DELETE_CHANNELS(MANAGE_CHANNELS, pair(ResourceType.CHANNEL, Action.DELETE)),
 
   // Challenges
   ACCESS_CHALLENGES(
       null, pair(ResourceType.CHALLENGE, Action.READ), pair(ResourceType.CHALLENGE, Action.SEARCH)),
-  MANAGE_CHALLENGES(ACCESS_CHALLENGES, pair(ResourceType.CHALLENGE, Action.WRITE)),
+  MANAGE_CHALLENGES(
+      ACCESS_CHALLENGES,
+      pair(ResourceType.CHALLENGE, Action.WRITE),
+      pair(ResourceType.CHALLENGE, Action.CREATE)),
   DELETE_CHALLENGES(MANAGE_CHALLENGES, pair(ResourceType.CHALLENGE, Action.DELETE)),
 
   // Lessons Learned
@@ -110,7 +131,10 @@ public enum Capability {
       null,
       pair(ResourceType.LESSON_LEARNED, Action.READ),
       pair(ResourceType.LESSON_LEARNED, Action.SEARCH)),
-  MANAGE_LESSONS_LEARNED(ACCESS_LESSONS_LEARNED, pair(ResourceType.LESSON_LEARNED, Action.WRITE)),
+  MANAGE_LESSONS_LEARNED(
+      ACCESS_LESSONS_LEARNED,
+      pair(ResourceType.LESSON_LEARNED, Action.WRITE),
+      pair(ResourceType.LESSON_LEARNED, Action.CREATE)),
   DELETE_LESSONS_LEARNED(MANAGE_LESSONS_LEARNED, pair(ResourceType.LESSON_LEARNED, Action.DELETE)),
 
   // Security Platforms
@@ -119,7 +143,9 @@ public enum Capability {
       pair(ResourceType.SECURITY_PLATFORM, Action.READ),
       pair(ResourceType.SECURITY_PLATFORM, Action.SEARCH)),
   MANAGE_SECURITY_PLATFORMS(
-      ACCESS_SECURITY_PLATFORMS, pair(ResourceType.SECURITY_PLATFORM, Action.WRITE)),
+      ACCESS_SECURITY_PLATFORMS,
+      pair(ResourceType.SECURITY_PLATFORM, Action.WRITE),
+      pair(ResourceType.SECURITY_PLATFORM, Action.CREATE)),
   DELETE_SECURITY_PLATFORMS(
       MANAGE_SECURITY_PLATFORMS, pair(ResourceType.SECURITY_PLATFORM, Action.DELETE)),
   // Platform Settings
