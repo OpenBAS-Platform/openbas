@@ -379,6 +379,13 @@ const Parameters = () => {
             <ListItemText primary={t('RabbitMQ')} />
             <ItemBoolean status={null} variant="large" neutralLabel={settings?.rabbitmq_version} />
           </ListItem>
+          {settings.analytics_engine_type !== undefined
+            && (
+              <ListItem divider={true}>
+                <ListItemText primary={t(settings.analytics_engine_type)} />
+                <ItemBoolean status={null} variant="large" neutralLabel={settings?.analytics_engine_version} />
+              </ListItem>
+            )}
           <ListItem divider={true}>
             <ListItemText primary={t('Telemetry manager')} />
             <ItemBoolean status={settings?.telemetry_manager_enable} variant="large" label={settings?.telemetry_manager_enable ? t('Enable') : t('Disabled')} />

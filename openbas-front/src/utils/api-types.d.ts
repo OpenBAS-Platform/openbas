@@ -4500,6 +4500,10 @@ export interface PlatformSettings {
   auth_saml2_enable?: boolean;
   /** List of Saml2 providers */
   platform_saml2_providers?: OAuthProvider[];
+  /** Type of analytics engine */
+  analytics_engine_type?: string;
+  /** Current version of analytics engine */
+  analytics_engine_version?: string;
   /** True if local authentication is enabled */
   auth_local_enable?: boolean;
   /** True if OpenID is enabled */
