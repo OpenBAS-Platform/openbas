@@ -35,7 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +54,6 @@ public class AssetGroupApi extends RestBehavior {
 
   @PostMapping(ASSET_GROUP_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public AssetGroup createAssetGroup(@Valid @RequestBody final AssetGroupInput input) {
     AssetGroup assetGroup = new AssetGroup();
@@ -66,7 +64,7 @@ public class AssetGroupApi extends RestBehavior {
 
   @GetMapping(ASSET_GROUP_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isObserver()")
+  
   public List<AssetGroup> assetGroups() {
     return this.assetGroupService.assetGroups();
   }
@@ -74,7 +72,7 @@ public class AssetGroupApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isObserver()")
+  
   public Page<AssetGroupOutput> assetGroups(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);
@@ -111,7 +109,7 @@ public class AssetGroupApi extends RestBehavior {
 
   @PostMapping(ASSET_GROUP_URI + "/find")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isObserver()")
+  
   @Transactional(readOnly = true)
   public List<AssetGroupOutput> findAssetGroups(
       @RequestBody @Valid @NotNull final List<String> assetGroupIds) {
@@ -123,7 +121,7 @@ public class AssetGroupApi extends RestBehavior {
       resourceId = "#assetGroupId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isObserver()")
+  
   public AssetGroup assetGroup(@PathVariable @NotBlank final String assetGroupId) {
     return this.assetGroupService.assetGroup(assetGroupId);
   }
@@ -133,7 +131,6 @@ public class AssetGroupApi extends RestBehavior {
       resourceId = "#assetGroupId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public AssetGroup updateAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
@@ -149,7 +146,6 @@ public class AssetGroupApi extends RestBehavior {
       resourceId = "#assetGroupId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public AssetGroup updateAssetsOnAssetGroup(
       @PathVariable @NotBlank final String assetGroupId,
@@ -163,7 +159,6 @@ public class AssetGroupApi extends RestBehavior {
       resourceId = "#assetGroupId",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.ASSET_GROUP)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
     try {

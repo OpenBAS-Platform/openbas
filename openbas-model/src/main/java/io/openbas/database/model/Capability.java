@@ -117,22 +117,16 @@ public enum Capability {
   ACCESS_SECURITY_PLATFORMS(
       null,
       pair(ResourceType.SECURITY_PLATFORM, Action.READ),
-      pair(ResourceType.GROUP_ROLE, Action.READ),
-      pair(ResourceType.USER_GROUP, Action.READ),
-      pair(ResourceType.SECURITY_PLATFORM, Action.SEARCH),
-      pair(ResourceType.GROUP_ROLE, Action.SEARCH),
-      pair(ResourceType.USER_GROUP, Action.SEARCH)),
+      pair(ResourceType.SECURITY_PLATFORM, Action.SEARCH)
+     ),
   MANAGE_SECURITY_PLATFORMS(
       ACCESS_SECURITY_PLATFORMS,
       pair(ResourceType.SECURITY_PLATFORM, Action.WRITE),
-      pair(ResourceType.GROUP_ROLE, Action.WRITE),
-      pair(ResourceType.USER_GROUP, Action.WRITE)),
+),
   DELETE_SECURITY_PLATFORMS(
       MANAGE_SECURITY_PLATFORMS,
-      pair(ResourceType.SECURITY_PLATFORM, Action.DELETE),
-      pair(ResourceType.GROUP_ROLE, Action.DELETE),
-      pair(ResourceType.USER_GROUP, Action.DELETE)),
-
+      pair(ResourceType.SECURITY_PLATFORM, Action.DELETE)
+    ),
   // Platform Settings
   //
   ACCESS_PLATFORM_SETTINGS(
@@ -143,13 +137,19 @@ public enum Capability {
       pair(ResourceType.INJECTOR, Action.READ),
       pair(ResourceType.INJECTOR_CONTRACT, Action.READ),
       pair(ResourceType.MAPPER, Action.READ),
+      pair(ResourceType.GROUP_ROLE, Action.READ),
+      pair(ResourceType.USER_GROUP, Action.READ),
+      pair(ResourceType.USER, Action.READ),
       pair(ResourceType.PLATFORM_SETTING, Action.SEARCH),
       pair(ResourceType.TAG_RULE, Action.SEARCH),
       pair(ResourceType.COLLECTOR, Action.SEARCH),
       pair(ResourceType.INJECTOR, Action.SEARCH),
       pair(ResourceType.INJECTOR_CONTRACT, Action.SEARCH),
       pair(ResourceType.MAPPER, Action.SEARCH),
-      pair(ResourceType.ORGANIZATION, Action.SEARCH)),
+      pair(ResourceType.ORGANIZATION, Action.SEARCH),
+      pair(ResourceType.GROUP_ROLE, Action.SEARCH),
+      pair(ResourceType.USER_GROUP, Action.SEARCH),
+      pair(ResourceType.USER, Action.SEARCH)),
   MANAGE_PLATFORM_SETTINGS(
       ACCESS_PLATFORM_SETTINGS,
       pair(ResourceType.PLATFORM_SETTING, Action.WRITE),
@@ -162,6 +162,9 @@ public enum Capability {
       pair(ResourceType.INJECTOR, Action.WRITE),
       pair(ResourceType.INJECTOR_CONTRACT, Action.WRITE),
       pair(ResourceType.ORGANIZATION, Action.WRITE),
+      pair(ResourceType.GROUP_ROLE, Action.WRITE),
+      pair(ResourceType.USER_GROUP, Action.WRITE),
+      pair(ResourceType.USER, Action.WRITE),
       pair(ResourceType.PLATFORM_SETTING, Action.DELETE),
       pair(ResourceType.ATTACK_PATTERN, Action.DELETE),
       pair(ResourceType.KILL_CHAIN_PHASE, Action.DELETE),
@@ -172,7 +175,10 @@ public enum Capability {
       pair(ResourceType.INJECTOR, Action.DELETE),
       pair(ResourceType.INJECTOR_CONTRACT, Action.DELETE),
       pair(ResourceType.ORGANIZATION, Action.DELETE),
-      pair(ResourceType.MAPPER, Action.DELETE));
+      pair(ResourceType.MAPPER, Action.DELETE),
+      pair(ResourceType.GROUP_ROLE, Action.DELETE),
+      pair(ResourceType.USER_GROUP, Action.DELETE),
+      pair(ResourceType.USER, Action.DELETE));
 
   private record ResourceTypeActionPair(ResourceType resource, Action action) {}
 

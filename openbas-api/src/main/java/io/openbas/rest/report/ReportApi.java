@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -33,7 +32,6 @@ public class ReportApi extends RestBehavior {
       resourceId = "#reportId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isObserver()")
   public Report report(@PathVariable String reportId) {
     return this.reportService.report(UUID.fromString(reportId));
   }

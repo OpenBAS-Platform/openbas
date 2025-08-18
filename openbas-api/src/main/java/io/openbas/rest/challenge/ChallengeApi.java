@@ -22,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,7 +51,6 @@ public class ChallengeApi extends RestBehavior {
     return this.challengeRepository.findAll(fromIds(challengeIds));
   }
 
-  @PreAuthorize("isPlanner()")
   @PutMapping("/api/challenges/{challengeId}")
   @RBAC(
       resourceId = "#challengeId",
@@ -86,7 +84,6 @@ public class ChallengeApi extends RestBehavior {
     return challengeService.enrichChallengeWithExercisesOrScenarios(saveChallenge);
   }
 
-  @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)

@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,7 +65,6 @@ public class PayloadApi extends RestBehavior {
 
   @PostMapping(PAYLOAD_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
     return this.payloadCreationService.createPayload(input);
@@ -77,7 +75,6 @@ public class PayloadApi extends RestBehavior {
       resourceId = "#payloadId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.PAYLOAD)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(
       @NotBlank @PathVariable final String payloadId,
@@ -90,7 +87,6 @@ public class PayloadApi extends RestBehavior {
       resourceId = "#payloadId",
       actionPerformed = Action.DUPLICATE,
       resourceType = ResourceType.PAYLOAD)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload duplicatePayload(@NotBlank @PathVariable final String payloadId) {
     return this.payloadService.duplicate(payloadId);
@@ -98,7 +94,6 @@ public class PayloadApi extends RestBehavior {
 
   @PostMapping(PAYLOAD_URI + "/upsert")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
-  @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
     return this.payloadUpsertService.upsertPayload(input);
@@ -119,7 +114,6 @@ public class PayloadApi extends RestBehavior {
 
   @PostMapping(PAYLOAD_URI + "/import")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
-  @PreAuthorize("isPlanner()")
   public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
   }

@@ -211,14 +211,11 @@ const Players = () => {
               </ListItem>
             ))}
       </List>
-      {me.user_is_planner
-        && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
-            <CreatePlayer
-              onCreate={result => setPlayers([result, ...players])}
-            />
-          </Can>
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+        <CreatePlayer
+          onCreate={result => setPlayers([result, ...players])}
+        />
+      </Can>
     </>
   );
 };
