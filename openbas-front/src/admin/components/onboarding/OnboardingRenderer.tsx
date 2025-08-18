@@ -6,7 +6,7 @@ import { getOnboardingConfig } from '../../../actions/onboarding/onboarding-acti
 import { useFormatter } from '../../../components/i18n';
 import { type OnboardingCategoryDTO, type OnboardingItemDTO } from '../../../utils/api-types';
 import useAuth from '../../../utils/hooks/useAuth';
-import { shouldDisplayButton } from './onboarding-utils';
+import { OnboardingConfigUriMap, shouldDisplayButton } from './onboarding-utils';
 import OnboardingContextualButton from './OnboardingContextualButton';
 import OnboardingWelcomeDialog, { ONBOARDING_WELCOME_DIALOG_KEY } from './OnboardingWelcomeDialog';
 
@@ -23,7 +23,7 @@ const OnboardingRenderer = () => {
   useEffect(() => {
     setMatchedItem(undefined);
     onboardingConfig?.forEach((item) => {
-      const i = item.items.find(i => i.uri === pathname);
+      const i = item.items.find(i => OnboardingConfigUriMap[i.labelKey] === pathname);
       if (i) setMatchedItem(i);
     });
   }, [pathname]);

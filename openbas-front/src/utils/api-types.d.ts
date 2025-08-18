@@ -3714,7 +3714,6 @@ export interface OnboardingCategoryDTO {
 
 export interface OnboardingItemDTO {
   labelKey: string;
-  uri: string;
   videoLink: string;
 }
 

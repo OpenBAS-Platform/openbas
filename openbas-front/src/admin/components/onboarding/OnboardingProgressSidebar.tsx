@@ -17,7 +17,7 @@ import { type OnboardingCategoryDTO, type OnboardingItemDTO, type UserOnboarding
 import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
-import { OnboardingConfigIconMap } from './onboarding-utils';
+import { OnboardingConfigIconMap, OnboardingConfigUriMap } from './onboarding-utils';
 import { ONBOARDING_WELCOME_DIALOG_KEY } from './OnboardingWelcomeDialog';
 
 const THEME_DARK_ONBOARDING_HEADER = '#0C3545';
@@ -174,7 +174,7 @@ const OnboardingProgressSidebar: React.FC<Props> = ({ onCloseSidebar }) => {
                       <ListItem key={item.labelKey} disablePadding>
                         <ListItemButton
                           onClick={() => {
-                            navigate(item.uri);
+                            navigate(OnboardingConfigUriMap[item.labelKey]);
                             onCloseSidebar();
                           }}
                           sx={{

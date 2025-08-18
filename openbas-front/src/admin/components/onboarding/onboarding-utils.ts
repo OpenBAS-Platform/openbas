@@ -1,5 +1,6 @@
 import { DnsOutlined, PeopleOutlined, RocketLaunch } from '@mui/icons-material';
 
+import { COLLECTOR_BASE_URL, ENDPOINT_BASE_URL, PLAYER_BASE_URL, SCENARIO_BASE_URL, TEAM_BASE_URL } from '../../../constants/BaseUrls';
 import { type PlatformSettings, type User } from '../../../utils/api-types';
 
 /*
@@ -25,4 +26,12 @@ export const OnboardingConfigIconMap: Record<string, React.ElementType> = {
   dns: DnsOutlined,
   people: PeopleOutlined,
   rocket: RocketLaunch,
+};
+
+export const OnboardingConfigUriMap: Record<string, string> = {
+  onboarding_launch_scenario_get_started: SCENARIO_BASE_URL,
+  onboarding_endpoint_setup: ENDPOINT_BASE_URL,
+  onboarding_player_setup: PLAYER_BASE_URL,
+  onboarding_team_setup: TEAM_BASE_URL,
+  onboarding_collector_setup: COLLECTOR_BASE_URL,
 };

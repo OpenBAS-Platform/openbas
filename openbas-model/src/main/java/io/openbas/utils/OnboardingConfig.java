@@ -13,8 +13,7 @@ public class OnboardingConfig {
   public record OnboardingCategoryDTO(
       @NotBlank String category, @NotBlank String icon, @NotNull List<OnboardingItemDTO> items) {}
 
-  public record OnboardingItemDTO(
-      @NotBlank String uri, @NotBlank String labelKey, @NotBlank String videoLink) {}
+  public record OnboardingItemDTO(@NotBlank String labelKey, @NotBlank String videoLink) {}
 
   public static final String TECHNICAL_SETUP_ICON = "dns";
   public static final String TABLE_TOP_SETUP_ICON = "people";
@@ -22,30 +21,23 @@ public class OnboardingConfig {
 
   public static final String VIDEO_URI = "https://app.storylane.io/demo/bxqijbtlfklz";
 
-  public static final String SCENARIO_BASE_URL = "/admin/scenarios";
-  public static final String ENDPOINT_BASE_URL = "/admin/assets/endpoints";
-  public static final String PLAYER_BASE_URL = "/admin/teams/players";
-  public static final String TEAM_BASE_URL = "/admin/teams/teams";
-  public static final String COLLECTOR_BASE_URL = "/admin/integrations/collectors";
-
   public static List<OnboardingCategoryDTO> getOnboardingConfig() {
     return List.of(
         new OnboardingCategoryDTO(
             TECHNICAL_SETUP,
             TECHNICAL_SETUP_ICON,
             List.of(
-                new OnboardingItemDTO(ENDPOINT_BASE_URL, ENDPOINT_SETUP, VIDEO_URI),
-                new OnboardingItemDTO(COLLECTOR_BASE_URL, COLLECTOR_SETUP, VIDEO_URI))),
+                new OnboardingItemDTO(ENDPOINT_SETUP, VIDEO_URI),
+                new OnboardingItemDTO(COLLECTOR_SETUP, VIDEO_URI))),
         new OnboardingCategoryDTO(
             TABLE_TOP_SETUP,
             TABLE_TOP_SETUP_ICON,
             List.of(
-                new OnboardingItemDTO(PLAYER_BASE_URL, PLAYER_SETUP, VIDEO_URI),
-                new OnboardingItemDTO(TEAM_BASE_URL, TEAM_SETUP, VIDEO_URI))),
+                new OnboardingItemDTO(PLAYER_SETUP, VIDEO_URI),
+                new OnboardingItemDTO(TEAM_SETUP, VIDEO_URI))),
         new OnboardingCategoryDTO(
             GET_STARTED,
             GET_STARTED_ICON,
-            List.of(
-                new OnboardingItemDTO(SCENARIO_BASE_URL, LAUNCH_SCENARIO_GET_STARTED, VIDEO_URI))));
+            List.of(new OnboardingItemDTO(LAUNCH_SCENARIO_GET_STARTED, VIDEO_URI))));
   }
 }
