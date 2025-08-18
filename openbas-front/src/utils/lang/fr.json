@@ -755,6 +755,7 @@
   "inject_asset_groups": "Groupes d'actifs",
   "inject_assets": "Actifs",
   "inject_attack_patterns": "Modèle d'attaque",
+  "inject_execution_date": "Date d'exécution",
   "inject_expectation_description": "Description",
   "inject_expectation_expected_score": "Score attendu",
   "inject_expectation_expiration_time": "Temps d'expiration",

@@ -1762,6 +1762,8 @@ export interface EsInject {
   base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  /** @format date-time */
+  inject_execution_date?: string;
   inject_status?: string;
   inject_title?: string;
 }
