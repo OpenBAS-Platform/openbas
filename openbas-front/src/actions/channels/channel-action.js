@@ -33,10 +33,10 @@ export const fetchObserverChannel = (exerciseId, channelId) => (dispatch) => {
   return getReferential(channelReader, uri)(dispatch);
 };
 
-// -- EXERCISES --
+// -- SIMULATIONS --
 
-export const fetchExerciseChannels = exerciseId => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/channels`;
+export const fetchSimulationChannels = simulationId => (dispatch) => {
+  const uri = `/api/exercises/${simulationId}/channels`;
   return getReferential(arrayOfChannels, uri)(dispatch);
 };
 

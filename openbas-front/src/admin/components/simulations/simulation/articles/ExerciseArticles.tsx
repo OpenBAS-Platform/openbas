@@ -2,7 +2,7 @@ import { useParams } from 'react-router';
 
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import { fetchExerciseChannels } from '../../../../../actions/channels/channel-action';
+import { fetchSimulationChannels } from '../../../../../actions/channels/channel-action';
 import { fetchExerciseDocuments } from '../../../../../actions/documents/documents-actions';
 import { useHelper } from '../../../../../store';
 import { type Exercise } from '../../../../../utils/api-types';
@@ -21,7 +21,7 @@ const ExerciseArticles = () => {
   useDataLoader(() => {
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseDocuments(exerciseId));
-    dispatch(fetchExerciseChannels(exerciseId));
+    dispatch(fetchSimulationChannels(exerciseId));
   });
   const context = articleContextForExercise(exerciseId);
   return (

@@ -87,7 +87,7 @@ export const searchAssetGroupByIdAsOption = (ids: string[]) => {
 // -- SIMULATIONS --
 
 export const fetchSimulationAssetGroups = (simulationId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/asset_groups`;
+  const uri = `/api/exercises/${simulationId}/asset_groups`;
   return getReferential(arrayOfAssetGroups, uri)(dispatch);
 };
 
