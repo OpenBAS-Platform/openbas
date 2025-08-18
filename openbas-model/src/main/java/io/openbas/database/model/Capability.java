@@ -190,6 +190,7 @@ public enum Capability {
       pair(ResourceType.GROUP_ROLE, Action.WRITE),
       pair(ResourceType.USER_GROUP, Action.WRITE),
       pair(ResourceType.USER, Action.WRITE),
+      pair(ResourceType.USER, Action.CREATE),
       pair(ResourceType.PLATFORM_SETTING, Action.DELETE),
       pair(ResourceType.ATTACK_PATTERN, Action.DELETE),
       pair(ResourceType.KILL_CHAIN_PHASE, Action.DELETE),

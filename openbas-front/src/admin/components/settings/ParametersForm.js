@@ -5,6 +5,8 @@ import { Form } from 'react-final-form';
 import OldSelectField from '../../../components/fields/OldSelectField';
 import OldTextField from '../../../components/fields/OldTextField';
 import inject18n from '../../../components/i18n';
+import { Can } from '../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types.js';
 
 const ParametersForm = (props) => {
   const { t, onSubmit, initialValues } = props;
@@ -57,14 +59,16 @@ const ParametersForm = (props) => {
             </MenuItem>
           </OldSelectField>
           <div style={{ marginTop: 20 }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              type="submit"
-              disabled={pristine || submitting}
-            >
-              {t('Update')}
-            </Button>
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+              <Button
+                variant="contained"
+                color="secondary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </Can>
           </div>
         </form>
       )}
