@@ -3,7 +3,7 @@ import { Alert, Button, CircularProgress, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Link } from 'react-router';
 
-import FiligranDialog from '../dialog/FiligranDialog';
+import Dialog from '../dialog/Dialog';
 
 interface Props {
   open: boolean;
@@ -26,7 +26,7 @@ const LoaderDialog = ({
 }: Props) => {
   const theme = useTheme();
   return (
-    <FiligranDialog
+    <Dialog
       open={open}
       handleClose={() => onClose()}
       title=""
@@ -77,7 +77,7 @@ const LoaderDialog = ({
         )}
       </div>
 
-    </FiligranDialog>
+    </Dialog>
   );
 };
 

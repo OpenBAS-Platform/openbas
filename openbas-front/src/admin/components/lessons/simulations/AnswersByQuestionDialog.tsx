@@ -1,7 +1,7 @@
 import { Button, LinearProgress, Typography, useTheme } from '@mui/material';
 import { type FunctionComponent } from 'react';
 
-import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import { type LessonsAnswer, type User } from '../../../../utils/api-types';
 import { resolveUserName } from '../../../../utils/String';
@@ -20,7 +20,7 @@ const AnswersByQuestionDialog: FunctionComponent<Props> = ({ open, onClose, ques
   const theme = useTheme();
 
   return (
-    <FiligranDialog
+    <Dialog
       open={open}
       handleClose={onClose}
       title={question}
@@ -85,7 +85,7 @@ const AnswersByQuestionDialog: FunctionComponent<Props> = ({ open, onClose, ques
         </Button>
       </div>
 
-    </FiligranDialog>
+    </Dialog>
   );
 };
 

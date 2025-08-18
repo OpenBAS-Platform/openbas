@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
 import { addDocument, fetchDocument } from '../../../../actions/Document';
-import FiligranDialog from '../../../../components/common/dialog/FiligranDialog.tsx';
+import Dialog from '../../../../components/common/dialog/Dialog.tsx';
 import Drawer from '../../../../components/common/Drawer';
 import inject18n from '../../../../components/i18n';
 import { DocumentContext } from '../../common/Context';
@@ -86,7 +86,7 @@ const CreateDocument = (props) => {
         </Fab>
       )}
       {inline ? (
-        <FiligranDialog
+        <Dialog
           open={open}
           handleClose={() => setOpen(false)}
           title={t('Create a new document')}
@@ -97,7 +97,7 @@ const CreateDocument = (props) => {
             handleClose={() => setOpen(false)}
             filters={filters}
           />
-        </FiligranDialog>
+        </Dialog>
       ) : (
         <Drawer
           open={open}

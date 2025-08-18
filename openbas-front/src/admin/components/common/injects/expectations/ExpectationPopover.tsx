@@ -3,7 +3,7 @@ import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogConten
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { type LoggedHelper } from '../../../../../actions/helper';
-import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../../components/common/dialog/Dialog';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
@@ -136,7 +136,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
           </Button>
         </DialogActions>
       </DialogMUI>
-      <FiligranDialog
+      <Dialog
         open={openEdit}
         handleClose={handleCloseEdit}
         title={t('Update the expectation')}
@@ -146,7 +146,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
           onSubmit={onSubmitEdit}
           handleClose={handleCloseEdit}
         />
-      </FiligranDialog>
+      </Dialog>
     </div>
   );
 };

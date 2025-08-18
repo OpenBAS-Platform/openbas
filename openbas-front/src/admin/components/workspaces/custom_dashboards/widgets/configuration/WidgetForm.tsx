@@ -4,7 +4,7 @@ import { type FunctionComponent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import FiligranDialog from '../../../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../../../components/common/dialog/Dialog';
 import StepperComponent from '../../../../../../components/common/StepperComponent';
 import { useFormatter } from '../../../../../../components/i18n';
 import { type Widget } from '../../../../../../utils/api-types-custom';
@@ -235,7 +235,7 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   return (
     <form id="widgetCreationForm">
-      <FiligranDialog
+      <Dialog
         className="noDrag"
         open={open}
         handleClose={onClose}
@@ -275,7 +275,7 @@ const WidgetForm: FunctionComponent<Props> = ({
             />
           )}
         </>
-      </FiligranDialog>
+      </Dialog>
     </form>
   );
 };

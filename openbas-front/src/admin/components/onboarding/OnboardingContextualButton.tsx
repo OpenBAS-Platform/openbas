@@ -3,8 +3,8 @@ import { Button, type SxProps, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useState } from 'react';
 
-import FiligranDialog from '../../../components/common/dialog/FiligranDialog';
-import useFiligranDialog from '../../../components/common/dialog/useFiligranDialog';
+import Dialog from '../../../components/common/dialog/Dialog';
+import useDialog from '../../../components/common/dialog/useDialog';
 import OnboardingVideoPlayer from './OnboardingVideoPlayer';
 
 const estimateLabelWidth = (label: string) => {
@@ -39,7 +39,7 @@ interface VideoPlayerButtonProps {
 const OnboardingContextualButton = ({ label, videoLink }: VideoPlayerButtonProps) => {
   const theme = useTheme();
 
-  const { handleOpen, dialogProps } = useFiligranDialog<void>();
+  const { handleOpen, dialogProps } = useDialog<void>();
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(false);
   const estimatedWidth = useMemo(() => estimateLabelWidth(label), [label]);
@@ -69,9 +69,9 @@ const OnboardingContextualButton = ({ label, videoLink }: VideoPlayerButtonProps
         <span style={labelStyle(reduced, theme)}>{label}</span>
         <HelpOutline />
       </Button>
-      <FiligranDialog {...dialogProps} title={label} showCloseIcon>
+      <Dialog {...dialogProps} title={label} showCloseIcon>
         <OnboardingVideoPlayer videoLink={videoLink} />
-      </FiligranDialog>
+      </Dialog>
     </>
   );
 };

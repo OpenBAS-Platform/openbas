@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { addPlayer } from '../../../../actions/User';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
-import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type PlayerInput } from '../../../../utils/api-types';
@@ -78,7 +78,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
               classes={{ primary: classes.text }}
             />
           </ListItemButton>
-          <FiligranDialog
+          <Dialog
             open={openDialog}
             handleClose={handleClose}
             title={t('Create a new player')}
@@ -88,7 +88,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
               handleClose={handleClose}
               onSubmit={onSubmit}
             />
-          </FiligranDialog>
+          </Dialog>
         </>
       ) : (
         <>

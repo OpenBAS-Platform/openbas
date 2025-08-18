@@ -1,5 +1,5 @@
 import { Close } from '@mui/icons-material';
-import { Box, type Breakpoint, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, type Breakpoint, Dialog as MuiDialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { type FunctionComponent, type ReactElement, type ReactNode } from 'react';
 
 import Transition from '../Transition';
@@ -15,7 +15,7 @@ interface DialogProps {
   showCloseIcon?: boolean;
 }
 
-const FiligranDialog: FunctionComponent<DialogProps> = ({
+const Dialog: FunctionComponent<DialogProps> = ({
   open = false,
   handleClose,
   children,
@@ -28,7 +28,7 @@ const FiligranDialog: FunctionComponent<DialogProps> = ({
   const renderContent = typeof children === 'function' ? children() : children;
 
   return (
-    <Dialog
+    <MuiDialog
       className={className}
       open={open}
       onClose={handleClose}
@@ -51,8 +51,8 @@ const FiligranDialog: FunctionComponent<DialogProps> = ({
       )}
       <DialogContent>{renderContent}</DialogContent>
       {actions && <DialogActions>{actions}</DialogActions>}
-    </Dialog>
+    </MuiDialog>
   );
 };
 
-export default FiligranDialog;
+export default Dialog;

@@ -3,7 +3,7 @@ import { Menu, MenuItem, ToggleButton, Tooltip } from '@mui/material';
 import { type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import FiligranDialog from '../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import { type ImportMessage, type ImportPostSummary, type ImportTestSummary, type InjectsImportInput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
@@ -116,7 +116,7 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
         <MenuItem onClick={handleXlsImportOpen}>{t('inject_import_xls_action')}</MenuItem>
       </Menu>
       <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleJsonImportClose} handleSubmit={onFileSelectSubmit} />
-      <FiligranDialog
+      <Dialog
         open={openXlsImportDialog}
         handleClose={handleXlsImportClose}
         title={t('Import injects')}
@@ -143,7 +143,7 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
               />
             )}
         </>
-      </FiligranDialog>
+      </Dialog>
     </>
   );
 };

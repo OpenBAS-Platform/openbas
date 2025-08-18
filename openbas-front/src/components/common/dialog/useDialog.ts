@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-const useFiligranDialog = <T = void>() => {
+const useDialog = <T = void>() => {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<T | undefined>(undefined);
 
@@ -26,4 +26,4 @@ const useFiligranDialog = <T = void>() => {
   };
 };
 
-export default useFiligranDialog;
+export default useDialog;

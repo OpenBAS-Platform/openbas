@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { addReportForExercise, deleteReportForExercise, fetchReportsForExercise, updateReportForExercise } from '../../../../../actions/reports/report-actions';
 import { type ReportsHelper } from '../../../../../actions/reports/report-helper';
-import FiligranDialog from '../../../../../components/common/dialog/FiligranDialog';
+import Dialog from '../../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type Report, type ReportInput } from '../../../../../utils/api-types';
@@ -73,7 +73,7 @@ const ExerciseReports: FunctionComponent<ReportListProps> = ({ exerciseId, exerc
           >
             <Add />
           </Fab>
-          <FiligranDialog
+          <Dialog
             title={t('Create a new report')}
             open={openCreate}
             handleClose={handleCloseCreate}
@@ -83,7 +83,7 @@ const ExerciseReports: FunctionComponent<ReportListProps> = ({ exerciseId, exerc
               handleCancel={handleCloseCreate}
               initialValues={{ report_name: exerciseName } as Report}
             />
-          </FiligranDialog>
+          </Dialog>
         </>
       )}
     </ReportContext.Provider>
