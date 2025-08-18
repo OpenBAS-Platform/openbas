@@ -57,11 +57,8 @@ public class EndpointFixture {
     return endpoint;
   }
 
-  public static Endpoint createEndpointWithCreationAndUpdate(
-      Instant creationDate, Instant updateDate, String name, Endpoint.PLATFORM_TYPE platform) {
+  public static Endpoint createEndpointWithPlatform(String name, Endpoint.PLATFORM_TYPE platform) {
     Endpoint endpoint = new Endpoint();
-    endpoint.setCreatedAt(creationDate);
-    endpoint.setUpdatedAt(updateDate);
     endpoint.setName(name);
     endpoint.setDescription("Endpoint description");
     endpoint.setHostname("Windows Hostname");

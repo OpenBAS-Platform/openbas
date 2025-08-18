@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.EndpointRepository;
 import io.openbas.engine.EngineContext;
 import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
@@ -39,7 +40,6 @@ class DashboardApiTest extends IntegrationTest {
   @Autowired private EngineService engineService;
   @Autowired private EngineContext engineContext;
   @Autowired private EndpointComposer endpointComposer;
-  @Autowired private InjectExpectationComposer injectExpectationComposer;
   @Autowired private WidgetComposer widgetComposer;
   @Autowired private CustomDashboardComposer customDashboardComposer;
   @Autowired private MockMvc mvc;
@@ -48,6 +48,7 @@ class DashboardApiTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private FindingComposer findingComposer;
   @Autowired private CustomDashboardParameterComposer customDashboardParameterComposer;
+  @Autowired private EndpointRepository endpointRepository;
 
   @BeforeEach
   void setup() throws IOException {
@@ -55,7 +56,6 @@ class DashboardApiTest extends IntegrationTest {
     widgetComposer.reset();
     exerciseComposer.reset();
     injectComposer.reset();
-    injectExpectationComposer.reset();
 
     // force reset elastic
     for (EsModel<?> model : engineContext.getModels()) {
@@ -417,30 +417,39 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Count entities with date range filter.")
     void countEntitiesWithDateRangeFilter() throws Exception {
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  "Endpoint 1",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  "Endpoint 2",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(60, ChronoUnit.DAYS),
-                  Instant.now().minus(60, ChronoUnit.DAYS),
-                  "Endpoint 3",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist();
+      Endpoint endpoint1 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint2 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint3 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 3", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+
+      endpointRepository.setCreationDate(
+          Instant.now().minus(180, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setUpdateDate(
+          Instant.now().minus(180, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(180, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setUpdateDate(
+          Instant.now().minus(180, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(60, ChronoUnit.DAYS), endpoint3.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(60, ChronoUnit.DAYS), endpoint3.getId());
 
       Widget widget =
           widgetComposer
@@ -494,42 +503,48 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for temporal widgets.")
     void fetchSeriesForTemporalWidgets() throws Exception {
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 1",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(180, ChronoUnit.DAYS),
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  "Endpoint 2",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 3",
-                  Endpoint.PLATFORM_TYPE.Linux))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 4",
-                  Endpoint.PLATFORM_TYPE.MacOS))
-          .persist()
-          .get();
+      Endpoint endpoint1 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint2 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint3 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
+              .persist()
+              .get();
+      Endpoint endpoint4 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
+              .persist()
+              .get();
+
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(183, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setUpdateDate(
+          Instant.now().minus(183, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint3.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint3.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint4.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint4.getId());
 
       Widget widget =
           widgetComposer
@@ -581,42 +596,48 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for structural widgets.")
     void fetchSeriesForStructuralWidgets() throws Exception {
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 1",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(180, ChronoUnit.DAYS),
-                  Instant.now().minus(183, ChronoUnit.DAYS),
-                  "Endpoint 2",
-                  Endpoint.PLATFORM_TYPE.Windows))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 3",
-                  Endpoint.PLATFORM_TYPE.Linux))
-          .persist()
-          .get();
-      endpointComposer
-          .forEndpoint(
-              EndpointFixture.createEndpointWithCreationAndUpdate(
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  Instant.now().minus(83, ChronoUnit.DAYS),
-                  "Endpoint 4",
-                  Endpoint.PLATFORM_TYPE.MacOS))
-          .persist()
-          .get();
+      Endpoint endpoint1 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 1", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint2 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 2", Endpoint.PLATFORM_TYPE.Windows))
+              .persist()
+              .get();
+      Endpoint endpoint3 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 3", Endpoint.PLATFORM_TYPE.Linux))
+              .persist()
+              .get();
+      Endpoint endpoint4 =
+          endpointComposer
+              .forEndpoint(
+                  EndpointFixture.createEndpointWithPlatform(
+                      "Endpoint 4", Endpoint.PLATFORM_TYPE.MacOS))
+              .persist()
+              .get();
+
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint1.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(183, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setUpdateDate(
+          Instant.now().minus(183, ChronoUnit.DAYS), endpoint2.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint3.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint3.getId());
+      endpointRepository.setCreationDate(
+          Instant.now().minus(83, ChronoUnit.DAYS), endpoint4.getId());
+      endpointRepository.setUpdateDate(Instant.now().minus(83, ChronoUnit.DAYS), endpoint4.getId());
 
       Widget widget =
           widgetComposer
@@ -663,6 +684,7 @@ class DashboardApiTest extends IntegrationTest {
               .getContentAsString();
 
       assertThatJson(response).node("[0].data").isArray().size().isEqualTo(3);
+      assertThatJson(response).node("[0].data[0].value").isEqualTo(1);
     }
   }
 }
