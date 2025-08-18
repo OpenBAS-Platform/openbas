@@ -33,7 +33,11 @@ public enum Capability {
       null,
       pair(ResourceType.ATOMIC_TESTING, Action.READ),
       pair(ResourceType.ATOMIC_TESTING, Action.SEARCH)),
-  MANAGE_ATOMIC_TESTING(ACCESS_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.WRITE)),
+  MANAGE_ATOMIC_TESTING(
+      ACCESS_ATOMIC_TESTING,
+      pair(ResourceType.ATOMIC_TESTING, Action.WRITE),
+      pair(ResourceType.ATOMIC_TESTING, Action.DUPLICATE),
+      pair(ResourceType.ATOMIC_TESTING, Action.CREATE)),
   DELETE_ATOMIC_TESTING(MANAGE_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.DELETE)),
   LAUNCH_ATOMIC_TESTING(MANAGE_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH)),
 
