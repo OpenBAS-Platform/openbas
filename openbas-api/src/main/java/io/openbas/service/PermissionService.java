@@ -22,7 +22,8 @@ public class PermissionService {
           ResourceType.CVE,
           ResourceType.TAG,
           ResourceType.ATTACK_PATTERN,
-          ResourceType.KILL_CHAIN_PHASE);
+          ResourceType.KILL_CHAIN_PHASE,
+          ResourceType.ORGANIZATION); // TODO review open apis see issue/3789
 
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(
