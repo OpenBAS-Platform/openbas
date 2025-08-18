@@ -1,5 +1,6 @@
 package io.openbas.api.custom_dashboard;
 
+import io.openbas.database.model.CustomDashboard;
 import io.openbas.jsonapi.GenericJsonApiExporter;
 import io.openbas.jsonapi.GenericJsonApiImporter;
 import io.openbas.jsonapi.JsonApiDocument;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("isAdmin()")
 public class CustomDashboardApiImporter extends RestBehavior {
 
-  private final GenericJsonApiImporter importer;
+  private final GenericJsonApiImporter<CustomDashboard> importer;
   private final GenericJsonApiExporter exporter;
 
   @PostMapping(value = "/import")
@@ -27,7 +28,7 @@ public class CustomDashboardApiImporter extends RestBehavior {
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
       @RequestBody @NotNull JsonApiDocument<ResourceObject> doc,
       @RequestParam(name = "include", required = false) Boolean include) {
-    Object persisted = importer.upsert(doc, include);
+    CustomDashboard persisted = importer.upsert(doc, include);
 
     JsonApiDocument<ResourceObject> export = exporter.export(persisted, include != null && include);
 
