@@ -69,10 +69,10 @@ export const importEndpoints = (file: FormData, targetType: string) => {
   return simplePostCall(`/api/mappers/import/csv?targetType=` + targetType, file);
 };
 
-// -- EXERCISES --
+// -- SIMULATIONS --
 
-export const fetchExerciseEndpoints = (exerciseId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/endpoints`;
+export const fetchSimulationEndpoints = (simulationId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${simulationId}/endpoints`;
   return getReferential(arrayOfEndpoints, uri)(dispatch);
 };
 
