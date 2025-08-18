@@ -45,11 +45,10 @@ public class CustomDashboardParameters implements Base {
   /**
    * Generates a UUID **only if the ID is not already set**, just before persisting.
    *
-   * This allows:
-   * - Keeping provided IDs (e.g. from import/export).
-   * - Auto-generating IDs for new entities (e.g. via UI or tests).
+   * <p>This allows: - Keeping provided IDs (e.g. from import/export). - Auto-generating IDs for new
+   * entities (e.g. via UI or tests).
    *
-   * Using `@PrePersist` avoids issues with `@GeneratedValue`, which always overrides or fails
+   * <p>Using `@PrePersist` avoids issues with `@GeneratedValue`, which always overrides or fails
    * when an ID is already present on persist.
    */
   @PrePersist
