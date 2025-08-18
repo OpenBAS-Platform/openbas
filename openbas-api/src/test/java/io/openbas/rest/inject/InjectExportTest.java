@@ -16,6 +16,7 @@ import io.openbas.rest.inject.form.ExportOptionsInput;
 import io.openbas.rest.inject.form.InjectExportFromSearchRequestInput;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
+import io.openbas.rest.inject.form.InjectIndividualExportRequestInput;
 import io.openbas.service.FileService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
@@ -88,6 +89,43 @@ public class InjectExportTest extends IntegrationTest {
   }
 
   private final List<Article> knownArticlesToExport = new ArrayList<>();
+
+  private InjectComposer.Composer createIndividualInjectWrapper() {
+    ArticleComposer.Composer articleToExportFromExercise =
+        articleComposer
+            .forArticle(ArticleFixture.getDefaultArticle())
+            .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel()));
+    knownArticlesToExport.add(articleToExportFromExercise.get());
+    ArticleComposer.Composer articleToExportFromScenario =
+        articleComposer
+            .forArticle(ArticleFixture.getDefaultArticle())
+            .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel()));
+    knownArticlesToExport.add(articleToExportFromScenario.get());
+    InjectComposer.Composer injectWithExerciseComposer =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other inject tag")))
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withArticle(articleToExportFromExercise))
+            .withDocument(
+                documentComposer
+                    .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
+                    .withInMemoryFile(FileFixture.getPlainTextFileContent()));
+    // wrap it in a persisted exercise
+    exerciseComposer
+        .forExercise(ExerciseFixture.createDefaultExercise())
+        .withArticle(
+            articleComposer
+                .forArticle(ArticleFixture.getDefaultArticle())
+                .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
+        .withArticle(articleToExportFromExercise)
+        .persist()
+        .withInject(injectWithExerciseComposer);
+
+    return injectWithExerciseComposer;
+  }
 
   private List<InjectComposer.Composer> createDefaultInjectWrappers() {
     ArticleComposer.Composer articleToExportFromExercise =
@@ -530,8 +568,63 @@ public class InjectExportTest extends IntegrationTest {
 
   @Nested
   @WithMockAdminUser
+  @DisplayName("Individual export With admin authorisation")
+  public class IndividualExportWithAdminAuthorisation {
+    @Test
+    @DisplayName("When the inject is not found in the database, return NOT FOUND")
+    public void whenIndividualExportInjectIsNotFound_returnNotFound() throws Exception {
+      List<InjectExportTarget> targets = createDefaultInjectTargets();
+
+      InjectExportTarget extra_target = new InjectExportTarget();
+      extra_target.setId(UUID.randomUUID().toString());
+
+      targets.add(extra_target);
+
+      mvc.perform(
+              post("/api/injects/ " + UUID.randomUUID().toString() + "/export")
+                  .content(mapper.writeValueAsString(new InjectIndividualExportRequestInput()))
+                  .contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isNotFound())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+    }
+
+    @Test
+    @DisplayName("Returned zip file contains json with correct injects")
+    public void returnedZipFileContainsJsonWithCorrectInjects() throws Exception {
+
+      Inject inject = createIndividualInjectWrapper().persist().get();
+
+      byte[] response =
+          mvc.perform(
+                  post("/api/injects/" + inject.getId() + "/export")
+                      .content(mapper.writeValueAsString(new InjectIndividualExportRequestInput()))
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsByteArray();
+
+      String actualJson = ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+      ObjectMapper objectMapper = mapper.copy();
+      objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+      objectMapper.addMixIn(Base.class, Mixins.Base.class);
+      String injectJson = objectMapper.writeValueAsString(List.of(inject));
+
+      assertThatJson(actualJson)
+          .when(IGNORING_ARRAY_ORDER)
+          .node("inject_information")
+          .isEqualTo(injectJson);
+    }
+  }
+
+  @Nested
+  @WithMockAdminUser
   @DisplayName("With admin authorisation")
   public class WithAdminAuthorisation {
+
     @Test
     @DisplayName("When a single target inject is not found in the database, return NOT FOUND")
     public void whenSingleTargetInjectIsNotFound_returnNotFound() throws Exception {
