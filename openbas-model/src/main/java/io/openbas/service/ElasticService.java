@@ -733,6 +733,7 @@ public class ElasticService implements EngineService {
     return List.of();
   }
 
+  /** {@inheritDoc} */
   @Override
   public String getEngineVersion() {
     try {
