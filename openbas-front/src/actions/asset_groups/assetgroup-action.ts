@@ -84,7 +84,7 @@ export const searchAssetGroupByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${ASSET_GROUP_URI}/options`, ids);
 };
 
-// -- EXERCISES --
+// -- SIMULATIONS --
 
 export const fetchExerciseAssetGroups = (exerciseId: string) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/asset_groups`;
