@@ -1,6 +1,5 @@
 package io.openbas.rest.mapper;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -46,7 +45,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
@@ -64,7 +62,7 @@ public class MapperApi extends RestBehavior {
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
   private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
 
-  @Secured(ROLE_USER)
+  
   @PostMapping("/api/mappers/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.MAPPER)
   public Page<RawPaginationImportMapper> getImportMapper(
@@ -74,7 +72,7 @@ public class MapperApi extends RestBehavior {
         .map(RawPaginationImportMapper::new);
   }
 
-  @Secured(ROLE_USER)
+  
   @GetMapping("/api/mappers/{mapperId}")
   @RBAC(resourceId = "#mapperId", actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   public ImportMapper getImportMapperById(@PathVariable String mapperId) {
@@ -119,7 +117,7 @@ public class MapperApi extends RestBehavior {
   }
 
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
-  @Secured(ROLE_USER)
+  
   @PostMapping(value = "/api/mappers/export/csv")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   @LogExecutionTime
@@ -177,7 +175,7 @@ public class MapperApi extends RestBehavior {
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Import injects into an xls file")
-  @Secured(ROLE_USER)
+  
   public ImportPostSummary importXLSFile(@RequestPart("file") @NotNull MultipartFile file) {
     validateUploadedFile(file);
     return injectImportService.storeXlsFileForImport(file);
@@ -190,7 +188,7 @@ public class MapperApi extends RestBehavior {
       resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  @Secured(ROLE_USER)
+  
   public ImportTestSummary testImportXLSFile(
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportTestInput input) {
@@ -214,7 +212,7 @@ public class MapperApi extends RestBehavior {
   @Operation(
       description = "Import all datas from a specific target (endpoint,...) through a csv file")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
-  @Secured(ROLE_USER)
+  
   @PostMapping("/api/mappers/import/csv")
   @LogExecutionTime
   @Transactional(rollbackOn = Exception.class)

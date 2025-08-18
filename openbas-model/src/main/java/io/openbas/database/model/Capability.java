@@ -117,16 +117,11 @@ public enum Capability {
   ACCESS_SECURITY_PLATFORMS(
       null,
       pair(ResourceType.SECURITY_PLATFORM, Action.READ),
-      pair(ResourceType.SECURITY_PLATFORM, Action.SEARCH)
-     ),
+      pair(ResourceType.SECURITY_PLATFORM, Action.SEARCH)),
   MANAGE_SECURITY_PLATFORMS(
-      ACCESS_SECURITY_PLATFORMS,
-      pair(ResourceType.SECURITY_PLATFORM, Action.WRITE)
-),
+      ACCESS_SECURITY_PLATFORMS, pair(ResourceType.SECURITY_PLATFORM, Action.WRITE)),
   DELETE_SECURITY_PLATFORMS(
-      MANAGE_SECURITY_PLATFORMS,
-      pair(ResourceType.SECURITY_PLATFORM, Action.DELETE)
-    ),
+      MANAGE_SECURITY_PLATFORMS, pair(ResourceType.SECURITY_PLATFORM, Action.DELETE)),
   // Platform Settings
   //
   ACCESS_PLATFORM_SETTINGS(

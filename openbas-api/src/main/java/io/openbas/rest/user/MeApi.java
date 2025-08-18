@@ -1,7 +1,6 @@
 package io.openbas.rest.user;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TokenSpecification.fromUser;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 
@@ -28,7 +27,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -61,14 +59,14 @@ public class MeApi extends RestBehavior {
     this.tokenRepository = tokenRepository;
   }
 
-  @Secured(ROLE_USER)
+  
   @GetMapping("/api/logout")
   @RBAC(skipRBAC = true)
   public ResponseEntity<Object> logout() {
     return ResponseEntity.ok().build();
   }
 
-  @Secured(ROLE_USER)
+  
   @GetMapping("/api/me")
   @RBAC(skipRBAC = true)
   public User me() {
@@ -77,7 +75,7 @@ public class MeApi extends RestBehavior {
         .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
   }
 
-  @Secured(ROLE_USER)
+  
   @PutMapping("/api/me/profile")
   @RBAC(skipRBAC = true)
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
@@ -93,7 +91,7 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  @Secured(ROLE_USER)
+  
   @PutMapping("/api/me/information")
   @RBAC(skipRBAC = true)
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
@@ -107,7 +105,7 @@ public class MeApi extends RestBehavior {
     return savedUser;
   }
 
-  @Secured(ROLE_USER)
+  
   @PutMapping("/api/me/password")
   @RBAC(skipRBAC = true)
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input)
@@ -124,7 +122,7 @@ public class MeApi extends RestBehavior {
     }
   }
 
-  @Secured(ROLE_USER)
+  
   @PostMapping("/api/me/token/refresh")
   @RBAC(skipRBAC = true)
   @Transactional(rollbackOn = Exception.class)
@@ -143,7 +141,7 @@ public class MeApi extends RestBehavior {
     return tokenRepository.save(token);
   }
 
-  @Secured(ROLE_USER)
+  
   @GetMapping("/api/me/tokens")
   @RBAC(skipRBAC = true)
   public List<Token> tokens() {

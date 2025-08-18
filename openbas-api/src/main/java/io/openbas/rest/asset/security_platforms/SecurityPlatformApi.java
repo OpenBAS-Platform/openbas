@@ -1,6 +1,5 @@
 package io.openbas.rest.asset.security_platforms;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -18,12 +17,11 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
+
 public class SecurityPlatformApi {
 
   public static final String SECURITY_PLATFORM_URI = "/api/security_platforms";

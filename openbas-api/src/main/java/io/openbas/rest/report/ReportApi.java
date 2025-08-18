@@ -1,6 +1,5 @@
 package io.openbas.rest.report;
 
-import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
@@ -15,12 +14,11 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
+
 public class ReportApi extends RestBehavior {
 
   private final ExerciseService exerciseService;

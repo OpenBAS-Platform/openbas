@@ -1,6 +1,5 @@
 package io.openbas.rest.team;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.contextual;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
@@ -18,13 +17,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
+
 public class ExerciseTeamApi extends RestBehavior {
 
   private final TeamService teamService;

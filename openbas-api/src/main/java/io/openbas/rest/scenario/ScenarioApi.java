@@ -1,6 +1,5 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ScenarioSpecification.byName;
 import static io.openbas.database.specification.TeamSpecification.fromScenario;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -41,13 +40,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 public class ScenarioApi extends RestBehavior {
 

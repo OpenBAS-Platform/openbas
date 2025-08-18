@@ -1,6 +1,5 @@
 package io.openbas.rest.exercise;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
 import io.openbas.aop.RBAC;
@@ -22,7 +21,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +42,7 @@ public class ExerciseImportApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  @Secured(ROLE_USER)
+  
   public ImportTestSummary dryRunImportXLSFile(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,
@@ -72,7 +70,7 @@ public class ExerciseImportApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Validate and import injects from an xls file")
-  @Secured(ROLE_USER)
+  
   public ImportTestSummary validateImportXLSFile(
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,

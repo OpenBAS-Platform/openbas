@@ -1,6 +1,5 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 import io.openbas.aop.RBAC;
@@ -13,13 +12,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Secured(ROLE_USER)
 @RequiredArgsConstructor
 public class ScenarioStatisticApi extends RestBehavior {
 

@@ -1,6 +1,5 @@
 package io.openbas.rest.kill_chain_phase;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.KillChainPhaseSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -28,12 +27,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@Secured(ROLE_USER)
+
 public class KillChainPhaseApi extends RestBehavior {
 
   public static final String KILL_CHAIN_PHASE_URI = "/api/kill_chain_phases";

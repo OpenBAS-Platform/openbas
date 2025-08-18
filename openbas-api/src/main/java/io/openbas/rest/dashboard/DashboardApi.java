@@ -1,6 +1,5 @@
 package io.openbas.rest.dashboard;
 
-import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
@@ -13,11 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 public class DashboardApi extends RestBehavior {
 

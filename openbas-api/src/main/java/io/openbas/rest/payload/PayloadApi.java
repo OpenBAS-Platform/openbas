@@ -1,6 +1,5 @@
 package io.openbas.rest.payload;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -25,12 +24,11 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 public class PayloadApi extends RestBehavior {
 

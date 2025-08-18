@@ -1,7 +1,6 @@
 package io.openbas.rest.team;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.*;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -43,12 +42,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 @UserRoleDescription
 @Tag(

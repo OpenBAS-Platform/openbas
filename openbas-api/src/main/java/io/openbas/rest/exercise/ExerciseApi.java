@@ -1,7 +1,6 @@
 package io.openbas.rest.exercise;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -57,14 +56,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 public class ExerciseApi extends RestBehavior {
 

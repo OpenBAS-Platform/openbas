@@ -1,6 +1,5 @@
 package io.openbas.rest.cve;
 
-import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
@@ -18,11 +17,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
+
 @RequiredArgsConstructor
 @Tag(name = "CVE API", description = "Operations related to CVEs")
 public class CveApi extends RestBehavior {
