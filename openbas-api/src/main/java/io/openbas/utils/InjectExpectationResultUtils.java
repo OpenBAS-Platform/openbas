@@ -173,7 +173,27 @@ public class InjectExpectationResultUtils {
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
-      @NotNull List<ResultDistribution> distribution) {}
+      @NotNull List<ResultDistribution> distribution) {
+    public double getSuccessRate() {
+      if (distribution.isEmpty()) {
+        return 0;
+      }
+
+      double numberExpectations = 0;
+      for (ResultDistribution distribution : distribution) {
+        numberExpectations += distribution.value();
+      }
+
+      double numberSuccess =
+          distribution.stream()
+              .filter(d -> Objects.equals(d.id, ExpectationType.SUCCESS_ID))
+              .findFirst()
+              .get()
+              .value();
+
+      return numberSuccess / numberExpectations;
+    }
+  }
 
   public record ResultDistribution(
       @NotNull String id, @NotNull String label, @NotNull Integer value) {}
