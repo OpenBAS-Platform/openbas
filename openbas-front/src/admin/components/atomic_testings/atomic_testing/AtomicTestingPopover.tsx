@@ -2,14 +2,14 @@ import { type FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
-import { exportInjects } from '../../../../actions/injects/inject-action';
+import { exportInject } from '../../../../actions/injects/inject-action';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
 import type {
-  InjectExportRequestInput,
+  InjectIndividualExportRequestInput,
   InjectResultOutput,
   InjectResultOverviewOutput,
 } from '../../../../utils/api-types';
@@ -67,9 +67,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const handleOpenExport = () => setExportOpen(true);
   const handleCloseExport = () => setExportOpen(false);
   const doExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
-    const exportData: InjectExportRequestInput = {
-      injects:
-      [{ inject_id: atomic.inject_id }],
+    const exportData: InjectIndividualExportRequestInput = {
       options: {
         with_players: withPlayers,
         with_teams: withTeams,
@@ -77,7 +75,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
       },
     };
 
-    exportInjects(exportData).then((result) => {
+    exportInject(atomic.inject_id, exportData).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
       const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
       const filename = match[1];

@@ -2823,6 +2823,10 @@ export interface InjectImporterUpdateInput {
   inject_importer_type_value: string;
 }
 
+export interface InjectIndividualExportRequestInput {
+  options?: ExportOptionsInput;
+}
+
 export interface InjectInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];

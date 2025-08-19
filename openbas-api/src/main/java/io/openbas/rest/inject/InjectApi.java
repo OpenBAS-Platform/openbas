@@ -134,6 +134,30 @@ public class InjectApi extends RestBehavior {
     runInjectExport(injects, exportOptionsMask, response);
   }
 
+  @Operation(summary = "Export an inject")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Inject exported successfully"),
+        @ApiResponse(responseCode = "404", description = "The inject was not found")
+      })
+  @PostMapping(INJECT_URI + "/{injectId}/export")
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
+  public void injectsIndividualExport(
+      @PathVariable @NotBlank final String injectId,
+      @RequestBody @Valid
+          final InjectIndividualExportRequestInput injectIndividualExportRequestInput,
+      HttpServletResponse response)
+      throws IOException {
+
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    int exportOptionsMask =
+        ExportOptions.mask(
+            injectIndividualExportRequestInput.getExportOptions().isWithPlayers(),
+            injectIndividualExportRequestInput.getExportOptions().isWithTeams(),
+            injectIndividualExportRequestInput.getExportOptions().isWithVariableValues());
+    runInjectExport(List.of(inject), exportOptionsMask, response);
+  }
+
   private void runInjectExport(
       List<Inject> injects, int exportOptionsMask, HttpServletResponse response)
       throws IOException {
