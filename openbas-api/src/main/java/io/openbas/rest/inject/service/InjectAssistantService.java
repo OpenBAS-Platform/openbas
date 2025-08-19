@@ -1,5 +1,7 @@
 package io.openbas.rest.inject.service;
 
+import static java.util.Collections.emptyList;
+
 import io.openbas.database.helper.InjectorContractRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -162,6 +164,9 @@ public class InjectAssistantService {
    */
   private Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
+    if (endpoints.isEmpty())
+      return Map.of("Windows:x86_64", emptyList(), "Linux:x86_64", emptyList());
+
     return endpoints.stream()
         .collect(
             Collectors.groupingBy(endpoint -> endpoint.getPlatform() + ":" + endpoint.getArch()));
@@ -238,7 +243,7 @@ public class InjectAssistantService {
     if (knownInjectorContracts == null
         || platformArchitecturePairs == null
         || platformArchitecturePairs.isEmpty()) {
-      return Collections.emptyList();
+      return emptyList();
     }
 
     Set<Endpoint.PLATFORM_TYPE> platforms = new HashSet<>();
@@ -325,7 +330,7 @@ public class InjectAssistantService {
             .toList();
     if (assetsFromGroup.isEmpty()) {
       // No endpoints in the asset group, return empty result
-      return new ContractResultForAssetGroup(Collections.emptyList(), "");
+      return new ContractResultForAssetGroup(emptyList(), "");
     }
     Map<String, List<Endpoint>> groupedAssets =
         this.groupEndpointsByPlatformAndArchitecture(assetsFromGroup);
@@ -379,9 +384,9 @@ public class InjectAssistantService {
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
-    if (endpoints.isEmpty()) {
-      return;
-    }
+    //    if (endpoints.isEmpty()) {
+    //      return;
+    //    }
     ContractResultForEndpoints endpointResults =
         getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
 
