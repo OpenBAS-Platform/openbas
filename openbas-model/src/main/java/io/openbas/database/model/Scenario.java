@@ -34,6 +34,7 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Scenario.tags-injects",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
+@Grantable(grantFieldName = "scenario")
 public class Scenario implements Base {
 
   public enum SEVERITY {

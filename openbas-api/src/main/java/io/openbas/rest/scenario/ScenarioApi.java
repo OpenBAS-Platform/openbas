@@ -283,7 +283,7 @@ public class ScenarioApi extends RestBehavior {
   @PutMapping(SCENARIO_URI + "/{scenarioId}/recurrence")
   @RBAC(
       resourceId = "#scenarioId",
-      actionPerformed = Action.WRITE,
+      actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SCENARIO)
   public Scenario updateScenarioRecurrence(
       @PathVariable @NotBlank final String scenarioId,

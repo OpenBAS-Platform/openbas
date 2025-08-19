@@ -14,10 +14,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.config.OpenBASPrincipal;
+import io.openbas.config.SessionHelper;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.ee.Ee;
 import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractFieldType;
@@ -41,6 +44,8 @@ import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -411,7 +416,8 @@ public class InjectService {
    * @throws BadRequestException if neither of the searchPaginationInput or injectIDsToSearch is
    *     provided
    */
-  public Specification<Inject> getInjectSpecification(final InjectBulkProcessingInput input) {
+  public Specification<Inject> getInjectSpecification(
+      final InjectBulkProcessingInput input, Grant.GRANT_TYPE requestedGrantLevel) {
     if ((CollectionUtils.isEmpty(input.getInjectIDsToProcess())
             && (input.getSearchPaginationInput() == null))
         || (!CollectionUtils.isEmpty(input.getInjectIDsToProcess())
@@ -432,6 +438,13 @@ public class InjectService {
       filterSpecifications =
           filterSpecifications.and(
               computeSearchJpa(input.getSearchPaginationInput().getTextSearch()));
+      OpenBASPrincipal principal = SessionHelper.currentUser();
+      // We have no list of IDs so we must make sure that the user has access to the injects through
+      // a grantable resource (e.g. scenario, simulation...)
+      lkfneglk filterSpecifications =
+          filterSpecifications.and(
+              SpecificationUtils.hasGrantAccess(
+                  principal.getId(), principal.isAdmin(), requestedGrantLevel));
     }
     if (!CollectionUtils.isEmpty(input.getInjectIDsToIgnore())) {
       filterSpecifications =
@@ -500,7 +513,9 @@ public class InjectService {
       InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
-    Specification<Inject> filterSpecifications = getInjectSpecification(input);
+    OpenBASPrincipal principal = SessionHelper.currentUser();
+    Specification<Inject> filterSpecifications =
+        getInjectSpecification(input, requested_grant_level);
 
     // Services calls
     // Bulk select
@@ -1006,5 +1021,41 @@ public class InjectService {
    */
   public List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId) {
     return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
+  }
+
+  public Specification<Inject> hasGrantAccessForInject(
+      final String userId, final boolean isAdmin, Grant.GRANT_TYPE grantType) {
+
+    return (root, query, cb) -> {
+      if (isAdmin) {
+        return cb.conjunction();
+      }
+
+      // Check if both are null - automatically granted
+      Predicate bothNull = cb.and(cb.isNull(root.get("scenario")), cb.isNull(root.get("exercise")));
+
+      // Get allowed grant types
+      List<Grant.GRANT_TYPE> allowedGrantTypes = grantType.andHigher();
+
+      // Create subquery for accessible scenarios
+      Subquery<String> accessibleScenarios =
+          SpecificationUtils.accessibleScenariosSubquery(query, cb, userId, allowedGrantTypes);
+
+      // Create subquery for accessible exercises
+      Subquery<String> accessibleExercises =
+          SpecificationUtils.accessibleExercisesSubquery(query, cb, userId, allowedGrantTypes);
+
+      // Check if inject's scenario is accessible (null is OK)
+      Predicate scenarioAccessible =
+          cb.or(cb.isNull(root.get("scenario")), root.get("scenario").in(accessibleScenarios));
+
+      // Check if inject's exercise is accessible (null is OK)
+      Predicate exerciseAccessible =
+          cb.or(cb.isNull(root.get("exercise")), root.get("exercise").in(accessibleExercises));
+
+      // Inject is accessible if both scenario and exercise are accessible
+      // (where "accessible" includes being null)
+      return cb.and(scenarioAccessible, exerciseAccessible);
+    };
   }
 }

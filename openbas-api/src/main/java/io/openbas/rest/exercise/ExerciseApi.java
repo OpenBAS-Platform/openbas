@@ -661,7 +661,7 @@ public class ExerciseApi extends RestBehavior {
   @PutMapping(EXERCISE_URI + "/{exerciseId}/status")
   @RBAC(
       resourceId = "#exerciseId",
-      actionPerformed = Action.WRITE,
+      actionPerformed = Action.LAUNCH,
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackFor = Exception.class)
   public Exercise changeExerciseStatus(

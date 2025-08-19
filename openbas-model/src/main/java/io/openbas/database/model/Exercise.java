@@ -32,6 +32,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "exercises")
 @EntityListeners(ModelBaseListener.class)
+@Grantable(grantFieldName = "exercise")
 public class Exercise implements Base {
 
   @Getter

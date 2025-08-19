@@ -8,7 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
@@ -32,6 +35,13 @@ public class Grant implements Base {
 
     public int getPriority() {
       return priority;
+    }
+
+    // Get this grant type and all higher priority ones
+    public List<GRANT_TYPE> andHigher() {
+      return Arrays.stream(values())
+          .filter(gt -> gt.getPriority() >= this.getPriority())
+          .collect(Collectors.toList());
     }
 
     //  verify that priority is unique
