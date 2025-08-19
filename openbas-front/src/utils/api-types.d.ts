@@ -3280,6 +3280,11 @@ export interface InjectsImportTestInput {
   timezone_offset: number;
 }
 
+export interface JsonApiDocumentResourceObject {
+  data?: ResourceObject;
+  included?: object[];
+}
+
 export type JsonNode = object;
 
 export interface KillChainPhase {
@@ -4930,6 +4935,10 @@ export interface RelatedFindingOutput {
   finding_value: string;
 }
 
+export interface Relationship {
+  data: object;
+}
+
 export interface RenewTokenInput {
   token_id: string;
 }
@@ -4993,6 +5002,13 @@ export interface ReportInput {
 export interface ResetUserInput {
   lang?: string;
   login: string;
+}
+
+export interface ResourceObject {
+  attributes?: Record<string, object>;
+  id: string;
+  relationships?: Record<string, Relationship>;
+  type: string;
 }
 
 export interface ResultDistribution {
@@ -6033,7 +6049,6 @@ export interface Widget {
     | StructuralHistogramWidget;
   /** @format date-time */
   widget_created_at: string;
-  widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
   widget_type:
