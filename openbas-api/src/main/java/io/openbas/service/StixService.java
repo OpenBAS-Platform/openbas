@@ -19,9 +19,6 @@ import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.types.Identifier;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -29,11 +26,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class StixService {
-
 
   private final InjectAssistantService injectAssistantService;
   private final AttackPatternService attackPatternService;
