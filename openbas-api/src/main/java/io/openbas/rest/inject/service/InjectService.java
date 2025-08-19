@@ -439,13 +439,6 @@ public class InjectService {
       filterSpecifications =
           filterSpecifications.and(
               computeSearchJpa(input.getSearchPaginationInput().getTextSearch()));
-      OpenBASPrincipal principal = SessionHelper.currentUser();
-      // We have no list of IDs so we must make sure that the user has access to the injects through
-      // a grantable resource (e.g. scenario, simulation...)
-      lkfneglk filterSpecifications =
-          filterSpecifications.and(
-              SpecificationUtils.hasGrantAccess(
-                  principal.getId(), principal.isAdmin(), requestedGrantLevel));
     }
     if (!CollectionUtils.isEmpty(input.getInjectIDsToIgnore())) {
       filterSpecifications =
