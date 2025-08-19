@@ -93,7 +93,6 @@ public class Scenario implements Base {
   @JsonProperty("scenario_security_assessment")
   private SecurityAssessment securityAssessment;
 
-
   @Column(name = "scenario_external_url")
   @Column(name = "scenario_external_url")
   @JsonProperty("scenario_external_url")
