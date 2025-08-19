@@ -7,7 +7,7 @@ import { type OrganizationHelper, type TagHelper } from '../../../../actions/hel
 import { type TeamInputForm } from '../../../../actions/teams/Team';
 import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../actions/teams/team-helper';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';

@@ -9,7 +9,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { tryChallenge } from '../../../../actions/Challenge';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';

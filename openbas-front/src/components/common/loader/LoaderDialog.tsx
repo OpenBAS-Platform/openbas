@@ -3,7 +3,7 @@ import { Alert, Button, CircularProgress, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Link } from 'react-router';
 
-import Dialog from '../Dialog';
+import Dialog from '../dialog/Dialog';
 
 interface Props {
   open: boolean;

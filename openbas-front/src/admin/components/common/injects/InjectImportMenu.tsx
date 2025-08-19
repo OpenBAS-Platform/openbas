@@ -3,7 +3,7 @@ import { Menu, MenuItem, ToggleButton, Tooltip } from '@mui/material';
 import { type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import { type ImportMessage, type ImportPostSummary, type ImportTestSummary, type InjectsImportInput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
