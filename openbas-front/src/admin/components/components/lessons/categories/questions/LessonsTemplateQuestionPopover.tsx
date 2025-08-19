@@ -71,7 +71,7 @@ const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({
     {
       label: 'Delete',
       action: handleOpenDelete,
-      userRight: ability.can(ACTIONS.DELETE, SUBJECTS.LESSONS_LEARNED),
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.LESSONS_LEARNED), // Manage and not delete because deleting a template question is updating the lessons.
     },
   ];
 
