@@ -377,34 +377,47 @@ public class ScenarioApi extends RestBehavior {
 
   // region asset groups, endpoints, documents and channels
   @GetMapping(SCENARIO_URI + "/{scenarioId}/asset_groups")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Operation(
       summary =
           "Get asset groups. Can only be called if the user has access to the given scenario.",
       description = "Get all asset groups used by injects for a given scenario")
-  @PreAuthorize("isObserver()")
   public List<AssetGroup> assetGroups(@PathVariable String scenarioId) {
     return this.assetGroupService.assetGroupsForScenario(scenarioId);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/channels")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Operation(
       summary = "Get channels. Can only be called if the user has access to the given scenario.",
       description = "Get all channels used by articles for a given scenario")
-  @PreAuthorize("isObserver()")
   public Iterable<Channel> channels(@PathVariable String scenarioId) {
     return this.channelService.channelsForScenario(scenarioId);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/endpoints")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Operation(
       summary = "Get endpoints. Can only be called if the user has access to the given scenario.",
       description = "Get all endpoints used by injects for a given scenario")
-  @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints(@PathVariable String scenarioId) {
     return this.endpointService.endpointsForScenario(scenarioId);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/documents")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Operation(
       summary = "Get documents. Can only be called if the user has access to the given scenario.",
       description = "Get all documents used by injects for a given scenario")
