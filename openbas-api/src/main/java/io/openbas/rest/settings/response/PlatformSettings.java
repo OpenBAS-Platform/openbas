@@ -117,6 +117,14 @@ public class PlatformSettings {
   @Schema(description = "Current version of RabbitMQ")
   private String rabbitMQVersion;
 
+  @JsonProperty("analytics_engine_type")
+  @Schema(description = "Type of analytics engine")
+  private String analyticsEngineType;
+
+  @JsonProperty("analytics_engine_version")
+  @Schema(description = "Current version of analytics engine")
+  private String analyticsEngineVersion;
+
   @JsonProperty("platform_ai_enabled")
   @Schema(description = "True if AI is enabled for the platform")
   private Boolean aiEnabled;
