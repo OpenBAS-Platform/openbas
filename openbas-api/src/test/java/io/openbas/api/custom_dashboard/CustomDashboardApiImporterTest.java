@@ -60,6 +60,7 @@ class CustomDashboardApiImporterTest extends IntegrationTest {
     JsonNode json = new ObjectMapper().readTree(response);
     assertEquals("custom_dashboards", json.at("/data/type").asText());
     assertEquals(
-        "Custom dashboard name " + IMPORTED_OBJECT_NAME_SUFFIX, json.at("/data/attributes/custom_dashboard_name").asText());
+        "Custom dashboard name " + IMPORTED_OBJECT_NAME_SUFFIX,
+        json.at("/data/attributes/custom_dashboard_name").asText());
   }
 }
