@@ -40,7 +40,8 @@ const inlineStyles: Record<string, CSSProperties> = {
   agent_privilege: { width: '15%' },
   agent_deployment_mode: { width: '10%' },
   agent_active: { width: '10%' },
-  agent_last_seen: { width: '20%' },
+  agent_version: { width: '5%' },
+  agent_last_seen: { width: '15%' },
 };
 
 interface Props { agents: AgentOutput[] }
@@ -130,6 +131,12 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
       value: (agent: AgentOutput) => {
         return (<AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />);
       },
+    },
+    {
+      field: 'agent_version',
+      label: 'Version',
+      isSortable: false,
+      value: (agent: AgentOutput) => agent.agent_version,
     },
     {
       field: 'agent_last_seen',

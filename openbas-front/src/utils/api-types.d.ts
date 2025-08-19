@@ -55,6 +55,8 @@ export interface AgentOutput {
   agent_last_seen?: string;
   /** Agent privilege */
   agent_privilege?: "admin" | "standard";
+  /** The version of the agent */
+  agent_version?: string;
 }
 
 export interface AgentTarget {
