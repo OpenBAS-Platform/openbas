@@ -409,9 +409,10 @@ public class InjectService {
   }
 
   /**
-   * Get the inject specification for the search pagination input
+   * Get the inject specification for the search pagination input related where the user has grants (through scenarios or simulations)
    *
    * @param input the search input
+   * @param requestedGrantLevel the requested grant level to filter the injects
    * @return the inject specification to search in DB
    * @throws BadRequestException if neither of the searchPaginationInput or injectIDsToSearch is
    *     provided
@@ -451,6 +452,10 @@ public class InjectService {
           filterSpecifications.and(
               JpaUtils.computeNotIn(Inject.ID_FIELD_NAME, input.getInjectIDsToIgnore()));
     }
+    // Filter out any injects not related to resources where the user is granted with the appropriate level
+    OpenBASPrincipal principal = SessionHelper.currentUser();
+    filterSpecifications =
+            filterSpecifications.and(hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
     return filterSpecifications;
   }
 
@@ -513,44 +518,12 @@ public class InjectService {
       InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
-    OpenBASPrincipal principal = SessionHelper.currentUser();
     Specification<Inject> filterSpecifications =
         getInjectSpecification(input, requested_grant_level);
 
     // Services calls
-    // Bulk select
-    List<Inject> injectsToProcess = this.injectRepository.findAll(filterSpecifications);
-
-    // Assert that the user is allowed to delete the injects
-    // Can't use PreAuthorized as we don't have the data about involved scenarios and simulations
-
-    switch (requested_grant_level) {
-      case OBSERVER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectObserver);
-      case PLANNER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
-      default ->
-          throw new AccessDeniedException(
-              "No specified behaviour for grant %s".formatted(requested_grant_level.toString()));
-    }
-    return injectsToProcess;
-  }
-
-  /**
-   * Check if the user is allowed to delete the injects from the scenario or exercise
-   *
-   * @param injects the injects to check
-   * @param authoriseFunction the function to check if the user is a planner for the scenario or
-   *     exercise
-   * @throws AccessDeniedException if the user is not allowed to delete the injects from the
-   *     scenario or exercise
-   */
-  public <T extends Base> void authoriseWithThrow(
-      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
-    InjectAuthorisationResult result = this.authorise(injects, authoriseFunction);
-    if (!result.getUnauthorised().isEmpty()) {
-      throw new AccessDeniedException(
-          "You are not allowed to alter the injects of ids "
-              + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
-    }
+    // Bulk select, only on injects granted through scenario or simulation (or without grant for atomic tests)
+    return this.injectRepository.findAll(filterSpecifications);
   }
 
   /**
@@ -1043,7 +1016,7 @@ public class InjectService {
 
       // Create subquery for accessible exercises
       Subquery<String> accessibleExercises =
-          SpecificationUtils.accessibleExercisesSubquery(query, cb, userId, allowedGrantTypes);
+          SpecificationUtils.accessibleSimulationsSubquery(query, cb, userId, allowedGrantTypes);
 
       // Check if inject's scenario is accessible (null is OK)
       Predicate scenarioAccessible =

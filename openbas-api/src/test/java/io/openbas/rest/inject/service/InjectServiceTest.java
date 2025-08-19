@@ -26,20 +26,20 @@ import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@ExtendWith(MockitoExtension.class)
 class InjectServiceTest {
 
   private static final String INJECT_ID = "injectid";
@@ -54,8 +54,6 @@ class InjectServiceTest {
 
   @Mock(extraInterfaces = {MethodSecurityExpressionHandler.class})
   private SecurityExpressionHandler methodSecurityExpressionHandler;
-
-  @Mock private SecurityExpression securityExpression;
 
   @Mock private InjectDocumentRepository injectDocumentRepository;
 
@@ -78,10 +76,6 @@ class InjectServiceTest {
 
   @BeforeEach
   void setUp() {
-
-    MockitoAnnotations.openMocks(this);
-    when(methodSecurityExpressionHandler.getSecurityExpression()).thenReturn(securityExpression);
-
     mapper = new ObjectMapper();
     ReflectionTestUtils.setField(injectService, "mapper", mapper);
   }
@@ -147,7 +141,7 @@ class InjectServiceTest {
     input.getSearchPaginationInput().setTextSearch("test");
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input);
+    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -161,7 +155,7 @@ class InjectServiceTest {
     input.setInjectIDsToProcess(List.of("id1", "id2"));
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input);
+    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -176,7 +170,7 @@ class InjectServiceTest {
     input.setInjectIDsToIgnore(List.of("id3"));
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input);
+    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -190,7 +184,7 @@ class InjectServiceTest {
 
     // Act & assert
     BadRequestException exception =
-        assertThrows(BadRequestException.class, () -> injectService.getInjectSpecification(input));
+        assertThrows(BadRequestException.class, () -> injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER));
 
     // Assert
     assertEquals(
@@ -342,7 +336,6 @@ class InjectServiceTest {
     List<Inject> injects = List.of(new Inject(), new Inject());
     //noinspection unchecked
     when(injectRepository.findAll(any(Specification.class))).thenReturn(injects);
-    when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
     List<Inject> result =
@@ -364,7 +357,6 @@ class InjectServiceTest {
 
     //noinspection unchecked
     when(injectRepository.findAll(any(Specification.class))).thenReturn(injects);
-    when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
     List<Inject> result =
@@ -387,7 +379,6 @@ class InjectServiceTest {
 
     //noinspection unchecked
     when(injectRepository.findAll(any(Specification.class))).thenReturn(injects);
-    when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
     List<Inject> result =
@@ -413,37 +404,6 @@ class InjectServiceTest {
     // Assert
     assertEquals(
         "Either inject_ids_to_process or search_pagination_input must be provided, and not both at the same time",
-        exception.getMessage());
-  }
-
-  @DisplayName("Test get injects and check is planner with access denied")
-  @Test
-  void getInjectsAndCheckPermissionWithAccessDenied() {
-    // Arrange
-    InjectBulkProcessingInput input = new InjectBulkProcessingInput();
-    input.setSearchPaginationInput(new SearchPaginationInput());
-    input.getSearchPaginationInput().setFilterGroup(new Filters.FilterGroup());
-    input.getSearchPaginationInput().setTextSearch("test");
-
-    List<Inject> injects = List.of(new Inject(), new Inject());
-    Scenario s1 = new Scenario();
-    s1.setId("testScenario");
-    injects.getFirst().setScenario(s1);
-
-    //noinspection unchecked
-    when(injectRepository.findAll(any(Specification.class))).thenReturn(injects);
-    when(securityExpression.isInjectPlanner(any())).thenReturn(false);
-
-    // Act & assert
-    AccessDeniedException exception =
-        assertThrows(
-            AccessDeniedException.class,
-            () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
-
-    // Assert
-    assertEquals(
-        "You are not allowed to alter the injects of ids "
-            + String.join(", ", injects.stream().map(Inject::getId).toList()),
         exception.getMessage());
   }
 
@@ -486,90 +446,6 @@ class InjectServiceTest {
 
     // Assert
     verify(injectRepository, never()).deleteAllById(any());
-  }
-
-  @DisplayName("Test isPlanner with valid input and scenario planner OK")
-  @Test
-  void testIsPlannerScenarioPlanner() {
-    // Arrange
-    Inject inject = new Inject();
-    Scenario scenario = new Scenario();
-    scenario.setId("scenario1");
-    inject.setScenario(scenario);
-
-    when(securityExpression.isInjectPlanner(any())).thenReturn(true);
-
-    // Act & Assert
-    assertDoesNotThrow(
-        () ->
-            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
-  }
-
-  @DisplayName("Test isPlanner with valid input and scenario planner KO")
-  @Test
-  void testIsPlannerScenarioPlannerAccessDenied() {
-    // Arrange
-    Inject inject = new Inject();
-    Scenario scenario = new Scenario();
-    scenario.setId("scenario1");
-    inject.setScenario(scenario);
-
-    when(securityExpression.isInjectPlanner("scenario1")).thenReturn(false);
-
-    // Act & Assert
-    assertThrows(
-        AccessDeniedException.class,
-        () ->
-            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
-  }
-
-  @DisplayName("Test isPlanner with valid input and simulation planner OK")
-  @Test
-  void testIsPlannerSimulationPlanner() {
-    // Arrange
-    Inject inject = new Inject();
-    Exercise exercise = new Exercise();
-    exercise.setId("exercise1");
-    inject.setExercise(exercise);
-
-    when(securityExpression.isInjectPlanner(any())).thenReturn(true);
-
-    // Act & Assert
-    assertDoesNotThrow(
-        () ->
-            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
-  }
-
-  @DisplayName("Test isPlanner with valid input and simulation planner OK")
-  @Test
-  void testIsPlannerSimulationPlannerAccessDenied() {
-    // Arrange
-    Inject inject = new Inject();
-    Exercise exercise = new Exercise();
-    exercise.setId("exercise1");
-    inject.setExercise(exercise);
-
-    when(securityExpression.isInjectPlanner("exercise1")).thenReturn(false);
-
-    // Act & Assert
-    assertThrows(
-        AccessDeniedException.class,
-        () ->
-            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
-  }
-
-  @DisplayName("Test isPlanner with no injects")
-  @Test
-  void testIsPlannerNoInjects() {
-
-    // Arrange
-    when(securityExpression.isInjectPlanner("exercise1")).thenReturn(false);
-
-    // Act
-    injectService.authoriseWithThrow(Collections.emptyList(), SecurityExpression::isInjectPlanner);
-
-    // Assert
-    verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
   }
 
   @DisplayName("Test canApplyAssetToInject with manual inject")

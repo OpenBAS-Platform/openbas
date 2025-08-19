@@ -125,7 +125,7 @@ public class SpecificationUtils {
    * @param allowedGrantTypes List of grant types that provide access (e.g., OBSERVER and higher)
    * @return A subquery that selects exercise IDs the user can access
    */
-  private static Subquery<String> accessibleSimulationsSubquery(
+  public static Subquery<String> accessibleSimulationsSubquery(
       CriteriaQuery<?> query,
       CriteriaBuilder cb,
       String userId,

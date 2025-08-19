@@ -267,6 +267,7 @@ public class ExerciseApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Throw license restricted error when launch exercise with Crowdstrike")
+    @WithMockAdminUser
     void given_crowdstrike_should_not_launchExercise() throws Exception {
       Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
       ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
