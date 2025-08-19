@@ -137,7 +137,7 @@ public class InjectApi extends RestBehavior {
         @ApiResponse(responseCode = "200", description = "Inject exported successfully"),
         @ApiResponse(responseCode = "404", description = "The inject was not found")
       })
-  @PostMapping(INJECT_URI + "/{injectId}/export")
+  @PostMapping(INJECT_URI + "/{injectId}/inject_export")
   @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public void injectsIndividualExport(
       @PathVariable @NotBlank final String injectId,

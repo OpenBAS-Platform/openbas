@@ -32,7 +32,7 @@ export const exportInjects = (data: InjectExportRequestInput) => {
 };
 
 export const exportInject = (injectId: string, data: InjectIndividualExportRequestInput) => {
-  const uri = `/api/injects/${injectId}/export`;
+  const uri = `/api/injects/${injectId}/inject_export`;
   return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
     MESSAGING$.notifyError('Could not request export of inject');
     throw error;
