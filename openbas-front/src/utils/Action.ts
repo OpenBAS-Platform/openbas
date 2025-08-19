@@ -201,7 +201,7 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
     .delete(buildUri(uri))
-    .then(() => {
+    .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
         payload: {
@@ -210,6 +210,7 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
         },
       });
       notifySuccess('The element has been successfully deleted');
+      return response.data;
     })
     .catch((error) => {
       dispatch({
