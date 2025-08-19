@@ -15,6 +15,7 @@ import {
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
+import { scenario } from '../scenarios/scenario-schema';
 import * as schema from '../Schema';
 
 export const EXERCISE_URI = '/api/exercises';
@@ -196,4 +197,9 @@ export const checkExerciseTagRules = (exerciseId: string, newTagIds: string[]) =
 export const updateCustomDashboard = (exerciseId: string, customDashboardId: string | null) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${exerciseId}/custom-dashboards/${customDashboardId}`;
   return putReferential(schema.lessonsQuestion, uri, {})(dispatch);
+};
+
+export const fetchScenarioFromSimulation = (exerciseId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/scenario`;
+  return getReferential(scenario, uri)(dispatch);
 };

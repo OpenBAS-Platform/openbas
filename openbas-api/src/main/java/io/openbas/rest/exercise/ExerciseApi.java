@@ -39,6 +39,7 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
@@ -945,5 +946,27 @@ public class ExerciseApi extends RestBehavior {
   public List<Document> documents(@PathVariable String exerciseId) {
     return this.documentService.documentsForSimulation(exerciseId);
   }
+
+  @GetMapping(EXERCISE_URI + "/{exerciseId}/scenario")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
+  @Operation(
+      summary = "Get the Scenario linked to the exercise")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "The Scenario"),
+        @ApiResponse(responseCode = "404", description = "Exercise or Scenario not found")
+      })
+  public Scenario scenarioFromExercise(
+      @PathVariable @NotBlank @Schema(description = "ID of the exercise") final String exerciseId) {
+    Scenario scenario = exerciseService.getScenarioFromExercise(exerciseId);
+    if (scenario == null) {
+      throw new ElementNotFoundException("No scenario linked to exercise " + exerciseId);
+    }
+    return scenario;
+  }
+
   // end region
 }
