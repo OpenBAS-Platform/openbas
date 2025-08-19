@@ -53,7 +53,7 @@ const CustomDashboardParameters: FunctionComponent = () => {
               </div>
             );
           default:
-            return (<></>);
+            return null;
         }
       })}
     </div>
