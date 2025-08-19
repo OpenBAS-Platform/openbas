@@ -165,6 +165,13 @@ public class Exercise implements Base {
   @Queryable(filterable = true, dynamicValues = true)
   private Scenario scenario;
 
+  // STIX
+  @Getter
+  @ManyToOne
+  @JoinColumn(name = "exercise_security_assessment")
+  @JsonProperty("exercise_security_assessment")
+  private SecurityAssessment securityAssessment;
+
   // -- AUDIT --
 
   @Getter

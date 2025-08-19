@@ -87,11 +87,18 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_external_reference")
   @JsonProperty("scenario_external_reference")
-  private String externalReference;
+  private String externalReference; // TODO REMOVE STIX
+
+  @OneToOne(mappedBy = "scenario")
+  @JsonProperty("scenario_security_assessment")
+  private SecurityAssessment securityAssessment;
+
 
   @Column(name = "scenario_external_url")
+  @Column(name = "scenario_external_url")
   @JsonProperty("scenario_external_url")
-  private String externalUrl;
+  @JsonProperty("scenario_external_url")
+  private String externalUrl; // TODO REMOVE STIX
 
   // -- RECURRENCE --
 
