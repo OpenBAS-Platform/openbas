@@ -32,7 +32,7 @@ class StixApiTest extends IntegrationTest {
   @BeforeAll
   void setUp() throws Exception {
     try (FileInputStream fis =
-        new FileInputStream("src/test/resources/stix/bundles/report_stix_bundle_origin.json")) {
+        new FileInputStream("src/test/resources/stix-bundles/security-assessment.json")) {
       stixSecurityAssessment = IOUtils.toString(fis, StandardCharsets.UTF_8);
     }
   }
