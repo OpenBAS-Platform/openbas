@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.RawInjectExpectation;
@@ -174,6 +175,7 @@ public class InjectExpectationResultUtils {
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
       @NotNull List<ResultDistribution> distribution) {
+    @JsonIgnore
     public double getSuccessRate() {
       if (distribution.isEmpty()) {
         return 0;
