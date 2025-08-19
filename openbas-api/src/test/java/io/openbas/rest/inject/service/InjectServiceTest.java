@@ -15,7 +15,6 @@ import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.injector_contract.InjectorContractService;
-import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.AssetGroupService;
@@ -141,7 +140,8 @@ class InjectServiceTest {
     input.getSearchPaginationInput().setTextSearch("test");
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
+    Specification<Inject> specification =
+        injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -155,7 +155,8 @@ class InjectServiceTest {
     input.setInjectIDsToProcess(List.of("id1", "id2"));
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
+    Specification<Inject> specification =
+        injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -170,7 +171,8 @@ class InjectServiceTest {
     input.setInjectIDsToIgnore(List.of("id3"));
 
     // Act
-    Specification<Inject> specification = injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
+    Specification<Inject> specification =
+        injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER);
 
     // Assert
     assertNotNull(specification);
@@ -184,7 +186,9 @@ class InjectServiceTest {
 
     // Act & assert
     BadRequestException exception =
-        assertThrows(BadRequestException.class, () -> injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER));
+        assertThrows(
+            BadRequestException.class,
+            () -> injectService.getInjectSpecification(input, Grant.GRANT_TYPE.OBSERVER));
 
     // Assert
     assertEquals(

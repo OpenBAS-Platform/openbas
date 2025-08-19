@@ -91,8 +91,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
     // Control and format inputs
     if (!scenarioId.equals(input.getSimulationOrScenarioId())) {
-      throw new BadRequestException(
-              "Provided scenario ID does not match the input scenario ID");
+      throw new BadRequestException("Provided scenario ID does not match the input scenario ID");
     }
     if (CollectionUtils.isEmpty(input.getInjectIDsToProcess())
         && input.getSearchPaginationInput() == null) {

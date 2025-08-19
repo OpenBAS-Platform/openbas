@@ -44,6 +44,7 @@ import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
@@ -409,7 +410,8 @@ public class InjectService {
   }
 
   /**
-   * Get the inject specification for the search pagination input related where the user has grants (through scenarios or simulations)
+   * Get the inject specification for the search pagination input related where the user has grants
+   * (through scenarios or simulations)
    *
    * @param input the search input
    * @param requestedGrantLevel the requested grant level to filter the injects
@@ -445,10 +447,12 @@ public class InjectService {
           filterSpecifications.and(
               JpaUtils.computeNotIn(Inject.ID_FIELD_NAME, input.getInjectIDsToIgnore()));
     }
-    // Filter out any injects not related to resources where the user is granted with the appropriate level
+    // Filter out any injects not related to resources where the user is granted with the
+    // appropriate level
     OpenBASPrincipal principal = SessionHelper.currentUser();
     filterSpecifications =
-            filterSpecifications.and(hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
+        filterSpecifications.and(
+            hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
     return filterSpecifications;
   }
 
@@ -515,7 +519,8 @@ public class InjectService {
         getInjectSpecification(input, requested_grant_level);
 
     // Services calls
-    // Bulk select, only on injects granted through scenario or simulation (or without grant for atomic tests)
+    // Bulk select, only on injects granted through scenario or simulation (or without grant for
+    // atomic tests)
     return this.injectRepository.findAll(filterSpecifications);
   }
 
@@ -998,30 +1003,38 @@ public class InjectService {
       }
 
       // Check if both are null - automatically granted
-      Predicate bothNull = cb.and(cb.isNull(root.get("scenario")), cb.isNull(root.get("exercise")));
+      Path<Object> scenarioPath = root.get("scenario");
+      Path<Object> exercisePath = root.get("exercise");
+      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(exercisePath));
 
       // Get allowed grant types
       List<Grant.GRANT_TYPE> allowedGrantTypes = grantType.andHigher();
-
       // Create subquery for accessible scenarios
       Subquery<String> accessibleScenarios =
           SpecificationUtils.accessibleScenariosSubquery(query, cb, userId, allowedGrantTypes);
-
       // Create subquery for accessible exercises
       Subquery<String> accessibleExercises =
           SpecificationUtils.accessibleSimulationsSubquery(query, cb, userId, allowedGrantTypes);
-
-      // Check if inject's scenario is accessible (null is OK)
-      Predicate scenarioAccessible =
-          cb.or(cb.isNull(root.get("scenario")), root.get("scenario").in(accessibleScenarios));
-
-      // Check if inject's exercise is accessible (null is OK)
-      Predicate exerciseAccessible =
-          cb.or(cb.isNull(root.get("exercise")), root.get("exercise").in(accessibleExercises));
-
-      // Inject is accessible if both scenario and exercise are accessible
-      // (where "accessible" includes being null)
-      return cb.and(scenarioAccessible, exerciseAccessible);
+      // Check if inject's scenario ID is accessible (null is OK)
+      Predicate scenarioAccessible;
+      if (scenarioPath != null) {
+        scenarioAccessible =
+            cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
+      } else {
+        scenarioAccessible = cb.conjunction(); // Always true if no scenario field
+      }
+      // Check if inject's exercise ID is accessible (null is OK)
+      Predicate exerciseAccessible;
+      if (exercisePath != null) {
+        exerciseAccessible =
+            cb.or(cb.isNull(exercisePath), exercisePath.get("id").in(accessibleExercises));
+      } else {
+        exerciseAccessible = cb.conjunction(); // Always true if no exercise field
+      }
+      // Inject is accessible if:
+      // 1. Both scenario and exercise are null (automatically granted), OR
+      // 2. User has access to the non-null scenario/exercise
+      return cb.or(bothNull, cb.and(scenarioAccessible, exerciseAccessible));
     };
   }
 }
