@@ -39,14 +39,16 @@ const Dialog: FunctionComponent<DialogProps> = ({
     >
       {title && (
         <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            {title}
-            {showCloseIcon && (
+          {showCloseIcon ? (
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              {title}
               <IconButton onClick={handleClose} size="small" aria-label="close">
                 <Close />
               </IconButton>
-            )}
-          </Box>
+            </Box>
+          ) : (
+            title
+          )}
         </DialogTitle>
       )}
       <DialogContent>{renderContent}</DialogContent>
