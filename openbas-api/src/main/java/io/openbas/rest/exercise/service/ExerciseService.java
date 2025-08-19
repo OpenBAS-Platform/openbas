@@ -61,7 +61,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -811,20 +810,5 @@ public class ExerciseService {
       }
     }
     return false;
-  }
-
-  /**
-   * Return the scenario link to the exercise
-   *
-   * @param exerciseId
-   * @return
-   */
-  @Transactional(readOnly = true)
-  public Scenario getScenarioFromExercise(@NotBlank String exerciseId) {
-    Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    Scenario scenario = exercise.getScenario();
-    Hibernate.initialize(scenario);
-    return scenario;
   }
 }

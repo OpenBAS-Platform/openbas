@@ -108,6 +108,7 @@ public class ExerciseApi extends RestBehavior {
   private final ActionMetricCollector actionMetricCollector;
   private final ChannelService channelService;
   private final DocumentService documentService;
+  private final ScenarioService scenarioService;
 
   // endregion
 
@@ -952,8 +953,7 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @Operation(
-      summary = "Get the Scenario linked to the exercise")
+  @Operation(summary = "Get the Scenario linked to the exercise")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "The Scenario"),
@@ -961,11 +961,7 @@ public class ExerciseApi extends RestBehavior {
       })
   public Scenario scenarioFromExercise(
       @PathVariable @NotBlank @Schema(description = "ID of the exercise") final String exerciseId) {
-    Scenario scenario = exerciseService.getScenarioFromExercise(exerciseId);
-    if (scenario == null) {
-      throw new ElementNotFoundException("No scenario linked to exercise " + exerciseId);
-    }
-    return scenario;
+    return scenarioService.scenarioFromExerciseId(exerciseId);
   }
 
   // end region

@@ -296,6 +296,12 @@ public class ScenarioService {
         .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
 
+  public Scenario scenarioFromExerciseId(@NotBlank final String exerciseId) {
+    return this.scenarioRepository
+        .findByExercises_Id(exerciseId)
+        .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
+  }
+
   @Transactional(readOnly = true)
   public ExerciseSimple latestExerciseByExternalReference(
       @NotBlank final String scenarioExternalReference) {
