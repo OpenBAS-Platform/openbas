@@ -2,12 +2,14 @@ import { useNavigate } from 'react-router';
 
 import { importCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
 import ImportUploader from '../../../../components/common/ImportUploader';
+import { useFormatter } from '../../../../components/i18n';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 const ImportUploaderCustomDashboard = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useFormatter();
 
   const handleUpload = async (_: FormData, file: File) => {
     const content = await file.text();
@@ -20,8 +22,9 @@ const ImportUploaderCustomDashboard = () => {
 
   return (
     <ImportUploader
-      title="Import a custom dashboard"
+      title={t('Import a custom dashboard')}
       handleUpload={handleUpload}
+      fileAccepted=".json"
     />
   );
 };

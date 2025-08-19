@@ -35,7 +35,7 @@ public class GenericJsonApiImporter<T extends Base> {
     }
     Map<String, ResourceObject> includedMap = toMap(doc.included());
     Map<String, T> entityCache = new HashMap<>();
-    T entity = buildEntity(doc.data(), includedMap, entityCache, withRels);
+    T entity = buildEntity(doc.data(), includedMap, entityCache, withRels, true);
 
     // merge/upsert
     return entityManager.merge(entity);
@@ -57,7 +57,8 @@ public class GenericJsonApiImporter<T extends Base> {
       ResourceObject resource,
       Map<String, ResourceObject> includedMap,
       Map<String, T> entityCache,
-      boolean withRels) {
+      boolean withRels,
+      boolean rootEntity) {
     // Sanity check
     if (resource == null) {
       return null;
@@ -78,7 +79,9 @@ public class GenericJsonApiImporter<T extends Base> {
     // Instantiate or load
     T entity = null;
 
-    if (hasText(id) && !clazz.isAnnotationPresent(InnerRelationship.class)) {
+    // For non-root entities with a valid ID and not marked as @InnerRelationship,
+    // try loading the existing entity from the database.
+    if (!rootEntity && hasText(id) && !clazz.isAnnotationPresent(InnerRelationship.class)) {
       entity = entityManager.find(clazz, id);
     }
     // Create new instance if not found.
@@ -176,7 +179,7 @@ public class GenericJsonApiImporter<T extends Base> {
     // Available in the bundle
     ResourceObject included = includedMap.get(id);
     if (included != null) {
-      return buildEntity(included, includedMap, entityCache, withRels);
+      return buildEntity(included, includedMap, entityCache, withRels, false);
     }
 
     // Not present in the bundle, resolve it
