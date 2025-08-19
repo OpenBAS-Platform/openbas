@@ -2,6 +2,7 @@ package io.openbas.api.custom_dashboard;
 
 import static io.openbas.jsonapi.GenericJsonApiIUtils.JSONAPI;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
+import static io.openbas.utils.Constants.IMPORTED_OBJECT_NAME_SUFFIX;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +60,6 @@ class CustomDashboardApiImporterTest extends IntegrationTest {
     JsonNode json = new ObjectMapper().readTree(response);
     assertEquals("custom_dashboards", json.at("/data/type").asText());
     assertEquals(
-        "Custom dashboard name", json.at("/data/attributes/custom_dashboard_name").asText());
+        "Custom dashboard name " + IMPORTED_OBJECT_NAME_SUFFIX, json.at("/data/attributes/custom_dashboard_name").asText());
   }
 }
