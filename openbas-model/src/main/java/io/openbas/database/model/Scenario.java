@@ -101,8 +101,6 @@ public class Scenario implements Base {
   private SecurityAssessment securityAssessment;
 
   @Column(name = "scenario_external_url")
-  @Column(name = "scenario_external_url")
-  @JsonProperty("scenario_external_url")
   @JsonProperty("scenario_external_url")
   private String externalUrl; // TODO REMOVE STIX
 
