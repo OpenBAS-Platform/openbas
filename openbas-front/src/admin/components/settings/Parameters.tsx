@@ -379,9 +379,9 @@ const Parameters = () => {
             <ListItemText primary={t('RabbitMQ')} />
             <ItemBoolean status={null} variant="large" neutralLabel={settings?.rabbitmq_version} />
           </ListItem>
-          {settings.analytics_engine_type !== undefined
+          {settings.analytics_engine_type
             && (
-              <ListItem divider={true}>
+              <ListItem divider>
                 <ListItemText primary={t(settings.analytics_engine_type)} />
                 <ItemBoolean status={null} variant="large" neutralLabel={settings?.analytics_engine_version} />
               </ListItem>
