@@ -3,12 +3,16 @@ import { ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/materi
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
+import type { AttackPatternHelper } from '../../../../../../../../../actions/attack_patterns/attackpattern-helper';
+import AttackPatternChip from '../../../../../../../../../components/AttackPatternChip';
 import TagsFragment from '../../../../../../../../../components/common/list/fragments/TagsFragment';
 import useBodyItemsStyles from '../../../../../../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../../../../../../components/i18n';
 import ItemStatus from '../../../../../../../../../components/ItemStatus';
 import PlatformIcon from '../../../../../../../../../components/PlatformIcon';
+import { useHelper } from '../../../../../../../../../store';
 import {
+  type AttackPattern,
   type EsInject,
   type EsScenario,
   type EsSimulation,
@@ -25,16 +29,35 @@ type Props = {
   columns: string[];
   element: EsInject | EsSimulation | EsScenario;
 };
+
 const InjectListElement = (props: Props) => {
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
 
+  const { attackPatterns }: { attackPatterns: AttackPattern[] } = useHelper((helper: AttackPatternHelper) => {
+    return { attackPatterns: helper.getAttackPatterns() };
+  });
+
   /* eslint-disable react/display-name */
   // eslint doesn't seem to be able to infer the display names of subcomponents but react can
   const elementsFromColumn = (column: string) => {
     switch (column) {
+      case 'base_attack_patterns_side':
+        return (esElement: EsInject) => {
+          if (esElement.base_attack_patterns_side && attackPatterns) {
+            return esElement.base_attack_patterns_side.map((id: string) => {
+              const attackPattern = attackPatterns.find(ap => ap.attack_pattern_id === id);
+              return attackPattern && (
+                <AttackPatternChip key={attackPattern.attack_pattern_id} attackPattern={attackPattern}></AttackPatternChip>
+              );
+            },
+            );
+          } else {
+            return (<></>);
+          }
+        };
       case 'base_tags_side':
         return (esElement: EsInject | EsScenario | EsSimulation) => <TagsFragment tags={esElement.base_tags_side ?? []} />;
       case 'status':
