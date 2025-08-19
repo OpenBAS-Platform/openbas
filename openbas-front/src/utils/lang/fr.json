@@ -723,6 +723,7 @@
   "IMAP service is not responding, your injectors may be impacted.": "Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.",
   "Import": "Importation",
   "Import a simulation": "Importer une simulation",
+  "Import a custom dashboard": "Importer un tableau de bord personnalisé",
   "Import endpoints": "Importer des endpoints",
   "Import from Hub": "Importer depuis le Hub",
   "Import injects": "Importer des stimulis",
