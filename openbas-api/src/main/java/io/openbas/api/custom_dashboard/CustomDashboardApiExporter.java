@@ -7,6 +7,7 @@ import io.openbas.jsonapi.ResourceObject;
 import io.openbas.rest.custom_dashboard.CustomDashboardApi;
 import io.openbas.rest.custom_dashboard.CustomDashboardService;
 import io.openbas.rest.helper.RestBehavior;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ public class CustomDashboardApiExporter extends RestBehavior {
   private final CustomDashboardService customDashboardService;
   private final GenericJsonApiExporter exporter;
 
+  @Operation(
+      description =
+          "Exports a custom dashboard in JSON:API format, optionally including related entities.")
   @GetMapping(value = "/{customDashboardId}/export")
   @Transactional(readOnly = true)
   public ResponseEntity<JsonApiDocument<ResourceObject>> export(
