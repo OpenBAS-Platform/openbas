@@ -1,15 +1,48 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.SecurityAssessment;
+import io.openbas.database.model.StixRefToExternalRef;
+import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.database.repository.SecurityAssessmentRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.attack_pattern.service.AttackPatternService;
+import io.openbas.rest.inject.form.InjectAssistantInput;
+import io.openbas.rest.inject.service.InjectAssistantService;
+import io.openbas.rest.inject.service.InjectService;
+import io.openbas.stix.objects.Bundle;
+import io.openbas.stix.objects.ObjectBase;
+import io.openbas.stix.parsing.Parser;
+import io.openbas.stix.parsing.ParsingException;
+import io.openbas.stix.types.Identifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class StixService {
+
+
+  private final InjectAssistantService injectAssistantService;
+  private final AttackPatternService attackPatternService;
+  private final InjectService injectService;
+  private final SecurityAssessmentRepository securityAssessmentRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final TagRepository tagRepository;
+  private final Parser stixParser;
+  private final ObjectMapper objectMapper;
 
   public List<String> generateScenarioFromSTIXBundle(String stixJson)
       throws IOException, ParsingException {
@@ -24,7 +57,6 @@ public class StixService {
       String id = (String) obj.getProperty("id").getValue();
       SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
       Scenario scenario = getOrCreateScenario(securityAssessment);
-      ;
 
       updateSecurityAssessmentFromStix(obj, bundle, scenario, securityAssessment);
       securityAssessment.setScenario(scenario);
@@ -50,7 +82,9 @@ public class StixService {
       Scenario scenario,
       SecurityAssessment securityAssessment)
       throws ParsingException, JsonProcessingException {
-    if (scenario.getFrom() == null) scenario.setFrom("toto@gmail.com"); // TODO change
+    if (scenario.getFrom() == null) {
+      scenario.setFrom("toto@gmail.com"); // TODO change
+    }
 
     securityAssessment.setExternalId((String) stixAssessmentObj.getProperty("id").getValue());
     securityAssessment.setName((String) stixAssessmentObj.getProperty("name").getValue());
