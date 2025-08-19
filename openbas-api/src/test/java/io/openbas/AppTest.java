@@ -13,11 +13,25 @@ import org.springframework.context.ConfigurableApplicationContext;
 class AppTest extends IntegrationTest {
 
   @Autowired private SettingRepository settingRepository;
+  private static String previousServerPort;
 
   @BeforeAll
   static void setup() {
     // Setting another port we're going to launch new instances of the application
+    previousServerPort = System.getProperty("server.port");
     System.setProperty("server.port", "8089");
+  }
+
+  @AfterAll
+  static void cleanup() {
+    // Changing back the port to the previous value
+    if (previousServerPort != null) {
+      System.setProperty("server.port", previousServerPort);
+    } else {
+      System.clearProperty("server.port");
+    }
+    // Removing the property for the instance id
+    System.clearProperty("openbas.instance-id");
   }
 
   @DisplayName("Should throw an exception when having an incorrect instance id")
