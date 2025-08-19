@@ -56,7 +56,11 @@ public class Group implements Base {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Set<DefaultGrant> defaultGrants = new HashSet<>();
 
-  @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+  @OneToMany(
+      mappedBy = "group",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("group_grants")
   @JsonSerialize(using = MultiModelDeserializer.class)
   @Fetch(value = FetchMode.SUBSELECT)

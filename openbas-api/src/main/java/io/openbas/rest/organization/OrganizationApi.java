@@ -19,37 +19,27 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.organization.form.OrganizationCreateInput;
 import io.openbas.rest.organization.form.OrganizationUpdateInput;
+import io.openbas.service.organization.OrganizationService;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class OrganizationApi extends RestBehavior {
 
   public static final String ORGANIZATION_URI = "/api/organizations";
 
-  private OrganizationRepository organizationRepository;
-  private TagRepository tagRepository;
-  private UserRepository userRepository;
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-    this.organizationRepository = organizationRepository;
-  }
+  private final OrganizationRepository organizationRepository;
+  private final TagRepository tagRepository;
+  private final UserRepository userRepository;
+  private final OrganizationService organizationService;
 
   @GetMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
@@ -64,6 +54,14 @@ public class OrganizationApi extends RestBehavior {
     return organizations;
   }
 
+  @PostMapping(ORGANIZATION_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
+  public Page<Organization> organizations(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return this.organizationService.organizationPagination(searchPaginationInput);
+  }
+
+  @Secured(ROLE_ADMIN)
   @PostMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ORGANIZATION)
   @Transactional(rollbackOn = Exception.class)
