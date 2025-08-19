@@ -29,28 +29,31 @@ const CustomDashboardParameters: FunctionComponent = () => {
     }}
     >
       {(customDashboard?.custom_dashboard_parameters ?? []).map((p) => {
-        if (p.custom_dashboards_parameter_type === 'scenario') {
-          return (
-            <div key={p.custom_dashboards_parameter_id}>
-              <ScenarioField
-                label={p.custom_dashboards_parameter_name}
-                value={getParameterValue(p.custom_dashboards_parameter_id)}
-                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
-              />
-            </div>
-          );
-        } else if (p.custom_dashboards_parameter_type === 'simulation') {
-          return (
-            <div key={p.custom_dashboards_parameter_id}>
-              <SimulationField
-                label={p.custom_dashboards_parameter_name}
-                value={getParameterValue(p.custom_dashboards_parameter_id)}
-                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
-              />
-            </div>
-          );
-        } else {
-          return (<></>);
+        switch (p.custom_dashboards_parameter_type) {
+          case 'scenario':
+            return (
+              <div key={p.custom_dashboards_parameter_id}>
+                <ScenarioField
+                  label={p.custom_dashboards_parameter_name}
+                  value={getParameterValue(p.custom_dashboards_parameter_id)}
+                  onChange={(value: string | undefined) =>
+                    handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
+                />
+              </div>
+            );
+          case 'simulation':
+            return (
+              <div key={p.custom_dashboards_parameter_id}>
+                <SimulationField
+                  label={p.custom_dashboards_parameter_name}
+                  value={getParameterValue(p.custom_dashboards_parameter_id)}
+                  onChange={(value: string | undefined) =>
+                    handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
+                />
+              </div>
+            );
+          default:
+            return (<></>);
         }
       })}
     </div>

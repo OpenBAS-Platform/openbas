@@ -255,8 +255,10 @@ public class Scenario implements Base {
   private List<Exercise> exercises;
 
   public void setExercises(List<Exercise> exercises) {
-    for (Exercise exercise : exercises) {
-      if (exercise != null) exercise.setUpdatedAt(now());
+    if (exercises != null) {
+      for (Exercise exercise : exercises) {
+        if (exercise != null) exercise.setUpdatedAt(now());
+      }
     }
     this.exercises = exercises;
     this.setUpdatedAt(now());
