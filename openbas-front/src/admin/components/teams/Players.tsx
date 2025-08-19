@@ -52,10 +52,7 @@ const Players = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { me, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
-    me: helper.getMe(),
-    organizationsMap: helper.getOrganizationsMap(),
-  }));
+  const { organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({ organizationsMap: helper.getOrganizationsMap() }));
 
   useDataLoader(() => {
     dispatch(fetchOrganizations());

@@ -1,14 +1,14 @@
 import { LabelOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import * as R from 'ramda';
-import { Component, useContext } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
 import { storeHelper } from '../actions/Schema';
 import { addTag } from '../actions/Tag';
 import TagForm from '../admin/components/settings/tags/TagForm';
-import { AbilityContext, Can } from '../utils/permissions/PermissionsProvider.js';
+import { Can } from '../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../utils/permissions/types.js';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
