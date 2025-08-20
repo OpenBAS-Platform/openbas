@@ -16,10 +16,31 @@ public interface SecurityCoverageSendJobRepository
     extends CrudRepository<SecurityCoverageSendJob, String>,
         JpaSpecificationExecutor<SecurityCoverageSendJob> {
 
+  String findByStatusAndUpdatedAtBeforeStatement =
+      """
+
+          """;
+
   @Query("select scsj from SecurityCoverageSendJob scsj where scsj.simulation = ?1")
   Optional<SecurityCoverageSendJob> findBySimulation(@NotBlank Exercise simulation);
 
-  // TODO: SELECT FOR UPDATE SKIP LOCKED;
-  List<SecurityCoverageSendJob> findByStatusAndUpdatedAtBefore(
+  @Query(
+      value =
+          """
+    SELECT scsj.* FROM security_coverage_send_job scsj
+    WHERE scsj.security_coverage_send_job_status = :status
+      AND scsj.security_coverage_send_job_updated_at < :updatedAtBefore
+    """,
+      nativeQuery = true)
+  List<SecurityCoverageSendJob> findByStatusAndUpdatedAtBeforeNoLock(
       String status, Instant updatedAtBefore);
+
+  @Query(
+      value =
+          """
+    SELECT scsj.* FROM security_coverage_send_job scsj
+    WHERE scsj.security_coverage_send_job_id IN :ids
+    """,
+      nativeQuery = true)
+  List<SecurityCoverageSendJob> findAllByIdForUpdate(List<String> ids);
 }

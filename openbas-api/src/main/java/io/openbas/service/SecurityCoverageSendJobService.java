@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.database.repository.SecurityCoverageSendJobRepository;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SecurityCoverageSendJobService {
   private final SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
+  private final EntityManager entityManager;
 
   public void createOrUpdateJobsForSimulation(Set<Exercise> exercises) {
     List<SecurityCoverageSendJob> jobs = new ArrayList<>();
@@ -23,6 +25,7 @@ public class SecurityCoverageSendJobService {
       Optional<SecurityCoverageSendJob> scsj =
           securityCoverageSendJobRepository.findBySimulation(exercise);
       if (scsj.isPresent()) {
+        scsj.get().setStatus("PENDING");
         scsj.get().setUpdatedAt(Instant.now());
         jobs.add(scsj.get());
       } else {
@@ -38,12 +41,29 @@ public class SecurityCoverageSendJobService {
   }
 
   public List<SecurityCoverageSendJob> getPendingSecurityCoverageSendJobs() {
-    return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBefore(
+    return securityCoverageSendJobRepository.findByStatusAndUpdatedAtBeforeNoLock(
         "PENDING", Instant.now().minus(1, ChronoUnit.MINUTES));
   }
 
-  public void consumeJob(SecurityCoverageSendJob job) {
-    job.setStatus("SENT");
-    securityCoverageSendJobRepository.save(job);
+  public void consumeJobs(List<SecurityCoverageSendJob> jobs) {
+    entityManager.flush();
+    entityManager.clear();
+    List<SecurityCoverageSendJob> refetchedJobs =
+        securityCoverageSendJobRepository.findAllByIdForUpdate(
+            jobs.stream().map(SecurityCoverageSendJob::getId).toList());
+
+    for (SecurityCoverageSendJob job : jobs) {
+      List<SecurityCoverageSendJob> jobsToUpdate = new ArrayList<>();
+      Optional<SecurityCoverageSendJob> refetched =
+          refetchedJobs.stream().filter(j -> job.getId().equals(j.getId())).findAny();
+      if (refetched.isPresent()
+          && job.getSimulation().equals(refetched.get().getSimulation())
+          && job.getStatus().equals(refetched.get().getStatus())
+          && job.getUpdatedAt().equals(refetched.get().getUpdatedAt())) {
+        refetched.get().setStatus("SENT");
+        jobsToUpdate.add(refetched.get());
+      }
+      securityCoverageSendJobRepository.saveAll(jobsToUpdate);
+    }
   }
 }

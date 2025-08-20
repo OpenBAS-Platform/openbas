@@ -9,6 +9,7 @@ import io.openbas.stix.objects.Bundle;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@DisallowConcurrentExecution
 public class SecurityCoverageJob implements Job {
   private final SecurityCoverageSendJobService securityCoverageSendJobService;
   private final SecurityCoverageService securityCoverageService;
@@ -30,8 +32,8 @@ public class SecurityCoverageJob implements Job {
       Bundle bundle =
           securityCoverageService.createBundleFromSendJobs(List.of(securityCoverageSendJob));
       JsonNode n = bundle.toStix(mapper);
-      // send bundle
-      securityCoverageSendJobService.consumeJob(securityCoverageSendJob);
     }
+    securityCoverageSendJobService.consumeJobs(jobs);
+    // send bundle
   }
 }
