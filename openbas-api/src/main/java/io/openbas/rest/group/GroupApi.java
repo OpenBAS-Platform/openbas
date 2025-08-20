@@ -152,7 +152,7 @@ public class GroupApi extends RestBehavior {
     grant.setResourceId(input.getResourceId());
     grant.setGrantResourceType(input.getResourceType());
 
-  @PostMapping("/api/groups/{groupId}/grants/{grantId}")
+  @DeleteMapping("/api/groups/{groupId}/grants/{grantId}")
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
