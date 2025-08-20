@@ -8,6 +8,7 @@ import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsSendInput, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -18,7 +19,6 @@ import SendLessonsForm from '../SendLessonsForm';
 import AnswersByQuestionDialog from './AnswersByQuestionDialog';
 import CrysisIntensity from './CrysisIntensity';
 import LessonsCategories from './LessonsCategories';
-import {useAppDispatch} from "../../../../utils/hooks";
 
 const useStyles = makeStyles()(theme => ({
   metric: {

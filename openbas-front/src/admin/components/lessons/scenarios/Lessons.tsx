@@ -1,10 +1,12 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
-import {type ChangeEvent, type FunctionComponent, useContext, useEffect, useState} from 'react';
+import { type ChangeEvent, type FunctionComponent, useContext, useEffect, useState } from 'react';
 
+import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -12,8 +14,6 @@ import CreateObjective from '../CreateObjective';
 import LessonsObjectives from '../LessonsObjectives';
 import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
-import {fetchLessonsTemplates} from "../../../../actions/Lessons";
-import {useAppDispatch} from "../../../../utils/hooks";
 
 interface GenericSource {
   id: string;
