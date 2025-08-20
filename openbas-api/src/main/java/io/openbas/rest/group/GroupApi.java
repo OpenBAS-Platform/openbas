@@ -198,7 +198,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/grants")
   @RBAC(
       resourceId = "#groupId",
@@ -232,10 +231,9 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/grants/{grantId}")
   @RBAC(
-      resourceId = "#grantId",
+      resourceId = "#groupId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
