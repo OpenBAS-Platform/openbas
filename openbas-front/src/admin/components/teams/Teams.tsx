@@ -20,6 +20,7 @@ const Teams = () => {
     permissions: {
       readOnly: false,
       canManage: user.user_is_planner || false, // TODO : update with CASL
+      canLaunch: false, // TODO : update with CASL
       isRunning: false,
     },
   };

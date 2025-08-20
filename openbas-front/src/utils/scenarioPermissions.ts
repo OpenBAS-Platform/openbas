@@ -7,26 +7,12 @@ import { useHelper } from '../store';
 import { AbilityContext } from './permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from './permissions/types';
 
-const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
+const useScenarioPermissions = (scenarioId: string) => {
   const ability = useContext(AbilityContext);
 
-  const { scenario, me, logged } = useHelper((helper: ScenariosHelper & UserHelper & LoggedHelper) => {
-    return {
-      scenario: helper.getScenario(scenarioId),
-      me: helper.getMe(),
-      logged: helper.logged(),
-    };
+  const { logged } = useHelper((helper: ScenariosHelper & UserHelper & LoggedHelper) => {
+    return { logged: helper.logged() };
   });
-  if ((!fullScenario && !scenario) || !me) {
-    return {
-      canAccess: false,
-      canManage: false,
-      canLaunch: false,
-      readOnly: true, // todo : check if it's useful
-      isLoggedIn: !R.isEmpty(logged), // todo : check if it's useful
-      isRunning: false, // todo : check if it's useful
-    };
-  }
 
   const canAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenarioId);
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenarioId);
@@ -36,9 +22,9 @@ const useScenarioPermissions = (scenarioId: string, fullScenario = null) => {
     canAccess,
     canManage,
     canLaunch,
-    readOnly: !canManage,
-    isLoggedIn: !R.isEmpty(logged),
-    isRunning: false,
+    readOnly: !canManage, // todo : check where is it useful
+    isLoggedIn: !R.isEmpty(logged), // todo : check where is it useful
+    isRunning: false, // todo : check where is it useful
   };
 };
 

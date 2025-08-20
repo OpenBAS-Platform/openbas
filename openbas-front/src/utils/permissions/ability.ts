@@ -42,6 +42,5 @@ export function defineAbility(capabilities: string[], grants: Record<string, str
   }
 
   console.log(rules);
-
   return createMongoAbility(rules);
 }
