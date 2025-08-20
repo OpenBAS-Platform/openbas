@@ -1,5 +1,6 @@
 import { ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { useLocation } from 'react-router';
 
@@ -19,6 +20,7 @@ const MenuItemGroup: FunctionComponent<Props> = ({ item, state, helpers }) => {
   // Standard hooks
   const { t } = useFormatter();
   const location = useLocation();
+  const theme = useTheme();
   const { dimension } = useDimensions();
   const isMobile = dimension.width < 768;
 
@@ -47,7 +49,13 @@ const MenuItemGroup: FunctionComponent<Props> = ({ item, state, helpers }) => {
         onMouseEnter={() => !navOpen && handleSelectedMenuOpen(item.href)}
         onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
       >
-        <ListItemIcon style={{ minWidth: 20 }}>{item.icon()}</ListItemIcon>
+        <ListItemIcon style={{
+          minWidth: 20,
+          color: theme.palette.text.primary,
+        }}
+        >
+          {item.icon()}
+        </ListItemIcon>
         {navOpen && (
           <>
             <ListItemText
