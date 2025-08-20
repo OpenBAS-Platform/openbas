@@ -950,7 +950,7 @@ public class ExerciseApi extends RestBehavior {
 
   @GetMapping(EXERCISE_URI + "/{simulationId}/scenario")
   @RBAC(
-      resourceId = "#exerciseId",
+      resourceId = "#simulationId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
   @Operation(summary = "Get the Scenario linked to the simulation")
@@ -962,7 +962,7 @@ public class ExerciseApi extends RestBehavior {
         @ApiResponse(responseCode = "404", description = "Simulation or Scenario not found")
       })
   public Scenario scenarioFromSimulation(
-      @PathVariable @NotBlank @Schema(description = "ID of the exercise")
+      @PathVariable @NotBlank @Schema(description = "ID of the simulation")
           final String simulationId) {
     return scenarioService.scenarioFromSimulationId(simulationId);
   }

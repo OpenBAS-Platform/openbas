@@ -199,7 +199,7 @@ export const updateCustomDashboard = (exerciseId: string, customDashboardId: str
   return putReferential(schema.lessonsQuestion, uri, {})(dispatch);
 };
 
-export const fetchScenarioFromSimulation = (exerciseId: string) => (dispatch: Dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/scenario`;
+export const fetchScenarioFromSimulation = (simulationId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${simulationId}/scenario`;
   return getReferential(scenario, uri)(dispatch);
 };
