@@ -4133,6 +4133,25 @@ export interface PageNotificationRuleOutput {
   totalPages?: number;
 }
 
+export interface PageOrganization {
+  content?: Organization[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PagePayload {
   content?: Payload[];
   empty?: boolean;
