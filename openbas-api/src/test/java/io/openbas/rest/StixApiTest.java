@@ -78,6 +78,15 @@ class StixApiTest extends IntegrationTest {
 
       List<String> createdScenarioIds = mapper.readValue(createResponse, List.class);
       assertThat(createdScenarioIds).hasSize(1);
+
+      String scenarioId = createdScenarioIds.get(0);
+      Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
+      assertThat(createdScenario.getName()).isEqualTo("Security Assessment Q3 2025");
+      assertThat(createdScenario.getDescription())
+          .isEqualTo("Security assessment test plan for threat context XYZ.");
+      assertThat(createdScenario.getSecurityAssessment())
+          .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
+      assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 16 * * *");
     }
 
     @Test
