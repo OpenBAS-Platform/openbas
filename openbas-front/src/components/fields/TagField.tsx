@@ -129,16 +129,18 @@ const TagField: FunctionComponent<Props> = ({
                 ...params.InputProps,
                 endAdornment: (
                   <>
-                    <IconButton
-                      style={{
-                        position: 'absolute',
-                        right: '35px',
-                      }}
-                      disabled={disabled}
-                      onClick={() => handleOpenTagCreation()}
-                    >
-                      <AddOutlined />
-                    </IconButton>
+                    <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+                      <IconButton
+                        style={{
+                          position: 'absolute',
+                          right: '35px',
+                        }}
+                        disabled={disabled}
+                        onClick={() => handleOpenTagCreation()}
+                      >
+                        <AddOutlined />
+                      </IconButton>
+                    </Can>
                     {params.InputProps.endAdornment}
                   </>
                 ),
