@@ -1,4 +1,4 @@
-import { postReferential } from '../utils/Action';
+import { delReferential, delSubResourceReferential, postReferential } from '../utils/Action';
 import * as schema from './Schema';
 
 export const addGrant = (groupId, data) => (dispatch) => {
@@ -18,5 +18,5 @@ export const deleteGroupOrganization = (groupId, organizationId) => (dispatch) =
 
 export const deleteGrant = (groupId, grantId) => (dispatch) => {
   const uri = `/api/groups/${groupId}/grants/${grantId}`;
-  return postReferential(schema.group, uri)(dispatch);
+  return delSubResourceReferential(schema.group, uri)(dispatch);
 };
