@@ -46,8 +46,10 @@ public class SecurityCoverageSendJobService {
   }
 
   public void consumeJobs(List<SecurityCoverageSendJob> jobs) {
+    /* force hibernate to forget cache and refetch new data */
     entityManager.flush();
     entityManager.clear();
+    /* end clear */
     List<SecurityCoverageSendJob> refetchedJobs =
         securityCoverageSendJobRepository.findAllByIdForUpdate(
             jobs.stream().map(SecurityCoverageSendJob::getId).toList());
