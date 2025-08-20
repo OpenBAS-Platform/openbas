@@ -23,7 +23,7 @@ const useAtomicTestingGrant = (groupId: string) => {
 
   const configs: TableConfig<InjectResultOutput>[] = [
     {
-      label: t('Atomic Testing'),
+      label: t('Atomic testing'),
       value: inject => inject.inject_title,
       width: '40%',
       align: 'left',
