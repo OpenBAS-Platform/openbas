@@ -1,6 +1,6 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
-import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
+import {type ChangeEvent, type FunctionComponent, useContext, useEffect, useState} from 'react';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -12,6 +12,7 @@ import CreateObjective from '../CreateObjective';
 import LessonsObjectives from '../LessonsObjectives';
 import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
+import {fetchLessonsTemplates} from "../../../../actions/Lessons";
 
 interface GenericSource {
   id: string;
@@ -55,6 +56,12 @@ const Lessons: FunctionComponent<Props> = ({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
+
+  useEffect(() => {
+    if (openApplyTemplate) {
+      dispatch(fetchLessonsTemplates());
+    }
+  }, [openApplyTemplate]);
 
   // Context
   const {
