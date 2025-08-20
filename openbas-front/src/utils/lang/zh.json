@@ -127,6 +127,7 @@
   "At least one inject type is required": "至少需要一个注入类型",
   "At least one player (per team) must validate the expectation": "至少一名球员(每队)必须验证期望值",
   "Atomic testing is currently unavailable or you do not have sufficient permissions to access it.": "原子测试当前不可用，或者您没有足够的权限访问它。",
+  "Atomic testing": "自动测试",
   "Atomic testings": "自动测试",
   "atomic_testing_export_prompt": "导出此原子测试",
   "atomicTestings": "原子测试",

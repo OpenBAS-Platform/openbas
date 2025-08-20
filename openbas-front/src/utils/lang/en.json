@@ -127,6 +127,7 @@
   "At least one inject type is required": "At least one inject type is required",
   "At least one player (per team) must validate the expectation": "At least one player (per team) must validate the expectation",
   "Atomic testing is currently unavailable or you do not have sufficient permissions to access it.": "Atomic testing is currently unavailable or you do not have sufficient permissions to access it.",
+  "Atomic testing": "Atomic testing",
   "Atomic testings": "Atomic testings",
   "atomic_testing_export_prompt": "Export this atomic testing",
   "atomicTestings": "Atomic Testings",
