@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/* Based on https://jsonapi.org/ */
 @Component
 @RequiredArgsConstructor
 public class GenericJsonApiImporter<T extends Base> {
