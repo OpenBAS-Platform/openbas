@@ -81,10 +81,11 @@ class StixApiTest extends IntegrationTest {
 
       String scenarioId = createdScenarioIds.get(0);
       Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
-      assertThat(createdScenario.getName()).isEqualTo("Security Assessment Q3 2025");
+      assertThat(createdScenario.getName())
+          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
       assertThat(createdScenario.getDescription())
           .isEqualTo("Security assessment test plan for threat context XYZ.");
-      assertThat(createdScenario.getSecurityAssessment())
+      assertThat(createdScenario.getSecurityAssessment().getId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 16 * * *");
     }
