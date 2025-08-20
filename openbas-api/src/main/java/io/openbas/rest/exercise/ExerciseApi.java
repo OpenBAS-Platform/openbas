@@ -39,6 +39,7 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
@@ -107,6 +108,7 @@ public class ExerciseApi extends RestBehavior {
   private final ActionMetricCollector actionMetricCollector;
   private final ChannelService channelService;
   private final DocumentService documentService;
+  private final ScenarioService scenarioService;
 
   // endregion
 
@@ -945,5 +947,25 @@ public class ExerciseApi extends RestBehavior {
   public List<Document> documents(@PathVariable String exerciseId) {
     return this.documentService.documentsForSimulation(exerciseId);
   }
+
+  @GetMapping(EXERCISE_URI + "/{simulationId}/scenario")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
+  @Operation(summary = "Get the Scenario linked to the simulation")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The Scenario related to the given simulation"),
+        @ApiResponse(responseCode = "404", description = "Simulation or Scenario not found")
+      })
+  public Scenario scenarioFromSimulation(
+      @PathVariable @NotBlank @Schema(description = "ID of the simulation")
+          final String simulationId) {
+    return scenarioService.scenarioFromSimulationId(simulationId);
+  }
+
   // end region
 }
