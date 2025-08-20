@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import org.springframework.stereotype.Component;
 
+/* Based on https://jsonapi.org/ */
 @Component
 public class GenericJsonApiExporter {
 
