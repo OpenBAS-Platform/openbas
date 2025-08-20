@@ -85,7 +85,7 @@ class StixApiTest extends IntegrationTest {
           .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
       assertThat(createdScenario.getDescription())
           .isEqualTo("Security assessment test plan for threat context XYZ.");
-      assertThat(createdScenario.getSecurityAssessment().getId())
+      assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 16 * * *");
     }
