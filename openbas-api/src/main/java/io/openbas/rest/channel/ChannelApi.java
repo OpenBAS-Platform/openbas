@@ -6,13 +6,18 @@ import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.channel.form.*;
 import io.openbas.rest.channel.response.ChannelReader;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChannelService;
 import io.openbas.service.ScenarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +39,7 @@ public class ChannelApi extends RestBehavior {
   private final DocumentRepository documentRepository;
   private final UserRepository userRepository;
   private final ChannelService channelService;
+  private final DocumentService documentService;
 
   // -- CHANNELS --
 
@@ -350,5 +356,21 @@ public class ChannelApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String articleId) {
     articleRepository.deleteById(articleId);
+  }
+
+  @GetMapping("/api/channels/{channelId}/documents")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHANNEL)
+  @Operation(summary = "Get the Documents used in a channel")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the Channel")
+      })
+  public List<RawDocument> documentsFromChannel(@PathVariable String channelId) {
+    return documentService.documentsForChannel(channelId);
   }
 }

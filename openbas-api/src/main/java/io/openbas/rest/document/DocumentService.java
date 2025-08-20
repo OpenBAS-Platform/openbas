@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
@@ -109,5 +110,9 @@ public class DocumentService {
 
   public List<Document> documentsForSimulation(String simulationId) {
     return this.documentRepository.findAllDistinctBySimulationId(simulationId);
+  }
+
+  public List<RawDocument> documentsForChannel(@NotBlank String channelId) {
+    return this.documentRepository.rawAllDocumentsByChannelId(channelId);
   }
 }
