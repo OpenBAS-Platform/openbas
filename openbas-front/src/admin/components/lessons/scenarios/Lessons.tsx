@@ -13,6 +13,7 @@ import LessonsObjectives from '../LessonsObjectives';
 import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
 import {fetchLessonsTemplates} from "../../../../actions/Lessons";
+import {useAppDispatch} from "../../../../utils/hooks";
 
 interface GenericSource {
   id: string;
@@ -47,6 +48,7 @@ const Lessons: FunctionComponent<Props> = ({
   // Standard hooks
   const theme = useTheme();
   const { t } = useFormatter();
+  const dispatch = useAppDispatch();
 
   const [selectedObjective, setSelectedObjective] = useState<string | null>(null);
   const [openApplyTemplate, setOpenApplyTemplate] = useState<boolean>(false);
