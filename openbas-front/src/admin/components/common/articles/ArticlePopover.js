@@ -1,8 +1,8 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import * as R from 'ramda';
 import { Fragment, useContext, useState } from 'react';
 
+import ButtonPopover from '../../../../components/common/ButtonPopover.js';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { ArticleContext, PermissionsContext } from '../Context';
@@ -20,17 +20,10 @@ const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  // popover management
-  const handlePopoverOpen = (event) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-  const handlePopoverClose = () => setAnchorEl(null);
+
   // Edit action
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
@@ -43,7 +36,6 @@ const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
   // Delete action
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
@@ -51,7 +43,6 @@ const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
   };
   const handleOpenRemove = () => {
     setOpenRemove(true);
-    handlePopoverClose();
   };
   const handleCloseRemove = () => {
     setOpenRemove(false);
@@ -73,30 +64,29 @@ const ArticlePopover = ({ article, onRemoveArticle, disabled = false }) => {
     ]),
   )(article);
 
+  // Button Popover
+  const entries = [{
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    userRight: permissions.canManage,
+  }, {
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    userRight: permissions.canManage,
+  }];
+  if (onRemoveArticle) entries.push({
+    label: 'Remove from the inject',
+    action: () => handleOpenRemove(),
+    userRight: true,
+  });
+
   return (
     <Fragment>
-      <IconButton
-        color="primary"
+      <ButtonPopover
+        entries={entries}
+        variant="icon"
         disabled={!permissions.canManage || disabled}
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {onRemoveArticle && (
-          <MenuItem onClick={handleOpenRemove}>
-            {t('Remove from the inject')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
-      </Menu>
+      />
       <Dialog
         open={openDelete}
         TransitionComponent={Transition}

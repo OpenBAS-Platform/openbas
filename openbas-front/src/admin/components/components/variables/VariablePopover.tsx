@@ -1,5 +1,4 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { type FunctionComponent, useContext, useState } from 'react';
 
 import ButtonPopover from '../../../../components/common/ButtonPopover';
@@ -24,7 +23,6 @@ const VariablePopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const { permissions } = useContext(PermissionsContext);
 
   const initialValues = (({
@@ -70,49 +68,11 @@ const VariablePopover: FunctionComponent<Props> = ({
 
   return (
     <>
-
       <ButtonPopover
         entries={entries}
         variant="icon"
         disabled={disabled}
       />
-
-      {/* <IconButton */}
-      {/*  onClick={(ev) => { */}
-      {/*    ev.stopPropagation(); */}
-      {/*    setAnchorEl(ev.currentTarget); */}
-      {/*  }} */}
-      {/*  aria-haspopup="true" */}
-      {/*  size="large" */}
-      {/*  color="primary" */}
-      {/*  disabled={disabled} */}
-      {/* > */}
-      {/*  <MoreVert /> */}
-      {/* </IconButton> */}
-      {/* <Menu */}
-      {/*  anchorEl={anchorEl} */}
-      {/*  open={Boolean(anchorEl)} */}
-      {/*  onClose={() => setAnchorEl(null)} */}
-      {/* > */}
-      {/*  <MenuItem */}
-      {/*    onClick={() => { */}
-      {/*      setEditVar(true); */}
-      {/*      setAnchorEl(null); */}
-      {/*    }} */}
-      {/*    disabled={disabled} */}
-      {/*  > */}
-      {/*    {t('Update')} */}
-      {/*  </MenuItem> */}
-      {/*  <MenuItem */}
-      {/*    onClick={() => { */}
-      {/*      setDeleteVar(true); */}
-      {/*      setAnchorEl(null); */}
-      {/*    }} */}
-      {/*    disabled={disabled} */}
-      {/*  > */}
-      {/*    {t('Delete')} */}
-      {/*  </MenuItem> */}
-      {/* </Menu> */}
       <Dialog
         open={deleteVar}
         TransitionComponent={Transition}

@@ -21,7 +21,6 @@ import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import DocumentType from '../../components/documents/DocumentType';
-import { ArticleContext } from '../Context.js';
 import ArticleAddDocuments from './ArticleAddDocuments.js';
 
 const useStyles = makeStyles()(() => ({
@@ -379,11 +378,13 @@ const ArticleForm = ({
                 );
               })}
               {values.article_channel?.type && (
-                <ArticleAddDocuments
-                  articleDocumentsIds={documents}
-                  handleAddDocuments={handleAddDocuments}
-                  channelType={values.article_channel.type}
-                />
+                <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}>
+                  <ArticleAddDocuments
+                    articleDocumentsIds={documents}
+                    handleAddDocuments={handleAddDocuments}
+                    channelType={values.article_channel.type}
+                  />
+                </Can>
               )}
             </List>
             <div style={{
