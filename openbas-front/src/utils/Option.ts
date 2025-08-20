@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
 import countriesJson from '../static/geo/countries.json';
-import { type AttackPattern, type Document, type Exercise, type KillChainPhase, type Organization, type Scenario, type Tag } from './api-types';
+import { type AttackPattern, type Exercise, type KillChainPhase, type Organization, type Scenario, type Tag } from './api-types';
 
 interface Countries {
   features: [{
@@ -32,19 +32,6 @@ export const createGroupOption: (id: string, label: string, group: string, color
   };
 };
 
-export const documentOptions = (
-  document_ids: string[] | undefined,
-  documentsMap: Record<string, Document>,
-) => (document_ids ?? [])
-  .map(documentId => documentsMap[documentId])
-  .filter(documentItem => documentItem !== undefined)
-  .map(
-    documentItem => ({
-      id: documentItem.document_id,
-      label: documentItem.document_name,
-    }) as Option,
-  );
-
 export const tagOptions = (
   tag_ids: string[] | undefined,
   tagsMap: Record<string, Tag>,
@@ -57,18 +44,6 @@ export const tagOptions = (
       label: tagItem.tag_name,
       color: tagItem.tag_color,
     }) as Option,
-  );
-
-export const platformOptions = (
-  platform_ids: string[] | undefined,
-) => (platform_ids ?? [])
-  .map(
-    (platformId) => {
-      return {
-        id: platformId,
-        label: platformId,
-      };
-    },
   );
 
 export const attackPatternOptions = (
