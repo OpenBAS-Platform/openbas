@@ -231,7 +231,7 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @PostMapping("/api/groups/{groupId}/grants/{grantId}")
+  @DeleteMapping("/api/groups/{groupId}/grants/{grantId}")
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
