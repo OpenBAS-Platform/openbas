@@ -3,7 +3,6 @@ package io.openbas.rest.group;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -199,14 +198,13 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/grants")
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
-  public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
+  public Group groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
     if (input.getExerciseId() == null && input.getScenarioId() == null) {
       throw new IllegalArgumentException("At least one of exercise or scenario should be present");
     }
@@ -226,31 +224,24 @@ public class GroupApi extends RestBehavior {
     Grant grant = new Grant();
     grant.setName(input.getName());
     grant.setGroup(group);
-    if (exerciseOpt.isPresent()) {
-      grant.setExercise(exerciseOpt.get());
-    }
-    if (scenarioOpt.isPresent()) {
-      grant.setScenario(scenarioOpt.get());
-    }
-    Grant savedGrant = grantRepository.save(grant);
+    exerciseOpt.ifPresent(grant::setExercise);
+    scenarioOpt.ifPresent(grant::setScenario);
 
-    // Exercise
-    if (exerciseOpt.isPresent()) {
-      Exercise exercise = exerciseOpt.get();
-      exercise.getGrants().add(savedGrant);
-      exercise.setUpdatedAt(now());
-      exerciseRepository.save(exercise);
-    }
+    group.getGrants().add(grant);
+    return groupRepository.save(group);
+  }
 
-    // Scenario
-    if (scenarioOpt.isPresent()) {
-      Scenario scenario = scenarioOpt.get();
-      scenario.getGrants().add(savedGrant);
-      scenario.setUpdatedAt(now());
-      scenarioRepository.save(scenario);
-    }
-
-    return savedGrant;
+  @DeleteMapping("/api/groups/{groupId}/grants/{grantId}")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
+  @Transactional(rollbackOn = Exception.class)
+  public Group deleteGrant(@PathVariable String groupId, @PathVariable String grantId) {
+    Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
+    Grant grant = grantRepository.findById(grantId).orElseThrow(ElementNotFoundException::new);
+    group.getGrants().remove(grant);
+    return this.groupRepository.save(group);
   }
 
   @Secured(ROLE_ADMIN)
@@ -273,7 +264,7 @@ public class GroupApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
+  @PostMapping("/api/groups/{groupId}/organizations/{organizationId}")
   @RBAC(
       resourceId = "#groupId",
       actionPerformed = Action.WRITE,
@@ -285,17 +276,6 @@ public class GroupApi extends RestBehavior {
         organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
     group.getOrganizations().remove(organization);
     return groupRepository.save(group);
-  }
-
-  @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/grants/{grantId}")
-  @RBAC(
-      resourceId = "#grantId",
-      actionPerformed = Action.WRITE,
-      resourceType = ResourceType.USER_GROUP)
-  @Transactional(rollbackOn = Exception.class)
-  public void deleteGrant(@PathVariable String grantId) {
-    grantRepository.deleteById(grantId);
   }
 
   @Secured(ROLE_ADMIN)

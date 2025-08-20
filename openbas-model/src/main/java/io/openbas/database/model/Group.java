@@ -64,7 +64,11 @@ public class Group implements Base {
       joinColumns = @JoinColumn(name = "group_id"))
   private List<Grant.GRANT_TYPE> scenariosDefaultGrants = new ArrayList<>();
 
-  @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+  @OneToMany(
+      mappedBy = "group",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("group_grants")
   @JsonSerialize(using = MultiModelDeserializer.class)
   @Fetch(value = FetchMode.SUBSELECT)
