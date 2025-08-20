@@ -9,7 +9,6 @@ import DocumentType from '../../admin/components/components/documents/DocumentTy
 import { useHelper } from '../../store';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
-import useDataLoader from '../../utils/hooks/useDataLoader';
 import ButtonPopover, { type PopoverEntry } from '../common/ButtonPopover';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
@@ -108,18 +107,18 @@ const FileLoader: FunctionComponent<Props> = ({
 
   // Fetching data
   const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper) => ({ documents: helper.getDocuments() }));
-  useDataLoader(() => {
-    dispatch(fetchDocuments());
-  });
 
   useEffect(() => {
+    if (open) {
+      dispatch(fetchDocuments());
+    }
     if (initialValue?.id && documents.length > 0) {
       const resolvedDocument = documents.find(doc => doc.document_id === initialValue.id);
       if (resolvedDocument) {
         setSelectedDocument(resolvedDocument);
       }
     }
-  }, [documents]);
+  });
 
   useEffect(() => {
     if (firstInteraction) {
