@@ -10,8 +10,8 @@ public class ExecutorHelper {
   // Only used in Tanium / CS / Caldera executors, the native OpenAEV agent will determine a
   // relative path at its level
   public static final String IMPLANT_LOCATION_WINDOWS =
-      "\"C:\\Program Files (x86)\\Filigran\\OBAS Agent\\runtimes";
-  public static final String IMPLANT_LOCATION_UNIX = "/opt/openbas-agent/runtimes";
+      "\"C:\\Program Files (x86)\\Filigran\\OBAS Agent\\runtimes\\";
+  public static final String IMPLANT_LOCATION_UNIX = "/opt/openbas-agent/runtimes/";
 
   private ExecutorHelper() {}
 
