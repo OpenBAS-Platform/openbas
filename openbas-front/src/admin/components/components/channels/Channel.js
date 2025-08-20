@@ -96,7 +96,7 @@ const Channel = () => {
                 </Typography>
                 {logoDark ? (
                   <img
-                    src={`/api/documents/${logoDark.document_id}/file`}
+                    src={`/api/images/channels/id/${channelId}/dark`}
                     style={{
                       maxHeight: 200,
                       maxWidth: 200,
@@ -123,7 +123,7 @@ const Channel = () => {
                 </Typography>
                 {logoLight ? (
                   <img
-                    src={`/api/documents/${logoLight.document_id}/file`}
+                    src={`/api/images/channels/id/${channelId}/light`}
                     style={{
                       maxHeight: 200,
                       maxWidth: 200,

@@ -22,9 +22,12 @@ import io.openbas.rest.document.form.DocumentUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.service.ChannelService;
 import io.openbas.service.FileService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -67,6 +70,7 @@ public class DocumentApi extends RestBehavior {
   private final DocumentService documentService;
   private final FileService fileService;
   private final InjectService injectService;
+  private final ChannelService channelService;
 
   private Optional<Document> resolveDocument(String documentId) {
     OpenBASPrincipal user = currentUser();
@@ -476,6 +480,31 @@ public class DocumentApi extends RestBehavior {
       downloadDocument(securityPlatform.getLogoDark().getId(), response);
     } else if (securityPlatform.getLogoLight() != null) {
       downloadDocument(securityPlatform.getLogoLight().getId(), response);
+    } else {
+      downloadCollectorImage("openbas_fake_detector", response);
+    }
+  }
+
+  @GetMapping(value = "/api/images/channels/id/{channelId}/{theme}")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHANNEL)
+  @Operation(summary = "Get the channel image")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Channel image"),
+        @ApiResponse(responseCode = "404", description = "Channel not found")
+      })
+  public void getChannelImageFromId(
+      @PathVariable String channelId, @PathVariable String theme, HttpServletResponse response)
+      throws IOException {
+    Channel channel = channelService.channel(channelId);
+
+    if (theme.equals("dark") && channel.getLogoDark() != null) {
+      downloadDocument(channel.getLogoDark().getId(), response);
+    } else if (channel.getLogoLight() != null) {
+      downloadDocument(channel.getLogoLight().getId(), response);
     } else {
       downloadCollectorImage("openbas_fake_detector", response);
     }
