@@ -4,7 +4,6 @@ import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../actions/Document';
 import { searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
@@ -23,8 +22,6 @@ import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { type Payload, type SearchPaginationInput } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { Can } from '../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePayload from './CreatePayload';
@@ -102,12 +99,8 @@ const Payloads = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
-  const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
-  useDataLoader(() => {
-    dispatch(fetchDocuments());
-  });
 
   // Headers
   const headers: Header[] = useMemo(() => [
