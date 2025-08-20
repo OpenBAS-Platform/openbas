@@ -1,7 +1,6 @@
 import { Tooltip, Typography } from '@mui/material';
 import { type FunctionComponent, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router';
-import { makeStyles } from 'tss-react/mui';
 
 import { type CustomDashboard } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
@@ -11,8 +10,6 @@ import CustomDashboardPopover from './CustomDashboardPopover';
 
 const CustomDashboardHeader: FunctionComponent = () => {
   // Standard hooks
-  const { classes } = useStyles();
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
