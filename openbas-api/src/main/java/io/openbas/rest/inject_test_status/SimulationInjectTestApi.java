@@ -39,7 +39,10 @@ public class SimulationInjectTestApi extends RestBehavior {
    * @see #findExercisePageInjectTests
    */
   @PostMapping("/api/exercise/{simulationId}/injects/test")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -48,7 +51,10 @@ public class SimulationInjectTestApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test/search")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findExercisePageInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
