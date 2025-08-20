@@ -1,5 +1,7 @@
 package io.openbas.rest;
 
+import static io.openbas.rest.StixApi.STIX_API;
+
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.StixService;
 import io.openbas.stix.parsing.ParsingException;
@@ -24,7 +26,7 @@ public class StixApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(
-      value = "/generate-scenario-from-stix-bundle",
+      value = STIX_API + "/generate-scenario-from-stix-bundle",
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public List<String> generateScenarioFromSTIXBundle(@RequestBody String stixJson)
       throws IOException, ParsingException {
