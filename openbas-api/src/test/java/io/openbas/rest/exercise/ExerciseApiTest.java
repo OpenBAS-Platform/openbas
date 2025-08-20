@@ -52,6 +52,7 @@ public class ExerciseApiTest extends IntegrationTest {
   @Autowired private TagRepository tagRepository;
   @Autowired private TagRuleRepository tagRuleRepository;
   @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   List<ExerciseComposer.Composer> exerciseWrapperComposers = new ArrayList<>();
   private static final List<String> EXERCISE_IDS = new ArrayList<>();
@@ -144,6 +145,30 @@ public class ExerciseApiTest extends IntegrationTest {
           JsonPath.read(response, "$.global_scores_by_exercise_ids." + exercise2Saved.getId())
               .toString());
     }
+  }
+
+  @Test
+  @DisplayName("Get scenario from exercise id")
+  @WithMockAdminUser
+  void givenExerciseId_whenGettingScenarioFromExercise_thenReturnScenario() throws Exception {
+    Scenario scenario = ScenarioFixture.createDefaultCrisisScenario();
+    Scenario scenarioSaved = scenarioRepository.save(scenario);
+
+    Exercise exercise = ExerciseFixture.createDefaultCrisisExercise();
+    exercise.setScenario(scenarioSaved);
+
+    Exercise exerciseSaved = exerciseRepository.save(exercise);
+
+    String response =
+        mvc.perform(
+                get(EXERCISE_URI + "/" + exerciseSaved.getId() + "/scenario")
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertEquals(scenarioSaved.getId(), JsonPath.read(response, "$.scenario_id"));
   }
 
   @DisplayName("Check if a rule applies when a rule is found")
