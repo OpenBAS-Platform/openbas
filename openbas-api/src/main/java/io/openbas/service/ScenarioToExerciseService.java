@@ -54,6 +54,7 @@ public class ScenarioToExerciseService {
     exercise.setFrom(scenario.getFrom());
     exercise.addReplyTos(scenario.getReplyTos());
     exercise.setStart(start);
+    exercise.setSecurityAssessment(scenario.getSecurityAssessment());
     if (isRunning) {
       exercise.setStatus(ExerciseStatus.RUNNING);
     }
