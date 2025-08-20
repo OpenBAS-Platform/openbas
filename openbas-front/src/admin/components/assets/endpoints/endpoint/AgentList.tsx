@@ -136,7 +136,7 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
       field: 'agent_version',
       label: 'Version',
       isSortable: false,
-      value: (agent: AgentOutput) => agent.agent_version,
+      value: (agent: AgentOutput) => agent.agent_version ?? '-',
     },
     {
       field: 'agent_last_seen',
