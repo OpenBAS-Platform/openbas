@@ -5,8 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
-import { fetchDocuments } from '../../../../actions/Document';
+import { fetchDocumentsChannels, updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -42,7 +41,7 @@ const Channel = () => {
   }),
   );
   useDataLoader(() => {
-    dispatch(fetchDocuments());
+    dispatch(fetchDocumentsChannels(channelId));
   });
   const submitUpdate = data => dispatch(updateChannel(channelId, data));
   const submitLogo = (documentId, theme) => {
