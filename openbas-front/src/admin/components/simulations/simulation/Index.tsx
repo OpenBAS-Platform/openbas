@@ -230,11 +230,11 @@ const Index = () => {
     if (!exercise) {
       return;
     }
-    if (!exercise?.exercise_scenario) {
+    if (!exercise.exercise_scenario) {
       setPristine(false);
       setLoading(false);
     } else {
-      dispatch(fetchScenarioFromSimulation(exercise?.exercise_id)).finally(() => {
+      dispatch(fetchScenarioFromSimulation(exercise.exercise_id)).finally(() => {
         setPristine(false);
         setLoading(false);
       });

@@ -296,10 +296,11 @@ public class ScenarioService {
         .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
 
-  public Scenario scenarioFromExerciseId(@NotBlank final String exerciseId) {
+  public Scenario scenarioFromSimulationId(@NotBlank final String simulationId) {
     return this.scenarioRepository
-        .findByExercises_Id(exerciseId)
-        .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
+        .findByExercises_Id(simulationId)
+        .orElseThrow(
+            () -> new ElementNotFoundException("Scenario not found for simulation" + simulationId));
   }
 
   @Transactional(readOnly = true)
