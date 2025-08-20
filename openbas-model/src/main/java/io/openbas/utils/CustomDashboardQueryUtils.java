@@ -4,13 +4,15 @@ import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.engine.api.WidgetConfiguration;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 public class CustomDashboardQueryUtils {
 
-  private CustomDashboardQueryUtils() {}
+  private CustomDashboardQueryUtils() {
+  }
 
   public static Instant calcStartDate(
       Map<String, String> parameters,
@@ -18,21 +20,21 @@ public class CustomDashboardQueryUtils {
       Map<String, CustomDashboardParameters> definitionParameters) {
     String timeRangeParameterId =
         definitionParameters.entrySet().stream()
-            .filter(entry -> entry.getValue().getType().name.equals("timeRange"))
+            .filter(entry -> "timeRange".equals(entry.getValue().getType().name))
+            .map(Map.Entry::getKey)
             .findFirst()
-            .get()
-            .getKey();
+            .orElseThrow(() -> new IllegalStateException("Missing parameter with type 'timeRange'"));
+
     String startDateParameterId =
         definitionParameters.entrySet().stream()
-            .filter(entry -> entry.getValue().getType().name.equals("startDate"))
+            .filter(entry -> "startDate".equals(entry.getValue().getType().name))
+            .map(Map.Entry::getKey)
             .findFirst()
-            .get()
-            .getKey();
+            .orElseThrow(() -> new IllegalStateException("Missing parameter with type 'startDate'"));
+
     String dashboardTimeRange = parameters.get(timeRangeParameterId);
     String widgetTimeRange = widgetConfig.getTimeRange().name();
     switch (widgetTimeRange) {
-      case "ALL_TIME":
-        return Instant.parse("2016-01-01T00:00:00Z");
       case "LAST_DAY":
         return Instant.now().minus(24, ChronoUnit.HOURS);
       case "LAST_WEEK":
@@ -46,36 +48,35 @@ public class CustomDashboardQueryUtils {
       case "LAST_YEAR":
         return Instant.now().minus(360, ChronoUnit.DAYS);
       case "CUSTOM":
+        assert widgetConfig.getStart() != null;
         if (!widgetConfig.getStart().isEmpty()) {
           return Instant.parse(
               parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
-
-      default:
+      case "DEFAULT":
         if (!hasText(dashboardTimeRange)) {
           throw new RuntimeException("Dashboard timerange is not set");
         }
         switch (dashboardTimeRange) {
-          case "ALL_TIME":
-            return Instant.parse("2016-01-01T00:00:00Z");
           case "LAST_DAY":
-            return Instant.now().minus(24, ChronoUnit.HOURS);
+            return Instant.now().minus(1, ChronoUnit.DAYS);
           case "LAST_WEEK":
-            return Instant.now().minus(7, ChronoUnit.DAYS);
+            return Instant.now().minus(1, ChronoUnit.WEEKS);
           case "LAST_MONTH":
-            return Instant.now().minus(30, ChronoUnit.DAYS);
+            return Instant.now().minus(1, ChronoUnit.MONTHS);
           case "LAST_QUARTER":
-            return Instant.now().minus(90, ChronoUnit.DAYS);
+            return Instant.now().minus(3, ChronoUnit.MONTHS);
           case "LAST_SEMESTER":
-            return Instant.now().minus(180, ChronoUnit.DAYS);
+            return Instant.now().minus(6, ChronoUnit.MONTHS);
           case "LAST_YEAR":
-            return Instant.now().minus(360, ChronoUnit.DAYS);
+            return Instant.now().minus(1, ChronoUnit.YEARS);
           case "CUSTOM":
             if (parameters.get(startDateParameterId) != null) {
               return Instant.parse(parameters.get(startDateParameterId));
             }
           default:
         }
+      default:
     }
     return Instant.now();
   }
