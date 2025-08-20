@@ -374,9 +374,7 @@ public class DocumentApi extends RestBehavior {
       resourceType = ResourceType.DOCUMENT)
   public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
       throws IOException {
-    Document document =
-        resolveDocument(documentId)
-            .orElseThrow(() -> new ElementNotFoundException("Document not found"));
+    Document document = documentService.document(documentId);
     response.addHeader(
         HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
     response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
