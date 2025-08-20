@@ -82,7 +82,8 @@ public enum Capability {
   MANAGE_PAYLOADS(
       ACCESS_PAYLOADS,
       pair(ResourceType.PAYLOAD, Action.WRITE),
-      pair(ResourceType.PAYLOAD, Action.CREATE)),
+      pair(ResourceType.PAYLOAD, Action.CREATE),
+      pair(ResourceType.PAYLOAD, Action.DUPLICATE)),
   DELETE_PAYLOADS(MANAGE_PAYLOADS, pair(ResourceType.PAYLOAD, Action.DELETE)),
 
   // Dashboards
