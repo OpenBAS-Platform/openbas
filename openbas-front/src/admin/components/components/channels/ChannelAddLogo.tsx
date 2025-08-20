@@ -6,7 +6,6 @@ import FileTransferDialog from '../../../../components/fields/FileTransferDialog
 import { useFormatter } from '../../../../components/i18n';
 import { type RawDocument } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 
@@ -19,11 +18,10 @@ const ChannelAddLogo: FunctionComponent<Props> = ({ handleAddLogo }) => {
   const [open, setOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<RawDocument | null>(null);
 
-  useDataLoader(() => {
-    dispatch(fetchDocuments());
-  });
-
   useEffect(() => {
+    if (open) {
+      dispatch(fetchDocuments());
+    }
     if (selectedDocument && selectedDocument.document_id) {
       handleAddLogo(selectedDocument.document_id);
     }
