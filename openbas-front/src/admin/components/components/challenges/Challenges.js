@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchChallenges } from '../../../../actions/Challenge';
+import { fetchChallenges } from '../../../../actions/challenge-action.js';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import Breadcrumbs from '../../../../components/Breadcrumbs';

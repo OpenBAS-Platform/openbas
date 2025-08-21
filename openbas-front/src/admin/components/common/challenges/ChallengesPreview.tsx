@@ -8,7 +8,7 @@ import { type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { tryChallenge } from '../../../../actions/Challenge';
+import { tryChallenge } from '../../../../actions/challenge-action';
 import Dialog from '../../../../components/common/Dialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';

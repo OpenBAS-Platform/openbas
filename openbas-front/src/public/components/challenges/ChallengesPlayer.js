@@ -26,7 +26,7 @@ import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
-import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
+import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/challenge-action.js';
 import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
