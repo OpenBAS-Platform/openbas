@@ -212,7 +212,7 @@ const TeamAddPlayers: FunctionComponent<Props> = ({ addedUsersIds, teamId }) => 
                     <Chip
                       key={userId}
                       onDelete={() => {
-                        setUsersIds(usersIds.splice(usersIds.indexOf(userId), 1));
+                        setUsersIds(usersIds.filter(id => id !== userId));
                       }}
                       label={truncate(resolveUserName(user), 22)}
                       avatar={(
