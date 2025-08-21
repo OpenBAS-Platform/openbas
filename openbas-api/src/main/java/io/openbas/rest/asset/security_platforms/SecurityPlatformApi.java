@@ -183,6 +183,6 @@ public class SecurityPlatformApi {
             description = "The list of Documents used in the Channel")
       })
   public List<RawDocument> documentsFromChannel(@PathVariable String securityPlatformId) {
-    return documentService.documentsForChannel(securityPlatformId);
+    return documentService.documentsForSecurityPlatform(securityPlatformId);
   }
 }
