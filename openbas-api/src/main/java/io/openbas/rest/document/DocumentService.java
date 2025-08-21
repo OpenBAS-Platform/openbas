@@ -119,4 +119,8 @@ public class DocumentService {
   public List<RawDocument> documentsForSecurityPlatform(@NotBlank String securityPlatformId) {
     return this.documentRepository.rawAllDocumentsBySecurityPlatformId(securityPlatformId);
   }
+
+  public List<RawDocument> documentsForChallenge(@NotBlank String challengeId) {
+    return this.documentRepository.rawAllDocumentsByChallengeId(challengeId);
+  }
 }

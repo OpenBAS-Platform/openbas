@@ -8,14 +8,19 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
 import io.openbas.rest.challenge.response.ChallengeResult;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +38,7 @@ public class ChallengeApi extends RestBehavior {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final ChallengeService challengeService;
+  private final DocumentService documentService;
 
   @GetMapping("/api/challenges")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.CHALLENGE)
@@ -127,5 +133,21 @@ public class ChallengeApi extends RestBehavior {
       throws InputValidationException {
     validateUUID(challengeId);
     return challengeService.tryChallenge(challengeId, input);
+  }
+
+  @GetMapping("/api/challenges/{challengeId}/documents")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHALLENGE)
+  @Operation(summary = "Get the Documents used in a challenge")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the Challenge")
+      })
+  public List<RawDocument> documentsFromChallenge(@PathVariable String challengeId) {
+    return documentService.documentsForChallenge(challengeId);
   }
 }
