@@ -1,6 +1,6 @@
 import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
@@ -9,6 +9,9 @@ import DocumentType from '../../admin/components/components/documents/DocumentTy
 import { useHelper } from '../../store';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
+import useDataLoader from '../../utils/hooks/useDataLoader';
+import { AbilityContext, Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import ButtonPopover, { type PopoverEntry } from '../common/ButtonPopover';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
@@ -99,6 +102,7 @@ const FileLoader: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const [open, setOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<RawDocument | undefined>(undefined);
@@ -108,17 +112,20 @@ const FileLoader: FunctionComponent<Props> = ({
   // Fetching data
   const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper) => ({ documents: helper.getDocuments() }));
 
-  useEffect(() => {
-    if (open) {
+  useDataLoader(() => {
+    if (ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS)) {
       dispatch(fetchDocuments());
     }
+  });
+
+  useEffect(() => {
     if (initialValue?.id && documents.length > 0) {
       const resolvedDocument = documents.find(doc => doc.document_id === initialValue.id);
       if (resolvedDocument) {
         setSelectedDocument(resolvedDocument);
       }
     }
-  });
+  }, [documents]);
 
   useEffect(() => {
     if (firstInteraction) {
@@ -156,7 +163,7 @@ const FileLoader: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: handleOpen,
-      userRight: true,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS),
     },
     {
       label: 'Download',
@@ -184,20 +191,22 @@ const FileLoader: FunctionComponent<Props> = ({
       }}
       >
         {!selectedDocument && (
-          <ListItem
-            className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
-            divider
-            onClick={handleOpen}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Add document"
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+            <ListItem
+              className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
+              divider
+              onClick={handleOpen}
+              color="primary"
+            >
+              <ListItemIcon color="primary">
+                <ControlPointOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Add document"
+                classes={{ primary: classes.text }}
+              />
+            </ListItem>
+          </Can>
         )}
         {InputLabelProps?.required && error && (
           <Typography className={classes.errorMessage}>
