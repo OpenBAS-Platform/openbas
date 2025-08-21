@@ -5,6 +5,7 @@ import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.engine.EngineService;
+import io.openbas.engine.api.CustomDashboardTimeRange;
 import io.openbas.engine.api.ListConfiguration;
 import io.openbas.engine.api.ListRuntime;
 import io.openbas.engine.api.StructuralHistogramRuntime;
@@ -12,11 +13,13 @@ import io.openbas.engine.model.inject.EsInject;
 import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
+
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class EsAttackPathService {
+
   private final AttackPatternRepository attackPatternRepository;
 
   private final EngineService esService;
@@ -32,7 +36,7 @@ public class EsAttackPathService {
   /**
    * Fetches attack paths for a given simulation.
    *
-   * @param user the user requesting the data
+   * @param user    the user requesting the data
    * @param runtime the structural histogram runtime containing the simulation filter and the series
    * @return a list of attack paths associated with the simulation
    * @throws ExecutionException
@@ -88,7 +92,7 @@ public class EsAttackPathService {
   /**
    * Fetches the injects associated with a given simulation ID from Elasticsearch.
    *
-   * @param user the user requesting the data
+   * @param user         the user requesting the data
    * @param simulationId the ID of the simulation for which injects are to be fetched
    * @return a list of EsInject objects associated with the simulation
    */
@@ -99,6 +103,8 @@ public class EsAttackPathService {
       Map<String, CustomDashboardParameters> definitionParameters) {
     Map<String, List<String>> filterMap = Map.of("base_simulation_side", List.of(simulationId));
     ListConfiguration config = esService.createListConfiguration("inject", filterMap);
+    config.setDateAttribute("inject_created_at");
+    config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
 
     return esService
         .entities(user, new ListRuntime(config, parameters, definitionParameters))
@@ -168,9 +174,8 @@ public class EsAttackPathService {
    * Aggregates data from a list of EsSeries based on a specific filter label. ( Success or Failed )
    *
    * @param series the list of EsSeries to aggregate
-   * @param label the label to filter the series data (e.g., "SUCCESS" or "FAILED")
-   * @return a map where keys are series data keys(attackPatternId) and values are their aggregated
-   *     counts
+   * @param label  the label to filter the series data (e.g., "SUCCESS" or "FAILED")
+   * @return a map where keys are series data keys(attackPatternId) and values are their aggregated counts
    */
   private Map<String, Long> aggregateSeriesData(List<EsSeries> series, String label) {
     return series.stream()
@@ -180,10 +185,10 @@ public class EsAttackPathService {
   }
 
   /**
-   * Builds a list of attack paths from a list of EsInject objects, mapping them to their
-   * corresponding attack patterns and success rates.
+   * Builds a list of attack paths from a list of EsInject objects, mapping them to their corresponding attack patterns
+   * and success rates.
    *
-   * @param esInjects the list of EsInject objects to process
+   * @param esInjects      the list of EsInject objects to process
    * @param attackPatterns a map of attack pattern IDs to AttackPattern objects
    * @param successRateMap a map of attack pattern IDs to their success rates
    * @return a list of EsAttackPath objects representing the attack paths
@@ -195,7 +200,9 @@ public class EsAttackPathService {
     Map<String, EsAttackPath> esAttackPathsMap = new HashMap<>();
 
     for (EsInject inject : esInjects) {
-      if (inject.getBase_attack_patterns_side() == null) continue;
+      if (inject.getBase_attack_patterns_side() == null) {
+        continue;
+      }
 
       for (String attackId : inject.getBase_attack_patterns_side()) {
         esAttackPathsMap.compute(
@@ -203,7 +210,7 @@ public class EsAttackPathService {
             (key, value) ->
                 value == null
                     ? createNewAttackPath(
-                        attackPatterns.get(attackId), inject, successRateMap.get(attackId))
+                    attackPatterns.get(attackId), inject, successRateMap.get(attackId))
                     : updateAttackPath(value, inject));
       }
     }
@@ -215,8 +222,8 @@ public class EsAttackPathService {
    * Creates a new EsAttackPath object based on the provided attack pattern and inject.
    *
    * @param attackPattern the attack pattern to base the attack path on
-   * @param inject the inject containing the base ID and children attack patterns
-   * @param successRate the success rate of the attack pattern
+   * @param inject        the inject containing the base ID and children attack patterns
+   * @param successRate   the success rate of the attack pattern
    * @return a new EsAttackPath object, or null if the attack pattern is null
    */
   private EsAttackPath createNewAttackPath(
@@ -254,7 +261,7 @@ public class EsAttackPathService {
    * Updates an existing EsAttackPath object by adding the inject's base ID and children
    *
    * @param attackPath the existing EsAttackPath to update
-   * @param inject the EsInject containing the base ID and children attack patterns
+   * @param inject     the EsInject containing the base ID and children attack patterns
    * @return the updated EsAttackPath object
    */
   private EsAttackPath updateAttackPath(EsAttackPath attackPath, EsInject inject) {

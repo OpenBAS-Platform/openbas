@@ -23,7 +23,7 @@ public class WidgetInput {
 
   @JsonProperty("widget_config")
   @NotNull(message = MANDATORY_MESSAGE)
-  @Valid
+  //@Valid
   private WidgetConfiguration widgetConfiguration;
 
   @JsonProperty("widget_layout")

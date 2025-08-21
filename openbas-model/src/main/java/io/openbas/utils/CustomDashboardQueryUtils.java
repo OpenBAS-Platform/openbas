@@ -48,8 +48,7 @@ public class CustomDashboardQueryUtils {
       case "LAST_YEAR":
         return Instant.now().minus(360, ChronoUnit.DAYS);
       case "CUSTOM":
-        assert widgetConfig.getStart() != null;
-        if (!widgetConfig.getStart().isEmpty()) {
+        if (hasText(widgetConfig.getStart())) {
           return Instant.parse(
               parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
@@ -59,17 +58,17 @@ public class CustomDashboardQueryUtils {
         }
         switch (dashboardTimeRange) {
           case "LAST_DAY":
-            return Instant.now().minus(1, ChronoUnit.DAYS);
+            return Instant.now().minus(24, ChronoUnit.HOURS);
           case "LAST_WEEK":
-            return Instant.now().minus(1, ChronoUnit.WEEKS);
+            return Instant.now().minus(7, ChronoUnit.DAYS);
           case "LAST_MONTH":
-            return Instant.now().minus(1, ChronoUnit.MONTHS);
+            return Instant.now().minus(30, ChronoUnit.DAYS);
           case "LAST_QUARTER":
-            return Instant.now().minus(3, ChronoUnit.MONTHS);
+            return Instant.now().minus(90, ChronoUnit.DAYS);
           case "LAST_SEMESTER":
-            return Instant.now().minus(6, ChronoUnit.MONTHS);
+            return Instant.now().minus(180, ChronoUnit.DAYS);
           case "LAST_YEAR":
-            return Instant.now().minus(1, ChronoUnit.YEARS);
+            return Instant.now().minus(360, ChronoUnit.DAYS);
           case "CUSTOM":
             if (parameters.get(startDateParameterId) != null) {
               return Instant.parse(parameters.get(startDateParameterId));

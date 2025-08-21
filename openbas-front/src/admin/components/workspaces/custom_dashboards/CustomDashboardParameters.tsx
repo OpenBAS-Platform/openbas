@@ -71,18 +71,7 @@ const CustomDashboardParameters: FunctionComponent = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 300px))',
-        gap: theme.spacing(2),
-      }}
-    >
-      {(customDashboard?.custom_dashboard_parameters ?? []).map(p => (
-        <div key={p.custom_dashboards_parameter_id}>
-          {renderParameterField(p)}
-        </div>
-      ))}
+    <>
       <TimeRangeFilters
         timeRangeValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id)}
         handleTimeRange={(data) => {
@@ -97,7 +86,18 @@ const CustomDashboardParameters: FunctionComponent = () => {
           handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id, data);
         }}
       />
-    </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 300px))',
+          gap: theme.spacing(2),
+        }}
+      >
+        {(customDashboard?.custom_dashboard_parameters ?? []).map(p => renderParameterField(p))}
+
+      </div>
+    </>
+
   );
 };
 

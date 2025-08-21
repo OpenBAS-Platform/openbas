@@ -38,12 +38,14 @@ import io.openbas.utils.CustomDashboardQueryUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
@@ -59,7 +61,8 @@ public class ElasticService implements EngineService {
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   public ElasticService(
       EngineContext searchEngine,
@@ -85,9 +88,9 @@ public class ElasticService implements EngineService {
     }
     if (propertyField.getType().isAssignableFrom(String.class)
         || (propertyField.getType().isAssignableFrom(Set.class)
-            && propertyField.getSubtype() instanceof ParameterizedType
-            && String.class.equals(
-                ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
+        && propertyField.getSubtype() instanceof ParameterizedType
+        && String.class.equals(
+        ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));
@@ -723,16 +726,38 @@ public class ElasticService implements EngineService {
               SortOptions.of(
                   so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
     }
-    Query query =
-        buildQuery(
-            user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    ListConfiguration widgetConfig = runtime.getWidget();
+    Map<String, String> parameters = runtime.getParameters();
+    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
+    Instant finalStart =
+        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
+    Instant finalEnd =
+        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
+    Query dateRangeQuery =
+        DateRangeQuery.of(
+                d ->
+                    d.field(widgetConfig.getDateAttribute())
+                        .gt(String.valueOf(finalStart))
+                        .lt(String.valueOf(finalEnd)))
+            ._toRangeQuery()
+            ._toQuery();
+    Query listQuery = buildQuery(
+        user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
+      Query query = null;
+      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+        query = queryBuilder.must(listQuery).build()._toQuery();
+      } else {
+        query = queryBuilder.must(dateRangeQuery, listQuery).build()._toQuery();
+      }
+      Query finalQuery = query;
       SearchResponse<?> response =
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(runtime.getWidget().getLimit())
-                      .query(query)
+                      .query(finalQuery)
                       .sort(engineSorts),
               getClassForEntity(entityName));
       return response.hits().hits().stream()
@@ -756,7 +781,7 @@ public class ElasticService implements EngineService {
   /**
    * Create a list configuration for the given entity name and filter value map.
    *
-   * @param entityName the name of the entity to filter on
+   * @param entityName     the name of the entity to filter on
    * @param filterValueMap a map of filter
    * @return a ListConfiguration object
    */
@@ -818,7 +843,9 @@ public class ElasticService implements EngineService {
     return List.of();
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getEngineVersion() {
     try {

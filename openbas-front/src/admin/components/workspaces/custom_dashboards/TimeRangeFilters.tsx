@@ -57,7 +57,7 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 300px))',
       gap: theme.spacing(2),
     }}
     >
