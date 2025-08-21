@@ -5,14 +5,20 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformInput;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformUpsertInput;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +37,7 @@ public class SecurityPlatformApi {
   private final SecurityPlatformRepository securityPlatformRepository;
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
+  private final DocumentService documentService;
 
   @GetMapping(SECURITY_PLATFORM_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SECURITY_PLATFORM)
@@ -161,5 +168,21 @@ public class SecurityPlatformApi {
   @Transactional(rollbackOn = Exception.class)
   public void deleteSecurityPlatform(@PathVariable @NotBlank final String securityPlatformId) {
     this.securityPlatformRepository.deleteById(securityPlatformId);
+  }
+
+  @GetMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}/documents")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SECURITY_PLATFORM)
+  @Operation(summary = "Get the Documents used in a channel")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the Channel")
+      })
+  public List<RawDocument> documentsFromChannel(@PathVariable String securityPlatformId) {
+    return documentService.documentsForChannel(securityPlatformId);
   }
 }
