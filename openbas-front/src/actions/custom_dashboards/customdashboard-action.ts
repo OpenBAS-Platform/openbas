@@ -46,14 +46,12 @@ export const searchCustomDashboardAsOptionsByResourceId = (resourceId: string) =
 export const exportCustomDashboard = (id: string) => {
   return simpleCall(`${CUSTOM_DASHBOARD_URI}/${id}/export`, {
     params: { include: true },
-    headers: { Accept: 'application/vnd.api+json' },
+    headers: { Accept: 'application/zip' },
+    responseType: 'blob',
   });
 };
 
 // -- IMPORT --
 export const importCustomDashboard = (content: FormData) => (dispatch: Dispatch) => {
-  return postReferential(null, `${CUSTOM_DASHBOARD_URI}/import`, content, {
-    headers: { 'Content-Type': 'application/vnd.api+json' },
-    params: { include: true },
-  })(dispatch);
+  return postReferential(null, `${CUSTOM_DASHBOARD_URI}/import`, content, { params: { include: true } })(dispatch);
 };
