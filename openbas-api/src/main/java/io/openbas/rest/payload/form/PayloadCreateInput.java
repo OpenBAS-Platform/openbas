@@ -32,7 +32,7 @@ import lombok.Data;
     discriminatorMapping = {
       @DiscriminatorMapping(value = "Command", schema = Command.class),
       @DiscriminatorMapping(value = "Executable", schema = Executable.class),
-      @DiscriminatorMapping(value = "File", schema = FileDrop.class),
+      @DiscriminatorMapping(value = "FileDrop", schema = FileDrop.class),
       @DiscriminatorMapping(value = "Dns", schema = DnsResolution.class),
       @DiscriminatorMapping(value = "Network", schema = NetworkTraffic.class)
     })

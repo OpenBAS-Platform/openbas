@@ -1,6 +1,7 @@
+import { AttachmentOutlined } from '@mui/icons-material';
 import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
@@ -9,8 +10,9 @@ import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { type AttackPattern, type Command, type DnsResolution, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
+import { type AttackPattern, type Command, type DnsResolution, type Document, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
+import DocumentType from '../components/documents/DocumentType';
 
 const useStyles = makeStyles()(theme => ({
   chip: {
@@ -32,17 +34,46 @@ const useStyles = makeStyles()(theme => ({
     gridTemplateColumns: '1fr 1fr',
     gap: theme.spacing(2),
   },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
 
 }));
+const inlineStyles: Record<string, CSSProperties> = {
+  document_icon: {
+    float: 'left',
+    width: '5%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_name: {
+    float: 'left',
+    width: '45%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
 
-interface Props { selectedPayload: PayloadType | null }
+interface Props {
+  selectedPayload: PayloadType | null;
+  documentsMap: Record<string, Document>;
+}
 
-const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
+const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documentsMap }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
-
   const { attackPatternsMap }: { attackPatternsMap: ReturnType<AttackPatternHelper['getAttackPatternsMap']> } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
 
   const getAttackCommand = (payload: PayloadType | null): string => {
@@ -53,7 +84,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         return (payload as Command).command_content || '';
       case 'Dns':
         return (payload as DnsResolution).dns_resolution_hostname || '';
-      case 'File':
+      case 'FileDrop':
         return (payload as FileDrop).file_drop_file || '';
       case 'Executable':
         return (payload as Executable).executable_file || '';
@@ -61,7 +92,13 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         return '';
     }
   };
-
+  const payloadTypesItems: Map<string, string> = new Map<string, string>([
+    ['Command', t('Command Line')],
+    ['Executable', t('Executable')],
+    ['FileDrop', t('File Drop')],
+    ['DnsResolution', t('DNS Resolution')],
+  ],
+  );
   return (
     <>
       <div className={classes.payloadContainer}>
@@ -138,20 +175,34 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               {emptyFilled(selectedPayload?.payload_external_id)}
             </Typography>
           </div>
-        </div>
-        <div>
-          <Typography
-            variant="h3"
-            gutterBottom
-          >
-            {t('Tags')}
-          </Typography>
-          <ItemTags
-            variant="reduced-view"
-            tags={selectedPayload?.payload_tags}
-          />
-        </div>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Tags')}
+            </Typography>
+            <ItemTags
+              variant="reduced-view"
+              tags={selectedPayload?.payload_tags}
+            />
+          </div>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Type')}
+            </Typography>
 
+            <Typography
+              variant="body2"
+              gutterBottom
+            >
+              {emptyFilled(selectedPayload?.payload_type ? payloadTypesItems.get(selectedPayload.payload_type) : undefined)}
+            </Typography>
+          </div>
+        </div>
         {selectedPayload?.payload_type === 'Command' && (
           <>
             <div>
@@ -178,6 +229,32 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               <pre>
                 <ItemCopy content={getAttackCommand(selectedPayload)} />
               </pre>
+            </div>
+          </>
+        )}
+        {selectedPayload?.payload_type === 'FileDrop' && (
+          <>
+            <div>
+              <Typography
+                variant="h3"
+                gutterBottom
+              >
+                {t('File to drop')}
+              </Typography>
+
+              <Typography
+                variant="body2"
+                gutterBottom
+              >
+                <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
+                <div className={classes.bodyItem} style={inlineStyles.document_name}>
+                  {documentsMap[selectedPayload.file_drop_file]?.document_name}
+                </div>
+                <div className={classes.bodyItem} style={inlineStyles.document_type}>
+                  <DocumentType type={documentsMap[selectedPayload.file_drop_file]?.document_type} variant="list" />
+                </div>
+
+              </Typography>
             </div>
           </>
         )}

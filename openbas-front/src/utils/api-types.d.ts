@@ -4347,7 +4347,7 @@ export type Payload = BasePayload &
   (
     | BasePayloadPayloadTypeMapping<"Command", Command>
     | BasePayloadPayloadTypeMapping<"Executable", Executable>
-    | BasePayloadPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadPayloadTypeMapping<"FileDrop", FileDrop>
     | BasePayloadPayloadTypeMapping<"Dns", DnsResolution>
     | BasePayloadPayloadTypeMapping<"Network", NetworkTraffic>
   );
@@ -4370,7 +4370,7 @@ export type PayloadCreateInput = BasePayloadCreateInput &
   (
     | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
     | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
-    | BasePayloadCreateInputPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadCreateInputPayloadTypeMapping<"FileDrop", FileDrop>
     | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
     | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
   );
