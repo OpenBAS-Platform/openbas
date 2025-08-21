@@ -128,7 +128,9 @@ const ChallengeForm = (props) => {
   const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
   useDataLoader(() => {
     dispatch(fetchExercises());
-    dispatch(fetchDocuments());
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
+      dispatch(fetchDocuments());
+    }
   });
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);

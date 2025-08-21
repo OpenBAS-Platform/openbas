@@ -113,7 +113,7 @@ const FileLoader: FunctionComponent<Props> = ({
   const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper) => ({ documents: helper.getDocuments() }));
 
   useDataLoader(() => {
-    if (ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS)) {
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
       dispatch(fetchDocuments());
     }
   });
