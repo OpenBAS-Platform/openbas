@@ -15,7 +15,7 @@ interface Props {
   handleClose: () => void;
   editing?: boolean;
   initialValues?: SecurityPlatformInput;
-  securityPlatformId: string;
+  securityPlatformId?: string;
 }
 
 const SecurityPlatformForm: FunctionComponent<Props> = ({
