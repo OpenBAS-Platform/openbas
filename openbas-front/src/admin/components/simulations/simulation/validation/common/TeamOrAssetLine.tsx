@@ -7,7 +7,7 @@ import { fetchAssetGroups } from '../../../../../../actions/asset_groups/assetgr
 import { type AssetGroupsHelper } from '../../../../../../actions/asset_groups/assetgroup-helper';
 import { type EndpointHelper } from '../../../../../../actions/assets/asset-helper';
 import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-actions';
-import { fetchExerciseChallenges } from '../../../../../../actions/Challenge';
+import { fetchExerciseChallenges } from '../../../../../../actions/challenge-action';
 import { fetchExerciseArticles } from '../../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../../actions/channels/article-helper';
 import { fetchChannels } from '../../../../../../actions/channels/channel-action';
