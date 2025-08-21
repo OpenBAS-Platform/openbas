@@ -32,8 +32,8 @@ public class SecurityCoverageJob implements Job {
       Bundle bundle =
           securityCoverageService.createBundleFromSendJobs(List.of(securityCoverageSendJob));
       JsonNode n = bundle.toStix(mapper);
+      // send bundle
     }
     securityCoverageSendJobService.consumeJobs(jobs);
-    // send bundle
   }
 }
