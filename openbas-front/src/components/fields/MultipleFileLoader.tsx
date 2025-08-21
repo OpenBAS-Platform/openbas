@@ -8,6 +8,8 @@ import { PermissionsContext } from '../../admin/components/common/Context';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
+import { Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { useFormatter } from '../i18n';
 import FileTransferDialog from './FileTransferDialog';
 
@@ -60,20 +62,22 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ListItemButton
-        divider
-        onClick={handleOpen}
-        color="primary"
-        disabled={permissions.readOnly || disabled}
-      >
-        <ListItemIcon color="primary">
-          <ControlPointOutlined color="primary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={t('Add documents')}
-          classes={{ primary: classes.text }}
-        />
-      </ListItemButton>
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+        <ListItemButton
+          divider
+          onClick={handleOpen}
+          color="primary"
+          disabled={disabled}
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Add documents')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItemButton>
+      </Can>
       <FileTransferDialog
         label={t('Add documents')}
         open={open}
