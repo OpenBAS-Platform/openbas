@@ -3,6 +3,7 @@ package io.openbas.service;
 import io.openbas.database.model.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.validation.constraints.NotNull;
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class PermissionService {
 
   private final GrantService grantService;
   private final InjectService injectService;
+  private final InjectStatusService injectStatusService;
   private final NotificationRuleService notificationRuleService;
 
   @Transactional
@@ -134,8 +136,7 @@ public class PermissionService {
       // parent action rule: anything non-READ becomes WRITE on the parent
       Action parentAction = (action == Action.READ) ? Action.READ : Action.WRITE;
       return new Target(inject.getParentResourceId(), inject.getParentResourceType(), parentAction);
-    }
-    if (resourceType == ResourceType.NOTIFICATION_RULE) {
+    } else if (resourceType == ResourceType.NOTIFICATION_RULE) {
       NotificationRule notificationRule =
           notificationRuleService
               .findById(resourceId)
