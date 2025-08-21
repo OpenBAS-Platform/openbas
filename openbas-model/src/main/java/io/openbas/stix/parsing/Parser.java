@@ -37,9 +37,7 @@ public class Parser {
 
   private ObjectBase parseObject(JsonNode propertyNode)
       throws JsonProcessingException, ParsingException {
-    ObjectBase object = new ObjectBase();
-    object.setProperties(jsonObjectToPropertyMap(propertyNode));
-    return object;
+    return ObjectFactory.instantiateFromProps(jsonObjectToPropertyMap(propertyNode));
   }
 
   private BaseType<?> parseProperty(java.lang.String propertyName, JsonNode propertyNode)

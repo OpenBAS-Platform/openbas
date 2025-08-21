@@ -3,10 +3,13 @@ package io.openbas.stix.objects;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.stix.objects.constants.CommonProperties;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.parsing.StixSerialisable;
 import io.openbas.stix.types.Identifier;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 
 public class Bundle implements StixSerialisable {
@@ -14,11 +17,21 @@ public class Bundle implements StixSerialisable {
 
   public Bundle(Identifier id, List<ObjectBase> objects) {
     this.id = id;
-    this.objects = objects;
+    this.domainObjects = new ArrayList<>();
+    this.relationshipObjects = new ArrayList<>();
+    for (ObjectBase obj : objects) {
+      switch (obj) {
+        case DomainObject sdo -> this.domainObjects.add(sdo);
+        case RelationshipObject sro -> this.relationshipObjects.add(sro);
+        default -> throw new IllegalArgumentException();
+      }
+    }
   }
 
   public List<ObjectBase> findByType(String type) {
-    return this.getObjects().stream().filter(o -> o.getProperty("type").equals(type)).toList();
+    return this.allObjects().stream()
+        .filter(o -> o.getProperty(CommonProperties.TYPE.toString()).equals(type))
+        .toList();
   }
 
   public ObjectBase findById(Identifier id) throws ParsingException {
@@ -34,22 +47,30 @@ public class Bundle implements StixSerialisable {
   }
 
   private List<ObjectBase> findByIdsWithPossibleMisses(List<Identifier> ids) {
-    return this.objects.stream()
-        .filter(ob -> ids.stream().anyMatch(id -> ob.getProperty("id").equals(id)))
+    return this.allObjects().stream()
+        .filter(
+            ob ->
+                ids.stream()
+                    .anyMatch(id -> ob.getProperty(CommonProperties.ID.toString()).equals(id)))
         .toList();
   }
 
   @Getter private final Identifier id;
   @Getter private final String type = TYPE;
-  @Getter private final List<ObjectBase> objects;
+  @Getter private final List<DomainObject> domainObjects;
+  @Getter private final List<RelationshipObject> relationshipObjects;
+
+  private List<ObjectBase> allObjects() {
+    return Stream.concat(domainObjects.stream(), relationshipObjects.stream()).toList();
+  }
 
   @Override
   public JsonNode toStix(ObjectMapper mapper) {
     ObjectNode node = mapper.createObjectNode();
-    node.set("id", getId().toStix(mapper));
-    node.set("type", mapper.valueToTree(getType()));
+    node.set(CommonProperties.ID.toString(), getId().toStix(mapper));
+    node.set(CommonProperties.TYPE.toString(), mapper.valueToTree(getType()));
     node.set(
-        "objects", mapper.valueToTree(getObjects().stream().map(ob -> ob.toStix(mapper)).toList()));
+        "objects", mapper.valueToTree(allObjects().stream().map(ob -> ob.toStix(mapper)).toList()));
     return node;
   }
 }
