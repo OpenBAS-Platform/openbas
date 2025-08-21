@@ -48,7 +48,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
 
   const submitExport = async () => {
     const { data } = await exportCustomDashboard(customDashboard.custom_dashboard_id);
-    download(JSON.stringify(data, null, 2), `dashboard-${customDashboard.custom_dashboard_id}.json`, 'application/json');
+    download(data, `dashboard-${customDashboard.custom_dashboard_id}.zip`, 'application/zip');
   };
 
   const submitDelete = useCallback(async () => {

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GenericJsonApiExporter {
 
-  public JsonApiDocument<ResourceObject> export(Object entity, boolean withRels) {
+  public JsonApiDocument<ResourceObject> handleExport(Object entity, boolean withRels) {
     Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
     List<ResourceObject> included = new ArrayList<>();
     ResourceObject root = toResource(entity, withRels, visited, included);
