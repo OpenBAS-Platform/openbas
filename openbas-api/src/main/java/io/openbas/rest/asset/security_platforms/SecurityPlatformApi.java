@@ -175,14 +175,14 @@ public class SecurityPlatformApi {
       resourceId = "#securityPlatformId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SECURITY_PLATFORM)
-  @Operation(summary = "Get the Documents used in a channel")
+  @Operation(summary = "Get the Documents used in a security platform")
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "The list of Documents used in the Channel")
+            description = "The list of Documents used in the security platform")
       })
-  public List<RawDocument> documentsFromChannel(@PathVariable String securityPlatformId) {
+  public List<RawDocument> documentsFromSecurityPlatform(@PathVariable String securityPlatformId) {
     return documentService.documentsForSecurityPlatform(securityPlatformId);
   }
 }
