@@ -84,19 +84,23 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     label: 'Update',
     action: () => handleOpenEdit(),
     disabled: !permissions.canWrite,
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
     action: () => handleOpenExport(),
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
     disabled: !userAdmin,
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
 
   return (

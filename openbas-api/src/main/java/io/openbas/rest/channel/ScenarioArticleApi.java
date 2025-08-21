@@ -18,7 +18,6 @@ import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +30,6 @@ public class ScenarioArticleApi extends RestBehavior {
   private final InjectRepository injectRepository;
   private final ArticleRepository articleRepository;
 
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   @GetMapping(SCENARIO_URI + "/{scenarioId}/articles")
   @RBAC(
       resourceId = "#scenarioId",

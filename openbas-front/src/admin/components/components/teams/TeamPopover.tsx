@@ -1,12 +1,12 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { type OrganizationHelper, type TagHelper } from '../../../../actions/helper';
 import { type TeamInputForm } from '../../../../actions/teams/Team';
 import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../actions/teams/team-helper';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -14,6 +14,8 @@ import { useHelper } from '../../../../store';
 import { type Team, type TeamOutput, type TeamUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { type Option, organizationOption, tagOptions } from '../../../../utils/Option';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { TeamContext } from '../../common/Context';
 import TeamForm from './TeamForm';
 
@@ -38,6 +40,8 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
+
   const { organizationsMap, tagsMap } = useHelper(
     (
       helper: ExercisesHelper & TeamsHelper & OrganizationHelper & TagHelper,
@@ -55,20 +59,10 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const [openEdit, setOpenEdit] = useState(openEditOnInit);
   const [openRemove, setOpenRemove] = useState(false);
   const [openRemoveFromInject, setOpenRemoveFromInject] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
-  // Popover
-  const handlePopoverOpen = (event: ReactMouseEvent) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
 
   // Edition
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
@@ -99,7 +93,6 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   // Deletion
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
 
   const handleCloseDelete = () => setOpenDelete(false);
@@ -118,7 +111,6 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   // Remove
   const handleOpenRemove = () => {
     setOpenRemove(true);
-    handlePopoverClose();
   };
 
   const handleCloseRemove = () => setOpenRemove(false);
@@ -130,7 +122,6 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   // Remove
   const handleOpenRemoveFromInject = () => {
     setOpenRemoveFromInject(true);
-    handlePopoverClose();
   };
 
   const handleCloseRemoveFromInject = () => setOpenRemoveFromInject(false);
@@ -149,40 +140,37 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
     team_tags: tagOptions(team.team_tags, tagsMap),
   };
 
+  // Button Popover
+  const entries = [];
+  if (onUpdate) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+  });
+  if (managePlayers) entries.push({
+    label: 'Manage players',
+    action: () => managePlayers(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS),
+  });
+  if (onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual) entries.push({
+    label: 'Remove from the context',
+    action: () => handleOpenRemove(),
+    userRight: true,
+  });
+  if (onRemoveTeamFromInject) entries.push({
+    label: 'Remove from the inject',
+    action: () => handleOpenRemoveFromInject(),
+    userRight: true,
+  });
+  if (onDelete) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.TEAMS_AND_PLAYERS),
+  });
+
   return (
     <>
-      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary" disabled={disabled}>
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
-        {managePlayers && (
-          <MenuItem onClick={() => {
-            handlePopoverClose();
-            managePlayers();
-          }}
-          >
-            {t('Manage players')}
-          </MenuItem>
-        )}
-        {onRemoveTeam && !onRemoveTeamFromInject && !team.team_contextual && (
-          <MenuItem onClick={handleOpenRemove}>
-            {' '}
-            {t('Remove from the context')}
-          </MenuItem>
-        )}
-        {onRemoveTeamFromInject && (
-          <MenuItem onClick={handleOpenRemoveFromInject}>
-            {' '}
-            {t('Remove from the inject')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
-      </Menu>
+      <ButtonPopover disabled={disabled} entries={entries} variant="icon" />
       <MuiDialog
         open={openDelete}
         TransitionComponent={Transition}

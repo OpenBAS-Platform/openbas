@@ -1,7 +1,5 @@
 package io.openbas.rest.group;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
@@ -32,11 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
 public class GroupApi extends RestBehavior {
 
   private ExerciseRepository exerciseRepository;
@@ -107,7 +103,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
@@ -119,7 +114,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/users")
   @RBAC(
       resourceId = "#groupId",
@@ -148,7 +142,6 @@ public class GroupApi extends RestBehavior {
     return savedGroup;
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/roles")
   @RBAC(
       resourceId = "#groupId",
@@ -183,7 +176,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/information")
   @RBAC(
       resourceId = "#groupId",
@@ -199,7 +191,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/grants")
   @RBAC(
       resourceId = "#groupId",
@@ -253,7 +244,6 @@ public class GroupApi extends RestBehavior {
     return savedGrant;
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/organizations")
   @RBAC(
       resourceId = "#groupId",
@@ -272,7 +262,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
   @RBAC(
       resourceId = "#groupId",
@@ -287,7 +276,6 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/grants/{grantId}")
   @RBAC(
       resourceId = "#grantId",
@@ -298,7 +286,6 @@ public class GroupApi extends RestBehavior {
     grantRepository.deleteById(grantId);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/groups/{groupId}")
   @RBAC(
       resourceId = "#groupId",

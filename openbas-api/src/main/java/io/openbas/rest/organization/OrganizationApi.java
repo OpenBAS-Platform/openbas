@@ -1,7 +1,6 @@
 package io.openbas.rest.organization;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.OrganizationSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -26,8 +25,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -56,7 +53,6 @@ public class OrganizationApi extends RestBehavior {
 
   @GetMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ORGANIZATION)
-  @PreAuthorize("isObserver()")
   public Iterable<RawOrganization> organizations() {
     OpenBASPrincipal currentUser = currentUser();
     List<RawOrganization> organizations;
@@ -68,7 +64,6 @@ public class OrganizationApi extends RestBehavior {
     return organizations;
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ORGANIZATION)
   @Transactional(rollbackOn = Exception.class)
@@ -79,7 +74,6 @@ public class OrganizationApi extends RestBehavior {
     return organizationRepository.save(organization);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(ORGANIZATION_URI + "/{organizationId}")
   @RBAC(
       resourceId = "#organizationId",
@@ -96,7 +90,6 @@ public class OrganizationApi extends RestBehavior {
     return organizationRepository.save(organization);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(ORGANIZATION_URI + "/{organizationId}")
   @RBAC(
       resourceId = "#organizationId",

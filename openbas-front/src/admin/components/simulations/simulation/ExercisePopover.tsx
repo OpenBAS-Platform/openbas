@@ -125,23 +125,28 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     label: 'Update',
     action: () => handleOpenEdit(),
     disabled: !permissions.canWriteBypassStatus,
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
     action: () => handleOpenExport(),
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Access reports')) entries.push({
     label: 'Access reports',
     action: () => handleOpenReports(),
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
     disabled: !userAdmin,
+    userRight: true, // TODO: update while casl will be implemented on this page
   });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {

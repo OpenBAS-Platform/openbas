@@ -6,7 +6,6 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../../actions/Application';
-import { type TagHelper, type UserHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
@@ -23,7 +22,6 @@ import ItemSeverity from '../../../components/ItemSeverity';
 import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
-import { useHelper } from '../../../store';
 import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
 import ImportFromHubButton from '../common/ImportFromHubButton';
 import ImportUploaderScenario from './ImportUploaderScenario';
@@ -54,9 +52,6 @@ const Scenarios = () => {
   const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = useMemo(() => [
@@ -275,14 +270,12 @@ const Scenarios = () => {
               })
         }
       </List>
-      {userAdmin && (
-        <ScenarioCreation
-          onCreate={(result: Scenario) => {
-            setScenarios([result, ...scenarios]);
-            fetchStatistics();
-          }}
-        />
-      )}
+      <ScenarioCreation
+        onCreate={(result: Scenario) => {
+          setScenarios([result, ...scenarios]);
+          fetchStatistics();
+        }}
+      />
     </>
   );
 };

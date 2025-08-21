@@ -1,7 +1,9 @@
 package io.openbas.service;
 
 import io.openbas.database.model.*;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.validation.constraints.NotNull;
 import java.util.EnumSet;
 import java.util.Set;
@@ -22,17 +24,20 @@ public class PermissionService {
           ResourceType.CVE,
           ResourceType.TAG,
           ResourceType.ATTACK_PATTERN,
-          ResourceType.KILL_CHAIN_PHASE);
+          ResourceType.KILL_CHAIN_PHASE,
+          ResourceType.ORGANIZATION); // TODO review open apis see issue/3789
 
   private static final EnumSet<ResourceType> RESOURCES_MANAGED_BY_GRANTS =
       EnumSet.of(
           ResourceType.SCENARIO, ResourceType.SIMULATION, ResourceType.SIMULATION_OR_SCENARIO);
 
   private static final EnumSet<ResourceType> RESOURCES_USING_PARENT_PERMISSION =
-      EnumSet.of(ResourceType.INJECT);
+      EnumSet.of(ResourceType.INJECT, ResourceType.NOTIFICATION_RULE);
 
   private final GrantService grantService;
   private final InjectService injectService;
+  private final InjectStatusService injectStatusService;
+  private final NotificationRuleService notificationRuleService;
 
   @Transactional
   public boolean hasPermission(
@@ -80,6 +85,11 @@ public class PermissionService {
       final String resourceId,
       @NotNull final ResourceType resourceType,
       @NotNull final Action action) {
+    Set<Capability> userCapabilities = user.getCapabilities();
+
+    if (userCapabilities.contains(Capability.BYPASS)) {
+      return true;
+    }
     // user can access search apis but the result will be filtered
     if (Action.SEARCH.equals(action)) {
       return true;
@@ -126,6 +136,16 @@ public class PermissionService {
       // parent action rule: anything non-READ becomes WRITE on the parent
       Action parentAction = (action == Action.READ) ? Action.READ : Action.WRITE;
       return new Target(inject.getParentResourceId(), inject.getParentResourceType(), parentAction);
+    } else if (resourceType == ResourceType.NOTIFICATION_RULE) {
+      NotificationRule notificationRule =
+          notificationRuleService
+              .findById(resourceId)
+              .orElseThrow(
+                  () ->
+                      new ElementNotFoundException(
+                          "NotificationRule not found with id:" + resourceId));
+      Action parentAction = Action.READ; // FIXME permission should be linked to userid
+      return new Target(notificationRule.getResourceId(), ResourceType.SCENARIO, parentAction);
     }
     return new Target(resourceId, resourceType, action);
   }

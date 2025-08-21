@@ -1,7 +1,6 @@
 package io.openbas.rest.inject;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
 import io.openbas.aop.LogExecutionTime;
@@ -46,8 +45,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -140,7 +137,7 @@ public class InjectApi extends RestBehavior {
         @ApiResponse(responseCode = "200", description = "Inject exported successfully"),
         @ApiResponse(responseCode = "404", description = "The inject was not found")
       })
-  @PostMapping(INJECT_URI + "/{injectId}/export")
+  @PostMapping(INJECT_URI + "/{injectId}/inject_export")
   @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public void injectsIndividualExport(
       @PathVariable @NotBlank final String injectId,
@@ -191,7 +188,6 @@ public class InjectApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
   @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
-  @PreAuthorize("isInjectObserver(#injectId)")
   public Page<InjectTarget> injectTargetSearch(
       @PathVariable String injectId,
       @PathVariable String targetType,
@@ -228,7 +224,6 @@ public class InjectApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/options")
   @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
-  @PreAuthorize("isInjectObserver(#injectId)")
   public List<FilterUtilsJpa.Option> targetOptions(
       @PathVariable String injectId,
       @PathVariable String targetType,
@@ -337,7 +332,6 @@ public class InjectApi extends RestBehavior {
     this.importService.handleFileImport(file, targetExercise, targetScenario);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
   @RBAC(
       resourceId = "#injectId",
@@ -351,7 +345,6 @@ public class InjectApi extends RestBehavior {
     return injectRepository.save(inject);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
   @RBAC(
       resourceId = "#injectId",
@@ -362,7 +355,6 @@ public class InjectApi extends RestBehavior {
     injectExecutionCallback(null, injectId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   @RBAC(
       resourceId = "#injectId",
@@ -392,7 +384,6 @@ public class InjectApi extends RestBehavior {
     injectExecutionService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping(INJECT_URI + "/{injectId}/{agentId}/executable-payload")
   @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @Operation(
@@ -413,7 +404,6 @@ public class InjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject updateInject(
       @PathVariable String exerciseId,
       @PathVariable String injectId,

@@ -16,9 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import { RocketLaunchOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 
 interface Props {
@@ -29,7 +27,6 @@ interface Props {
 const EnterpriseEditionButton = ({ style = {}, classes }: Props) => {
   const { t } = useFormatter();
   const { openDialog } = useEnterpriseEdition();
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
   return (
     <>
       <Button
@@ -38,7 +35,6 @@ const EnterpriseEditionButton = ({ style = {}, classes }: Props) => {
         color="ee"
         onClick={() => openDialog()}
         startIcon={<RocketLaunchOutlined />}
-        disabled={!userAdmin}
         style={style}
         classes={classes}
       >

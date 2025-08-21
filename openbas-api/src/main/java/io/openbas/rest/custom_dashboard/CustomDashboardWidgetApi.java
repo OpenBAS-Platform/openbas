@@ -15,13 +15,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(CustomDashboardWidgetApi.CUSTOM_DASHBOARDS_WIDGET_URI)
 @RequiredArgsConstructor
-@PreAuthorize("isAdmin()")
 public class CustomDashboardWidgetApi extends RestBehavior {
 
   public static final String CUSTOM_DASHBOARDS_WIDGET_URI = CUSTOM_DASHBOARDS_URI + "/{id}/widgets";
@@ -62,7 +60,8 @@ public class CustomDashboardWidgetApi extends RestBehavior {
   }
 
   @PutMapping("/{widgetId}/layout")
-  @RBAC(resourceId = "#id", actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
+  // FIXME -> displaying trigger this api so we marked it as READ but should be WRITE
+  @RBAC(resourceId = "#id", actionPerformed = Action.READ, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<Widget> updateWidgetLayout(
       @PathVariable @NotBlank final String id,
       @PathVariable @NotBlank final String widgetId,

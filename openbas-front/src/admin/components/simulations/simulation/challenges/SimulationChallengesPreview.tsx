@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../../../actions/Application';
-import { fetchSimulationObserverChallenges } from '../../../../../actions/Challenge';
+import { fetchSimulationObserverChallenges } from '../../../../../actions/challenge-action';
 import { fetchSimulationPlayerDocuments } from '../../../../../actions/Document';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';

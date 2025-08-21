@@ -1,7 +1,5 @@
 package io.openbas.rest.tag_rule;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
@@ -22,7 +20,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,7 +65,6 @@ public class TagRuleApi extends RestBehavior {
     return tagRuleService.findAll().stream().map(tagRuleMapper::toTagRuleOutput).toList();
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @RBAC(
@@ -87,7 +83,6 @@ public class TagRuleApi extends RestBehavior {
     tagRuleService.deleteTagRule(tagRuleId);
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.TAG_RULE)
@@ -103,7 +98,6 @@ public class TagRuleApi extends RestBehavior {
         tagRuleService.createTagRule(input.getTagName(), input.getAssetGroups()));
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @RBAC(

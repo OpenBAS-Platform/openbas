@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +49,6 @@ public class PlayerApi extends RestBehavior {
   @GetMapping(PLAYER_URI)
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
-  @PreAuthorize("isObserver()")
   public Iterable<RawPlayer> players() {
     List<RawPlayer> players;
     OpenBASPrincipal currentUser = currentUser();
@@ -81,7 +79,6 @@ public class PlayerApi extends RestBehavior {
 
   @GetMapping("/api/player/{userId}/communications")
   @RBAC(resourceId = "#userId", actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
-  @PreAuthorize("isPlanner()")
   public Iterable<Communication> playerCommunications(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
     return communicationRepository.findByUser(userId);
@@ -89,7 +86,6 @@ public class PlayerApi extends RestBehavior {
 
   @PostMapping(PLAYER_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLAYER)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
@@ -105,7 +101,6 @@ public class PlayerApi extends RestBehavior {
 
   @PostMapping(PLAYER_URI + "/upsert")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLAYER)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
@@ -150,7 +145,6 @@ public class PlayerApi extends RestBehavior {
 
   @PutMapping(PLAYER_URI + "/{userId}")
   @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
-  @PreAuthorize("isPlanner()")
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
@@ -166,7 +160,6 @@ public class PlayerApi extends RestBehavior {
 
   @DeleteMapping(PLAYER_URI + "/{userId}")
   @RBAC(resourceId = "#userId", actionPerformed = Action.DELETE, resourceType = ResourceType.PLAYER)
-  @PreAuthorize("isPlanner()")
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);

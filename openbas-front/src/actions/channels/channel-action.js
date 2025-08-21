@@ -1,5 +1,6 @@
 import { delReferential, getReferential, postReferential, putReferential } from '../../utils/Action';
 import { channelReader } from '../Schema';
+import * as schema from '../Schema.js';
 import { arrayOfChannels, channelAction } from './channel-schema';
 
 export const fetchChannels = () => (dispatch) => {
@@ -46,3 +47,5 @@ export const fetchScenarioChannels = scenarioId => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/channels`;
   return getReferential(arrayOfChannels, uri)(dispatch);
 };
+
+export const fetchDocumentsChannels = channelId => dispatch => getReferential(schema.arrayOfDocuments, `/api/channels/${channelId}/documents`)(dispatch);

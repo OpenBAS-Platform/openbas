@@ -17,6 +17,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.ExpectationUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +34,12 @@ public class ChannelService {
   private final ArticleRepository articleRepository;
   private final ChannelRepository channelRepository;
   @Resource protected ObjectMapper mapper;
+
+  public Channel channel(@NotNull final String channelId) {
+    return channelRepository
+        .findById(channelId)
+        .orElseThrow(() -> new ElementNotFoundException("Channel not found with id: " + channelId));
+  }
 
   public ChannelReader validateArticles(String exerciseId, String channelId, User user) {
     ChannelReader channelReader;

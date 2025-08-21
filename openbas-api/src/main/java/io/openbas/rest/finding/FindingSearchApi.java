@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -73,7 +72,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -106,7 +104,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<AggregatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -139,7 +136,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<AggregatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -174,7 +170,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,

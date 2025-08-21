@@ -59,6 +59,77 @@ public interface DocumentRepository
 
   @Query(
       value =
+          """
+        select d.*,
+               array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+               array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+               array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+        from documents d
+        left join exercises_documents exdoc on d.document_id = exdoc.document_id
+        left join exercises ex on ex.exercise_id = exdoc.exercise_id
+        left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+        left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+        left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+        left join tags tg on tg.tag_id = tagdoc.tag_id
+        left join channels chl_light on d.document_id = chl_light.channel_logo_light
+        left join channels chl_dark  on d.document_id = chl_dark.channel_logo_dark
+        where chl_light.channel_id = :channelId
+           or chl_dark.channel_id  = :channelId
+        group by d.document_id
+        order by d.document_id desc
+        """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByChannelId(@Param("channelId") String channelId);
+
+  @Query(
+      value =
+          """
+                select d.*,
+                       array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                       array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                       array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                from documents d
+                left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                left join tags tg on tg.tag_id = tagdoc.tag_id
+                left join assets sp_light on d.document_id = sp_light.security_platform_logo_light
+                left join assets sp_dark  on d.document_id = sp_dark.security_platform_logo_dark
+                where sp_light.asset_id = :securityPlatformId
+                   or sp_dark.asset_id  = :securityPlatformId
+                group by d.document_id
+                order by d.document_id desc
+                """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsBySecurityPlatformId(
+      @Param("securityPlatformId") String securityPlatformId);
+
+  @Query(
+      value =
+          """
+                        select d.*,
+                               array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                               array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                               array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                        from documents d
+                        left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                        left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                        left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                        left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                        left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                        left join tags tg on tg.tag_id = tagdoc.tag_id
+                        left join challenges_documents chdoc on d.document_id = chdoc.document_id
+                        where chdoc.challenge_id = :challengeId
+                        group by d.document_id
+                        order by d.document_id desc
+                        """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByChallengeId(@Param("challengeId") String challengeId);
+
+  @Query(
+      value =
           "select d.*, "
               + "array_remove(array_agg(tg.tag_id), NULL) as document_tags, "
               + "array_remove(array_agg(ex.exercise_id), NULL) as document_exercises, "

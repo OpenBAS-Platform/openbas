@@ -3,7 +3,7 @@ import { updateTeamPlayers } from '../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../actions/teams/team-helper';
 import { type Page } from '../../../components/common/queryable/Page';
 import { useHelper } from '../../../store';
-import { type SearchPaginationInput, type Team, type TeamOutput, type User } from '../../../utils/api-types';
+import { type SearchPaginationInput, type Team, type TeamOutput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import { PermissionsContext, type PermissionsContextType, TeamContext, type TeamContextType } from '../common/Context';
 import TeamsComponent from '../components/teams/Teams';
@@ -11,10 +11,7 @@ import { type UserStore } from './players/Player';
 
 const Teams = () => {
   const dispatch = useAppDispatch();
-  const { user, teams }: {
-    user: User;
-    teams: Team[];
-  } = useHelper((helper: UserHelper & TeamsHelper) => ({
+  const { teams }: { teams: Team[] } = useHelper((helper: UserHelper & TeamsHelper) => ({
     user: helper.getMe(),
     teams: helper.getTeams(),
   }));
@@ -22,7 +19,7 @@ const Teams = () => {
   const permissionsContext: PermissionsContextType = {
     permissions: {
       readOnly: false,
-      canWrite: user.user_is_planner || false,
+      canWrite: false,
       isRunning: false,
     },
   };

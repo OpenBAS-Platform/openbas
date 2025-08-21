@@ -1,7 +1,5 @@
 package io.openbas.rest.mitigation;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -28,11 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
 public class MitigationApi extends RestBehavior {
 
   private MitigationRepository mitigationRepository;
@@ -81,7 +77,6 @@ public class MitigationApi extends RestBehavior {
     return mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations")
   @RBAC(
       skipRBAC =
@@ -107,7 +102,6 @@ public class MitigationApi extends RestBehavior {
         AttackPatternSpecification.fromAttackPattern(mitigationId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/mitigations/{mitigationId}")
   @RBAC(
       skipRBAC =
@@ -161,7 +155,6 @@ public class MitigationApi extends RestBehavior {
     return fromIterable(this.mitigationRepository.saveAll(upserted));
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mitigations/upsert")
   @RBAC(
       skipRBAC =
@@ -173,7 +166,6 @@ public class MitigationApi extends RestBehavior {
     return new ArrayList<>(upsertMitigations(mitigations));
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mitigations/{mitigationId}")
   @RBAC(
       skipRBAC =

@@ -19,6 +19,8 @@ import { useHelper } from '../../../store';
 import { type PlatformSettings, type SettingsEnterpriseEditionUpdateInput, type SettingsPlatformWhitemarkUpdateInput, type SettingsUpdateInput, type ThemeInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
 import ParametersForm from './ParametersForm';
 import ThemeForm from './ThemeForm';
@@ -117,13 +119,15 @@ const Parameters = () => {
             {t('License')}
           </Typography>
           {!isEnterpriseEditionByConfig && !isEnterpriseEdition && (
-            <EnterpriseEditionButton
-              style={{
-                marginLeft: 'auto',
-                gridColumn: 'span 2',
-              }}
-              classes={{ root: classes.button }}
-            />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+              <EnterpriseEditionButton
+                style={{
+                  marginLeft: 'auto',
+                  gridColumn: 'span 2',
+                }}
+                classes={{ root: classes.button }}
+              />
+            </Can>
           )}
           {!isEnterpriseEditionByConfig && isEnterpriseEdition && (
             <>
@@ -277,13 +281,15 @@ const Parameters = () => {
         {t('OpenBAS platform')}
       </Typography>
       {!isEnterpriseEditionActivated && (
-        <EnterpriseEditionButton
-          style={{
-            marginLeft: 'auto',
-            gridColumn: 'span 2',
-          }}
-          classes={{ root: classes.button }}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <EnterpriseEditionButton
+            style={{
+              marginLeft: 'auto',
+              gridColumn: 'span 2',
+            }}
+            classes={{ root: classes.button }}
+          />
+        </Can>
       )}
 
       <Paper sx={{ gridColumn: 'span 3' }} variant="outlined" className={`${classes.paper} ${classes.marginBottom}`} style={{ minHeight: 340 }}>

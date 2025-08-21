@@ -15,6 +15,8 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import SecurityMenu from '../SecurityMenu';
 import CreateGroup from './CreateGroup';
 import GroupPopover from './GroupPopover';
@@ -277,9 +279,11 @@ const Groups = () => {
             </ListItem>
           ))}
         </List>
-        <CreateGroup
-          onCreate={result => setGroups([result, ...groups])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateGroup
+            onCreate={result => setGroups([result, ...groups])}
+          />
+        </Can>
       </div>
       <SecurityMenu />
     </div>

@@ -12,14 +12,16 @@ import {
   Slide,
 } from '@mui/material';
 import * as R from 'ramda';
-import { forwardRef, useState } from 'react';
+import { forwardRef, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
+import { deleteChallenge, updateChallenge } from '../../../../actions/challenge-action.js';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { tagOptions } from '../../../../utils/Option';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChallengeForm from './ChallengeForm';
 
 const Transition = forwardRef((props, ref) => (
@@ -32,6 +34,8 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
 
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
+
   // states
   const [openDelete, setOpenDelete] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
@@ -96,21 +100,27 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
   )(challenge);
   return (
     <>
-      <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
-        <MoreVert />
-      </IconButton>
+      {(ability.can(ACTIONS.MANAGE, SUBJECTS.CHALLENGES) || ability.can(ACTIONS.DELETE, SUBJECTS.CHALLENGES) || onRemoveChallenge) && (
+        <IconButton disabled={disabled} onClick={handlePopoverOpen} aria-haspopup="true" size="large" color="primary">
+          <MoreVert />
+        </IconButton>
+      )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHALLENGES}>
+          <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        </Can>
         {onRemoveChallenge && (
           <MenuItem onClick={handleOpenRemove}>
             {t('Remove from the inject')}
           </MenuItem>
         )}
-        <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        <Can I={ACTIONS.DELETE} a={SUBJECTS.CHALLENGES}>
+          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        </Can>
       </Menu>
       <Dialog
         open={openDelete}
@@ -143,6 +153,7 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
           <DialogTitle>{t('Update the challenge')}</DialogTitle>
           <DialogContent>
             <ChallengeForm
+              challengeId={challenge.challenge_id}
               editing
               onSubmit={onSubmitEdit}
               handleClose={handleCloseEdit}
@@ -158,6 +169,7 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
           title={t('Update the challenge')}
         >
           <ChallengeForm
+            challengeId={challenge.challenge_id}
             editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}

@@ -2398,16 +2398,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -2433,7 +2433,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
 }
 

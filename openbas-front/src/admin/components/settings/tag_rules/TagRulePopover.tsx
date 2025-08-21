@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteTagRule } from '../../../../actions/tag_rules/tagrule-actions';
 import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
@@ -6,6 +6,8 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type TagRuleOutput } from '../../../../utils/api-types';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import OPEN_CTI_TAG_NAME from './TagRuleConstants';
 import TagRuleUpdate from './TagRuleUpdate';
 
@@ -20,6 +22,7 @@ const TagRulePopover: FunctionComponent<Props> = ({
   tagRule,
 }) => {
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
 
   // Edition
   const [openEdit, setOpenEdit] = useState(false);
@@ -42,6 +45,7 @@ const TagRulePopover: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: handleOpenEdit,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
   ];
 
@@ -50,6 +54,8 @@ const TagRulePopover: FunctionComponent<Props> = ({
     entries.push({
       label: 'Delete',
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
+
     });
   }
 

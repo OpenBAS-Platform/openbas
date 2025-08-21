@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 
-import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
+import { fetchScenarioChallenges } from '../../../../../actions/challenge-action';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { useHelper } from '../../../../../store';
 import { type Scenario } from '../../../../../utils/api-types';

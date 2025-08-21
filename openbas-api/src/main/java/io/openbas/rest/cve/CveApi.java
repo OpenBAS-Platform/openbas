@@ -1,8 +1,5 @@
 package io.openbas.rest.cve;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
-
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
@@ -19,11 +16,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
 @RequiredArgsConstructor
 @Tag(name = "CVE API", description = "Operations related to CVEs")
 public class CveApi extends RestBehavior {
@@ -57,7 +52,6 @@ public class CveApi extends RestBehavior {
     return cveMapper.toCveOutput(cveService.findByExternalId(externalId));
   }
 
-  @Secured(ROLE_ADMIN)
   @Operation(summary = "Create a new CVE")
   @PostMapping(CVE_API)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CVE)
@@ -66,7 +60,6 @@ public class CveApi extends RestBehavior {
     return cveMapper.toCveSimple(cveService.createCve(input));
   }
 
-  @Secured(ROLE_ADMIN)
   @Operation(summary = "Bulk insert CVEs")
   @LogExecutionTime
   @PostMapping(CVE_API + "/bulk")
@@ -75,7 +68,6 @@ public class CveApi extends RestBehavior {
     this.cveService.bulkUpsertCVEs(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @Operation(summary = "Update an existing CVE")
   @PutMapping(CVE_API + "/{cveId}")
   @RBAC(resourceId = "#cveId", actionPerformed = Action.WRITE, resourceType = ResourceType.CVE)
@@ -84,7 +76,6 @@ public class CveApi extends RestBehavior {
     return cveMapper.toCveSimple(cveService.updateCve(cveId, input));
   }
 
-  @Secured(ROLE_ADMIN)
   @Operation(summary = "Delete a CVE")
   @DeleteMapping(CVE_API + "/{cveId}")
   @RBAC(resourceId = "#cveId", actionPerformed = Action.DELETE, resourceType = ResourceType.CVE)

@@ -581,7 +581,7 @@ public class InjectExportTest extends IntegrationTest {
       targets.add(extra_target);
 
       mvc.perform(
-              post("/api/injects/ " + UUID.randomUUID().toString() + "/export")
+              post("/api/injects/ " + UUID.randomUUID().toString() + "/inject_export")
                   .content(mapper.writeValueAsString(new InjectIndividualExportRequestInput()))
                   .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isNotFound())
@@ -598,7 +598,7 @@ public class InjectExportTest extends IntegrationTest {
 
       byte[] response =
           mvc.perform(
-                  post("/api/injects/" + inject.getId() + "/export")
+                  post("/api/injects/" + inject.getId() + "/inject_export")
                       .content(mapper.writeValueAsString(new InjectIndividualExportRequestInput()))
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())

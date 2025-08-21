@@ -8,6 +8,8 @@ import TagsFilter from '../../admin/components/common/filters/TagsFilter';
 import CreateDocument from '../../admin/components/components/documents/CreateDocument';
 import { useHelper } from '../../store';
 import { type RawDocument } from '../../utils/api-types';
+import { Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { truncate } from '../../utils/String';
 import Transition from '../common/Transition';
 import { useFormatter } from '../i18n';
@@ -64,13 +66,7 @@ const FileTransferDialog: FunctionComponent<Props> = ({
   const [selectedDocuments, setSelectedDocuments] = useState<RawDocument[]>([]);
 
   // Fetching data
-  const { documents, userAdmin }: {
-    documents: [RawDocument];
-    userAdmin: string;
-  } = useHelper((helper: DocumentHelper & UserHelper) => ({
-    documents: helper.getDocuments(),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper & UserHelper) => ({ documents: helper.getDocuments() }));
 
   useEffect(() => {
     if (initialDocumentIds.length > 0) {
@@ -207,12 +203,12 @@ const FileTransferDialog: FunctionComponent<Props> = ({
                   </ListItem>
                 );
               })}
-              {userAdmin && (
+              <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
                 <CreateDocument
                   inline
                   onCreate={handleAddDocument}
                 />
-              )}
+              </Can>
             </List>
           </GridLegacy>
           {multiple && (

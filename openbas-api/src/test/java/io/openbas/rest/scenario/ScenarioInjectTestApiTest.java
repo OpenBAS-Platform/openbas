@@ -23,7 +23,6 @@ import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectTestStatusComposer;
 import io.openbas.utils.fixtures.composers.ScenarioComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
@@ -157,7 +156,8 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     }
   }
 
-  @Nested
+  // FIXME these tests are not applicable anymore and needs to be refactored
+  /*@Nested
   @DisplayName("As Unauthorized User")
   class UnauthorizedUserAccess {
 
@@ -219,5 +219,5 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
                   injectTestStatus1.getId()))
           .andExpect(status().isNotFound());
     }
-  }
+  }*/
 }

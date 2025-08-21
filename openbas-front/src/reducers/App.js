@@ -12,8 +12,7 @@ const app = (state = Map({}), action = {}) => {
         theme: user.user_theme,
         admin: user.user_admin,
         isOnlyPlayer:
-          !user.user_capabilities
-          && !user.user_grants,
+            !user.user_capabilities && !user.user_grants,
       };
       return state.set('logged', logged);
     }

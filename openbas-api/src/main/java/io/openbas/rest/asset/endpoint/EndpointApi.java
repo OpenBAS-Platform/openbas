@@ -1,7 +1,5 @@
 package io.openbas.rest.asset.endpoint;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
 import io.openbas.aop.LogExecutionTime;
@@ -28,14 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
 public class EndpointApi extends RestBehavior {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
@@ -48,13 +43,11 @@ public class EndpointApi extends RestBehavior {
 
   @PostMapping(ENDPOINT_URI + "/agentless")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     return this.endpointService.createEndpoint(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
@@ -67,7 +60,6 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/jobs")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(@RequestBody final EndpointRegisterInput input) {
     return this.assetAgentJobRepository.findAll(
@@ -84,7 +76,6 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(
       @PathVariable @NotBlank final String endpointExternalReference) {
@@ -94,7 +85,6 @@ public class EndpointApi extends RestBehavior {
 
   @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
@@ -103,7 +93,6 @@ public class EndpointApi extends RestBehavior {
   @Deprecated(since = "1.11.0")
   @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJobDepreacted(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
@@ -112,7 +101,6 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI)
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
-  @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(
         EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints());
@@ -124,7 +112,6 @@ public class EndpointApi extends RestBehavior {
       resourceId = "#endpointId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ASSET)
-  @PreAuthorize("isPlanner()")
   public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
     return endpointMapper.toEndpointOverviewOutput(this.endpointService.getEndpoint(endpointId));
   }
@@ -150,7 +137,6 @@ public class EndpointApi extends RestBehavior {
     return this.endpointService.endpoints(endpointIds);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @RBAC(
       resourceId = "#endpointId",
@@ -164,7 +150,6 @@ public class EndpointApi extends RestBehavior {
         this.endpointService.updateEndpoint(endpointId, input));
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @RBAC(
       resourceId = "#endpointId",

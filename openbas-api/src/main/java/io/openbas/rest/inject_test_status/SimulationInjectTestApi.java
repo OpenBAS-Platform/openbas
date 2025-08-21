@@ -39,7 +39,10 @@ public class SimulationInjectTestApi extends RestBehavior {
    * @see #findExercisePageInjectTests
    */
   @PostMapping("/api/exercise/{simulationId}/injects/test")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -48,7 +51,10 @@ public class SimulationInjectTestApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test/search")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findExercisePageInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -71,9 +77,9 @@ public class SimulationInjectTestApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/injects/test/{testId}")
   @RBAC(
-      resourceId = "#testId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.SIMULATION)
+      actionPerformed = Action.SEARCH,
+      resourceType =
+          ResourceType.SIMULATION) // fixme : should use action search on resourceType simulation
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
