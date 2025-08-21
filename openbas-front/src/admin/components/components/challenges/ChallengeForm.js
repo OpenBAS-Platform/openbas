@@ -1,13 +1,14 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, GridLegacy, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
 import arrayMutators from 'final-form-arrays';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../../actions/Document';
+import { fetchDocumentsChallenge } from '../../../../actions/challenge-action.js';
+import { fetchDocuments } from '../../../../actions/Document.js';
 import { fetchExercises } from '../../../../actions/Exercise';
 import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
@@ -126,12 +127,18 @@ const ChallengeForm = (props) => {
   const required = value => (value ? undefined : t('This field is required.'));
   const requiredArray = value => (value && value.length > 0 ? undefined : t('This field is required.'));
   const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
+
   useDataLoader(() => {
     dispatch(fetchExercises());
     if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
       dispatch(fetchDocuments());
+    } else {
+      dispatch(fetchDocumentsChallenge(props.challengeId));
     }
   });
+
+  console.log(documentsMap);
+
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
     setDocumentsOrderAsc(!documentsSortBy);

@@ -15,7 +15,7 @@ import * as R from 'ramda';
 import { forwardRef, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { deleteChallenge, updateChallenge } from '../../../../actions/Challenge';
+import { deleteChallenge, updateChallenge } from '../../../../actions/challenge-action.js';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -153,6 +153,7 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
           <DialogTitle>{t('Update the challenge')}</DialogTitle>
           <DialogContent>
             <ChallengeForm
+              challengeId={challenge.challenge_id}
               editing
               onSubmit={onSubmitEdit}
               handleClose={handleCloseEdit}
@@ -168,6 +169,7 @@ const ChallengePopover = ({ challenge, onRemoveChallenge, inline, disabled = fal
           title={t('Update the challenge')}
         >
           <ChallengeForm
+            challengeId={challenge.challenge_id}
             editing
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}

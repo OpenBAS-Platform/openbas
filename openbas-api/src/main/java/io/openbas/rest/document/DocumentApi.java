@@ -225,12 +225,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping("/api/documents")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.DOCUMENT)
   public List<RawDocument> documents() {
-    OpenBASPrincipal user = currentUser();
-    if (user.isAdmin()) {
-      return documentRepository.rawAllDocuments();
-    } else {
-      return documentRepository.rawAllDocumentsByAccessLevel(user.getId());
-    }
+    return documentRepository.rawAllDocuments();
   }
 
   @PostMapping(DOCUMENT_API + "/search")

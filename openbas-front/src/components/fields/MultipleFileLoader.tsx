@@ -1,10 +1,9 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
-import { PermissionsContext } from '../../admin/components/common/Context';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
@@ -41,7 +40,6 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { permissions } = useContext(PermissionsContext);
   const [open, setOpen] = useState(false);
 
   useDataLoader(() => {
@@ -62,7 +60,7 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}>
         <ListItemButton
           divider
           onClick={handleOpen}
