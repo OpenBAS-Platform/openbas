@@ -197,6 +197,10 @@ public class ExerciseService {
     return documentService.getPlayerDocuments(articles, injects);
   }
 
+  public boolean hasPendingResults(Exercise exercise) {
+    return exercise.getInjects().stream().allMatch(injectService::hasPendingResults);
+  }
+
   private void getListOfExerciseTeams(
       @NotNull Exercise exercise, @NotNull Exercise exerciseOrigin) {
     Map<String, Team> contextualTeams = new HashMap<>();

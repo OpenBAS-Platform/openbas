@@ -208,6 +208,10 @@ public class InjectService {
     }
   }
 
+  public boolean hasPendingResults(Inject inject) {
+    return inject.getExpectations().stream().allMatch(ex -> ex.getResults().isEmpty());
+  }
+
   public List<AssetToExecute> resolveAllAssetsToExecute(@NotNull final Inject inject) {
     List<AssetToExecute> assetToExecutes = new ArrayList<>();
 

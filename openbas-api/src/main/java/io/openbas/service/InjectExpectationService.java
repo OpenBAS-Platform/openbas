@@ -147,9 +147,8 @@ public class InjectExpectationService {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
 
-    if (updated.getExercise() != null && updated.getExercise().getSecurityAssessment() != null) {
-      securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
-    }
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
+
     return updated;
   }
 
@@ -183,12 +182,8 @@ public class InjectExpectationService {
           }
         });
 
-    Set<Exercise> simulations =
-        expectations.stream()
-            .map(InjectExpectation::getExercise)
-            .filter(e -> e != null && e.getSecurityAssessment() != null)
-            .collect(Collectors.toSet());
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(simulations);
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+        expectations.stream().map(InjectExpectation::getExercise).collect(Collectors.toSet()));
 
     injectExpectationRepository.saveAll(expectations);
   }
@@ -249,9 +244,7 @@ public class InjectExpectationService {
       computeExpectationsForTeamsAndPlayer(updated, null);
     }
 
-    if (updated.getExercise() != null && updated.getExercise().getSecurityAssessment() != null) {
-      securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
-    }
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
 
     return updated;
   }
@@ -438,11 +431,8 @@ public class InjectExpectationService {
 
     // end of computing
 
-    if (injectExpectation.getExercise() != null
-        && injectExpectation.getExercise().getSecurityAssessment() != null) {
-      securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-          Set.of(injectExpectation.getExercise()));
-    }
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+        Set.of(injectExpectation.getExercise()));
 
     return injectExpectation;
   }
@@ -495,12 +485,10 @@ public class InjectExpectationService {
       propagateUpdateToAssetGroups(inject, collector);
       // end of computing
     }
-    Set<Exercise> simulations =
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
         injectExpectations.stream()
             .map(InjectExpectation::getExercise)
-            .filter(e -> e != null && e.getSecurityAssessment() != null)
-            .collect(Collectors.toSet());
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(simulations);
+            .collect(Collectors.toSet()));
   }
 
   private void propagateUpdateToAssets(

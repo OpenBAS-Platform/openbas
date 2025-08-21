@@ -3,13 +3,12 @@ package io.openbas.service;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.database.repository.SecurityCoverageSendJobRepository;
+import io.openbas.rest.exercise.service.ExerciseService;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +16,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SecurityCoverageSendJobService {
   private final SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
+  private final ExerciseService exerciseService;
   private final EntityManager entityManager;
 
   public void createOrUpdateJobsForSimulation(Set<Exercise> exercises) {
+    Set<Exercise> toSend = this.filterFullyAssessedSimulations(exercises);
     List<SecurityCoverageSendJob> jobs = new ArrayList<>();
-    for (Exercise exercise : exercises) {
+    for (Exercise exercise : toSend) {
       Optional<SecurityCoverageSendJob> scsj =
           securityCoverageSendJobRepository.findBySimulation(exercise);
       if (scsj.isPresent()) {
@@ -67,5 +68,13 @@ public class SecurityCoverageSendJobService {
       }
       securityCoverageSendJobRepository.saveAll(jobsToUpdate);
     }
+  }
+
+  private Set<Exercise> filterFullyAssessedSimulations(Set<Exercise> source) {
+    return source.stream()
+        .filter(Objects::nonNull)
+        .filter(e -> e.getSecurityAssessment() != null)
+        .filter(e -> !exerciseService.hasPendingResults(e))
+        .collect(Collectors.toSet());
   }
 }
