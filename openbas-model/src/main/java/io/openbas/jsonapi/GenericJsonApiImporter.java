@@ -30,7 +30,7 @@ public class GenericJsonApiImporter<T extends Base> {
   @Resource private final ObjectMapper objectMapper;
 
   @Transactional
-  public T upsert(JsonApiDocument<ResourceObject> doc, boolean withRels) {
+  public T handleImport(JsonApiDocument<ResourceObject> doc, boolean withRels) {
     if (doc == null || doc.data() == null) {
       throw new IllegalArgumentException("Data is required to import document");
     }
