@@ -263,54 +263,58 @@ const ChallengeForm = (props) => {
             {documents.map((documentId) => {
               const document = documentsMap[documentId] || {};
               return (
-                <ListItemButton
-                  key={document.document_id}
-                  classes={{ root: classes.item }}
-                  divider={true}
-                  component="a"
-                  href={`/api/documents/${document.document_id}/file`}
-                >
-                  <ListItemIcon>
-                    <AttachmentOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={(
-                      <div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_name}
-                        >
-                          {document.document_name}
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_type}
-                        >
-                          <DocumentType
-                            type={document.document_type}
-                            variant="list"
-                          />
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_tags}
-                        >
-                          <ItemTags
-                            variant="list"
-                            tags={document.document_tags}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  />
-                  <ListItemSecondaryAction>
+                <ListItem
+                  key={documentId}
+                  secondaryAction={(
                     <DocumentPopover
                       inline
                       document={document}
                       onRemoveDocument={handleRemoveDocument}
                     />
-                  </ListItemSecondaryAction>
-                </ListItemButton>
+                  )}
+                >
+                  <ListItemButton
+                    key={document.document_id}
+                    classes={{ root: classes.item }}
+                    divider
+                    component="a"
+                    href={`/api/documents/${document.document_id}/file`}
+                  >
+                    <ListItemIcon>
+                      <AttachmentOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_name}
+                          >
+                            {document.document_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_type}
+                          >
+                            <DocumentType
+                              type={document.document_type}
+                              variant="list"
+                            />
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_tags}
+                          >
+                            <ItemTags
+                              variant="list"
+                              tags={document.document_tags}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
               );
             })}
             <MultipleFileLoader

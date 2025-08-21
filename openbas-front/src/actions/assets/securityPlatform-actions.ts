@@ -34,4 +34,4 @@ export const searchSecurityPlatforms = (searchPaginationInput: SearchPaginationI
   return simplePostCall(uri, data);
 };
 
-export const fetchDocumentFromSecurityPlatform = (securityPlatformId: string) => (dispatch: Dispatch) => getReferential(schema.document, `${SECURITY_PLATFORM_URI}/${securityPlatformId}/documents`)(dispatch);
+export const fetchDocumentFromSecurityPlatform = (securityPlatformId: string) => (dispatch: Dispatch) => getReferential(schema.arrayOfDocuments, `${SECURITY_PLATFORM_URI}/${securityPlatformId}/documents`)(dispatch);
