@@ -665,7 +665,8 @@ public class ExerciseService {
 
   // -- GLOBAL RESULTS --
   public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
-    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
+    return resultUtils.computeGlobalExpectationResults(
+        exerciseRepository.findInjectsByExercise(exerciseId));
   }
 
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(ExercisesGlobalScoresInput input) {

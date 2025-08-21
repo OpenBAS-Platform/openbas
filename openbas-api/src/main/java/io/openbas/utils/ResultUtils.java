@@ -25,10 +25,6 @@ public class ResultUtils {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectExpectationMapper injectExpectationMapper;
 
-  public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
-    return computeGlobalExpectationResults(injectIds);
-  }
-
   public List<ExpectationResultsByType> computeGlobalExpectationResults(Set<String> injectIds) {
 
     if (injectIds == null || injectIds.isEmpty()) {

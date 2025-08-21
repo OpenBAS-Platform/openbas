@@ -121,7 +121,7 @@ public class SimulationStixService {
 
   private BaseType<?> computeCoverageFromInjects(List<Inject> injects) {
     List<InjectExpectationResultUtils.ExpectationResultsByType> coverageResults =
-        resultUtils.getResultsByTypes(
+        resultUtils.computeGlobalExpectationResults(
             injects.stream().map(Inject::getId).collect(Collectors.toSet()));
 
     Map<String, BaseType<?>> coverageValues = new HashMap<>();

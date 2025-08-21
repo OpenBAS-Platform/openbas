@@ -126,9 +126,9 @@ class ExerciseServiceTest extends IntegrationTest {
     when(exerciseRepository.findInjectsByExercise(exerciseId1)).thenReturn(exercise1InjectIds);
     when(exerciseRepository.findInjectsByExercise(exerciseId2)).thenReturn(exercise2InjectIds);
 
-    when(resultUtils.getResultsByTypes(exercise1InjectIds))
+    when(resultUtils.computeGlobalExpectationResults(exercise1InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise1GlobalScores);
-    when(resultUtils.getResultsByTypes(exercise2InjectIds))
+    when(resultUtils.computeGlobalExpectationResults(exercise2InjectIds))
         .thenReturn(ExpectationResultsByTypeFixture.exercise2GlobalScores);
 
     var results =
