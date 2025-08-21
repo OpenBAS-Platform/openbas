@@ -3,6 +3,7 @@ import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Ty
 import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchDocumentFromSecurityPlatform } from '../../actions/assets/securityPlatform-actions';
 import { fetchDocuments } from '../../actions/Document';
 import { type DocumentHelper } from '../../actions/helper';
 import DocumentType from '../../admin/components/components/documents/DocumentType';
@@ -88,6 +89,8 @@ interface Props {
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   error?: boolean;
+  parentResourceType?: string;
+  parentResourceId?: string;
 }
 
 const FileLoader: FunctionComponent<Props> = ({
@@ -98,6 +101,8 @@ const FileLoader: FunctionComponent<Props> = ({
   setFieldValue,
   InputLabelProps,
   error,
+  parentResourceType,
+  parentResourceId,
 }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -115,6 +120,8 @@ const FileLoader: FunctionComponent<Props> = ({
   useDataLoader(() => {
     if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
       dispatch(fetchDocuments());
+    } else if (parentResourceType == 'security_platform' && parentResourceId != null) {
+      dispatch(fetchDocumentFromSecurityPlatform(parentResourceId));
     }
   });
 

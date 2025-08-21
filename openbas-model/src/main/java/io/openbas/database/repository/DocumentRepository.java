@@ -95,8 +95,8 @@ public interface DocumentRepository
                 left join scenarios sc on sc.scenario_id = scdoc.scenario_id
                 left join documents_tags tagdoc on d.document_id = tagdoc.document_id
                 left join tags tg on tg.tag_id = tagdoc.tag_id
-                left join asset sp_light on d.document_id = sp_light.security_platform_logo_light
-                left join asset sp_dark  on d.document_id = sp_dark.security_platform_logo_dark
+                left join assets sp_light on d.document_id = sp_light.security_platform_logo_light
+                left join assets sp_dark  on d.document_id = sp_dark.security_platform_logo_dark
                 where sp_light.asset_id = :securityPlatformId
                    or sp_dark.asset_id  = :securityPlatformId
                 group by d.document_id

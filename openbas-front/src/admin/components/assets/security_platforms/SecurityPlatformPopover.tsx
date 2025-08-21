@@ -125,6 +125,7 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
             editing={true}
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
+            securityPlatformId={securityPlatform.asset_id}
           />
         </Dialog>
       ) : (
@@ -138,6 +139,7 @@ const SecurityPlatformPopover: FunctionComponent<Props> = ({
             editing
             onSubmit={submitEdit}
             handleClose={() => setEdition(false)}
+            securityPlatformId={securityPlatform.asset_id}
           />
         </Drawer>
       )}
