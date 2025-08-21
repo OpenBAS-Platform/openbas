@@ -24,7 +24,7 @@ public class SecurityCoverageJob implements Job {
   private final ObjectMapper mapper;
 
   @Override
-  @Transactional // ensure a transaction context to help lock rows
+  @Transactional
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
