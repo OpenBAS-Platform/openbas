@@ -1,4 +1,4 @@
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import ImportFileSelector from './ImportFileSelector';
 

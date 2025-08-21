@@ -4,7 +4,7 @@ import { type FunctionComponent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import Dialog from '../../../../../../components/common/Dialog';
+import Dialog from '../../../../../../components/common/dialog/Dialog';
 import StepperComponent from '../../../../../../components/common/StepperComponent';
 import { useFormatter } from '../../../../../../components/i18n';
 import { type Widget } from '../../../../../../utils/api-types-custom';

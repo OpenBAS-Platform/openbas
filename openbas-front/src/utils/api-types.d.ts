@@ -1042,14 +1042,14 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type: "scenario" | "simulation";
 }
 
 /** Payload to create a CVE */
@@ -1844,6 +1844,7 @@ export interface EsSimulation {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   /** @uniqueItems true */
   base_tags_side?: string[];
   /** @uniqueItems true */
@@ -3706,6 +3707,17 @@ export interface ObjectiveInput {
   objective_title?: string;
 }
 
+export interface OnboardingCategoryDTO {
+  category: string;
+  icon: string;
+  items: OnboardingItemDTO[];
+}
+
+export interface OnboardingItemDTO {
+  labelKey: string;
+  videoLink: string;
+}
+
 export interface Option {
   id?: string;
   label?: string;
@@ -4500,6 +4512,10 @@ export interface PlatformSettings {
   auth_saml2_enable?: boolean;
   /** List of Saml2 providers */
   platform_saml2_providers?: OAuthProvider[];
+  /** Type of analytics engine */
+  analytics_engine_type?: string;
+  /** Current version of analytics engine */
+  analytics_engine_version?: string;
   /** True if local authentication is enabled */
   auth_local_enable?: boolean;
   /** True if OpenID is enabled */
@@ -4576,19 +4592,23 @@ export interface PlatformSettings {
   /** id of the platform */
   platform_id?: string;
   /** Language of the platform */
-  platform_lang?: string;
+  platform_lang: string;
   /** Platform licensing */
   platform_license?: License;
   /** Definition of the dark theme */
   platform_light_theme?: ThemeInput;
   /** Name of the platform */
-  platform_name?: string;
+  platform_name: string;
+  /** Platform onboarding contextual help enabled */
+  platform_onboarding_contextual_help_enable?: boolean;
+  /** Platform onboarding widget enabled */
+  platform_onboarding_widget_enable?: boolean;
   /** List of OpenID providers */
   platform_openid_providers?: OAuthProvider[];
   /** Policies of the platform */
   platform_policies?: PolicyInput;
   /** Theme of the platform */
-  platform_theme?: string;
+  platform_theme: string;
   /** Current version of the platform */
   platform_version?: string;
   /** 'true' if the platform has the whitemark activated */
@@ -5248,6 +5268,13 @@ export interface SettingsEnterpriseEditionUpdateInput {
   platform_enterprise_license?: string;
 }
 
+export interface SettingsOnboardingUpdateInput {
+  /** Platform onboarding contextual help enabled */
+  platform_onboarding_contextual_help_enable?: boolean;
+  /** Platform onboarding widget enabled */
+  platform_onboarding_widget_enable?: boolean;
+}
+
 export interface SettingsPlatformWhitemarkUpdateInput {
   /** The whitemark of the platform */
   platform_whitemark: string;
@@ -5402,6 +5429,10 @@ export interface StatusPayloadOutput {
   /** @uniqueItems true */
   payload_tags?: string[];
   payload_type?: string;
+}
+
+export interface StepsInput {
+  steps: string[];
 }
 
 export interface StructuralHistogramSeries {
@@ -5719,14 +5750,21 @@ export interface UpdateNotificationRuleInput {
   subject: string;
 }
 
+export interface UpdateOnboardingInput {
+  /** User onboarding contextual help enabled */
+  user_onboarding_contextual_help_enable: "DEFAULT" | "ENABLED" | "DISABLED";
+  /** User onboarding widget enabled */
+  user_onboarding_widget_enable: "DEFAULT" | "ENABLED" | "DISABLED";
+}
+
 export interface UpdateProfileInput {
   user_country?: string;
-  user_email?: string;
+  user_email: string;
   user_firstname: string;
-  user_lang?: string;
+  user_lang: string;
   user_lastname: string;
   user_organization?: string;
-  user_theme?: string;
+  user_theme: string;
 }
 
 export interface UpdateScenarioInput {
@@ -5865,13 +5903,13 @@ export interface User {
   user_is_player?: boolean;
   /** Language of the user */
   user_lang?: string;
-  /**
-   * Last communication date of the user
-   * @format date-time
-   */
-  user_last_comcheck?: string;
   /** Last name of the user */
   user_lastname?: string;
+  /** User onboarding contextual help enabled */
+  user_onboarding_contextual_help_enable: "DEFAULT" | "ENABLED" | "DISABLED";
+  user_onboarding_progress?: string;
+  /** User onboarding widget enabled */
+  user_onboarding_widget_enable: "DEFAULT" | "ENABLED" | "DISABLED";
   /** Organization ID of the user */
   user_organization?: string;
   /** PGP key of the user */
@@ -5892,6 +5930,22 @@ export interface User {
    * @format date-time
    */
   user_updated_at: string;
+}
+
+export interface UserOnboardingProgress {
+  listened?: boolean;
+  /** @format date-time */
+  onboarding_created_at?: string;
+  onboarding_id: string;
+  /** @format date-time */
+  onboarding_updated_at?: string;
+  progress: UserOnboardingStepStatus[];
+}
+
+export interface UserOnboardingStepStatus {
+  completed?: boolean;
+  skipped?: boolean;
+  step?: string;
 }
 
 export interface UserOutput {

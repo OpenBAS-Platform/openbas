@@ -126,4 +126,11 @@ public interface EngineService {
    * @return the list of results
    */
   List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter);
+
+  /**
+   * Get engine version of the engine
+   *
+   * @return the version of the engine
+   */
+  String getEngineVersion();
 }

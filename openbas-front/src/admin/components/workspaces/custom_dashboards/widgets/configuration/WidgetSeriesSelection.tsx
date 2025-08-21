@@ -12,15 +12,12 @@ import { availableOperators, buildFilter } from '../../../../../../components/co
 import { buildSearchPagination } from '../../../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../../../components/i18n';
-import {
-  type FilterGroup,
-  type PropertySchemaDTO,
-} from '../../../../../../utils/api-types';
-import { createGroupOption, type GroupOption } from '../../../../../../utils/Option';
+import { type FilterGroup, type PropertySchemaDTO } from '../../../../../../utils/api-types';
+import { type GroupOption } from '../../../../../../utils/Option';
 import { capitalize } from '../../../../../../utils/String';
 import { MITRE_FILTER_KEY } from '../../../../common/filters/MitreFilter';
 import { CustomDashboardContext } from '../../CustomDashboardContext';
-import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from '../WidgetUtils';
+import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities, getDefaultValuesForType } from '../WidgetUtils';
 import getAuthorizedPerspectives from './AuthorizedPerspectives';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
 
@@ -132,11 +129,12 @@ const WidgetSeriesSelection: FunctionComponent<{
     }
     (customDashboard?.custom_dashboard_parameters ?? []).forEach((p) => {
       if (p.custom_dashboards_parameter_type === 'simulation') {
-        const values = defaultValues;
-        const items = values.get('base_simulation_side') ?? [];
-        const option = createGroupOption(p.custom_dashboards_parameter_id, p.custom_dashboards_parameter_name, 'Parameters');
-        if (!items.map(i => i.id).includes(option.id)) values.set('base_simulation_side', [...items, option]);
-        setDefaultValues(values);
+        const newDefaultValues = getDefaultValuesForType(defaultValues, p, 'base_simulation_side');
+        setDefaultValues(newDefaultValues);
+      }
+      if (p.custom_dashboards_parameter_type === 'scenario') {
+        const newDefaultValues = getDefaultValuesForType(defaultValues, p, 'base_scenario_side');
+        setDefaultValues(newDefaultValues);
       }
     });
   }, [entity]);

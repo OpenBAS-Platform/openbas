@@ -1,7 +1,7 @@
 import { type FunctionComponent, useContext, useState } from 'react';
 
 import ButtonPopover, { type VariantButtonPopover } from '../../../../components/common/ButtonPopover';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import { type Report, type ReportInput } from '../../../../utils/api-types';

@@ -3,7 +3,7 @@ import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogConten
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { type LoggedHelper } from '../../../../../actions/helper';
-import Dialog from '../../../../../components/common/Dialog';
+import Dialog from '../../../../../components/common/dialog/Dialog';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';

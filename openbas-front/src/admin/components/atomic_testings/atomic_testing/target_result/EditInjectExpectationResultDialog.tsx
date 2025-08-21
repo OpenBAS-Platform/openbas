@@ -1,4 +1,4 @@
-import Dialog from '../../../../../components/common/Dialog';
+import Dialog from '../../../../../components/common/dialog/Dialog';
 import type { InjectExpectationResult } from '../../../../../utils/api-types';
 import { type InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import { isManualExpectation } from '../../../common/injects/expectations/ExpectationUtils';
