@@ -1,5 +1,5 @@
-import { FiberManualRecord, MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, List, ListItem, Menu, MenuItem, Typography } from '@mui/material';
+import { FiberManualRecord } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, List, ListItem, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useContext, useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from 'react';
 import { deleteDocument, updateDocument } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import { fetchScenarios } from '../../../../actions/scenarios/scenario-actions';
+import ButtonPopover from '../../../../components/common/ButtonPopover.js';
 import DialogDelete from '../../../../components/common/DialogDelete.js';
 import Drawer from '../../../../components/common/Drawer';
 import { craftedDocumentFilter } from '../../../../components/common/queryable/filter/FilterUtils.js';
@@ -18,7 +19,7 @@ import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { exerciseOptions, scenarioOptions, tagOptions } from '../../../../utils/Option';
-import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import DocumentForm from './DocumentForm';
 
@@ -60,7 +61,6 @@ const DocumentPopover = (props) => {
     });
   }
 
-  const [anchorEl, setAnchorEl] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [relations, setRelations] = useState(null);
   const [loadingRelations, setLoadingRelations] = useState(false);
@@ -68,18 +68,8 @@ const DocumentPopover = (props) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
 
-  const handlePopoverOpen = (event) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
 
   const handleCloseEdit = () => {
@@ -100,7 +90,6 @@ const DocumentPopover = (props) => {
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
     setLoadingRelations(true);
     fetch(`/api/documents/${document.document_id}/relations`)
       .then(res => res.json())
@@ -201,7 +190,6 @@ const DocumentPopover = (props) => {
 
   const handleOpenRemove = () => {
     setOpenRemove(true);
-    handlePopoverClose();
   };
 
   const handleCloseRemove = () => {
@@ -215,7 +203,6 @@ const DocumentPopover = (props) => {
 
   const handleToggleAttachement = () => {
     onToggleAttach(document.document_id);
-    handlePopoverClose();
   };
 
   const documentTags = tagOptions(document.document_tags, tagsMap);
@@ -223,50 +210,31 @@ const DocumentPopover = (props) => {
   const documentScenarios = scenarioOptions(document.document_scenarios, scenariosMap);
   const initialValues = R.pipe(R.assoc('document_tags', documentTags), R.assoc('document_exercises', documentExercises), R.assoc('document_scenarios', documentScenarios), R.pick(['document_name', 'document_description', 'document_type', 'document_tags', 'document_exercises', 'document_scenarios']))(document);
 
+  const entries = [];
+  if (onUpdate) entries.push({
+    label: t('Update'),
+    action: () => handleOpenEdit(),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS),
+  });
+  if (onToggleAttach) entries.push({
+    label: attached ? t('Disable attachment') : t('Enable attachment'),
+    action: () => handleToggleAttachement(),
+    userRight: true,
+  });
+  if (onRemoveDocument) entries.push({
+    label: t('Remove from the element'),
+    action: () => handleOpenRemove(),
+    userRight: true,
+  });
+  if (!onRemoveDocument) entries.push({
+    label: t('Delete'),
+    action: () => handleOpenDelete(),
+    userRight: ability.can(ACTIONS.DELETE, SUBJECTS.DOCUMENTS),
+  });
+
   return (
     <div>
-      {(ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS) || ability.can(ACTIONS.DELETE, SUBJECTS.DOCUMENTS) || onToggleAttach || onRemoveDocument)
-        && (
-          <IconButton
-            color="primary"
-            onClick={handlePopoverOpen}
-            aria-haspopup="true"
-            size="large"
-            disabled={disabled}
-          >
-            <MoreVert />
-          </IconButton>
-        )}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        {onUpdate && (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
-            <MenuItem onClick={handleOpenEdit}>
-              {t('Update')}
-            </MenuItem>
-          </Can>
-        )}
-        {onToggleAttach && (
-          <MenuItem onClick={handleToggleAttachement}>
-            {attached ? t('Disable attachment') : t('Enable attachment')}
-          </MenuItem>
-        )}
-        {onRemoveDocument && (
-          <MenuItem onClick={handleOpenRemove}>
-            {t('Remove from the element')}
-          </MenuItem>
-        )}
-        {!onRemoveDocument && (
-          <Can I={ACTIONS.DELETE} a={SUBJECTS.DOCUMENTS}>
-            <MenuItem onClick={handleOpenDelete} disabled={!document.document_can_be_deleted}>
-              {t('Delete')}
-            </MenuItem>
-          </Can>
-        )}
-      </Menu>
+      <ButtonPopover entries={entries} disabled={disabled} variant="icon" />
 
       <DialogDelete
         open={openDelete}
