@@ -137,8 +137,6 @@ const ChallengeForm = (props) => {
     }
   });
 
-  console.log(documentsMap);
-
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
     setDocumentsOrderAsc(!documentsSortBy);
