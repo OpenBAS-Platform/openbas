@@ -6,6 +6,7 @@ import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
+import io.openbas.database.model.Grant;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.BadRequestException;
@@ -89,6 +90,9 @@ public class ScenarioInjectTestApi extends RestBehavior {
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
+    if (!scenarioId.equals(input.getSimulationOrScenarioId())) {
+      throw new BadRequestException("Provided scenario ID does not match the input scenario ID");
+    }
     if (CollectionUtils.isEmpty(input.getInjectIDsToProcess())
         && input.getSearchPaginationInput() == null) {
       throw new BadRequestException(
@@ -97,7 +101,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
     // Specification building
     Specification<Inject> filterSpecifications =
-        this.injectService.getInjectSpecification(input).and(testable());
+        this.injectService.getInjectSpecification(input, Grant.GRANT_TYPE.LAUNCHER).and(testable());
 
     // Services calls
     // Bulk test

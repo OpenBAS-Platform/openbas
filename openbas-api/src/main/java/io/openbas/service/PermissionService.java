@@ -52,6 +52,12 @@ public class PermissionService {
       return user.isAdmin();
     }
 
+    // If we are searching for resources with parent permission, the search function must handle the
+    // permission computation itself.
+    // Example: export of injects
+    if (RESOURCES_USING_PARENT_PERMISSION.contains(resourceType) && Action.SEARCH.equals(action)) {
+      return true;
+    }
     // for inject/article the permission will be based on the parent's (scenario/simulation/test)
     // permission
     if (RESOURCES_USING_PARENT_PERMISSION.contains(resourceType)) {

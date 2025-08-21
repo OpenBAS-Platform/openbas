@@ -20,11 +20,11 @@ import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +44,6 @@ public class FullTextSearchService<T extends Base> {
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
   private Map<Class<T>, List<String>> searchListByClassMap;
-  private Map<Class<T>, String> grantsFilterNameByClassMap;
   private Map<Class<T>, Optional<Capability>> capaByClassMap;
 
   @PostConstruct
@@ -95,25 +94,6 @@ public class FullTextSearchService<T extends Base> {
             (Class<T>) Exercise.class,
             Capability.of(ResourceType.SIMULATION, Action.SEARCH));
 
-    // If the grant system isn't available for a resource, StringUtils.EMPTY is used as default
-    // value
-    this.grantsFilterNameByClassMap =
-        Map.of(
-            (Class<T>) Asset.class,
-            StringUtils.EMPTY,
-            (Class<T>) AssetGroup.class,
-            StringUtils.EMPTY,
-            (Class<T>) User.class,
-            StringUtils.EMPTY,
-            (Class<T>) Team.class,
-            StringUtils.EMPTY,
-            (Class<T>) Organization.class,
-            StringUtils.EMPTY,
-            (Class<T>) Scenario.class,
-            "scenario", // this is the name of the field on which to make a SQL join to the grants
-            (Class<T>) Exercise.class,
-            "exercise"); // this is the name of the field on which to make a SQL join to the grants
-
     validateMapKeys();
   }
 
@@ -121,10 +101,9 @@ public class FullTextSearchService<T extends Base> {
   private void validateMapKeys() {
     Set<Class<T>> keys1 = repositoryMap.keySet();
     Set<Class<T>> keys2 = searchListByClassMap.keySet();
-    Set<Class<T>> keys3 = grantsFilterNameByClassMap.keySet();
-    Set<Class<T>> keys4 = capaByClassMap.keySet();
+    Set<Class<T>> keys3 = capaByClassMap.keySet();
 
-    if (!keys1.equals(keys2) || !keys1.equals(keys3) || !keys1.equals(keys4)) {
+    if (!keys1.equals(keys2) || !keys1.equals(keys3)) {
       throw new IllegalStateException("All maps must have the same keys");
     }
   }
@@ -169,16 +148,14 @@ public class FullTextSearchService<T extends Base> {
 
     String finalSearchTerm = getFinalSearchTerm(searchPaginationInput.getTextSearch());
 
-    return buildPaginationJPA(
-            repository::findAll,
-            searchPaginationInput,
-            clazzT,
-            SpecificationUtils.fullTextSearch(
-                finalSearchTerm,
-                searchListByClassMap.get(clazzT),
-                grantsFilterNameByClassMap.getOrDefault(clazzT, ""),
-                principal.getId(),
-                principal.isAdmin()))
+    // Specification building
+    Specification<T> specs =
+        SpecificationUtils.<T>fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT))
+            .and(
+                SpecificationUtils.hasGrantAccess(
+                    principal.getId(), principal.isAdmin(), Grant.GRANT_TYPE.OBSERVER));
+
+    return buildPaginationJPA(repository::findAll, searchPaginationInput, clazzT, specs)
         .map(this::transform);
   }
 
@@ -306,14 +283,14 @@ public class FullTextSearchService<T extends Base> {
     classesToSearch.forEach(
         tClass -> {
           JpaSpecificationExecutor<T> repository = repositoryMap.get(tClass);
-          long count =
-              repository.count(
-                  SpecificationUtils.fullTextSearch(
-                      finalSearchTerm,
-                      searchListByClassMap.get(tClass),
-                      grantsFilterNameByClassMap.getOrDefault(tClass, ""),
-                      principal.getId(),
-                      principal.isAdmin()));
+          // Specification building
+          Specification<T> specs =
+              SpecificationUtils.<T>fullTextSearch(
+                      finalSearchTerm, searchListByClassMap.get(tClass))
+                  .and(
+                      SpecificationUtils.hasGrantAccess(
+                          principal.getId(), principal.isAdmin(), Grant.GRANT_TYPE.OBSERVER));
+          long count = repository.count(specs);
           results.put(tClass, new FullTextSearchCountResult(tClass.getSimpleName(), count));
         });
 
