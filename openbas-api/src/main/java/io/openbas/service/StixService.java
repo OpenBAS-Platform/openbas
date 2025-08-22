@@ -112,6 +112,8 @@ public class StixService {
         (String) stixAssessmentObj.getProperty("threat_context_ref").getValue();
     securityAssessment.setThreatContextRef(threatContextRef);
 
+    // Object refs -> Extract different types objects
+
     // Attack pattern refs -> convert to MITRE IDs
     securityAssessment.setAttackPatternRefs(
         extractAttackPatterns(
