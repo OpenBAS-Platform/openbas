@@ -6,4 +6,8 @@ public interface RawGrant {
   String getGrant_name();
 
   String getUser_id();
+
+  String getGrant_resource();
+
+  String getGrant_resource_type();
 }

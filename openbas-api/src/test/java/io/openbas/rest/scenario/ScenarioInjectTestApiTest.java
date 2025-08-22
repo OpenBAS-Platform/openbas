@@ -23,7 +23,6 @@ import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InjectTestStatusComposer;
 import io.openbas.utils.fixtures.composers.ScenarioComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -87,7 +86,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should return paginated inject test results when inject tests exist")
-    @WithMockPlannerUser
+    @WithMockAdminUser
     void should_return_paginated_results_when_inject_tests_exist() throws Exception {
       SearchPaginationInput searchPaginationInput = new SearchPaginationInput();
       String response =
@@ -145,7 +144,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should return 200 when deleting an inject test status")
-    @WithMockPlannerUser
+    @WithMockAdminUser
     void should_return_200_when_fetching_deleting_an_inject_test_status() throws Exception {
       mvc.perform(
               delete(
