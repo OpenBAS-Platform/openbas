@@ -258,6 +258,28 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
             </div>
           </>
         )}
+        {selectedPayload?.payload_type === 'DnsResolution' && (
+          <>
+            <div>
+              <Typography
+                variant="h3"
+                gutterBottom
+              >
+                {t('Hostname')}
+              </Typography>
+
+              <Typography
+                variant="body2"
+                gutterBottom
+              >
+                <div>
+                  {selectedPayload.dns_resolution_hostname}
+                </div>
+
+              </Typography>
+            </div>
+          </>
+        )}
         <div>
           <Typography
             variant="h3"
