@@ -7,8 +7,10 @@ import io.openbas.service.SecurityCoverageSendJobService;
 import io.openbas.service.SecurityCoverageService;
 import io.openbas.stix.objects.Bundle;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 @DisallowConcurrentExecution
 public class SecurityCoverageJob implements Job {
   private final SecurityCoverageSendJobService securityCoverageSendJobService;
@@ -28,12 +31,22 @@ public class SecurityCoverageJob implements Job {
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
+    List<SecurityCoverageSendJob> successfulJobs = new ArrayList<>();
     for (SecurityCoverageSendJob securityCoverageSendJob : jobs) {
-      Bundle bundle =
-          securityCoverageService.createBundleFromSendJobs(List.of(securityCoverageSendJob));
-      JsonNode n = bundle.toStix(mapper);
-      // send bundle
+      try {
+        Bundle bundle =
+            securityCoverageService.createBundleFromSendJobs(List.of(securityCoverageSendJob));
+        JsonNode n = bundle.toStix(mapper);
+        // send bundle
+        successfulJobs.add(securityCoverageSendJob);
+      } catch (Exception e) {
+        // don't crash the job
+        log.error(
+            "Could not create the STIX bundle for coverage of simulation {}",
+            securityCoverageSendJob.getSimulation().getId(),
+            e);
+      }
     }
-    securityCoverageSendJobService.consumeJobs(jobs);
+    securityCoverageSendJobService.consumeJobs(successfulJobs);
   }
 }

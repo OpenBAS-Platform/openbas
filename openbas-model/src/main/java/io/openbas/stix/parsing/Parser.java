@@ -14,13 +14,17 @@ import io.openbas.stix.types.inner.KillChainPhase;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class Parser {
+  private final ObjectMapper mapper;
+
   public Bundle parseBundle(java.lang.String source)
       throws JsonProcessingException, ParsingException {
-    JsonNode jsonNode = new ObjectMapper().readTree(source);
+    JsonNode jsonNode = mapper.readTree(source);
     if (!jsonNode.has("type") || !"bundle".equals(jsonNode.get("type").asText())) {
       throw new ParsingException("Invalid STIX: not a STIX bundle");
     }
@@ -33,6 +37,10 @@ public class Parser {
       objects.add(parseObject(objectNode));
     }
     return new Bundle(id, objects);
+  }
+
+  public ObjectBase parseObject(String json) throws JsonProcessingException, ParsingException {
+    return parseObject(mapper.readTree(json));
   }
 
   private ObjectBase parseObject(JsonNode propertyNode)

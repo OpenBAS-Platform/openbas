@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.rest.attack_pattern.service.AttackPatternService;
@@ -9,6 +10,8 @@ import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.objects.RelationshipObject;
 import io.openbas.stix.objects.constants.CommonProperties;
 import io.openbas.stix.objects.constants.ObjectTypes;
+import io.openbas.stix.parsing.Parser;
+import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.types.BaseType;
 import io.openbas.stix.types.Identifier;
 import io.openbas.stix.types.StixString;
@@ -24,11 +27,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SecurityCoverageService {
+  private final Parser stixParser;
   private final AttackPatternService attackPatternService;
   private final ResultUtils resultUtils;
   private final OpenBASConfig openBASConfig;
 
-  public Bundle createBundleFromSendJobs(List<SecurityCoverageSendJob> securityCoverageSendJobs) {
+  public Bundle createBundleFromSendJobs(List<SecurityCoverageSendJob> securityCoverageSendJobs)
+      throws ParsingException, JsonProcessingException {
     List<ObjectBase> objects = new ArrayList<>();
     for (SecurityCoverageSendJob securityCoverageSendJob : securityCoverageSendJobs) {
       SecurityAssessment sa = securityCoverageSendJob.getSimulation().getSecurityAssessment();
@@ -43,62 +48,44 @@ public class SecurityCoverageService {
     return new Bundle(new Identifier("bundle--" + UUID.randomUUID()), objects);
   }
 
-  private List<ObjectBase> getCoverageForSimulation(Exercise exercise) {
+  private List<ObjectBase> getCoverageForSimulation(Exercise exercise)
+      throws ParsingException, JsonProcessingException {
     List<ObjectBase> objects = new ArrayList<>();
 
     // create the main coverage object
-    DomainObject coverage =
-        new DomainObject(
-            Map.of(
-                CommonProperties.ID.toString(),
-                new Identifier("security-coverage--" + exercise.getId()),
-                CommonProperties.TYPE.toString(),
-                new StixString("security-coverage"),
-                CommonProperties.CREATED.toString(),
-                new Timestamp(exercise.getCreatedAt()),
-                CommonProperties.MODIFIED.toString(),
-                new Timestamp(Instant.now()),
-                "security_assessment_ref",
-                new Identifier(exercise.getSecurityAssessment().getExternalId()),
-                "coverage",
-                getOverallCoverage(exercise),
-                "url",
-                new StixString(
-                    String.format(
-                        "%s/admin/simulations/%s", openBASConfig.getBaseUrl(), exercise.getId())),
-                "is_closed",
-                new io.openbas.stix.types.Boolean(false),
-                "start_time",
-                new Timestamp(exercise.getStart().get()),
-                "end_time",
-                new Timestamp(exercise.getEnd().get())));
+    SecurityAssessment assessment = exercise.getSecurityAssessment();
+    DomainObject coverage = (DomainObject) stixParser.parseObject(assessment.getRawStix());
+    coverage.setProperty(CommonProperties.MODIFIED.toString(), new Timestamp(Instant.now()));
+    coverage.setProperty("coverage", getOverallCoverage(exercise));
     objects.add(coverage);
 
     for (StixRefToExternalRef stixRef : exercise.getSecurityAssessment().getAttackPatternRefs()) {
       BaseType<?> attackPatternCoverage =
           getAttackPatternCoverage(stixRef.getExternalRef(), exercise);
+      boolean covered = !((Map<String, BaseType<?>>) attackPatternCoverage.getValue()).isEmpty();
       RelationshipObject sro =
           new RelationshipObject(
-              Map.of(
-                  CommonProperties.ID.toString(),
-                  new Identifier(ObjectTypes.RELATIONSHIP + "--" + exercise.getId()),
-                  CommonProperties.TYPE.toString(),
-                  new StixString(ObjectTypes.RELATIONSHIP.toString()),
-                  "relationship_type",
-                  new StixString("has-assessed"),
-                  "start_time",
-                  new Timestamp(exercise.getStart().get()),
-                  "end_time",
-                  new Timestamp(exercise.getEnd().get()),
-                  RelationshipObject.Properties.SOURCE_REF.toString(),
-                  coverage.getProperty(CommonProperties.ID.toString()),
-                  RelationshipObject.Properties.TARGET_REF.toString(),
-                  new Identifier(stixRef.getStixRef()),
-                  "coverage",
-                  attackPatternCoverage,
-                  "covered",
-                  new io.openbas.stix.types.Boolean(
-                      !((Map<String, BaseType<?>>) attackPatternCoverage.getValue()).isEmpty())));
+              new HashMap<>(
+                  Map.of(
+                      CommonProperties.ID.toString(),
+                      new Identifier(ObjectTypes.RELATIONSHIP + "--" + exercise.getId()),
+                      CommonProperties.TYPE.toString(),
+                      new StixString(ObjectTypes.RELATIONSHIP.toString()),
+                      "relationship_type",
+                      new StixString("has-assessed"),
+                      "start_time",
+                      new Timestamp(exercise.getStart().get()),
+                      "stop_time",
+                      new Timestamp(exercise.getEnd().get()),
+                      RelationshipObject.Properties.SOURCE_REF.toString(),
+                      coverage.getProperty(CommonProperties.ID.toString()),
+                      RelationshipObject.Properties.TARGET_REF.toString(),
+                      new Identifier(stixRef.getStixRef()),
+                      "covered",
+                      new io.openbas.stix.types.Boolean(covered))));
+      if (covered) {
+        sro.setProperty("coverage", attackPatternCoverage);
+      }
       objects.add(sro);
     }
 

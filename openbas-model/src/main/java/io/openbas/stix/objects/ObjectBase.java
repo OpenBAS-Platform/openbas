@@ -18,6 +18,10 @@ public abstract class ObjectBase implements StixSerialisable {
     return properties.get(name);
   }
 
+  public void setProperty(String name, BaseType<?> value) {
+    properties.put(name, value);
+  }
+
   public boolean hasProperty(String name) {
     return properties.containsKey(name);
   }
