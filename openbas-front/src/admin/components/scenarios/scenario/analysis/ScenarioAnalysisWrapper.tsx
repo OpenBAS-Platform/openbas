@@ -9,7 +9,7 @@ import ScenarioAnalysis from './ScenarioAnalysis';
 const ScenarioAnalysisWrapper = () => {
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [parameters, setParameters] = useLocalStorage<Record<string, ParameterOption>>('custom-dashboard-simulation-' + scenarioId, Object.fromEntries(new Map()));
+  const [parameters, setParameters] = useLocalStorage<Record<string, ParameterOption>>('custom-dashboard-scenario-' + scenarioId, Object.fromEntries(new Map()));
   const contextValue = useMemo(() => ({
     customDashboard: customDashboardValue,
     setCustomDashboard: setCustomDashboardValue,
