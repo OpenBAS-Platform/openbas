@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -42,36 +43,38 @@ public class StixService {
   private final Parser stixParser;
   private final ObjectMapper objectMapper;
 
-  public List<String> generateScenarioFromSTIXBundle(String stixJson)
-      throws IOException, ParsingException {
+  public String processBundle(String stixJson) throws IOException, ParsingException {
     JsonNode root = objectMapper.readTree(stixJson);
     Bundle bundle = stixParser.parseBundle(root.toString());
 
-    List<String> createdScenarios = new ArrayList<>();
+    List<ObjectBase> assessments = bundle.findByType("x-security-assessment");
 
-    for (ObjectBase obj :
-        bundle.findByType(
-            "x-security-assessment")) { // Maybe we could have various security assestments
-      String id = (String) obj.getProperty("id").getValue();
-      SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
-      Scenario scenario = getOrCreateScenario(securityAssessment);
-
-      updateSecurityAssessmentFromStix(obj, bundle, scenario, securityAssessment);
-      securityAssessment.setScenario(scenario);
-      SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
-
-      // Create Scenario using SecurityAssessment
-      scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
-      scenario
-          .getTags()
-          .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
-
-      // Creation injects based attack patterns from stix
-      createdInjectsForScenario(securityAssessment, scenario);
-
-      createdScenarios.add(scenario.getId());
+    if (assessments.size() != 1) {
+      throw new BadRequestException(
+          "STIX bundle must contain exactly one x-security-assessment");
     }
-    return createdScenarios;
+
+    ObjectBase obj = assessments.get(0);
+    String id = obj.getProperty("id").getValue().toString();
+
+    SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
+    Scenario scenario = getOrCreateScenario(securityAssessment);
+
+    updateSecurityAssessmentFromStix(obj, bundle, scenario, securityAssessment);
+
+    securityAssessment.setScenario(scenario);
+    SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
+
+    // Create Scenario using SecurityAssessment
+    scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
+    scenario
+        .getTags()
+        .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
+
+    // Creation injects based attack patterns from stix
+    createdInjectsForScenario(securityAssessment, scenario);
+
+    return scenario.getId();
   }
 
   private void updateSecurityAssessmentFromStix(
