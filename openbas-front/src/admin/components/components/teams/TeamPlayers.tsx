@@ -309,7 +309,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
             key={user.user_id}
             classes={{ root: classes.item }}
             divider
-            secondaryAction={permissions.canWrite
+            secondaryAction={permissions.canManage
               ? (<PlayerPopover user={user} teamId={teamId} />)
               : <span> &nbsp; </span>}
           >
@@ -408,7 +408,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
         ))}
       </List>
       {
-        permissions.canWrite
+        permissions.canManage
         && (
           <TeamAddPlayers
             teamId={teamId}

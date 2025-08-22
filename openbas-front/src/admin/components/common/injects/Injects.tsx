@@ -650,7 +650,7 @@ const Injects: FunctionComponent<Props> = ({
               })}
         </List>
       )}
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <>
           {selectedInjectId !== null
             && (

@@ -11,7 +11,7 @@ import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/permissions/simulationPermissions.js';
 import ChannelMicroblogging from './ChannelMicroblogging';
 import ChannelNewspaper from './ChannelNewspaper';
 import ChannelTvChannel from './ChannelTvChannel';
@@ -42,7 +42,7 @@ const ChannelPreview = () => {
   if (channel) {
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -57,7 +57,7 @@ const ChannelPreview = () => {
             {t('Switch to player mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

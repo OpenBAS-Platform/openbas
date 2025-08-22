@@ -1,10 +1,11 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Variable, type VariableInput } from '../../../../utils/api-types';
+import { PermissionsContext } from '../../common/Context';
 import VariableForm from './VariableForm';
 
 interface Props {
@@ -22,7 +23,7 @@ const VariablePopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const { permissions } = useContext(PermissionsContext);
 
   const initialValues = (({
     variable_key,
@@ -35,58 +36,44 @@ const VariablePopover: FunctionComponent<Props> = ({
   }))(variable);
 
   // Edition
-
   const [editVar, setEditVar] = useState(false);
   const submitEdit = (data: VariableInput) => {
     onEdit(variable, data);
     setEditVar(false);
   };
+  const handleUpdate = () => {
+    setEditVar(true);
+  };
 
   // Deletion
-
   const [deleteVar, setDeleteVar] = useState(false);
   const submitDelete = () => {
     onDelete(variable);
     setDeleteVar(false);
   };
+  const handleDelete = () => {
+    setDeleteVar(true);
+  };
+
+  // Button Popover
+  const entries = [{
+    label: t('Update'),
+    action: () => handleUpdate(),
+    userRight: permissions.canManage,
+  }, {
+    label: t('Delete'),
+    action: () => handleDelete(),
+    userRight: permissions.canManage,
+  }];
+
   return (
     <>
-      <IconButton
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        aria-haspopup="true"
-        size="large"
-        color="primary"
+
+      <ButtonPopover
+        entries={entries}
+        variant="icon"
         disabled={disabled}
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        <MenuItem
-          onClick={() => {
-            setEditVar(true);
-            setAnchorEl(null);
-          }}
-          disabled={disabled}
-        >
-          {t('Update')}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setDeleteVar(true);
-            setAnchorEl(null);
-          }}
-          disabled={disabled}
-        >
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
+      />
       <Dialog
         open={deleteVar}
         TransitionComponent={Transition}

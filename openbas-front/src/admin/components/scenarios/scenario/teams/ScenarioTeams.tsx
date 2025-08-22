@@ -41,7 +41,7 @@ const ScenarioTeams: FunctionComponent<Props> = ({ scenarioTeamsUsers }) => {
       >
         <Typography variant="h4">
           {t('Teams')}
-          {permissions.canWrite
+          {permissions.canManage
             && (
               <UpdateTeams
                 addedTeamIds={teamsStore.map((team: Team) => team.team_id)}

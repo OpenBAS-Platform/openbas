@@ -14,7 +14,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import * as R from 'ramda';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type FullArticleStore } from '../../../../../../actions/channels/Article';
@@ -31,6 +31,7 @@ import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { truncate } from '../../../../../../utils/String';
 import ChannelIcon from '../../../../components/channels/ChannelIcon';
 import CreateArticle from '../../../articles/CreateArticle';
+import { PermissionsContext } from '../../../Context';
 
 const useStyles = makeStyles()(theme => ({
   box: {
@@ -64,6 +65,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const { permissions } = useContext(PermissionsContext);
 
   const { articlesMap, channelsMap } = useHelper((helper: ArticlesHelper & ChannelsHelper) => ({
     articlesMap: helper.getArticlesMap(),
@@ -188,13 +190,16 @@ const InjectAddArticles: FunctionComponent<Props> = ({
                     </ListItemButton>
                   );
                 })}
-                <CreateArticle
-                  inline
-                  openCreate={openCreate}
-                  onCreate={onCreate}
-                  handleOpenCreate={handleOpenCreate}
-                  handleCloseCreate={handleCloseCreate}
-                />
+                {permissions.canManage
+                  && (
+                    <CreateArticle
+                      inline
+                      openCreate={openCreate}
+                      onCreate={onCreate}
+                      handleOpenCreate={handleOpenCreate}
+                      handleCloseCreate={handleCloseCreate}
+                    />
+                  )}
               </List>
             </GridLegacy>
             <GridLegacy item xs={4}>

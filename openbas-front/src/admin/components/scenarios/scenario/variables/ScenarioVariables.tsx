@@ -44,7 +44,7 @@ const ScenarioVariables = () => {
       >
         <Typography variant="h4">
           {t('Variables')}
-          {permissions.canWrite && (<CreateVariable />)}
+          {permissions.canManage && (<CreateVariable />)}
         </Typography>
         <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
           <Variables variables={variables} />
