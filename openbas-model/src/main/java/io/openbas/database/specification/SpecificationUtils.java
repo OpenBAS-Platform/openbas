@@ -43,10 +43,14 @@ public class SpecificationUtils {
    *
    * @param userId ID of the user performing the search
    * @param isAdmin true id the user performing the search has admin privileges
+   * @param hasCapaForClass true id the user has the capa for the specific class to bypass grants
    * @param grantType the minimum grant type required to access the resource
    */
   public static <T extends Base> Specification<T> hasGrantAccess(
-      final String userId, final boolean isAdmin, Grant.GRANT_TYPE grantType) {
+      final String userId,
+      final boolean isAdmin,
+      boolean hasCapaForClass,
+      Grant.GRANT_TYPE grantType) {
     return (root, query, cb) -> {
       Class<?> entityClass = root.getJavaType();
 
@@ -54,7 +58,7 @@ public class SpecificationUtils {
       Grantable grantFilter = entityClass.getAnnotation(Grantable.class);
 
       // If the user is an admin or there is no grant system associated
-      if (isAdmin || grantFilter == null) {
+      if (isAdmin || grantFilter == null || hasCapaForClass) {
         return cb.conjunction(); // Always true
       }
 

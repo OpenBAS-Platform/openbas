@@ -765,9 +765,8 @@ public class ExerciseApi extends RestBehavior {
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
     User currentUser = userService.currentUser();
-    if (currentUser.isAdmin()
-        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
-        || currentUser.getCapabilities().contains(Capability.BYPASS)) {
+    if (currentUser.isAdminOrBypass()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)) {
       return buildPaginationCriteriaBuilder(
           (Specification<Exercise> specification,
               Specification<Exercise> specificationCount,

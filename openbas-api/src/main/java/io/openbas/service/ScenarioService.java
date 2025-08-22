@@ -137,9 +137,8 @@ public class ScenarioService {
   public List<ScenarioSimple> scenarios() {
     List<RawScenario> scenarios;
     User currentUser = userService.currentUser();
-    if (currentUser.isAdmin()
-        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
-        || currentUser.getCapabilities().contains(Capability.BYPASS)) {
+    if (currentUser.isAdminOrBypass()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)) {
       scenarios = fromIterable(this.scenarioRepository.rawAll());
     } else {
       scenarios = this.scenarioRepository.rawAllGranted(currentUser().getId());
@@ -170,9 +169,8 @@ public class ScenarioService {
           UnaryOperator<Specification<Scenario>> deepFilterSpecification,
           Map<String, Join<Base, Base>> joinMap) {
     User currentUser = userService.currentUser();
-    if (currentUser.isAdmin()
-        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
-        || currentUser.getCapabilities().contains(Capability.BYPASS)) {
+    if (currentUser.isAdminOrBypass()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)) {
       return (specification, specificationCount, pageable) ->
           this.findAllWithCriteriaBuilder(
               deepFilterSpecification.apply(specification),

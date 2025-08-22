@@ -131,15 +131,16 @@ public class FullTextSearchService<T extends Base> {
             .orElseThrow(
                 () -> new IllegalArgumentException(clazz + " is not handle by full text search"));
 
-    OpenBASPrincipal principal = SessionHelper.currentUser();
+    User currentUser = userService.currentUser();
     // Check if the principal has the right to search this class
     Capability capaForClass = capaByClassMap.get(clazzT).orElse(Capability.BYPASS);
-    if (!principal.isAdmin() && capaForClass != Capability.BYPASS) {
-      User u = userService.currentUser();
+    boolean isGrantable = clazzT.getAnnotation(Grantable.class) != null;
+
+    if (!currentUser.isAdminOrBypass() && capaForClass != Capability.BYPASS && !isGrantable) {
       // We can't really use the PermissionService.hasPermission method here because it would
       // require a mapping between classes and resourceType
-      if (!u.getCapabilities().contains(Capability.BYPASS)
-          && !u.getCapabilities().contains(capaForClass)) {
+      if (!currentUser.getCapabilities().contains(Capability.BYPASS)
+          && !currentUser.getCapabilities().contains(capaForClass)) {
         return generateEmptyResult(searchPaginationInput);
       }
     }
@@ -153,7 +154,10 @@ public class FullTextSearchService<T extends Base> {
         SpecificationUtils.<T>fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT))
             .and(
                 SpecificationUtils.hasGrantAccess(
-                    principal.getId(), principal.isAdmin(), Grant.GRANT_TYPE.OBSERVER));
+                    currentUser.getId(),
+                    currentUser.isAdminOrBypass(),
+                    currentUser.getCapabilities().contains(capaForClass),
+                    Grant.GRANT_TYPE.OBSERVER));
 
     return buildPaginationJPA(repository::findAll, searchPaginationInput, clazzT, specs)
         .map(this::transform);

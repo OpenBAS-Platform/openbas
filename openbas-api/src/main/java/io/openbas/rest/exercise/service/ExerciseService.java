@@ -368,9 +368,8 @@ public class ExerciseService {
     // We get the exercises depending on whether or not we are granted or have the capa
     User currentUser = userService.currentUser();
     List<RawExerciseSimple> exercises =
-        currentUser.isAdmin()
+        currentUser.isAdminOrBypass()
                 || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
-                || currentUser.getCapabilities().contains(Capability.BYPASS)
             ? exerciseRepository.rawAll()
             : exerciseRepository.rawAllGranted(currentUser().getId());
     return exerciseMapper.getExerciseSimples(exercises);

@@ -345,6 +345,12 @@ public class User implements Base {
     return !isAdmin() && !isManager();
   }
 
+  @JsonProperty("user_is_admin_or_bypass")
+  @Schema(description = "True if the user is admin or has bypass capa")
+  public boolean isAdminOrBypass() {
+    return isAdmin() || getCapabilities().contains(Capability.BYPASS);
+  }
+
   @JsonProperty("user_capabilities")
   @Enumerated(EnumType.STRING)
   public Set<Capability> getCapabilities() {
