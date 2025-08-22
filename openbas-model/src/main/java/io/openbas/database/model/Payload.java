@@ -52,8 +52,8 @@ import org.hibernate.annotations.UuidGenerator;
       @DiscriminatorMapping(value = "Command", schema = Command.class),
       @DiscriminatorMapping(value = "Executable", schema = Executable.class),
       @DiscriminatorMapping(value = "FileDrop", schema = FileDrop.class),
-      @DiscriminatorMapping(value = "Dns", schema = DnsResolution.class),
-      @DiscriminatorMapping(value = "Network", schema = NetworkTraffic.class)
+      @DiscriminatorMapping(value = "DnsResolution", schema = DnsResolution.class),
+      @DiscriminatorMapping(value = "NetworkTraffic", schema = NetworkTraffic.class)
     })
 public class Payload implements Base {
 

@@ -82,7 +82,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
     switch (payload.payload_type) {
       case 'Command':
         return (payload as Command).command_content || '';
-      case 'Dns':
+      case 'DnsResolution':
         return (payload as DnsResolution).dns_resolution_hostname || '';
       case 'FileDrop':
         return (payload as FileDrop).file_drop_file || '';

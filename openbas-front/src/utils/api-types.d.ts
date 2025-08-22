@@ -4360,8 +4360,8 @@ export type Payload = BasePayload &
     | BasePayloadPayloadTypeMapping<"Command", Command>
     | BasePayloadPayloadTypeMapping<"Executable", Executable>
     | BasePayloadPayloadTypeMapping<"FileDrop", FileDrop>
-    | BasePayloadPayloadTypeMapping<"Dns", DnsResolution>
-    | BasePayloadPayloadTypeMapping<"Network", NetworkTraffic>
+    | BasePayloadPayloadTypeMapping<"DnsResolution", DnsResolution>
+    | BasePayloadPayloadTypeMapping<"NetworkTraffic", NetworkTraffic>
   );
 
 export interface PayloadArgument {
@@ -4383,8 +4383,8 @@ export type PayloadCreateInput = BasePayloadCreateInput &
     | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
     | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
     | BasePayloadCreateInputPayloadTypeMapping<"FileDrop", FileDrop>
-    | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
-    | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
+    | BasePayloadCreateInputPayloadTypeMapping<"DnsResolution", DnsResolution>
+    | BasePayloadCreateInputPayloadTypeMapping<"NetworkTraffic", NetworkTraffic>
   );
 
 export interface PayloadExportRequestInput {

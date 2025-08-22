@@ -4,11 +4,11 @@ import java.util.function.Supplier;
 import lombok.Getter;
 
 public enum PayloadType {
-  COMMAND("Command", Command::new),
-  EXECUTABLE("Executable", Executable::new),
-  FILE_DROP("FileDrop", FileDrop::new),
-  DNS_RESOLUTION("DnsResolution", DnsResolution::new),
-  NETWORK_TRAFFIC("NetworkTraffic", NetworkTraffic::new);
+  COMMAND(Command.COMMAND_TYPE, Command::new),
+  EXECUTABLE(Executable.EXECUTABLE_TYPE, Executable::new),
+  FILE_DROP(FileDrop.FILE_DROP_TYPE, FileDrop::new),
+  DNS_RESOLUTION(DnsResolution.DNS_RESOLUTION_TYPE, DnsResolution::new),
+  NETWORK_TRAFFIC(NetworkTraffic.NETWORK_TRAFFIC_TYPE, NetworkTraffic::new);
 
   public final String key;
   @Getter public final Supplier<Payload> payloadSupplier;
