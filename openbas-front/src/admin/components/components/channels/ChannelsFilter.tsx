@@ -1,5 +1,5 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { type FunctionComponent, useEffect } from 'react';
+import { type FunctionComponent, useContext, useEffect } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
@@ -8,6 +8,8 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type Channel } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { ArticleContext } from '../../common/Context';
 import ChannelIcon from './ChannelIcon';
 import { type ChannelOption } from './ChannelOption';
 
@@ -39,10 +41,13 @@ interface ChannelTransformed {
 const ChannelsFilter: FunctionComponent<Props> = (props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const { fetchChannels } = useContext(ArticleContext);
+
   const dispatch = useAppDispatch();
-  useEffect(() => {
+  useDataLoader(() => {
     dispatch(fetchChannels());
-  }, []);
+  });
+
   const { channels } = useHelper((helper: ChannelsHelper) => ({ channels: helper.getChannels() }));
   const { onChannelsChange, onClearChannels = () => { }, fullWidth } = props;
 
