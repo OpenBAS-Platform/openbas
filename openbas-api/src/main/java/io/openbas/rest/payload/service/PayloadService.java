@@ -151,7 +151,7 @@ public class PayloadService {
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
 
-    if (payload.getType().equals("Command")) {
+    if (payload.getType().equals(Command.COMMAND_TYPE)) {
       builder.optional(obfuscatorField());
     }
 
