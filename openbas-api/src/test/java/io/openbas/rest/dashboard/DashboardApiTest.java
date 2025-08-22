@@ -13,6 +13,7 @@ import io.openbas.engine.EngineContext;
 import io.openbas.engine.EngineService;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.api.*;
+import io.openbas.utils.CustomDashboardTimeRange;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.CustomDashboardFixture;
 import io.openbas.utils.fixtures.composers.*;

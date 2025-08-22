@@ -4,6 +4,7 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
+import { CUSTOM_TIME_RANGE, getTimeRangeItems } from './widgets/configuration/common/TimeRangeUtils';
 
 interface Props {
   handleTimeRange: (data: string) => void;
@@ -19,40 +20,7 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
   const { t } = useFormatter();
   const theme = useTheme();
 
-  const timeRangeItems = [
-    {
-      value: 'ALL_TIME',
-      label: t('All time'),
-    },
-    {
-      value: 'CUSTOM',
-      label: t('Custom range'),
-    },
-    {
-      value: 'LAST_DAY',
-      label: t('Last 24 hours'),
-    },
-    {
-      value: 'LAST_WEEK',
-      label: t('Last 7 days'),
-    },
-    {
-      value: 'LAST_MONTH',
-      label: t('Last month'),
-    },
-    {
-      value: 'LAST_QUARTER',
-      label: t('Last 3 months'),
-    },
-    {
-      value: 'LAST_SEMESTER',
-      label: t('Last 6 months'),
-    },
-    {
-      value: 'LAST_YEAR',
-      label: t('Last year'),
-    },
-  ];
+  const timeRangeItems = getTimeRangeItems(t);
 
   return (
     <div style={{
@@ -84,7 +52,7 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
         </Select>
       </FormControl>
       {
-        timeRangeValue === 'CUSTOM' && (
+        timeRangeValue === CUSTOM_TIME_RANGE && (
           <>
             <DateTimePicker
               views={['year', 'month', 'day']}

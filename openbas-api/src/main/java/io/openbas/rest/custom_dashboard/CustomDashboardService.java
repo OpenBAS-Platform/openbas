@@ -1,11 +1,11 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType.*;
 import static io.openbas.database.specification.CustomDashboardSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.CustomDashboard;
-import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.raw.RawCustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
@@ -13,11 +13,8 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.mapper.CustomDashboardMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
-
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -42,32 +39,17 @@ public class CustomDashboardService {
    */
   @Transactional
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
-    CustomDashboardParameters customDashboardTimeRangeParameter = new CustomDashboardParameters();
-    customDashboardTimeRangeParameter.setName("Time range");
-    customDashboardTimeRangeParameter.setType(
-        CustomDashboardParameters.CustomDashboardParameterType.timeRange);
-    customDashboardTimeRangeParameter.setCustomDashboard(customDashboard);
-    CustomDashboardParameters customDashboardStartDateParameter = new CustomDashboardParameters();
-    customDashboardStartDateParameter.setName("Start date");
-    customDashboardStartDateParameter.setType(
-        CustomDashboardParameters.CustomDashboardParameterType.startDate);
-    customDashboardStartDateParameter.setCustomDashboard(customDashboard);
-    CustomDashboardParameters customDashboardEndDateParameter = new CustomDashboardParameters();
-    customDashboardEndDateParameter.setName("End date");
-    customDashboardEndDateParameter.setType(
-        CustomDashboardParameters.CustomDashboardParameterType.endDate);
-    customDashboardEndDateParameter.setCustomDashboard(customDashboard);
-    List<CustomDashboardParameters> customDashboardParametersList = new ArrayList<>(customDashboard.getParameters());
-    customDashboardParametersList.add(customDashboardTimeRangeParameter);
-    customDashboardParametersList.add(customDashboardStartDateParameter);
-    customDashboardParametersList.add(customDashboardEndDateParameter);
-    customDashboard.setParameters(customDashboardParametersList);
-    return this.customDashboardRepository.save(customDashboard);
+    CustomDashboard customDashboardWithDefaultParams =
+        customDashboard
+            .addParameter("Time range", timeRange)
+            .addParameter("Start date", startDate)
+            .addParameter("End date", endDate);
+    return this.customDashboardRepository.save(customDashboardWithDefaultParams);
   }
 
   /**
-   * Retrieves all {@link CustomDashboard} entities from the database and converts them into
-   * {@link CustomDashboardOutput} DTOs.
+   * Retrieves all {@link CustomDashboard} entities from the database and converts them into {@link
+   * CustomDashboardOutput} DTOs.
    *
    * @return list of {@link CustomDashboardOutput} DTOs
    */
@@ -78,8 +60,8 @@ public class CustomDashboardService {
   }
 
   /**
-   * Retrieves a paginated list of {@link CustomDashboard} entities according to the provided
-   * {@link SearchPaginationInput}.
+   * Retrieves a paginated list of {@link CustomDashboard} entities according to the provided {@link
+   * SearchPaginationInput}.
    *
    * @param searchPaginationInput the pagination and filtering input
    * @return a {@link Page} of {@link CustomDashboard} entities
@@ -107,7 +89,8 @@ public class CustomDashboardService {
   }
 
   /**
-   * Updates an existing {@link CustomDashboard} entity. The update date is set to the current timestamp.
+   * Updates an existing {@link CustomDashboard} entity. The update date is set to the current
+   * timestamp.
    *
    * @param customDashboard the {@link CustomDashboard} entity to update
    * @return the updated {@link CustomDashboard}
@@ -135,16 +118,16 @@ public class CustomDashboardService {
   // -- OPTION --
 
   /**
-   * Finds all {@link CustomDashboard} entities matching a search text, and returns them as
-   * {@link FilterUtilsJpa.Option} DTOs for use in UI dropdowns.
+   * Finds all {@link CustomDashboard} entities matching a search text, and returns them as {@link
+   * FilterUtilsJpa.Option} DTOs for use in UI dropdowns.
    *
    * @param searchText partial or full name to filter dashboards
    * @return list of {@link FilterUtilsJpa.Option} objects
    */
   public List<FilterUtilsJpa.Option> findAllAsOptions(final String searchText) {
     return fromIterable(
-        customDashboardRepository.findAll(
-            byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+            customDashboardRepository.findAll(
+                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();

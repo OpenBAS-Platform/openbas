@@ -1,11 +1,13 @@
 package io.openbas.service;
 
+import static io.openbas.utils.CustomDashboardQueryUtils.calcEndDate;
+import static io.openbas.utils.CustomDashboardQueryUtils.calcStartDate;
+import static io.openbas.utils.CustomDashboardTimeRange.ALL_TIME;
 import static io.openbas.utils.OpenSearchUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
@@ -27,20 +29,16 @@ import io.openbas.engine.query.EsSeriesData;
 import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
 import jakarta.annotation.Resource;
-import io.openbas.utils.CustomDashboardQueryUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldSort;
 import org.opensearch.client.opensearch._types.FieldValue;
@@ -57,8 +55,6 @@ import org.opensearch.client.opensearch.generic.Response;
 @Slf4j
 public class OpenSearchService implements EngineService {
 
-  private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
-
   private final OpenSearchDriver driver;
   private final EngineContext searchEngine;
   private final OpenSearchClient openSearchClient;
@@ -66,17 +62,16 @@ public class OpenSearchService implements EngineService {
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource private ObjectMapper mapper;
 
   /**
    * Constructor for the opensearch engine
    *
-   * @param searchEngine             the context of the engine
-   * @param driver                   the driver
+   * @param searchEngine the context of the engine
+   * @param driver the driver
    * @param indexingStatusRepository the repository for the indexing status
-   * @param engineConfig             the config of the engine
-   * @param commonSearchService      the common search service
+   * @param engineConfig the config of the engine
+   * @param commonSearchService the common search service
    * @throws Exception in case of an issue during the initialization of the opensearchclient
    */
   public OpenSearchService(
@@ -97,8 +92,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Convert a field to a FieldValue
    *
-   * @param field      the field
-   * @param value      the value
+   * @param field the field
+   * @param value the value
    * @param parameters the map of parameters
    * @return the FieldValue
    */
@@ -111,9 +106,9 @@ public class OpenSearchService implements EngineService {
     }
     if (propertyField.getType().isAssignableFrom(String.class)
         || (propertyField.getType().isAssignableFrom(Set.class)
-        && propertyField.getSubtype() instanceof ParameterizedType
-        && String.class.equals(
-        ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
+            && propertyField.getSubtype() instanceof ParameterizedType
+            && String.class.equals(
+                ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));
@@ -130,8 +125,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Query an engine using the filter, parameters and definition
    *
-   * @param filter               the filter
-   * @param parameters           the parameters
+   * @param filter the filter
+   * @param parameters the parameters
    * @param definitionParameters the map of parameters
    * @return the query
    */
@@ -287,8 +282,8 @@ public class OpenSearchService implements EngineService {
   /**
    * Build the query from filter
    *
-   * @param groupFilter          the filter
-   * @param parameters           the parameters to use
+   * @param groupFilter the filter
+   * @param parameters the parameters to use
    * @param definitionParameters the definition of the parameters
    * @return the query generated
    */
@@ -314,10 +309,10 @@ public class OpenSearchService implements EngineService {
   /**
    * Build the query
    *
-   * @param user                 the user auth to use
-   * @param search               the search to use
-   * @param groupFilter          the filter to use
-   * @param parameters           the parameters to use
+   * @param user the user auth to use
+   * @param search the search to use
+   * @param groupFilter the filter to use
+   * @param parameters the parameters to use
    * @param definitionParameters the definition parameters to use
    * @return the query built
    */
@@ -355,7 +350,7 @@ public class OpenSearchService implements EngineService {
    * Resolve the ids of the representative
    *
    * @param user the user to use
-   * @param ids  the ids to check
+   * @param ids the ids to check
    * @return a map of ids
    */
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
@@ -386,9 +381,6 @@ public class OpenSearchService implements EngineService {
 
   // region indexing
 
-  /**
-   * {@inheritDoc}
-   */
   public <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models) {
     models.forEach(
         model -> {
@@ -439,9 +431,6 @@ public class OpenSearchService implements EngineService {
         });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void bulkDelete(List<String> ids) {
     try {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
@@ -469,33 +458,12 @@ public class OpenSearchService implements EngineService {
 
   // endregion
 
-  public Query buildDateRangeQuery(Map<String, String> parameters,
-      Map<String, CustomDashboardParameters> definitionParameters, WidgetConfiguration widgetConfiguration) {
-    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Instant finalStart =
-        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfiguration, definitionParameters);
-    Instant finalEnd =
-        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfiguration, definitionParameters);
-    return RangeQuery.of(
-            d ->
-                d.field(widgetConfiguration.getDateAttribute())
-                    .gt(JsonData.of(finalStart))
-                    .lt(JsonData.of(finalEnd)))
-        .toQuery();
-  }
-
   // region query
 
-  /**
-   * {@inheritDoc}
-   */
   public long count(RawUserAuth user, CountRuntime runtime) {
     FlatConfiguration widgetConfig = runtime.getConfig();
-    Map<String, String> parameters = runtime.getParameters();
-    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
 
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Query dateRangeQuery = buildDateRangeQuery(parameters, definitionParameters, widgetConfig);
     try {
       Query countQuery =
           buildQuery(
@@ -508,10 +476,16 @@ public class OpenSearchService implements EngineService {
                   .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
-      Query query = null;
-      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+      Query query;
+      if (widgetConfig.getTimeRange().equals(ALL_TIME)) {
         query = queryBuilder.must(countQuery).build().toQuery();
       } else {
+        Instant finalStart =
+            calcStartDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Instant finalEnd =
+            calcEndDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Query dateRangeQuery =
+            buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
         query = queryBuilder.must(dateRangeQuery, countQuery).build().toQuery();
       }
       Query finalQuery = query;
@@ -524,9 +498,6 @@ public class OpenSearchService implements EngineService {
     return 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public EsSeries termHistogram(
       RawUserAuth user,
       StructuralHistogramWidget widgetConfig,
@@ -535,13 +506,16 @@ public class OpenSearchService implements EngineService {
       Map<String, CustomDashboardParameters> definitionParameters) {
 
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Query dateRangeQuery = buildDateRangeQuery(parameters, definitionParameters, widgetConfig);
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
-    Query query = null;
-    if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+    Query query;
+    if (widgetConfig.getTimeRange().equals(ALL_TIME)) {
       query = queryBuilder.must(filterQuery).build().toQuery();
     } else {
+      Instant finalStart = calcStartDate(widgetConfig, parameters, definitionParameters);
+      Instant finalEnd = calcEndDate(widgetConfig, parameters, definitionParameters);
+      Query dateRangeQuery =
+          buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
       query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
     }
     String aggregationKey = "term_histogram";
@@ -594,10 +568,10 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for string type
    *
-   * @param user      the user to use
-   * @param config    the config for a structural histogram
+   * @param user the user to use
+   * @param config the config for a structural histogram
    * @param aggregate the aggregate
-   * @param field     the field
+   * @param field the field
    * @return the series to use
    */
   private EsSeries termHistogramSTerms(
@@ -632,7 +606,7 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for double type
    *
-   * @param config    the config to use
+   * @param config the config to use
    * @param aggregate the aggregate to use
    * @return a series
    */
@@ -653,7 +627,7 @@ public class OpenSearchService implements EngineService {
   /**
    * Histogram for long type
    *
-   * @param config    the config to use
+   * @param config the config to use
    * @param aggregate the aggregate to use
    * @return a series
    */
@@ -671,9 +645,6 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName(), data);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -683,9 +654,6 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public EsSeries dateHistogram(
       RawUserAuth user,
       DateHistogramWidget widgetConfig,
@@ -693,74 +661,47 @@ public class OpenSearchService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    Instant finalStart =
-        CustomDashboardQueryUtils.calcStartDate(parameters, widgetConfig, definitionParameters);
-    Instant finalEnd =
-        CustomDashboardQueryUtils.calcEndDate(parameters, widgetConfig, definitionParameters);
-    Query dateRangeQuery =
-        RangeQuery.of(
-                d ->
-                    d.field(widgetConfig.getDateAttribute())
-                        .gt(JsonData.of(finalStart))
-                        .lt(JsonData.of(finalEnd)))
-            .toQuery();
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
 
-    Query query = null;
-    if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+    Instant finalStart = calcStartDate(widgetConfig, parameters, definitionParameters);
+    Instant finalEnd = calcEndDate(widgetConfig, parameters, definitionParameters);
+
+    Query query;
+    if (widgetConfig.getTimeRange().equals(ALL_TIME)) {
       query = queryBuilder.must(filterQuery).build().toQuery();
     } else {
+      Query dateRangeQuery =
+          buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
       query = queryBuilder.must(dateRangeQuery, filterQuery).build().toQuery();
     }
 
-    ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
-    ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
     try {
       String aggregationKey = "date_histogram";
-      Query finalQuery = query;
-      SearchResponse<Void> response = null;
-      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
-        response =
-            openSearchClient.search(
-                b ->
-                    b.index(engineConfig.getIndexPrefix() + "*")
-                        .size(0)
-                        .query(finalQuery)
-                        .aggregations(
-                            aggregationKey,
-                            a ->
-                                a.dateHistogram(
-                                    h ->
-                                        h.field(widgetConfig.getDateAttribute())
-                                            .minDocCount(0)
-                                            .format(widgetConfig.getInterval().format)
-                                            .calendarInterval(widgetConfig.getInterval().openType)
-                                            .keyed(false))),
-                Void.class);
+      ExtendedBounds<FieldDateMath> extendedBounds;
+      if (widgetConfig.getTimeRange().equals(ALL_TIME)) {
+        extendedBounds = null;
       } else {
-        response =
-            openSearchClient.search(
-                b ->
-                    b.index(engineConfig.getIndexPrefix() + "*")
-                        .size(0)
-                        .query(finalQuery)
-                        .aggregations(
-                            aggregationKey,
-                            a ->
-                                a.dateHistogram(
-                                    h ->
-                                        h.field(widgetConfig.getDateAttribute())
-                                            .minDocCount(0)
-                                            .format(widgetConfig.getInterval().format)
-                                            .calendarInterval(widgetConfig.getInterval().openType)
-                                            .extendedBounds(extendedBounds)
-                                            .keyed(false))),
-                Void.class);
+        ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
+        bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
+        bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
+        extendedBounds = bounds.build();
       }
-      assert response != null;
+      SearchResponse<Void> response =
+          openSearchClient.search(
+              b ->
+                  b.index(engineConfig.getIndexPrefix() + "*")
+                      .size(0)
+                      .query(query)
+                      .aggregations(
+                          aggregationKey,
+                          a ->
+                              buildDateHistogramAggregation(
+                                  a,
+                                  widgetConfig.getDateAttribute(),
+                                  widgetConfig.getInterval(),
+                                  extendedBounds)),
+              Void.class);
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
       List<EsSeriesData> data =
@@ -777,9 +718,6 @@ public class OpenSearchService implements EngineService {
     return new EsSeries(config.getName());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
     Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
@@ -789,9 +727,6 @@ public class OpenSearchService implements EngineService {
         .toList();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public List<EsBase> entities(RawUserAuth user, ListRuntime runtime) {
     Filters.FilterGroup searchFilters = runtime.getWidget().getPerspective().getFilter();
     String entityName =
@@ -828,17 +763,20 @@ public class OpenSearchService implements EngineService {
     }
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
     ListConfiguration widgetConfig = runtime.getWidget();
-    Map<String, String> parameters = runtime.getParameters();
-    Map<String, CustomDashboardParameters> definitionParameters = runtime.getDefinitionParameters();
-    Query dateRangeQuery = buildDateRangeQuery(parameters, definitionParameters, widgetConfig);
     Query listQuery =
         buildQuery(
             user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
-      Query query = null;
-      if (widgetConfig.getTimeRange().name().equals("ALL_TIME")) {
+      Query query;
+      if (widgetConfig.getTimeRange().equals(ALL_TIME)) {
         query = queryBuilder.must(listQuery).build().toQuery();
       } else {
+        Instant finalStart =
+            calcStartDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Instant finalEnd =
+            calcEndDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Query dateRangeQuery =
+            buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
         query = queryBuilder.must(dateRangeQuery, listQuery).build().toQuery();
       }
       Query finalQuery = query;
@@ -874,9 +812,6 @@ public class OpenSearchService implements EngineService {
     return model.get().getModel();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public ListConfiguration createListConfiguration(
       String entityName, Map<String, List<String>> filterValueMap) {
     // Create filters
@@ -935,9 +870,6 @@ public class OpenSearchService implements EngineService {
     return List.of();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getEngineVersion() {
     String endpoint = "/_nodes";
@@ -961,9 +893,6 @@ public class OpenSearchService implements EngineService {
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void cleanUpIndex(String model) throws IOException {
     driver.cleanUpIndex(model, openSearchClient);

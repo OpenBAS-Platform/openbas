@@ -5,6 +5,7 @@ import static lombok.AccessLevel.NONE;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.openbas.utils.CustomDashboardTimeRange;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
@@ -19,18 +20,18 @@ import lombok.Setter;
     discriminatorProperty = "widget_configuration_type",
     oneOf = {HistogramWidget.class, ListConfiguration.class, FlatConfiguration.class},
     discriminatorMapping = {
-        @DiscriminatorMapping(
-            value = WidgetConfigurationType.Values.FLAT,
-            schema = FlatConfiguration.class),
-        @DiscriminatorMapping(
-            value = WidgetConfigurationType.Values.LIST,
-            schema = ListConfiguration.class),
-        @DiscriminatorMapping(
-            value = WidgetConfigurationType.Values.TEMPORAL_HISTOGRAM,
-            schema = DateHistogramWidget.class),
-        @DiscriminatorMapping(
-            value = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM,
-            schema = StructuralHistogramWidget.class),
+      @DiscriminatorMapping(
+          value = WidgetConfigurationType.Values.FLAT,
+          schema = FlatConfiguration.class),
+      @DiscriminatorMapping(
+          value = WidgetConfigurationType.Values.LIST,
+          schema = ListConfiguration.class),
+      @DiscriminatorMapping(
+          value = WidgetConfigurationType.Values.TEMPORAL_HISTOGRAM,
+          schema = DateHistogramWidget.class),
+      @DiscriminatorMapping(
+          value = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM,
+          schema = StructuralHistogramWidget.class),
     })
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -38,14 +39,14 @@ import lombok.Setter;
     property = "widget_configuration_type",
     visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = FlatConfiguration.class, name = WidgetConfigurationType.Values.FLAT),
-    @JsonSubTypes.Type(value = ListConfiguration.class, name = WidgetConfigurationType.Values.LIST),
-    @JsonSubTypes.Type(
-        value = DateHistogramWidget.class,
-        name = WidgetConfigurationType.Values.TEMPORAL_HISTOGRAM),
-    @JsonSubTypes.Type(
-        value = StructuralHistogramWidget.class,
-        name = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM)
+  @JsonSubTypes.Type(value = FlatConfiguration.class, name = WidgetConfigurationType.Values.FLAT),
+  @JsonSubTypes.Type(value = ListConfiguration.class, name = WidgetConfigurationType.Values.LIST),
+  @JsonSubTypes.Type(
+      value = DateHistogramWidget.class,
+      name = WidgetConfigurationType.Values.TEMPORAL_HISTOGRAM),
+  @JsonSubTypes.Type(
+      value = StructuralHistogramWidget.class,
+      name = WidgetConfigurationType.Values.STRUCTURAL_HISTOGRAM)
 })
 public abstract class WidgetConfiguration {
 
@@ -57,11 +58,9 @@ public abstract class WidgetConfiguration {
   @JsonProperty("title")
   private String title;
 
-  @Nullable
-  private String start; // Date or $custom_dashboard_start
+  @Nullable private String start; // Date or $custom_dashboard_start
 
-  @Nullable
-  private String end; // Date or $custom_dashboard_end
+  @Nullable private String end; // Date or $custom_dashboard_end
 
   @NotNull
   @JsonProperty("time_range")

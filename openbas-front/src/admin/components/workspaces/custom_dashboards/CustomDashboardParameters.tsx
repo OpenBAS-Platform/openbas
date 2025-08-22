@@ -6,6 +6,7 @@ import SimulationField from '../../../../components/fields/SimulationField';
 import { type CustomDashboardParameters as CustomDashboardParametersType } from '../../../../utils/api-types';
 import { CustomDashboardContext } from './CustomDashboardContext';
 import TimeRangeFilters from './TimeRangeFilters';
+import { LAST_QUARTER_TIME_RANGE } from './widgets/configuration/common/TimeRangeUtils';
 
 const CustomDashboardParameters: FunctionComponent = () => {
   const theme = useTheme();
@@ -33,10 +34,10 @@ const CustomDashboardParameters: FunctionComponent = () => {
     }
   };
 
-  const dateParameters: CustomDashboardParametersType[] = [];
+  const dateParameters: Map<CustomDashboardParametersType['custom_dashboards_parameter_type'], string> = new Map();
   customDashboard?.custom_dashboard_parameters?.forEach((p) => {
     if (['timeRange', 'startDate', 'endDate'].includes(p.custom_dashboards_parameter_type)) {
-      dateParameters.push(p);
+      dateParameters.set(p.custom_dashboards_parameter_type, p.custom_dashboards_parameter_id);
     }
   });
 
@@ -73,18 +74,12 @@ const CustomDashboardParameters: FunctionComponent = () => {
   return (
     <>
       <TimeRangeFilters
-        timeRangeValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id)}
-        handleTimeRange={(data) => {
-          handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'timeRange')?.custom_dashboards_parameter_id, data);
-        }}
-        startDateValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'startDate')?.custom_dashboards_parameter_id)}
-        handleStartDate={(data) => {
-          handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'startDate')?.custom_dashboards_parameter_id, data);
-        }}
-        endDateValue={getParameterValue(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id)}
-        handleEndDate={(data) => {
-          handleParameters(dateParameters.find(p => p.custom_dashboards_parameter_type === 'endDate')?.custom_dashboards_parameter_id, data);
-        }}
+        timeRangeValue={getParameterValue(dateParameters.get('timeRange')) ?? LAST_QUARTER_TIME_RANGE}
+        handleTimeRange={data => handleParameters(dateParameters.get('timeRange'), data)}
+        startDateValue={getParameterValue(dateParameters.get('startDate'))}
+        handleStartDate={data => handleParameters(dateParameters.get('startDate'), data)}
+        endDateValue={getParameterValue(dateParameters.get('endDate'))}
+        handleEndDate={data => handleParameters(dateParameters.get('endDate'), data)}
       />
       <div
         style={{
@@ -94,7 +89,6 @@ const CustomDashboardParameters: FunctionComponent = () => {
         }}
       >
         {(customDashboard?.custom_dashboard_parameters ?? []).map(p => renderParameterField(p))}
-
       </div>
     </>
 

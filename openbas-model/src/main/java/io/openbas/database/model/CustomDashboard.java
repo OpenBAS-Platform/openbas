@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -61,6 +62,16 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_parameters")
   @OrderBy("id ASC")
   private List<CustomDashboardParameters> parameters = new ArrayList<>();
+
+  public CustomDashboard addParameter(
+      @NotBlank final String name, @NotBlank final CustomDashboardParameterType type) {
+    CustomDashboardParameters customDashboardEndDateParameter = new CustomDashboardParameters();
+    customDashboardEndDateParameter.setName(name);
+    customDashboardEndDateParameter.setType(type);
+    customDashboardEndDateParameter.setCustomDashboard(this);
+    this.parameters.add(customDashboardEndDateParameter);
+    return this;
+  }
 
   // -- AUDIT --
 

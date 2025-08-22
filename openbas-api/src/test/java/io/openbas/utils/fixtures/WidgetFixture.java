@@ -7,6 +7,7 @@ import io.openbas.database.model.Filters;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.*;
+import io.openbas.utils.CustomDashboardTimeRange;
 import java.util.ArrayList;
 import java.util.List;
 

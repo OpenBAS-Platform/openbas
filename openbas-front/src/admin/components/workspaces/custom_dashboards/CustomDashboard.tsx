@@ -10,6 +10,9 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type Widget } from '../../../../utils/api-types-custom';
 import { CustomDashboardContext } from './CustomDashboardContext';
+import CustomDashboardHeader from './CustomDashboardHeader';
+import { LAST_QUARTER_TIME_RANGE } from './widgets/configuration/common/TimeRangeUtils';
+import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
 import { getWidgetTitle } from './widgets/WidgetUtils';
 import WidgetViz from './widgets/WidgetViz';
@@ -33,9 +36,6 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
       custom_dashboards_parameter_type: string;
       custom_dashboards_parameter_id: string;
     }) => {
-      if ('timeRange' === p.custom_dashboards_parameter_type) {
-        params[p.custom_dashboards_parameter_id] = 'LAST_QUARTER';
-      }
     });
     setCustomDashboardParameters(prev => ({
       ...prev,

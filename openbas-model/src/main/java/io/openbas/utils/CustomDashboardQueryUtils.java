@@ -1,124 +1,142 @@
 package io.openbas.utils;
 
+import static io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType.*;
+import static io.openbas.utils.CustomDashboardTimeRange.*;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.CustomDashboardParameters;
+import io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType;
 import io.openbas.engine.api.WidgetConfiguration;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 public class CustomDashboardQueryUtils {
 
-  private CustomDashboardQueryUtils() {
+  private CustomDashboardQueryUtils() {}
+
+  public static boolean isAllTime(
+      WidgetConfiguration widgetConfig,
+      Map<String, String> parameters,
+      Map<String, CustomDashboardParameters> definitionParameters) {
+    if (ALL_TIME.equals(widgetConfig.getTimeRange())) {
+      return true;
+    }
+    if (DEFAULT.equals(widgetConfig.getTimeRange())) {
+      final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+      CustomDashboardTimeRange dashboardTimeRange =
+          CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
+      return ALL_TIME.equals(dashboardTimeRange);
+    }
+    return false;
   }
 
   public static Instant calcStartDate(
-      Map<String, String> parameters,
       WidgetConfiguration widgetConfig,
+      Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    String timeRangeParameterId =
-        definitionParameters.entrySet().stream()
-            .filter(entry -> "timeRange".equals(entry.getValue().getType().name))
-            .map(Map.Entry::getKey)
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Missing parameter with type 'timeRange'"));
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+    final String startDateParameterId = findParamIdByType(definitionParameters, startDate);
 
-    String startDateParameterId =
-        definitionParameters.entrySet().stream()
-            .filter(entry -> "startDate".equals(entry.getValue().getType().name))
-            .map(Map.Entry::getKey)
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Missing parameter with type 'startDate'"));
+    CustomDashboardTimeRange widgetTimeRange =
+        CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());
+    final Instant now = Instant.now();
 
-    String dashboardTimeRange = parameters.get(timeRangeParameterId);
-    String widgetTimeRange = widgetConfig.getTimeRange().name();
     switch (widgetTimeRange) {
-      case "LAST_DAY":
-        return Instant.now().minus(24, ChronoUnit.HOURS);
-      case "LAST_WEEK":
-        return Instant.now().minus(7, ChronoUnit.DAYS);
-      case "LAST_MONTH":
-        return Instant.now().minus(30, ChronoUnit.DAYS);
-      case "LAST_QUARTER":
-        return Instant.now().minus(90, ChronoUnit.DAYS);
-      case "LAST_SEMESTER":
-        return Instant.now().minus(180, ChronoUnit.DAYS);
-      case "LAST_YEAR":
-        return Instant.now().minus(360, ChronoUnit.DAYS);
-      case "CUSTOM":
+      case LAST_DAY:
+        return now.minus(24, ChronoUnit.HOURS);
+      case LAST_WEEK:
+        return now.minus(7, ChronoUnit.DAYS);
+      case LAST_MONTH:
+        return now.minus(30, ChronoUnit.DAYS);
+      case LAST_QUARTER:
+        return now.minus(90, ChronoUnit.DAYS);
+      case LAST_SEMESTER:
+        return now.minus(180, ChronoUnit.DAYS);
+      case LAST_YEAR:
+        return now.minus(360, ChronoUnit.DAYS);
+      case CUSTOM:
         if (hasText(widgetConfig.getStart())) {
           return Instant.parse(
               parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
-      case "DEFAULT":
-        if (!hasText(dashboardTimeRange)) {
+      case DEFAULT:
+        try {
+          CustomDashboardTimeRange dashboardTimeRange =
+              CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
+          switch (dashboardTimeRange) {
+            case LAST_DAY:
+              return now.minus(24, ChronoUnit.HOURS);
+            case LAST_WEEK:
+              return now.minus(7, ChronoUnit.DAYS);
+            case LAST_MONTH:
+              return now.minus(30, ChronoUnit.DAYS);
+            case LAST_QUARTER:
+              return now.minus(90, ChronoUnit.DAYS);
+            case LAST_SEMESTER:
+              return now.minus(180, ChronoUnit.DAYS);
+            case LAST_YEAR:
+              return now.minus(360, ChronoUnit.DAYS);
+            case CUSTOM:
+              if (parameters.get(startDateParameterId) != null) {
+                return Instant.parse(parameters.get(startDateParameterId));
+              }
+            default:
+          }
+        } catch (IllegalArgumentException e) {
           throw new RuntimeException("Dashboard timerange is not set");
-        }
-        switch (dashboardTimeRange) {
-          case "LAST_DAY":
-            return Instant.now().minus(24, ChronoUnit.HOURS);
-          case "LAST_WEEK":
-            return Instant.now().minus(7, ChronoUnit.DAYS);
-          case "LAST_MONTH":
-            return Instant.now().minus(30, ChronoUnit.DAYS);
-          case "LAST_QUARTER":
-            return Instant.now().minus(90, ChronoUnit.DAYS);
-          case "LAST_SEMESTER":
-            return Instant.now().minus(180, ChronoUnit.DAYS);
-          case "LAST_YEAR":
-            return Instant.now().minus(360, ChronoUnit.DAYS);
-          case "CUSTOM":
-            if (parameters.get(startDateParameterId) != null) {
-              return Instant.parse(parameters.get(startDateParameterId));
-            }
-          default:
         }
       default:
     }
-    return Instant.now();
+    return now;
   }
 
   public static Instant calcEndDate(
-      Map<String, String> parameters,
       WidgetConfiguration widgetConfig,
+      Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
 
-    String timeRangeParameterId =
-        definitionParameters.entrySet().stream()
-            .filter(entry -> entry.getValue().getType().name.equals("timeRange"))
-            .findFirst()
-            .get()
-            .getKey();
-    String widgetTimeRange = widgetConfig.getTimeRange().name();
-    String dashboardTimeRange = parameters.get(timeRangeParameterId);
-    String endDateParameterId =
-        definitionParameters.entrySet().stream()
-            .filter(entry -> entry.getValue().getType().name.equals("endDate"))
-            .findFirst()
-            .get()
-            .getKey();
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+    final String endDateParameterId = findParamIdByType(definitionParameters, endDate);
+
+    CustomDashboardTimeRange widgetTimeRange =
+        CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());
+    final Instant now = Instant.now();
 
     switch (widgetTimeRange) {
-      case "CUSTOM":
-        if (!widgetConfig.getEnd().isEmpty()) {
+      case CUSTOM:
+        if (hasText(widgetConfig.getEnd())) {
           return Instant.parse(
               parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
         }
-      case "DEFAULT":
-        if (!hasText(dashboardTimeRange)) {
+      case DEFAULT:
+        try {
+          CustomDashboardTimeRange dashboardTimeRange =
+              CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
+          if (dashboardTimeRange.equals(CUSTOM)) {
+            if (parameters.get(endDateParameterId) != null) {
+              return Instant.parse(parameters.get(endDateParameterId));
+            }
+          } else {
+            return now;
+          }
+        } catch (IllegalArgumentException e) {
           throw new RuntimeException("Dashboard timerange is not set");
         }
-        if (dashboardTimeRange.equals("CUSTOM")) {
-          if (parameters.get(endDateParameterId) != null) {
-            return Instant.parse(parameters.get(endDateParameterId));
-          }
-        } else {
-          return Instant.now();
-        }
       default:
-        return Instant.now();
+        return now;
     }
+  }
+
+  // -- PRIVATE --
+
+  private static String findParamIdByType(
+      Map<String, CustomDashboardParameters> definitionParameters,
+      CustomDashboardParameterType type) {
+    return definitionParameters.entrySet().stream()
+        .filter(entry -> type.equals(entry.getValue().getType()))
+        .map(Map.Entry::getKey)
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Missing parameter with type '" + type + "'"));
   }
 }
