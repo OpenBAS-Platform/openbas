@@ -43,7 +43,10 @@ public class PermissionService {
   public boolean hasPermission(
       @NotNull final User user, String resourceId, ResourceType resourceType, Action action) {
 
-    if (user.isAdmin()) {
+    Set<Capability> userCapabilities = user.getCapabilities();
+
+    // admin user or capa bypass
+    if (user.isAdminOrBypass()) {
       return true;
     }
 
@@ -67,13 +70,19 @@ public class PermissionService {
       action = parentTarget.action;
     }
 
-    // Scenario and simulation are  only accessible by GRANT
-    if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
+    // if resource is grantable then the search api is open as it will be filtered in the code
+    if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType) && Action.SEARCH.equals(action)) {
+      return true;
+    }
 
-      // creation and duplication are managed using capa
-      if (Action.CREATE.equals(action)) {
-        return hasCapaPermission(user, resourceType, action);
-      }
+    // check if the user has the capa first
+    boolean hasPermission = hasCapaPermission(user, resourceType, action);
+    if (hasCapaPermission(user, resourceType, action)) {
+      return true;
+    }
+
+    // if the user doesn't have the capa check if the user has a grant
+    if (!hasPermission || RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
       if (Action.DUPLICATE.equals(action)) {
         // to duplicate we need the "create" capa but also read on the resource
         return hasCapaPermission(user, resourceType, action)
@@ -81,9 +90,8 @@ public class PermissionService {
       }
 
       return hasGrantPermission(user, resourceId, resourceType, action);
-    } else {
-      return hasCapaPermission(user, resourceType, action);
     }
+    return false;
   }
 
   private boolean hasGrantPermission(
@@ -91,11 +99,6 @@ public class PermissionService {
       final String resourceId,
       @NotNull final ResourceType resourceType,
       @NotNull final Action action) {
-    Set<Capability> userCapabilities = user.getCapabilities();
-
-    if (userCapabilities.contains(Capability.BYPASS)) {
-      return true;
-    }
     // user can access search apis but the result will be filtered
     if (Action.SEARCH.equals(action)) {
       return true;
@@ -113,7 +116,7 @@ public class PermissionService {
     }
   }
 
-  private boolean hasCapaPermission(
+  boolean hasCapaPermission(
       @NotNull final User user,
       @NotNull final ResourceType resourceType,
       @NotNull final Action action) {

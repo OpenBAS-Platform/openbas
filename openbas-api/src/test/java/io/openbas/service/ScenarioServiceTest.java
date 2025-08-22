@@ -57,6 +57,7 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired private InjectDuplicateService injectDuplicateService;
   @Mock private InjectService injectService;
   @Mock private TagRuleService tagRuleService;
+  @Mock private UserService userService;
   @InjectMocks private ScenarioService scenarioService;
 
   @Mock private LicenseCacheManager licenseCacheManager;
@@ -89,6 +90,7 @@ class ScenarioServiceTest extends IntegrationTest {
             injectDuplicateService,
             tagRuleService,
             injectService,
+            userService,
             injectRepository,
             lessonsCategoryRepository);
   }
@@ -114,6 +116,7 @@ class ScenarioServiceTest extends IntegrationTest {
             injectDuplicateService,
             tagRuleService,
             injectService,
+            userService,
             injectRepository,
             lessonsCategoryRepository);
   }

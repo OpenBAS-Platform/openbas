@@ -14,27 +14,36 @@ public enum Capability {
   // Superuser
   BYPASS(null, pair(null, null)),
 
-  // Assesment
-  // FIXME : split capabilities to review
-  CREATE_ASSESSMENT(
+  // Assessment
+  ACCESS_ASSESSMENT(
       null,
-      pair(ResourceType.SCENARIO, Action.CREATE),
-      pair(ResourceType.SIMULATION, Action.CREATE),
-      pair(ResourceType.SCENARIO, Action.DUPLICATE),
-      pair(ResourceType.SIMULATION, Action.DUPLICATE)),
-
-  // Atomic Testing
-  ACCESS_ATOMIC_TESTING(
-      null,
+      pair(ResourceType.SCENARIO, Action.READ),
+      pair(ResourceType.SCENARIO, Action.SEARCH),
+      pair(ResourceType.SIMULATION, Action.READ),
+      pair(ResourceType.SIMULATION, Action.SEARCH),
       pair(ResourceType.ATOMIC_TESTING, Action.READ),
       pair(ResourceType.ATOMIC_TESTING, Action.SEARCH)),
-  MANAGE_ATOMIC_TESTING(
-      ACCESS_ATOMIC_TESTING,
+  MANAGE_ASSESSMENT(
+      ACCESS_ASSESSMENT,
+      pair(ResourceType.SCENARIO, Action.WRITE),
+      pair(ResourceType.SCENARIO, Action.DUPLICATE),
+      pair(ResourceType.SCENARIO, Action.CREATE),
+      pair(ResourceType.SIMULATION, Action.WRITE),
+      pair(ResourceType.SIMULATION, Action.DUPLICATE),
+      pair(ResourceType.SIMULATION, Action.CREATE),
       pair(ResourceType.ATOMIC_TESTING, Action.WRITE),
       pair(ResourceType.ATOMIC_TESTING, Action.DUPLICATE),
       pair(ResourceType.ATOMIC_TESTING, Action.CREATE)),
-  DELETE_ATOMIC_TESTING(MANAGE_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.DELETE)),
-  LAUNCH_ATOMIC_TESTING(MANAGE_ATOMIC_TESTING, pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH)),
+  DELETE_ASSESSMENT(
+      MANAGE_ASSESSMENT,
+      pair(ResourceType.SCENARIO, Action.DELETE),
+      pair(ResourceType.SIMULATION, Action.DELETE),
+      pair(ResourceType.ATOMIC_TESTING, Action.DELETE)),
+  LAUNCH_ASSESSMENT(
+      MANAGE_ASSESSMENT,
+      pair(ResourceType.SCENARIO, Action.LAUNCH),
+      pair(ResourceType.SIMULATION, Action.LAUNCH),
+      pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH)),
 
   // Teams & Players
   MANAGE_TEAMS_AND_PLAYERS(
