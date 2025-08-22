@@ -1,6 +1,7 @@
 package io.openbas.rest.asset.security_platforms;
 
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -9,12 +10,15 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformInput;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformUpsertInput;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
@@ -153,5 +157,20 @@ public class SecurityPlatformApi {
   @Transactional(rollbackOn = Exception.class)
   public void deleteSecurityPlatform(@PathVariable @NotBlank final String securityPlatformId) {
     this.securityPlatformRepository.deleteById(securityPlatformId);
+  }
+
+  @GetMapping(SECURITY_PLATFORM_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return securityPlatformRepository.findAllByName(StringUtils.trimToNull(searchText)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @PostMapping(SECURITY_PLATFORM_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.securityPlatformRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
+import { searchSecurityPlatformByIdAsOption } from '../../../../actions/assets/securityPlatform-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchCustomDashboardByIdAsOptions } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
@@ -140,6 +141,11 @@ const useRetrieveOptions = () => {
         break;
       case CUSTOM_DASHBOARD:
         searchCustomDashboardByIdAsOptions(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_security_platforms_side':
+        searchSecurityPlatformByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
