@@ -113,6 +113,7 @@ public class ScenarioService {
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
+  private final UserService userService;
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -135,7 +136,10 @@ public class ScenarioService {
 
   public List<ScenarioSimple> scenarios() {
     List<RawScenario> scenarios;
-    if (currentUser().isAdmin()) {
+    User currentUser = userService.currentUser();
+    if (currentUser.isAdmin()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
+        || currentUser.getCapabilities().contains(Capability.BYPASS)) {
       scenarios = fromIterable(this.scenarioRepository.rawAll());
     } else {
       scenarios = this.scenarioRepository.rawAllGranted(currentUser().getId());
@@ -165,7 +169,10 @@ public class ScenarioService {
       getFindAllFunction(
           UnaryOperator<Specification<Scenario>> deepFilterSpecification,
           Map<String, Join<Base, Base>> joinMap) {
-    if (currentUser().isAdmin()) {
+    User currentUser = userService.currentUser();
+    if (currentUser.isAdmin()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
+        || currentUser.getCapabilities().contains(Capability.BYPASS)) {
       return (specification, specificationCount, pageable) ->
           this.findAllWithCriteriaBuilder(
               deepFilterSpecification.apply(specification),
