@@ -51,7 +51,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
   const { defaultValues } = useContext(FilterContext);
   useEffect(() => {
     if (filter.values) {
-      searchOptions(filter.key, filter.values, defaultValues.get(filter.key));
+      searchOptions(filter.key, filter.values, { defaultValues: defaultValues.get(filter.key) });
     }
   }, [filter]);
 
