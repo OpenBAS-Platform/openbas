@@ -18,6 +18,7 @@ public class InjectExpectationHelper {
       return EXPECTATION_STATUS.PENDING;
     }
     if (injectExpectation.getTeam() != null) {
+      // Only 1 result possible when expectation team
       return computeStatusForTeam(injectExpectation.getResults().getFirst().getResult());
     }
 
@@ -39,6 +40,7 @@ public class InjectExpectationHelper {
       ObjectMapper mapper = new ObjectMapper();
       try {
         JsonNode node = mapper.readTree(injectExpectation.getInject_expectation_results());
+        // Only 1 result possible when expectation team
         return computeStatusForTeam(node.get(0).get("result").asText());
       } catch (JsonProcessingException e) {
         return EXPECTATION_STATUS.PENDING;
