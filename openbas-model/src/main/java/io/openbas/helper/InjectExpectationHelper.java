@@ -18,8 +18,7 @@ public class InjectExpectationHelper {
       return EXPECTATION_STATUS.PENDING;
     }
     if (injectExpectation.getTeam() != null) {
-      return computeStatusForTeam(
-          injectExpectation.getResults().getFirst().getResult());
+      return computeStatusForTeam(injectExpectation.getResults().getFirst().getResult());
     }
 
     if (injectExpectation.getScore() >= injectExpectation.getExpectedScore()) {
