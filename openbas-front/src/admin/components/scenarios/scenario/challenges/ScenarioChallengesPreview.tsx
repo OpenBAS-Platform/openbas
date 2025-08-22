@@ -10,8 +10,8 @@ import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import { useHelper } from '../../../../../store';
 import { type Scenario as ScenarioType, type ScenarioChallengesReader } from '../../../../../utils/api-types';
 import { useQueryParameter } from '../../../../../utils/Environment';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import { usePermissions } from '../../../../../utils/permissions/simulationPermissions';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 

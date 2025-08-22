@@ -12,6 +12,8 @@ import Transition from '../../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemTags from '../../../../../../components/ItemTags';
 import { type TeamOutput } from '../../../../../../utils/api-types';
+import { Can } from '../../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../../utils/permissions/types';
 import CreateTeam from '../../../../components/teams/CreateTeam';
 import { TeamContext } from '../../../Context';
 
@@ -135,13 +137,15 @@ const InjectAddTeams: FunctionComponent<Props> = ({
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
               buttonComponent={(
-                <CreateTeam
-                  inline
-                  onCreate={(team) => {
-                    setTeamValues([...teamValues, team as TeamOutput]);
-                    setSelectedTeamValues([...selectedTeamValues, team as TeamOutput]);
-                  }}
-                />
+                <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+                  <CreateTeam
+                    inline
+                    onCreate={(team) => {
+                      setTeamValues([...teamValues, team as TeamOutput]);
+                      setSelectedTeamValues([...selectedTeamValues, team as TeamOutput]);
+                    }}
+                  />
+                </Can>
               )}
               getId={element => element.team_id}
               getName={element => element.team_name}

@@ -40,7 +40,7 @@ import ItemTags from '../../../components/ItemTags';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/permissions/simulationPermissions.js';
 
 const useStyles = makeStyles()(() => ({
   root: {

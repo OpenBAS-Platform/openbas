@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import { useHelper } from '../store';
+import { useHelper } from '../../store.js';
 
 export const isExerciseReadOnly = (exercise, overrideStatus = false) => {
   if (!exercise) {

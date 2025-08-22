@@ -17,8 +17,8 @@ import {
   type Exercise,
   type UpdateExerciseInput,
 } from '../../../../utils/api-types';
-import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { usePermissions } from '../../../../utils/permissions/simulationPermissions';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
 

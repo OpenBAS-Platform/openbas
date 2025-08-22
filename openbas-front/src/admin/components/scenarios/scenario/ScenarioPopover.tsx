@@ -9,7 +9,7 @@ import ExportOptionsDialog from '../../../../components/common/export/ExportOpti
 import { useFormatter } from '../../../../components/i18n';
 import { type Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useScenarioPermissions from '../../../../utils/scenarioPermissions';
+import useScenarioPermissions from '../../../../utils/permissions/scenarioPermissions';
 import ScenarioUpdate from './ScenarioUpdate';
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
