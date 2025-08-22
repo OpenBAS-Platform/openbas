@@ -67,7 +67,7 @@ public class PermissionService {
       action = parentTarget.action;
     }
 
-    // Scenario and simulation are  only accessible by GRANT
+    // Scenario and simulation are only accessible by GRANT
     if (RESOURCES_MANAGED_BY_GRANTS.contains(resourceType)) {
 
       // creation and duplication are managed using capa

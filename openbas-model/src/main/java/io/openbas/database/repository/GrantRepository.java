@@ -24,20 +24,20 @@ public interface GrantRepository
               + "FROM grants "
               + "LEFT JOIN groups ON grants.grant_group = groups.group_id "
               + "LEFT JOIN users_groups ON groups.group_id = grants.grant_group "
-              + "WHERE grants.grant_exercise IN :ids ;",
+              + "WHERE grants.grant_resource_type = 'SIMULATION' and grants.grant_resource IN :ids ;",
       nativeQuery = true)
   List<RawGrant> rawByExerciseIds(@Param("ids") List<String> ids);
 
   @Query(
-      value =
-          "SELECT users_groups.user_id, grants.grant_name, grants.grant_id "
-              + "FROM grants "
-              + "LEFT JOIN groups ON grants.grant_group = groups.group_id "
-              + "LEFT JOIN users_groups ON groups.group_id = grants.grant_group "
-              + "WHERE (grants.grant_exercise = :resourceId "
-              + "OR grants.grant_scenario = :resourceId)"
-              + "AND users_groups.user_id = :userId;",
-      nativeQuery = true)
-  List<RawGrant> rawByResourceIdAndUserId(
-      @Param("resourceId") String resourceId, @Param("userId") String userId);
+      "SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END "
+          + "FROM Grant g "
+          + "JOIN g.group gr "
+          + "JOIN gr.users u "
+          + "WHERE u.id = :userId "
+          + "AND g.resourceId = :resourceId "
+          + "AND g.name IN :grantTypes")
+  boolean existsByUserIdAndResourceIdAndNameIn(
+      @Param("userId") String userId,
+      @Param("resourceId") String resourceId,
+      @Param("grantTypes") List<Grant.GRANT_TYPE> grantTypes);
 }

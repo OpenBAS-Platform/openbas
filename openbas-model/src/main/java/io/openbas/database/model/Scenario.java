@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -34,8 +35,8 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Scenario.tags-injects",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
-@Grantable(grantFieldName = "scenario")
-public class Scenario implements Base {
+@Grantable(Grant.GRANT_RESOURCE_TYPE.SCENARIO)
+public class Scenario implements GrantableBase {
 
   public enum SEVERITY {
     @JsonProperty("low")
@@ -154,7 +155,15 @@ public class Scenario implements Base {
   @Schema(type = "string")
   private CustomDashboard customDashboard;
 
-  @OneToMany(mappedBy = "scenario", fetch = FetchType.EAGER)
+  @Getter
+  @OneToMany(fetch = FetchType.EAGER)
+  @JoinColumn(
+      name = "grant_resource",
+      referencedColumnName = "scenario_id",
+      insertable = false,
+      updatable = false)
+  @SQLRestriction(
+      "grant_resource_type = 'SCENARIO'") // Must be present in Grant.GRANT_RESOURCE_TYPE
   @JsonIgnore
   private List<Grant> grants = new ArrayList<>();
 
