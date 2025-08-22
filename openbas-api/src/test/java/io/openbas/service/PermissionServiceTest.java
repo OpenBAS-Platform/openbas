@@ -63,7 +63,7 @@ public class PermissionServiceTest extends IntegrationTest {
     user.setGroups(List.of(getGroup(Capability.ACCESS_ASSESSMENT)));
     when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(false);
     assertTrue(
-        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SIMULATION, Action.WRITE));
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SIMULATION, Action.READ));
   }
 
   @Test

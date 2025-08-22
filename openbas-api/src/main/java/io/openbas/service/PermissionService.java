@@ -46,7 +46,7 @@ public class PermissionService {
     Set<Capability> userCapabilities = user.getCapabilities();
 
     // admin user or capa bypass
-    if (user.isAdmin() || userCapabilities.contains(Capability.BYPASS)) {
+    if (user.isAdminOrBypass()) {
       return true;
     }
 
