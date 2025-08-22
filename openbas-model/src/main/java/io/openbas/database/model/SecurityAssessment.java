@@ -49,10 +49,6 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_scheduling")
   private String scheduling;
 
-  @Column(name = "security_assessment_security_coverage_submission_url", nullable = false)
-  @JsonProperty("security_assessment_security_coverage_submission_url")
-  private String securityCoverageSubmissionUrl;
-
   @Column(name = "security_assessment_period_start")
   @JsonProperty("security_assessment_period_start")
   private Instant periodStart;

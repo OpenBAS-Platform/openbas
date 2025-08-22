@@ -41,8 +41,7 @@ public class StixService {
   private final Parser stixParser;
   private final ObjectMapper objectMapper;
 
-  public List<String> generateScenarioFromSTIXBundle(String stixJson)
-      throws IOException, ParsingException {
+  public List<String> processBundle(String stixJson) throws IOException, ParsingException {
     JsonNode root = objectMapper.readTree(stixJson);
     Bundle bundle = stixParser.parseBundle(root.toString());
 
@@ -52,9 +51,9 @@ public class StixService {
     // the current assumption is that there will always
     // be at most a single security assessment in any bundle
     // therefore guard this assumption with an error
-    if (assessments.size() > 1) {
+    if (assessments.size() != 1) {
       throw new ParsingException(
-          "There is more than one object of type 'x-security-assessment' in the bundle");
+          "STIX bundle must contain exactly one x-security-assessment.");
     }
 
     for (ObjectBase obj : assessments) {
@@ -63,18 +62,18 @@ public class StixService {
       Scenario scenario = getOrCreateScenario(securityAssessment);
 
       updateSecurityAssessmentFromStix(obj, bundle, scenario, securityAssessment);
+
       securityAssessment.setScenario(scenario);
       SecurityAssessment savedSecurity = securityAssessmentRepository.save(securityAssessment);
 
       // Create Scenario using SecurityAssessment
       scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
       scenario
-          .getTags()
-          .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
+              .getTags()
+              .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
       // Creation injects based attack patterns from stix
       createdInjectsForScenario(securityAssessment, scenario);
-
       createdScenarios.add(scenario.getId());
     }
     return createdScenarios;
@@ -94,8 +93,6 @@ public class StixService {
     securityAssessment.setName((String) stixAssessmentObj.getProperty("name").getValue());
     securityAssessment.setDescription(
         (String) stixAssessmentObj.getProperty("description").getValue());
-    securityAssessment.setSecurityCoverageSubmissionUrl(
-        (String) stixAssessmentObj.getProperty("security_coverage_submission_url").getValue());
 
     securityAssessment.setScheduling(
         (String) stixAssessmentObj.getProperty("scheduling").getValue());
@@ -118,7 +115,6 @@ public class StixService {
         (String) stixAssessmentObj.getProperty("threat_context_ref").getValue();
     securityAssessment.setThreatContextRef(threatContextRef);
 
-    // Attack pattern refs -> convert to MITRE IDs
     // the assumption is that any attack pattern found in bundle
     // is relevant to the current security assessment
     securityAssessment.setAttackPatternRefs(

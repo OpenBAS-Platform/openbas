@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.utils.fixtures.composers.AttackPatternComposer;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
@@ -34,12 +36,13 @@ class StixApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private InjectRepository injectRepository;
 
   @Autowired private AttackPatternComposer attackPatternComposer;
 
   private String stixSecurityAssessment;
 
-  @BeforeAll
+  @BeforeEach
   void setUp() throws Exception {
     try (FileInputStream fis =
         new FileInputStream("src/test/resources/stix-bundles/security-assessment.json")) {
@@ -64,11 +67,69 @@ class StixApiTest extends IntegrationTest {
   class ImportStixBundles {
 
     @Test
+    @DisplayName("Should return 400 when STIX bundle has no security assessment")
+    void shouldReturnBadRequestWhenNoSecurityAssessment() throws Exception {
+      String bundleWithoutAssessment =
+          stixSecurityAssessment.replace("x-security-assessment", "x-other-type");
+
+      mvc.perform(
+              post(STIX_API + "/process-bundle")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(bundleWithoutAssessment))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when STIX bundle has multiple security assessments")
+    void shouldReturnBadRequestWhenMultipleSecurityAssessments() throws Exception {
+      // Simulate bundle with two identical security assessments
+      String duplicatedAssessment =
+          stixSecurityAssessment.replace("]", ", " + stixSecurityAssessment.split("\\[")[1]);
+
+      mvc.perform(
+              post(STIX_API + "/process-bundle")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(duplicatedAssessment))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when STIX JSON is malformed")
+    void shouldReturnBadRequestWhenStixJsonIsInvalid() throws Exception {
+      String invalidJson = "{ not-a-valid-json }";
+
+      mvc.perform(
+              post(STIX_API + "/process-bundle")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(invalidJson))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when STIX bundle has invalid structure")
+    void shouldReturnBadRequestWhenStixStructureInvalid() throws Exception {
+      String structurallyInvalidStix =
+          """
+        {
+          "type": "bundle",
+          "id": "bundle--1234"
+          // Missing "objects" field
+        }
+        """;
+
+      mvc.perform(
+              post(STIX_API + "/process-bundle")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(structurallyInvalidStix))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Should create the scenario from stix bundle")
     void shouldCreateScenario() throws Exception {
       String createResponse =
           mvc.perform(
-                  post(STIX_API + "/generate-scenario-from-stix-bundle")
+                  post(STIX_API + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(stixSecurityAssessment))
               .andExpect(status().isOk())
@@ -88,6 +149,9 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 16 * * *");
+
+      List<Inject> injects = injectRepository.findByScenarioId(scenarioId);
+      assertThat(injects).hasSize(4);
     }
 
     @Test
@@ -101,7 +165,7 @@ class StixApiTest extends IntegrationTest {
 
       String updatedResponse =
           mvc.perform(
-                  post(STIX_API + "/generate-scenario-from-stix-bundle")
+                  post(STIX_API + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(updatedBundle))
               .andExpect(status().isOk())
@@ -117,4 +181,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(updatedScenario.getName()).isEqualTo("Security Assessment Q3 2025 - UPDATED");
     }
   }
+
+  // Test update injects
+  // Tests errors (without attacks ->update scenario -> delete injects?, bundles empty)
 }

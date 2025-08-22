@@ -27,6 +27,8 @@ public class V4_19__Add_security_coverage_send_job extends BaseJavaMigration {
           """
           ALTER TABLE security_assessments
           ADD COLUMN security_assessment_raw_stix JSONB NOT NULL;
+          ALTER TABLE security_assessments
+          DROP COLUMN security_assessment_security_coverage_submission_url;
           """);
     }
   }
