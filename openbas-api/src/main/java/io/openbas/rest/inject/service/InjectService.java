@@ -39,7 +39,10 @@ import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.*;
-import io.openbas.utils.*;
+import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InjectUtils;
+import io.openbas.utils.JpaUtils;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
@@ -497,8 +500,10 @@ public class InjectService {
 
     // we update the injects values
     injectsToUpdate.forEach(
-        inject ->
-            applyUpdateOperation(inject, operations, teamsFromDB, assetsFromDB, assetGroupsFromDB));
+        inject -> {
+          applyUpdateOperation(inject, operations, teamsFromDB, assetsFromDB, assetGroupsFromDB);
+          inject.setUpdatedAt(now());
+        });
 
     // Save updated injects and return them
     return this.injectRepository.saveAll(injectsToUpdate);

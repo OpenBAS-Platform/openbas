@@ -14,6 +14,8 @@ import java.time.Instant;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
@@ -51,6 +53,7 @@ public class Tag implements Base {
   @JsonProperty("tag_created_at")
   @JsonIgnore
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Getter
@@ -59,6 +62,7 @@ public class Tag implements Base {
   @JsonProperty("tag_updated_at")
   @JsonIgnore
   @NotNull
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @Getter(onMethod_ = @JsonIgnore)

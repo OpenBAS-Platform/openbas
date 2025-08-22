@@ -2,8 +2,8 @@ import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from '@mui/
 import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-interface Item {
-  value: string;
+export interface Item<T extends string = string> {
+  value: T;
   label: string;
 }
 interface Props {
@@ -15,6 +15,13 @@ interface Props {
   disabled?: boolean;
   multiple?: boolean;
 }
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const createItems = <T extends string>(vals: readonly T[]): Item<T>[] =>
+  vals.map(v => ({
+    value: v,
+    label: v,
+  }));
 
 const SelectFieldController = ({ name, label, items, style, multiple = false, required, disabled }: Props) => {
   const { control } = useFormContext();

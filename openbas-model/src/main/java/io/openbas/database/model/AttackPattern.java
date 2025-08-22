@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -72,11 +74,13 @@ public class AttackPattern implements Base {
   @Queryable(sortable = true)
   @Column(name = "attack_pattern_created_at")
   @JsonProperty("attack_pattern_created_at")
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Queryable(sortable = true)
   @Column(name = "attack_pattern_updated_at")
   @JsonProperty("attack_pattern_updated_at")
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -99,6 +103,12 @@ public class AttackPattern implements Base {
   @Getter(onMethod_ = @JsonIgnore)
   @Transient
   private final ResourceType resourceType = ResourceType.ATTACK_PATTERN;
+
+  // UpdatedAt now used to sync with linked object
+  public void setKillChainPhases(List<KillChainPhase> killChainPhases) {
+    this.updatedAt = now();
+    this.killChainPhases = killChainPhases;
+  }
 
   @Override
   public int hashCode() {

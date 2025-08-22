@@ -22,6 +22,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -60,6 +62,7 @@ public class Team implements Base {
   @JsonProperty("team_created_at")
   @NotNull
   @Schema(description = "Creation date of the team", accessMode = Schema.AccessMode.READ_ONLY)
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Queryable(sortable = true)
@@ -67,6 +70,7 @@ public class Team implements Base {
   @JsonProperty("team_updated_at")
   @NotNull
   @Schema(description = "Update date of the team", accessMode = Schema.AccessMode.READ_ONLY)
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @ArraySchema(schema = @Schema(description = "IDs of the tags of the team", type = "string"))

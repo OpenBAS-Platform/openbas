@@ -1,19 +1,27 @@
 package io.openbas.rest.asset.endpoint;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
-import io.openbas.database.model.*;
+import io.openbas.aop.onboarding.Onboarding;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.Agent;
+import io.openbas.database.model.AssetAgentJob;
+import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.*;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.HttpReqRespUtils;
+import io.openbas.utils.InputFilterOptions;
 import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -22,6 +30,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 public class EndpointApi extends RestBehavior {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
@@ -44,6 +54,7 @@ public class EndpointApi extends RestBehavior {
   @PostMapping(ENDPOINT_URI + "/agentless")
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
+  @Onboarding(step = ENDPOINT_SETUP)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     return this.endpointService.createEndpoint(input);
   }
@@ -166,13 +177,55 @@ public class EndpointApi extends RestBehavior {
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return endpointRepository
-        .findAllBySimulationOrScenarioIdAndName(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+      @RequestParam(required = false) final String simulationOrScenarioId,
+      @RequestParam(required = false) final String inputFilterOption) {
+    List<FilterUtilsJpa.Option> options = List.of();
+    InputFilterOptions injectFilterOptionEnum;
+    try {
+      injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
+    } catch (Exception e) {
+      if (StringUtils.isEmpty(inputFilterOption)) {
+        log.warn("InputFilterOption is null, fall back to backwards compatible case");
+        if (StringUtils.isNotEmpty(simulationOrScenarioId)) {
+          injectFilterOptionEnum = InputFilterOptions.SIMULATION_OR_SCENARIO;
+        } else {
+          injectFilterOptionEnum = InputFilterOptions.ATOMIC_TESTING;
+        }
+      } else {
+        throw new BadRequestException(
+            String.format("Invalid input filter option %s", inputFilterOption));
+      }
+    }
+
+    switch (injectFilterOptionEnum) {
+      case ALL_INJECTS:
+        {
+          options =
+              endpointRepository.findAllEndpointsForAtomicTestingsSimulationsAndScenarios().stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .toList();
+          break;
+        }
+      case SIMULATION_OR_SCENARIO:
+        {
+          if (StringUtils.isEmpty(simulationOrScenarioId)) {
+            throw new BadRequestException("Missing simulation or scenario id");
+          }
+        }
+      case ATOMIC_TESTING:
+        {
+          options =
+              endpointRepository
+                  .findAllBySimulationOrScenarioIdAndName(
+                      StringUtils.trimToNull(simulationOrScenarioId),
+                      StringUtils.trimToNull(searchText))
+                  .stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .toList();
+          break;
+        }
+    }
+    return options;
   }
 
   @LogExecutionTime

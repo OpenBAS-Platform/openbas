@@ -11,11 +11,17 @@ public interface RawScenario {
 
   Instant getScenario_created_at();
 
-  Instant getScenario_updated_at();
+  Instant getScenario_injects_updated_at();
 
   public String getScenario_subtitle();
 
   public Set<String> getScenario_tags();
+
+  public Set<String> getScenario_assets();
+
+  public Set<String> getScenario_asset_groups();
+
+  public Set<String> getScenario_teams();
 
   public Set<String> getScenario_injects();
 }

@@ -4,6 +4,7 @@ import static io.openbas.utils.OpenSearchUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
@@ -24,14 +25,17 @@ import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldSort;
@@ -43,6 +47,8 @@ import org.opensearch.client.opensearch._types.query_dsl.*;
 import org.opensearch.client.opensearch.core.*;
 import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
 import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.generic.Response;
 
 @Slf4j
 public class OpenSearchService implements EngineService {
@@ -54,6 +60,8 @@ public class OpenSearchService implements EngineService {
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
+
+  @Resource protected ObjectMapper mapper;
 
   /**
    * Constructor for the opensearch engine
@@ -95,7 +103,11 @@ public class OpenSearchService implements EngineService {
     if (propertyField == null) {
       throw new AnalyticsEngineException("Unknown field: " + field);
     }
-    if (propertyField.getType().isAssignableFrom(String.class)) {
+    if (propertyField.getType().isAssignableFrom(String.class)
+        || (propertyField.getType().isAssignableFrom(Set.class)
+            && propertyField.getSubtype() instanceof ParameterizedType
+            && String.class.equals(
+                ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));
@@ -813,6 +825,30 @@ public class OpenSearchService implements EngineService {
       log.error(String.format("query exception: %s", e.getMessage()), e);
     }
     return List.of();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getEngineVersion() {
+    String endpoint = "/_nodes";
+    try (Response response =
+        openSearchClient
+            .generic()
+            .execute(Requests.builder().endpoint(endpoint).method("GET").build())) {
+      final int status = response.getStatus();
+      if (status == 200 && response.getBody().isPresent()) {
+        Set<String> versions = new HashSet<>();
+        mapper
+            .readTree(response.getBody().get().bodyAsBytes())
+            .get("nodes")
+            .elements()
+            .forEachRemaining(jsonNode -> versions.add(jsonNode.get("version").textValue()));
+        return Strings.join(versions, ',');
+      }
+    } catch (IOException e) {
+      log.warn("Unable to retrieve engine version", e);
+    }
+    return null;
   }
 
   /** {@inheritDoc} */

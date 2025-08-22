@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { addPlayer } from '../../../../actions/User';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type PlayerInput } from '../../../../utils/api-types';

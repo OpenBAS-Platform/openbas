@@ -50,4 +50,20 @@ public class EsInject extends EsBase {
   @Queryable(label = "inject contract")
   @EsQueryable(keyword = true)
   private String base_inject_contract_side; // Must finish by _side
+
+  @Queryable(label = "tags", filterable = true, dynamicValues = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_tags_side; // Must finish by _side
+
+  @Queryable(label = "assets", filterable = true, dynamicValues = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_assets_side; // Must finish by _side
+
+  @Queryable(label = "asset groups", filterable = true, dynamicValues = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_asset_groups_side; // Must finish by _side
+
+  @Queryable(label = "teams", filterable = true, dynamicValues = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_teams_side; // Must finish by _side
 }

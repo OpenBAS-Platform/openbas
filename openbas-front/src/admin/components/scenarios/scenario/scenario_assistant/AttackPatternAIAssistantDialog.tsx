@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchAttackPatternsWithAIWebservice } from '../../../../../actions/AttackPattern';
-import Dialog from '../../../../../components/common/Dialog';
+import Dialog from '../../../../../components/common/dialog/Dialog';
 import ImportUploader from '../../../../../components/common/ImportUploader';
 import { useFormatter } from '../../../../../components/i18n';
 

@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { SettingsEnterpriseEditionUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';

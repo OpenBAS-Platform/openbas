@@ -5,6 +5,7 @@ import static io.openbas.database.specification.TeamSpecification.*;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.UserOnboardingProgressUtils.TEAM_SETUP;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.time.Instant.now;
@@ -13,11 +14,13 @@ import static org.springframework.util.StringUtils.hasText;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
+import io.openbas.aop.onboarding.Onboarding;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawTeam;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.AlreadyExistingException;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
@@ -27,6 +30,7 @@ import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.InputFilterOptions;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +43,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,6 +53,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @UserRoleDescription
+@Slf4j
 @Tag(
     name = "Teams management",
     description = "Endpoints to manage teams",
@@ -143,6 +149,7 @@ public class TeamApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The created team")})
   @Operation(description = "Create a new team", summary = "Create team")
+  @Onboarding(step = TEAM_SETUP)
   public Team createTeam(@Valid @RequestBody TeamCreateInput input) {
     isTeamAlreadyExists(input);
     Team team = new Team();
@@ -233,13 +240,54 @@ public class TeamApi extends RestBehavior {
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.TEAM)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
-    return teamRepository
-        .findAllBySimulationOrScenarioIdAndName(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+      @RequestParam(required = false) final String simulationOrScenarioId,
+      @RequestParam(required = false) final String inputFilterOption) {
+    List<FilterUtilsJpa.Option> options = List.of();
+    InputFilterOptions injectFilterOptionEnum;
+    try {
+      injectFilterOptionEnum = InputFilterOptions.valueOf(inputFilterOption);
+    } catch (Exception e) {
+      if (StringUtils.isEmpty(inputFilterOption)) {
+        log.warn("InputFilterOption is null, fall back to backwards compatible case");
+        if (StringUtils.isNotEmpty(simulationOrScenarioId)) {
+          injectFilterOptionEnum = InputFilterOptions.SIMULATION_OR_SCENARIO;
+        } else {
+          injectFilterOptionEnum = InputFilterOptions.ATOMIC_TESTING;
+        }
+      } else {
+        throw new BadRequestException(
+            String.format("Invalid input filter option %s", inputFilterOption));
+      }
+    }
+    switch (injectFilterOptionEnum) {
+      case ALL_INJECTS:
+        {
+          options =
+              teamRepository.findAllTeamsForAtomicTestingsSimulationsAndScenarios().stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .toList();
+          break;
+        }
+      case SIMULATION_OR_SCENARIO:
+        {
+          if (StringUtils.isEmpty(simulationOrScenarioId)) {
+            throw new BadRequestException("Missing simulation or scenario id");
+          }
+        }
+      case ATOMIC_TESTING:
+        {
+          options =
+              teamRepository
+                  .findAllBySimulationOrScenarioIdAndName(
+                      StringUtils.trimToNull(simulationOrScenarioId),
+                      StringUtils.trimToNull(searchText))
+                  .stream()
+                  .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+                  .toList();
+          break;
+        }
+    }
+    return options;
   }
 
   @PostMapping(TEAM_URI + "/options")

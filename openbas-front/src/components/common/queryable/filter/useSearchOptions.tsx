@@ -1,3 +1,4 @@
+import { type AxiosResponse } from 'axios';
 import { useState } from 'react';
 
 import { searchAssetGroupAsOption, searchAssetGroupLinkedToFindingsAsOption } from '../../../../actions/asset_groups/assetgroup-action';
@@ -15,7 +16,7 @@ import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
-import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
+import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -23,15 +24,23 @@ const useSearchOptions = () => {
 
   const [options, setOptions] = useState<GroupOption[] | Option[]>([]);
 
+  const handleOptions = (response: AxiosResponse<GroupOption[] | Option[]>, defaultValues: GroupOption[]) => {
+    if (defaultValues && defaultValues.length > 0) {
+      setOptions([...defaultValues, ...response.data.map((d: Option) => ({
+        ...d,
+        group: 'Values',
+      }))]);
+    } else {
+      setOptions(response.data);
+    }
+  };
+
   const searchOptions = (filterKey: string, search: string = '', contextId: string = '', defaultValues: GroupOption[] = []) => {
     switch (filterKey) {
       case SIMULATIONS:
       case 'base_simulation_side':
         searchSimulationAsOptions(search).then((response) => {
-          setOptions([...defaultValues, ...response.data.map((d: Option) => ({
-            ...d,
-            group: 'Values',
-          }))]);
+          handleOptions(response, defaultValues);
         });
         break;
       case 'injector_contract_injector':
@@ -81,6 +90,7 @@ const useSearchOptions = () => {
       case 'team_tags':
       case 'finding_tags':
       case 'user_tags':
+      case 'base_tags_side':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });
@@ -91,7 +101,12 @@ const useSearchOptions = () => {
         });
         break;
       case 'inject_asset_groups':
-        searchAssetGroupAsOption(search, contextId).then((response) => {
+        searchAssetGroupAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_asset_groups_side':
+        searchAssetGroupAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -102,12 +117,22 @@ const useSearchOptions = () => {
         break;
       case 'inject_assets':
       case 'base_endpoint_side':
-        searchEndpointAsOption(search, contextId).then((response) => {
+        searchEndpointAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_assets_side':
+        searchEndpointAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;
       case 'inject_teams':
-        searchTeamsAsOption(search, contextId).then((response) => {
+        searchTeamsAsOption(search, contextId, contextId ? 'SIMULATION_OR_SCENARIO' : 'ATOMIC_TESTING').then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'base_teams_side':
+        searchTeamsAsOption(search, contextId, 'ALL_INJECTS').then((response) => {
           setOptions(response.data);
         });
         break;
@@ -123,8 +148,10 @@ const useSearchOptions = () => {
         break;
       case 'finding_scenario':
       case 'exercise_scenario':
+      case 'base_scenario_side':
+      case SCENARIOS:
         searchScenarioAsOption(search).then((response) => {
-          setOptions(response.data);
+          handleOptions(response, defaultValues);
         });
         break;
       case 'scenario_category':

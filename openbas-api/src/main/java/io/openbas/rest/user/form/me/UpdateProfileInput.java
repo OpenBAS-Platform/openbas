@@ -14,6 +14,7 @@ import lombok.Setter;
 public class UpdateProfileInput {
 
   @Email(message = EMAIL_FORMAT)
+  @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("user_email")
   private String email;
 
@@ -28,9 +29,11 @@ public class UpdateProfileInput {
   @JsonProperty("user_organization")
   private String organizationId;
 
+  @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("user_lang")
   private String lang;
 
+  @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("user_theme")
   private String theme;
 

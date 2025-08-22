@@ -74,6 +74,10 @@ public class User implements Base {
   @Schema(description = "Language of the user")
   private String lang = LANG_AUTO;
 
+  public String getLang() {
+    return ofNullable(this.lang).orElse(LANG_AUTO);
+  }
+
   @Getter(NONE)
   @Setter
   @Column(name = "user_theme")
@@ -81,13 +85,29 @@ public class User implements Base {
   @Schema(description = "Theme of the user")
   private String theme = THEME_DEFAULT;
 
+  public String getTheme() {
+    return ofNullable(this.theme).orElse(THEME_DEFAULT);
+  }
+
   @Getter(NONE)
+  @Setter(NONE)
   @Column(name = "user_email")
   @JsonProperty("user_email")
   @Queryable(filterable = true, searchable = true, sortable = true)
   @NotBlank
   @Schema(description = "Email of the user")
   private String email;
+
+  public void setEmail(final String email) {
+    this.email =
+        ofNullable(email)
+            .map(String::toLowerCase)
+            .orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
+  }
+
+  public String getEmail() {
+    return ofNullable(this.email).map(String::toLowerCase).orElse(null);
+  }
 
   @Setter
   @Column(name = "user_phone")
@@ -160,6 +180,35 @@ public class User implements Base {
   @JsonProperty("user_city")
   @Schema(description = "City of the user")
   private String city;
+
+  // Onboarding
+  @Getter(NONE)
+  @Setter
+  @Enumerated(EnumType.STRING)
+  @Column(name = "user_onboarding_widget_enable")
+  @JsonProperty("user_onboarding_widget_enable")
+  @Schema(description = "User onboarding widget enabled")
+  @NotNull
+  private UserOnboardingStatus onboardingWidgetEnable = UserOnboardingStatus.DEFAULT;
+
+  public UserOnboardingStatus getOnboardingWidgetEnable() {
+    return ofNullable(this.onboardingWidgetEnable).orElse(UserOnboardingStatus.DEFAULT);
+  }
+
+  @Getter(NONE)
+  @Setter
+  @Enumerated(EnumType.STRING)
+  @Column(name = "user_onboarding_contextual_help_enable")
+  @JsonProperty("user_onboarding_contextual_help_enable")
+  @Schema(description = "User onboarding contextual help enabled")
+  @NotNull
+  private UserOnboardingStatus onboardingContextualHelpEnable = UserOnboardingStatus.DEFAULT;
+
+  public UserOnboardingStatus getOnboardingContextualHelpEnable() {
+    return ofNullable(this.onboardingContextualHelpEnable).orElse(UserOnboardingStatus.DEFAULT);
+  }
+
+  // -- RELATIONS --
 
   @ArraySchema(schema = @Schema(description = "Group IDs of the user", type = "string"))
   @Setter
@@ -235,30 +284,27 @@ public class User implements Base {
   @JsonIgnore
   private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
 
-  public String getLang() {
-    return ofNullable(this.lang).orElse(LANG_AUTO);
-  }
-
-  public String getTheme() {
-    return ofNullable(this.theme).orElse(THEME_DEFAULT);
-  }
-
-  public String getEmail() {
-    return ofNullable(this.email).map(String::toLowerCase).orElse(null);
-  }
-
-  public void setEmail(final String email) {
-    this.email =
-        ofNullable(email)
-            .map(String::toLowerCase)
-            .orElseThrow(() -> new IllegalArgumentException("Email can't be null"));
-  }
-
   @JsonProperty("user_gravatar")
   @Schema(description = "Gravatar of the user")
   public String getGravatar() {
     return UserHelper.getGravatar(getEmail());
   }
+
+  @JsonIgnore
+  public String getName() {
+    return getFirstname() + " " + getLastname();
+  }
+
+  @JsonIgnore
+  public String getNameOrEmail() {
+    if (getFirstname() != null && getLastname() != null) {
+      return getName();
+    } else {
+      return getEmail();
+    }
+  }
+
+  // -- RBAC --
 
   @JsonProperty("user_is_planner")
   @Schema(description = "True if the user is planner")
@@ -287,33 +333,10 @@ public class User implements Base {
     return isAdmin() || isPlanner() || isObserver() || !getTeams().isEmpty();
   }
 
-  @JsonProperty("user_last_comcheck")
-  @Schema(description = "Last communication date of the user")
-  public Optional<Instant> getLastComcheck() {
-    return getComcheckStatuses().stream()
-        .filter(comcheckStatus -> comcheckStatus.getReceiveDate().isPresent())
-        .map(comcheckStatus -> comcheckStatus.getReceiveDate().get())
-        .min(Instant::compareTo);
-  }
-
   @JsonProperty("user_is_external")
   @Schema(description = "True if the user is external")
   public boolean isExternal() {
     return this.getId().equals(ADMIN_UUID);
-  }
-
-  @JsonIgnore
-  public String getName() {
-    return getFirstname() + " " + getLastname();
-  }
-
-  @JsonIgnore
-  public String getNameOrEmail() {
-    if (getFirstname() != null && getLastname() != null) {
-      return getName();
-    } else {
-      return getEmail();
-    }
   }
 
   @JsonProperty("user_is_only_player")
@@ -351,6 +374,15 @@ public class User implements Base {
   public boolean isUserHasAccess(User user) {
     return user.isAdmin() || user.getId().equals(getId());
   }
+
+  // -- ONBOARDING --
+
+  @Setter
+  @Schema(type = "string")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonProperty("user_onboarding_progress")
+  private UserOnboardingProgress onboardingProgress;
 
   @Override
   public boolean equals(Object o) {

@@ -1,3 +1,4 @@
+import type { AxiosResponse } from 'axios';
 import { useState } from 'react';
 
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
@@ -14,10 +15,21 @@ import { searchSimulationByIdAsOptions } from '../../../../actions/simulations/s
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
-import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
+import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
+
+  const handleOptions = (response: AxiosResponse<GroupOption[] | Option[]>, filterDefaultValues: GroupOption[]) => {
+    if (filterDefaultValues && filterDefaultValues.length > 0) {
+      setOptions([...filterDefaultValues, ...response.data.map((d: Option) => ({
+        ...d,
+        group: 'Values',
+      }))]);
+    } else {
+      setOptions(response.data);
+    }
+  };
 
   const searchOptions = (filterKey: string, ids: string[], defaultValues: GroupOption[] = []) => {
     const filterDefaultValues = defaultValues.filter(v => ids.includes(v.id));
@@ -25,10 +37,7 @@ const useRetrieveOptions = () => {
       case SIMULATIONS:
       case 'base_simulation_side':
         searchSimulationByIdAsOptions(ids).then((response) => {
-          setOptions([...filterDefaultValues, ...response.data.map((d: Option) => ({
-            ...d,
-            group: 'Values',
-          }))]);
+          handleOptions(response, filterDefaultValues);
         });
         break;
       case 'injector_contract_injector':
@@ -79,23 +88,27 @@ const useRetrieveOptions = () => {
       case 'team_tags':
       case 'finding_tags':
       case 'user_tags':
+      case 'base_tags_side':
         searchTagByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'finding_asset_groups':
       case 'inject_asset_groups':
+      case 'base_asset_groups_side':
         searchAssetGroupByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'finding_assets':
       case 'inject_assets':
+      case 'base_assets_side':
         searchEndpointByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;
       case 'inject_teams':
+      case 'base_teams_side':
         searchTeamByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
@@ -112,8 +125,10 @@ const useRetrieveOptions = () => {
         break;
       case 'finding_scenario' :
       case 'exercise_scenario':
+      case 'base_scenario_side':
+      case SCENARIOS:
         searchScenarioByIdAsOption(ids).then((response) => {
-          setOptions(response.data);
+          handleOptions(response, filterDefaultValues);
         });
         break;
       case 'user_organization':

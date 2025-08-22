@@ -1,6 +1,8 @@
 package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS;
+import static io.openbas.database.model.InjectorContract.PREDEFINED_EXPECTATIONS;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
@@ -56,9 +58,6 @@ public class AtomicTestingService {
 
   private final InjectSearchService injectSearchService;
   private final InjectService injectService;
-
-  private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
-  private static final String EXPECTATIONS = "expectations";
 
   // -- CRUD --
 
@@ -152,8 +151,8 @@ public class AtomicTestingService {
   private ObjectNode setExpectations(
       AtomicTestingInput input, InjectorContract injectorContract, ObjectNode finalContent) {
     if (input.getContent() == null
-        || input.getContent().get(EXPECTATIONS) == null
-        || input.getContent().get(EXPECTATIONS).isEmpty()) {
+        || input.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS) == null
+        || input.getContent().get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS).isEmpty()) {
       try {
         JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
         List<JsonNode> contractElements =
@@ -167,11 +166,11 @@ public class AtomicTestingService {
                 .toList();
         if (!contractElements.isEmpty()) {
           JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PRE_DEFINE_EXPECTATIONS).isNull()
-              && !contractElement.get(PRE_DEFINE_EXPECTATIONS).isEmpty()) {
+          if (!contractElement.get(PREDEFINED_EXPECTATIONS).isNull()
+              && !contractElement.get(PREDEFINED_EXPECTATIONS).isEmpty()) {
             finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
             ArrayNode predefinedExpectations = mapper.createArrayNode();
-            StreamSupport.stream(contractElement.get(PRE_DEFINE_EXPECTATIONS).spliterator(), false)
+            StreamSupport.stream(contractElement.get(PREDEFINED_EXPECTATIONS).spliterator(), false)
                 .forEach(
                     predefinedExpectation -> {
                       ObjectNode newExpectation = predefinedExpectation.deepCopy();
@@ -180,10 +179,12 @@ public class AtomicTestingService {
                     });
             // We need the remove in case there are empty expectations because put is deprecated and
             // putifabsent doesn't replace empty expectations
-            if (finalContent.has(EXPECTATIONS) && finalContent.get(EXPECTATIONS).isEmpty()) {
-              finalContent.remove(EXPECTATIONS);
+            if (finalContent.has(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS)
+                && finalContent.get(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS).isEmpty()) {
+              finalContent.remove(CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS);
             }
-            finalContent.putIfAbsent(EXPECTATIONS, predefinedExpectations);
+            finalContent.putIfAbsent(
+                CONTRACT_ELEMENT_CONTENT_KEY_EXPECTATIONS, predefinedExpectations);
           }
         }
       } catch (JsonProcessingException e) {

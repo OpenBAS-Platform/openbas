@@ -14,6 +14,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.config.EngineConfig;
 import io.openbas.database.model.CustomDashboardParameters;
 import io.openbas.database.model.Filters;
@@ -33,14 +34,17 @@ import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 
 @Slf4j
 public class ElasticService implements EngineService {
@@ -52,6 +56,8 @@ public class ElasticService implements EngineService {
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
+
+  @Resource protected ObjectMapper mapper;
 
   public ElasticService(
       EngineContext searchEngine,
@@ -75,7 +81,11 @@ public class ElasticService implements EngineService {
     if (propertyField == null) {
       throw new RuntimeException("Unknown field: " + field);
     }
-    if (propertyField.getType().isAssignableFrom(String.class)) {
+    if (propertyField.getType().isAssignableFrom(String.class)
+        || (propertyField.getType().isAssignableFrom(Set.class)
+            && propertyField.getSubtype() instanceof ParameterizedType
+            && String.class.equals(
+                ((ParameterizedType) propertyField.getSubtype()).getActualTypeArguments()[0]))) {
       builder.stringValue(target);
     } else if (propertyField.getType().isAssignableFrom(Number.class)) {
       builder.longValue(Long.parseLong(target));
@@ -721,6 +731,23 @@ public class ElasticService implements EngineService {
       log.error(String.format("query exception: %s", e.getMessage()), e);
     }
     return List.of();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getEngineVersion() {
+    try {
+      Set<String> versions = new HashSet<>();
+      mapper
+          .readTree(elasticClient.cluster().state().valueBody().toJson().toString())
+          .get("nodes")
+          .elements()
+          .forEachRemaining(jsonNode -> versions.add(jsonNode.get("version").textValue()));
+      return Strings.join(versions, ',');
+    } catch (IOException e) {
+      log.warn("Unable to retrieve engine version", e);
+    }
+    return null;
   }
 
   // endregion

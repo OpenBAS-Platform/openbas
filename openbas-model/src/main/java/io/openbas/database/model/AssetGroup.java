@@ -21,7 +21,9 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -119,11 +121,13 @@ public class AssetGroup implements Base {
   @Column(name = "asset_group_created_at")
   @JsonProperty("asset_group_created_at")
   @NotNull
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Column(name = "asset_group_updated_at")
   @JsonProperty("asset_group_updated_at")
   @NotNull
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @Getter(onMethod_ = @JsonIgnore)

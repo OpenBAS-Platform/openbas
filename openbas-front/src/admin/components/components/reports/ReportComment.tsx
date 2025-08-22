@@ -2,7 +2,7 @@ import { Edit } from '@mui/icons-material';
 import { Button, IconButton, Paper } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
-import Dialog from '../../../../components/common/Dialog';
+import Dialog from '../../../../components/common/dialog/Dialog';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import MarkDownField from '../../../../components/fields/MarkDownField';
 import { useFormatter } from '../../../../components/i18n';

@@ -3,8 +3,11 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.SettingKeys.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.valueOf;
 import static java.util.Optional.ofNullable;
 
+import io.openbas.config.EngineConfig;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
@@ -16,6 +19,7 @@ import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.ee.Ee;
 import io.openbas.ee.License;
+import io.openbas.engine.EngineService;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
@@ -32,6 +36,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,19 +49,21 @@ import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PlatformSettingsService {
 
   public static final String THEME_TYPE_LIGHT = "light";
   public static final String THEME_TYPE_DARK = "dark";
 
-  private ApplicationContext context;
-  private Environment env;
-  private SettingRepository settingRepository;
-  private OpenCTIConfig openCTIConfig;
-  private XTMHubConfig xtmHubConfig;
-  private AiConfig aiConfig;
-  private CalderaExecutorConfig calderaExecutorConfig;
-  private Ee eeService;
+  private final ApplicationContext context;
+  private final Environment env;
+  private final SettingRepository settingRepository;
+  private final OpenCTIConfig openCTIConfig;
+  private final XTMHubConfig xtmHubConfig;
+  private final AiConfig aiConfig;
+  private final CalderaExecutorConfig calderaExecutorConfig;
+  private final Ee eeService;
+  private final EngineService engineService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
@@ -67,47 +74,8 @@ public class PlatformSettingsService {
   @Resource private OpenBASConfig openBASConfig;
   @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
   @Resource private RabbitmqConfig rabbitmqConfig;
+  @Resource private EngineConfig engineConfig;
   @Autowired private LicenseCacheManager licenseCacheManager;
-
-  @Autowired
-  public void setOpenCTIConfig(OpenCTIConfig openCTIConfig) {
-    this.openCTIConfig = openCTIConfig;
-  }
-
-  @Autowired
-  public void setXtmHubConfig(XTMHubConfig xtmHubConfig) {
-    this.xtmHubConfig = xtmHubConfig;
-  }
-
-  @Autowired
-  public void setAiConfig(AiConfig aiConfig) {
-    this.aiConfig = aiConfig;
-  }
-
-  @Autowired
-  public void setCalderaExecutorConfig(CalderaExecutorConfig calderaExecutorConfig) {
-    this.calderaExecutorConfig = calderaExecutorConfig;
-  }
-
-  @Autowired
-  public void setSettingRepository(SettingRepository settingRepository) {
-    this.settingRepository = settingRepository;
-  }
-
-  @Autowired
-  public void setEnv(Environment env) {
-    this.env = env;
-  }
-
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
-
-  @Autowired
-  public void setEeService(Ee eeService) {
-    this.eeService = eeService;
-  }
 
   // -- PROVIDERS --
   private List<OAuthProvider> buildOpenIdProviders() {
@@ -252,6 +220,8 @@ public class PlatformSettingsService {
         platformSettings.setPostgreVersion(settingRepository.getServerVersion());
         platformSettings.setJavaVersion(Runtime.version().toString());
         platformSettings.setRabbitMQVersion(RabbitMQHelper.getRabbitMQVersion(rabbitmqConfig));
+        platformSettings.setAnalyticsEngineType(engineConfig.getEngineSelector());
+        platformSettings.setAnalyticsEngineVersion(engineService.getEngineVersion());
       }
     }
 
@@ -323,6 +293,29 @@ public class PlatformSettingsService {
 
     // License
     platformSettings.setPlatformLicense(licenseCacheManager.getEnterpriseEditionInfo());
+
+    // Onboarding
+    String onboardingWidgetEnable =
+        ofNullable(dbSettings.get(PLATFORM_ONBOARDING_WIDGET_ENABLE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_ONBOARDING_WIDGET_ENABLE.defaultValue());
+    platformSettings.setOnboardingWidgetEnable(parseBoolean(onboardingWidgetEnable));
+    String onboardingContextualHelpEnable =
+        ofNullable(dbSettings.get(PLATFORM_ONBOARDING_CONTEXTUAL_HELP_ENABLE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_ONBOARDING_CONTEXTUAL_HELP_ENABLE.defaultValue());
+    platformSettings.setOnboardingContextualHelpEnable(
+        parseBoolean(onboardingContextualHelpEnable));
+    return platformSettings;
+  }
+
+  public PlatformSettings defaultValues() {
+    PlatformSettings platformSettings = new PlatformSettings();
+    // Onboarding
+    platformSettings.setOnboardingWidgetEnable(
+        parseBoolean(PLATFORM_ONBOARDING_WIDGET_ENABLE.defaultValue()));
+    platformSettings.setOnboardingContextualHelpEnable(
+        parseBoolean(PLATFORM_ONBOARDING_CONTEXTUAL_HELP_ENABLE.defaultValue()));
     return platformSettings;
   }
 
@@ -409,6 +402,24 @@ public class PlatformSettingsService {
     settingsToSave.add(
         resolveFromMap(
             dbSettings, PLATFORM_CONSENT_CONFIRM_TEXT.key(), input.getConsentConfirmText()));
+    settingRepository.saveAll(settingsToSave);
+    return findSettings();
+  }
+
+  public PlatformSettings updateSettingsOnboarding(SettingsOnboardingUpdateInput input) {
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
+    List<Setting> settingsToSave = new ArrayList<>();
+    settingsToSave.add(
+        resolveFromMap(
+            dbSettings,
+            PLATFORM_ONBOARDING_WIDGET_ENABLE.key(),
+            valueOf(input.isOnboardingWidgetEnable())));
+    settingsToSave.add(
+        resolveFromMap(
+            dbSettings,
+            PLATFORM_ONBOARDING_CONTEXTUAL_HELP_ENABLE.key(),
+            valueOf(input.isOnboardingContextualHelpEnable())));
+
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
@@ -507,7 +518,7 @@ public class PlatformSettingsService {
     Optional<Setting> platformWhiteMarkedSetting =
         this.setting(SettingKeys.PLATFORM_WHITEMARK.name().toLowerCase());
     return platformWhiteMarkedSetting
-        .map(setting -> Boolean.parseBoolean(setting.getValue()))
-        .orElse(Boolean.parseBoolean(defaultValue));
+        .map(setting -> parseBoolean(setting.getValue()))
+        .orElse(parseBoolean(defaultValue));
   }
 }

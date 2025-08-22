@@ -111,7 +111,7 @@ const PaginationComponentV2 = <T extends object>({
       const { data } = result;
       setContent(data.content);
       queryableHelpers.paginationHelpers.handleChangeTotalElements(data.totalElements);
-      if (data.totalPages < data.pageable.pageNumber) {
+      if (data.totalPages <= data.pageable.pageNumber) {
         queryableHelpers.paginationHelpers.handleChangePage(0);
       }
     });
