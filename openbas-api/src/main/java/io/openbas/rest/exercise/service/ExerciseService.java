@@ -198,7 +198,7 @@ public class ExerciseService {
   }
 
   public boolean hasPendingResults(Exercise exercise) {
-    return exercise.getInjects().stream().allMatch(injectService::hasPendingResults);
+    return exercise.getInjects().stream().anyMatch(injectService::hasPendingResults);
   }
 
   private void getListOfExerciseTeams(

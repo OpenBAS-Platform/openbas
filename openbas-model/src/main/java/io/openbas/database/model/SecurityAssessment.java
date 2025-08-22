@@ -80,6 +80,11 @@ public class SecurityAssessment implements Base {
   @JsonIgnore
   private Scenario scenario;
 
+  @Type(JsonType.class)
+  @Column(name = "security_assessment_raw_stix", columnDefinition = "jsonb")
+  @JsonProperty("security_assessment_raw_stix")
+  private String rawStix;
+
   @CreationTimestamp
   @Column(name = "security_assessment_created_at", updatable = false)
   @JsonProperty("security_assessment_created_at")

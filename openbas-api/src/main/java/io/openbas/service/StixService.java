@@ -18,7 +18,6 @@ import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
 import io.openbas.stix.parsing.ParsingException;
-import io.openbas.stix.types.Identifier;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -48,10 +47,17 @@ public class StixService {
     Bundle bundle = stixParser.parseBundle(root.toString());
 
     List<String> createdScenarios = new ArrayList<>();
+    List<ObjectBase> assessments = bundle.findByType("x-security-assessment");
 
-    for (ObjectBase obj :
-        bundle.findByType(
-            "x-security-assessment")) { // Maybe we could have various security assestments
+    // the current assumption is that there will always
+    // be at most a single security assessment in any bundle
+    // therefore guard this assumption with an error
+    if (assessments.size() > 1) {
+      throw new ParsingException(
+          "There is more than one object of type 'x-security-assessment' in the bundle");
+    }
+
+    for (ObjectBase obj : assessments) {
       String id = (String) obj.getProperty("id").getValue();
       SecurityAssessment securityAssessment = getOrCreateSecurityAssessment(id);
       Scenario scenario = getOrCreateScenario(securityAssessment);
@@ -105,16 +111,18 @@ public class StixService {
           Instant.parse((String) stixAssessmentObj.getProperty("period_end").getValue()));
     }
 
+    // finally store the actual stix object in database
+    securityAssessment.setRawStix(stixAssessmentObj.toStix(objectMapper).toString());
+
     String threatContextRef =
         (String) stixAssessmentObj.getProperty("threat_context_ref").getValue();
     securityAssessment.setThreatContextRef(threatContextRef);
 
     // Attack pattern refs -> convert to MITRE IDs
+    // the assumption is that any attack pattern found in bundle
+    // is relevant to the current security assessment
     securityAssessment.setAttackPatternRefs(
-        extractAttackPatterns(
-            bundle.findByIds(
-                (List<Identifier>)
-                    stixAssessmentObj.getProperty("attack_pattern_refs").getValue())));
+        extractAttackPatterns(bundle.findByType("attack-pattern")));
 
     // Add vulnerabilities
     // TODO Add labels as upsert tags

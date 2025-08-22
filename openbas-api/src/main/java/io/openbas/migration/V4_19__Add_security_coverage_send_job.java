@@ -22,6 +22,12 @@ public class V4_19__Add_security_coverage_send_job extends BaseJavaMigration {
               security_coverage_send_job_updated_at TIMESTAMPTZ DEFAULT now()
           );
           """);
+
+      statement.execute(
+          """
+          ALTER TABLE security_assessments
+          ADD COLUMN security_assessment_raw_stix JSONB NOT NULL;
+          """);
     }
   }
 }
