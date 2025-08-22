@@ -146,6 +146,14 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
           key={variable.variable_id}
           classes={{ root: classes.item }}
           divider
+          secondaryAction={(
+            <VariablePopover
+              variable={variable}
+              disabled={permissions?.readOnly}
+              onEdit={onEditVariable}
+              onDelete={onDeleteVariable}
+            />
+          )}
         >
           <ListItemIcon>
             <AttachMoneyOutlined color="primary" />
@@ -174,14 +182,6 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
               </>
             )}
           />
-          <ListItemSecondaryAction>
-            <VariablePopover
-              variable={variable}
-              disabled={permissions?.readOnly}
-              onEdit={onEditVariable}
-              onDelete={onDeleteVariable}
-            />
-          </ListItemSecondaryAction>
         </ListItem>
       ))}
     </List>

@@ -132,7 +132,7 @@ const SimulationLessons = () => {
         source={{
           ...source,
           isReadOnly: permissions.readOnly,
-          isUpdatable: permissions.canWrite,
+          isUpdatable: permissions.canManage,
         }}
         objectives={objectives}
         injects={injects}

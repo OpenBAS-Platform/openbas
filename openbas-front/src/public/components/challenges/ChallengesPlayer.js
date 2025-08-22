@@ -231,7 +231,7 @@ const ChallengesPlayer = () => {
     const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -246,7 +246,7 @@ const ChallengesPlayer = () => {
             {t('Switch to preview mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"
