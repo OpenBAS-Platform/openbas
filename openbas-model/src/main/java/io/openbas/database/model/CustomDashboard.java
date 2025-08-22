@@ -65,6 +65,9 @@ public class CustomDashboard implements Base {
 
   public CustomDashboard addParameter(
       @NotBlank final String name, @NotBlank final CustomDashboardParameterType type) {
+    if (this.getParameters().stream().anyMatch(p -> p.getType().equals(type) && type.uniq)) {
+      return this;
+    }
     CustomDashboardParameters customDashboardEndDateParameter = new CustomDashboardParameters();
     customDashboardEndDateParameter.setName(name);
     customDashboardEndDateParameter.setType(type);

@@ -23,7 +23,7 @@ public class CustomDashboardQueryUtils {
       return true;
     }
     if (DEFAULT.equals(widgetConfig.getTimeRange())) {
-      final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+      final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
       CustomDashboardTimeRange dashboardTimeRange =
           CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
       return ALL_TIME.equals(dashboardTimeRange);
@@ -35,8 +35,8 @@ public class CustomDashboardQueryUtils {
       WidgetConfiguration widgetConfig,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
-    final String startDateParameterId = findParamIdByType(definitionParameters, startDate);
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
+    final String startDateParameterId = findParamIdByType(definitionParameters, START_DATE);
 
     CustomDashboardTimeRange widgetTimeRange =
         CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());
@@ -96,8 +96,8 @@ public class CustomDashboardQueryUtils {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
 
-    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
-    final String endDateParameterId = findParamIdByType(definitionParameters, endDate);
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
+    final String endDateParameterId = findParamIdByType(definitionParameters, END_DATE);
 
     CustomDashboardTimeRange widgetTimeRange =
         CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());

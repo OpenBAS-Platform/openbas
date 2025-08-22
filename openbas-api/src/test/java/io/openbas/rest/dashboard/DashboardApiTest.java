@@ -77,7 +77,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createListWidgetWithEntity("endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createDefaultCustomDashboard()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -280,7 +280,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -298,7 +298,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
@@ -325,7 +325,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEntity("endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -343,7 +343,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
@@ -378,7 +378,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(WidgetFixture.createNumberWidgetWithEndpointAndFilter())
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -396,7 +396,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
@@ -459,7 +459,7 @@ class DashboardApiTest extends IntegrationTest {
                       "endpoint", CustomDashboardTimeRange.LAST_QUARTER, "base_created_at"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -469,7 +469,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
@@ -557,7 +557,7 @@ class DashboardApiTest extends IntegrationTest {
                       "endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -567,7 +567,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
@@ -650,7 +650,7 @@ class DashboardApiTest extends IntegrationTest {
                       "endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createCustomDashboardWithParams()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
@@ -668,7 +668,7 @@ class DashboardApiTest extends IntegrationTest {
               .filter(
                   param ->
                       param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.timeRange)
+                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
               .toString();
 
       Map<String, String> input = new HashMap<>();
