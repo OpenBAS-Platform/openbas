@@ -265,7 +265,7 @@ public class FullTextSearchTest extends IntegrationTest {
             "Full text search 'DoesNotExist' returns 0 asset - user with capabilities"),
         Arguments.of(
             "Asset",
-            Capability.ACCESS_ATOMIC_TESTING,
+            Capability.ACCESS_ASSESSMENT,
             0,
             List.<String>of(),
             "Full text search 'Asset' returns 0 asset - user with wrong capabilities"),
