@@ -9,7 +9,7 @@
             ],
             "created": "2025-08-04T14:00:00Z",
             "description": "Security assessment test plan for threat context XYZ. Updated",
-            "id": "x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1-list",
+            "id": "x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0582c1-list",
             "labels": [
 			    "opencti",
                 "assessment",

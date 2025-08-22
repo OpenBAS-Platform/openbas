@@ -1,9 +1,9 @@
 package io.openbas.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.rest.attack_pattern.service.AttackPatternService;
+import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.DomainObject;
 import io.openbas.stix.objects.ObjectBase;
@@ -30,7 +30,7 @@ public class SecurityCoverageService {
   private final Parser stixParser;
   private final AttackPatternService attackPatternService;
   private final ResultUtils resultUtils;
-  private final OpenBASConfig openBASConfig;
+  private final ExerciseService exerciseService;
 
   public Bundle createBundleFromSendJobs(List<SecurityCoverageSendJob> securityCoverageSendJobs)
       throws ParsingException, JsonProcessingException {
@@ -73,16 +73,18 @@ public class SecurityCoverageService {
                       new StixString(ObjectTypes.RELATIONSHIP.toString()),
                       "relationship_type",
                       new StixString("has-assessed"),
-                      "start_time",
-                      new Timestamp(exercise.getStart().get()),
-                      "stop_time",
-                      new Timestamp(exercise.getEnd().get()),
                       RelationshipObject.Properties.SOURCE_REF.toString(),
                       coverage.getProperty(CommonProperties.ID.toString()),
                       RelationshipObject.Properties.TARGET_REF.toString(),
                       new Identifier(stixRef.getStixRef()),
                       "covered",
                       new io.openbas.stix.types.Boolean(covered))));
+      exercise
+          .getStart()
+          .ifPresent(instant -> sro.setProperty("start_time", new Timestamp(instant)));
+      exerciseService
+          .getLatestValidityDate(exercise)
+          .ifPresent(instant -> sro.setProperty("stop_time", new Timestamp(instant)));
       if (covered) {
         sro.setProperty("coverage", attackPatternCoverage);
       }
