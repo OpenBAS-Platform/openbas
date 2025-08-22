@@ -28,7 +28,7 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const isTeam = target?.targetType === 'TEAMS';
-  const isPlayer = target?.targetType === 'PLAYER';
+  const isPlayer = target?.targetType === 'PLAYERS';
   const isAsset = target?.targetType === 'ASSETS';
   const isAgent = target?.targetType === 'AGENT';
 
