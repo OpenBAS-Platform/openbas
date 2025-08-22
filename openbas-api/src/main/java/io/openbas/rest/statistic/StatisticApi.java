@@ -6,6 +6,7 @@ import static io.openbas.utils.InjectExpectationResultUtils.getExpectationResult
 import static java.util.stream.Collectors.groupingBy;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.raw.RawGlobalInjectExpectation;
@@ -54,6 +55,8 @@ public class StatisticApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/api/statistics")
+  // FIXME open this api is necessary for login but that should not be the case
+  @RBAC(skipRBAC = true)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Retrieve platform statistics")
   @ApiResponse(

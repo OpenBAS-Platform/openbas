@@ -8,6 +8,8 @@ import { withStyles } from 'tss-react/mui';
 import { addAttackPattern, fetchAttackPatterns } from '../actions/AttackPattern';
 import { storeHelper } from '../actions/Schema';
 import AttackPatternForm from '../admin/components/settings/attack_patterns/AttackPatternForm';
+import { Can } from '../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../utils/permissions/types.js';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 
@@ -77,7 +79,6 @@ class OldAttackPatternField extends Component {
       style,
       label,
       placeholder,
-      userAdmin,
       useExternalId,
     } = this.props;
     const attackPatternsOptions = attackPatterns.map(
@@ -90,6 +91,7 @@ class OldAttackPatternField extends Component {
         };
       },
     );
+
     return (
       <>
         <Autocomplete
@@ -102,7 +104,7 @@ class OldAttackPatternField extends Component {
           placeholder={placeholder}
           options={attackPatternsOptions}
           style={style}
-          openCreate={userAdmin ? this.handleOpenAttackPatternCreation.bind(this) : null}
+          openCreate={this.handleOpenAttackPatternCreation.bind(this)}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props} key={option.id}>
@@ -114,7 +116,7 @@ class OldAttackPatternField extends Component {
           )}
           classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
-        {userAdmin && (
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
           <Dialog
             open={this.state.attackPatternCreation}
             onClose={this.handleCloseAttackPatternCreation.bind(this)}
@@ -128,7 +130,7 @@ class OldAttackPatternField extends Component {
               />
             </DialogContent>
           </Dialog>
-        )}
+        </Can>
       </>
     );
   }
@@ -139,7 +141,6 @@ const select = (state) => {
   return {
     killChainPhasesMap: helper.getKillChainPhasesMap().toJS(),
     attackPatterns: helper.getAttackPatterns().toJS(),
-    userAdmin: helper.getMeAdmin(),
   };
 };
 

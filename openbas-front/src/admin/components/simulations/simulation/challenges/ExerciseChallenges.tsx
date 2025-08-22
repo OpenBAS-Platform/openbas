@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 
-import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
+import { fetchExerciseChallenges } from '../../../../../actions/challenge-action';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { useHelper } from '../../../../../store';
 import { type Exercise } from '../../../../../utils/api-types';

@@ -8,6 +8,8 @@ import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_da
 import { ErrorBoundary } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import { type Widget } from '../../../../utils/api-types-custom';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { CustomDashboardContext } from './CustomDashboardContext';
 import CustomDashboardHeader from './CustomDashboardHeader';
 import WidgetCreation from './widgets/WidgetCreation';
@@ -204,11 +206,13 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
           })}
         </ReactGridLayout>
         {!readOnly && customDashboard && (
-          <WidgetCreation
-            customDashboardId={customDashboard.custom_dashboard_id}
-            widgets={customDashboard?.custom_dashboard_widgets ?? []}
-            onCreate={widget => handleWidgetCreate(widget)}
-          />
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.DASHBOARDS}>
+            <WidgetCreation
+              customDashboardId={customDashboard.custom_dashboard_id}
+              widgets={customDashboard?.custom_dashboard_widgets ?? []}
+              onCreate={widget => handleWidgetCreate(widget)}
+            />
+          </Can>
         )}
       </div>
     </div>

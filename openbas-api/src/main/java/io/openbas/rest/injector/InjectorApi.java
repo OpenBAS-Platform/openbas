@@ -2,7 +2,6 @@ package io.openbas.rest.injector;
 
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.EndpointService.JFROG_BASE;
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import io.openbas.aop.RBAC;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -44,7 +44,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,11 +75,16 @@ public class InjectorApi extends RestBehavior {
   private final InjectStatusService injectStatusService;
 
   @GetMapping("/api/injectors")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public Iterable<Injector> injectors() {
     return injectorRepository.findAll();
   }
 
   @GetMapping("/api/injectors/{injectorId}/injector_contracts")
+  @RBAC(
+      resourceId = "#injectorId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.INJECTOR)
   public Collection<JsonNode> injectorInjectTypes(@PathVariable String injectorId) {
     Injector injector =
         injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
@@ -176,8 +180,11 @@ public class InjectorApi extends RestBehavior {
     return injectorRepository.save(injector);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/injectors/{injectorId}")
+  @RBAC(
+      resourceId = "#injectorId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.INJECTOR)
   public Injector updateInjector(
       @PathVariable String injectorId, @Valid @RequestBody InjectorUpdateInput input) {
     Injector injector =
@@ -194,17 +201,20 @@ public class InjectorApi extends RestBehavior {
         input.getPayloads());
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping("/api/injectors/{injectorId}")
+  @RBAC(
+      resourceId = "#injectorId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.INJECTOR)
   public Injector injector(@PathVariable String injectorId) {
     return injectorRepository.findById(injectorId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(
       value = "/api/injectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.INJECTOR)
   @Transactional(rollbackOn = Exception.class)
   public InjectorRegistration registerInjector(
       @Valid @RequestPart("input") InjectorCreateInput input,
@@ -302,6 +312,7 @@ public class InjectorApi extends RestBehavior {
   @GetMapping(
       value = "/api/implant/caldera/{platform}/{arch}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RBAC(skipRBAC = true)
   public @ResponseBody byte[] getCalderaImplant(
       @PathVariable String platform, @PathVariable String arch) throws IOException {
     return getCalderaFile(platform, arch, null);
@@ -310,6 +321,7 @@ public class InjectorApi extends RestBehavior {
   @GetMapping(
       value = "/api/implant/caldera/{platform}/{arch}/{extension}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RBAC(skipRBAC = true)
   public @ResponseBody byte[] getCalderaScript(
       @PathVariable String platform, @PathVariable String arch, @PathVariable String extension)
       throws IOException {
@@ -340,6 +352,7 @@ public class InjectorApi extends RestBehavior {
   @GetMapping(
       value = "/api/implant/openbas/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @RBAC(skipRBAC = true)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
       @PathVariable String platform,
       @PathVariable String architecture,
@@ -387,6 +400,7 @@ public class InjectorApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(INJECT0R_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
@@ -398,6 +412,7 @@ public class InjectorApi extends RestBehavior {
   }
 
   @PostMapping(INJECT0R_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.injectorRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

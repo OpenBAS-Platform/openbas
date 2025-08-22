@@ -1,11 +1,12 @@
 import { RowingOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import * as R from 'ramda';
+import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchChallenges } from '../../../../actions/Challenge';
+import { fetchChallenges } from '../../../../actions/challenge-action.js';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -15,6 +16,8 @@ import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import TagsFilter from '../../common/filters/TagsFilter';
 import ChallengePopover from './ChallengePopover';
@@ -101,6 +104,7 @@ const Challenges = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const initialKeyword = params.get('search') || '';
+  const ability = useContext(AbilityContext);
 
   // Filter and sort hook
   const searchColumns = ['name', 'content', 'category'];
@@ -114,7 +118,9 @@ const Challenges = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchChallenges());
-    dispatch(fetchDocuments());
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
+      dispatch(fetchDocuments());
+    }
   });
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
@@ -284,7 +290,9 @@ const Challenges = () => {
           );
         })}
       </List>
-      <CreateChallenge />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.CHALLENGES}>
+        <CreateChallenge />
+      </Can>
     </>
   );
 };

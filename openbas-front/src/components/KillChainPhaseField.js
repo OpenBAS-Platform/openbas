@@ -8,6 +8,8 @@ import { withStyles } from 'tss-react/mui';
 import { addKillChainPhase } from '../actions/KillChainPhase';
 import { storeHelper } from '../actions/Schema';
 import KillChainPhaseForm from '../admin/components/settings/kill_chain_phases/KillChainPhaseForm';
+import { Can } from '../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../utils/permissions/types.js';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 
@@ -70,7 +72,6 @@ class KillChainPhaseField extends Component {
       style,
       label,
       placeholder,
-      userAdmin,
     } = this.props;
     const killChainPhasesOptions = killChainPhases.map(
       n => ({
@@ -78,6 +79,7 @@ class KillChainPhaseField extends Component {
         label: `[${n.phase_kill_chain_name}] ${n.phase_name}`,
       }),
     );
+
     return (
       <>
         <Autocomplete
@@ -90,7 +92,7 @@ class KillChainPhaseField extends Component {
           placeholder={placeholder}
           options={killChainPhasesOptions}
           style={style}
-          openCreate={userAdmin ? this.handleOpenKillChainPhaseCreation.bind(this) : null}
+          openCreate={this.handleOpenKillChainPhaseCreation.bind(this)}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props} key={option.id}>
@@ -102,7 +104,7 @@ class KillChainPhaseField extends Component {
           )}
           classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
-        {userAdmin && (
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
           <Dialog
             open={this.state.killChainPhaseCreation}
             onClose={this.handleCloseKillChainPhaseCreation.bind(this)}
@@ -116,7 +118,7 @@ class KillChainPhaseField extends Component {
               />
             </DialogContent>
           </Dialog>
-        )}
+        </Can>
       </>
     );
   }
@@ -124,10 +126,7 @@ class KillChainPhaseField extends Component {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  return {
-    killChainPhases: helper.getKillChainPhases().toJS(),
-    userAdmin: helper.getMeAdmin(),
-  };
+  return { killChainPhases: helper.getKillChainPhases().toJS() };
 };
 
 export default R.compose(

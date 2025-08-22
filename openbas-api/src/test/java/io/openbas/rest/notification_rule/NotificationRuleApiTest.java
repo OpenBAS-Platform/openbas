@@ -199,7 +199,7 @@ public class NotificationRuleApiTest extends IntegrationTest {
         notificationRule.getResourceId(),
         JsonPath.read(response, "$.notification_rule_resource_id"));
     assertEquals(
-        notificationRule.getResourceType().name(),
+        notificationRule.getNotificationResourceType().name(),
         JsonPath.read(response, "$.notification_rule_resource_type"));
     assertEquals(
         notificationRule.getOwner().getId(), JsonPath.read(response, "$.notification_rule_owner"));
@@ -229,7 +229,7 @@ public class NotificationRuleApiTest extends IntegrationTest {
         notificationRule.getResourceId(),
         JsonPath.read(response, "$[0].notification_rule_resource_id"));
     assertEquals(
-        notificationRule.getResourceType().name(),
+        notificationRule.getNotificationResourceType().name(),
         JsonPath.read(response, "$[0].notification_rule_resource_type"));
     assertEquals(
         notificationRule.getOwner().getId(),
@@ -273,7 +273,7 @@ public class NotificationRuleApiTest extends IntegrationTest {
     NotificationRule notificationRule = new NotificationRule();
     notificationRule.setOwner(userRepository.findById(ADMIN_UUID).orElse(null));
     notificationRule.setSubject("subject");
-    notificationRule.setResourceType(NotificationRuleResourceType.SCENARIO);
+    notificationRule.setNotificationResourceType(NotificationRuleResourceType.SCENARIO);
     notificationRule.setTrigger(NotificationRuleTrigger.DIFFERENCE);
     notificationRule.setType(NotificationRuleType.EMAIL);
     notificationRule.setResourceId(resourceId);

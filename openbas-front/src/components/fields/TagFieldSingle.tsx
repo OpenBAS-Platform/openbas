@@ -10,6 +10,8 @@ import TagForm from '../../admin/components/settings/tags/TagForm';
 import { useHelper } from '../../store';
 import { type Tag } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
+import { Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles()(() => ({
@@ -51,13 +53,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   // Fetching data
-  const { tags, userAdmin }: {
-    tags: [Tag];
-    userAdmin: boolean;
-  } = useHelper((helper: TagHelper & UserHelper) => ({
-    tags: helper.getTags().filter(tag => !forbiddenOptions.includes(tag.tag_name)),
-    userAdmin: helper.getMeAdmin(),
-  }));
+  const { tags }: { tags: [Tag] } = useHelper((helper: TagHelper & UserHelper) => ({ tags: helper.getTags().filter(tag => !forbiddenOptions.includes(tag.tag_name)) }));
   const dispatch = useAppDispatch();
 
   // Handle tag creation
@@ -140,7 +136,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
       >
         <AddOutlined />
       </IconButton>
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
         <Dialog
           open={tagCreation}
           onClose={handleCloseTagCreation}
@@ -154,7 +150,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
             />
           </DialogContent>
         </Dialog>
-      )}
+      </Can>
     </div>
   );
 };

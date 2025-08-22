@@ -2425,16 +2425,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -2460,7 +2460,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
 }
 
@@ -2848,6 +2848,10 @@ export interface InjectImporterUpdateInput {
   inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
+}
+
+export interface InjectIndividualExportRequestInput {
+  options?: ExportOptionsInput;
 }
 
 export interface InjectInput {
@@ -5006,6 +5010,7 @@ export interface RoleInput {
   /** @uniqueItems true */
   role_capabilities?: (
     | "BYPASS"
+    | "CREATE_ASSESSMENT"
     | "ACCESS_ATOMIC_TESTING"
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"
@@ -5833,6 +5838,7 @@ export interface User {
   /** @uniqueItems true */
   user_capabilities?: (
     | "BYPASS"
+    | "CREATE_ASSESSMENT"
     | "ACCESS_ATOMIC_TESTING"
     | "MANAGE_ATOMIC_TESTING"
     | "DELETE_ATOMIC_TESTING"

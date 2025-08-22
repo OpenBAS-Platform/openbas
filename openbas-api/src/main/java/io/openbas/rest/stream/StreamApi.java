@@ -7,18 +7,23 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.aop.RBAC;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.database.audit.BaseEvent;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.User;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.PermissionService;
+import io.openbas.service.UserService;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -36,6 +41,14 @@ public class StreamApi extends RestBehavior {
   public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
   private final Map<String, Tuple2<OpenBASPrincipal, FluxSink<Object>>> consumers = new HashMap<>();
 
+  private final PermissionService permissionService;
+  private final UserService userService;
+
+  public StreamApi(PermissionService permissionService, UserService userService) {
+    this.permissionService = permissionService;
+    this.userService = userService;
+  }
+
   private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
     event.setInstanceData(mapper.valueToTree(event.getInstance()));
@@ -44,19 +57,26 @@ public class StreamApi extends RestBehavior {
     flux.next(message);
   }
 
-  @EventListener
+  @TransactionalEventListener
   public void listenDatabaseUpdate(BaseEvent event) {
     consumers.entrySet().stream()
         .parallel()
         .forEach(
             entry -> {
+              User user = userService.user(entry.getValue().getT1().getId());
+              // FIXME find a way to cache user
+              // -> close session when user se login
+
               Tuple2<OpenBASPrincipal, FluxSink<Object>> tupleFlux = entry.getValue();
-              OpenBASPrincipal listener = tupleFlux.getT1();
               FluxSink<Object> fluxSink = tupleFlux.getT2();
-              boolean isCurrentObserver = event.isUserObserver(listener.isAdmin());
-              if (!isCurrentObserver) {
+              if (!permissionService.hasPermission(
+                  user,
+                  event.getInstance().getId(),
+                  event.getInstance().getResourceType(),
+                  Action.READ)) {
                 // If user as no visibility, we can send a "delete" userEvent with only the internal
                 // id
+                // TODO -> rethink this logic -> do we need to send DELETE events
                 try {
                   String propertyId =
                       event
@@ -84,6 +104,7 @@ public class StreamApi extends RestBehavior {
 
   /** Create a flux for current user & session */
   @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @RBAC(skipRBAC = true) // TODO RBAC check must be done manually for every event in this method
   public ResponseEntity<Flux<Object>> streamFlux() {
     String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
     // Build the database event flux.

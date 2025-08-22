@@ -3,7 +3,6 @@ import { SelectGroup } from 'mdi-material-ui';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { searchTagRules } from '../../../../actions/tag_rules/tagrule-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -14,8 +13,9 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTargets from '../../../../components/ItemTargets';
-import { useHelper } from '../../../../store';
 import { type TagRuleOutput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
@@ -30,8 +30,6 @@ const TagRules = () => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const [tagRules, setTagRules] = useState<TagRuleOutput[]>([]);
 
@@ -137,11 +135,11 @@ const TagRules = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
         <TagRuleCreate
           onCreate={result => setTagRules([...tagRules, result])}
         />
-      )}
+      </Can>
     </>
   );
 };

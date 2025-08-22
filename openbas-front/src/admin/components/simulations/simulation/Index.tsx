@@ -5,8 +5,8 @@ import { makeStyles } from 'tss-react/mui';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { fetchExercise } from '../../../../actions/Exercise';
+import { fetchScenarioFromSimulation } from '../../../../actions/exercises/exercise-action';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import { seriesForSimulation } from '../../../../actions/simulations/simulation-customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
@@ -226,15 +226,18 @@ const Index = () => {
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   useDataLoader(() => {
     setLoading(true);
-    dispatch(fetchExercise(exerciseId)).finally(() => {
+    dispatch(fetchExercise(exerciseId));
+    if (!exercise) {
+      return;
+    }
+    if (!exercise.exercise_scenario) {
       setPristine(false);
       setLoading(false);
-    });
-  });
-
-  useDataLoader(() => {
-    if (exercise?.exercise_scenario) {
-      dispatch(fetchScenario(exercise?.exercise_scenario));
+    } else {
+      dispatch(fetchScenarioFromSimulation(exercise.exercise_id)).finally(() => {
+        setPristine(false);
+        setLoading(false);
+      });
     }
   }, [exercise]);
 

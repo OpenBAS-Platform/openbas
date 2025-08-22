@@ -1,29 +1,32 @@
 package io.openbas.rest.challenge;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.ChallengeSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
 import io.openbas.rest.challenge.response.ChallengeResult;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,8 +38,10 @@ public class ChallengeApi extends RestBehavior {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final ChallengeService challengeService;
+  private final DocumentService documentService;
 
   @GetMapping("/api/challenges")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.CHALLENGE)
   public Iterable<Challenge> challenges() {
     return fromIterable(challengeRepository.findAll()).stream()
         .map(challengeService::enrichChallengeWithExercisesOrScenarios)
@@ -45,14 +50,18 @@ public class ChallengeApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/api/challenges/find")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.CHALLENGE)
   @org.springframework.transaction.annotation.Transactional(readOnly = true)
   public List<Challenge> findEndpoints(
       @RequestBody @Valid @NotNull final List<String> challengeIds) {
     return this.challengeRepository.findAll(fromIds(challengeIds));
   }
 
-  @PreAuthorize("isPlanner()")
   @PutMapping("/api/challenges/{challengeId}")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public Challenge updateChallenge(
       @PathVariable String challengeId, @Valid @RequestBody ChallengeInput input) {
@@ -81,8 +90,8 @@ public class ChallengeApi extends RestBehavior {
     return challengeService.enrichChallengeWithExercisesOrScenarios(saveChallenge);
   }
 
-  @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();
@@ -104,18 +113,41 @@ public class ChallengeApi extends RestBehavior {
     return challengeRepository.save(challenge);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/challenges/{challengeId}")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.CHALLENGE)
   @Transactional(rollbackOn = Exception.class)
   public void deleteChallenge(@PathVariable String challengeId) {
     challengeRepository.deleteById(challengeId);
   }
 
   @PostMapping("/api/challenges/{challengeId}/try")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHALLENGE)
   public ChallengeResult tryChallenge(
       @PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input)
       throws InputValidationException {
     validateUUID(challengeId);
     return challengeService.tryChallenge(challengeId, input);
+  }
+
+  @GetMapping("/api/challenges/{challengeId}/documents")
+  @RBAC(
+      resourceId = "#challengeId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHALLENGE)
+  @Operation(summary = "Get the Documents used in a challenge")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the Challenge")
+      })
+  public List<RawDocument> documentsFromChallenge(@PathVariable String challengeId) {
+    return documentService.documentsForChallenge(challengeId);
   }
 }

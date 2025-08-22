@@ -30,20 +30,21 @@ import jakarta.servlet.ServletException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
+@Transactional
 public class ExerciseApiStatusTest extends IntegrationTest {
 
   static Exercise SCHEDULED_EXERCISE;
@@ -132,11 +133,11 @@ public class ExerciseApiStatusTest extends IntegrationTest {
     CANCELED_EXERCISE = exerciseRepository.save(canceledExercise);
     teamRepository.save(team);
 
-    inject1.setTeams(List.of(team));
-    inject2.setTeams(List.of(team));
-    inject3.setTeams(List.of(team));
-    inject4.setTeams(List.of(team));
-    inject5.setTeams(List.of(team));
+    inject1.setTeams(new ArrayList<>(List.of(team)));
+    inject2.setTeams(new ArrayList<>(List.of(team)));
+    inject3.setTeams(new ArrayList<>(List.of(team)));
+    inject4.setTeams(new ArrayList<>(List.of(team)));
+    inject5.setTeams(new ArrayList<>(List.of(team)));
 
     injectRepository.save(inject1);
     injectRepository.save(inject2);
@@ -162,20 +163,9 @@ public class ExerciseApiStatusTest extends IntegrationTest {
 
     injectStatus.setName(ExecutionStatus.ERROR);
     inject5.setStatus(injectStatus);
-    FINISHED_EXERCISE.setInjects(List.of(inject5));
-    FINISHED_EXERCISE.setPauses(List.of(pause));
-    FINISHED_EXERCISE.setLessonsCategories(List.of(lessonsCategory));
-  }
-
-  @AfterEach
-  void afterAll() {
-    this.injectRepository.deleteAll();
-    this.exerciseRepository.deleteAll();
-    this.userRepository.deleteAll();
-    this.teamRepository.deleteAll();
-    this.lessonsAnswerRepository.deleteById(LESSON_ANSWER.getId());
-    this.lessonsQuestionRepository.deleteAll();
-    this.lessonsCategoryRepository.deleteAll();
+    FINISHED_EXERCISE.setInjects(new ArrayList<>(List.of(inject5)));
+    FINISHED_EXERCISE.setPauses(new ArrayList<>(List.of(pause)));
+    FINISHED_EXERCISE.setLessonsCategories(new ArrayList<>(List.of(lessonsCategory)));
   }
 
   @DisplayName("Start an exercise manually")
@@ -334,7 +324,7 @@ public class ExerciseApiStatusTest extends IntegrationTest {
         assertEquals(
             Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
             JsonPath.read(response, "$.exercise_next_possible_status"));
-        assertEquals(1, injects.size());
+        assertEquals(2, injects.size());
 
         // --CLEAN--
         pauseRepository.delete(pauses.getFirst());

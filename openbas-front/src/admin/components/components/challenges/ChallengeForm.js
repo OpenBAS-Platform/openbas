@@ -1,13 +1,14 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, GridLegacy, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
 import arrayMutators from 'final-form-arrays';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchDocuments } from '../../../../actions/Document';
+import { fetchDocumentsChallenge } from '../../../../actions/challenge-action.js';
+import { fetchDocuments } from '../../../../actions/Document.js';
 import { fetchExercises } from '../../../../actions/Exercise';
 import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
 import OldMarkDownField from '../../../../components/fields/OldMarkDownField';
@@ -18,6 +19,8 @@ import ItemTags from '../../../../components/ItemTags';
 import TagField from '../../../../components/TagField';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import DocumentPopover from '../documents/DocumentPopover';
 import DocumentType from '../documents/DocumentType';
 
@@ -100,6 +103,8 @@ const ChallengeForm = (props) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useDispatch();
+  const ability = useContext(AbilityContext);
+
   const { onSubmit, handleClose, initialValues, editing, documentsIds } = props;
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
@@ -122,10 +127,16 @@ const ChallengeForm = (props) => {
   const required = value => (value ? undefined : t('This field is required.'));
   const requiredArray = value => (value && value.length > 0 ? undefined : t('This field is required.'));
   const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
+
   useDataLoader(() => {
     dispatch(fetchExercises());
-    dispatch(fetchDocuments());
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
+      dispatch(fetchDocuments());
+    } else {
+      dispatch(fetchDocumentsChallenge(props.challengeId));
+    }
   });
+
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
     setDocumentsOrderAsc(!documentsSortBy);
@@ -257,59 +268,64 @@ const ChallengeForm = (props) => {
             {documents.map((documentId) => {
               const document = documentsMap[documentId] || {};
               return (
-                <ListItemButton
-                  key={document.document_id}
-                  classes={{ root: classes.item }}
-                  divider={true}
-                  component="a"
-                  href={`/api/documents/${document.document_id}/file`}
-                >
-                  <ListItemIcon>
-                    <AttachmentOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={(
-                      <div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_name}
-                        >
-                          {document.document_name}
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_type}
-                        >
-                          <DocumentType
-                            type={document.document_type}
-                            variant="list"
-                          />
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_tags}
-                        >
-                          <ItemTags
-                            variant="list"
-                            tags={document.document_tags}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  />
-                  <ListItemSecondaryAction>
+                <ListItem
+                  key={documentId}
+                  secondaryAction={(
                     <DocumentPopover
                       inline
                       document={document}
                       onRemoveDocument={handleRemoveDocument}
                     />
-                  </ListItemSecondaryAction>
-                </ListItemButton>
+                  )}
+                >
+                  <ListItemButton
+                    key={document.document_id}
+                    classes={{ root: classes.item }}
+                    divider
+                    component="a"
+                    href={`/api/documents/${document.document_id}/file`}
+                  >
+                    <ListItemIcon>
+                      <AttachmentOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_name}
+                          >
+                            {document.document_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_type}
+                          >
+                            <DocumentType
+                              type={document.document_type}
+                              variant="list"
+                            />
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_tags}
+                          >
+                            <ItemTags
+                              variant="list"
+                              tags={document.document_tags}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
               );
             })}
             <MultipleFileLoader
               initialDocumentIds={documents}
               handleAddDocuments={handleAddDocuments}
+              disabled={!ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)}
             />
           </List>
           <FieldArray name="challenge_flags" validate={requiredArray}>

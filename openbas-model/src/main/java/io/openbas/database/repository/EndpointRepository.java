@@ -130,4 +130,8 @@ public interface EndpointRepository
               + ";",
       nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
+
+  List<Endpoint> findDistinctByInjectsScenarioId(String scenarioId);
+
+  List<Endpoint> findDistinctByInjectsExerciseId(String exerciseId);
 }

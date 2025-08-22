@@ -1,12 +1,13 @@
 package io.openbas.rest.mapper;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.ImportMapper;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.raw.RawPaginationImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
@@ -44,7 +45,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
@@ -62,8 +62,8 @@ public class MapperApi extends RestBehavior {
   private static final int MAXIMUM_FILE_SIZE_ALLOWED = 25 * 1000 * 1000;
   private static final List<String> ACCEPTED_FILE_TYPES = List.of("xls", "xlsx");
 
-  @Secured(ROLE_USER)
   @PostMapping("/api/mappers/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.MAPPER)
   public Page<RawPaginationImportMapper> getImportMapper(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -71,23 +71,23 @@ public class MapperApi extends RestBehavior {
         .map(RawPaginationImportMapper::new);
   }
 
-  @Secured(ROLE_USER)
   @GetMapping("/api/mappers/{mapperId}")
+  @RBAC(resourceId = "#mapperId", actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   public ImportMapper getImportMapperById(@PathVariable String mapperId) {
     return importMapperRepository
         .findById(UUID.fromString(mapperId))
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.MAPPER)
   public ImportMapper createImportMapper(
       @RequestBody @Valid final ImportMapperAddInput importMapperAddInput) {
     return mapperService.createAndSaveImportMapper(importMapperAddInput);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(value = "/api/mappers/export")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   public void exportMappers(
       @RequestBody @Valid final ExportMapperInput exportMapperInput, HttpServletResponse response) {
     try {
@@ -115,8 +115,8 @@ public class MapperApi extends RestBehavior {
   }
 
   @Operation(description = "Export all datas from a specific target (endpoint,...)")
-  @Secured(ROLE_USER)
   @PostMapping(value = "/api/mappers/export/csv")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.MAPPER)
   @LogExecutionTime
   public void exportMappersCsv(
       @RequestParam TargetType targetType,
@@ -125,8 +125,8 @@ public class MapperApi extends RestBehavior {
     mapperService.exportMappersCsv(targetType, input, response);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/import")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   public void importMappers(@RequestPart("file") @NotNull MultipartFile file)
       throws ImportException {
     try {
@@ -138,40 +138,52 @@ public class MapperApi extends RestBehavior {
     }
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.DUPLICATE,
+      resourceType = ResourceType.MAPPER)
   @Operation(summary = "Duplicate XLS mapper by id")
   public ImportMapper duplicateMapper(@PathVariable @NotBlank final String mapperId) {
     return mapperService.getDuplicateImportMapper(mapperId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.MAPPER)
   public ImportMapper updateImportMapper(
       @PathVariable String mapperId,
       @Valid @RequestBody ImportMapperUpdateInput importMapperUpdateInput) {
     return mapperService.updateImportMapper(mapperId, importMapperUpdateInput);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/mappers/{mapperId}")
+  @RBAC(
+      resourceId = "#mapperId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.MAPPER)
   public void deleteImportMapper(@PathVariable String mapperId) {
     importMapperRepository.deleteById(UUID.fromString(mapperId));
   }
 
   @PostMapping("/api/mappers/store")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Import injects into an xls file")
-  @Secured(ROLE_USER)
   public ImportPostSummary importXLSFile(@RequestPart("file") @NotNull MultipartFile file) {
     validateUploadedFile(file);
     return injectImportService.storeXlsFileForImport(file);
   }
 
   @PostMapping("/api/mappers/store/{importId}")
+  @RBAC(
+      resourceId = "#importId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.MAPPER)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  @Secured(ROLE_USER)
   public ImportTestSummary testImportXLSFile(
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportTestInput input) {
@@ -194,7 +206,7 @@ public class MapperApi extends RestBehavior {
   // -- IMPORT --
   @Operation(
       description = "Import all datas from a specific target (endpoint,...) through a csv file")
-  @Secured(ROLE_USER)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.MAPPER)
   @PostMapping("/api/mappers/import/csv")
   @LogExecutionTime
   @Transactional(rollbackOn = Exception.class)

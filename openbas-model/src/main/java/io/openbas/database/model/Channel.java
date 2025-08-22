@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -86,6 +88,16 @@ public class Channel implements Base {
   @JsonProperty("channel_logo_light")
   @Schema(type = "string")
   private Document logoLight;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.CHANNEL;
+
+  // The following field is not accessed by our code but is necessary for the ORM mapping
+  // (findDistinctByArticlesExerciseId, findDistinctByArticlesScenarioId...).
+  @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private List<Article> articles;
 
   @Override
   public String getId() {

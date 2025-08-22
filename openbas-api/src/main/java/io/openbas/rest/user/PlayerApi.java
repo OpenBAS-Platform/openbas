@@ -8,6 +8,7 @@ import static io.openbas.utils.UserOnboardingProgressUtils.PLAYER_SETUP;
 import static java.time.Instant.now;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.aop.onboarding.Onboarding;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.SessionManager;
@@ -28,7 +29,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +49,8 @@ public class PlayerApi extends RestBehavior {
   private final PlayerService playerService;
 
   @GetMapping(PLAYER_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
-  @PreAuthorize("isObserver()")
   public Iterable<RawPlayer> players() {
     List<RawPlayer> players;
     OpenBASPrincipal currentUser = currentUser();
@@ -73,20 +73,21 @@ public class PlayerApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(PLAYER_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PLAYER)
   public Page<PlayerOutput> players(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.playerService.playerPagination(searchPaginationInput);
   }
 
   @GetMapping("/api/player/{userId}/communications")
-  @PreAuthorize("isPlanner()")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.READ, resourceType = ResourceType.PLAYER)
   public Iterable<Communication> playerCommunications(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
     return communicationRepository.findByUser(userId);
   }
 
   @PostMapping(PLAYER_URI)
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
   @Onboarding(step = PLAYER_SETUP)
   public User createPlayer(@Valid @RequestBody PlayerInput input) {
@@ -102,7 +103,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PostMapping(PLAYER_URI + "/upsert")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PLAYER)
   @Transactional(rollbackOn = Exception.class)
   public User upsertPlayer(@Valid @RequestBody PlayerInput input) {
     checkOrganizationAccess(userRepository, input.getOrganizationId());
@@ -146,7 +147,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @PutMapping(PLAYER_URI + "/{userId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.WRITE, resourceType = ResourceType.PLAYER)
   public User updatePlayer(@PathVariable String userId, @Valid @RequestBody PlayerInput input) {
     checkUserAccess(userRepository, userId);
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
@@ -161,7 +162,7 @@ public class PlayerApi extends RestBehavior {
   }
 
   @DeleteMapping(PLAYER_URI + "/{userId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(resourceId = "#userId", actionPerformed = Action.DELETE, resourceType = ResourceType.PLAYER)
   public void deletePlayer(@PathVariable String userId) {
     checkUserAccess(userRepository, userId);
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);

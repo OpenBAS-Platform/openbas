@@ -9,6 +9,7 @@ import Groups from './groups/Groups';
 import KillChainPhases from './kill_chain_phases/KillChainPhases';
 import Parameters from './Parameters';
 import Policies from './policies/Policies';
+import Roles from './roles/Roles';
 import TagRules from './tag_rules/TagRules';
 import Tags from './tags/Tags';
 import Users from './users/Users';
@@ -17,9 +18,10 @@ const Index = () => (
   <Routes>
     <Route path="" element={<Navigate to="parameters" replace={true} />} />
     <Route path="parameters" element={errorWrapper(Parameters)()} />
-    <Route path="security" element={<Navigate to="groups" replace={true} />} />
+    <Route path="security" element={<Navigate to="roles" replace={true} />} />
     <Route path="security/groups" element={errorWrapper(Groups)()} />
     <Route path="security/users" element={errorWrapper(Users)()} />
+    <Route path="security/roles" element={errorWrapper(Roles)()} />
     <Route path="security/policies" element={errorWrapper(Policies)()} />
     <Route path="taxonomies" element={<Navigate to="tags" replace={true} />} />
     <Route path="taxonomies/tags" element={errorWrapper(Tags)()} />

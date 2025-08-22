@@ -4,9 +4,8 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.DatabaseHelper.resolveRelation;
 import static java.time.Instant.now;
 
-import io.openbas.database.model.Evaluation;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Objective;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.EvaluationRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.ObjectiveRepository;
@@ -20,7 +19,6 @@ import io.openbas.rest.objective.form.ObjectiveInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,13 +34,19 @@ public class ExerciseObjectiveApi extends RestBehavior {
 
   // region objectives
   @GetMapping(EXERCISE_URI + "{exerciseId}/objectives")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
     return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
   }
 
   @PostMapping(EXERCISE_URI + "{exerciseId}/objectives")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Objective createObjective(
       @PathVariable String exerciseId, @Valid @RequestBody ObjectiveInput input) {
@@ -55,7 +59,10 @@ public class ExerciseObjectiveApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public Objective updateObjective(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -67,7 +74,10 @@ public class ExerciseObjectiveApi extends RestBehavior {
   }
 
   @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
     objectiveRepository.deleteById(objectiveId);
   }
@@ -76,21 +86,30 @@ public class ExerciseObjectiveApi extends RestBehavior {
 
   // region evaluations
   @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Evaluation getEvaluation(
       @PathVariable String exerciseId, @PathVariable String evaluationId) {
     return evaluationRepository.findById(evaluationId).orElseThrow(ElementNotFoundException::new);
   }
 
   @GetMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Iterable<Evaluation> getEvaluations(
       @PathVariable String exerciseId, @PathVariable String objectiveId) {
     return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
   }
 
   @PostMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Evaluation createEvaluation(
       @PathVariable String exerciseId,
@@ -115,7 +134,10 @@ public class ExerciseObjectiveApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public Evaluation updateEvaluation(
       @PathVariable String exerciseId,
       @PathVariable String objectiveId,
@@ -137,7 +159,10 @@ public class ExerciseObjectiveApi extends RestBehavior {
   }
 
   @DeleteMapping(EXERCISE_URI + "{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
     evaluationRepository.deleteById(evaluationId);
   }

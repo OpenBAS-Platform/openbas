@@ -5,13 +5,18 @@ import { Link } from 'react-router';
 
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import { type InjectStore } from '../../../../actions/injects/Inject';
-import { exportInjects } from '../../../../actions/injects/inject-action';
+import { exportInject } from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject, InjectExportRequestInput, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
+import type {
+  Inject,
+  InjectIndividualExportRequestInput,
+  InjectStatus,
+  InjectTestStatusOutput,
+} from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { download } from '../../../../utils/utils';
@@ -141,17 +146,14 @@ const InjectPopover: FunctionComponent<Props> = ({
   const handleExportClose = () => setOpenExportDialog(false);
 
   const handleExportJsonSingle = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
-    const exportData: InjectExportRequestInput = {
-      injects: [
-        { inject_id: inject.inject_id },
-      ],
+    const exportData: InjectIndividualExportRequestInput = {
       options: {
         with_players: withPlayers,
         with_teams: withTeams,
         with_variable_values: withVariableValues,
       },
     };
-    exportInjects(exportData).then((result) => {
+    exportInject(inject.inject_id, exportData).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
       const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
       const filename = match[1];

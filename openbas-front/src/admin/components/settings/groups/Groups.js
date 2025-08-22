@@ -15,6 +15,8 @@ import SortHeadersComponent from '../../../../components/common/pagination/SortH
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import SecurityMenu from '../SecurityMenu';
 import CreateGroup from './CreateGroup';
 import GroupPopover from './GroupPopover';
@@ -183,6 +185,15 @@ const Groups = () => {
               key={group.group_id}
               classes={{ root: classes.item }}
               divider={true}
+              secondaryAction={(
+                <GroupPopover
+                  group={group}
+                  groupUsersIds={group.group_users}
+                  groupRolesIds={group.group_roles}
+                  onUpdate={result => setGroups(groups.map(g => (g.group_id !== result.group_id ? g : result)))}
+                  onDelete={result => setGroups(groups.filter(g => (g.group_id !== result)))}
+                />
+              )}
             >
               <ListItemIcon>
                 <GroupsOutlined color="primary" />
@@ -264,20 +275,15 @@ const Groups = () => {
                   </div>
                 )}
               />
-              <ListItemSecondaryAction>
-                <GroupPopover
-                  group={group}
-                  groupUsersIds={group.group_users}
-                  onUpdate={result => setGroups(groups.map(g => (g.group_id !== result.group_id ? g : result)))}
-                  onDelete={result => setGroups(groups.filter(g => (g.group_id !== result)))}
-                />
-              </ListItemSecondaryAction>
+
             </ListItem>
           ))}
         </List>
-        <CreateGroup
-          onCreate={result => setGroups([result, ...groups])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateGroup
+            onCreate={result => setGroups([result, ...groups])}
+          />
+        </Can>
       </div>
       <SecurityMenu />
     </div>

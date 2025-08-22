@@ -13,6 +13,8 @@ import { useHelper } from '../../../store';
 import { type PlatformSettings, type SettingsEnterpriseEditionUpdateInput, type SettingsOnboardingUpdateInput, type SettingsPlatformWhitemarkUpdateInput, type SettingsUpdateInput, type ThemeInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEditionButton';
 import ParametersForm from './ParametersForm';
 import ParametersOnboardingForm from './ParametersOnboardingForm';
@@ -90,13 +92,20 @@ const Parameters = () => {
             current: true,
           }]}
         />
+
         {!isEnterpriseEditionActivated && (
-          <EnterpriseEditionButton />
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+            <EnterpriseEditionButton />
+          </Can>
         )}
+
         {isEnterpriseEditionActivated && (
           <div>
             {!isEnterpriseEditionByConfig && !isEnterpriseEdition && (
-              <EnterpriseEditionButton />
+              <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+
+                <EnterpriseEditionButton />
+              </Can>
             )}
             {!isEnterpriseEditionByConfig && isEnterpriseEdition && (
               <>

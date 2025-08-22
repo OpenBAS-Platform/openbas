@@ -78,6 +78,10 @@ public class Injector implements Base {
   @JsonIgnore
   private List<InjectorContract> contracts = new ArrayList<>();
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.INJECTOR;
+
   @JsonIgnore
   @Override
   public boolean isUserHasAccess(User user) {

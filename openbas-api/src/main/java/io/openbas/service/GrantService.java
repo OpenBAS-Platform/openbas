@@ -96,6 +96,10 @@ public class GrantService {
       @NotNull final User user,
       @NotNull final Grant.GRANT_TYPE grantType) {
     return this.grantRepository.rawByResourceIdAndUserId(resourceId, user.getId()).stream()
-        .anyMatch(rawGrant -> grantType.name().equals(rawGrant.getGrant_name()));
+        .anyMatch(
+            rawGrant -> {
+              Grant.GRANT_TYPE rawToGrant = Grant.GRANT_TYPE.valueOf(rawGrant.getGrant_name());
+              return rawToGrant.getPriority() >= grantType.getPriority();
+            });
   }
 }

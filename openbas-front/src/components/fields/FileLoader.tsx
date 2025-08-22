@@ -1,8 +1,9 @@
 import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchDocumentFromSecurityPlatform } from '../../actions/assets/securityPlatform-actions';
 import { fetchDocuments } from '../../actions/Document';
 import { type DocumentHelper } from '../../actions/helper';
 import DocumentType from '../../admin/components/components/documents/DocumentType';
@@ -10,6 +11,8 @@ import { useHelper } from '../../store';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
+import { AbilityContext, Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import ButtonPopover, { type PopoverEntry } from '../common/ButtonPopover';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
@@ -86,6 +89,8 @@ interface Props {
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   error?: boolean;
+  parentResourceType?: string;
+  parentResourceId?: string;
 }
 
 const FileLoader: FunctionComponent<Props> = ({
@@ -96,10 +101,13 @@ const FileLoader: FunctionComponent<Props> = ({
   setFieldValue,
   InputLabelProps,
   error,
+  parentResourceType,
+  parentResourceId,
 }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   const [open, setOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<RawDocument | undefined>(undefined);
@@ -108,8 +116,13 @@ const FileLoader: FunctionComponent<Props> = ({
 
   // Fetching data
   const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper) => ({ documents: helper.getDocuments() }));
+
   useDataLoader(() => {
-    dispatch(fetchDocuments());
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
+      dispatch(fetchDocuments());
+    } else if (parentResourceType == 'security_platform' && parentResourceId != null) {
+      dispatch(fetchDocumentFromSecurityPlatform(parentResourceId));
+    }
   });
 
   useEffect(() => {
@@ -157,14 +170,17 @@ const FileLoader: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: handleOpen,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DOCUMENTS),
     },
     {
       label: 'Download',
       action: () => handleDownload(selectedDocument?.document_id),
+      userRight: true,
     },
     {
       label: 'Remove',
       action: handleRemove,
+      userRight: true,
     },
   ];
 
@@ -182,20 +198,22 @@ const FileLoader: FunctionComponent<Props> = ({
       }}
       >
         {!selectedDocument && (
-          <ListItem
-            className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
-            divider
-            onClick={handleOpen}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Add document"
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.DOCUMENTS}>
+            <ListItem
+              className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}
+              divider
+              onClick={handleOpen}
+              color="primary"
+            >
+              <ListItemIcon color="primary">
+                <ControlPointOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Add document"
+                classes={{ primary: classes.text }}
+              />
+            </ListItem>
+          </Can>
         )}
         {InputLabelProps?.required && error && (
           <Typography className={classes.errorMessage}>

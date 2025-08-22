@@ -9,6 +9,8 @@ import Drawer from '../../../../../components/common/Drawer';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import { attackPatternOptions } from '../../../../../utils/Option';
+import { Can } from '../../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types.js';
 import InjectorContractCustomForm from './InjectorContractCustomForm';
 import InjectorContractForm from './InjectorContractForm';
 
@@ -96,9 +98,11 @@ const InjectorContractPopover = ({ injectorContract, killChainPhasesMap, attackP
   }
   return (
     <>
-      <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
-        <MoreVert />
-      </IconButton>
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+        <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+          <MoreVert />
+        </IconButton>
+      </Can>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

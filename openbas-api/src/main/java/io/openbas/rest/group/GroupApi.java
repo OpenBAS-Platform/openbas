@@ -1,12 +1,11 @@
 package io.openbas.rest.group;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -31,11 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
 public class GroupApi extends RestBehavior {
 
   private ExerciseRepository exerciseRepository;
@@ -82,11 +79,13 @@ public class GroupApi extends RestBehavior {
   }
 
   @GetMapping("/api/groups")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.USER_GROUP)
   public Iterable<Group> groups() {
     return groupRepository.findAll();
   }
 
   @PostMapping("/api/groups/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.USER_GROUP)
   public Page<Group> users(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<Group> specification, Pageable pageable) ->
@@ -96,12 +95,16 @@ public class GroupApi extends RestBehavior {
   }
 
   @GetMapping("/api/groups/{groupId}")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.USER_GROUP)
   public Group group(@PathVariable String groupId) {
     return groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group createGroup(@Valid @RequestBody GroupCreateInput input) {
     Group group = new Group();
@@ -111,8 +114,11 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/users")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group updateGroupUsers(
       @PathVariable String groupId, @Valid @RequestBody GroupUpdateUsersInput input) {
@@ -136,8 +142,11 @@ public class GroupApi extends RestBehavior {
     return savedGroup;
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/roles")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Operation(
       description = "Update roles associated to a group",
       summary = "Update roles associated to a group")
@@ -154,19 +163,24 @@ public class GroupApi extends RestBehavior {
             .findById(groupId)
             .orElseThrow(() -> new ElementNotFoundException("Group not found with id: " + groupId));
 
-    input.getRoleIds().stream()
-        .map(
-            id ->
-                roleService
-                    .findById(id)
-                    .orElseThrow(
-                        () -> new ElementNotFoundException("Role not found with id: " + id)))
-        .forEach(group.getRoles()::add);
+    group.setRoles(
+        input.getRoleIds().stream()
+            .map(
+                id ->
+                    roleService
+                        .findById(id)
+                        .orElseThrow(
+                            () -> new ElementNotFoundException("Role not found with id: " + id)))
+            .collect(toList()));
+
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/groups/{groupId}/information")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group updateGroupInformation(
       @PathVariable String groupId, @Valid @RequestBody GroupCreateInput input) {
@@ -177,8 +191,11 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/grants")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
     if (input.getExerciseId() == null && input.getScenarioId() == null) {
@@ -227,8 +244,11 @@ public class GroupApi extends RestBehavior {
     return savedGrant;
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/groups/{groupId}/organizations")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public Group groupOrganization(
       @PathVariable String groupId, @Valid @RequestBody OrganizationGrantInput input) {
@@ -242,8 +262,11 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/groups/{groupId}/organizations/{organizationId}")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   public Group deleteGroupOrganization(
       @PathVariable String groupId, @PathVariable String organizationId) {
     Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
@@ -253,15 +276,21 @@ public class GroupApi extends RestBehavior {
     return groupRepository.save(group);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/grants/{grantId}")
+  @RBAC(
+      resourceId = "#grantId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public void deleteGrant(@PathVariable String grantId) {
     grantRepository.deleteById(grantId);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/groups/{groupId}")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
   public void deleteGroup(@PathVariable String groupId) {
     groupRepository.deleteById(groupId);

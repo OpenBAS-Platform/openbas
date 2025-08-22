@@ -8,6 +8,7 @@ export const entitiesInitializer = Map({
     files: Map({}),
     users: Map({}),
     groups: Map({}),
+    roles: Map({}),
     grants: Map({}),
     organizations: Map({}),
     tokens: Map({}),

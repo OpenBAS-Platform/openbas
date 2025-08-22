@@ -17,6 +17,8 @@ import { type Organization } from '../../../utils/api-types';
 import { exportData } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { truncate } from '../../../utils/String';
 import TagsFilter from '../common/filters/TagsFilter';
@@ -81,15 +83,13 @@ const Organizations = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { organizations, tagsMap, userAdmin }: {
+  const { organizations, tagsMap }: {
     organizations: ReturnType<OrganizationHelper['getOrganizations']>;
     tagsMap: ReturnType<TagHelper['getTagsMap']>;
-    userAdmin: ReturnType<UserHelper['getMeAdmin']>;
   }
     = useHelper((helper: UserHelper & TagHelper & OrganizationHelper) => ({
       organizations: helper.getOrganizations(),
       tagsMap: helper.getTagsMap(),
-      userAdmin: helper.getMeAdmin(),
     }));
 
   useDataLoader(() => {
@@ -254,7 +254,10 @@ const Organizations = () => {
           </ListItem>
         ))}
       </List>
-      {userAdmin && <CreateOrganization />}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+        <CreateOrganization />
+      </Can>
+
     </>
   );
 };

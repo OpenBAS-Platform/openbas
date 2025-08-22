@@ -6,6 +6,7 @@ import io.openbas.database.raw.RawScenario;
 import io.openbas.utils.Constants;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -157,4 +158,6 @@ public interface ScenarioRepository
   @Transactional
   void removeTeams(
       @Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
+
+  Optional<Scenario> findByExercises_Id(String exerciseId);
 }

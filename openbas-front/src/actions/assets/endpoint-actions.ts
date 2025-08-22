@@ -69,3 +69,17 @@ export const searchEndpointLinkedToFindingsAsOption = (searchText: string = '', 
 export const importEndpoints = (file: FormData, targetType: string) => {
   return simplePostCall(`/api/mappers/import/csv?targetType=` + targetType, file);
 };
+
+// -- SIMULATIONS --
+
+export const fetchSimulationEndpoints = (simulationId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/exercises/${simulationId}/endpoints`;
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
+};
+
+// -- SCENARIOS --
+
+export const fetchScenarioEndpoints = (scenarioId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/scenarios/${scenarioId}/endpoints`;
+  return getReferential(arrayOfEndpoints, uri)(dispatch);
+};

@@ -1,11 +1,13 @@
 package io.openbas.rest.injector_contract;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.raw.RawInjectorsContrats;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector_contract.form.InjectorContractAddInput;
@@ -16,7 +18,6 @@ import io.openbas.rest.injector_contract.output.InjectorContractBaseOutput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -30,11 +31,13 @@ public class InjectorContractApi extends RestBehavior {
   private final InjectorContractService injectorContractService;
 
   @GetMapping(INJECTOR_CONTRACT_URL)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.INJECTOR_CONTRACT)
   public Iterable<RawInjectorsContrats> injectContracts() {
     return injectorContractService.getAllRawInjectContracts();
   }
 
   @PostMapping(INJECTOR_CONTRACT_URL + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.INJECTOR_CONTRACT)
   public Page<? extends InjectorContractBaseOutput> injectorContracts(
       @RequestBody @Valid final InjectorContractSearchPaginationInput input) {
     if (input.isIncludeFullDetails()) {
@@ -50,37 +53,49 @@ public class InjectorContractApi extends RestBehavior {
     }
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
+  @RBAC(
+      resourceId = "#injectorContractId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract injectorContract(@PathVariable String injectorContractId) {
     return injectorContractService.getSingleInjectorContract(injectorContractId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECTOR_CONTRACT_URL)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract createInjectorContract(
       @Valid @RequestBody InjectorContractAddInput input) {
     return injectorContractService.createNewInjectorContract(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
+  @RBAC(
+      resourceId = "#injectorContractId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract updateInjectorContract(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateInput input) {
     return injectorContractService.updateInjectorContract(injectorContractId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}/mapping")
+  @RBAC(
+      resourceId = "#injectorContractId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public InjectorContract updateInjectorContractMapping(
       @PathVariable String injectorContractId,
       @Valid @RequestBody InjectorContractUpdateMappingInput input) {
     return injectorContractService.updateAttackPatternMappings(injectorContractId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(INJECTOR_CONTRACT_URL + "/{injectorContractId}")
+  @RBAC(
+      resourceId = "#injectorContractId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.INJECTOR_CONTRACT)
   public void deleteInjectorContract(@PathVariable String injectorContractId) {
     this.injectorContractService.deleteInjectorContract(injectorContractId);
   }

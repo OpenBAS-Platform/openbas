@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../../../actions/Application';
-import { fetchScenarioObserverChallenges } from '../../../../../actions/Challenge';
+import { fetchScenarioObserverChallenges } from '../../../../../actions/challenge-action';
 import { fetchScenarioPlayerDocuments } from '../../../../../actions/Document';
 import { type ScenarioChallengesReaderHelper } from '../../../../../actions/helper';
 import { fetchScenario } from '../../../../../actions/scenarios/scenario-actions';

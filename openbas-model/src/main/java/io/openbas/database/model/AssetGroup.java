@@ -130,6 +130,10 @@ public class AssetGroup implements Base {
   @UpdateTimestamp
   private Instant updatedAt = now();
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.ASSET_GROUP;
+
   @Override
   public int hashCode() {
     return Objects.hash(id);

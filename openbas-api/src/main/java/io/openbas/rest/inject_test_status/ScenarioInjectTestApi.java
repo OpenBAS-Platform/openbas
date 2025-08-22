@@ -4,7 +4,11 @@ import static io.openbas.database.specification.InjectSpecification.testable;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.Grant;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
@@ -19,7 +23,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +35,10 @@ public class ScenarioInjectTestApi extends RestBehavior {
   private final InjectService injectService;
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
       @PathVariable @NotBlank String scenarioId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -41,13 +48,17 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(SCENARIO_URI + "/injects/test/{testId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SCENARIO)
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SCENARIO)
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank final String scenarioId, @PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
@@ -55,7 +66,10 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/injects/test/{testId}")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   public void deleteInjectTest(
       @PathVariable @NotBlank final String scenarioId, @PathVariable String testId) {
     injectTestStatusService.deleteInjectTest(testId);
@@ -66,13 +80,19 @@ public class ScenarioInjectTestApi extends RestBehavior {
       tags = {"Injects", "Tests"})
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/test")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SCENARIO)
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
+    if (!scenarioId.equals(input.getSimulationOrScenarioId())) {
+      throw new BadRequestException("Provided scenario ID does not match the input scenario ID");
+    }
     if (CollectionUtils.isEmpty(input.getInjectIDsToProcess())
         && input.getSearchPaginationInput() == null) {
       throw new BadRequestException(
@@ -81,7 +101,7 @@ public class ScenarioInjectTestApi extends RestBehavior {
 
     // Specification building
     Specification<Inject> filterSpecifications =
-        this.injectService.getInjectSpecification(input).and(testable());
+        this.injectService.getInjectSpecification(input, Grant.GRANT_TYPE.LAUNCHER).and(testable());
 
     // Services calls
     // Bulk test

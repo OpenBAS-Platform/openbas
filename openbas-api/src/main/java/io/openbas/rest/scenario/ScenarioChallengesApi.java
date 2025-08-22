@@ -3,6 +3,7 @@ package io.openbas.rest.scenario;
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.helper.StreamHelper.fromIterable;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
@@ -37,6 +38,10 @@ public class ScenarioChallengesApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/scenarios/{scenarioId}/documents")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public List<Document> playerDocuments(
       @PathVariable String scenarioId, @RequestParam Optional<String> userId) {
     Optional<Scenario> scenarioOpt = this.scenarioRepository.findById(scenarioId);
@@ -56,6 +61,10 @@ public class ScenarioChallengesApi extends RestBehavior {
   }
 
   @GetMapping("/api/observer/scenarios/{scenarioId}/challenges")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public ScenarioChallengesReader observerChallenges(@PathVariable String scenarioId) {
     Scenario scenario =
         scenarioRepository.findById(scenarioId).orElseThrow(ElementNotFoundException::new);
