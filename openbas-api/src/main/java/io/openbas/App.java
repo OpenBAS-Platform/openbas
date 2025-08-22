@@ -41,19 +41,23 @@ public class App {
             .findByKey(PLATFORM_INSTANCE_CREATION.key())
             .orElse(new Setting(PLATFORM_INSTANCE_CREATION.key(), ""));
 
+    String platformId;
+
     // If we don't have a platform instance id or if it's been specified as another value than the
     // one in the database
     if (instanceId.isEmpty()
-        || (openBASConfig.getInstanceId() != null
+        || (!Strings.isBlank(openBASConfig.getInstanceId())
             && !instanceId.get().getValue().equals(openBASConfig.getInstanceId()))) {
       log.info("Updating platform instance id");
       // We update the platform instance id using a random UUID if the value does not exist in the
       // database
+      platformId = UUID.randomUUID().toString();
       Setting instanceIdSetting =
-          instanceId.orElse(new Setting(PLATFORM_INSTANCE.key(), UUID.randomUUID().toString()));
+          instanceId.orElse(new Setting(PLATFORM_INSTANCE.key(), platformId));
 
       // If it's been specified as a specific id, we validate that it's a proper UUID and use it
       if (!Strings.isBlank(openBASConfig.getInstanceId())) {
+        platformId = openBASConfig.getInstanceId();
         instanceIdSetting.setValue(UUID.fromString(openBASConfig.getInstanceId()).toString());
       }
 
@@ -61,6 +65,9 @@ public class App {
       settingRepository.save(instanceIdSetting);
       instanceCreationDate.setValue(Timestamp.from(Instant.now()).toString());
       settingRepository.save(instanceCreationDate);
+    } else {
+      platformId = instanceId.get().getValue();
     }
+    log.info("Startup of the platform - Platform Instance ID: {}", platformId);
   }
 }

@@ -62,7 +62,7 @@ public class OpenBASConfig {
   private String enabledDevFeatures = "";
 
   @JsonProperty("instance_id")
-  private String instanceId = null;
+  private String instanceId;
 
   @JsonIgnore private String cookieName = "openbas_token";
 
