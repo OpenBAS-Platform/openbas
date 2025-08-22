@@ -52,8 +52,7 @@ public class StixService {
     // be at most a single security assessment in any bundle
     // therefore guard this assumption with an error
     if (assessments.size() != 1) {
-      throw new ParsingException(
-          "STIX bundle must contain exactly one x-security-assessment.");
+      throw new ParsingException("STIX bundle must contain exactly one x-security-assessment.");
     }
 
     for (ObjectBase obj : assessments) {
@@ -69,8 +68,8 @@ public class StixService {
       // Create Scenario using SecurityAssessment
       scenario = createScenarioFromSecurityAssessment(scenario, savedSecurity);
       scenario
-              .getTags()
-              .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
+          .getTags()
+          .add(tagRepository.findByName("opencti").get()); // TODO Set tags based in labels
 
       // Creation injects based attack patterns from stix
       createdInjectsForScenario(securityAssessment, scenario);
