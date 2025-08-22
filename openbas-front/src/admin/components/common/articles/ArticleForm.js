@@ -1,7 +1,7 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined } from '@mui/icons-material';
 import { Box, Button, GridLegacy, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import * as R from 'ramda';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
@@ -15,6 +15,9 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import RestrictionAccess from '../../../../utils/permissions/RestrictionAccess.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import ChannelIcon from '../../components/channels/ChannelIcon';
 import DocumentPopover from '../../components/documents/DocumentPopover';
 import DocumentType from '../../components/documents/DocumentType';
@@ -110,6 +113,8 @@ const ArticleForm = ({
   const { t } = useFormatter();
   const { classes } = useStyles();
   const dispatch = useDispatch();
+  const ability = useContext(AbilityContext);
+
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const [documents, setDocuments] = useState(documentsIds || []);
@@ -132,8 +137,12 @@ const ArticleForm = ({
     }),
   );
   useDataLoader(() => {
-    dispatch(fetchChannels());
-    dispatch(fetchDocuments());
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.CHANNELS)) {
+      dispatch(fetchChannels());
+    }
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
+      dispatch(fetchDocuments());
+    }
   });
   const handleAddDocuments = docsIds => setDocuments([...documents, ...docsIds]);
   const handleRemoveDocument = docId => setDocuments(documents.filter(n => n !== docId));
@@ -212,6 +221,9 @@ const ArticleForm = ({
             <Typography variant="h2" style={{ marginTop: 0 }}>
               {t('Information')}
             </Typography>
+            <Can not I={ACTIONS.ACCESS} a={SUBJECTS.CHANNELS}>
+              <RestrictionAccess restrictedField="channels" />
+            </Can>
             <Autocomplete
               size="small"
               name="article_channel"
@@ -365,11 +377,13 @@ const ArticleForm = ({
                 );
               })}
               {values.article_channel?.type && (
-                <ArticleAddDocuments
-                  articleDocumentsIds={documents}
-                  handleAddDocuments={handleAddDocuments}
-                  channelType={values.article_channel.type}
-                />
+                <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}>
+                  <ArticleAddDocuments
+                    articleDocumentsIds={documents}
+                    handleAddDocuments={handleAddDocuments}
+                    channelType={values.article_channel.type}
+                  />
+                </Can>
               )}
             </List>
             <div style={{

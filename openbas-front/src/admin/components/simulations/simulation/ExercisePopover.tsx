@@ -124,7 +124,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
-    disabled: !permissions.canWriteBypassStatus,
+    disabled: !permissions.canManageBypassStatus,
     userRight: true, // TODO: update while casl will be implemented on this page
   });
   if (actions.includes('Duplicate')) entries.push({

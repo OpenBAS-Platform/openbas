@@ -23,6 +23,8 @@ import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ImportFromHubButton from '../common/ImportFromHubButton';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
@@ -270,12 +272,14 @@ const Scenarios = () => {
               })
         }
       </List>
-      <ScenarioCreation
-        onCreate={(result: Scenario) => {
-          setScenarios([result, ...scenarios]);
-          fetchStatistics();
-        }}
-      />
+      <Can I={ACTIONS.CREATE} a={SUBJECTS.ASSESSMENT}>
+        <ScenarioCreation
+          onCreate={(result: Scenario) => {
+            setScenarios([result, ...scenarios]);
+            fetchStatistics();
+          }}
+        />
+      </Can>
     </>
   );
 };

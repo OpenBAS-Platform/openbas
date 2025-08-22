@@ -41,10 +41,10 @@ const SimulationReportPage: FunctionComponent = () => {
     : [];
 
   const permissions = usePermissions(exerciseId);
-  const [canEditReport, setCanEditReport] = useState(permissions.canWrite);
+  const [canEditReport, setCanEditReport] = useState(permissions.canManage);
   useEffect(() => {
-    setCanEditReport(permissions.canWrite);
-  }, [permissions.canWrite]);
+    setCanEditReport(permissions.canManage);
+  }, [permissions.canManage]);
 
   // Context
   const context: ReportContextType = {
@@ -106,7 +106,7 @@ const SimulationReportPage: FunctionComponent = () => {
               t,
             })}
           />
-          {permissions.canWrite && <ReportPopover variant="toggle" report={report} actions={['Update']} />}
+          {permissions.canManage && <ReportPopover variant="toggle" report={report} actions={['Update']} />}
         </ToggleButtonGroup>
       </div>
 

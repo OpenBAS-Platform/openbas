@@ -97,7 +97,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Media pressure')}
       </Typography>
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <CreateArticle
           openCreate={openCreate}
           handleOpenCreate={handleOpenCreate}
@@ -117,16 +117,19 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
             <div style={{ fontSize: 18 }}>
               {t('No media pressure article available in this simulation yet.')}
             </div>
-            <Button
-              style={{ marginTop: 20 }}
-              startIcon={<NewspaperOutlined />}
-              variant="outlined"
-              color="primary"
-              size="small"
-              onClick={handleOpenCreate}
-            >
-              {t('Create an article')}
-            </Button>
+            {permissions.canManage
+              && (
+                <Button
+                  style={{ marginTop: 20 }}
+                  startIcon={<NewspaperOutlined />}
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  onClick={handleOpenCreate}
+                >
+                  {t('Create an article')}
+                </Button>
+              )}
           </div>
         )}
         />

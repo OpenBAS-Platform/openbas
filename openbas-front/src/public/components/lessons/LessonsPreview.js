@@ -71,7 +71,7 @@ const LessonsPreview = (props) => {
   if (source) {
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && source.isPlayerViewAvailable && (
+        {permissions.isLoggedIn && permissions.canAccess && source.isPlayerViewAvailable && (
           <Button
             color="secondary"
             variant="outlined"
@@ -86,7 +86,7 @@ const LessonsPreview = (props) => {
             {t('Switch to player mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

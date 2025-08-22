@@ -161,7 +161,7 @@ const ArticleAddDocuments = (props) => {
           divider
           onClick={handleOpen}
           color="primary"
-          disabled={!permissions.canWrite}
+          disabled={!permissions.canManage}
         >
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
