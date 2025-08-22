@@ -1,5 +1,7 @@
 package io.openbas.database.raw;
 
+import io.openbas.database.model.Grant;
+
 public interface RawGrant {
   String getGrant_id();
 
@@ -9,5 +11,5 @@ public interface RawGrant {
 
   String getGrant_resource();
 
-  String getGrant_resource_type();
+  Grant.GRANT_RESOURCE_TYPE getGrant_resource_type();
 }

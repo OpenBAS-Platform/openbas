@@ -170,7 +170,8 @@ class GroupPopover extends Component {
   handleGrantScenarioCheck(scenarioId, grantId, grantName, event) {
     const data = {
       grant_name: grantName,
-      grant_scenario: scenarioId,
+      grant_resource: scenarioId,
+      grant_resource_type: 'SCENARIO',
     };
     this.handleGrantCheck(data, grantId, event);
   }
@@ -178,7 +179,8 @@ class GroupPopover extends Component {
   handleGrantExerciseCheck(exerciseId, grantId, grantName, event) {
     const data = {
       grant_name: grantName,
-      grant_exercise: exerciseId,
+      grant_resource: exerciseId,
+      grant_resource_type: 'SIMULATION',
     };
     this.handleGrantCheck(data, grantId, event);
   }
@@ -350,15 +352,21 @@ class GroupPopover extends Component {
                 <TableBody>
                   {this.props.scenarios.map((scenario) => {
                     const grantPlanner = R.find(
-                      g => g.grant_scenario === scenario.scenario_id
+                      g =>
+                        g.grant_resource === scenario.scenario_id
+                        && g.grant_resource_type === 'SCENARIO'
                         && g.grant_name === 'PLANNER',
                     )(group.group_grants);
                     const grantObserver = R.find(
-                      g => g.grant_scenario === scenario.scenario_id
+                      g =>
+                        g.grant_resource === scenario.scenario_id
+                        && g.grant_resource_type === 'SCENARIO'
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantLauncher = R.find(
-                      g => g.grant_scenario === scenario.scenario_id
+                      g =>
+                        g.grant_resource === scenario.scenario_id
+                        && g.grant_resource_type === 'SCENARIO'
                         && g.grant_name === 'LAUNCHER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
@@ -462,15 +470,21 @@ class GroupPopover extends Component {
                 <TableBody displayRowCheckbox={false}>
                   {this.props.exercises.map((exercise) => {
                     const grantPlanner = R.find(
-                      g => g.grant_exercise === exercise.exercise_id
+                      g =>
+                        g.grant_resource === exercise.exercise_id
+                        && g.grant_resource_type === 'SIMULATION'
                         && g.grant_name === 'PLANNER',
                     )(group.group_grants);
                     const grantObserver = R.find(
-                      g => g.grant_exercise === exercise.exercise_id
+                      g =>
+                        g.grant_resource === exercise.exercise_id
+                        && g.grant_resource_type === 'SIMULATION'
                         && g.grant_name === 'OBSERVER',
                     )(group.group_grants);
                     const grantLauncher = R.find(
-                      g => g.grant_exercise === exercise.exercise_id
+                      g =>
+                        g.grant_resource === exercise.exercise_id
+                        && g.grant_resource_type === 'SIMULATION'
                         && g.grant_name === 'LAUNCHER',
                     )(group.group_grants);
                     const grantPlannerId = R.propOr(
