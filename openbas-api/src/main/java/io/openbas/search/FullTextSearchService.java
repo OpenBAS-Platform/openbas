@@ -4,8 +4,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static io.openbas.utils.pagination.SortUtilsRuntime.toSortRuntime;
 import static org.springframework.util.StringUtils.hasText;
 
-import io.openbas.config.OpenBASPrincipal;
-import io.openbas.config.SessionHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.SpecificationUtils;
@@ -260,24 +258,17 @@ public class FullTextSearchService<T extends Base> {
     Map<Class<T>, FullTextSearchCountResult> results = new HashMap<>();
     String finalSearchTerm = getFinalSearchTerm(searchTerm);
 
-    OpenBASPrincipal principal = SessionHelper.currentUser();
-
+    User currentUser = userService.currentUser();
     // Only search classes that the user has access to
     Set<Class<T>> classesToSearch;
-    if (principal.isAdmin()) {
+    if (currentUser.isAdminOrBypass()) {
       classesToSearch = new HashSet<>(repositoryMap.keySet());
     } else {
-      User u =
-          userRepository
-              .findById(principal.getId())
-              .orElseThrow(
-                  () -> new IllegalArgumentException("User not found: " + principal.getId()));
 
       classesToSearch = new HashSet<>();
       for (Map.Entry<Class<T>, Optional<Capability>> entry : capaByClassMap.entrySet()) {
         Capability capaForClass = entry.getValue().orElse(Capability.BYPASS);
-        if (u.getCapabilities().contains(Capability.BYPASS)
-            || u.getCapabilities().contains(capaForClass)
+        if (currentUser.getCapabilities().contains(capaForClass)
             || Capability.BYPASS.equals(capaForClass)) {
           classesToSearch.add(entry.getKey());
         }
@@ -293,7 +284,12 @@ public class FullTextSearchService<T extends Base> {
                       finalSearchTerm, searchListByClassMap.get(tClass))
                   .and(
                       SpecificationUtils.hasGrantAccess(
-                          principal.getId(), principal.isAdmin(), Grant.GRANT_TYPE.OBSERVER));
+                          currentUser.getId(),
+                          currentUser.isAdminOrBypass(),
+                          currentUser
+                              .getCapabilities()
+                              .contains(capaByClassMap.get(tClass).orElse(Capability.BYPASS)),
+                          Grant.GRANT_TYPE.OBSERVER));
           long count = repository.count(specs);
           results.put(tClass, new FullTextSearchCountResult(tClass.getSimpleName(), count));
         });
