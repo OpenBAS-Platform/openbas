@@ -1782,6 +1782,8 @@ export interface EsInjectExpectation {
   base_inject_side?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_security_platforms_side?: string[];
   base_simulation_side?: string;
   base_team_side?: string;
   /** @format date-time */

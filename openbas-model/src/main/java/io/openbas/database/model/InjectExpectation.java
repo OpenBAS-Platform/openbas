@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Getter
@@ -114,12 +116,14 @@ public class InjectExpectation implements Base {
   @Setter
   @Column(name = "inject_expectation_created_at")
   @JsonProperty("inject_expectation_created_at")
+  @CreationTimestamp
   private Instant createdAt = now();
 
   @Queryable(filterable = true, label = "updated at")
   @Setter
   @Column(name = "inject_expectation_updated_at")
   @JsonProperty("inject_expectation_updated_at")
+  @UpdateTimestamp
   private Instant updatedAt = now();
 
   @Setter
