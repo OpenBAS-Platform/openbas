@@ -91,6 +91,7 @@ public class Grant implements Base {
   @Enumerated(EnumType.STRING)
   @Column(name = "grant_resource_type")
   @JsonProperty("grant_resource_type")
+  @Schema(type = "string")
   private GRANT_RESOURCE_TYPE grantResourceType = GRANT_RESOURCE_TYPE.UNKNOWN;
 
   @Override
