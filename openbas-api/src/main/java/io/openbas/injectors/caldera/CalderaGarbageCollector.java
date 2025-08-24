@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
-@ConditionalOnProperty(prefix = "executor.caldera", name = "enable")
+@ConditionalOnProperty(prefix = "injector.caldera", name = "enable")
 @RequiredArgsConstructor
 @Service
 public class CalderaGarbageCollector {
