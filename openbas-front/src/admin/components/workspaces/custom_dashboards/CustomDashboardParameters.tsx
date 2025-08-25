@@ -10,36 +10,46 @@ const CustomDashboardParameters: FunctionComponent = () => {
   const theme = useTheme();
   const { customDashboard, customDashboardParameters, setCustomDashboardParameters } = useContext(CustomDashboardContext);
 
-  const getParameterValue = (parameterId: string) => {
+  const getParameter = (parameterId: string) => {
     if (!customDashboard) return undefined;
     return customDashboardParameters[parameterId];
   };
-  const handleParameters = (parameterId: string, value: string) => {
+  const handleParametersValue = (parameterId: string, value: string) => {
     if (!customDashboard) return;
-    setCustomDashboardParameters(prev => ({
-      ...prev,
-      [parameterId]: value,
-    }));
+    setCustomDashboardParameters((prev) => {
+      return {
+        ...prev,
+        [parameterId]: {
+          ...prev[parameterId],
+          value,
+        },
+      };
+    });
   };
 
   const renderParameterField = (p: CustomDashboardParametersType) => {
+    const param = getParameter(p.custom_dashboards_parameter_id);
+    if (param?.hidden) {
+      return null;
+    }
     switch (p.custom_dashboards_parameter_type) {
       case 'scenario':
         return (
           <ScenarioField
             label={p.custom_dashboards_parameter_name}
-            value={getParameterValue(p.custom_dashboards_parameter_id)}
+            value={param?.value}
             onChange={(value: string | undefined) =>
-              handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
+              handleParametersValue(p.custom_dashboards_parameter_id, value ?? '')}
           />
         );
       case 'simulation':
         return (
           <SimulationField
             label={p.custom_dashboards_parameter_name}
-            value={getParameterValue(p.custom_dashboards_parameter_id)}
+            value={param?.value}
             onChange={(value: string | undefined) =>
-              handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
+              handleParametersValue(p.custom_dashboards_parameter_id, value ?? '')}
+            searchOptionsConfig={param?.searchOptionsConfig}
           />
         );
       default:

@@ -36,7 +36,7 @@ const CustomDashboardFieldController = <T extends FieldValues>({
 
   const { options, searchOptions } = useSearchOptions();
   useEffect(() => {
-    searchOptions(CUSTOM_DASHBOARD, '');
+    searchOptions({ filterKey: CUSTOM_DASHBOARD }, '');
   }, []);
 
   const values = (fieldValue: string) => {
@@ -59,7 +59,7 @@ const CustomDashboardFieldController = <T extends FieldValues>({
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onInputChange={(_, search, reason) => {
             if (reason === 'input') {
-              searchOptions(CUSTOM_DASHBOARD, search);
+              searchOptions({ filterKey: CUSTOM_DASHBOARD }, search);
             }
           }}
           onChange={(_, value) => {

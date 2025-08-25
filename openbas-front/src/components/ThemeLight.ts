@@ -11,7 +11,7 @@ const EE_COLOR = '#0c7e69';
 export const THEME_LIGHT_DEFAULT_BACKGROUND = '#f8f8f8';
 const THEME_LIGHT_DEFAULT_PRIMARY = '#001bda';
 const THEME_LIGHT_DEFAULT_SECONDARY = '#0c7e69';
-const THEME_LIGHT_DEFAULT_ACCENT = '#eeeeee';
+const THEME_LIGHT_DEFAULT_ACCENT = '#dfdfdf';
 const THEME_LIGHT_DEFAULT_PAPER = '#ffffff';
 const THEME_LIGHT_DEFAULT_NAV = '#ffffff';
 
@@ -125,6 +125,11 @@ const ThemeLight = (
       fontSize: 18,
       color: primary || THEME_LIGHT_DEFAULT_PRIMARY,
       fontFamily: '"Geologica", sans-serif',
+    },
+    subtitle2: {
+      fontWeight: 400,
+      fontSize: 18,
+      color: 'rgba(0, 0, 0, 0.87)',
     },
   },
   components: {

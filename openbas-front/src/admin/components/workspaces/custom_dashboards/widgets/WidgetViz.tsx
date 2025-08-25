@@ -36,13 +36,15 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T }>,
     setData: React.Dispatch<React.SetStateAction<T>>,
   ) => {
-    fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {
+    const params: Record<string, string> = Object.fromEntries(
+      Object.entries(customDashboardParameters).map(([key, val]) => [key, val.value]),
+    );
+    fetchFunction(widget.widget_id, params).then((response) => {
       if (response.data || typeof response.data === 'number') {
         setData(response.data);
       }
     }).finally(() => setLoading(false));
   };
-
   useEffect(() => {
     setLoading(true);
     switch (widget.widget_type) {

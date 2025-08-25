@@ -17,6 +17,8 @@ import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
 import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
 
+interface RetrieveOptionsConfig { defaultValues?: GroupOption[] | undefined }
+
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
 
@@ -31,8 +33,8 @@ const useRetrieveOptions = () => {
     }
   };
 
-  const searchOptions = (filterKey: string, ids: string[], defaultValues: GroupOption[] = []) => {
-    const filterDefaultValues = defaultValues.filter(v => ids.includes(v.id));
+  const searchOptions = (filterKey: string, ids: string[], config: RetrieveOptionsConfig) => {
+    const filterDefaultValues = (config.defaultValues ?? []).filter(v => ids.includes(v.id));
     switch (filterKey) {
       case SIMULATIONS:
       case 'base_simulation_side':
