@@ -6,7 +6,7 @@ import { type AttackPattern, type AttackPatternSimple } from '../utils/api-types
 const useStyles = makeStyles()(theme => ({
   chip: {
     fontSize: 12,
-    height: 20,
+    height: 18,
     marginRight: theme.spacing(1),
     textTransform: 'uppercase',
     borderRadius: 4,
