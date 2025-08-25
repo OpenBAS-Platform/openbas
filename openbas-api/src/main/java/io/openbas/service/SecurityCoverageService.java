@@ -54,7 +54,7 @@ public class SecurityCoverageService {
 
     // create the main coverage object
     SecurityAssessment assessment = exercise.getSecurityAssessment();
-    DomainObject coverage = (DomainObject) stixParser.parseObject(assessment.getRawStix());
+    DomainObject coverage = (DomainObject) stixParser.parseObject(assessment.getContent());
     coverage.setProperty(CommonProperties.MODIFIED.toString(), new Timestamp(Instant.now()));
     coverage.setProperty("coverage", getOverallCoverage(exercise));
     objects.add(coverage);

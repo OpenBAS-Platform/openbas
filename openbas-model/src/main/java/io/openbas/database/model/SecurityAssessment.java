@@ -67,6 +67,11 @@ public class SecurityAssessment implements Base {
   private List<StixRefToExternalRef> attackPatternRefs;
 
   @Type(JsonType.class)
+  @Column(name = "security_assessment_content", columnDefinition = "jsonb", nullable = false)
+  @JsonProperty("security_assessment_content")
+  private String content;
+
+  @Type(JsonType.class)
   @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_vulnerabilities_refs")
   private List<StixRefToExternalRef> vulnerabilitiesRefs;
@@ -75,11 +80,6 @@ public class SecurityAssessment implements Base {
   @JoinColumn(name = "security_assessment_scenario")
   @JsonIgnore
   private Scenario scenario;
-
-  @Type(JsonType.class)
-  @Column(name = "security_assessment_raw_stix", columnDefinition = "jsonb")
-  @JsonProperty("security_assessment_raw_stix")
-  private String rawStix;
 
   @CreationTimestamp
   @Column(name = "security_assessment_created_at", updatable = false)

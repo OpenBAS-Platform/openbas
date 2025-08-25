@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(StixApi.STIX_API)
+@RequestMapping(StixApi.STIX_URI)
 @Tag(name = "STIX API", description = "Operations related to STIX bundles")
 public class StixApi extends RestBehavior {
 
-  public static final String STIX_API = "/api/stix";
+  public static final String STIX_URI = "/api/stix";
 
   private final StixService stixService;
 
@@ -45,9 +45,9 @@ public class StixApi extends RestBehavior {
     @ApiResponse(responseCode = "500", description = "Unexpected server error")
   })
   @Transactional(rollbackFor = Exception.class)
-  public ResponseEntity<List<String>> processBundle(@RequestBody String stixJson) {
+  public ResponseEntity<String> processBundle(@RequestBody String stixJson) {
     try {
-      List<String> createdScenario = stixService.processBundle(stixJson);
+      String createdScenario = stixService.processBundle(stixJson);
       return ResponseEntity.ok(createdScenario);
     } catch (ParsingException | IOException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
