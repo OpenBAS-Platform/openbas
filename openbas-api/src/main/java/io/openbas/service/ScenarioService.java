@@ -1,21 +1,5 @@
 package io.openbas.service;
 
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
-import static io.openbas.database.specification.TeamSpecification.fromIds;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
-import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.StringUtils.duplicateString;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-import static org.springframework.util.StringUtils.hasText;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -51,15 +35,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -76,6 +51,32 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
+import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
+import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
+import static io.openbas.utils.Constants.ARTICLES;
+import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+import static org.springframework.util.StringUtils.hasText;
 
 @RequiredArgsConstructor
 @Service
@@ -887,8 +888,10 @@ public class ScenarioService {
 
   public Scenario getOrCreateScenarioFromSecurityAssessment(SecurityAssessment sa) {
     if (sa.getScenario() != null) {
-      return scenarioRepository.findById(sa.getScenario().getId()).orElseGet(Scenario::new);
+      return scenarioRepository
+          .findById(sa.getScenario().getId())
+          .orElseGet(() -> createScenario(new Scenario()));
     }
-    return new Scenario();
+    return createScenario(new Scenario());
   }
 }
