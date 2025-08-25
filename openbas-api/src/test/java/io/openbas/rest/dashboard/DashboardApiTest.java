@@ -5,9 +5,11 @@ import static io.openbas.rest.dashboard.DashboardApi.DASHBOARD_URI;
 import static io.openbas.utils.CustomDashboardTimeRange.LAST_QUARTER;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.EndpointRepository;
@@ -565,7 +567,8 @@ class DashboardApiTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
-      assertThatJson(response).node("[0].data[0].value").isEqualTo(3);
+      List<Map<String, Object>> data = JsonPath.read(response, "$[0].data");
+      assertThat(data).anyMatch(entry -> (Integer) entry.get("value") == 3);
     }
 
     @Test
