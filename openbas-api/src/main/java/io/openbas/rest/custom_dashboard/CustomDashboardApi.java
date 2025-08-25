@@ -9,6 +9,9 @@ import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -99,5 +102,18 @@ public class CustomDashboardApi extends RestBehavior {
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.DASHBOARD)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return this.customDashboardService.findAllByIdsAsOptions(ids);
+  }
+
+  @GetMapping("/resource/{resourceId}/options")
+  @RBAC(
+      resourceId = "#resourceId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION_OR_SCENARIO)
+  @Operation(summary = "Get the dashboard used in a resource")
+  @ApiResponses(
+      value = {@ApiResponse(responseCode = "200", description = "Dashboard used in the resource")})
+  public List<FilterUtilsJpa.Option> optionsByResourceId(
+      @PathVariable @NotBlank final String resourceId) {
+    return this.customDashboardService.findAllByResourceIdsAsOptions(resourceId);
   }
 }

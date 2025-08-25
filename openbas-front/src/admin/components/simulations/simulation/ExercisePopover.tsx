@@ -202,6 +202,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           disabled={permissions.readOnly}
           handleClose={handleCloseEdit}
           edit
+          simulationId={exercise.exercise_id}
         />
 
       </Drawer>
