@@ -233,7 +233,6 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
           </>
         )}
         {selectedPayload?.payload_type === 'FileDrop' && (
-          <>
             <div>
               <Typography
                 variant="h3"
@@ -242,10 +241,6 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
                 {t('File to drop')}
               </Typography>
 
-              <Typography
-                variant="body2"
-                gutterBottom
-              >
                 <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
                 <div className={classes.bodyItem} style={inlineStyles.document_name}>
                   {documentsMap[selectedPayload.file_drop_file]?.document_name}
@@ -254,12 +249,9 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
                   <DocumentType type={documentsMap[selectedPayload.file_drop_file]?.document_type} variant="list" />
                 </div>
 
-              </Typography>
             </div>
-          </>
         )}
         {selectedPayload?.payload_type === 'DnsResolution' && (
-          <>
             <div>
               <Typography
                 variant="h3"
@@ -272,13 +264,29 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
                 variant="body2"
                 gutterBottom
               >
-                <div>
                   {selectedPayload.dns_resolution_hostname}
-                </div>
 
               </Typography>
             </div>
-          </>
+        )}
+        {selectedPayload?.payload_type === 'Executable' && (
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Executable File')}
+            </Typography>
+
+            <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
+            <div className={classes.bodyItem} style={inlineStyles.document_name}>
+              {documentsMap[selectedPayload.executable_file]?.document_name}
+            </div>
+            <div className={classes.bodyItem} style={inlineStyles.document_type}>
+              <DocumentType type={documentsMap[selectedPayload.executable_file]?.document_type} variant="list" />
+            </div>
+
+          </div>
         )}
         <div>
           <Typography
@@ -413,7 +421,6 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
 
         </div>
       </div>
-
     </>
   );
 };
