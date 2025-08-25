@@ -19,7 +19,7 @@ public class SecurityCoverageSendJobService {
   private final ExerciseService exerciseService;
   private final EntityManager entityManager;
 
-  public void createOrUpdateJobsForSimulation(Set<Exercise> exercises) {
+  public void createOrUpdateJobsForSimulation(List<Exercise> exercises) {
     Set<Exercise> toSend = this.filterFullyAssessedSimulations(exercises);
     List<SecurityCoverageSendJob> jobs = new ArrayList<>();
     for (Exercise exercise : toSend) {
@@ -70,7 +70,7 @@ public class SecurityCoverageSendJobService {
     }
   }
 
-  private Set<Exercise> filterFullyAssessedSimulations(Set<Exercise> source) {
+  private Set<Exercise> filterFullyAssessedSimulations(List<Exercise> source) {
     return source.stream()
         .filter(Objects::nonNull)
         .filter(e -> e.getSecurityAssessment() != null)

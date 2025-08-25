@@ -147,7 +147,9 @@ public class InjectExpectationService {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
 
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(updated.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return updated;
   }
@@ -183,7 +185,7 @@ public class InjectExpectationService {
         });
 
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-        expectations.stream().map(InjectExpectation::getExercise).collect(Collectors.toSet()));
+        expectations.stream().map(InjectExpectation::getExercise).toList());
 
     injectExpectationRepository.saveAll(expectations);
   }
@@ -244,7 +246,9 @@ public class InjectExpectationService {
       computeExpectationsForTeamsAndPlayer(updated, null);
     }
 
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(Set.of(updated.getExercise()));
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(updated.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return updated;
   }
@@ -431,8 +435,9 @@ public class InjectExpectationService {
 
     // end of computing
 
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-        Set.of(injectExpectation.getExercise()));
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(injectExpectation.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return injectExpectation;
   }
@@ -486,9 +491,7 @@ public class InjectExpectationService {
       // end of computing
     }
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-        injectExpectations.stream()
-            .map(InjectExpectation::getExercise)
-            .collect(Collectors.toSet()));
+        injectExpectations.stream().map(InjectExpectation::getExercise).toList());
   }
 
   private void propagateUpdateToAssets(
