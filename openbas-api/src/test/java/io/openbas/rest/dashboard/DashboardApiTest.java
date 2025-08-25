@@ -207,7 +207,7 @@ class DashboardApiTest extends IntegrationTest {
               CustomDashboardParameterFixture.createSimulationCustomDashboardParameter());
       CustomDashboardComposer.Composer dashboardWrapper =
           customDashboardComposer
-              .forCustomDashboard(CustomDashboardFixture.createDefaultCustomDashboard())
+              .forCustomDashboard(CustomDashboardFixture.createCustomDashboardWithDefaultParams())
               .withCustomDashboardParameter(paramWrapper)
               .persist();
 
