@@ -92,17 +92,21 @@ public class Scenario implements Base {
   @Queryable(filterable = true, sortable = true)
   private SEVERITY severity;
 
+  // -- OCTI GENERATION SCENARIO FROM HTTP CALL--
+
   @Column(name = "scenario_external_reference")
   @JsonProperty("scenario_external_reference")
-  private String externalReference; // TODO REMOVE STIX
+  private String externalReference;
+
+  @Column(name = "scenario_external_url")
+  @JsonProperty("scenario_external_url")
+  private String externalUrl;
+
+  // -- OCTI GENERATION SCENARIO FROM STIX --
 
   @OneToOne(mappedBy = "scenario")
   @JsonProperty("scenario_security_assessment")
   private SecurityAssessment securityAssessment;
-
-  @Column(name = "scenario_external_url")
-  @JsonProperty("scenario_external_url")
-  private String externalUrl; // TODO REMOVE STIX
 
   // -- RECURRENCE --
 

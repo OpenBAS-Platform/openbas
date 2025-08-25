@@ -22,13 +22,13 @@ public class V4_18__Add_octi_stix_objects extends BaseJavaMigration {
               security_assessment_exercise VARCHAR(255),
               security_assessment_name VARCHAR(255) NOT NULL,
               security_assessment_description TEXT,
-              security_assessment_security_coverage_submission_url VARCHAR(150) NOT NULL,
               security_assessment_scheduling VARCHAR(50) NOT NULL,
               security_assessment_period_start TIMESTAMPTZ,
               security_assessment_period_end TIMESTAMPTZ,
               security_assessment_threat_context_ref VARCHAR(255) NOT NULL,
               security_assessment_attack_pattern_refs JSONB,
               security_assessment_vulnerabilities_refs JSONB,
+              security_assessment_content JSONB NOT NULL,
               security_assessment_created_at TIMESTAMPTZ DEFAULT now(),
               security_assessment_updated_at TIMESTAMPTZ DEFAULT now()
           );
