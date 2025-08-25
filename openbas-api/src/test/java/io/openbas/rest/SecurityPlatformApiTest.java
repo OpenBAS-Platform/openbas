@@ -10,11 +10,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.SecurityPlatform;
 import io.openbas.database.repository.SecurityPlatformRepository;
+import io.openbas.utils.fixtures.composers.SecurityPlatformComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.json.JSONArray;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,20 +36,31 @@ class SecurityPlatformApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
   @Autowired private SecurityPlatformRepository securityPlatformRepository;
+  @Autowired private SecurityPlatformComposer securityPlatformComposer;
+  @Autowired private EntityManager entityManager;
+
+  @BeforeEach
+  public void beforeEach() {
+    securityPlatformComposer.reset();
+  }
 
   // Options tests
 
-  private List<SecurityPlatform> prepareOptionsSecurityPlatformTestData() {
+  private List<SecurityPlatformComposer.Composer> prepareOptionsSecurityPlatformTestData() {
     SecurityPlatform securityPlatformTest1 = new SecurityPlatform();
     securityPlatformTest1.setName(SECURITY_PLATFORM_NAME + "1");
     securityPlatformTest1.setSecurityPlatformType(SecurityPlatform.SECURITY_PLATFORM_TYPE.SIEM);
-    SecurityPlatform securityPlatform1 =
-        this.securityPlatformRepository.save(securityPlatformTest1);
+    SecurityPlatformComposer.Composer securityPlatform1 =
+        securityPlatformComposer.forSecurityPlatform(securityPlatformTest1);
+    securityPlatform1.persist();
     SecurityPlatform securityPlatformTest2 = new SecurityPlatform();
     securityPlatformTest2.setName(SECURITY_PLATFORM_NAME + "2");
     securityPlatformTest2.setSecurityPlatformType(SecurityPlatform.SECURITY_PLATFORM_TYPE.SIEM);
-    SecurityPlatform securityPlatform2 =
-        this.securityPlatformRepository.save(securityPlatformTest2);
+    SecurityPlatformComposer.Composer securityPlatform2 =
+        securityPlatformComposer.forSecurityPlatform(securityPlatformTest2);
+    securityPlatform2.persist();
+    entityManager.flush();
+    entityManager.clear();
     return List.of(securityPlatform1, securityPlatform2);
   }
 
@@ -95,11 +109,12 @@ class SecurityPlatformApiTest extends IntegrationTest {
   @WithMockAdminUser
   void optionsByIdTest(Integer numberOfSecurityPlatformToProvide, Integer expectedNumberOfResults)
       throws Exception {
-    List<SecurityPlatform> securityPlatforms = prepareOptionsSecurityPlatformTestData();
+    List<SecurityPlatformComposer.Composer> securityPlatforms =
+        prepareOptionsSecurityPlatformTestData();
 
     List<String> securityPlatformIdsToSearch = new ArrayList<>();
     for (int i = 0; i < numberOfSecurityPlatformToProvide; i++) {
-      securityPlatformIdsToSearch.add(securityPlatforms.get(i).getId());
+      securityPlatformIdsToSearch.add(securityPlatforms.get(i).get().getId());
     }
 
     // --EXECUTE--;

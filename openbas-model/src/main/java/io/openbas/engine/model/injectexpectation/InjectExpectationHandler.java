@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
 
+  private static final String SECURITY_PLATFORM = "security-platform";
+
   private final InjectExpectationRepository injectExpectationRepository;
 
   @Override
@@ -112,8 +114,7 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
                       results.stream()
                           .filter(
                               injectExpectationResult ->
-                                  "security-platform"
-                                      .equals(injectExpectationResult.getSourceType()))
+                                  SECURITY_PLATFORM.equals(injectExpectationResult.getSourceType()))
                           .map(InjectExpectationResult::getSourceId)
                           .collect(Collectors.toSet());
                   dependencies.addAll(securityPlatformIds);
