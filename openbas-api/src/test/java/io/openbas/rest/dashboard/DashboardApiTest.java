@@ -130,7 +130,7 @@ class DashboardApiTest extends IntegrationTest {
               .forWidget(listWidget)
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
-                      CustomDashboardFixture.createDefaultCustomDashboard()))
+                      CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
               .persist()
               .get();
 
