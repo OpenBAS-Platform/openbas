@@ -8,7 +8,6 @@ import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { type UserHelper } from '../../../../../actions/helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
@@ -77,7 +76,6 @@ const SimulationLessons = () => {
   );
 
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayersByExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));

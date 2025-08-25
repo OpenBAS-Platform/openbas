@@ -1,12 +1,14 @@
 import { BallotOutlined, ContactMailOutlined, ContentPasteGoOutlined, DeleteSweepOutlined, SpeakerNotesOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, GridLegacy, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
-import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
+import { type ChangeEvent, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
+import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsSendInput, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -88,6 +90,7 @@ const Lessons: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
+  const dispatch = useAppDispatch();
 
   const [selectedObjective, setSelectedObjective] = useState<string | null>(null);
   const [openApplyTemplate, setOpenApplyTemplate] = useState<boolean>(false);
@@ -100,6 +103,12 @@ const Lessons: FunctionComponent<Props> = ({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
+
+  useEffect(() => {
+    if (openApplyTemplate) {
+      dispatch(fetchLessonsTemplates());
+    }
+  }, [openApplyTemplate]);
 
   // Context
   const {

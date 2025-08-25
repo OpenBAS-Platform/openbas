@@ -5,7 +5,6 @@ import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluati
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
 import {
@@ -80,7 +79,6 @@ const ScenarioLessons = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayers());
     dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(scenarioId));
