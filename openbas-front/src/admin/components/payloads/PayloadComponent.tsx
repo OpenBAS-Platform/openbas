@@ -269,7 +269,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
               variant="h3"
               gutterBottom
             >
-              {t('Executable File')}
+              {t('Executable file')}
             </Typography>
 
             <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
