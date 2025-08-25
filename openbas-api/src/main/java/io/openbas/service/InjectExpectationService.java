@@ -52,6 +52,7 @@ public class InjectExpectationService {
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final CollectorRepository collectorRepository;
+  private final SecurityCoverageSendJobService securityCoverageSendJobService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -145,6 +146,11 @@ public class InjectExpectationService {
     if (HUMAN_EXPECTATION.contains(injectExpectation.getType()) && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
+
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(updated.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
+
     return updated;
   }
 
@@ -177,6 +183,9 @@ public class InjectExpectationService {
             updateInjectExpectationAgent(input, expectation, result);
           }
         });
+
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+        expectations.stream().map(InjectExpectation::getExercise).toList());
 
     injectExpectationRepository.saveAll(expectations);
   }
@@ -236,6 +245,10 @@ public class InjectExpectationService {
         && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, null);
     }
+
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(updated.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return updated;
   }
@@ -422,6 +435,10 @@ public class InjectExpectationService {
 
     // end of computing
 
+    List<Exercise> exercises = new ArrayList<>();
+    exercises.add(injectExpectation.getExercise());
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
+
     return injectExpectation;
   }
 
@@ -473,6 +490,8 @@ public class InjectExpectationService {
       propagateUpdateToAssetGroups(inject, collector);
       // end of computing
     }
+    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+        injectExpectations.stream().map(InjectExpectation::getExercise).toList());
   }
 
   private void propagateUpdateToAssets(

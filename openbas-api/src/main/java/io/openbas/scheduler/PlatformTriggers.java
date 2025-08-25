@@ -57,4 +57,14 @@ public class PlatformTriggers {
         .withSchedule(_15_seconds)
         .build();
   }
+
+  @Bean
+  public Trigger securityCoverageTrigger() {
+    SimpleScheduleBuilder _15_seconds = simpleSchedule().withIntervalInSeconds(15).repeatForever();
+    return newTrigger()
+        .forJob(this.platformJobs.getSecurityCoverageJobExecution())
+        .withIdentity("securityCoverageTrigger")
+        .withSchedule(_15_seconds)
+        .build();
+  }
 }

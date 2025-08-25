@@ -9,14 +9,20 @@ import io.openbas.stix.types.BaseType;
 import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
-import lombok.Getter;
-import lombok.Setter;
 
-public class ObjectBase implements StixSerialisable {
-  @Getter @Setter private Map<String, BaseType<?>> properties;
+public abstract class ObjectBase implements StixSerialisable {
+  private final Map<String, BaseType<?>> properties;
+
+  protected ObjectBase(Map<String, BaseType<?>> properties) {
+    this.properties = properties;
+  }
 
   public BaseType<?> getProperty(String name) {
     return properties.get(name);
+  }
+
+  public void setProperty(String name, BaseType<?> value) {
+    properties.put(name, value);
   }
 
   public boolean hasProperty(String name) {
