@@ -23,8 +23,8 @@ import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.rest.inject.service.SimulationInjectService;
 import io.openbas.service.InjectSearchService;
-import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,7 +34,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,22 +53,21 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ExerciseInjectApi extends RestBehavior {
+public class SimulationInjectApi extends RestBehavior {
 
   private final InjectSearchService injectSearchService;
-  private final InjectTestStatusService injectTestStatusService;
   private final Executor executor;
   private final InjectorContractRepository injectorContractRepository;
   private final CommunicationRepository communicationRepository;
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
   private final InjectRepository injectRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final TeamRepository teamRepository;
   private final ExecutionContextService executionContextService;
   private final InjectService injectService;
   private final InjectDuplicateService injectDuplicateService;
   private final InjectStatusService injectStatusService;
+  private final SimulationInjectService simulationInjectService;
 
   @Operation(summary = "Retrieved injects for an exercise")
   @ApiResponses(
@@ -237,12 +235,7 @@ public class ExerciseInjectApi extends RestBehavior {
   @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
-    Exercise exercise =
-        this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
-    exercise.setUpdatedAt(Instant.now());
-    this.exerciseRepository.save(exercise);
+    this.simulationInjectService.deleteInject(exerciseId, injectId);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/activation")
