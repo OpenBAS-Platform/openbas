@@ -1,9 +1,5 @@
 package io.openbas.service;
 
-import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
-import static io.openbas.utils.SecurityAssessmentUtils.*;
-import static io.openbas.utils.TimeUtils.getCronExpression;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
@@ -17,17 +13,22 @@ import io.openbas.rest.tag.form.TagCreateInput;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
-import io.openbas.stix.parsing.ParserHelper;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.types.Identifier;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+
+import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
+import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
+import static io.openbas.utils.SecurityAssessmentUtils.extractObjectReferences;
+import static io.openbas.utils.TimeUtils.getCronExpression;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,7 +57,6 @@ public class SecurityAssessmentService {
   private final SecurityAssessmentRepository securityAssessmentRepository;
 
   private final Parser stixParser;
-  private final ParserHelper parserHelper;
   private final ObjectMapper objectMapper;
 
   public SecurityAssessment buildSecurityAssessmentFromStix(String stixJson)
@@ -68,18 +68,16 @@ public class SecurityAssessmentService {
     ObjectBase stixAssessmentObj = extractAndValidateAssessment(bundle);
 
     // Mandatory fields
-    String externalId = parserHelper.getRequiredProperty(stixAssessmentObj, STIX_ID);
+    String externalId = stixAssessmentObj.getRequiredProperty(STIX_ID);
     SecurityAssessment securityAssessment = getByExternalIdOrCreateSecurityAssessment(externalId);
     securityAssessment.setExternalId(externalId);
 
-    String threatContextRef =
-        parserHelper.getRequiredProperty(stixAssessmentObj, STIX_THREAT_CONTEXT_REF);
+    String threatContextRef = stixAssessmentObj.getRequiredProperty(STIX_THREAT_CONTEXT_REF);
     securityAssessment.setThreatContextRef(threatContextRef);
 
     // Optional fields
-    parserHelper.setIfPresent(stixAssessmentObj, STIX_NAME, securityAssessment::setName);
-    parserHelper.setIfPresent(
-        stixAssessmentObj, STIX_DESCRIPTION, securityAssessment::setDescription);
+    stixAssessmentObj.setIfPresent(STIX_NAME, securityAssessment::setName);
+    stixAssessmentObj.setIfPresent(STIX_DESCRIPTION, securityAssessment::setDescription);
 
     // Object refs (extract attack patterns and vulnerabilities)
     if (stixAssessmentObj.hasProperty(STIX_OBJECT_REFS)) {
@@ -90,15 +88,12 @@ public class SecurityAssessmentService {
     }
 
     // Default Fields
-    String scheduling =
-        parserHelper.getOptionalProperty(stixAssessmentObj, STIX_SCHEDULING, ONE_SHOT);
+    String scheduling = stixAssessmentObj.getOptionalProperty(STIX_SCHEDULING, ONE_SHOT);
     securityAssessment.setScheduling(scheduling);
 
     // Period Start & End
-    parserHelper.setInstantIfPresent(
-        stixAssessmentObj, STIX_PERIOD_START, securityAssessment::setPeriodStart);
-    parserHelper.setInstantIfPresent(
-        stixAssessmentObj, STIX_PERIOD_END, securityAssessment::setPeriodEnd);
+    stixAssessmentObj.setInstantIfPresent(STIX_PERIOD_START, securityAssessment::setPeriodStart);
+    stixAssessmentObj.setInstantIfPresent(STIX_PERIOD_END, securityAssessment::setPeriodEnd);
 
     securityAssessment.setContent(stixJson);
     return save(securityAssessment);
@@ -132,8 +127,6 @@ public class SecurityAssessmentService {
     scenario.setRecurrence(cron);
 
     scenario.setTags(Set.of(buildDefaultTags()));
-
-    scenarioService.computeEmails(scenario);
 
     return scenarioService.updateScenario(scenario);
   }

@@ -1,15 +1,16 @@
 package io.openbas.utils;
 
-import static io.openbas.service.SecurityAssessmentService.ONE_SHOT;
-import static java.time.ZoneOffset.UTC;
-
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import static io.openbas.service.SecurityAssessmentService.ONE_SHOT;
+import static java.time.ZoneOffset.UTC;
 
 public class TimeUtils {
 
@@ -22,7 +23,7 @@ public class TimeUtils {
   }
 
   public static String getCronExpression(String scheduling, Instant start) {
-    ZonedDateTime zdt = start.atZone(ZoneId.systemDefault());
+    ZonedDateTime zdt = start.atZone(ZoneId.of("UTC"));
     int minute = zdt.getMinute();
     int hour = zdt.getHour();
     int dayOfMonth = zdt.getDayOfMonth();
