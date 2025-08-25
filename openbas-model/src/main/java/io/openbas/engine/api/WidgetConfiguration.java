@@ -1,7 +1,6 @@
 package io.openbas.engine.api;
 
 import static io.openbas.utils.CustomDashboardTimeRange.DEFAULT;
-import static io.openbas.utils.CustomDashboardTimeRange.LAST_QUARTER;
 import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

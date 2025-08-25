@@ -41,9 +41,9 @@ public class CustomDashboardService {
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
     CustomDashboard customDashboardWithDefaultParams =
         customDashboard
-            .addParameter("Time range", TIME_RANGE)
-            .addParameter("Start date", START_DATE)
-            .addParameter("End date", END_DATE);
+            .addParameter("Time range", timeRange)
+            .addParameter("Start date", startDate)
+            .addParameter("End date", endDate);
     return this.customDashboardRepository.save(customDashboardWithDefaultParams);
   }
 

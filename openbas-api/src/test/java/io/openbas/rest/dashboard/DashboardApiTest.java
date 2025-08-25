@@ -1,6 +1,8 @@
 package io.openbas.rest.dashboard;
 
+import static io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType.timeRange;
 import static io.openbas.rest.dashboard.DashboardApi.DASHBOARD_URI;
+import static io.openbas.utils.CustomDashboardTimeRange.LAST_QUARTER;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -294,15 +296,10 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
-      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+      input.put(timeRangeParameterId, String.valueOf(LAST_QUARTER));
 
       String response =
           mvc.perform(
@@ -339,15 +336,10 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
-      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+      input.put(timeRangeParameterId, String.valueOf(LAST_QUARTER));
 
       String response =
           mvc.perform(
@@ -392,15 +384,10 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
-      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+      input.put(timeRangeParameterId, String.valueOf(LAST_QUARTER));
 
       String response =
           mvc.perform(
@@ -456,7 +443,7 @@ class DashboardApiTest extends IntegrationTest {
           widgetComposer
               .forWidget(
                   WidgetFixture.createNumberWidgetWithEntityAndTimeRange(
-                      "endpoint", CustomDashboardTimeRange.LAST_QUARTER, "base_created_at"))
+                      "endpoint", LAST_QUARTER, "base_created_at"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
                       CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
@@ -465,12 +452,7 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
       input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_SEMESTER));
@@ -551,10 +533,7 @@ class DashboardApiTest extends IntegrationTest {
           widgetComposer
               .forWidget(
                   WidgetFixture.creatTemporalWidgetWithTimeRange(
-                      CustomDashboardTimeRange.LAST_QUARTER,
-                      "base_created_at",
-                      HistogramInterval.month,
-                      "endpoint"))
+                      LAST_QUARTER, "base_created_at", HistogramInterval.month, "endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
                       CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
@@ -563,15 +542,10 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
-      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+      input.put(timeRangeParameterId, String.valueOf(LAST_QUARTER));
 
       // force persistence
       entityManager.flush();
@@ -644,10 +618,7 @@ class DashboardApiTest extends IntegrationTest {
           widgetComposer
               .forWidget(
                   WidgetFixture.creatStructuralWidgetWithTimeRange(
-                      CustomDashboardTimeRange.LAST_QUARTER,
-                      "base_created_at",
-                      "endpoint_platform",
-                      "endpoint"))
+                      LAST_QUARTER, "base_created_at", "endpoint_platform", "endpoint"))
               .withCustomDashboard(
                   customDashboardComposer.forCustomDashboard(
                       CustomDashboardFixture.createCustomDashboardWithDefaultParams()))
@@ -664,15 +635,10 @@ class DashboardApiTest extends IntegrationTest {
 
       List<CustomDashboardParameters> parameters = widget.getCustomDashboard().getParameters();
       String timeRangeParameterId =
-          parameters.stream()
-              .filter(
-                  param ->
-                      param.getType()
-                          == CustomDashboardParameters.CustomDashboardParameterType.TIME_RANGE)
-              .toString();
+          parameters.stream().filter(param -> param.getType() == timeRange).toString();
 
       Map<String, String> input = new HashMap<>();
-      input.put(timeRangeParameterId, String.valueOf(CustomDashboardTimeRange.LAST_QUARTER));
+      input.put(timeRangeParameterId, String.valueOf(LAST_QUARTER));
 
       String response =
           mvc.perform(

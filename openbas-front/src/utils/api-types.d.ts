@@ -1044,10 +1044,10 @@ export interface CustomDashboardParameters {
   custom_dashboards_parameter_name: string;
   custom_dashboards_parameter_type:
     | "simulation"
-    | "scenario"
     | "timeRange"
     | "startDate"
-    | "endDate";
+    | "endDate"
+    | "scenario";
   listened?: boolean;
 }
 
@@ -1056,10 +1056,10 @@ export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_name: string;
   custom_dashboards_parameter_type:
     | "simulation"
-    | "scenario"
     | "timeRange"
     | "startDate"
-    | "endDate";
+    | "endDate"
+    | "scenario";
 }
 
 /** Payload to create a CVE */

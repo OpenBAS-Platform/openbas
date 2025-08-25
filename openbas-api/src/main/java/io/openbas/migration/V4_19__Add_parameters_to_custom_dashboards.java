@@ -26,9 +26,9 @@ public class V4_19__Add_parameters_to_custom_dashboards extends BaseJavaMigratio
                 "INSERT INTO custom_dashboards_parameters (custom_dashboards_parameter_id,custom_dashboard_id,custom_dashboards_parameter_name,custom_dashboards_parameter_type) VALUES (?,?,?,?) ON CONFLICT DO NOTHING")) {
       while (dashboardsResults.next()) {
         String dashboardId = dashboardsResults.getString("custom_dashboard_id");
-        addParameter(statementDashboard, dashboardId, "Time range", TIME_RANGE.name);
-        addParameter(statementDashboard, dashboardId, "Start date", START_DATE.name);
-        addParameter(statementDashboard, dashboardId, "End date", END_DATE.name);
+        addParameter(statementDashboard, dashboardId, "Time range", timeRange.name);
+        addParameter(statementDashboard, dashboardId, "Start date", startDate.name);
+        addParameter(statementDashboard, dashboardId, "End date", endDate.name);
         statementDashboard.addBatch();
       }
       statementDashboard.executeBatch();

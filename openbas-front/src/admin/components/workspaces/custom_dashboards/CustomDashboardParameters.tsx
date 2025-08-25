@@ -24,13 +24,14 @@ const CustomDashboardParameters: FunctionComponent = () => {
     if (!customDashboard) return;
     if (parameterId) {
       setCustomDashboardParameters((prev) => {
-      return {
-        ...prev,
-        [parameterId]: {
-          ...prev[parameterId],value,
-      },
-      };
-    });
+        return {
+          ...prev,
+          [parameterId]: {
+            ...prev[parameterId],
+            value,
+          },
+        };
+      });
     }
   };
 
@@ -74,12 +75,12 @@ const CustomDashboardParameters: FunctionComponent = () => {
   return (
     <>
       <TimeRangeFilters
-        timeRangeValue={getParameterValue(dateParameters.get('timeRange')) ?? LAST_QUARTER_TIME_RANGE}
-        handleTimeRange={data => handleParameters(dateParameters.get('timeRange'), data)}
-        startDateValue={getParameterValue(dateParameters.get('startDate'))}
-        handleStartDate={data => handleParameters(dateParameters.get('startDate'), data)}
-        endDateValue={getParameterValue(dateParameters.get('endDate'))}
-        handleEndDate={data => handleParameters(dateParameters.get('endDate'), data)}
+        timeRangeValue={getParameter(dateParameters.get('timeRange'))?.value ?? LAST_QUARTER_TIME_RANGE}
+        handleTimeRange={data => handleParametersValue(dateParameters.get('timeRange'), data)}
+        startDateValue={getParameter(dateParameters.get('startDate'))?.value}
+        handleStartDate={data => handleParametersValue(dateParameters.get('startDate'), data)}
+        endDateValue={getParameter(dateParameters.get('endDate'))?.value}
+        handleEndDate={data => handleParametersValue(dateParameters.get('endDate'), data)}
       />
       <div
         style={{

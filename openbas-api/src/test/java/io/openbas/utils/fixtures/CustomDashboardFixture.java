@@ -18,8 +18,8 @@ public class CustomDashboardFixture {
     CustomDashboard customDashboard = new CustomDashboard();
     customDashboard.setName(NAME);
     return customDashboard
-        .addParameter("Time range", TIME_RANGE)
-        .addParameter("Start date", START_DATE)
-        .addParameter("End date", END_DATE);
+        .addParameter("Time range", timeRange)
+        .addParameter("Start date", startDate)
+        .addParameter("End date", endDate);
   }
 }

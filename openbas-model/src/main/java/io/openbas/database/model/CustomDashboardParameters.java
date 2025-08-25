@@ -16,11 +16,11 @@ import org.hibernate.annotations.UuidGenerator;
 public class CustomDashboardParameters implements Base {
 
   public enum CustomDashboardParameterType {
-    SIMULATION("simulation", true, false),
-    TIME_RANGE("timeRange", false, true),
-    START_DATE("startDate", false, true),
-    END_DATE("endDate", false, true),
-    SCENARIO("scenario", true, false);
+    simulation("simulation", true, false),
+    timeRange("timeRange", false, true),
+    startDate("startDate", false, true),
+    endDate("endDate", false, true),
+    scenario("scenario", true, false);
 
     public final String name;
     public final boolean isInstance;

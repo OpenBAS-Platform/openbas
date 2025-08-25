@@ -29,4 +29,12 @@ public enum CustomDashboardTimeRange {
   CustomDashboardTimeRange(String name) {
     this.name = name;
   }
+
+  public static CustomDashboardTimeRange fromValue(final String value) {
+    try {
+      return CustomDashboardTimeRange.valueOf(value.toUpperCase());
+    } catch (IllegalArgumentException | NullPointerException e) {
+      return LAST_QUARTER;
+    }
+  }
 }

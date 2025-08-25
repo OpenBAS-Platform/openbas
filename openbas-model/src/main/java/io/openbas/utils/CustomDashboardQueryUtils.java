@@ -23,9 +23,8 @@ public class CustomDashboardQueryUtils {
       return true;
     }
     if (DEFAULT.equals(widgetConfig.getTimeRange())) {
-      final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
-      CustomDashboardTimeRange dashboardTimeRange =
-          CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
+      final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+      CustomDashboardTimeRange dashboardTimeRange = fromValue(parameters.get(timeRangeParameterId));
       return ALL_TIME.equals(dashboardTimeRange);
     }
     return false;
@@ -35,11 +34,10 @@ public class CustomDashboardQueryUtils {
       WidgetConfiguration widgetConfig,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
-    final String startDateParameterId = findParamIdByType(definitionParameters, START_DATE);
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+    final String startDateParameterId = findParamIdByType(definitionParameters, startDate);
 
-    CustomDashboardTimeRange widgetTimeRange =
-        CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());
+    CustomDashboardTimeRange widgetTimeRange = fromValue(widgetConfig.getTimeRange().name());
     final Instant now = Instant.now();
 
     switch (widgetTimeRange) {
@@ -61,30 +59,26 @@ public class CustomDashboardQueryUtils {
               parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart()));
         }
       case DEFAULT:
-        try {
-          CustomDashboardTimeRange dashboardTimeRange =
-              CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
-          switch (dashboardTimeRange) {
-            case LAST_DAY:
-              return now.minus(24, ChronoUnit.HOURS);
-            case LAST_WEEK:
-              return now.minus(7, ChronoUnit.DAYS);
-            case LAST_MONTH:
-              return now.minus(30, ChronoUnit.DAYS);
-            case LAST_QUARTER:
-              return now.minus(90, ChronoUnit.DAYS);
-            case LAST_SEMESTER:
-              return now.minus(180, ChronoUnit.DAYS);
-            case LAST_YEAR:
-              return now.minus(360, ChronoUnit.DAYS);
-            case CUSTOM:
-              if (parameters.get(startDateParameterId) != null) {
-                return Instant.parse(parameters.get(startDateParameterId));
-              }
-            default:
-          }
-        } catch (IllegalArgumentException e) {
-          throw new RuntimeException("Dashboard timerange is not set");
+        CustomDashboardTimeRange dashboardTimeRange =
+            fromValue(parameters.get(timeRangeParameterId));
+        switch (dashboardTimeRange) {
+          case LAST_DAY:
+            return now.minus(24, ChronoUnit.HOURS);
+          case LAST_WEEK:
+            return now.minus(7, ChronoUnit.DAYS);
+          case LAST_MONTH:
+            return now.minus(30, ChronoUnit.DAYS);
+          case LAST_QUARTER:
+            return now.minus(90, ChronoUnit.DAYS);
+          case LAST_SEMESTER:
+            return now.minus(180, ChronoUnit.DAYS);
+          case LAST_YEAR:
+            return now.minus(360, ChronoUnit.DAYS);
+          case CUSTOM:
+            if (parameters.get(startDateParameterId) != null) {
+              return Instant.parse(parameters.get(startDateParameterId));
+            }
+          default:
         }
       default:
     }
@@ -96,11 +90,10 @@ public class CustomDashboardQueryUtils {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
 
-    final String timeRangeParameterId = findParamIdByType(definitionParameters, TIME_RANGE);
-    final String endDateParameterId = findParamIdByType(definitionParameters, END_DATE);
+    final String timeRangeParameterId = findParamIdByType(definitionParameters, timeRange);
+    final String endDateParameterId = findParamIdByType(definitionParameters, endDate);
 
-    CustomDashboardTimeRange widgetTimeRange =
-        CustomDashboardTimeRange.valueOf(widgetConfig.getTimeRange().name());
+    CustomDashboardTimeRange widgetTimeRange = fromValue(widgetConfig.getTimeRange().name());
     final Instant now = Instant.now();
 
     switch (widgetTimeRange) {
@@ -110,18 +103,14 @@ public class CustomDashboardQueryUtils {
               parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd()));
         }
       case DEFAULT:
-        try {
-          CustomDashboardTimeRange dashboardTimeRange =
-              CustomDashboardTimeRange.valueOf(parameters.get(timeRangeParameterId));
-          if (dashboardTimeRange.equals(CUSTOM)) {
-            if (parameters.get(endDateParameterId) != null) {
-              return Instant.parse(parameters.get(endDateParameterId));
-            }
-          } else {
-            return now;
+        CustomDashboardTimeRange dashboardTimeRange =
+            fromValue(parameters.get(timeRangeParameterId));
+        if (dashboardTimeRange.equals(CUSTOM)) {
+          if (parameters.get(endDateParameterId) != null) {
+            return Instant.parse(parameters.get(endDateParameterId));
           }
-        } catch (IllegalArgumentException e) {
-          throw new RuntimeException("Dashboard timerange is not set");
+        } else {
+          return now;
         }
       default:
         return now;
