@@ -1,4 +1,6 @@
-import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
+import type { Dispatch } from 'redux';
+
+import { postReferential, simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import { type CustomDashboardInput, type SearchPaginationInput } from '../../utils/api-types';
 
 export const CUSTOM_DASHBOARD_URI = '/api/custom-dashboards';
@@ -34,4 +36,18 @@ export const searchCustomDashboardAsOptions = (searchText: string = '') => {
 
 export const searchCustomDashboardByIdAsOptions = (ids: string[]) => {
   return simplePostCall(`${CUSTOM_DASHBOARD_URI}/options`, ids);
+};
+
+// -- EXPORT --
+export const exportCustomDashboard = (id: string) => {
+  return simpleCall(`${CUSTOM_DASHBOARD_URI}/${id}/export`, {
+    params: { include: true },
+    headers: { Accept: 'application/zip' },
+    responseType: 'blob',
+  });
+};
+
+// -- IMPORT --
+export const importCustomDashboard = (content: FormData) => (dispatch: Dispatch) => {
+  return postReferential(null, `${CUSTOM_DASHBOARD_URI}/import`, content, { params: { include: true } })(dispatch);
 };
