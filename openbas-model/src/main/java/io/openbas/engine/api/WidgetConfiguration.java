@@ -69,7 +69,7 @@ public abstract class WidgetConfiguration {
 
   @NotBlank
   @JsonProperty("date_attribute")
-  private String dateAttribute;
+  private String dateAttribute = "base_created_at";
 
   WidgetConfiguration(WidgetConfigurationType configurationType) {
     this.configurationType = configurationType;
