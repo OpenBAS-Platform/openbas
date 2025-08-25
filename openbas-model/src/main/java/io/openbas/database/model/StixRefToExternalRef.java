@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,5 +20,23 @@ public class StixRefToExternalRef {
   public StixRefToExternalRef(String stixRef, String externalRef) {
     this.stixRef = stixRef;
     this.externalRef = externalRef;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (null == o || this.getClass() != o.getClass()) {
+      return false;
+    }
+    final StixRefToExternalRef that = (StixRefToExternalRef) o;
+    return Objects.equals(this.stixRef, that.stixRef)
+        && Objects.equals(this.externalRef, that.externalRef);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.stixRef, this.externalRef);
   }
 }

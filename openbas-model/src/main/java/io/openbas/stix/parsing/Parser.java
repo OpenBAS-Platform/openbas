@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Parser {
+
   public Bundle parseBundle(java.lang.String source)
       throws JsonProcessingException, ParsingException {
     JsonNode jsonNode = new ObjectMapper().readTree(source);

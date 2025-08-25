@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(StixApi.STIX_API)
+@RequestMapping(StixApi.STIX_URI)
 @Tag(name = "STIX API", description = "Operations related to STIX bundles")
 public class StixApi extends RestBehavior {
 
-  public static final String STIX_API = "/api/stix";
+  public static final String STIX_URI = "/api/stix";
 
   private final StixService stixService;
 
