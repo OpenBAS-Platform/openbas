@@ -1126,11 +1126,11 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getSource(), recreated.get().getSource());
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
 
-          if (Objects.equals(expected.getType(), "FileDrop")) {
+          if (Objects.equals(expected.getType(), FileDrop.FILE_DROP_TYPE)) {
             Assertions.assertNotNull(((FileDrop) recreated.get()).getFileDropFile());
           }
 
-          if (Objects.equals(expected.getType(), "Executable")) {
+          if (Objects.equals(expected.getType(), Executable.EXECUTABLE_TYPE)) {
             Assertions.assertNotNull(((Executable) recreated.get()).getExecutableFile());
           }
 
