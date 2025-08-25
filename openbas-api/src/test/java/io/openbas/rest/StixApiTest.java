@@ -154,7 +154,7 @@ class StixApiTest extends IntegrationTest {
           .isEqualTo("Security assessment test plan for threat context XYZ.");
       assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
-      assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 16 * * *");
+      assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
       assertThat(createdScenario.getMainFocus()).isEqualTo(INCIDENT_RESPONSE);
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
