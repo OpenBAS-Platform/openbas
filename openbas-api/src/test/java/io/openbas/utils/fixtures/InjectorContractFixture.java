@@ -33,7 +33,7 @@ public class InjectorContractFixture {
   @Autowired private InjectorContractRepository injectorContractRepository;
 
   public InjectorContract getWellKnownSingleEmailContract() {
-    return injectorContractRepository.findByIdOrExternalId(EMAIL_DEFAULT, "blerh").orElseThrow();
+    return injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
   }
 
   private static ObjectNode createDefaultContent(ObjectMapper objectMapper) {
