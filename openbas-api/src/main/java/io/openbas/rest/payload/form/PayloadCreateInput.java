@@ -33,8 +33,12 @@ import lombok.Data;
       @DiscriminatorMapping(value = Command.COMMAND_TYPE, schema = Command.class),
       @DiscriminatorMapping(value = Executable.EXECUTABLE_TYPE, schema = Executable.class),
       @DiscriminatorMapping(value = FileDrop.FILE_DROP_TYPE, schema = FileDrop.class),
-      @DiscriminatorMapping(value = DnsResolution.DNS_RESOLUTION_TYPE, schema = DnsResolution.class),
-      @DiscriminatorMapping(value = NetworkTraffic.NETWORK_TRAFFIC_TYPE, schema = NetworkTraffic.class)
+      @DiscriminatorMapping(
+          value = DnsResolution.DNS_RESOLUTION_TYPE,
+          schema = DnsResolution.class),
+      @DiscriminatorMapping(
+          value = NetworkTraffic.NETWORK_TRAFFIC_TYPE,
+          schema = NetworkTraffic.class)
     })
 @Data
 public class PayloadCreateInput {

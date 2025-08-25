@@ -227,41 +227,41 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
           </>
         )}
         {selectedPayload?.payload_type === 'FileDrop' && (
-            <div>
-              <Typography
-                variant="h3"
-                gutterBottom
-              >
-                {t('File to drop')}
-              </Typography>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('File to drop')}
+            </Typography>
 
-                <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
-                <div className={classes.bodyItem} style={inlineStyles.document_name}>
-                  {documentsMap[selectedPayload.file_drop_file]?.document_name}
-                </div>
-                <div className={classes.bodyItem} style={inlineStyles.document_type}>
-                  <DocumentType type={documentsMap[selectedPayload.file_drop_file]?.document_type} variant="list" />
-                </div>
-
+            <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
+            <div className={classes.bodyItem} style={inlineStyles.document_name}>
+              {documentsMap[selectedPayload.file_drop_file]?.document_name}
             </div>
+            <div className={classes.bodyItem} style={inlineStyles.document_type}>
+              <DocumentType type={documentsMap[selectedPayload.file_drop_file]?.document_type} variant="list" />
+            </div>
+
+          </div>
         )}
         {selectedPayload?.payload_type === 'DnsResolution' && (
-            <div>
-              <Typography
-                variant="h3"
-                gutterBottom
-              >
-                {t('Hostname')}
-              </Typography>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Hostname')}
+            </Typography>
 
-              <Typography
-                variant="body2"
-                gutterBottom
-              >
-                  {selectedPayload.dns_resolution_hostname}
+            <Typography
+              variant="body2"
+              gutterBottom
+            >
+              {selectedPayload.dns_resolution_hostname}
 
-              </Typography>
-            </div>
+            </Typography>
+          </div>
         )}
         {selectedPayload?.payload_type === 'Executable' && (
           <div>
