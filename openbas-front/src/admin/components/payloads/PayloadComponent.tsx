@@ -92,13 +92,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
         return '';
     }
   };
-  const payloadTypesItems: Map<string, string> = new Map<string, string>([
-    ['Command', t('Command Line')],
-    ['Executable', t('Executable')],
-    ['FileDrop', t('File Drop')],
-    ['DnsResolution', t('DNS Resolution')],
-  ],
-  );
+
   return (
     <>
       <div className={classes.payloadContainer}>
@@ -199,7 +193,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
               variant="body2"
               gutterBottom
             >
-              {emptyFilled(selectedPayload?.payload_type ? payloadTypesItems.get(selectedPayload.payload_type) : undefined)}
+              {t(emptyFilled(selectedPayload?.payload_type))}
             </Typography>
           </div>
         </div>
