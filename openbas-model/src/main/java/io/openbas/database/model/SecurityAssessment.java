@@ -49,10 +49,6 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_scheduling")
   private String scheduling;
 
-  @Column(name = "security_assessment_security_coverage_submission_url", nullable = false)
-  @JsonProperty("security_assessment_security_coverage_submission_url")
-  private String securityCoverageSubmissionUrl;
-
   @Column(name = "security_assessment_period_start")
   @JsonProperty("security_assessment_period_start")
   private Instant periodStart;
@@ -69,6 +65,11 @@ public class SecurityAssessment implements Base {
   @Column(name = "security_assessment_attack_pattern_refs", columnDefinition = "jsonb")
   @JsonProperty("security_assessment_attack_pattern_refs")
   private List<StixRefToExternalRef> attackPatternRefs;
+
+  @Type(JsonType.class)
+  @Column(name = "security_assessment_content", columnDefinition = "jsonb", nullable = false)
+  @JsonProperty("security_assessment_content")
+  private String content;
 
   @Type(JsonType.class)
   @Column(name = "security_assessment_vulnerabilities_refs", columnDefinition = "jsonb")

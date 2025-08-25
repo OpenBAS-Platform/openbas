@@ -27,6 +27,14 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class InjectAssistantService {
 
+  public static final Map<String, List<Endpoint>> DEFAULT_CONFIGURATION_ENDPOINTS =
+      Map.of(
+          "Windows:x86_64", emptyList(),
+          "Windows:arm64", emptyList(),
+          "Linux:x86_64", emptyList(),
+          "Linux:arm64", emptyList(),
+          "macOS:arm64", emptyList());
+
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final InjectorContractService injectorContractService;
@@ -164,8 +172,7 @@ public class InjectAssistantService {
    */
   private Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
-    if (endpoints.isEmpty())
-      return Map.of("Windows:x86_64", emptyList(), "Linux:x86_64", emptyList());
+    if (endpoints.isEmpty()) return DEFAULT_CONFIGURATION_ENDPOINTS;
 
     return endpoints.stream()
         .collect(
@@ -384,9 +391,6 @@ public class InjectAssistantService {
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
-    //    if (endpoints.isEmpty()) {
-    //      return;
-    //    }
     ContractResultForEndpoints endpointResults =
         getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
 
@@ -464,7 +468,7 @@ public class InjectAssistantService {
    * Generates injects based on the provided attack pattern ID, endpoints, asset groups, and the
    * number of injects to create for each TTP.
    *
-   * @param attackPatternId the ID of the attack pattern to generate injects for
+   * @param attackPatternId the internal ID of the attack pattern to generate injects for
    * @param endpoints the list of endpoints to consider for the injects
    * @param assetGroups the list of asset groups to consider for the injects
    * @param injectNumberByTTP the maximum number of injects to create for each TTP
