@@ -11,11 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class HistogramWidget extends WidgetConfiguration {
+
   @Setter(NONE)
   @NotNull
   private final String mode;
 
-  @NotBlank private String field;
+  @NotBlank
+  @JsonProperty("date_attribute")
+  private String dateAttribute;
+
   private boolean stacked;
 
   @JsonProperty("display_legend")

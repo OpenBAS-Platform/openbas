@@ -1042,14 +1042,24 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "scenario" | "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "timeRange"
+    | "startDate"
+    | "endDate"
+    | "scenario";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "scenario" | "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "timeRange"
+    | "startDate"
+    | "endDate"
+    | "scenario";
 }
 
 /** Payload to create a CVE */
@@ -1252,13 +1262,10 @@ export type DateHistogramWidget = UtilRequiredKeys<
   "widget_configuration_type"
 > & {
   display_legend?: boolean;
-  end: string;
-  field: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
   mode: string;
   series: DateHistogramSeries[];
   stacked?: boolean;
-  start: string;
 };
 
 export interface DetectionRemediation {
@@ -2474,10 +2481,22 @@ export interface GroupUpdateUsersInput {
 }
 
 export interface HistogramWidget {
+  date_attribute: string;
   display_legend?: boolean;
-  field: string;
+  end?: string;
   mode: string;
   stacked?: boolean;
+  start?: string;
+  time_range:
+    | "DEFAULT"
+    | "ALL_TIME"
+    | "CUSTOM"
+    | "LAST_DAY"
+    | "LAST_WEEK"
+    | "LAST_MONTH"
+    | "LAST_QUARTER"
+    | "LAST_SEMESTER"
+    | "LAST_YEAR";
   title?: string;
   widget_configuration_type:
     | "flat"

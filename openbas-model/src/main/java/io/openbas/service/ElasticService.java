@@ -1,6 +1,8 @@
 package io.openbas.service;
 
+import static io.openbas.utils.CustomDashboardQueryUtils.*;
 import static io.openbas.utils.ElasticUtils.*;
+import static io.openbas.utils.ElasticUtils.buildDateRangeQuery;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -33,6 +35,7 @@ import io.openbas.engine.model.EsBase;
 import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
+import io.openbas.exception.AnalyticsEngineException;
 import io.openbas.schema.PropertySchema;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -48,7 +51,6 @@ import org.apache.logging.log4j.util.Strings;
 
 @Slf4j
 public class ElasticService implements EngineService {
-  private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
   private final ElasticDriver driver;
   private final EngineContext searchEngine;
@@ -79,7 +81,7 @@ public class ElasticService implements EngineService {
     String target = ofNullable(parameters.getOrDefault(value, value)).orElse("");
     PropertySchema propertyField = commonSearchService.getIndexingSchema().get(field);
     if (propertyField == null) {
-      throw new RuntimeException("Unknown field: " + field);
+      throw new AnalyticsEngineException("Unknown field: " + field);
     }
     if (propertyField.getType().isAssignableFrom(String.class)
         || (propertyField.getType().isAssignableFrom(Set.class)
@@ -396,8 +398,12 @@ public class ElasticService implements EngineService {
 
   // region query
   public long count(RawUserAuth user, CountRuntime runtime) {
+    FlatConfiguration widgetConfig = runtime.getConfig();
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+
     try {
-      Query query =
+      Query countQuery =
           buildQuery(
               user,
               null,
@@ -408,8 +414,21 @@ public class ElasticService implements EngineService {
                   .getFilter(), // 1 count = 1 serie limit = 1 filter group
               runtime.getParameters(),
               runtime.getDefinitionParameters());
+      Query query;
+      if (isAllTime(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters())) {
+        query = queryBuilder.must(countQuery).build()._toQuery();
+      } else {
+        Instant finalStart =
+            calcStartDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Instant finalEnd =
+            calcEndDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Query dateRangeQuery =
+            buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
+        query = queryBuilder.must(dateRangeQuery, countQuery).build()._toQuery();
+      }
+      Query finalQuery = query;
       return elasticClient
-          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(finalQuery))
           .count();
     } catch (IOException e) {
       log.error(String.format("count exception: %s", e.getMessage()), e);
@@ -423,7 +442,21 @@ public class ElasticService implements EngineService {
       StructuralHistogramSeries config,
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
-    Query query = buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
+
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    Query filterQuery =
+        buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
+    Query query;
+    if (isAllTime(widgetConfig, parameters, definitionParameters)) {
+      query = queryBuilder.must(filterQuery).build()._toQuery();
+    } else {
+      Instant finalStart = calcStartDate(widgetConfig, parameters, definitionParameters);
+      Instant finalEnd = calcEndDate(widgetConfig, parameters, definitionParameters);
+      Query dateRangeQuery =
+          buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
+      query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
+    }
+
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
@@ -544,23 +577,33 @@ public class ElasticService implements EngineService {
       Map<String, String> parameters,
       Map<String, CustomDashboardParameters> definitionParameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
-    Instant startInstant = Instant.parse(start);
-    String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
-    Instant endInstant = Instant.parse(end);
-    Query dateRangeQuery =
-        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
-            ._toRangeQuery()
-            ._toQuery();
+
     Query filterQuery =
         buildQuery(user, null, config.getFilter(), parameters, definitionParameters);
-    Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
-    ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
-    ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
+
+    Instant finalStart = calcStartDate(widgetConfig, parameters, definitionParameters);
+    Instant finalEnd = calcEndDate(widgetConfig, parameters, definitionParameters);
+
+    Query query;
+    if (isAllTime(widgetConfig, parameters, definitionParameters)) {
+      query = queryBuilder.must(filterQuery).build()._toQuery();
+    } else {
+      Query dateRangeQuery =
+          buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
+      query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
+    }
     try {
       String aggregationKey = "date_histogram";
+
+      ExtendedBounds<FieldDateMath> extendedBounds;
+      if (isAllTime(widgetConfig, parameters, definitionParameters)) {
+        extendedBounds = null;
+      } else {
+        ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
+        bounds.min(FieldDateMath.of(m -> m.value((double) finalStart.toEpochMilli())));
+        bounds.max(FieldDateMath.of(m -> m.value((double) finalEnd.toEpochMilli())));
+        extendedBounds = bounds.build();
+      }
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
@@ -570,14 +613,11 @@ public class ElasticService implements EngineService {
                       .aggregations(
                           aggregationKey,
                           a ->
-                              a.dateHistogram(
-                                  h ->
-                                      h.field(widgetConfig.getField())
-                                          .minDocCount(0)
-                                          .format(widgetConfig.getInterval().format)
-                                          .calendarInterval(widgetConfig.getInterval().esType)
-                                          .extendedBounds(extendedBounds)
-                                          .keyed(false))),
+                              buildDateHistogramAggregation(
+                                  a,
+                                  widgetConfig.getDateAttribute(),
+                                  widgetConfig.getInterval(),
+                                  extendedBounds)),
               Void.class);
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
@@ -638,16 +678,31 @@ public class ElasticService implements EngineService {
               SortOptions.of(
                   so -> so.field(FieldSort.of(fs -> fs.field("_score").order(SortOrder.Desc)))));
     }
-    Query query =
+    BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    ListConfiguration widgetConfig = runtime.getWidget();
+    Query listQuery =
         buildQuery(
             user, "", searchFilters, runtime.getParameters(), runtime.getDefinitionParameters());
     try {
+      Query query;
+      if (isAllTime(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters())) {
+        query = queryBuilder.must(listQuery).build()._toQuery();
+      } else {
+        Instant finalStart =
+            calcStartDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Instant finalEnd =
+            calcEndDate(widgetConfig, runtime.getParameters(), runtime.getDefinitionParameters());
+        Query dateRangeQuery =
+            buildDateRangeQuery(widgetConfig.getDateAttribute(), finalStart, finalEnd);
+        query = queryBuilder.must(dateRangeQuery, listQuery).build()._toQuery();
+      }
+      Query finalQuery = query;
       SearchResponse<?> response =
           elasticClient.search(
               b ->
                   b.index(engineConfig.getIndexPrefix() + "*")
                       .size(runtime.getWidget().getLimit())
-                      .query(query)
+                      .query(finalQuery)
                       .sort(engineSorts),
               getClassForEntity(entityName));
       return response.hits().hits().stream()
@@ -733,7 +788,6 @@ public class ElasticService implements EngineService {
     return List.of();
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getEngineVersion() {
     try {
