@@ -3,10 +3,10 @@ package io.openbas.service;
 import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
 import static io.openbas.utils.SecurityAssessmentUtils.extractObjectReferences;
-import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.cron.ScheduleFrequency;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.SecurityAssessmentRepository;
 import io.openbas.rest.attack_pattern.service.AttackPatternService;
@@ -15,6 +15,7 @@ import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.tag.TagService;
 import io.openbas.rest.tag.form.TagCreateInput;
+import io.openbas.service.cron.CronService;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
@@ -53,6 +54,7 @@ public class SecurityAssessmentService {
   private final InjectAssistantService injectAssistantService;
   private final AttackPatternService attackPatternService;
   private final InjectService injectService;
+  private final CronService cronService;
 
   private final SecurityAssessmentRepository securityAssessmentRepository;
 
@@ -89,7 +91,13 @@ public class SecurityAssessmentService {
 
     // Default Fields
     String scheduling = stixAssessmentObj.getOptionalProperty(STIX_SCHEDULING, ONE_SHOT);
-    securityAssessment.setScheduling(scheduling);
+    try {
+      securityAssessment.setScheduling(ScheduleFrequency.fromString(scheduling));
+    } catch (IllegalArgumentException iae) {
+      throw new ParsingException(
+          String.format("Error parsing scheduling on security assessment: %s", iae.getMessage()),
+          iae);
+    }
 
     // Period Start & End
     stixAssessmentObj.setInstantIfPresent(STIX_PERIOD_START, securityAssessment::setPeriodStart);
@@ -123,7 +131,7 @@ public class SecurityAssessmentService {
     scenario.setRecurrenceStart(start);
     scenario.setRecurrenceEnd(end);
 
-    String cron = getCronExpression(securityAssessment.getScheduling(), start);
+    String cron = cronService.getCronExpression(securityAssessment.getScheduling(), start);
     scenario.setRecurrence(cron);
 
     scenario.setTags(new HashSet<>(Set.of(buildDefaultTags())));

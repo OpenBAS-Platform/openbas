@@ -7,7 +7,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
-import io.openbas.service.utils.CronService;
+import io.openbas.service.cron.CronService;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.time.ZoneId;

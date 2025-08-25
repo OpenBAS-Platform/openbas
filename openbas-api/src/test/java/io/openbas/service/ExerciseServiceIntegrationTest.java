@@ -18,7 +18,7 @@ import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
-import io.openbas.service.utils.CronService;
+import io.openbas.service.cron.CronService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.fixtures.ExerciseFixture;
