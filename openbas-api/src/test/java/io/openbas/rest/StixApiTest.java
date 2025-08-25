@@ -65,7 +65,6 @@ class StixApiTest extends IntegrationTest {
           .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1003"))
           .persist();
     }
-    attackPatternComposer.reset();
   }
 
   @Nested
