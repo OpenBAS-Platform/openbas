@@ -13,6 +13,8 @@ argClean=$(echo "$arg" | sed -e 's/%3d/=/g' -e 's/%2b/+/g' -e 's|%2f|/|g')
 decoded_cmd=$(echo "$argClean" | base64 -d)
 
 # Run command fully detached (new session, no terminal)
-setsid bash -c "$decoded_cmd" >/dev/null 2>&1 &
+$decoded_cmd" &
+
+exit 0
 
 echo "Task triggered."
