@@ -219,6 +219,7 @@ const Payloads = () => {
       filters: [
         buildEmptyFilter('payload_attack_patterns', 'contains'),
         buildEmptyFilter('payload_platforms', 'contains'),
+
       ],
     },
   }));

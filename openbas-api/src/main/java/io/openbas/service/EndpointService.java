@@ -126,6 +126,10 @@ public class EndpointService {
         hostname, platform.name(), arch.name(), ips);
   }
 
+  public Optional<Endpoint> findEndpointByExternalReference(@NotNull final String externalReference) {
+      return this.endpointRepository.findByExternalReference(externalReference).stream().findFirst();
+  }
+
   public Optional<Endpoint> findEndpointByAtLeastOneMacAddress(
       @NotNull final String[] macAddresses) {
     return this.endpointRepository.findByAtleastOneMacAddress(macAddresses).stream().findFirst();
