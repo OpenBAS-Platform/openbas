@@ -1,11 +1,9 @@
 import { InsertChartOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, TextField, Tooltip } from '@mui/material';
-import { useEffect } from 'react';
 import { type Control, Controller, type FieldValues, type Path } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import { CUSTOM_DASHBOARD } from '../common/queryable/filter/constants';
-import useSearchOptions from '../common/queryable/filter/useSearchOptions';
+import type { Option } from '../../utils/Option';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles()(() => ({
@@ -24,20 +22,19 @@ interface Props<T extends FieldValues> {
   name: Path<T>;
   control: Control<T>;
   label: string;
+  fetchOptions: (searchText: string) => void;
+  options: Option[];
 }
 
 const CustomDashboardFieldController = <T extends FieldValues>({
   name,
   control,
   label,
+  fetchOptions,
+  options,
 }: Props<T>) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
-
-  const { options, searchOptions } = useSearchOptions();
-  useEffect(() => {
-    searchOptions(CUSTOM_DASHBOARD, '');
-  }, []);
 
   const values = (fieldValue: string) => {
     return options.find(o => fieldValue?.includes(o.id));
@@ -59,7 +56,7 @@ const CustomDashboardFieldController = <T extends FieldValues>({
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onInputChange={(_, search, reason) => {
             if (reason === 'input') {
-              searchOptions(CUSTOM_DASHBOARD, search);
+              fetchOptions(search);
             }
           }}
           onChange={(_, value) => {

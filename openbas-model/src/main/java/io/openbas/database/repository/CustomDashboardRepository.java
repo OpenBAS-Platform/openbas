@@ -28,4 +28,18 @@ public interface CustomDashboardRepository
               + "FROM custom_dashboards cd;",
       nativeQuery = true)
   List<RawCustomDashboard> rawAll();
+
+  @Query(
+      value =
+          """
+      select cd.* from custom_dashboards cd
+      join scenarios s on s.scenario_custom_dashboard = cd.custom_dashboard_id
+      where s.scenario_id = :resourceId
+      union
+      select cd.* from custom_dashboards cd
+      join exercises e on e.exercise_custom_dashboard = cd.custom_dashboard_id
+      where e.exercise_id = :resourceId
+      """,
+      nativeQuery = true)
+  List<CustomDashboard> findByResourceId(String resourceId);
 }
