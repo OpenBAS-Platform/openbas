@@ -113,6 +113,7 @@ public class InjectStatusService {
                 .filter(
                     t ->
                         ExecutionTraceAction.START.equals(t.getAction())
+                            && agent != null
                             && t.getAgent().getId().equals(agent.getId()))
                 .findFirst()
                 .map(startTrace -> startTrace.getTime().plusMillis(input.getDuration()))
