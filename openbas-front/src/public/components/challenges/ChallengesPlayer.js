@@ -26,7 +26,7 @@ import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
-import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
+import { fetchSimulationPlayerChallenges, validateChallenge } from '../../../actions/challenge-action.js';
 import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard.js';
 import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
@@ -40,7 +40,7 @@ import ItemTags from '../../../components/ItemTags';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
+import { useSimulationPermissions } from '../../../utils/permissions/simulationPermissions.ts';
 
 const useStyles = makeStyles()(() => ({
   root: {
@@ -147,7 +147,7 @@ const ChallengesPlayer = () => {
     challenge_attempt: currentAttempt,
   } = currentChallengeEntry ?? {};
   // Pass the full exercise because the exercise is never loaded in the store at this point
-  const permissions = usePermissions(exerciseId, exercise);
+  const permissions = useSimulationPermissions(exerciseId, exercise);
   const handleClose = () => {
     setCurrentChallengeEntry(null);
     setCurrentResult(null);
@@ -231,7 +231,7 @@ const ChallengesPlayer = () => {
     const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -246,7 +246,7 @@ const ChallengesPlayer = () => {
             {t('Switch to preview mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

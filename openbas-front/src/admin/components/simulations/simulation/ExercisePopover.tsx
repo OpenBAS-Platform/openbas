@@ -17,8 +17,8 @@ import {
   type Exercise,
   type UpdateExerciseInput,
 } from '../../../../utils/api-types';
-import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useSimulationPermissions from '../../../../utils/permissions/simulationPermissions';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
 
@@ -114,7 +114,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     handleCloseExport();
   };
 
-  const permissions = usePermissions(exercise.exercise_id);
+  const permissions = useSimulationPermissions(exercise.exercise_id);
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
@@ -124,24 +124,29 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
-    disabled: !permissions.canWriteBypassStatus,
+    disabled: !permissions.canManage,
+    userRight: permissions.canManage,
   });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
+    userRight: permissions.canManage,
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
     action: () => handleOpenExport(),
+    userRight: true,
   });
   if (actions.includes('Access reports')) entries.push({
     label: 'Access reports',
     action: () => handleOpenReports(),
+    userRight: true,
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
     disabled: !userAdmin,
+    userRight: permissions.canManage,
   });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
@@ -197,6 +202,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           disabled={permissions.readOnly}
           handleClose={handleCloseEdit}
           edit
+          simulationId={exercise.exercise_id}
         />
 
       </Drawer>

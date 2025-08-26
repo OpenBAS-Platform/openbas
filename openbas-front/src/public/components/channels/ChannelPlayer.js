@@ -11,7 +11,7 @@ import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
+import { useSimulationPermissions } from '../../../utils/permissions/simulationPermissions.ts';
 import ChannelMicroblogging from './ChannelMicroblogging';
 import ChannelNewspaper from './ChannelNewspaper';
 import ChannelTvChannel from './ChannelTvChannel';
@@ -33,7 +33,7 @@ const ChannelPlayer = () => {
   const { channelReader } = useHelper(helper => ({ channelReader: helper.getChannelReader(channelId) }));
   const { channel_information: channel, channel_exercise: exercise } = channelReader ?? {};
   // Pass the full exercise because the exercise is never loaded in the store at this point
-  const permissions = usePermissions(exerciseId, exercise);
+  const permissions = useSimulationPermissions(exerciseId, exercise);
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerChannel(exerciseId, channelId, userId));
@@ -42,7 +42,7 @@ const ChannelPlayer = () => {
   if (channel) {
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -57,7 +57,7 @@ const ChannelPlayer = () => {
             {t('Switch to preview mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

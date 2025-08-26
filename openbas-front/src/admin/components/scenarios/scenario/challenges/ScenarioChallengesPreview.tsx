@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../../../actions/Application';
-import { fetchScenarioObserverChallenges } from '../../../../../actions/Challenge';
+import { fetchScenarioObserverChallenges } from '../../../../../actions/challenge-action';
 import { fetchScenarioPlayerDocuments } from '../../../../../actions/Document';
 import { type ScenarioChallengesReaderHelper } from '../../../../../actions/helper';
 import { fetchScenario } from '../../../../../actions/scenarios/scenario-actions';
@@ -10,8 +10,8 @@ import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import { useHelper } from '../../../../../store';
 import { type Scenario as ScenarioType, type ScenarioChallengesReader } from '../../../../../utils/api-types';
 import { useQueryParameter } from '../../../../../utils/Environment';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import useScenarioPermissions from '../../../../../utils/permissions/scenarioPermissions';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 
@@ -19,17 +19,14 @@ const ScenarioChallengesPreview = () => {
   const dispatch = useAppDispatch();
 
   const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
-  const { challengesReader, fullScenario }: {
-    fullScenario: ScenarioType;
-    challengesReader: ScenarioChallengesReader;
-  } = useHelper((helper: ScenarioChallengesReaderHelper & ScenariosHelper) => ({
+  const { challengesReader }: { challengesReader: ScenarioChallengesReader } = useHelper((helper: ScenarioChallengesReaderHelper & ScenariosHelper) => ({
     fullScenario: helper.getScenario(scenarioId),
     challengesReader: helper.getScenarioChallengesReader(scenarioId),
   }));
 
   const { scenario_information: scenario, scenario_challenges: challenges } = challengesReader ?? {};
 
-  const permissions = usePermissions(scenarioId, fullScenario);
+  const permissions = useScenarioPermissions(scenarioId);
   const [userId] = useQueryParameter(['user']);
 
   useEffect(() => {

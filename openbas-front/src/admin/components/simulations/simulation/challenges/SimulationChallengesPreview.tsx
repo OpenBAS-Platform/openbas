@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../../../actions/Application';
-import { fetchSimulationObserverChallenges } from '../../../../../actions/Challenge';
+import { fetchSimulationObserverChallenges } from '../../../../../actions/challenge-action';
 import { fetchSimulationPlayerDocuments } from '../../../../../actions/Document';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
@@ -10,8 +10,8 @@ import { type SimulationChallengesReaderHelper } from '../../../../../actions/he
 import { useHelper } from '../../../../../store';
 import { type Exercise as ExerciseType, type SimulationChallengesReader } from '../../../../../utils/api-types';
 import { useQueryParameter } from '../../../../../utils/Environment';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import useSimulationPermissions from '../../../../../utils/permissions/simulationPermissions';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 
@@ -26,7 +26,7 @@ const SimulationChallengesPreview = () => {
     challengesReader: helper.getSimulationChallengesReader(exerciseId),
   }));
   const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
-  const permissions = usePermissions(exerciseId, fullExercise);
+  const permissions = useSimulationPermissions(exerciseId, fullExercise);
   const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
 
   useEffect(() => {

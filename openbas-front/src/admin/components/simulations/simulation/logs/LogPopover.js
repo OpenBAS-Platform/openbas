@@ -65,7 +65,7 @@ class LogPopover extends Component {
   }
 
   render() {
-    const { t, log, exercise, tagsMap } = this.props;
+    const { t, log, tagsMap } = this.props;
     const logTags = tagOptions(log.log_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('log_tags', logTags),
@@ -77,7 +77,6 @@ class LogPopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
-          disabled={isExerciseReadOnly(exercise, true)}
         >
           <MoreVert />
         </IconButton>

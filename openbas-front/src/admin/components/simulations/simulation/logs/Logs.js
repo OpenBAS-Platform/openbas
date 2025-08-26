@@ -40,9 +40,8 @@ const Logs = () => {
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, logs, usersMap } = useHelper((helper) => {
+  const { logs, usersMap } = useHelper((helper) => {
     return {
-      exercise: helper.getExercise(exerciseId),
       logs: helper.getExerciseLogs(exerciseId),
       usersMap: helper.getUsersMap(),
     };
@@ -83,16 +82,16 @@ const Logs = () => {
         <Typography variant="h4" style={{ float: 'left' }}>
           {t('Simulation logs')}
         </Typography>
-        {isExerciseUpdatable(exercise, true) && (
-          <IconButton
-            color="secondary"
-            onClick={handleToggleWrite}
-            size="large"
-            style={{ margin: '-15px 0 0 5px' }}
-          >
-            <EditOutlined fontSize="small" />
-          </IconButton>
-        )}
+
+        <IconButton
+          color="secondary"
+          onClick={handleToggleWrite}
+          size="large"
+          style={{ margin: '-15px 0 0 5px' }}
+        >
+          <EditOutlined fontSize="small" />
+        </IconButton>
+
         {logs.map(log => (
           <Card
             key={log.log_id}
@@ -123,7 +122,6 @@ const Logs = () => {
                                         &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
                       {t('added an entry on')}
-                      {' '}
                       {nsdt(log.log_created_at)}
                     </span>
                   </div>
@@ -146,33 +144,33 @@ const Logs = () => {
             </CardContent>
           </Card>
         ))}
-        {isExerciseUpdatable(exercise, true) && (
-          <Accordion
-            style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
-            expanded={openCreateLog}
-            onChange={handleToggleWrite}
-            variant="outlined"
-          >
-            <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-              <Typography className={classes.heading}>
-                <RateReviewOutlined />
+
+        <Accordion
+          style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
+          expanded={openCreateLog}
+          onChange={handleToggleWrite}
+          variant="outlined"
+        >
+          <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+            <Typography className={classes.heading}>
+              <RateReviewOutlined />
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails style={{
-              width: '100%',
-              paddingBottom: 80,
-            }}
-            >
-              <LogForm
-                initialValues={{ log_tags: [] }}
-                onSubmit={submitCreateLog}
-                handleClose={() => setOpenCreateLog(false)}
-              />
-            </AccordionDetails>
-          </Accordion>
-        )}
+              <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails style={{
+            width: '100%',
+            paddingBottom: 80,
+          }}
+          >
+            <LogForm
+              initialValues={{ log_tags: [] }}
+              onSubmit={submitCreateLog}
+              handleClose={() => setOpenCreateLog(false)}
+            />
+          </AccordionDetails>
+        </Accordion>
+
         <div style={{ marginTop: 100 }} />
         <div ref={bottomRef} />
       </div>

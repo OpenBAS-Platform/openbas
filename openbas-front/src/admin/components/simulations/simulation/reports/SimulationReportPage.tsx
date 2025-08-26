@@ -8,8 +8,8 @@ import ExportPdfButton from '../../../../../components/ExportPdfButton';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type Exercise, type LessonsQuestion, type Report, type ReportInput } from '../../../../../utils/api-types';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import useSimulationPermissions from '../../../../../utils/permissions/simulationPermissions';
 import { ReportContext, type ReportContextType } from '../../../common/Context';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import ReportComment from '../../../components/reports/ReportComment';
@@ -40,11 +40,11 @@ const SimulationReportPage: FunctionComponent = () => {
     ? reportData.lessonsAnswers.filter(answer => answer.lessons_answer_question === selectedQuestion.lessonsquestion_id)
     : [];
 
-  const permissions = usePermissions(exerciseId);
-  const [canEditReport, setCanEditReport] = useState(permissions.canWrite);
+  const permissions = useSimulationPermissions(exerciseId);
+  const [canEditReport, setCanEditReport] = useState(permissions.canManage);
   useEffect(() => {
-    setCanEditReport(permissions.canWrite);
-  }, [permissions.canWrite]);
+    setCanEditReport(permissions.canManage);
+  }, [permissions.canManage]);
 
   // Context
   const context: ReportContextType = {
@@ -106,7 +106,7 @@ const SimulationReportPage: FunctionComponent = () => {
               t,
             })}
           />
-          {permissions.canWrite && <ReportPopover variant="toggle" report={report} actions={['Update']} />}
+          {permissions.canManage && <ReportPopover variant="toggle" report={report} actions={['Update']} />}
         </ToggleButtonGroup>
       </div>
 

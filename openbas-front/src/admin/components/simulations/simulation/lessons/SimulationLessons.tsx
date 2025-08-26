@@ -8,7 +8,6 @@ import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { type UserHelper } from '../../../../../actions/helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives, updateExerciseObjective } from '../../../../../actions/Objective';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
@@ -16,9 +15,9 @@ import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type EvaluationInput, type Exercise, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type ObjectiveInput } from '../../../../../utils/api-types';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useSimulationPermissions from '../../../../../utils/permissions/simulationPermissions';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/simulations/Lessons';
 
@@ -77,7 +76,6 @@ const SimulationLessons = () => {
   );
 
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
     dispatch(fetchPlayersByExercise(exerciseId));
     dispatch(fetchLessonsCategories(exerciseId));
     dispatch(fetchLessonsQuestions(exerciseId));
@@ -86,7 +84,7 @@ const SimulationLessons = () => {
     dispatch(fetchExerciseInjects(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
   });
-  const permissions = usePermissions(exerciseId, exercise);
+  const permissions = useSimulationPermissions(exerciseId, exercise);
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(exerciseId, data)),
@@ -134,7 +132,7 @@ const SimulationLessons = () => {
         source={{
           ...source,
           isReadOnly: permissions.readOnly,
-          isUpdatable: permissions.canWrite,
+          isUpdatable: permissions.canManage,
         }}
         objectives={objectives}
         injects={injects}
