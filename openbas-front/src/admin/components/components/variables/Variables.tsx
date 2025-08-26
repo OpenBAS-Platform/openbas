@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type Variable } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { PermissionsContext, VariableContext } from '../../common/Context';
+import { VariableContext } from '../../common/Context';
 import VariablePopover from './VariablePopover';
 
 const useStyles = makeStyles()(() => ({
@@ -90,7 +90,7 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
   const { classes } = useStyles();
   // Context
   const { onEditVariable, onDeleteVariable } = useContext(VariableContext);
-  const { permissions } = useContext(PermissionsContext);
+
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
     'key',

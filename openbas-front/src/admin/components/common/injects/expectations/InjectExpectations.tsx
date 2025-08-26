@@ -30,7 +30,6 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   predefinedExpectationDatas = [],
   expectationDatas,
   handleExpectations,
-  readOnly = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
