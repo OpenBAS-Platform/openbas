@@ -29,3 +29,22 @@ export const defaultGrantSimulationPlanner: DefaultGrant = {
   grant_type: 'PLANNER',
   grant_resource_type: 'SIMULATION',
 };
+export const defaultGrantPayloadObserver: DefaultGrant = {
+  grant_type: 'OBSERVER',
+  grant_resource_type: 'PAYLOAD',
+};
+
+export const defaultGrantPayloadPlanner: DefaultGrant = {
+  grant_type: 'PLANNER',
+  grant_resource_type: 'PAYLOAD',
+};
+
+export const defaultGrantAtomicTestingObserver: DefaultGrant = {
+  grant_type: 'OBSERVER',
+  grant_resource_type: 'ATOMIC_TESTING',
+};
+
+export const defaultGrantAtomicTestingPlanner: DefaultGrant = {
+  grant_type: 'PLANNER',
+  grant_resource_type: 'ATOMIC_TESTING',
+};

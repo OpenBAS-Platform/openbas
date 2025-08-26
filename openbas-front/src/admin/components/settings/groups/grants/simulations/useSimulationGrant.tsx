@@ -27,7 +27,8 @@ const useSimulationGrant = (groupId: string) => {
     if (checked) {
       const data: GroupGrantInput = {
         grant_name: grantName,
-        grant_exercise: exerciseId,
+        grant_resource: exerciseId,
+        grant_resource_type: 'SIMULATION',
       };
       dispatch(addGrant(group.group_id, data));
     } else {
@@ -38,7 +39,7 @@ const useSimulationGrant = (groupId: string) => {
   const getGrantIds = (exercise: Exercise) => {
     const grants = group.group_grants ?? [];
     const findGrantId = (name: string) => grants
-      .find((g: Grant) => g.grant_exercise === exercise.exercise_id && g.grant_name === name)?.grant_id ?? null;
+      .find((g: Grant) => g.grant_resource === exercise.exercise_id && g.grant_name === name)?.grant_id ?? null;
     return {
       observerId: findGrantId('OBSERVER'),
       plannerId: findGrantId('PLANNER'),

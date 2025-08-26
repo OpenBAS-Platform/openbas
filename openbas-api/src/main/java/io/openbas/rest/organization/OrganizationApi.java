@@ -61,7 +61,6 @@ public class OrganizationApi extends RestBehavior {
     return this.organizationService.organizationPagination(searchPaginationInput);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(ORGANIZATION_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ORGANIZATION)
   @Transactional(rollbackOn = Exception.class)
