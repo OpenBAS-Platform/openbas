@@ -6,7 +6,6 @@ import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
 import { type RelatedFindingOutput } from '../../../utils/api-types';
 import { AbilityContext } from '../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
-import { PermissionsContext } from '../common/Context';
 
 interface Props {
   finding: RelatedFindingOutput;

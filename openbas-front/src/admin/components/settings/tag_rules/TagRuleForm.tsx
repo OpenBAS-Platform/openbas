@@ -7,6 +7,8 @@ import { z } from 'zod';
 import TagFieldSingle from '../../../../components/fields/TagFieldSingle';
 import { useFormatter } from '../../../../components/i18n';
 import { type TagRuleInput, type TagRuleOutput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { zodImplement } from '../../../../utils/Zod';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
@@ -118,13 +120,14 @@ const TagRuleForm: FunctionComponent<Props> = ({
                   />
                 )}
               />
-              <InjectAddAssetGroups
-                assetGroupIds={assetGroupIds}
-                onSubmit={(result) => {
-                  onChange(result);
-                }}
-                disabled={permissions.readOnly}
-              />
+              <Can I={ACTIONS.ACCESS} a={SUBJECTS.ASSETS}>
+                <InjectAddAssetGroups
+                  assetGroupIds={assetGroupIds}
+                  onSubmit={(result) => {
+                    onChange(result);
+                  }}
+                />
+              </Can>
             </>
           );
         }}

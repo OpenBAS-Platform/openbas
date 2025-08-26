@@ -10,14 +10,12 @@ import VariableForm from './VariableForm';
 
 interface Props {
   variable: Variable;
-  disabled: boolean;
   onEdit: (variable: Variable, data: VariableInput) => void;
   onDelete: (variable: Variable) => void;
 }
 
 const VariablePopover: FunctionComponent<Props> = ({
   variable,
-  disabled,
   onEdit,
   onDelete,
 }) => {
@@ -68,11 +66,9 @@ const VariablePopover: FunctionComponent<Props> = ({
 
   return (
     <>
-
       <ButtonPopover
         entries={entries}
         variant="icon"
-        disabled={disabled}
       />
       <Dialog
         open={deleteVar}

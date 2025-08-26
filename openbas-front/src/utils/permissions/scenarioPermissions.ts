@@ -14,17 +14,17 @@ const useScenarioPermissions = (scenarioId: string) => {
     return { logged: helper.logged() };
   });
 
-  const canAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenarioId);
-  const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenarioId);
-  const canLaunch = ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, scenarioId);
+  const canAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.ACCESS, SUBJECTS.ASSESSMENT);
+  const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT);
+  const canLaunch = ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.LAUNCH, SUBJECTS.ASSESSMENT); ;
 
   return {
     canAccess,
     canManage,
     canLaunch,
-    readOnly: !canManage, // todo : check where is it useful
-    isLoggedIn: !R.isEmpty(logged), // todo : check where is it useful
-    isRunning: false, // todo : check where is it useful
+    readOnly: !canManage,
+    isLoggedIn: !R.isEmpty(logged),
+    isRunning: false,
   };
 };
 

@@ -1,8 +1,7 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { type FunctionComponent, useContext, useEffect } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';

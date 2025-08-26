@@ -136,7 +136,6 @@ const ScenarioLessons = () => {
       <Lessons
         source={{
           ...source,
-          isReadOnly: permissions.readOnly,
           isUpdatable: permissions.canManage,
         }}
         objectives={objectives}

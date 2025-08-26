@@ -1,6 +1,5 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
@@ -20,7 +19,6 @@ import type {
 } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { download } from '../../../../utils/utils';
 import { InjectContext, InjectTestContext, PermissionsContext } from '../Context';
 
@@ -89,19 +87,10 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openDisable, setOpenDisable] = useState(false);
   const [openDone, setOpenDone] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openExportDialog, setOpenExportDialog] = useState(false);
-
-  const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
 
   const handleOpenDuplicate = () => {
     setDuplicate(true);
-    handlePopoverClose();
   };
   const handleCloseDuplicate = () => setDuplicate(false);
 
@@ -127,7 +116,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
   const handleCloseDelete = () => setOpenDelete(false);
 
@@ -140,7 +128,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenTest = () => {
     setOpenTest(true);
-    handlePopoverClose();
   };
   const handleCloseTest = () => setOpenTest(false);
 
@@ -175,7 +162,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenEnable = () => {
     setOpenEnable(true);
-    handlePopoverClose();
   };
   const handleCloseEnable = () => setOpenEnable(false);
 
@@ -188,7 +174,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDisable = () => {
     setOpenDisable(true);
-    handlePopoverClose();
   };
   const handleCloseDisable = () => setOpenDisable(false);
 
@@ -201,7 +186,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDone = () => {
     setOpenDone(true);
-    handlePopoverClose();
   };
   const handleCloseDone = () => setOpenDone(false);
 
@@ -214,12 +198,10 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenEditContent = () => {
     setSelectedInjectId(inject.inject_id);
-    handlePopoverClose();
   };
 
   const handleOpenTrigger = () => {
     setOpenTrigger(true);
-    handlePopoverClose();
   };
   const handleCloseTrigger = () => setOpenTrigger(false);
 

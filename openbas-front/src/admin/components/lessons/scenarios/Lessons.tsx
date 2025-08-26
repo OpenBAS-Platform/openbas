@@ -22,7 +22,6 @@ interface GenericSource {
   type: string;
   name: string;
   lessons_anonymized: boolean;
-  isReadOnly: boolean;
   isUpdatable: boolean;
 }
 

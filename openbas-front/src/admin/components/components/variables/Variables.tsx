@@ -149,7 +149,6 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
           secondaryAction={(
             <VariablePopover
               variable={variable}
-              disabled={permissions?.readOnly}
               onEdit={onEditVariable}
               onDelete={onDeleteVariable}
             />

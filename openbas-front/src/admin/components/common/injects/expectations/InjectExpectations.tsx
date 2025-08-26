@@ -1,10 +1,11 @@
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import * as R from 'ramda';
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../components/i18n';
 import { truncate } from '../../../../../utils/String';
+import { PermissionsContext } from '../../Context';
 import { type ExpectationInput } from './Expectation';
 import ExpectationPopover from './ExpectationPopover';
 import { isAutomatic, typeIcon } from './ExpectationUtils';
@@ -34,6 +35,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   const [expectations, setExpectations] = useState(expectationDatas ?? []);
 
@@ -95,7 +97,6 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
                 expectation={expectation}
                 handleUpdate={handleUpdateExpectation}
                 handleDelete={handleRemoveExpectation}
-                disabled={readOnly}
               />
             )}
           >
@@ -123,11 +124,13 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
           </ListItem>
         ))}
       </List>
-      <InjectAddExpectation
-        handleAddExpectation={handleAddExpectation}
-        predefinedExpectations={predefinedExpectations}
-        disabled={readOnly}
-      />
+      {permissions.canManage
+        && (
+          <InjectAddExpectation
+            handleAddExpectation={handleAddExpectation}
+            predefinedExpectations={predefinedExpectations}
+          />
+        )}
     </>
   );
 };
