@@ -107,7 +107,7 @@ const Payloads = () => {
   const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
-  const { collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
+  const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
     documentsMap: helper.getDocumentsMap(),
     collectorsMap: helper.getCollectorsMap(),
   }));
@@ -359,7 +359,7 @@ const Payloads = () => {
         handleClose={() => setSelectedPayload(null)}
         title={t('Selected payload')}
       >
-        <PayloadComponent selectedPayload={selectedPayload} />
+        <PayloadComponent selectedPayload={selectedPayload} documentsMap={documentsMap} />
       </Drawer>
     </>
   );

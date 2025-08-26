@@ -30,6 +30,7 @@ public class AgentMapper {
             .deploymentMode(agent.getDeploymentMode())
             .executedByUser(agent.getExecutedByUser())
             .isActive(agent.isActive())
+            .agentVersion(agent.getVersion())
             .lastSeen(agent.getLastSeen());
 
     if (agent.getExecutor() != null) {

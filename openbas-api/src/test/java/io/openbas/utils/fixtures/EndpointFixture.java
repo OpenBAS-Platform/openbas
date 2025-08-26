@@ -57,6 +57,17 @@ public class EndpointFixture {
     return endpoint;
   }
 
+  public static Endpoint createEndpointWithPlatform(String name, Endpoint.PLATFORM_TYPE platform) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setName(name);
+    endpoint.setDescription("Endpoint description");
+    endpoint.setHostname("Windows Hostname");
+    endpoint.setIps(EndpointMapper.setIps(IPS));
+    endpoint.setPlatform(platform);
+    endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    return endpoint;
+  }
+
   public static Endpoint createDefaultWindowsEndpointWithArch(Endpoint.PLATFORM_ARCH arch) {
     Endpoint endpoint = createEndpoint();
     endpoint.setArch(arch);

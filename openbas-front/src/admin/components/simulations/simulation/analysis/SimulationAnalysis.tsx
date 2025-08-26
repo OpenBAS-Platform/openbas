@@ -11,6 +11,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import CustomDashboardComponent from '../../../workspaces/custom_dashboards/CustomDashboard';
 import { CustomDashboardContext, type ParameterOption } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
+import { ALL_TIME_TIME_RANGE } from '../../../workspaces/custom_dashboards/widgets/configuration/common/TimeRangeUtils';
 
 const SimulationAnalysis = () => {
   const dispatch = useAppDispatch();
@@ -52,6 +53,9 @@ const SimulationAnalysis = () => {
                 value: p.custom_dashboards_parameter_id,
                 hidden: false,
               };
+            }
+            if ('timeRange' === p.custom_dashboards_parameter_type) {
+              params[p.custom_dashboards_parameter_id].value = ALL_TIME_TIME_RANGE;
             }
           });
           setCustomDashboardParameters(params);

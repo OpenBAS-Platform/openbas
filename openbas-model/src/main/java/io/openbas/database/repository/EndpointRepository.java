@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -73,39 +74,39 @@ public interface EndpointRepository
   @Query(
       value =
           """
-    SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
-    FROM assets a
-    WHERE a.asset_id IN (
-        SELECT DISTINCT fa.asset_id
-        FROM findings f
-        LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
-    ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
-    """,
+              SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
+              FROM assets a
+              WHERE a.asset_id IN (
+                  SELECT DISTINCT fa.asset_id
+                  FROM findings f
+                  LEFT JOIN findings_assets fa ON fa.finding_id = f.finding_id
+              ) AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
+              """,
       nativeQuery = true)
   List<Object[]> findAllByNameLinkedToFindings(@Param("name") String name, Pageable pageable);
 
   @Query(
       value =
           """
-    SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
-    FROM assets a
-    WHERE a.asset_id IN (
-        SELECT DISTINCT fa2.asset_id
-        FROM findings_assets fa1
-        INNER JOIN findings f ON f.finding_id = fa1.finding_id
-        INNER JOIN findings_assets fa2 ON f.finding_id = fa2.finding_id
-        INNER JOIN injects i ON f.finding_inject_id = i.inject_id
-        LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
-        WHERE (
-            fa1.asset_id = :sourceId
-            OR i.inject_id = :sourceId
-            OR i.inject_exercise = :sourceId
-            OR se.scenario_id = :sourceId
-        )
-        AND fa2.asset_id != :sourceId
-    )
-    AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
-    """,
+              SELECT DISTINCT a.asset_id AS id, a.asset_name AS label
+              FROM assets a
+              WHERE a.asset_id IN (
+                  SELECT DISTINCT fa2.asset_id
+                  FROM findings_assets fa1
+                  INNER JOIN findings f ON f.finding_id = fa1.finding_id
+                  INNER JOIN findings_assets fa2 ON f.finding_id = fa2.finding_id
+                  INNER JOIN injects i ON f.finding_inject_id = i.inject_id
+                  LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
+                  WHERE (
+                      fa1.asset_id = :sourceId
+                      OR i.inject_id = :sourceId
+                      OR i.inject_exercise = :sourceId
+                      OR se.scenario_id = :sourceId
+                  )
+                  AND fa2.asset_id != :sourceId
+              )
+              AND (:name IS NULL OR LOWER(a.asset_name) LIKE LOWER(CONCAT('%', COALESCE(:name, ''), '%')));
+              """,
       nativeQuery = true)
   List<Object[]> findAllByNameLinkedToFindingsWithContext(
       @Param("sourceId") String sourceId, @Param("name") String name, Pageable pageable);
@@ -130,4 +131,18 @@ public interface EndpointRepository
               + ";",
       nativeQuery = true)
   List<RawEndpoint> findForIndexing(@Param("from") Instant from);
+
+  // For testing purposes only
+
+  @Modifying
+  @Query(
+      value = "UPDATE assets SET asset_created_at = :creationDate where asset_id = :id",
+      nativeQuery = true)
+  void setCreationDate(@Param("creationDate") Instant creationDate, @Param("id") String assetId);
+
+  @Modifying
+  @Query(
+      value = "UPDATE assets SET asset_updated_at = :updateDate where asset_id = :id",
+      nativeQuery = true)
+  void setUpdateDate(@Param("updateDate") Instant updateDate, @Param("id") String assetId);
 }

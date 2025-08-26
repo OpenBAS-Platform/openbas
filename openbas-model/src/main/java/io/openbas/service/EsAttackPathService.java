@@ -12,6 +12,7 @@ import io.openbas.engine.model.inject.EsInject;
 import io.openbas.engine.query.EsAttackPath;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
+import io.openbas.utils.CustomDashboardTimeRange;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class EsAttackPathService {
+
   private final AttackPatternRepository attackPatternRepository;
 
   private final EngineService esService;
@@ -99,6 +101,8 @@ public class EsAttackPathService {
       Map<String, CustomDashboardParameters> definitionParameters) {
     Map<String, List<String>> filterMap = Map.of("base_simulation_side", List.of(simulationId));
     ListConfiguration config = esService.createListConfiguration("inject", filterMap);
+    config.setDateAttribute("inject_created_at");
+    config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
 
     return esService
         .entities(user, new ListRuntime(config, parameters, definitionParameters))
@@ -195,7 +199,9 @@ public class EsAttackPathService {
     Map<String, EsAttackPath> esAttackPathsMap = new HashMap<>();
 
     for (EsInject inject : esInjects) {
-      if (inject.getBase_attack_patterns_side() == null) continue;
+      if (inject.getBase_attack_patterns_side() == null) {
+        continue;
+      }
 
       for (String attackId : inject.getBase_attack_patterns_side()) {
         esAttackPathsMap.compute(
