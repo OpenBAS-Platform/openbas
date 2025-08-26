@@ -1,4 +1,4 @@
-import { delReferential, delSubResourceReferential, postReferential } from '../utils/Action';
+import { delSubResourceReferential, postReferential } from '../utils/Action';
 import * as schema from './Schema';
 
 export const addGrant = (groupId, data) => (dispatch) => {

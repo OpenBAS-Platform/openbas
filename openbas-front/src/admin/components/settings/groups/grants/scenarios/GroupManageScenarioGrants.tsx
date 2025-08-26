@@ -14,7 +14,7 @@ const GroupManageScenarioGrants = ({ groupId }: { groupId: string }) => {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`group-${groupId}-cenarios`, buildSearchPagination({ sorts: initSorting('scenario_updated_at', 'DESC') }));
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`group-${groupId}-scenarios`, buildSearchPagination({ sorts: initSorting('scenario_updated_at', 'DESC') }));
   const search = (input: SearchPaginationInput) => {
     setLoading(true);
     return searchScenarios(input).finally(() => setLoading(false));

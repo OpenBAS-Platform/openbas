@@ -138,7 +138,7 @@ public class GroupApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
-  public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
+  public Group groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
     // Validate the resourceId
     grantService.validateResourceIdForGrant(input.getResourceId());
 
@@ -151,6 +151,10 @@ public class GroupApi extends RestBehavior {
     grant.setGroup(group);
     grant.setResourceId(input.getResourceId());
     grant.setGrantResourceType(input.getResourceType());
+
+    group.getGrants().add(grant);
+    return groupRepository.save(group);
+  }
 
   @DeleteMapping("/api/groups/{groupId}/grants/{grantId}")
   @RBAC(

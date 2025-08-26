@@ -197,7 +197,7 @@ export const postReferential = (schema: Schema | null, uri: string, data: unknow
     });
 };
 
-export const delSubResourceReferential = (schema: Schema | null, uri: string, data: unknown) => (dispatch: Dispatch) => {
+export const delSubResourceReferential = (schema: Schema | null, uri: string) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api(schema)
     .delete(buildUri(uri))

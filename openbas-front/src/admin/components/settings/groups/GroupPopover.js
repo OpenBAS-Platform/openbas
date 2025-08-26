@@ -9,9 +9,9 @@ import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupRoles, upda
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
-import GroupManageGrants from './grants/GroupManageGrants.tsx';
 import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
+import GroupManageGrants from './grants/GroupManageGrants.tsx';
 import GroupForm from './GroupForm';
 import GroupManageRoles from './GroupManageRoles.js';
 import GroupManageUsers from './GroupManageUsers';
