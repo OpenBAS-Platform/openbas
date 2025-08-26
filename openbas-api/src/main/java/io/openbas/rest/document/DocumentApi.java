@@ -29,6 +29,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -348,8 +350,10 @@ public class DocumentApi extends RestBehavior {
     Document document =
         resolveDocument(documentId)
             .orElseThrow(() -> new ElementNotFoundException("Document not found"));
-    response.addHeader(
-        HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+
+    String encodedFilename = URLEncoder.encode(document.getName(), StandardCharsets.UTF_8);
+
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + encodedFilename);
     response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
     response.setStatus(HttpServletResponse.SC_OK);
     try (InputStream fileStream =
