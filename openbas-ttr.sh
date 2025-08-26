@@ -15,6 +15,6 @@ decoded_cmd=$(echo "$argClean" | base64 -d)
 # Run command fully detached (new session, no terminal)
 $decoded_cmd" &
 
-exit 0
-
 echo "Task triggered."
+
+exit 0
