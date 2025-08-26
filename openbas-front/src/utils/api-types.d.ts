@@ -1382,6 +1382,7 @@ export interface Endpoint {
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
+  asset_external_reference?: string;
   asset_id: string;
   asset_name: string;
   asset_tags?: string[];
@@ -1408,6 +1409,7 @@ export interface Endpoint {
 
 export interface EndpointInput {
   asset_description?: string;
+  asset_external_reference?: string;
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
@@ -1438,6 +1440,8 @@ export interface EndpointOutput {
    * @uniqueItems true
    */
   asset_agents: AgentOutput[];
+  /** Asset external reference */
+  asset_external_reference?: string;
   /** Asset Id */
   asset_id: string;
   /** Asset name */
@@ -5114,6 +5118,7 @@ export interface SecurityPlatform {
 
 export interface SecurityPlatformInput {
   asset_description?: string;
+  asset_external_reference?: string;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
