@@ -1262,13 +1262,13 @@ export type DateHistogramWidget = UtilRequiredKeys<
 };
 
 export interface DefaultGrant {
-  grantResourceType?:
+  grant_resource_type?:
     | "SCENARIO"
     | "SIMULATION"
     | "ATOMIC_TESTING"
     | "PAYLOAD"
     | "UNKNOWN";
-  grantType?: "OBSERVER" | "PLANNER" | "LAUNCHER";
+  grant_type?: "OBSERVER" | "PLANNER" | "LAUNCHER";
 }
 
 export interface DetectionRemediation {
@@ -2447,11 +2447,7 @@ export interface Grant {
 
 export interface Group {
   /** @uniqueItems true */
-  defaultGrants?: DefaultGrant[];
-  group_default_exercise_observer?: boolean;
-  group_default_exercise_planner?: boolean;
-  group_default_scenario_observer?: boolean;
-  group_default_scenario_planner?: boolean;
+  group_default_grants?: DefaultGrant[];
   group_default_user_assign?: boolean;
   group_description?: string;
   group_grants?: Grant[];

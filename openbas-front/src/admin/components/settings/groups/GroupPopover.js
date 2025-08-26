@@ -231,10 +231,7 @@ class GroupPopover extends Component {
         'group_name',
         'group_description',
         'group_default_user_assign',
-        'group_default_scenario_observer',
-        'group_default_scenario_planner',
-        'group_default_exercise_planner',
-        'group_default_exercise_observer',
+        'group_default_grants',
       ],
       group,
     );

@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -49,8 +50,10 @@ public class Group implements Base {
   @JsonProperty("group_default_user_assign")
   private boolean defaultUserAssignation;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "groups_default_grants", joinColumns = @JoinColumn(name = "group_id"))
+  @JsonProperty("group_default_grants")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Set<DefaultGrant> defaultGrants = new HashSet<>();
 
   @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
@@ -122,26 +125,6 @@ public class Group implements Base {
         .filter(dg -> dg.getGrantResourceType() == Grant.GRANT_RESOURCE_TYPE.SCENARIO)
         .map(DefaultGrant::getGrantType)
         .collect(Collectors.toList());
-  }
-
-  @JsonProperty("group_default_exercise_planner")
-  public boolean isDefaultExercisePlanner() {
-    return getSimulationsDefaultGrants().contains(Grant.GRANT_TYPE.PLANNER);
-  }
-
-  @JsonProperty("group_default_exercise_observer")
-  public boolean isDefaultExerciseObserver() {
-    return getSimulationsDefaultGrants().contains(Grant.GRANT_TYPE.OBSERVER);
-  }
-
-  @JsonProperty("group_default_scenario_planner")
-  public boolean isDefaultScenarioPlanner() {
-    return getScenariosDefaultGrants().contains(Grant.GRANT_TYPE.PLANNER);
-  }
-
-  @JsonProperty("group_default_scenario_observer")
-  public boolean isDefaultScenarioObserver() {
-    return getScenariosDefaultGrants().contains(Grant.GRANT_TYPE.OBSERVER);
   }
 
   // endregion
