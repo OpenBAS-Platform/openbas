@@ -22,6 +22,7 @@ public class StixService {
     // Update Scenario using the last SecurityAssessment
     Scenario scenario =
         securityAssessmentService.buildScenarioFromSecurityAssessment(securityAssessment);
+    securityAssessmentService.setScenario(securityAssessment, scenario);
     return scenario.getId();
   }
 }

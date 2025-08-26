@@ -6,7 +6,6 @@ import io.openbas.database.model.SecurityCoverageSendJob;
 import io.openbas.service.SecurityCoverageSendJobService;
 import io.openbas.service.SecurityCoverageService;
 import io.openbas.stix.objects.Bundle;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class SecurityCoverageJob implements Job {
   private final ObjectMapper mapper;
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     List<SecurityCoverageSendJob> jobs =
         securityCoverageSendJobService.getPendingSecurityCoverageSendJobs();
@@ -47,6 +49,8 @@ public class SecurityCoverageJob implements Job {
             e);
       }
     }
-    securityCoverageSendJobService.consumeJobs(successfulJobs);
+    if(!successfulJobs.isEmpty()) {
+      securityCoverageSendJobService.consumeJobs(successfulJobs);
+    }
   }
 }

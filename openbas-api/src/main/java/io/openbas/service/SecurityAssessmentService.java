@@ -142,6 +142,11 @@ public class SecurityAssessmentService {
     return scenarioService.updateScenario(scenario);
   }
 
+  public SecurityAssessment setScenario(SecurityAssessment securityAssessment, Scenario scenario) {
+    securityAssessment.setScenario(scenario);
+    return this.save(securityAssessment);
+  }
+
   private SecurityAssessment getByExternalIdOrCreateSecurityAssessment(String externalId) {
     return securityAssessmentRepository
         .findByExternalId(externalId)

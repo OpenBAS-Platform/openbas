@@ -40,6 +40,7 @@ public interface SecurityCoverageSendJobRepository
           """
     SELECT scsj.* FROM security_coverage_send_job scsj
     WHERE scsj.security_coverage_send_job_id IN :ids
+    FOR UPDATE
     """,
       nativeQuery = true)
   List<SecurityCoverageSendJob> findAllByIdForUpdate(List<String> ids);
