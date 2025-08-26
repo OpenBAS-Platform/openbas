@@ -2,11 +2,9 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.raw.RawAsset;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

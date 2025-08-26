@@ -39,11 +39,11 @@ public interface EndpointRepository
       @NotNull final @Param("macAddresses") String[] macAddresses);
 
   @Query(
-          value =
-                  "select e.* from assets e where e.asset_external_reference = :externalReference order by e.asset_id",
-          nativeQuery = true)
+      value =
+          "select e.* from assets e where e.asset_external_reference = :externalReference order by e.asset_id",
+      nativeQuery = true)
   List<Endpoint> findByExternalReference(
-          @NotNull final @Param("externalReference") String externalReference);
+      @NotNull final @Param("externalReference") String externalReference);
 
   @Override
   @Query(
