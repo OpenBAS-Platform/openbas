@@ -20,7 +20,7 @@
           }
         ],
         "file_templates": [],
-        "command": "/bin/sh -c "/bin/echo $1 | sed 's#%2b#+#gi' | sed 's#%3d#=#gi' | sed 's#%2f#/#gi' | base64 -d | sh & exit 0\"",
+        "command": "/bin/sh -c \"/bin/echo $1 | sed 's#%2b#+#gi' | sed 's#%3d#=#gi' | sed 's#%2f#/#gi' | base64 -d | sh & exit 0\"",
         "command_timeout": 60,
         "expire_seconds": 660,
         "hidden_flag": 0,
