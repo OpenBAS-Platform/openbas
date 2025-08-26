@@ -14,6 +14,8 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import { type ExerciseSimple, type FilterGroup, type SearchPaginationInput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import ExercisePopover from './simulation/ExercisePopover';
@@ -113,7 +115,10 @@ const Simulations = () => {
         secondaryAction={secondaryAction}
         loading={loading}
       />
-      {userAdmin && <ExerciseCreation />}
+      {/* todo: manage and not create while the capability will be created */}
+      <Can I={ACTIONS.CREATE} a={SUBJECTS.ASSESSMENT}>
+        <ExerciseCreation />
+      </Can>
     </>
   );
 };
