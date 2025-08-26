@@ -295,7 +295,7 @@ class GroupForm extends Component {
                 <GridLegacy container spacing={3}>
                   <GridLegacy item xs={12}>
                     <Typography variant="h2" style={{ marginBottom: 0 }}>
-                      {t('Atomic Testings')}
+                      {t('Atomic testings')}
                     </Typography>
                   </GridLegacy>
                   <GridLegacy item xs={6} style={{ display: 'flex' }}>
