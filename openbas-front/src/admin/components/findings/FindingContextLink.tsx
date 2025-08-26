@@ -1,9 +1,12 @@
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 
 import ContextLink from '../../../components/ContextLink';
 import { ATOMIC_BASE_URL, SCENARIO_BASE_URL, SIMULATION_BASE_URL } from '../../../constants/BaseUrls';
 import { INJECT, SCENARIO, SIMULATION } from '../../../constants/Entities';
 import { type RelatedFindingOutput } from '../../../utils/api-types';
+import { AbilityContext } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { PermissionsContext } from '../common/Context';
 
 interface Props {
   finding: RelatedFindingOutput;
@@ -11,6 +14,8 @@ interface Props {
 }
 
 const FindingContextLink: FunctionComponent<Props> = ({ finding, type }) => {
+  const ability = useContext(AbilityContext);
+
   switch (type) {
     case INJECT: {
       const title = finding.finding_inject?.inject_title;
@@ -24,7 +29,9 @@ const FindingContextLink: FunctionComponent<Props> = ({ finding, type }) => {
         ? `${ATOMIC_BASE_URL}/${injectId}`
         : `${SIMULATION_BASE_URL}/${simulationId}/injects/${injectId}`;
 
-      return <ContextLink title={title} url={url} />;
+      const userRight = isAtomic ? ability.can(ACTIONS.ACCESS, SUBJECTS.ATOMIC_TESTING) : ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, finding.finding_simulation?.exercise_id);
+
+      return userRight ? <ContextLink title={title} url={url} /> : title;
     }
 
     case SIMULATION: {
@@ -33,7 +40,7 @@ const FindingContextLink: FunctionComponent<Props> = ({ finding, type }) => {
 
       if (!title || !id) return '-';
 
-      return <ContextLink title={title} url={`${SIMULATION_BASE_URL}/${id}`} />;
+      return ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, finding.finding_simulation?.exercise_id) ? <ContextLink title={title} url={`${SIMULATION_BASE_URL}/${id}`} /> : title;
     }
 
     case SCENARIO: {
@@ -42,7 +49,7 @@ const FindingContextLink: FunctionComponent<Props> = ({ finding, type }) => {
 
       if (!title || !id) return '-';
 
-      return <ContextLink title={title} url={`${SCENARIO_BASE_URL}/${id}`} />;
+      return ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, finding.finding_scenario?.scenario_id) ? <ContextLink title={title} url={`${SCENARIO_BASE_URL}/${id}`} /> : title;
     }
 
     default:

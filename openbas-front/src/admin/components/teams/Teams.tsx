@@ -20,6 +20,7 @@ const Teams = () => {
     permissions: {
       readOnly: false,
       canManage: false,
+      canAccess: false,
       canLaunch: false,
       isRunning: false,
     },

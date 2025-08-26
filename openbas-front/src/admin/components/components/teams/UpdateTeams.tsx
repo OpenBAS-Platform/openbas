@@ -11,6 +11,8 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { type Team, type TeamOutput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
 
@@ -115,10 +117,12 @@ const UpdateTeams: FunctionComponent<Props> = ({ addedTeamIds }) => {
               onDelete={removeTeam}
               paginationComponent={paginationComponent}
               buttonComponent={(
-                <CreateTeam
-                  inline
-                  onCreate={team => setSelectedTeamValues([...selectedTeamValues, team as TeamOutput])}
-                />
+                <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+                  <CreateTeam
+                    inline
+                    onCreate={team => setSelectedTeamValues([...selectedTeamValues, team as TeamOutput])}
+                  />
+                </Can>
               )}
               getId={element => element.team_id}
               getName={element => element.team_name}

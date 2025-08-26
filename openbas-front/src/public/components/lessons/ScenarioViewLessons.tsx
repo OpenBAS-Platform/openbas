@@ -34,7 +34,6 @@ const ScenarioViewLessons = () => {
 
   const {
     me,
-    scenario,
     source,
     lessonsCategories,
     lessonsQuestions,
@@ -62,7 +61,7 @@ const ScenarioViewLessons = () => {
   }, [dispatch, scenarioId, userId, finalUserId]);
 
   // Pass the full scenario because the scenario is never loaded in the store at this point
-  const permissions = useScenarioPermissions(scenarioId, scenario);
+  const permissions = useScenarioPermissions(scenarioId);
 
   const context: ViewLessonContextType = {};
 

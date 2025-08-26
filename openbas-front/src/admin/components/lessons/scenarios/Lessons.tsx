@@ -130,17 +130,19 @@ const Lessons: FunctionComponent<Props> = ({
                 />
               </Grid>
             )}
-            <Grid size={{ xs: 6 }}>
-              <Typography variant="h3">{t('Template')}</Typography>
-              <Button
-                startIcon={<ContentPasteGoOutlined />}
-                color="primary"
-                variant="contained"
-                onClick={() => setOpenApplyTemplate(true)}
-              >
-                {t('Apply')}
-              </Button>
-            </Grid>
+            <Can I={ACTIONS.ACCESS} a={SUBJECTS.LESSONS_LEARNED}>
+              <Grid size={{ xs: 6 }}>
+                <Typography variant="h3">{t('Template')}</Typography>
+                <Button
+                  startIcon={<ContentPasteGoOutlined />}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => setOpenApplyTemplate(true)}
+                >
+                  {t('Apply')}
+                </Button>
+              </Grid>
+            </Can>
             <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Check')}</Typography>
               <Button
@@ -185,7 +187,9 @@ const Lessons: FunctionComponent<Props> = ({
           isReport={false}
         />
       </div>
-      <CreateLessonsCategory />
+
+      {permissions.canManage
+        && <CreateLessonsCategory />}
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}

@@ -38,6 +38,9 @@ import {
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { usePermissions } from '../../../../../utils/permissions/simulationPermissions';
+import { AbilityContext } from '../../../../../utils/permissions/PermissionsProvider';
+import useScenarioPermissions from '../../../../../utils/permissions/scenarioPermissions';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/scenarios/Lessons';
 
@@ -90,7 +93,7 @@ const ScenarioLessons = () => {
     [scenario],
   );
 
-  const permissions = usePermissions(scenarioId, scenario);
+  const permissions = useScenarioPermissions(scenarioId);
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(scenarioId, data)),

@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
@@ -9,7 +9,9 @@ import ExportOptionsDialog from '../../../../components/common/export/ExportOpti
 import { useFormatter } from '../../../../components/i18n';
 import { type Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
 import useScenarioPermissions from '../../../../utils/permissions/scenarioPermissions';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ScenarioUpdate from './ScenarioUpdate';
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
@@ -32,6 +34,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { canManage } = useScenarioPermissions(scenario.scenario_id);
+  const ability = useContext(AbilityContext);
 
   // Duplicate
   const [duplicate, setDuplicate] = useState(false);
@@ -83,7 +86,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
-    userRight: canManage,
+    userRight: canManage && ability.can(ACTIONS.CREATE, SUBJECTS.ASSESSMENT),
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',

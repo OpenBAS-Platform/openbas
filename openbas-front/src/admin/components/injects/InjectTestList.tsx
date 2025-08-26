@@ -12,7 +12,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
-import { InjectTestContext } from '../common/Context';
+import { InjectTestContext, PermissionsContext } from '../common/Context';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
 import InjectTestPopover from './InjectTestPopover';
@@ -59,6 +59,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   const { classes } = useStyles();
   const { t, fldt } = useFormatter();
   const theme = useTheme();
+  const { permissions } = useContext(PermissionsContext);
 
   const [selectedInjectTestStatus, setSelectedInjectTestStatus] = useState<InjectTestStatusOutput | null>(null);
 
@@ -161,12 +162,15 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
                   key={test.status_id}
                   divider
                   secondaryAction={(
-                    <InjectTestPopover
-                      injectTest={test}
-                      onTest={result =>
-                        setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
-                      onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
-                    />
+                    permissions.canManage && (
+                      <InjectTestPopover
+                        injectTest={test}
+                        onTest={result =>
+                          setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
+                        onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
+                      />
+                    )
+
                   )}
                   disablePadding
                 >

@@ -6,7 +6,7 @@ import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
-import { InjectTestContext } from '../common/Context';
+import { InjectTestContext, PermissionsContext } from '../common/Context';
 
 interface Props {
   searchPaginationInput: SearchPaginationInput;
@@ -21,6 +21,7 @@ const InjectTestReplayAll: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
 
   const [openAllTest, setOpenAllTest] = useState(false);
 
@@ -53,21 +54,24 @@ const InjectTestReplayAll: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Tooltip title={t('Replay all tests')}>
-        <span>
-          <IconButton
-            aria-label="test"
-            disabled={
-              injectIds?.length === 0
-            }
-            onClick={handleOpenAllTest}
-            color="primary"
-            size="small"
-          >
-            <ForwardToInbox fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
+      {permissions.canManage
+        && (
+          <Tooltip title={t('Replay all tests')}>
+            <span>
+              <IconButton
+                aria-label="test"
+                disabled={
+                  injectIds?.length === 0
+                }
+                onClick={handleOpenAllTest}
+                color="primary"
+                size="small"
+              >
+                <ForwardToInbox fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        )}
       <DialogTest
         open={openAllTest}
         handleClose={handleCloseAllTest}

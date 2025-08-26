@@ -45,6 +45,7 @@ export type PermissionsContextType = {
   permissions: {
     readOnly: boolean;
     canManage: boolean;
+    canAccess: boolean;
     canLaunch: boolean;
     isRunning: boolean;
   };
@@ -188,6 +189,7 @@ export type ViewLessonContextType = {
 
 export const PermissionsContext = createContext<PermissionsContextType>({
   permissions: {
+    canAccess: false,
     canManage: false,
     canLaunch: false,
     readOnly: false,
