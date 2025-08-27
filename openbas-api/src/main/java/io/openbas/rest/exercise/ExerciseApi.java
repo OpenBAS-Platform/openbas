@@ -104,6 +104,7 @@ public class ExerciseApi extends RestBehavior {
   private final ChannelService channelService;
   private final DocumentService documentService;
   private final ScenarioService scenarioService;
+  private final UserService userService;
 
   // endregion
 
@@ -763,8 +764,9 @@ public class ExerciseApi extends RestBehavior {
   public Page<ExerciseSimple> exercises(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
-
-    if (currentUser().isAdmin()) {
+    User currentUser = userService.currentUser();
+    if (currentUser.isAdminOrBypass()
+        || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)) {
       return buildPaginationCriteriaBuilder(
           (Specification<Exercise> specification,
               Specification<Exercise> specificationCount,

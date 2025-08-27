@@ -5010,11 +5010,10 @@ export interface RoleInput {
   /** @uniqueItems true */
   role_capabilities?: (
     | "BYPASS"
-    | "CREATE_ASSESSMENT"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5838,11 +5837,10 @@ export interface User {
   /** @uniqueItems true */
   user_capabilities?: (
     | "BYPASS"
-    | "CREATE_ASSESSMENT"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5895,6 +5893,8 @@ export interface User {
   user_groups?: string[];
   /** User ID */
   user_id: string;
+  /** True if the user is admin or has bypass capa */
+  user_is_admin_or_bypass?: boolean;
   /** True if the user is external */
   user_is_external?: boolean;
   /** True if the user is manager */

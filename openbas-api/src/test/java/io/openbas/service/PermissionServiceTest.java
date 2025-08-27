@@ -58,6 +58,15 @@ public class PermissionServiceTest extends IntegrationTest {
   }
 
   @Test
+  public void test_hasPermission_write_WHEN_has_no_grant_but_Capa() {
+    User user = getUser(USER_ID, false);
+    user.setGroups(List.of(getGroup(Capability.ACCESS_ASSESSMENT)));
+    when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(false);
+    assertTrue(
+        permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SIMULATION, Action.READ));
+  }
+
+  @Test
   public void test_hasPermission_delete_WHEN_has_write_grant() {
     User user = getUser(USER_ID, false);
     when(grantService.hasWriteGrant(RESOURCE_ID, user)).thenReturn(true);
@@ -134,15 +143,15 @@ public class PermissionServiceTest extends IntegrationTest {
   @Test
   public void test_hasPermission_create_WHEN_has_create_capa() {
     User user = getUser(USER_ID, false);
-    user.setGroups(List.of(getGroup(Capability.CREATE_ASSESSMENT)));
+    user.setGroups(List.of(getGroup(Capability.MANAGE_ASSESSMENT)));
     assertTrue(
         permissionService.hasPermission(user, RESOURCE_ID, ResourceType.SCENARIO, Action.CREATE));
   }
 
   @Test
-  public void test_hasPermission_duplicate_WHEN_has_create_capa() {
+  public void test_hasPermission_duplicate_WHEN_has_manage_capa() {
     User user = getUser(USER_ID, false);
-    user.setGroups(List.of(getGroup(Capability.CREATE_ASSESSMENT)));
+    user.setGroups(List.of(getGroup(Capability.MANAGE_ASSESSMENT)));
     when(grantService.hasReadGrant(RESOURCE_ID, user)).thenReturn(true);
     assertTrue(
         permissionService.hasPermission(
