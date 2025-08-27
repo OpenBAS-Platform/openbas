@@ -348,8 +348,10 @@ public class DocumentApi extends RestBehavior {
     Document document =
         resolveDocument(documentId)
             .orElseThrow(() -> new ElementNotFoundException("Document not found"));
-    response.addHeader(
-        HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+
+    String encodedFilename = DocumentService.encodeFileName(document.getName());
+
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + encodedFilename);
     response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
     response.setStatus(HttpServletResponse.SC_OK);
     try (InputStream fileStream =

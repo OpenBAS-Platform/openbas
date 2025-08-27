@@ -16,6 +16,8 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -101,5 +103,9 @@ public class DocumentService {
                 "File already removed or not found in minio: {}", documentToRemove.getTarget(), e);
           }
         });
+  }
+
+  public static String encodeFileName(String name) {
+    return URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
   }
 }
