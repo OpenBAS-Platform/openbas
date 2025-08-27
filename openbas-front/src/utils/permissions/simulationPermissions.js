@@ -31,6 +31,7 @@ export const usePermissions = (exerciseId, fullExercise) => {
       canAccess: false,
       canManage: false,
       canLaunch: false,
+      canDelete: false,
       canAccessBypassStatus: false,
       canManageBypassStatus: false,
       canLaunchBypassStatus: false,
@@ -63,6 +64,7 @@ export const usePermissions = (exerciseId, fullExercise) => {
     canAccess,
     canManage,
     canLaunch,
+    canDelete: canManage, // todo : update
     canAccessBypassStatus,
     canManageBypassStatus,
     canLaunchBypassStatus,
