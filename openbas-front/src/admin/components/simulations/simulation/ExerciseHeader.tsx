@@ -46,7 +46,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
   const executionButton = () => {
     switch (exerciseStatus) {
       case 'SCHEDULED': {
-        if (!permissions.canManage) {
+        if (permissions.canLaunch) {
           return (
             <Button
               style={{
@@ -66,7 +66,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
         return (<div />);
       }
       case 'RUNNING': {
-        if (!permissions.canManage) {
+        if (permissions.canLaunch) {
           return (
             <Button
               style={{ marginRight: 10 }}
@@ -83,7 +83,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
         return (<div />);
       }
       case 'PAUSED': {
-        if (!permissions.canManage) {
+        if (permissions.canLaunch) {
           return (
             <Button
               style={{ marginRight: 10 }}
@@ -107,7 +107,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
     switch (exerciseStatus) {
       case 'RUNNING':
       case 'PAUSED': {
-        if (!permissions.canManage) {
+        if (permissions.canLaunch) {
           return (
             <Button
               style={{ marginRight: 10 }}
@@ -124,7 +124,7 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
       }
       case 'FINISHED':
       case 'CANCELED': {
-        if (!permissions.canManage) {
+        if (permissions.canLaunch) {
           return (
             <Button
               style={{ marginRight: 10 }}

@@ -24,6 +24,7 @@ const useSimulationPermissions = (exerciseId: string, fullExercise?: Exercise) =
       canAccess: false,
       canManage: false,
       canLaunch: false,
+      canDelete: false,
       readOnly: true,
       isLoggedIn: !R.isEmpty(logged),
       isRunning: false,
@@ -33,6 +34,7 @@ const useSimulationPermissions = (exerciseId: string, fullExercise?: Exercise) =
   const canAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, exerciseId) || ability.can(ACTIONS.ACCESS, SUBJECTS.ASSESSMENT);
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, exerciseId) || ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT);
   const canLaunch = ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, exerciseId) || ability.can(ACTIONS.LAUNCH, SUBJECTS.ASSESSMENT);
+  const canDelete = ability.can(ACTIONS.DELETE, SUBJECTS.RESOURCE, exerciseId) || ability.can(ACTIONS.DELETE, SUBJECTS.ASSESSMENT);
   const isRunning = (exercise || fullExercise).exercise_status === 'RUNNING';
   const readOnly = exercise.exercise_status === 'FINISHED' || exercise.exercise_status === 'CANCELED' || !canManage;
 
@@ -40,6 +42,7 @@ const useSimulationPermissions = (exerciseId: string, fullExercise?: Exercise) =
     canAccess,
     canManage,
     canLaunch,
+    canDelete,
     readOnly,
     isLoggedIn: !R.isEmpty(logged),
     isRunning,

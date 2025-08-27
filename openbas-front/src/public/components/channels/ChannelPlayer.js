@@ -11,7 +11,7 @@ import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { useSimulationPermissions } from '../../../utils/permissions/simulationPermissions.ts';
+import useSimulationPermissions from '../../../utils/permissions/simulationPermissions';
 import ChannelMicroblogging from './ChannelMicroblogging';
 import ChannelNewspaper from './ChannelNewspaper';
 import ChannelTvChannel from './ChannelTvChannel';

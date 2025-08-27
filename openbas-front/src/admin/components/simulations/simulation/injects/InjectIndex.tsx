@@ -22,7 +22,7 @@ const InjectIndexComponent: FunctionComponent<{
   exercise,
   injectResult,
 }) => {
-  const permissionsContext: PermissionsContextType = { permissions: useSimulationPermissions(exercise.exercise_id) };
+  const permissionsContext: PermissionsContextType = { permissions: useSimulationPermissions(exercise.exercise_id, exercise) };
 
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>(injectResult);
 
