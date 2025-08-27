@@ -1,5 +1,6 @@
 {
     "id": "bundle--c038a34d-411d-4a12-8f5e-fb957dbe9dc2",
+    "type": "bundle",
     "objects": [
         {
             "created": "2025-08-04T14:00:00Z",
@@ -98,6 +99,5 @@
             "x_opencti_id": "eb25bbe2-7af3-4d93-837c-d1933eb521e7",
             "x_opencti_type": "Attack-Pattern"
         }
-    ],
-    "type": "bundle"
+    ]
 }

@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +42,6 @@ public class StixApi extends RestBehavior {
         description = "Invalid STIX bundle (e.g., too many security assessments)"),
     @ApiResponse(responseCode = "500", description = "Unexpected server error")
   })
-  @Transactional(rollbackFor = Exception.class)
   public ResponseEntity<String> processBundle(@RequestBody String stixJson) {
     try {
       String createdScenario = stixService.processBundle(stixJson);

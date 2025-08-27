@@ -1,5 +1,21 @@
 package io.openbas.service;
 
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
+import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
+import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
+import static io.openbas.utils.Constants.ARTICLES;
+import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+import static org.springframework.util.StringUtils.hasText;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -35,6 +51,15 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -52,32 +77,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
-import static io.openbas.database.specification.TeamSpecification.fromIds;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_SCENARIO;
-import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.StringUtils.duplicateString;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-import static org.springframework.util.StringUtils.hasText;
-
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -90,11 +89,9 @@ public class ScenarioService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final ScenarioRepository scenarioRepository;
   private final TeamRepository teamRepository;
@@ -132,10 +129,11 @@ public class ScenarioService {
     if (!hasText(scenario.getFrom())) {
       if (this.imapEnabled) {
         scenario.setFrom(this.imapUsername);
-        scenario.setReplyTos(List.of(this.imapUsername));
+        scenario.setReplyTos(new ArrayList<>(Arrays.asList(this.imapUsername)));
       } else {
         scenario.setFrom(this.openBASConfig.getDefaultMailer());
-        scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
+        scenario.setReplyTos(
+            new ArrayList<>(Arrays.asList(this.openBASConfig.getDefaultReplyTo())));
       }
     }
   }
@@ -160,7 +158,7 @@ public class ScenarioService {
 
     // Compute find all method
     TriFunction<
-        Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
+            Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
         findAll = getFindAllFunction(deepFilterSpecification, joinMap);
 
     // Compute pagination from find all
@@ -168,10 +166,10 @@ public class ScenarioService {
   }
 
   private TriFunction<
-      Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
-  getFindAllFunction(
-      UnaryOperator<Specification<Scenario>> deepFilterSpecification,
-      Map<String, Join<Base, Base>> joinMap) {
+          Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
+      getFindAllFunction(
+          UnaryOperator<Specification<Scenario>> deepFilterSpecification,
+          Map<String, Join<Base, Base>> joinMap) {
     if (currentUser().isAdmin()) {
       return (specification, specificationCount, pageable) ->
           this.findAllWithCriteriaBuilder(
@@ -280,9 +278,7 @@ public class ScenarioService {
     scenario.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
-  /**
-   * Scenario is recurring AND start date is before now AND end date is after now
-   */
+  /** Scenario is recurring AND start date is before now AND end date is after now */
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
         ScenarioSpecification.isRecurring()
@@ -290,9 +286,7 @@ public class ScenarioService {
             .and(ScenarioSpecification.recurrenceStopDateAfter(instant)));
   }
 
-  /**
-   * Scenario is recurring AND start date is before now OR stop date is before now
-   */
+  /** Scenario is recurring AND start date is before now OR stop date is before now */
   public List<Scenario> potentialOutdatedRecurringScenario(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
         ScenarioSpecification.isRecurring()
@@ -533,12 +527,12 @@ public class ScenarioService {
     // Build the response
     String infos =
         "("
-        + (isWithTeams ? "with_teams" : "no_teams")
-        + " & "
-        + (isWithPlayers ? "with_players" : "no_players")
-        + " & "
-        + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
-        + ")";
+            + (isWithTeams ? "with_teams" : "no_teams")
+            + " & "
+            + (isWithPlayers ? "with_players" : "no_players")
+            + " & "
+            + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
+            + ")";
 
     String zipName = (scenario.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
@@ -878,14 +872,5 @@ public class ScenarioService {
       duplicatedObjectives.add(duplicatedObjective);
     }
     scenario.setObjectives(duplicatedObjectives);
-  }
-
-  public Scenario getOrCreateScenarioFromSecurityAssessment(SecurityAssessment sa) {
-    if (sa.getScenario() != null) {
-      return scenarioRepository
-          .findById(sa.getScenario().getId())
-          .orElseGet(() -> createScenario(new Scenario()));
-    }
-    return createScenario(new Scenario());
   }
 }
