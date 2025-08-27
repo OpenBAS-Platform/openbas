@@ -65,6 +65,7 @@ const EndpointForm: FunctionComponent<Props> = ({
         endpoint_arch: z.enum(['x86_64', 'arm64', 'Unknown']),
         endpoint_agent_version: z.string().optional(),
         endpoint_is_eol: z.boolean().optional(),
+        asset_external_reference: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
