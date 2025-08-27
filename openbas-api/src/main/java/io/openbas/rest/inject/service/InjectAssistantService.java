@@ -1,7 +1,5 @@
 package io.openbas.rest.inject.service;
 
-import static java.util.Collections.emptyList;
-
 import io.openbas.database.helper.InjectorContractRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -13,13 +11,16 @@ import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +40,8 @@ public class InjectAssistantService {
    * Generate injects for a given scenario based on the provided input.
    *
    * @param scenario the scenario for which injects are generated
-   * @param input the input containing details for inject generation, such as attack pattern IDs,
-   *     asset IDs, asset group IDs, and the number of injects per TTP
+   * @param input    the input containing details for inject generation, such as attack pattern IDs, asset IDs, asset
+   *                 group IDs, and the number of injects per TTP
    * @return a list of generated injects
    */
   public List<Inject> generateInjectsForScenario(Scenario scenario, InjectAssistantInput input) {
@@ -108,9 +109,9 @@ public class InjectAssistantService {
    * Builds an Inject object based on the provided InjectorContract, title, description and enabled
    *
    * @param injectorContract the InjectorContract associated with the Inject
-   * @param title the title of the Inject
-   * @param description the description of the Inject
-   * @param enabled indicates whether the Inject is enabled or not
+   * @param title            the title of the Inject
+   * @param description      the description of the Inject
+   * @param enabled          indicates whether the Inject is enabled or not
    * @return the inject object built
    */
   private Inject buildInject(
@@ -130,7 +131,7 @@ public class InjectAssistantService {
    * Builds a technical Inject object from the provided InjectorContract and AttackPattern.
    *
    * @param injectorContract the InjectorContract to build the Inject from
-   * @param attackPattern the AttackPattern associated with the Inject
+   * @param attackPattern    the AttackPattern associated with the Inject
    * @return the built Inject object
    */
   private Inject buildTechnicalInjectFromInjectorContract(
@@ -150,8 +151,8 @@ public class InjectAssistantService {
    * Builds a manual Inject object - also called Placeholder.
    *
    * @param attackPattern the AttackPattern to specify in the title and description of the Inject
-   * @param platform the platform to specify in the title and description of the Inject
-   * @param architecture the architecture to specify in the title and description of the Inject
+   * @param platform      the platform to specify in the title and description of the Inject
+   * @param architecture  the architecture to specify in the title and description of the Inject
    * @return the built manual Inject object
    */
   private Inject buildManualInject(
@@ -188,8 +189,8 @@ public class InjectAssistantService {
    * Groups endpoints by their platform and architecture.
    *
    * @param endpoints the list of endpoints to group
-   * @return a map where the key is a string combining platform and architecture, and the value is a
-   *     list of endpoints that match that platform-architecture pair
+   * @return a map where the key is a string combining platform and architecture, and the value is a list of endpoints
+   * that match that platform-architecture pair
    */
   public Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
@@ -200,17 +201,18 @@ public class InjectAssistantService {
 
   private record ContractResultForEndpoints(
       Map<InjectorContract, List<Endpoint>> contractEndpointsMap,
-      Map<String, List<Endpoint>> manualEndpoints) {}
+      Map<String, List<Endpoint>> manualEndpoints) {
+
+  }
 
   /**
    * Get the injector contract for assets and TTP.
    *
-   * @param attackPattern the attack pattern for which the injector contract need to match
+   * @param attackPattern     the attack pattern for which the injector contract need to match
    * @param injectNumberByTTP the maximum number of injector contracts to return
-   * @param endpoints the list of endpoints to consider for the injector contract
-   * @return a ContractResultForEndpoints containing the matched injector contracts with their
-   *     endpoints, and the map of platform architecture pairs with the endpoints for those that
-   *     didn't find injectorContract
+   * @param endpoints         the list of endpoints to consider for the injector contract
+   * @return a ContractResultForEndpoints containing the matched injector contracts with their endpoints, and the map of
+   * platform architecture pairs with the endpoints for those that didn't find injectorContract
    */
   private ContractResultForEndpoints getInjectorContractForAssetsAndTTP(
       AttackPattern attackPattern, Integer injectNumberByTTP, List<Endpoint> endpoints) {
@@ -256,10 +258,9 @@ public class InjectAssistantService {
   /**
    * Finds injector contracts based on the provided list of already found injector contracts,
    *
-   * @param knownInjectorContracts the list of known injector contracts to search from
-   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the
-   *     contracts
-   * @param injectNumberByTTP the maximum number of injector contracts to return
+   * @param knownInjectorContracts    the list of known injector contracts to search from
+   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the contracts
+   * @param injectNumberByTTP         the maximum number of injector contracts to return
    * @return a list of InjectorContract objects that match the search criteria
    */
   private List<InjectorContract> findInjectorContracts(
@@ -303,11 +304,10 @@ public class InjectAssistantService {
   /**
    * Finds or searches in Database for injector contracts based on the provided parameters.
    *
-   * @param knownInjectorContracts the list of known injector contracts to search from
-   * @param attackPattern the attack pattern to match against the injector contracts
-   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the
-   *     contracts
-   * @param injectNumberByTTP the maximum number of injector contracts to return
+   * @param knownInjectorContracts    the list of known injector contracts to search from
+   * @param attackPattern             the attack pattern to match against the injector contracts
+   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the contracts
+   * @param injectNumberByTTP         the maximum number of injector contracts to return
    * @return a list of InjectorContract objects that match the search criteria
    */
   private List<InjectorContract> findOrSearchInjectorContract(
@@ -329,19 +329,20 @@ public class InjectAssistantService {
   }
 
   private record ContractResultForAssetGroup(
-      List<InjectorContract> injectorContracts, String unmatchedPlatformArchitecture) {}
+      List<InjectorContract> injectorContracts, String unmatchedPlatformArchitecture) {
+
+  }
 
   /**
    * Get the injector contracts for a specific asset group and TTP
    *
-   * @param assetsFromGroup the assets related to group for which the injector contracts need to be
-   *     found
-   * @param attackPattern the attack pattern for which the injector contracts need to match
-   * @param injectNumberByTTP the maximum number of injector contracts to return
+   * @param assetsFromGroup        the assets related to group for which the injector contracts need to be found
+   * @param attackPattern          the attack pattern for which the injector contracts need to match
+   * @param injectNumberByTTP      the maximum number of injector contracts to return
    * @param knownInjectorContracts the list of already found injector contracts to search from
-   * @return a ContractResultForAssetGroup containing the injector contracts that successfully
-   *     matched for the asset group. and the most common platform-architecture pairs within the
-   *     asset group for which no matching injector contract was found.
+   * @return a ContractResultForAssetGroup containing the injector contracts that successfully matched for the asset
+   * group. and the most common platform-architecture pairs within the asset group for which no matching injector
+   * contract was found.
    */
   private ContractResultForAssetGroup getInjectorContractsForAssetGroupAndTTP(
       List<Endpoint> assetsFromGroup,
@@ -393,11 +394,11 @@ public class InjectAssistantService {
   /**
    * Handles the endpoints, search injector contract then create or update injects
    *
-   * @param endpoints the list of endpoints to process
-   * @param attackPattern the attack pattern for which the injects are created
-   * @param injectNumberByTTP the maximum number of injects to create for each TTP
-   * @param contractInjectMap a map to store the injector contracts and their corresponding injects
-   * @param manualInjectMap a map to store manual injects based on platform-architecture pairs
+   * @param endpoints              the list of endpoints to process
+   * @param attackPattern          the attack pattern for which the injects are created
+   * @param injectNumberByTTP      the maximum number of injects to create for each TTP
+   * @param contractInjectMap      a map to store the injector contracts and their corresponding injects
+   * @param manualInjectMap        a map to store manual injects based on platform-architecture pairs
    * @param knownInjectorContracts the list of already known injector contracts
    */
   private void handleEndpoints(
@@ -441,11 +442,11 @@ public class InjectAssistantService {
   /**
    * Handles the asset groups, search injector contract then create or update injects
    *
-   * @param assetsFromGroupMap Map of assetGroups with their list of endpoints
-   * @param attackPattern the attack pattern for which the injects are created
-   * @param injectNumberByTTP the maximum number of injects to create for each TTP
-   * @param contractInjectMap a map to store the injector contracts and their corresponding inject
-   * @param manualInjectMap a map to store manual injects based on platform-architecture pairs
+   * @param assetsFromGroupMap     Map of assetGroups with their list of endpoints
+   * @param attackPattern          the attack pattern for which the injects are created
+   * @param injectNumberByTTP      the maximum number of injects to create for each TTP
+   * @param contractInjectMap      a map to store the injector contracts and their corresponding inject
+   * @param manualInjectMap        a map to store manual injects based on platform-architecture pairs
    * @param knownInjectorContracts the list of already known injector contracts
    */
   private void handleAssetGroups(
@@ -486,13 +487,13 @@ public class InjectAssistantService {
   }
 
   /**
-   * Generates injects based on the provided attack pattern ID, endpoints, asset groups, and the
-   * number of injects to create for each TTP.
+   * Generates injects based on the provided attack pattern ID, endpoints, asset groups, and the number of injects to
+   * create for each TTP.
    *
-   * @param attackPatternId the internal ID of the attack pattern to generate injects for
-   * @param endpoints the list of endpoints to consider for the injects
+   * @param attackPatternId    the internal ID of the attack pattern to generate injects for
+   * @param endpoints          the list of endpoints to consider for the injects
    * @param assetsFromGroupMap the list of asset groups to consider for the injects
-   * @param injectNumberByTTP the maximum number of injects to create for each TTP
+   * @param injectNumberByTTP  the maximum number of injects to create for each TTP
    * @return a list of generated injects
    */
   private List<Inject> generateInjectsByTTP(
@@ -515,7 +516,7 @@ public class InjectAssistantService {
             injectNumberByTTP,
             attackPattern);
 
-    if (null != injects) {
+    if (!injects.isEmpty()) {
       return injects;
     }
 
@@ -555,7 +556,7 @@ public class InjectAssistantService {
       Integer injectNumberByTTP)
       throws UnprocessableContentException {
 
-    List<Inject> injects;
+    List<Inject> injects = new ArrayList<>();
 
     // Check if attack pattern exist
     AttackPattern attackPattern = attackPatternService.findById(attackPatternId);
@@ -576,7 +577,7 @@ public class InjectAssistantService {
             injectNumberByTTP,
             attackPattern);
 
-    if (null != injects) {
+    if (!injects.isEmpty()) {
       return injects;
     }
 
@@ -598,7 +599,9 @@ public class InjectAssistantService {
         .toList();
   }
 
-  /** Try to find any injector contract without limit of architecture and platforms */
+  /**
+   * Try to find any injector contract without limit of architecture and platforms
+   */
   private List<Inject> buildInjectsForAnyPlatformAndAnyArchitecture(
       Integer injectNumberByTTP, AttackPattern attackPattern) {
     List<InjectorContract> injectorContracts =
@@ -614,10 +617,12 @@ public class InjectAssistantService {
               })
           .toList();
     }
-    return null;
+    return emptyList();
   }
 
-  /** Try to find injector contract covering all platform-architecture pairs at once */
+  /**
+   * Try to find injector contract covering all platform-architecture pairs at once
+   */
   private List<Inject> buildInjectsForBestCaseWithAllPlatformAndArchitectures(
       List<Endpoint> endpoints,
       List<AssetGroup> assetGroups,
@@ -639,6 +644,6 @@ public class InjectAssistantService {
               })
           .toList();
     }
-    return null;
+    return emptyList();
   }
 }
