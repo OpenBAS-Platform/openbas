@@ -129,10 +129,11 @@ public class ScenarioService {
     if (!hasText(scenario.getFrom())) {
       if (this.imapEnabled) {
         scenario.setFrom(this.imapUsername);
-        scenario.setReplyTos(List.of(this.imapUsername));
+        scenario.setReplyTos(new ArrayList<>(Arrays.asList(this.imapUsername)));
       } else {
         scenario.setFrom(this.openBASConfig.getDefaultMailer());
-        scenario.setReplyTos(new ArrayList<>(List.of(this.openBASConfig.getDefaultReplyTo())));
+        scenario.setReplyTos(
+            new ArrayList<>(Arrays.asList(this.openBASConfig.getDefaultReplyTo())));
       }
     }
   }
@@ -871,12 +872,5 @@ public class ScenarioService {
       duplicatedObjectives.add(duplicatedObjective);
     }
     scenario.setObjectives(duplicatedObjectives);
-  }
-
-  public Scenario getOrCreateScenarioFromSecurityAssessment(SecurityAssessment sa) {
-    if (sa.getScenario() != null) {
-      return scenarioRepository.findById(sa.getScenario().getId()).orElseGet(Scenario::new);
-    }
-    return new Scenario();
   }
 }

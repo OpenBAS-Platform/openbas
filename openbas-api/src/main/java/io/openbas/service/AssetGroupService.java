@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -198,5 +199,23 @@ public class AssetGroupService {
     return results.stream()
         .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
         .toList();
+  }
+
+  public Map<AssetGroup, List<Endpoint>> assetsFromAssetGroupMap(List<AssetGroup> assetGroups) {
+    return assetGroups.stream()
+        .collect(
+            Collectors.toMap(
+                group -> group,
+                group ->
+                    this.assetsFromAssetGroup(group.getId()).stream()
+                        .map(Endpoint.class::cast)
+                        .toList()));
+  }
+
+  public Set<Pair<Endpoint.PLATFORM_TYPE, String>> computePairsPlatformArchitecture(
+      List<Endpoint> endpointList) {
+    return endpointList.stream()
+        .map(ep -> Pair.of(ep.getPlatform(), ep.getArch().name()))
+        .collect(Collectors.toSet());
   }
 }

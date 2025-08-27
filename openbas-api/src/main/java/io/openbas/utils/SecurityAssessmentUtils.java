@@ -11,8 +11,6 @@ public class SecurityAssessmentUtils {
 
   public static final String STIX_X_MITRE_ID = "x_mitre_id";
   public static final String STIX_ID = "id";
-  public static final String STIX_TYPE = "type";
-  public static final String STIX_ATTACK_PATTERN_TYPE = "attack-pattern";
   public static final String X_SECURITY_ASSESSMENT = "x-security-assessment";
 
   public static ObjectBase extractAndValidateAssessment(Bundle bundle) throws BadRequestException {
@@ -23,20 +21,16 @@ public class SecurityAssessmentUtils {
     return assessments.get(0);
   }
 
-  public static List<StixRefToExternalRef> extractObjectReferences(List<ObjectBase> objects) {
-    List<StixRefToExternalRef> stixToMitre = new ArrayList<>();
+  public static List<StixRefToExternalRef> extractAttackReferences(List<ObjectBase> objects) {
+    List<StixRefToExternalRef> stixToRef = new ArrayList<>();
     for (ObjectBase obj : objects) {
-      String stixId = (String) obj.getProperty(STIX_ID).getValue();
-      String type = (String) obj.getProperty(STIX_TYPE).getValue();
-
-      if (STIX_ATTACK_PATTERN_TYPE.equals(type)) {
-        String mitreId = (String) obj.getProperty(STIX_X_MITRE_ID).getValue();
-        if (mitreId != null) {
-          StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
-          stixToMitre.add(stixRef);
-        }
+      String mitreId = (String) obj.getProperty(STIX_X_MITRE_ID).getValue();
+      if (mitreId != null) {
+        String stixId = (String) obj.getProperty(STIX_ID).getValue();
+        StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
+        stixToRef.add(stixRef);
       }
     }
-    return stixToMitre;
+    return stixToRef;
   }
 }
