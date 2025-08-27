@@ -38,7 +38,7 @@ public class GenericJsonApiImporter<T extends Base> {
   private final FileService fileService;
 
   @Transactional
-  public T handleImport(JsonApiDocument<ResourceObject> doc, IncludeOptions includeOptions) {
+  public T handleImportEntity(JsonApiDocument<ResourceObject> doc, IncludeOptions includeOptions) {
     if (doc == null || doc.data() == null) {
       throw new IllegalArgumentException("Data is required to import document");
     }
@@ -174,7 +174,9 @@ public class GenericJsonApiImporter<T extends Base> {
         entity.setId(id);
       }
     }
-    entityCache.put(id, entity);
+    if (!rootEntity) {
+      entityCache.put(id, entity);
+    }
 
     // Populate
     applyAttributes(entity, resource.attributes());

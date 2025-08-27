@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router';
-import ImportUploader from '../../../components/common/ImportUploader';
-import { useAppDispatch } from '../../../utils/hooks';
-import { useFormatter } from '../../../components/i18n';
+
 import { importPayload } from '../../../actions/payloads/payload-actions';
+import ImportUploader from '../../../components/common/ImportUploader';
+import { useFormatter } from '../../../components/i18n';
+import { useAppDispatch } from '../../../utils/hooks';
 
 const ImportUploaderPayloads = () => {
   // Standard hooks
@@ -20,7 +21,6 @@ const ImportUploaderPayloads = () => {
       }
     });
   };
-
 
   return (
     <ImportUploader

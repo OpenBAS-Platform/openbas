@@ -8,7 +8,7 @@ import {
   simpleCall,
   simplePostCall,
 } from '../../utils/Action';
-import { type Payload, type PayloadCreateInput, type PayloadUpdateInput, type SearchPaginationInput, } from '../../utils/api-types';
+import { type Payload, type PayloadCreateInput, type PayloadUpdateInput, type SearchPaginationInput } from '../../utils/api-types';
 import { arrayOfDocuments, payload } from '../Schema';
 
 export const PAYLOAD_URI = '/api/payloads';

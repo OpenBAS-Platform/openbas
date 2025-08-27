@@ -7,6 +7,8 @@ import static io.openbas.utils.fixtures.CustomDashboardFixture.NAME;
 import static io.openbas.utils.fixtures.CustomDashboardFixture.createDefaultCustomDashboard;
 import static io.openbas.utils.fixtures.CustomDashboardParameterFixture.createSimulationCustomDashboardParameter;
 import static io.openbas.utils.fixtures.WidgetFixture.createDefaultWidget;
+import static io.openbas.utilstest.ZipUtils.convertToJson;
+import static io.openbas.utilstest.ZipUtils.extractAllFilesFromZip;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +20,7 @@ import io.openbas.utils.fixtures.composers.CustomDashboardComposer;
 import io.openbas.utils.fixtures.composers.CustomDashboardParameterComposer;
 import io.openbas.utils.fixtures.composers.WidgetComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,19 +58,27 @@ class CustomDashboardApiExporterTest extends IntegrationTest {
     CustomDashboardComposer.Composer wrapper = createCustomDashboardComposer();
 
     // -- EXECUTE --
-    String response =
+    byte[] response =
         mockMvc
             .perform(get(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId() + "/export"))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
-            .getContentAsString();
+            .getContentAsByteArray();
 
     // -- ASSERT --
     assertNotNull(response);
+    Map<String, byte[]> files = extractAllFilesFromZip(response);
+    Map<String, String> jsonFiles = convertToJson(files);
 
     // Custom dashboard
-    JsonNode json = new ObjectMapper().readTree(response);
+    String customDashboardString =
+        jsonFiles.entrySet().stream()
+            .filter(entry -> entry.getKey().startsWith("custom"))
+            .map(Map.Entry::getValue)
+            .findFirst()
+            .get();
+    JsonNode json = new ObjectMapper().readTree(customDashboardString);
     assertEquals("custom_dashboards", json.at("/data/type").asText());
     assertEquals(NAME, json.at("/data/attributes/custom_dashboard_name").asText());
     assertEquals(2, json.at("/data/relationships").size());

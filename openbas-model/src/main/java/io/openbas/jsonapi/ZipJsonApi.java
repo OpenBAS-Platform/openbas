@@ -138,8 +138,8 @@ public class ZipJsonApi<T extends Base> {
       }
     }
 
-    T persisted = importer.handleImport(doc, includeOptions);
     importer.handleImportDocument(doc, parsed.extras);
+    T persisted = importer.handleImportEntity(doc, includeOptions);
 
     JsonApiDocument<ResourceObject> export = exporter.handleExport(persisted, includeOptions);
 
