@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 public class SecurityCoverageSendJobTest extends IntegrationTest {
+
   @Test
   @DisplayName("Test send job")
   public void test() {}

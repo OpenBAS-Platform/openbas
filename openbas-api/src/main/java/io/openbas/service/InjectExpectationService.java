@@ -148,7 +148,7 @@ public class InjectExpectationService {
     }
 
     List<Exercise> exercises = new ArrayList<>();
-    exercises.add(updated.getExercise());
+    exercises.add(updated.getInject().getExercise());
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return updated;
@@ -185,7 +185,7 @@ public class InjectExpectationService {
         });
 
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-        expectations.stream().map(InjectExpectation::getExercise).toList());
+        expectations.stream().map(exp -> exp.getInject().getExercise()).toList());
 
     injectExpectationRepository.saveAll(expectations);
   }
@@ -247,7 +247,7 @@ public class InjectExpectationService {
     }
 
     List<Exercise> exercises = new ArrayList<>();
-    exercises.add(updated.getExercise());
+    exercises.add(updated.getInject().getExercise());
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return updated;
@@ -436,7 +436,7 @@ public class InjectExpectationService {
     // end of computing
 
     List<Exercise> exercises = new ArrayList<>();
-    exercises.add(injectExpectation.getExercise());
+    exercises.add(injectExpectation.getInject().getExercise());
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
 
     return injectExpectation;
@@ -491,7 +491,7 @@ public class InjectExpectationService {
       // end of computing
     }
     securityCoverageSendJobService.createOrUpdateJobsForSimulation(
-        injectExpectations.stream().map(InjectExpectation::getExercise).toList());
+        injectExpectations.stream().map(exp -> exp.getInject().getExercise()).toList());
   }
 
   private void propagateUpdateToAssets(
@@ -667,7 +667,7 @@ public class InjectExpectationService {
 
   // -- FINAL UPDATE --
 
-  public InjectExpectation update(@NotNull InjectExpectation injectExpectation) {
+  private InjectExpectation update(@NotNull InjectExpectation injectExpectation) {
     injectExpectation.setUpdatedAt(now());
     Inject inject = injectExpectation.getInject();
     inject.setUpdatedAt(now());

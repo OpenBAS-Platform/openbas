@@ -7,11 +7,10 @@ import io.openbas.rest.attack_pattern.service.AttackPatternService;
 import io.openbas.rest.inject.service.InjectAssistantService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.tag.TagService;
+import io.openbas.service.cron.CronService;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import io.openbas.service.cron.CronService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
