@@ -1,18 +1,15 @@
 import { Autocomplete, MenuItem, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { useEffect, useState } from 'react';
-import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
+import { type Control, Controller, useFormContext, type UseFormSetValue, useWatch } from 'react-hook-form';
 
 import { engineSchemas } from '../../../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../../../components/i18n';
 import { type PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import { type Widget } from '../../../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../../../utils/Option';
-import {
-  getAvailableModes,
-  getBaseEntities, getLimit,
-  type WidgetInputWithoutLayout,
-} from '../../WidgetUtils';
+import { getAvailableModes, getBaseEntities, getLimit, type WidgetInputWithoutLayout } from '../../WidgetUtils';
+import WidgetConfigDateAttributeController from '../common/WidgetConfigDateAttributeController';
+import WidgetConfigTimeRangeController from '../common/WidgetConfigTimeRangeController';
 import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 
 type Props = {
@@ -31,11 +28,47 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
     control,
     name: 'widget_config.mode',
   });
+  const widgetTimeRange = useWatch({
+    control,
+    name: 'widget_config.time_range',
+  });
   const series = useWatch({
     control,
     name: 'widget_config.series',
   });
+  const startDate = useWatch({
+    control,
+    name: 'widget_config.start',
+  });
+  const endDate = useWatch({
+    control,
+    name: 'widget_config.end',
+  });
   const entities = series.map(v => getBaseEntities(v.filter)).flat();
+
+  const { setError, clearErrors } = useFormContext();
+
+  useEffect(() => {
+    if (widgetTimeRange === 'CUSTOM' && !startDate) {
+      setError('widget_config.start', {
+        type: 'manual',
+        message: t('Start date is required'),
+      });
+    } else {
+      clearErrors('widget_config.start');
+    }
+  }, [widgetTimeRange, startDate]);
+
+  useEffect(() => {
+    if (widgetTimeRange === 'CUSTOM' && !endDate) {
+      setError('widget_config.end', {
+        type: 'manual',
+        message: t('End date is required'),
+      });
+    } else {
+      clearErrors('widget_config.end');
+    }
+  }, [widgetTimeRange, endDate]);
 
   // -- HANDLE MODE --
   const availableModes = getAvailableModes(widgetType);
@@ -120,38 +153,6 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
             )}
           />
         )}
-      {fieldOptions.length > 1
-        && (
-          <Controller
-            control={control}
-            name="widget_config.field"
-            render={({ field, fieldState }) => {
-              return (
-                <Autocomplete
-                  options={fieldOptions}
-                  groupBy={option => option.group}
-                  value={fieldOptions.find(o => o.id === field.value) ?? null}
-                  onChange={(_, value) => field.onChange(value?.id)}
-                  getOptionLabel={option => option.label ?? ''}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      label={t('Field')}
-                      variant="standard"
-                      fullWidth
-                      sx={{ mt: 2 }}
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      required
-                    />
-                  )}
-                  freeSolo={false}
-                />
-              );
-            }}
-          />
-        )}
       {hasLimit && (
         <Controller
           control={control}
@@ -173,77 +174,71 @@ const HistogramParameters = ({ widgetType, control, setValue }: Props) => {
           )}
         />
       )}
+      {fieldOptions.length > 1
+        && (
+          <Controller
+            control={control}
+            name={mode === 'temporal' ? 'widget_config.date_attribute' : 'widget_config.field'}
+            render={({ field, fieldState }) => {
+              return (
+                <Autocomplete
+                  options={fieldOptions}
+                  groupBy={option => option.group}
+                  value={fieldOptions.find(o => o.id === field.value) ?? null}
+                  onChange={(_, value) => field.onChange(value?.id)}
+                  getOptionLabel={option => option.label ?? ''}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label={mode === 'temporal' ? t('Date attribute') : t('Breakdown by')}
+                      variant="standard"
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      required
+                    />
+                  )}
+                  freeSolo={false}
+                />
+              );
+            }}
+          />
+        )}
       {mode === 'temporal' && (
-        <>
-          <Controller
-            control={control}
-            name="widget_config.interval"
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                select
-                variant="standard"
-                fullWidth
-                label={t('Interval')}
-                sx={{ mt: 2 }}
-                value={field.value ?? ''}
-                onChange={e => field.onChange(e.target.value)}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                required
-              >
-                <MenuItem value="day">{t('Day')}</MenuItem>
-                <MenuItem value="week">{t('Week')}</MenuItem>
-                <MenuItem value="month">{t('Month')}</MenuItem>
-                <MenuItem value="quarter">{t('Quarter')}</MenuItem>
-                <MenuItem value="year">{t('Year')}</MenuItem>
-              </TextField>
-            )}
-          />
-          <Controller
-            control={control}
-            name="widget_config.start"
-            render={({ field, fieldState }) => (
-              <DatePicker
-                label={t('Start date')}
-                sx={{ mt: 2 }}
-                value={field.value ? new Date(field.value) : null}
-                onChange={date => field.onChange(date?.toISOString() ?? '')}
-                slotProps={{
-                  textField: {
-                    required: true,
-                    fullWidth: true,
-                    error: !!fieldState.error,
-                    helperText: fieldState.error?.message,
-                    variant: 'standard',
-                  },
-                }}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="widget_config.end"
-            render={({ field, fieldState }) => (
-              <DatePicker
-                label={t('End date')}
-                sx={{ mt: 2 }}
-                value={field.value ? new Date(field.value) : null}
-                onChange={date => field.onChange(date?.toISOString() ?? '')}
-                slotProps={{
-                  textField: {
-                    required: true,
-                    fullWidth: true,
-                    error: !!fieldState.error,
-                    helperText: fieldState.error?.message,
-                    variant: 'standard',
-                  },
-                }}
-              />
-            )}
-          />
-        </>
+        <Controller
+          control={control}
+          name="widget_config.interval"
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              select
+              variant="standard"
+              fullWidth
+              label={t('Interval')}
+              sx={{ mt: 2 }}
+              value={field.value ?? ''}
+              onChange={e => field.onChange(e.target.value)}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              required
+            >
+              <MenuItem value="day">{t('Day')}</MenuItem>
+              <MenuItem value="week">{t('Week')}</MenuItem>
+              <MenuItem value="month">{t('Month')}</MenuItem>
+              <MenuItem value="quarter">{t('Quarter')}</MenuItem>
+              <MenuItem value="year">{t('Year')}</MenuItem>
+            </TextField>
+          )}
+        />
       )}
+      {
+        mode === 'structural' && (
+          <WidgetConfigDateAttributeController widgetType={widgetType} />
+        )
+      }
+      <WidgetConfigTimeRangeController />
     </>
   );
 };

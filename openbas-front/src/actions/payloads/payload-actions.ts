@@ -1,6 +1,13 @@
 import type { Dispatch } from 'redux';
 
-import { delReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
+import {
+  delReferential,
+  getReferential,
+  postReferential,
+  putReferential,
+  simpleCall,
+  simplePostCall
+} from '../../utils/Action';
 import {
   type Payload,
   type PayloadCreateInput,
@@ -9,7 +16,7 @@ import {
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
-import { payload } from '../Schema';
+import {arrayOfDocuments, payload} from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
@@ -53,4 +60,10 @@ export const duplicatePayload = (payloadId: Payload['payload_id']) => (dispatch:
 export const deletePayload = (payloadId: Payload['payload_id']) => (dispatch: Dispatch) => {
   const uri = `/api/payloads/${payloadId}`;
   return delReferential(uri, 'payloads', payloadId)(dispatch);
+};
+
+// -- DOCUMENTS --
+export const fetchDocumentsPayload = (payloadId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/payloads/${payloadId}/documents`;
+  return getReferential(arrayOfDocuments, uri)(dispatch);
 };

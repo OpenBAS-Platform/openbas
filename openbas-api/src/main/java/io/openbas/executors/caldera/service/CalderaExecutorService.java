@@ -81,6 +81,7 @@ public class CalderaExecutorService implements Runnable {
     this.agentService = agentService;
     try {
       if (config.isEnable()) {
+        log.warn("Caldera executor will be deprecated in OpenAEV 2.0");
         this.executor =
             executorService.register(
                 config.getId(),

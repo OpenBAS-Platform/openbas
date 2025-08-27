@@ -130,6 +130,28 @@ public interface DocumentRepository
 
   @Query(
       value =
+          """
+                                select d.*,
+                                       array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                                       array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                                       array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                                from documents d
+                                left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                                left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                                left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                                left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                                left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                                left join tags tg on tg.tag_id = tagdoc.tag_id
+                                left join payloads pa on d.document_id = pa.file_drop_file
+                                where pa.payload_id = :payloadId
+                                group by d.document_id
+                                order by d.document_id desc
+                                """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByPayloadId(@Param("payloadId") String payloadId);
+
+  @Query(
+      value =
           "select d.*, "
               + "array_remove(array_agg(tg.tag_id), NULL) as document_tags, "
               + "array_remove(array_agg(ex.exercise_id), NULL) as document_exercises, "

@@ -5,13 +5,18 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.*;
 import io.openbas.service.ImportService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -40,6 +45,7 @@ public class PayloadApi extends RestBehavior {
   private final PayloadUpdateService payloadUpdateService;
   private final PayloadUpsertService payloadUpsertService;
   private final PayloadExportService payloadExportService;
+  private final DocumentService documentService;
 
   @PostMapping(PAYLOAD_URI + "/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PAYLOAD)
@@ -144,5 +150,19 @@ public class PayloadApi extends RestBehavior {
       @Valid @RequestBody PayloadsDeprecateInput input) {
     this.payloadService.deprecateNonProcessedPayloadsByCollector(
         input.collectorId(), input.processedPayloadExternalIds());
+  }
+
+  @GetMapping(PAYLOAD_URI + "/{payloadId}/documents")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD)
+  @Operation(summary = "Get the Documents used in a payload")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "The list of Documents used in a payload")
+      })
+  public List<RawDocument> documentsFromPayload(@PathVariable String payloadId) {
+    return documentService.documentsForPayload(payloadId);
   }
 }

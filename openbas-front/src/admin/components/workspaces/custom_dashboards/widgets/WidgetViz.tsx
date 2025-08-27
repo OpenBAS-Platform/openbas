@@ -29,6 +29,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
   const [attackPathsVizData, setAttackPathsVizData] = useState<EsAttackPath[]>([]);
   const [numberVizData, setNumberVizData] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const { customDashboardParameters } = useContext(CustomDashboardContext);
 
@@ -36,17 +37,21 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
     fetchFunction: (id: string, p: Record<string, string | undefined>) => Promise<{ data: T }>,
     setData: React.Dispatch<React.SetStateAction<T>>,
   ) => {
-    fetchFunction(widget.widget_id, customDashboardParameters).then((response) => {
+    const params: Record<string, string> = Object.fromEntries(
+      Object.entries(customDashboardParameters).map(([key, val]) => [key, val.value]),
+    );
+    fetchFunction(widget.widget_id, params).then((response) => {
       if (response.data || typeof response.data === 'number') {
         setData(response.data);
       }
+    }).catch((error) => {
+      setErrorMessage(error.message);
     }).finally(() => setLoading(false));
   };
-
   useEffect(() => {
     setLoading(true);
     switch (widget.widget_type) {
-      case 'attack-path':{
+      case 'attack-path': {
         fetchData(attackPaths, setAttackPathsVizData);
         break;
       }
@@ -106,6 +111,7 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
         <VerticalBarChart
           widgetConfig={widget.widget_config}
           series={seriesData}
+          errorMessage={errorMessage}
         />
       );
     case 'horizontal-barchart':

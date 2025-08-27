@@ -19,6 +19,8 @@ import { AbilityContext } from '../../../../utils/permissions/PermissionsProvide
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
 
+interface RetrieveOptionsConfig { defaultValues?: GroupOption[] | undefined }
+
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
   const ability = useContext(AbilityContext);
@@ -34,9 +36,9 @@ const useRetrieveOptions = () => {
     }
   };
 
-  const searchOptions = (filterKey: string, ids: string[], defaultValues: GroupOption[] = []) => {
-    const filterDefaultValues = defaultValues.filter(v => ids.includes(v.id));
 
+  const searchOptions = (filterKey: string, ids: string[], config: RetrieveOptionsConfig) => {
+    const filterDefaultValues = (config.defaultValues ?? []).filter(v => ids.includes(v.id));
     switch (filterKey) {
       case SIMULATIONS:
       case 'base_simulation_side':

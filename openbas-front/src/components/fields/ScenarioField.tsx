@@ -17,8 +17,12 @@ interface Props {
 
 const ScenarioField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
   const { options, searchOptions } = useSearchOptions();
+  const searchOptionsConfig = {
+    filterKey: SCENARIOS,
+    defaultValues: defaultOptions,
+  };
   useEffect(() => {
-    searchOptions(SCENARIOS, '', '', defaultOptions);
+    searchOptions(searchOptionsConfig, '');
   }, []);
 
   return (
@@ -30,7 +34,7 @@ const ScenarioField: FunctionComponent<Props> = ({ label, value, onChange, class
       required={required}
       error={error}
       options={options}
-      onInputChange={(search: string) => searchOptions(SCENARIOS, search)}
+      onInputChange={(search: string) => searchOptions(searchOptionsConfig, search)}
     />
   );
 };
