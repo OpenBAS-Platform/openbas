@@ -1,8 +1,8 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { Button, Dialog as DialogMUI, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { type LoggedHelper } from '../../../../../actions/helper';
+import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import Dialog from '../../../../../components/common/dialog/Dialog';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
@@ -18,7 +18,6 @@ interface ExpectationPopoverProps {
   expectation: ExpectationInput;
   handleUpdate: (data: ExpectationInput, idx: number) => void;
   handleDelete: (idx: number) => void;
-  disabled?: boolean;
 }
 
 const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
@@ -26,14 +25,12 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   expectation,
   handleUpdate,
   handleDelete,
-  disabled = false,
 }) => {
   // Standard hooks
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
@@ -53,17 +50,9 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
     expectation_expiration_time: getExpirationTime(expectation.expectation_expiration_time),
   };
 
-  // Popover
-  const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-  const handlePopoverClose = () => setAnchorEl(null);
-
   // Edition
   const handleOpenEdit = () => {
     setOpenEdit(true);
-    handlePopoverClose();
   };
   const handleCloseEdit = () => setOpenEdit(false);
 
@@ -81,7 +70,6 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
   // Deletion
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
   const handleCloseDelete = () => setOpenDelete(false);
 
@@ -90,32 +78,21 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
     handleCloseDelete();
   };
 
+  // Button Popover
+  const entries = [
+    {
+      label: 'Update',
+      action: () => handleOpenEdit(),
+      userRight: permissions.canManage,
+    }, {
+      label: 'Remove',
+      action: () => handleOpenDelete(),
+      userRight: permissions.canManage,
+    }];
+
   return (
     <div>
-      <IconButton
-        onClick={event => handlePopoverOpen(event)}
-        aria-haspopup="true"
-        size="large"
-        disabled={permissions.readOnly || disabled}
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem
-          onClick={handleOpenEdit}
-        >
-          {t('Update')}
-        </MenuItem>
-        <MenuItem
-          onClick={handleOpenDelete}
-        >
-          {t('Remove')}
-        </MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} variant="icon" />
       <DialogMUI
         open={openDelete}
         TransitionComponent={Transition}

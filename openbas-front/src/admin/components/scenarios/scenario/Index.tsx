@@ -18,7 +18,7 @@ import { type NotificationRuleOutput, type Scenario } from '../../../../utils/ap
 import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import useScenarioPermissions from '../../../../utils/Scenario';
+import useScenarioPermissions from '../../../../utils/permissions/scenarioPermissions';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import ScenarioNotificationRulesDrawer from './notification_rule/ScenarioNotificationRulesDrawer';
 import injectContextForScenario from './ScenarioContext';
@@ -208,67 +208,74 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               flexDirection: 'row',
             }}
             >
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              >
-                <IconButton
-                  size="small"
-                  style={{ marginRight: theme.spacing(1) }}
-                  onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
-                >
-                  <NotificationsOutlined color={editNotification ? 'success' : 'primary'} />
-                </IconButton>
-                <Typography
-                  variant="body1"
-                  style={{ marginRight: theme.spacing(1) }}
-                >
-                  {t('Notification rules')}
-                </Typography>
-                <ScenarioNotificationRulesDrawer
-                  open={openScenarioNotificationRuleDrawer}
-                  setOpen={setOpenScenarioNotificationRuleDrawer}
-                  editing={editNotification}
-                  onCreate={onCreateNotification}
-                  onUpdate={result => setNotificationRule(result)}
-                  onDelete={onDeleteNotification}
-                  notificationRule={notificationRule}
-                  scenarioId={scenario.scenario_id}
-                  scenarioName={scenario.scenario_name}
-                />
-              </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              >
-                {!cronExpression && (
-                  <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
-                    <UpdateOutlined color="primary" />
-                  </IconButton>
-                )}
-                {cronExpression && !scenario.scenario_recurrence && (
-                  <IconButton
-                    size="small"
-                    style={{
-                      cursor: 'default',
-                      marginRight: theme.spacing(1),
-                    }}
+              {
+                permissionsContext.permissions.canManage && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                   >
-                    <UpdateOutlined />
-                  </IconButton>
-                )}
-                {cronExpression && scenario.scenario_recurrence && (
-                  <Tooltip title={(t('Modify the scheduling'))}>
+                    <IconButton
+                      size="small"
+                      style={{ marginRight: theme.spacing(1) }}
+                      onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
+                    >
+                      <NotificationsOutlined color={editNotification ? 'success' : 'primary'} />
+                    </IconButton>
+                    <Typography
+                      variant="body1"
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
+                      {t('Notification rules')}
+                    </Typography>
+                    <ScenarioNotificationRulesDrawer
+                      open={openScenarioNotificationRuleDrawer}
+                      setOpen={setOpenScenarioNotificationRuleDrawer}
+                      editing={editNotification}
+                      onCreate={onCreateNotification}
+                      onUpdate={result => setNotificationRule(result)}
+                      onDelete={onDeleteNotification}
+                      notificationRule={notificationRule}
+                      scenarioId={scenario.scenario_id}
+                      scenarioName={scenario.scenario_name}
+                    />
+                  </div>
+                )
+              }
+              { permissionsContext.permissions.canManage && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                >
+                  {!cronExpression && (
                     <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
                       <UpdateOutlined color="primary" />
                     </IconButton>
-                  </Tooltip>
-                )}
-                <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
-                {cronExpression && <span>{getHumanReadableScheduling()}</span>}
-              </div>
+                  )}
+                  {cronExpression && !scenario.scenario_recurrence && (
+                    <IconButton
+                      size="small"
+                      style={{
+                        cursor: 'default',
+                        marginRight: theme.spacing(1),
+                      }}
+                    >
+                      <UpdateOutlined />
+                    </IconButton>
+                  )}
+                  {cronExpression && scenario.scenario_recurrence && (
+                    <Tooltip title={(t('Modify the scheduling'))}>
+                      <IconButton size="small" onClick={() => setOpenScenarioRecurringFormDialog(true)} style={{ marginRight: theme.spacing(1) }}>
+                        <UpdateOutlined color="primary" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  <span style={{ color: theme.palette.text?.disabled }}>{!cronExpression && t('Not scheduled')}</span>
+                  {cronExpression && <span>{getHumanReadableScheduling()}</span>}
+                </div>
+              )}
+
             </div>
 
           </Box>

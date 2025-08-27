@@ -40,7 +40,7 @@ import ItemTags from '../../../components/ItemTags';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/permissions/simulationPermissions.js';
 
 const useStyles = makeStyles()(() => ({
   root: {
@@ -231,7 +231,7 @@ const ChallengesPlayer = () => {
     const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="secondary"
             variant="outlined"
@@ -246,7 +246,7 @@ const ChallengesPlayer = () => {
             {t('Switch to preview mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { type Variable } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { PermissionsContext, VariableContext } from '../../common/Context';
+import { VariableContext } from '../../common/Context';
 import VariablePopover from './VariablePopover';
 
 const useStyles = makeStyles()(() => ({
@@ -90,7 +90,7 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
   const { classes } = useStyles();
   // Context
   const { onEditVariable, onDeleteVariable } = useContext(VariableContext);
-  const { permissions } = useContext(PermissionsContext);
+
   // Filter and sort hook
   const filtering = useSearchAnFilter('variable', 'key', [
     'key',
@@ -146,6 +146,13 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
           key={variable.variable_id}
           classes={{ root: classes.item }}
           divider
+          secondaryAction={(
+            <VariablePopover
+              variable={variable}
+              onEdit={onEditVariable}
+              onDelete={onDeleteVariable}
+            />
+          )}
         >
           <ListItemIcon>
             <AttachMoneyOutlined color="primary" />
@@ -174,14 +181,6 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
               </>
             )}
           />
-          <ListItemSecondaryAction>
-            <VariablePopover
-              variable={variable}
-              disabled={permissions?.readOnly}
-              onEdit={onEditVariable}
-              onDelete={onDeleteVariable}
-            />
-          </ListItemSecondaryAction>
         </ListItem>
       ))}
     </List>

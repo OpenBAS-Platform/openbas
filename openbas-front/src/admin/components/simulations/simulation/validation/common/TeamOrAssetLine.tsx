@@ -10,7 +10,6 @@ import { fetchEndpoints } from '../../../../../../actions/assets/endpoint-action
 import { fetchExerciseChallenges } from '../../../../../../actions/challenge-action';
 import { fetchExerciseArticles } from '../../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../../actions/channels/article-helper';
-import { fetchChannels } from '../../../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../../../actions/channels/channel-helper';
 import { type Contract } from '../../../../../../actions/contract/contract';
 import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
@@ -76,7 +75,6 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
     };
   });
   useDataLoader(() => {
-    dispatch(fetchChannels());
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));

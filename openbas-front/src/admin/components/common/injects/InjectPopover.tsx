@@ -1,11 +1,11 @@
-import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import { type InjectStore } from '../../../../actions/injects/Inject';
 import { exportInject } from '../../../../actions/injects/inject-action';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
@@ -87,19 +87,10 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openDisable, setOpenDisable] = useState(false);
   const [openDone, setOpenDone] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [openExportDialog, setOpenExportDialog] = useState(false);
-
-  const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => setAnchorEl(null);
 
   const handleOpenDuplicate = () => {
     setDuplicate(true);
-    handlePopoverClose();
   };
   const handleCloseDuplicate = () => setDuplicate(false);
 
@@ -125,7 +116,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDelete = () => {
     setOpenDelete(true);
-    handlePopoverClose();
   };
   const handleCloseDelete = () => setOpenDelete(false);
 
@@ -138,7 +128,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenTest = () => {
     setOpenTest(true);
-    handlePopoverClose();
   };
   const handleCloseTest = () => setOpenTest(false);
 
@@ -173,7 +162,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenEnable = () => {
     setOpenEnable(true);
-    handlePopoverClose();
   };
   const handleCloseEnable = () => setOpenEnable(false);
 
@@ -186,7 +174,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDisable = () => {
     setOpenDisable(true);
-    handlePopoverClose();
   };
   const handleCloseDisable = () => setOpenDisable(false);
 
@@ -199,7 +186,6 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenDone = () => {
     setOpenDone(true);
-    handlePopoverClose();
   };
   const handleCloseDone = () => setOpenDone(false);
 
@@ -212,12 +198,10 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const handleOpenEditContent = () => {
     setSelectedInjectId(inject.inject_id);
-    handlePopoverClose();
   };
 
   const handleOpenTrigger = () => {
     setOpenTrigger(true);
-    handlePopoverClose();
   };
   const handleCloseTrigger = () => setOpenTrigger(false);
 
@@ -228,74 +212,67 @@ const InjectPopover: FunctionComponent<Props> = ({
     });
   };
 
+  // Button Popover
+  const entries = [];
+  entries.push({
+    label: t('Update'),
+    action: () => handleOpenEditContent(),
+    disabled: isDisabled,
+    userRight: permissions.canManage,
+  });
+  entries.push({
+    label: t('Duplicate'),
+    action: () => handleOpenDuplicate(),
+    disabled: isDisabled,
+    userRight: permissions.canManage,
+  });
+  if (inject.inject_testable && canBeTested) entries.push({
+    label: t('Test'),
+    action: () => handleOpenTest(),
+    disabled: isDisabled,
+    userRight: permissions.canLaunch,
+  });
+  entries.push({
+    label: t('inject_export_json_single'),
+    action: () => handleExportOpen(),
+    disabled: isDisabled,
+    userRight: true,
+  });
+  if (!inject.inject_status && onInjectDone && canDone) entries.push({
+    label: t('Mark as done'),
+    action: () => handleOpenDone(),
+    disabled: isDisabled,
+    userRight: true,
+  });
+  if (inject.inject_type !== 'openbas_manual' && canTriggerNow && onUpdateInjectTrigger) entries.push({
+    label: t('Trigger now'),
+    action: () => handleOpenTrigger(),
+    disabled: isDisabled || !permissions.isRunning,
+    userRight: true,
+  });
+  if (inject.inject_enabled) entries.push({
+    label: t('Disable'),
+    action: () => handleOpenDisable(),
+    disabled: isDisabled,
+    userRight: permissions.canManage,
+  });
+  else entries.push({
+    label: t('Enable'),
+    action: () => handleOpenEnable(),
+    disabled: isDisabled,
+    userRight: permissions.canManage,
+  });
+  entries.push({
+    label: t('Delete'),
+    action: () => handleOpenDelete(),
+    disabled: isDisabled,
+    userRight: permissions.canManage,
+  });
+
   return (
     <>
-      <IconButton
-        onClick={handlePopoverOpen}
-        aria-haspopup="true"
-        size="large"
-        color="primary"
-        disabled={permissions.readOnly}
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handlePopoverClose}
-      >
-        <MenuItem
-          onClick={handleOpenEditContent}
-          disabled={isDisabled}
-        >
-          {t('Update')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
-          {t('Duplicate')}
-        </MenuItem>
-        {inject.inject_testable && canBeTested && (
-          <MenuItem onClick={handleOpenTest}>
-            {t('Test')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleExportOpen} disabled={isDisabled}>
-          {t('inject_export_json_single')}
-        </MenuItem>
-        {!inject.inject_status && onInjectDone && canDone && (
-          <MenuItem
-            onClick={handleOpenDone}
-            disabled={isDisabled}
-          >
-            {t('Mark as done')}
-          </MenuItem>
-        )}
-        {inject.inject_type !== 'openbas_manual' && canTriggerNow && onUpdateInjectTrigger && (
-          <MenuItem
-            onClick={handleOpenTrigger}
-            disabled={isDisabled || !permissions.isRunning}
-          >
-            {t('Trigger now')}
-          </MenuItem>
-        )}
-        {inject.inject_enabled ? (
-          <MenuItem
-            onClick={handleOpenDisable}
-            disabled={isDisabled}
-          >
-            {t('Disable')}
-          </MenuItem>
-        ) : (
-          <MenuItem
-            onClick={handleOpenEnable}
-            disabled={isDisabled}
-          >
-            {t('Enable')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleOpenDelete}>
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
+      <ButtonPopover entries={entries} variant="icon" />
+
       <DialogDuplicate
         open={duplicate}
         handleClose={handleCloseDuplicate}

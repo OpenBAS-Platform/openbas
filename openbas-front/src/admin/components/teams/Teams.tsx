@@ -19,7 +19,10 @@ const Teams = () => {
   const permissionsContext: PermissionsContextType = {
     permissions: {
       readOnly: false,
-      canWrite: false,
+      canManage: false,
+      canAccess: false,
+      canDelete: false,
+      canLaunch: false,
       isRunning: false,
     },
   };

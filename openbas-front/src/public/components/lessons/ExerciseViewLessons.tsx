@@ -10,8 +10,8 @@ import { ViewLessonContext, type ViewLessonContextType } from '../../../admin/co
 import { useHelper } from '../../../store';
 import { type Exercise } from '../../../utils/api-types';
 import { useQueryParameter } from '../../../utils/Environment';
-import { usePermissions } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
+import { usePermissions } from '../../../utils/permissions/simulationPermissions';
 import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 

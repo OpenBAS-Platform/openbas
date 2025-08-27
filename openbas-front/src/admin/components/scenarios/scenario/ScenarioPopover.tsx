@@ -1,17 +1,17 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type UserHelper } from '../../../../actions/helper';
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
 import { type Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import useScenarioPermissions from '../../../../utils/Scenario';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import useScenarioPermissions from '../../../../utils/permissions/scenarioPermissions';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ScenarioUpdate from './ScenarioUpdate';
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
@@ -33,10 +33,8 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const permissions = useScenarioPermissions(scenario.scenario_id);
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
+  const { canManage, canDelete } = useScenarioPermissions(scenario.scenario_id);
+  const ability = useContext(AbilityContext);
 
   // Duplicate
   const [duplicate, setDuplicate] = useState(false);
@@ -83,24 +81,22 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
-    disabled: !permissions.canWrite,
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: canManage,
   });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: canManage && ability.can(ACTIONS.CREATE, SUBJECTS.ASSESSMENT),
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
     action: () => handleOpenExport(),
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: true,
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
-    disabled: !userAdmin,
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: canDelete,
   });
 
   return (

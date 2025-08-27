@@ -17,8 +17,8 @@ import {
   type Exercise,
   type UpdateExerciseInput,
 } from '../../../../utils/api-types';
-import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { usePermissions } from '../../../../utils/permissions/simulationPermissions';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
 
@@ -124,29 +124,29 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
-    disabled: !permissions.canWriteBypassStatus,
-    userRight: true, // TODO: update while casl will be implemented on this page
+    disabled: !permissions.canManageBypassStatus,
+    userRight: permissions.canManage,
   });
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: permissions.canManage,
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
     action: () => handleOpenExport(),
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: true,
   });
   if (actions.includes('Access reports')) entries.push({
     label: 'Access reports',
     action: () => handleOpenReports(),
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: true,
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
     disabled: !userAdmin,
-    userRight: true, // TODO: update while casl will be implemented on this page
+    userRight: permissions.canManage,
   });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
