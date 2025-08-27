@@ -33,12 +33,20 @@ type Props = {
 const InjectListElement = (props: Props) => {
   const { classes } = useStyles();
   const theme = useTheme();
-  const { t } = useFormatter();
+  const { t, nsdt } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
 
   const { attackPatterns }: { attackPatterns: AttackPattern[] } = useHelper((helper: AttackPatternHelper) => {
     return { attackPatterns: helper.getAttackPatterns() };
   });
+
+  const tooltip = (text: string) => {
+    return (
+      <Tooltip title={text} placement="bottom-start">
+        <span>{text}</span>
+      </Tooltip>
+    );
+  };
 
   /* eslint-disable react/display-name */
   // eslint doesn't seem to be able to infer the display names of subcomponents but react can
@@ -78,14 +86,22 @@ const InjectListElement = (props: Props) => {
             (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={theme.spacing(1)} />,
           );
         };
+      case 'base_created_at':
+        return (esElement: EsInject | EsScenario | EsSimulation) => {
+          return tooltip(nsdt(esElement.base_created_at));
+        };
+      case 'base_updated_at':
+        return (esElement: EsInject | EsScenario | EsSimulation) => {
+          return tooltip(nsdt(esElement.base_updated_at));
+        };
+      case 'inject_execution_date':
+        return (esElement: EsInject) => {
+          return tooltip(nsdt(esElement.inject_execution_date));
+        };
       default: return (esElement: EsInject | EsScenario | EsSimulation) => {
         const key = column as keyof typeof esElement;
         const text = esElement[key]?.toString() || '';
-        return (
-          <Tooltip title={text} placement="bottom-start">
-            <span>{text}</span>
-          </Tooltip>
-        );
+        return tooltip(text);
       };
     }
   };
@@ -93,7 +109,7 @@ const InjectListElement = (props: Props) => {
 
   return (
   // TODO #3524 see EndpointListElement
-    <ListItemButton classes={{ root: classes.item }} inert={true}>
+    <ListItemButton classes={{ root: classes.item }} className="noDrag">
       <ListItemIcon>
         <Description color="primary" />
       </ListItemIcon>

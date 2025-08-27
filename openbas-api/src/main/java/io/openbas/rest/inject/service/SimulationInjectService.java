@@ -1,12 +1,8 @@
 package io.openbas.rest.inject.service;
 
 import io.openbas.database.model.Exercise;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.InjectDocumentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.service.ExerciseService;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,16 +12,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SimulationInjectService {
 
-  private final ExerciseRepository exerciseRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
-  private final InjectRepository injectRepository;
+  private final ExerciseService exerciseService;
+  private final InjectService injectService;
 
   public void deleteInject(@NotBlank final String exerciseId, @NotBlank final String injectId) {
-    Exercise exercise =
-        this.exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
-    exercise.setUpdatedAt(Instant.now());
-    this.exerciseRepository.save(exercise);
+    Exercise exercise = this.exerciseService.exercise(exerciseId);
+    injectService.delete(injectId);
+    this.exerciseService.updateExercise(exercise);
   }
 }

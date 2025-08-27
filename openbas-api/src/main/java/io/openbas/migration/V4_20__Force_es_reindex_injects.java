@@ -13,7 +13,7 @@ public class V4_20__Force_es_reindex_injects extends BaseJavaMigration {
     try (Statement statement = context.getConnection().createStatement()) {
       // re-index injects, simulations and scenarios in ES
       statement.executeUpdate(
-          "DELETE FROM indexing_status WHERE indexing_status_type in ('inject', 'expectation-inject', 'simulation', 'scenario');");
+          "DELETE FROM indexing_status WHERE indexing_status_type in ('inject', 'expectation-inject', 'simulation', 'scenario', 'attack-pattern');");
     }
   }
 }
