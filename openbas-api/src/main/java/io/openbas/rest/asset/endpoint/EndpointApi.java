@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -51,6 +52,40 @@ public class EndpointApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
+    return this.endpointService.createEndpoint(input);
+  }
+
+  @PostMapping(ENDPOINT_URI + "/agentless/upsert")
+  @PreAuthorize("isPlanner()")
+  @Transactional(rollbackFor = Exception.class)
+  public Endpoint upsertAgentLessEndpoint(@Valid @RequestBody final EndpointInput input) {
+    Optional<Endpoint> endpoint = Optional.empty();
+    if (input.getExternalReference() != null) {
+      endpoint = this.endpointService.findEndpointByExternalReference(input.getExternalReference());
+    }
+    if (endpoint.isEmpty()) {
+      List<Endpoint> endpoints =
+          this.endpointService.findEndpointByHostnameAndAtLeastOneIp(
+              input.getHostname(), input.getPlatform(), input.getArch(), input.getIps());
+      if (!endpoints.isEmpty()) {
+        endpoint = Optional.of(endpoints.getFirst());
+      }
+    }
+    if (endpoint.isPresent()) {
+      Endpoint endpointToUpdate = endpoint.get();
+      // Mandatory fields
+      endpointToUpdate.setIps(EndpointMapper.setIps(input.getIps()));
+      endpointToUpdate.setArch(input.getArch());
+      endpointToUpdate.setPlatform(input.getPlatform());
+      // Optional fields
+      if (input.getHostname() != null) {
+        endpointToUpdate.setHostname(input.getHostname());
+      }
+      if (input.getMacAddresses() != null) {
+        endpointToUpdate.setMacAddresses(input.getMacAddresses());
+      }
+      return this.endpointService.updateEndpoint(endpointToUpdate);
+    }
     return this.endpointService.createEndpoint(input);
   }
 
