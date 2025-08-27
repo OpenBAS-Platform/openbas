@@ -68,7 +68,7 @@ public class FieldUtils {
     }
   }
 
-  public static Map<String, Object> getAllFieldValuesAsMap(Object entity) {
+  public static Map<String, Object> computeAllFieldValues(Object entity) {
     Map<String, Object> out = new LinkedHashMap<>();
     for (Field f : getAllFields(entity.getClass())) {
       if (f.isAnnotationPresent(JsonIgnore.class) || isRelation(f) || isStaticOrTransient(f)) {

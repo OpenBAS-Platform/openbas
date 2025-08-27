@@ -4,7 +4,8 @@ import static io.openbas.rest.payload.PayloadApi.PAYLOAD_URI;
 import static io.openbas.utils.fixtures.PayloadFixture.COMMAND_PAYLOAD_NAME;
 import static io.openbas.utils.fixtures.PayloadFixture.createDefaultCommand;
 import static io.openbas.utils.fixtures.TagFixture.getTagWithText;
-import static java.util.stream.Collectors.toMap;
+import static io.openbas.utilstest.ZipUtils.convertToJson;
+import static io.openbas.utilstest.ZipUtils.extractAllFilesFromZip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,13 +17,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.utils.fixtures.composers.PayloadComposer;
 import io.openbas.utils.fixtures.composers.TagComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,29 +72,5 @@ class PayloadApiExporterTest extends IntegrationTest {
     assertEquals(COMMAND_PAYLOAD_NAME, payloadJson.at("/data/attributes/payload_name").asText());
     assertEquals(
         "malware", payloadJson.at("/included").get(0).get("attributes").get("tag_name").asText());
-  }
-
-  private static Map<String, byte[]> extractAllFilesFromZip(byte[] zipBytes) throws Exception {
-    Map<String, byte[]> files = new LinkedHashMap<>();
-    try (ZipInputStream zis =
-        new ZipInputStream(new ByteArrayInputStream(zipBytes), StandardCharsets.UTF_8)) {
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        if (!entry.isDirectory()) {
-          ByteArrayOutputStream bos = new ByteArrayOutputStream();
-          zis.transferTo(bos);
-          files.put(entry.getName(), bos.toByteArray());
-        }
-      }
-    }
-    return files;
-  }
-
-  private static Map<String, String> convertToJson(Map<String, byte[]> files) {
-    return files.entrySet().stream()
-        .filter(entry -> entry.getKey().toLowerCase().endsWith(".json"))
-        .collect(
-            toMap(
-                Map.Entry::getKey, entry -> new String(entry.getValue(), StandardCharsets.UTF_8)));
   }
 }

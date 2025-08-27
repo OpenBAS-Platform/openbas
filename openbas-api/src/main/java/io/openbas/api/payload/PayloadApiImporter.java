@@ -10,6 +10,7 @@ import io.openbas.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping(PayloadApi.PAYLOAD_URI)
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class PayloadApiImporter extends RestBehavior {
     try {
       return zipJsonApi.handleImport(file, "payload_name");
     } catch (Exception ex) {
+      log.warn("Fallback to old import due to {}", ex.getMessage(), ex);
       // Fall back to the legacy importer
       importService.handleFileImport(file, null, null);
       return ResponseEntity.ok().build();

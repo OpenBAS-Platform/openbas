@@ -26,11 +26,11 @@ public class GenericJsonApiExporter {
     }
     Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
     List<ResourceObject> included = new ArrayList<>();
-    ResourceObject root = toResource(entity, includeOptions, visited, included);
+    ResourceObject root = buildResourceObject(entity, includeOptions, visited, included);
     return new JsonApiDocument<>(root, included.isEmpty() ? null : new ArrayList<>(included));
   }
 
-  private ResourceObject toResource(
+  private ResourceObject buildResourceObject(
       Object entity,
       IncludeOptions includeOptions,
       Set<Object> visited,
@@ -51,14 +51,14 @@ public class GenericJsonApiExporter {
     String type = resolveType(clazz);
     String id = readId(entity);
 
-    Map<String, Object> attrs = getAllFieldValuesAsMap(entity);
+    Map<String, Object> attrs = computeAllFieldValues(entity);
     Map<String, Relationship> rels =
-        extractRelationships(entity, includeOptions, visited, included);
+        computeAllRelationshipsValues(entity, includeOptions, visited, included);
 
     return new ResourceObject(id, type, attrs, rels);
   }
 
-  private Map<String, Relationship> extractRelationships(
+  private Map<String, Relationship> computeAllRelationshipsValues(
       Object entity,
       IncludeOptions includeOptions,
       Set<Object> visited,
@@ -109,7 +109,7 @@ public class GenericJsonApiExporter {
     rels.put(relName, new Relationship(ids));
 
     for (Object child : col) {
-      var ro = toResource(child, includeOptions, visited, included);
+      var ro = buildResourceObject(child, includeOptions, visited, included);
       if (ro != null) {
         included.add(ro);
       }
@@ -125,6 +125,9 @@ public class GenericJsonApiExporter {
       Field f) {
     String relName = resolveFieldJsonName(f);
     Object value = getField(entity, f);
+    // Force loading
+    Hibernate.initialize(value);
+    value = Hibernate.unproxy(value);
     if (value == null) {
       return;
     }
@@ -134,7 +137,7 @@ public class GenericJsonApiExporter {
     rels.put(
         relName,
         new Relationship(new ResourceIdentifier(readId(value), resolveType(value.getClass()))));
-    var ro = toResource(value, includeOptions, visited, included);
+    var ro = buildResourceObject(value, includeOptions, visited, included);
     if (ro != null) {
       included.add(ro);
     }
