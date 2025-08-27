@@ -88,7 +88,7 @@ const ScenarioHeader = ({
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const [openScenarioAssistantQueryParam] = useQueryParameter(['openScenarioAssistant']);
   const { injects, setInjects } = useContext(InjectContext);
-  const { canLaunch } = useScenarioPermissions(scenarioId);
+  const { canLaunch, canManage } = useScenarioPermissions(scenarioId);
 
   const [openScenarioAssistant, setOpenScenarioAssistant] = useState(openScenarioAssistantQueryParam === 'true');
   const [openLoaderDialog, setOpenLoaderDialog] = useState(false);
@@ -177,37 +177,43 @@ const ScenarioHeader = ({
               >
                 {t('Stop')}
               </Button>
-            ) : canLaunch
-              && (
-                <>
-                  <Button
-                    style={{
-                      marginRight: theme.spacing(1),
-                      lineHeight: 'initial',
-                      borderColor: theme.palette.divider,
-                    }}
-                    variant="outlined"
-                    color="inherit"
-                    size="small"
-                    onClick={() => setOpenScenarioAssistant(true)}
-                  >
-                    {t('Scenario assistant')}
-                  </Button>
-                  <Button
-                    style={{
-                      marginRight: theme.spacing(1),
-                      lineHeight: 'initial',
-                    }}
-                    startIcon={<PlayArrowOutlined />}
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() => setOpenInstantiateSimulationAndStart(true)}
-                  >
-                    {t('Launch now')}
-                  </Button>
-                </>
-              )}
+            )
+          : (
+              <>
+                {canManage
+                  && (
+                    <Button
+                      style={{
+                        marginRight: theme.spacing(1),
+                        lineHeight: 'initial',
+                        borderColor: theme.palette.divider,
+                      }}
+                      variant="outlined"
+                      color="inherit"
+                      size="small"
+                      onClick={() => setOpenScenarioAssistant(true)}
+                    >
+                      {t('Scenario assistant')}
+                    </Button>
+                  )}
+                {canLaunch
+                  && (
+                    <Button
+                      style={{
+                        marginRight: theme.spacing(1),
+                        lineHeight: 'initial',
+                      }}
+                      startIcon={<PlayArrowOutlined />}
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => setOpenInstantiateSimulationAndStart(true)}
+                    >
+                      {t('Launch now')}
+                    </Button>
+                  )}
+              </>
+            )}
         <ScenarioPopover
           scenario={scenario}
           actions={['Duplicate', 'Update', 'Delete', 'Export']}
