@@ -36,7 +36,6 @@ const useRetrieveOptions = () => {
     }
   };
 
-
   const searchOptions = (filterKey: string, ids: string[], config: RetrieveOptionsConfig) => {
     const filterDefaultValues = (config.defaultValues ?? []).filter(v => ids.includes(v.id));
     switch (filterKey) {

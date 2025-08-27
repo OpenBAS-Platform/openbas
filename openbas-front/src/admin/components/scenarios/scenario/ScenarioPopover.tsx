@@ -86,7 +86,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   if (actions.includes('Duplicate')) entries.push({
     label: 'Duplicate',
     action: () => handleOpenDuplicate(),
-    userRight: canManage && ability.can(ACTIONS.CREATE, SUBJECTS.ASSESSMENT),
+    userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT),
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
