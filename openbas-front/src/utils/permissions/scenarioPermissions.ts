@@ -16,12 +16,14 @@ const useScenarioPermissions = (scenarioId: string) => {
 
   const canAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.ACCESS, SUBJECTS.ASSESSMENT);
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT);
-  const canLaunch = ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.LAUNCH, SUBJECTS.ASSESSMENT); ;
+  const canLaunch = ability.can(ACTIONS.LAUNCH, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.LAUNCH, SUBJECTS.ASSESSMENT);
+  const canDelete = ability.can(ACTIONS.DELETE, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.DELETE, SUBJECTS.ASSESSMENT);
 
   return {
     canAccess,
     canManage,
     canLaunch,
+    canDelete,
     readOnly: !canManage,
     isLoggedIn: !R.isEmpty(logged),
     isRunning: false,

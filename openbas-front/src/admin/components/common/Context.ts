@@ -47,6 +47,7 @@ export type PermissionsContextType = {
     canManage: boolean;
     canAccess: boolean;
     canLaunch: boolean;
+    canDelete: boolean;
     isRunning: boolean;
   };
 };
@@ -192,6 +193,7 @@ export const PermissionsContext = createContext<PermissionsContextType>({
     canAccess: false,
     canManage: false,
     canLaunch: false,
+    canDelete: false,
     readOnly: false,
     isRunning: false,
   },

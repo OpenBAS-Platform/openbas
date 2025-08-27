@@ -33,7 +33,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { canManage } = useScenarioPermissions(scenario.scenario_id);
+  const { canManage, canDelete } = useScenarioPermissions(scenario.scenario_id);
   const ability = useContext(AbilityContext);
 
   // Duplicate
@@ -96,7 +96,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
-    userRight: canManage,
+    userRight: canDelete,
   });
 
   return (
