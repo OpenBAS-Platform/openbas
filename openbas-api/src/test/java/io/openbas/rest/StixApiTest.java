@@ -2,7 +2,7 @@ package io.openbas.rest;
 
 import static io.openbas.rest.StixApi.STIX_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.service.SecurityAssessmentService.INCIDENT_RESPONSE;
+import static io.openbas.service.ScenarioSecurityAssessmentService.INCIDENT_RESPONSE;
 import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,26 +49,31 @@ class StixApiTest extends IntegrationTest {
   @Autowired private AttackPatternComposer attackPatternComposer;
 
   private String stixSecurityAssessment;
+  private String stixSecurityAssessmentWithoutTtps;
 
-  @BeforeAll
+  @BeforeEach
   void setUp() throws Exception {
     attackPatternComposer.reset();
+    try (FileInputStream fis1 =
+            new FileInputStream("src/test/resources/stix-bundles/security-assessment.json");
+        FileInputStream fis2 =
+            new FileInputStream(
+                "src/test/resources/stix-bundles/security-assessment-without-ttps.json")) {
 
-    try (FileInputStream fis =
-        new FileInputStream("src/test/resources/stix-bundles/security-assessment.json")) {
-      stixSecurityAssessment = IOUtils.toString(fis, StandardCharsets.UTF_8);
-
-      attackPatternComposer
-          .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1531"))
-          .persist();
-      attackPatternComposer
-          .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1003"))
-          .persist();
+      stixSecurityAssessment = IOUtils.toString(fis1, StandardCharsets.UTF_8);
+      stixSecurityAssessmentWithoutTtps = IOUtils.toString(fis2, StandardCharsets.UTF_8);
     }
+
+    attackPatternComposer
+        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1531"))
+        .persist();
+    attackPatternComposer
+        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1003"))
+        .persist();
   }
 
-  @AfterAll
-  void afterAll() {
+  @AfterEach
+  void afterEach() {
     attackPatternComposer.reset();
   }
 
@@ -207,12 +212,7 @@ class StixApiTest extends IntegrationTest {
       List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
       assertThat(injects).hasSize(10);
 
-      String updatedBundle =
-          stixSecurityAssessment
-              .replace(
-                  "Security Assessment Q3 2025 - Threat Report XYZ",
-                  "Security Assessment Q3 2025 - UPDATED")
-              .replaceFirst("\"object_refs\"\\s*:\\s*\\[.*?\\]", "");
+      String updatedBundle = stixSecurityAssessmentWithoutTtps;
 
       String updatedResponse =
           mvc.perform(

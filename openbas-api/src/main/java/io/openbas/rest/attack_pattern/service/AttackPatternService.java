@@ -212,4 +212,10 @@ public class AttackPatternService {
       throw new RuntimeException(e);
     }
   }
+
+  public AttackPattern findById(String attackPatternId) {
+    return this.attackPatternRepository
+        .findById(attackPatternId)
+        .orElseThrow(() -> new ElementNotFoundException("Attack pattern not found"));
+  }
 }

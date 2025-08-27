@@ -211,4 +211,15 @@ public class AssetGroupService {
         .map(i -> new FilterUtilsJpa.Option((String) i[0], (String) i[1]))
         .toList();
   }
+
+  public Map<AssetGroup, List<Endpoint>> assetsFromAssetGroupMap(List<AssetGroup> assetGroups) {
+    return assetGroups.stream()
+        .collect(
+            Collectors.toMap(
+                group -> group,
+                group ->
+                    this.assetsFromAssetGroup(group.getId()).stream()
+                        .map(Endpoint.class::cast)
+                        .toList()));
+  }
 }
