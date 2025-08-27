@@ -5,6 +5,7 @@ import static io.openbas.utils.reflection.CollectionUtils.toCollection;
 import static io.openbas.utils.reflection.FieldUtils.getAllFields;
 import static io.openbas.utils.reflection.FieldUtils.getField;
 import static io.openbas.utils.reflection.RelationUtils.isRelation;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -40,15 +41,15 @@ public class ZipJsonApi<T extends Base> {
 
   public static final String IMPORTED_OBJECT_NAME_SUFFIX = " (Import)";
   private static final String META_ENTRY = "meta.json";
-  public static final DateTimeFormatter FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+  public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
   @Resource private ObjectMapper mapper = new ObjectMapper();
   private final GenericJsonApiImporter<T> importer;
   private final GenericJsonApiExporter exporter;
   private final DocumentRepository documentRepository;
   private final FileService fileService;
 
-  // -- REST --
+  // -- EXPORT --
 
   public ResponseEntity<byte[]> handleExport(T entity) throws IOException {
     return handleExport(entity, null, null);
@@ -120,6 +121,8 @@ public class ZipJsonApi<T extends Base> {
     }
   }
 
+  // -- IMPORT --
+
   public ResponseEntity<JsonApiDocument<ResourceObject>> handleImport(
       MultipartFile file, String nameAttributeKey) throws IOException {
     return handleImport(file, nameAttributeKey, null);
@@ -181,7 +184,7 @@ public class ZipJsonApi<T extends Base> {
     return bytes.toByteArray();
   }
 
-  public ParsedZip readZip(byte[] bytes) throws IOException {
+  private ParsedZip readZip(byte[] bytes) throws IOException {
     JsonApiDocument<ResourceObject> doc = null;
     Map<String, byte[]> extras = new HashMap<>();
 

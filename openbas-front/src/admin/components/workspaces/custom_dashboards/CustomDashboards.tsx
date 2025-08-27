@@ -4,8 +4,9 @@ import { type CSSProperties, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchCustomDashboards } from '../../../../actions/custom_dashboards/customdashboard-action';
+import { importCustomDashboard, searchCustomDashboards } from '../../../../actions/custom_dashboards/customdashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import ImportUploaderJsonApiComponent from '../../../../components/common/import/ImportUploaderJsonApiComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -20,7 +21,6 @@ import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
-import ImportUploaderCustomDashboard from './ImportUploaderCustomDashboard';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -99,7 +99,10 @@ const CustomDashboards = () => {
         queryableHelpers={queryableHelpers}
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
-            <ImportUploaderCustomDashboard />
+            <ImportUploaderJsonApiComponent
+              title={t('Import a custom dashboard')}
+              uploadFn={importCustomDashboard}
+            />
           </ToggleButtonGroup>
         )}
       />

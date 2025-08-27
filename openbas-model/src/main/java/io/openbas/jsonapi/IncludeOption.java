@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 /**
  * Marks a field of an entity as an "optional include" in JSON:API exports.
  *
- * <p>By default, all relations or fields annotated with {@code @IncludeOption} can be dynamically
- * included or excluded from the serialized JSON:API response, based on the {@link
- * io.openbas.jsonapi.IncludeOptions} provided by the caller.
+ * <p>By default, all relationships are included during export. When a field is annotated with
+ * {@code @IncludeOption}, its inclusion can be dynamically controlled by {@link IncludeOptions}
+ * provided at runtime.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})

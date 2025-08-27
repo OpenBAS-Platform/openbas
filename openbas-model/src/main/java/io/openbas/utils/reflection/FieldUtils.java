@@ -1,28 +1,28 @@
 package io.openbas.utils.reflection;
 
 import static io.openbas.utils.reflection.RelationUtils.isRelation;
+import static java.lang.reflect.Modifier.isStatic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class FieldUtils {
 
   private FieldUtils() {}
 
-  public static boolean isStaticOrTransient(Field field) {
+  public static boolean isStaticOrTransient(final Field field) {
     if (field == null) {
       throw new IllegalArgumentException("Field cannot be null");
     }
     int m = field.getModifiers();
-    return Modifier.isStatic(m) || field.isAnnotationPresent(jakarta.persistence.Transient.class);
+    return isStatic(m) || field.isAnnotationPresent(jakarta.persistence.Transient.class);
   }
 
   // -- GETTER --
 
-  public static String resolveFieldJsonName(Field field) {
+  public static String resolveFieldJsonName(final Field field) {
     if (field == null) {
       throw new IllegalArgumentException("Field cannot be null");
     }
@@ -42,7 +42,7 @@ public class FieldUtils {
     return fields;
   }
 
-  public static Map<String, Field> getAllFieldsAsMap(Class<?> clazz) {
+  public static Map<String, Field> getAllFieldsAsMap(final Class<?> clazz) {
     Map<String, Field> map = new LinkedHashMap<>();
     for (Field f : getAllFields(clazz)) {
       if (f.isAnnotationPresent(JsonIgnore.class) || isRelation(f) || isStaticOrTransient(f)) {
@@ -54,7 +54,7 @@ public class FieldUtils {
     return map;
   }
 
-  public static Object getField(Object target, Field field) {
+  public static Object getField(final Object target, Field field) {
     if (target == null || field == null) {
       throw new IllegalArgumentException("Target or field cannot be null");
     }
@@ -68,7 +68,7 @@ public class FieldUtils {
     }
   }
 
-  public static Map<String, Object> computeAllFieldValues(Object entity) {
+  public static Map<String, Object> computeAllFieldValues(final Object entity) {
     Map<String, Object> out = new LinkedHashMap<>();
     for (Field f : getAllFields(entity.getClass())) {
       if (f.isAnnotationPresent(JsonIgnore.class) || isRelation(f) || isStaticOrTransient(f)) {

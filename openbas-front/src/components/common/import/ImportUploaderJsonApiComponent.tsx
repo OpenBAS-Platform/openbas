@@ -1,21 +1,27 @@
 import { useNavigate } from 'react-router';
+import { type Dispatch } from 'redux';
 
-import { importPayload } from '../../../actions/payloads/payload-actions';
-import ImportUploader from '../../../components/common/ImportUploader';
-import { useFormatter } from '../../../components/i18n';
 import { useAppDispatch } from '../../../utils/hooks';
+import ImportUploader from '../ImportUploader';
 
-const ImportUploaderPayloads = () => {
+interface Props {
+  title: string;
+  uploadFn: (content: FormData) => (dispatch: Dispatch) => Promise<{ [x: string]: string }>;
+}
+
+const ImportUploaderJsonApiComponent = ({
+  title,
+  uploadFn,
+}: Props) => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { t } = useFormatter();
 
   const handleUpload = async (_: FormData, file: File) => {
     const form = new FormData();
     form.append('file', file);
 
-    await dispatch(importPayload(form)).then((result: { [x: string]: string }) => {
+    await dispatch(uploadFn(form)).then((result: { [x: string]: string }) => {
       if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
         navigate(0);
       }
@@ -24,11 +30,11 @@ const ImportUploaderPayloads = () => {
 
   return (
     <ImportUploader
-      title={t('Import payloads')}
+      title={title}
       handleUpload={handleUpload}
       fileAccepted=".zip"
     />
   );
 };
 
-export default ImportUploaderPayloads;
+export default ImportUploaderJsonApiComponent;

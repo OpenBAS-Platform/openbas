@@ -14,7 +14,7 @@ public class RelationUtils {
 
   private RelationUtils() {}
 
-  public static boolean isRelation(Field f) {
+  public static boolean isRelation(final Field f) {
     return f.isAnnotationPresent(OneToMany.class)
         || f.isAnnotationPresent(ManyToOne.class)
         || f.isAnnotationPresent(OneToOne.class)
@@ -23,7 +23,7 @@ public class RelationUtils {
 
   // -- GETTER --
 
-  public static Map<String, Field> getAllRelationsAsMap(Class<?> clazz) {
+  public static Map<String, Field> getAllRelationsAsMap(final Class<?> clazz) {
     Map<String, Field> map = new LinkedHashMap<>();
     for (Field f : getAllFields(clazz)) {
       if (!isRelation(f)) {
