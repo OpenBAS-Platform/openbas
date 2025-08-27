@@ -31,6 +31,7 @@ public class SecurityCoverageService {
   private final AttackPatternService attackPatternService;
   private final ResultUtils resultUtils;
   private final ExerciseService exerciseService;
+  private final AssetService assetService;
 
   public Bundle createBundleFromSendJobs(List<SecurityCoverageSendJob> securityCoverageSendJobs)
       throws ParsingException, JsonProcessingException {
@@ -59,6 +60,11 @@ public class SecurityCoverageService {
     coverage.setProperty("coverage", getOverallCoverage(exercise));
     objects.add(coverage);
 
+    // start and stop times
+    Optional<Timestamp> sroStartTime = exercise.getStart().map(Timestamp::new);
+    Optional<Timestamp> sroStopTime =
+        exerciseService.getLatestValidityDate(exercise).map(Timestamp::new);
+
     for (StixRefToExternalRef stixRef : exercise.getSecurityAssessment().getAttackPatternRefs()) {
       BaseType<?> attackPatternCoverage =
           getAttackPatternCoverage(stixRef.getExternalRef(), exercise);
@@ -74,19 +80,60 @@ public class SecurityCoverageService {
                       "relationship_type",
                       new StixString("has-assessed"),
                       RelationshipObject.Properties.SOURCE_REF.toString(),
-                      coverage.getProperty(CommonProperties.ID.toString()),
+                      coverage.getProperty(CommonProperties.ID),
                       RelationshipObject.Properties.TARGET_REF.toString(),
                       new Identifier(stixRef.getStixRef()),
                       "covered",
                       new io.openbas.stix.types.Boolean(covered))));
-      exercise
-          .getStart()
-          .ifPresent(instant -> sro.setProperty("start_time", new Timestamp(instant)));
-      exerciseService
-          .getLatestValidityDate(exercise)
-          .ifPresent(instant -> sro.setProperty("stop_time", new Timestamp(instant)));
+      sroStartTime.ifPresent(instant -> sro.setProperty("start_time", instant));
+      sroStopTime.ifPresent(instant -> sro.setProperty("stop_time", instant));
       if (covered) {
         sro.setProperty("coverage", attackPatternCoverage);
+      }
+      objects.add(sro);
+    }
+
+    for (SecurityPlatform securityPlatform : assetService.securityPlatforms()) {
+      DomainObject platformIdentity =
+          new DomainObject(
+              new HashMap<>(
+                  Map.of(
+                      CommonProperties.ID.toString(),
+                      new Identifier("identity--" + securityPlatform.getId()),
+                      CommonProperties.CREATED.toString(),
+                      new Timestamp(securityPlatform.getCreatedAt()),
+                      CommonProperties.MODIFIED.toString(),
+                      new Timestamp(securityPlatform.getUpdatedAt()),
+                      "name",
+                      new StixString(securityPlatform.getName()),
+                      CommonProperties.TYPE.toString(),
+                      new StixString("identity"),
+                      "identity_class",
+                      new StixString("security-platform"))));
+      objects.add(platformIdentity);
+
+      BaseType<?> platformCoverage = getOverallCoveragePerPlatform(exercise, securityPlatform);
+      boolean covered = !((Map<String, BaseType<?>>) platformCoverage.getValue()).isEmpty();
+      RelationshipObject sro =
+          new RelationshipObject(
+              new HashMap<>(
+                  Map.of(
+                      CommonProperties.ID.toString(),
+                      new Identifier(ObjectTypes.RELATIONSHIP + "--" + exercise.getId()),
+                      CommonProperties.TYPE.toString(),
+                      new StixString(ObjectTypes.RELATIONSHIP.toString()),
+                      "relationship_type",
+                      new StixString("has-assessed"),
+                      RelationshipObject.Properties.SOURCE_REF.toString(),
+                      coverage.getProperty(CommonProperties.ID),
+                      RelationshipObject.Properties.TARGET_REF.toString(),
+                      platformIdentity.getProperty(CommonProperties.ID),
+                      "covered",
+                      new io.openbas.stix.types.Boolean(covered))));
+      sroStartTime.ifPresent(instant -> sro.setProperty("start_time", instant));
+      sroStopTime.ifPresent(instant -> sro.setProperty("stop_time", instant));
+      if (covered) {
+        sro.setProperty("coverage", platformCoverage);
       }
       objects.add(sro);
     }
@@ -96,6 +143,11 @@ public class SecurityCoverageService {
 
   private BaseType<?> getOverallCoverage(Exercise exercise) {
     return computeCoverageFromInjects(exercise.getInjects());
+  }
+
+  private BaseType<?> getOverallCoveragePerPlatform(
+      Exercise exercise, SecurityPlatform securityPlatform) {
+    return computeCoverageFromInjects(exercise.getInjects(), securityPlatform);
   }
 
   private BaseType<?> getAttackPatternCoverage(String externalRef, Exercise exercise) {
@@ -119,6 +171,20 @@ public class SecurityCoverageService {
     }
 
     return computeCoverageFromInjects(injects);
+  }
+
+  private BaseType<?> computeCoverageFromInjects(
+      List<Inject> injects, SecurityPlatform securityPlatform) {
+    List<InjectExpectationResultUtils.ExpectationResultsByType> coverageResults =
+        resultUtils.computeGlobalExpectationResultsForPlatform(
+            injects.stream().map(Inject::getId).collect(Collectors.toSet()), securityPlatform);
+
+    Map<String, BaseType<?>> coverageValues = new HashMap<>();
+    for (InjectExpectationResultUtils.ExpectationResultsByType result : coverageResults) {
+      coverageValues.put(
+          result.type().name(), new StixString(String.valueOf(result.getSuccessRate())));
+    }
+    return new io.openbas.stix.types.Dictionary(coverageValues);
   }
 
   private BaseType<?> computeCoverageFromInjects(List<Inject> injects) {

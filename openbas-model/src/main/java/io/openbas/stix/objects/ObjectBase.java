@@ -3,6 +3,7 @@ package io.openbas.stix.objects;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.stix.objects.constants.CommonProperties;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.parsing.StixSerialisable;
 import io.openbas.stix.types.BaseType;
@@ -19,6 +20,10 @@ public abstract class ObjectBase implements StixSerialisable {
 
   public BaseType<?> getProperty(String name) {
     return properties.get(name);
+  }
+
+  public BaseType<?> getProperty(CommonProperties property) {
+    return this.getProperty(property.toString());
   }
 
   public void setProperty(String name, BaseType<?> value) {

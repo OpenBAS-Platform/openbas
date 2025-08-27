@@ -9,7 +9,5 @@ import org.junit.jupiter.api.Test;
 public class SecurityCoverageSendJobTest extends IntegrationTest {
   @Test
   @DisplayName("Test send job")
-  public void test() {
-
-  }
+  public void test() {}
 }

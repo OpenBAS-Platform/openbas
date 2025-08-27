@@ -25,6 +25,9 @@ public interface InjectExpectationRepository
   @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")
   List<InjectExpectation> findAllForExercise(@Param("exerciseId") String exerciseId);
 
+  @Query(value = "select i from InjectExpectation i where i.inject.id in :injectIds")
+  List<InjectExpectation> findAllForInjects(@Param("injectIds") Set<String> injectIds);
+
   @Query(
       value =
           "select i from InjectExpectation i where i.exercise.id = :exerciseId and i.inject.id = :injectId")
@@ -198,6 +201,7 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_type AS inject_expectation_type, "
               + "i.user_id AS user_id, "
               + "i.inject_expectation_score AS inject_expectation_score, "
+              + "i.inject_expectation_results AS inject_expectation_results, "
               + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "

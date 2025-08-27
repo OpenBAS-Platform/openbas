@@ -15,7 +15,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +48,7 @@ public class SecurityCoverageJob implements Job {
             e);
       }
     }
-    if(!successfulJobs.isEmpty()) {
+    if (!successfulJobs.isEmpty()) {
       securityCoverageSendJobService.consumeJobs(successfulJobs);
     }
   }
