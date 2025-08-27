@@ -13,8 +13,9 @@ $command = "-ExecutionPolicy Bypass -WindowStyle Hidden -NonInteractive -NoProfi
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $command
 $principal = New-ScheduledTaskPrincipal -UserID "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
-Register-ScheduledTask -TaskName "OpenBAS Payload" -Action $action -Principal $principal
-Start-ScheduledTask -TaskName "OpenBAS Payload"
+$taskName = "OpenBAS-Payload-" + [guid]::NewGuid().ToString()
+Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal
+Start-ScheduledTask -TaskName $taskName
 
 write-host "Task Triggered, sleep for 2 seconds..."
 
@@ -22,6 +23,7 @@ Start-Sleep -Seconds 2
 
 write-host "Sleep Complete, removing Scheduled Task"
 
-Unregister-ScheduledTask -TaskName "OpenBAS Payload" -confirm:$false
+Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+
 
 write-host "Task removed. Action Complete"
