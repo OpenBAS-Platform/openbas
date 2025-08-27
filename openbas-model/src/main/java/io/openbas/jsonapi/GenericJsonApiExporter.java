@@ -1,29 +1,40 @@
 package io.openbas.jsonapi;
 
 import static io.openbas.jsonapi.GenericJsonApiIUtils.resolveType;
+import static io.openbas.jsonapi.IncludeOptions.shouldInclude;
 import static io.openbas.utils.reflection.ClazzUtils.readId;
 import static io.openbas.utils.reflection.CollectionUtils.isCollection;
 import static io.openbas.utils.reflection.CollectionUtils.toCollection;
 import static io.openbas.utils.reflection.FieldUtils.*;
 import static io.openbas.utils.reflection.RelationUtils.isRelation;
+import static java.util.Collections.emptyMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.lang.reflect.Field;
 import java.util.*;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 /* Based on https://jsonapi.org/ */
 @Component
 public class GenericJsonApiExporter {
 
-  public JsonApiDocument<ResourceObject> handleExport(Object entity, boolean withRels) {
+  public JsonApiDocument<ResourceObject> handleExport(
+      Object entity, IncludeOptions includeOptions) {
+    if (includeOptions == null) {
+      includeOptions = IncludeOptions.of(emptyMap());
+    }
     Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
     List<ResourceObject> included = new ArrayList<>();
-    ResourceObject root = toResource(entity, withRels, visited, included);
+    ResourceObject root = toResource(entity, includeOptions, visited, included);
     return new JsonApiDocument<>(root, included.isEmpty() ? null : new ArrayList<>(included));
   }
 
   private ResourceObject toResource(
-      Object entity, boolean withRels, Set<Object> visited, List<ResourceObject> included) {
+      Object entity,
+      IncludeOptions includeOptions,
+      Set<Object> visited,
+      List<ResourceObject> included) {
     // Sanity check
     if (entity == null) {
       return null;
@@ -32,6 +43,9 @@ public class GenericJsonApiExporter {
     if (!visited.add(entity)) {
       return null;
     }
+    // Force loading
+    Hibernate.initialize(entity);
+    entity = Hibernate.unproxy(entity);
 
     Class<?> clazz = entity.getClass();
     String type = resolveType(clazz);
@@ -39,16 +53,21 @@ public class GenericJsonApiExporter {
 
     Map<String, Object> attrs = getAllFieldValuesAsMap(entity);
     Map<String, Relationship> rels =
-        withRels ? extractRelationships(entity, withRels, visited, included) : null;
+        extractRelationships(entity, includeOptions, visited, included);
 
     return new ResourceObject(id, type, attrs, rels);
   }
 
   private Map<String, Relationship> extractRelationships(
-      Object entity, boolean withRels, Set<Object> visited, List<ResourceObject> included) {
+      Object entity,
+      IncludeOptions includeOptions,
+      Set<Object> visited,
+      List<ResourceObject> included) {
     Map<String, Relationship> rels = new LinkedHashMap<>();
     for (Field f : getAllFields(entity.getClass())) {
-      if (!isRelation(f)) {
+      if (f.isAnnotationPresent(JsonIgnore.class)
+          || !isRelation(f)
+          || !shouldInclude(f, includeOptions)) {
         continue;
       }
 
@@ -58,9 +77,9 @@ public class GenericJsonApiExporter {
       }
 
       if (isCollection(f)) {
-        extractRelationshipValues(entity, withRels, visited, included, rels, f);
+        extractRelationshipValues(entity, includeOptions, visited, included, rels, f);
       } else {
-        extractRelationshipValue(entity, withRels, visited, included, rels, f);
+        extractRelationshipValue(entity, includeOptions, visited, included, rels, f);
       }
     }
     return rels.isEmpty() ? null : rels;
@@ -68,13 +87,16 @@ public class GenericJsonApiExporter {
 
   private void extractRelationshipValues(
       Object entity,
-      boolean withRels,
+      IncludeOptions includeOptions,
       Set<Object> visited,
       List<ResourceObject> included,
       Map<String, Relationship> rels,
       Field f) {
     String relName = resolveFieldJsonName(f);
     Object value = getField(entity, f);
+    // Force loading
+    Hibernate.initialize(value);
+    value = Hibernate.unproxy(value);
     Collection<?> col = toCollection(value);
     if (col.isEmpty()) {
       return;
@@ -87,7 +109,7 @@ public class GenericJsonApiExporter {
     rels.put(relName, new Relationship(ids));
 
     for (Object child : col) {
-      var ro = toResource(child, withRels, visited, included);
+      var ro = toResource(child, includeOptions, visited, included);
       if (ro != null) {
         included.add(ro);
       }
@@ -96,17 +118,23 @@ public class GenericJsonApiExporter {
 
   private void extractRelationshipValue(
       Object entity,
-      boolean withRels,
+      IncludeOptions includeOptions,
       Set<Object> visited,
       List<ResourceObject> included,
       Map<String, Relationship> rels,
       Field f) {
     String relName = resolveFieldJsonName(f);
     Object value = getField(entity, f);
+    if (value == null) {
+      return;
+    }
+    // Force loading
+    Hibernate.initialize(value);
+    value = Hibernate.unproxy(value);
     rels.put(
         relName,
         new Relationship(new ResourceIdentifier(readId(value), resolveType(value.getClass()))));
-    var ro = toResource(value, withRels, visited, included);
+    var ro = toResource(value, includeOptions, visited, included);
     if (ro != null) {
       included.add(ro);
     }

@@ -1,14 +1,14 @@
-package io.openbas.api.custom_dashboard;
+package io.openbas.api.simulation;
 
-import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.Exercise;
 import io.openbas.jsonapi.JsonApiDocument;
 import io.openbas.jsonapi.ResourceObject;
 import io.openbas.jsonapi.ZipJsonApi;
-import io.openbas.rest.custom_dashboard.CustomDashboardApi;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.simulation.SimulationApi;
+import io.openbas.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,23 +21,30 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping(CustomDashboardApi.CUSTOM_DASHBOARDS_URI)
+@RequestMapping(SimulationApi.SIMULATION_URI)
 @RequiredArgsConstructor
 @PreAuthorize("isAdmin()")
-public class CustomDashboardApiImporter extends RestBehavior {
+public class SimulationApiImporter extends RestBehavior {
 
-  private final ZipJsonApi<CustomDashboard> zipJsonApi;
+  private final ZipJsonApi<Exercise> zipJsonApi;
+  private final ImportService importService;
 
   @Operation(
       description =
-          "Imports a custom dashboard from a JSON:API document. The name will be suffixed with '(import)' by default.")
+          "Imports a simulation from a JSON:API document. The name will be suffixed with '(import)' by default.")
   @PostMapping(
       value = "/import",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Transactional
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
-      @RequestPart("file") @NotNull MultipartFile file) throws IOException {
-    return zipJsonApi.handleImport(file, "custom_dashboard_name");
+      @RequestPart("file") @NotNull MultipartFile file) throws Exception {
+    try {
+      return zipJsonApi.handleImport(file, "exercise_name");
+    } catch (Exception ex) {
+      // Fall back to the legacy importer
+      importService.handleFileImport(file, null, null);
+      return ResponseEntity.ok().build();
+    }
   }
 }
