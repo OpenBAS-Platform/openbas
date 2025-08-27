@@ -8,6 +8,7 @@ import { importPayload, searchPayloads } from '../../../actions/payloads/payload
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
+import ImportUploaderJsonApiComponent from '../../../components/common/import/ImportUploaderJsonApiComponent';
 import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -27,7 +28,6 @@ import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePayload from './CreatePayload';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
-import ImportUploaderJsonApiComponent from '../../../components/common/import/ImportUploaderJsonApiComponent';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
