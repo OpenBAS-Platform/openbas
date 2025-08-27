@@ -14,7 +14,9 @@ public class SecurityAssessmentFixture {
     securityAssessment.setExternalId("x-security-assessment--%s".formatted(UUID.randomUUID()));
     securityAssessment.setThreatContextRef("report--%s".formatted(UUID.randomUUID()));
     securityAssessment.setScheduling(ScheduleFrequency.DAILY);
-    securityAssessment.setContent("{}");
+    securityAssessment.setContent(
+        "{\"type\": \"x-security-assessment\", \"id\": \"%s\"}"
+            .formatted(securityAssessment.getExternalId()));
     return securityAssessment;
   }
 
