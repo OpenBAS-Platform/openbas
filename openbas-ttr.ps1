@@ -27,7 +27,25 @@ try {
     Write-Host "[ERROR] Start-ScheduledTask : $($_.Exception.Message)"
 }
 
-Start-Sleep -Seconds 2
+# Wait until the task has actually run
+$maxWait = 15  # maximum wait time in seconds
+$elapsed = 0
+$started = $false
+
+while ($elapsed -lt $maxWait -and -not $started) {
+    $info = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($info -and $info.LastRunTime -ne $null) {
+        Write-Host "[OK] Task $taskName has executed at $($info.LastRunTime)"
+        $started = $true
+    } else {
+        Start-Sleep -Seconds 1
+        $elapsed++
+    }
+}
+
+if (-not $started) {
+    Write-Host "[WARN] Task $taskName did not confirm execution within $maxWait seconds"
+}
 
 try {
     Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction Stop
