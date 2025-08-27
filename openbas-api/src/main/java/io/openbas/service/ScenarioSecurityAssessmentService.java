@@ -87,56 +87,116 @@ public class ScenarioSecurityAssessmentService {
 
   private void createdInjectsForScenario(Scenario scenario, SecurityAssessment securityAssessment) {
     // 1. Fetch internal Ids for TTPs
-    List<String> attackPatternIds =
-        attackPatternService
-            .getAttackPatternsByExternalIdsThrowIfMissing(
-                securityAssessment.getAttackPatternRefs().stream()
-                    .map(StixRefToExternalRef::getExternalRef)
-                    .collect(Collectors.toSet()))
-            .stream()
-            .map(AttackPattern::getId)
-            .toList();
+    List<String> attackPatternIds = fetchInternalTTPIdsFromSecurityAssessment(securityAssessment);
 
     if (attackPatternIds.isEmpty()) {
       injectService.deleteAll(scenario.getInjects());
+      return;
     }
 
     // 2. Fetch asset groups via tag rules
-    List<String> tagIds = scenario.getTags().stream().map(Tag::getId).toList();
-    List<AssetGroup> assetGroups = tagRuleService.getAssetGroupsFromTagIds(tagIds);
+    List<AssetGroup> assetGroups = fetchAssetGroupsFromScenarioTagRules(scenario);
 
-    // 3. Get all endpoints per asset group
+    // 3. Fetch Inject coverage
+    Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap =
+        extractCombinationTtpPlatformArchitectureFromScenarioInjects(scenario);
+
+    if (assetGroups.isEmpty()) {
+      handleNoAssetGroupsCase(scenario, attackPatternIds, injectCoverageMap);
+    } else {
+      handleWithAssetGroupsCase(scenario, assetGroups, attackPatternIds, injectCoverageMap);
+    }
+  }
+
+  private List<String> fetchInternalTTPIdsFromSecurityAssessment(
+      SecurityAssessment securityAssessment) {
+    return attackPatternService
+        .getAttackPatternsByExternalIdsThrowIfMissing(
+            securityAssessment.getAttackPatternRefs().stream()
+                .map(StixRefToExternalRef::getExternalRef)
+                .collect(Collectors.toSet()))
+        .stream()
+        .map(AttackPattern::getId)
+        .toList();
+  }
+
+  private List<AssetGroup> fetchAssetGroupsFromScenarioTagRules(Scenario scenario) {
+    return tagRuleService.getAssetGroupsFromTagIds(
+        scenario.getTags().stream().map(Tag::getId).toList());
+  }
+
+  private static Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>>
+      extractCombinationTtpPlatformArchitectureFromScenarioInjects(Scenario scenario) {
+    return scenario.getInjects().stream()
+        .map(inject -> inject.getInjectorContract().map(ic -> Map.entry(inject, ic)))
+        .flatMap(Optional::stream)
+        .filter(
+            entry -> {
+              InjectorContract ic = entry.getValue();
+              return ic.getArch() != null
+                  && ic.getPlatforms() != null
+                  && ic.getPlatforms().length > 0;
+            })
+        .map(
+            entry -> {
+              Inject inject = entry.getKey();
+              InjectorContract ic = entry.getValue();
+              String arch = ic.getArch().name();
+              Set<Endpoint.PLATFORM_TYPE> platforms =
+                  new HashSet<>(Arrays.asList(ic.getPlatforms()));
+
+              Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> combinations =
+                  ic.getAttackPatterns().stream()
+                      .flatMap(ap -> platforms.stream().map(p -> Triple.of(ap.getId(), p, arch)))
+                      .collect(Collectors.toSet());
+
+              return Map.entry(inject, combinations);
+            })
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (v1, v2) -> {
+                  v1.addAll(v2);
+                  return v1;
+                }));
+  }
+
+  private void handleWithAssetGroupsCase(
+      Scenario scenario,
+      List<AssetGroup> assetGroups,
+      List<String> attackPatternIds,
+      Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap) {
+
+    // 4. Get all endpoints per asset group
     Map<AssetGroup, List<Endpoint>> assetsFromGroupMap =
         assetGroupService.assetsFromAssetGroupMap(assetGroups);
 
-    // 4. Compute all (Platform, Arch) configs across all endpoints
+    // 5. Compute all (Platform, Arch) configs across all endpoints
     List<Endpoint> endpoints =
         assetsFromGroupMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
     Set<Pair<Endpoint.PLATFORM_TYPE, String>> allPlatformArchs =
         assetGroupService.computePairsPlatformArchitecture(endpoints);
 
-    // 5. Build required (TTP × Platform × Arch) combinations
+    // 6. Build required (TTP × Platform × Arch) combinations
     Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> requiredCombinations =
         buildCombinationTtpPlatformArchitecture(attackPatternIds, allPlatformArchs);
 
-    // 6. Extract covered combinations from existing injects
-    Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap =
-        extractCombinationTtpPlatformArchitectureFromScenarioInjects(scenario);
-
+    // 7. Extract covered combinations from existing injects
     Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> coveredCombinations =
         injectCoverageMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
 
-    // 7. Identify injects to delete: if all their combinations are irrelevant
-    // 8. Delete injects
+    // 8. Identify injects to delete: if all their combinations are irrelevant
+    // 9. Delete injects
     removeInjectsNoLongerNecessary(injectCoverageMap, requiredCombinations);
 
-    // 9. Compute missing combinations
-    // 10. Filter TTPs that are still missing
-    // 11. Filter AssetGroups based on missing (Platform × Arch)
+    // 10. Compute missing combinations
+    // 11. Filter TTPs that are still missing
+    // 12. Filter AssetGroups based on missing (Platform × Arch)
     MissingCombinations missingCombinations =
         getMissingCombinations(requiredCombinations, coveredCombinations, assetsFromGroupMap);
 
-    // 12. Generate missing injects only for missing TTPs and relevant asset groups
+    // 13. Generate missing injects only for missing TTPs and relevant asset groups
     if (!missingCombinations.filteredTtpIds().isEmpty()) {
       injectAssistantService.generateInjectsByTTPs(
           scenario,
@@ -144,6 +204,48 @@ public class ScenarioSecurityAssessmentService {
           1,
           missingCombinations.filteredAssetsFromGroupMap());
     }
+  }
+
+  private void handleNoAssetGroupsCase(
+      Scenario scenario,
+      List<String> requiredTtpIds,
+      Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap) {
+    Set<String> coveredTtpIds =
+        injectCoverageMap.values().stream()
+            .flatMap(Set::stream)
+            .map(Triple::getLeft)
+            .collect(Collectors.toSet());
+
+    Set<String> missingTtpIds = new HashSet<>(requiredTtpIds);
+    missingTtpIds.removeAll(coveredTtpIds);
+
+    // Remove injects not in requiredTtpIds or missing arch/platforms
+    List<Inject> injectsToRemove =
+        injectCoverageMap.entrySet().stream()
+            .filter(
+                entry -> {
+                  Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> triples = entry.getValue();
+                  return triples.stream().map(Triple::getLeft).noneMatch(requiredTtpIds::contains);
+                })
+            .map(Map.Entry::getKey)
+            .toList();
+
+    injectRepository.deleteAll(injectsToRemove);
+
+    if (!missingTtpIds.isEmpty()) {
+      injectAssistantService.generateInjectsByTTPs(
+          scenario, new ArrayList<>(missingTtpIds), 1, Map.of());
+    }
+  }
+
+  private static Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>
+      buildCombinationTtpPlatformArchitecture(
+          List<String> attackPatternIds,
+          Set<Pair<Endpoint.PLATFORM_TYPE, String>> allPlatformArchs) {
+    return attackPatternIds.stream()
+        .flatMap(
+            ttp -> allPlatformArchs.stream().map(pa -> Triple.of(ttp, pa.getLeft(), pa.getRight())))
+        .collect(Collectors.toSet());
   }
 
   private MissingCombinations getMissingCombinations(
@@ -164,9 +266,6 @@ public class ScenarioSecurityAssessmentService {
 
     return new MissingCombinations(filteredTtpIds, filteredAssetsFromGroupMap);
   }
-
-  private record MissingCombinations(
-      Set<String> filteredTtpIds, Map<AssetGroup, List<Endpoint>> filteredAssetsFromGroupMap) {}
 
   private Map<AssetGroup, List<Endpoint>> computeMissingAssetGroups(
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> missingCombinations,
@@ -207,50 +306,6 @@ public class ScenarioSecurityAssessmentService {
     injectRepository.deleteAll(injectsToRemove);
   }
 
-  private static Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>
-      buildCombinationTtpPlatformArchitecture(
-          List<String> attackPatternIds,
-          Set<Pair<Endpoint.PLATFORM_TYPE, String>> allPlatformArchs) {
-    return attackPatternIds.stream()
-        .flatMap(
-            ttp -> allPlatformArchs.stream().map(pa -> Triple.of(ttp, pa.getLeft(), pa.getRight())))
-        .collect(Collectors.toSet());
-  }
-
-  private static Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>>
-  extractCombinationTtpPlatformArchitectureFromScenarioInjects(Scenario scenario) {
-    return scenario.getInjects().stream()
-        .map(inject -> inject.getInjectorContract().map(ic -> Map.entry(inject, ic)))
-        .flatMap(Optional::stream)
-        .filter(
-            entry -> {
-              InjectorContract ic = entry.getValue();
-              return ic.getArch() != null
-                  && ic.getPlatforms() != null
-                  && ic.getPlatforms().length > 0;
-            })
-        .map(
-            entry -> {
-              Inject inject = entry.getKey();
-              InjectorContract ic = entry.getValue();
-              String arch = ic.getArch().name();
-              Set<Endpoint.PLATFORM_TYPE> platforms =
-                  new HashSet<>(Arrays.asList(ic.getPlatforms()));
-
-              Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> combinations =
-                  ic.getAttackPatterns().stream()
-                      .flatMap(ap -> platforms.stream().map(p -> Triple.of(ap.getId(), p, arch)))
-                      .collect(Collectors.toSet());
-
-              return Map.entry(inject, combinations);
-            })
-        .collect(
-            Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (v1, v2) -> {
-                  v1.addAll(v2);
-                  return v1;
-                }));
-  }
+  private record MissingCombinations(
+      Set<String> filteredTtpIds, Map<AssetGroup, List<Endpoint>> filteredAssetsFromGroupMap) {}
 }
