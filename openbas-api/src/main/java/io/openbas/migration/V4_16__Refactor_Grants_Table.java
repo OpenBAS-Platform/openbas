@@ -110,13 +110,13 @@ public class V4_16__Refactor_Grants_Table extends BaseJavaMigration {
   -- Step 7: Recreate the old tables
   CREATE TABLE groups_exercises_default_grants (
       group_id VARCHAR(255) NOT NULL,
-      exercisesdefaultgrants VARCHAR(255),
+      exercises_default_grants VARCHAR(255),
       CONSTRAINT fk_exercises_grants_group_id
           FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE
   );
   CREATE TABLE groups_scenarios_default_grants (
       group_id VARCHAR(255) NOT NULL,
-      scenariosdefaultgrants VARCHAR(255),
+      scenarios_default_grants VARCHAR(255),
       CONSTRAINT fk_scenarios_grants_group_id
           FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE
   );
