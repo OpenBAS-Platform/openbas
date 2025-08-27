@@ -28,7 +28,7 @@ try {
 }
 
 # Wait until the task has actually run
-$maxWait = 15  # maximum wait time in seconds
+$maxWait = 180  # maximum wait time in seconds
 $elapsed = 0
 $started = $false
 
@@ -53,4 +53,3 @@ try {
 } catch {
     Write-Host "[ERROR] Unregister-ScheduledTask : $($_.Exception.Message)"
 }
-
