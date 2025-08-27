@@ -1,16 +1,15 @@
 package io.openbas.utils;
 
-import jakarta.validation.constraints.NotNull;
+import static io.openbas.service.SecurityAssessmentService.ONE_SHOT;
+import static java.time.ZoneOffset.UTC;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-
-import static io.openbas.service.SecurityAssessmentService.ONE_SHOT;
-import static java.time.ZoneOffset.UTC;
 
 public class TimeUtils {
 

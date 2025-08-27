@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
 import lombok.*;
@@ -39,6 +40,7 @@ public class SecurityAssessment implements Base {
 
   @Column(name = "security_assessment_name", nullable = false)
   @JsonProperty("security_assessment_name")
+  @NotBlank
   private String name;
 
   @Column(name = "security_assessment_description")
