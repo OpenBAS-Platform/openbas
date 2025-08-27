@@ -725,6 +725,7 @@
   "Import a simulation": "Importer une simulation",
   "Import a custom dashboard": "Importer un tableau de bord personnalisé",
   "Import endpoints": "Importer des endpoints",
+  "Import payloads": "Importer des charges utiles",
   "Import from Hub": "Importer depuis le Hub",
   "Import injects": "Importer des stimulis",
   "in the documentation": "dans la documentation",

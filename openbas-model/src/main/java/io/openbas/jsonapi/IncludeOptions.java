@@ -3,6 +3,12 @@ package io.openbas.jsonapi;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+/**
+ * Options container to control which relationships are included during JSON:API export.
+ *
+ * <p>By default, all relationships are included. However, fields annotated with {@link
+ * IncludeOption} can be selectively included or excluded depending on the provided options map.
+ */
 public record IncludeOptions(Map<String, Boolean> includes) {
 
   public static boolean shouldInclude(Field f, IncludeOptions opts) {
