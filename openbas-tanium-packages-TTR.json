@@ -9,16 +9,7 @@
         },
         "name": "OpenBAS Subprocessor (Unix) TTR",
         "display_name": "OpenBAS Subprocessor (Unix) TTR",
-        "files": [
-          {
-            "hash": "dcb75118b0c76160551c18f2ee58d016c4ffeeef72c251fa08858a1d7420a365",
-            "name": "openbas-ttr.sh",
-            "source": "",
-            "size": 381,
-            "download_seconds": 0,
-            "direct_download_flag": false
-          }
-        ],
+        "files": [],
         "file_templates": [],
         "command": "/bin/sh -c \"/bin/echo $1 | sed 's#%2b#+#gi' | sed 's#%3d#=#gi' | sed 's#%2f#/#gi' | base64 -d | sh & exit 0\"",
         "command_timeout": 60,
