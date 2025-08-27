@@ -194,7 +194,7 @@ public class ScenarioSecurityAssessmentService {
       Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap,
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> requiredCombinations) {
     // 7. Identify injects to delete: if all their combinations are irrelevant
-    // TODO Remove Placeholders
+    // TODO Remove inject Placeholders
 
     // Inject with configuration outdated
     List<Inject> injectsToRemove =
