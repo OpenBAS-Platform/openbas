@@ -101,10 +101,14 @@ public class ScenarioSecurityAssessmentService {
     Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap =
         extractCombinationTtpPlatformArchitectureFromScenarioInjects(scenario);
 
-    if (assetGroups.isEmpty()) {
+    // 4. Get all endpoints per asset group
+    Map<AssetGroup, List<Endpoint>> assetsFromGroupMap =
+        assetGroupService.assetsFromAssetGroupMap(assetGroups);
+
+    if (assetGroups.isEmpty() || assetsFromGroupMap.values().stream().allMatch(List::isEmpty)) {
       handleNoAssetGroupsCase(scenario, attackPatternIds, injectCoverageMap);
     } else {
-      handleWithAssetGroupsCase(scenario, assetGroups, attackPatternIds, injectCoverageMap);
+      handleWithAssetGroupsCase(scenario, assetsFromGroupMap, attackPatternIds, injectCoverageMap);
     }
   }
 
@@ -164,13 +168,9 @@ public class ScenarioSecurityAssessmentService {
 
   private void handleWithAssetGroupsCase(
       Scenario scenario,
-      List<AssetGroup> assetGroups,
+      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
       List<String> attackPatternIds,
       Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap) {
-
-    // 4. Get all endpoints per asset group
-    Map<AssetGroup, List<Endpoint>> assetsFromGroupMap =
-        assetGroupService.assetsFromAssetGroupMap(assetGroups);
 
     // 5. Compute all (Platform, Arch) configs across all endpoints
     List<Endpoint> endpoints =
@@ -216,10 +216,11 @@ public class ScenarioSecurityAssessmentService {
             .map(Triple::getLeft)
             .collect(Collectors.toSet());
 
+    // 5. Remove Ttps already covered
     Set<String> missingTtpIds = new HashSet<>(requiredTtpIds);
     missingTtpIds.removeAll(coveredTtpIds);
 
-    // Remove injects not in requiredTtpIds or missing arch/platforms
+    // 6. Remove injects not in requiredTtpIds
     List<Inject> injectsToRemove =
         injectCoverageMap.entrySet().stream()
             .filter(
@@ -232,6 +233,7 @@ public class ScenarioSecurityAssessmentService {
 
     injectRepository.deleteAll(injectsToRemove);
 
+    // 7. Generate missing injects only for missing TTPs and relevant asset groups
     if (!missingTtpIds.isEmpty()) {
       injectAssistantService.generateInjectsByTTPs(
           scenario, new ArrayList<>(missingTtpIds), 1, Map.of());
