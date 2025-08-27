@@ -7,6 +7,7 @@ import { type Widget } from '../../../../../../utils/api-types-custom';
 import { type WidgetInputWithoutLayout } from '../WidgetUtils';
 import HistogramParameters from './histogram/HistogramParameters';
 import ListWidgetParameters from './list/ListWidgetParameters';
+import NumberWidgetParameters from './number/NumberWidgetParameters';
 
 const WidgetConfigurationParameters: FunctionComponent<{
   widgetType: Widget['widget_type'];
@@ -17,12 +18,12 @@ const WidgetConfigurationParameters: FunctionComponent<{
   const { t } = useFormatter();
   const getParametersControl = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
-      case 'list': return <ListWidgetParameters setValue={setValue} control={control} widgetType={widgetType} />;
-      case 'number': {
-        setValue('widget_config.widget_configuration_type', 'flat');
-        return <></>;
-      }
-      default: return <HistogramParameters setValue={setValue} control={control} widgetType={widgetType} />;
+      case 'list':
+        return <ListWidgetParameters setValue={setValue} control={control} widgetType={widgetType} />;
+      case 'number':
+        return <NumberWidgetParameters widgetType={widgetType} control={control} setValue={setValue} />;
+      default:
+        return <HistogramParameters setValue={setValue} control={control} widgetType={widgetType} />;
     }
   };
 

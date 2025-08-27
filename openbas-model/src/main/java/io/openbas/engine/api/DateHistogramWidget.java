@@ -16,11 +16,10 @@ public class DateHistogramWidget extends HistogramWidget {
 
   @NotNull List<DateHistogramSeries> series = new ArrayList<>();
   @NotNull private HistogramInterval interval = HistogramInterval.day;
-  @NotNull private String start; // Date or $custom_dashboard_start
-  @NotNull private String end; // Date or $custom_dashboard_end
 
   @Data
   public static class DateHistogramSeries {
+
     private String name;
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }

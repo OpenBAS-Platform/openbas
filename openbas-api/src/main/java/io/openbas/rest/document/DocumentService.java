@@ -123,4 +123,8 @@ public class DocumentService {
   public List<RawDocument> documentsForChallenge(@NotBlank String challengeId) {
     return this.documentRepository.rawAllDocumentsByChallengeId(challengeId);
   }
+
+  public List<RawDocument> documentsForPayload(@NotBlank String payloadId) {
+    return this.documentRepository.rawAllDocumentsByPayloadId(payloadId);
+  }
 }

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 
 import Dialog from '../../../../../../components/common/dialog/Dialog';
@@ -24,11 +24,12 @@ const ActionsComponent: FunctionComponent<{
 }> = ({ disabled, onCancel, onSubmit, editing }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const { formState: { errors } } = useFormContext();
 
   return (
     <>
       <Button onClick={onCancel}>{t('Cancel')}</Button>
-      <Button color="secondary" onClick={onSubmit} disabled={disabled}>
+      <Button color="secondary" onClick={onSubmit} disabled={disabled || Object.keys(errors).length > 0}>
         {editing ? t('Update') : t('Create')}
       </Button>
     </>
@@ -66,14 +67,19 @@ const WidgetForm: FunctionComponent<Props> = ({
         name: z.string().optional(),
         filter: z.any().refine(val => val !== undefined, { message: 'Filter cannot be undefined' }),
       })),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
     }),
     // DateHistogramConfiguration
     z.object({
       mode: z.literal('temporal'),
       title: z.string().optional(),
-      field: z.string().min(1, { message: t('Should not be empty') }),
-      start: z.string().min(1, { message: t('Should not be empty') }),
-      end: z.string().min(1, { message: t('Should not be empty') }),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       widget_configuration_type: z.literal('temporal-histogram'),
       stacked: z.boolean().optional(),
@@ -88,6 +94,10 @@ const WidgetForm: FunctionComponent<Props> = ({
       mode: z.literal('structural'),
       title: z.string().optional(),
       field: z.string().min(1, { message: t('Should not be empty') }),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
       limit: z.number()
@@ -104,6 +114,10 @@ const WidgetForm: FunctionComponent<Props> = ({
     z.object({
       title: z.string().optional(),
       widget_configuration_type: z.literal('list'),
+      date_attribute: z.string().min(1, { message: t('Should not be empty') }),
+      time_range: z.enum(['DEFAULT', 'ALL_TIME', 'CUSTOM', 'LAST_DAY', 'LAST_WEEK', 'LAST_MONTH', 'LAST_QUARTER', 'LAST_SEMESTER', 'LAST_YEAR']),
+      start: z.string().optional().nullable(),
+      end: z.string().optional().nullable(),
       sorts: z.array(z.object({
         direction: z.literal('ASC').or(z.literal('DESC')),
         fieldName: z.string(),
@@ -120,22 +134,24 @@ const WidgetForm: FunctionComponent<Props> = ({
     }),
   ]);
 
+  const methods = useForm<WidgetInputWithoutLayout>({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      zodImplement<WidgetInputWithoutLayout>().with({
+        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
+        // @ts-expect-error: types assigned to properties are necessary for validation purposes
+        widget_config: widgetConfigSchema,
+      }),
+    ),
+    defaultValues: initialValues,
+  });
   const {
     control,
     handleSubmit,
     watch,
     reset,
     setValue,
-  } = useForm<WidgetInputWithoutLayout>({
-    mode: 'onTouched',
-    resolver: zodResolver(
-      zodImplement<WidgetInputWithoutLayout>().with({
-        widget_type: z.enum(['vertical-barchart', 'horizontal-barchart', 'security-coverage', 'line', 'donut', 'list', 'attack-path', 'number']),
-        widget_config: widgetConfigSchema,
-      }),
-    ),
-    defaultValues: initialValues,
-  });
+  } = methods;
 
   const widgetType = watch('widget_type');
 
@@ -188,95 +204,101 @@ const WidgetForm: FunctionComponent<Props> = ({
   const getSeriesComponent = (widgetType: Widget['widget_type']) => {
     switch (widgetType) {
       case 'attack-path':
-      case 'security-coverage': return (
-        <Controller
-          control={control}
-          name="widget_config.series"
-          render={({ field: { value, onChange } }) => (
-            <WidgetSecurityCoverageSeriesSelection
-              value={value ?? [{ name: '' }]}
-              onChange={onChange}
-              onSubmit={nextStep}
-              isSimulationFilterMandatory={widgetType === 'attack-path'}
-            />
-          )}
-        />
-      );
-      case 'list': return (
-        <Controller
-          control={control}
-          name="widget_config.perspective"
-          render={({ field: { value, onChange } }) => (
-            <WidgetPerspectiveSelection
-              perspective={value ?? { name: '' }}
-              onChange={onChange}
-              onSubmit={nextStep}
-            />
+      case 'security-coverage':
+        return (
+          <Controller
+            control={control}
+            name="widget_config.series"
+            render={({ field: { value, onChange } }) => (
+              <WidgetSecurityCoverageSeriesSelection
+                value={value ?? [{ name: '' }]}
+                onChange={onChange}
+                onSubmit={nextStep}
+                isSimulationFilterMandatory={widgetType === 'attack-path'}
+              />
+            )}
+          />
+        );
+      case 'list':
+        return (
+          <Controller
+            control={control}
+            name="widget_config.perspective"
+            render={({ field: { value, onChange } }) => (
+              <WidgetPerspectiveSelection
+                perspective={value ?? { name: '' }}
+                onChange={onChange}
+                onSubmit={nextStep}
+              />
 
-          )}
-        />
-      );
-      default: return (
-        <Controller
-          control={control}
-          name="widget_config.series"
-          render={({ field: { value, onChange } }) => (
-            <WidgetMultiSeriesSelection
-              widgetType={widgetType}
-              currentSeries={value ?? [{ name: '' }]}
-              onChange={onChange}
-              onSubmit={nextStep}
-            />
-          )}
-        />
-      );
+            )}
+          />
+        );
+      default:
+        return (
+          <Controller
+            control={control}
+            name="widget_config.series"
+            render={({ field: { value, onChange } }) => (
+              <WidgetMultiSeriesSelection
+                widgetType={widgetType}
+                currentSeries={value ?? [{ name: '' }]}
+                onChange={onChange}
+                onSubmit={nextStep}
+              />
+            )}
+          />
+        );
     }
   };
 
   return (
-    <form id="widgetCreationForm">
-      <Dialog
-        className="noDrag"
-        open={open}
-        handleClose={onClose}
-        title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
-        actions={(
-          <ActionsComponent
-            disabled={!isLastStep()}
-            onCancel={onCancel}
-            onSubmit={handleSubmitWithoutPropagation}
-            editing={editing}
-          />
-        )}
-      >
-        <>
-          {activeStep === 0 && (
-            <Controller
-              control={control}
-              name="widget_type"
-              render={({ field: { value, onChange } }) => (
-                <WidgetTypeSelection
-                  value={value}
-                  onChange={(type) => {
-                    onChange(type);
-                    nextStep();
-                  }}
-                />
-              )}
+    <FormProvider {...methods}>
+      <form id="widgetCreationForm">
+        <Dialog
+          className="noDrag"
+          open={open}
+          handleClose={onClose}
+          title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
+          actions={(
+            <ActionsComponent
+              disabled={!isLastStep()}
+              onCancel={onCancel}
+              onSubmit={handleSubmitWithoutPropagation}
+              editing={editing}
             />
           )}
-          {activeStep === 1
-            && getSeriesComponent(widgetType)}
-          {activeStep === 2 && (
-            <WidgetConfigurationParameters
-              widgetType={widgetType}
-              control={control}
-              setValue={setValue}
-            />
-          )}
-        </>
-      </Dialog>
-    </form>
+        >
+          <>
+            {activeStep === 0 && (
+              <Controller
+                control={control}
+                name="widget_type"
+                render={({ field: { value, onChange } }) => (
+                  <WidgetTypeSelection
+                    value={value}
+                    onChange={(type) => {
+                      onChange(type);
+                      nextStep();
+                    }}
+                  />
+                )}
+              />
+            )}
+            {activeStep === 1
+              && getSeriesComponent(widgetType)}
+            {activeStep === 2 && (
+              <WidgetConfigurationParameters
+                widgetType={widgetType}
+                control={control}
+                setValue={setValue}
+              />
+            )}
+          </>
+        </Dialog>
+      </form>
+    </FormProvider>
+
   );
 };
 

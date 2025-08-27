@@ -10,9 +10,10 @@ import { verticalBarsChartOptions } from '../../../../../../utils/Charts';
 interface Props {
   widgetConfig: Widget['widget_config'];
   series: ApexOptions['series'];
+  errorMessage: string;
 }
 
-const VerticalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) => {
+const VerticalBarChart: FunctionComponent<Props> = ({ widgetConfig, series, errorMessage }) => {
   const theme = useTheme();
   const { t, fld } = useFormatter();
 
@@ -37,7 +38,7 @@ const VerticalBarChart: FunctionComponent<Props> = ({ widgetConfig, series }) =>
         true,
         false,
         undefined,
-        t('No data to display'),
+        errorMessage.length > 0 ? errorMessage : t('No data to display'),
       )}
       series={series}
       type="bar"

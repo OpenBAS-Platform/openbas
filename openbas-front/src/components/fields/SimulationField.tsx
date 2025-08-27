@@ -1,8 +1,7 @@
 import { type FunctionComponent, useEffect } from 'react';
 
-import type { GroupOption } from '../../utils/Option';
 import { SIMULATIONS } from '../common/queryable/filter/constants';
-import useSearchOptions from '../common/queryable/filter/useSearchOptions';
+import useSearchOptions, { type SearchOptionsConfig } from '../common/queryable/filter/useSearchOptions';
 import AutocompleteField from './AutocompleteField';
 
 interface Props {
@@ -12,13 +11,18 @@ interface Props {
   onChange: (value: string | undefined) => void;
   required?: boolean;
   error?: boolean;
-  defaultOptions?: GroupOption[];
+  searchOptionsConfig?: SearchOptionsConfig;
 }
 
-const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
+const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, searchOptionsConfig }) => {
   const { options, searchOptions } = useSearchOptions();
+  const finalSearchOptionsConfig = {
+    filterKey: searchOptionsConfig?.filterKey ?? SIMULATIONS,
+    contextId: searchOptionsConfig?.contextId,
+    defaultValues: searchOptionsConfig?.defaultValues,
+  };
   useEffect(() => {
-    searchOptions(SIMULATIONS, '', '', defaultOptions);
+    searchOptions(finalSearchOptionsConfig, '');
   }, []);
 
   return (
@@ -30,7 +34,7 @@ const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, cla
       required={required}
       error={error}
       options={options}
-      onInputChange={(search: string) => searchOptions(SIMULATIONS, search)}
+      onInputChange={(search: string) => searchOptions(finalSearchOptionsConfig, search)}
     />
   );
 };

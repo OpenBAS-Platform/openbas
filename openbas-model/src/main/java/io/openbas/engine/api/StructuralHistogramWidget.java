@@ -4,6 +4,7 @@ import static io.openbas.config.EngineConfig.Defaults.ENTITIES_CAP;
 
 import io.openbas.database.model.Filters;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.ArrayList;
@@ -22,10 +23,13 @@ public class StructuralHistogramWidget extends HistogramWidget {
   @Min(1)
   private int limit = ENTITIES_CAP;
 
+  @NotBlank private String field;
+
   @NotNull List<StructuralHistogramSeries> series = new ArrayList<>();
 
   @Data
   public static class StructuralHistogramSeries {
+
     private String name;
     private Filters.FilterGroup filter = new Filters.FilterGroup();
   }
