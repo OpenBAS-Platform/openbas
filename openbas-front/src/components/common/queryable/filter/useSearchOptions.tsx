@@ -11,12 +11,19 @@ import { searchInjectLinkedToFindingsAsOption, searchTargetOptions } from '../..
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { searchScenarioSimulationsAsOption } from '../../../../actions/scenarios/scenario-simulation-action';
 import { searchSimulationAsOptions } from '../../../../actions/simulations/simulation-action';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
-import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
+import { CUSTOM_DASHBOARD, SCENARIO_SIMULATIONS, SCENARIOS, SIMULATIONS } from './constants';
+
+export interface SearchOptionsConfig {
+  filterKey: string;
+  contextId?: string;
+  defaultValues?: GroupOption[] | undefined;
+}
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -24,7 +31,7 @@ const useSearchOptions = () => {
 
   const [options, setOptions] = useState<GroupOption[] | Option[]>([]);
 
-  const handleOptions = (response: AxiosResponse<GroupOption[] | Option[]>, defaultValues: GroupOption[]) => {
+  const handleOptions = (response: AxiosResponse<GroupOption[] | Option[]>, defaultValues: GroupOption[] | undefined) => {
     if (defaultValues && defaultValues.length > 0) {
       setOptions([...defaultValues, ...response.data.map((d: Option) => ({
         ...d,
@@ -35,12 +42,13 @@ const useSearchOptions = () => {
     }
   };
 
-  const searchOptions = (filterKey: string, search: string = '', contextId: string = '', defaultValues: GroupOption[] = []) => {
+  const searchOptions = (config: SearchOptionsConfig, search: string = '') => {
+    const { filterKey, contextId = '' } = config;
     switch (filterKey) {
       case SIMULATIONS:
       case 'base_simulation_side':
         searchSimulationAsOptions(search).then((response) => {
-          handleOptions(response, defaultValues);
+          handleOptions(response, config.defaultValues);
         });
         break;
       case 'injector_contract_injector':
@@ -151,7 +159,7 @@ const useSearchOptions = () => {
       case 'base_scenario_side':
       case SCENARIOS:
         searchScenarioAsOption(search).then((response) => {
-          handleOptions(response, defaultValues);
+          handleOptions(response, config.defaultValues);
         });
         break;
       case 'scenario_category':
@@ -172,6 +180,11 @@ const useSearchOptions = () => {
         break;
       case CUSTOM_DASHBOARD:
         searchCustomDashboardAsOptions(search).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case SCENARIO_SIMULATIONS:
+        searchScenarioSimulationsAsOption(contextId, search).then((response) => {
           setOptions(response.data);
         });
         break;

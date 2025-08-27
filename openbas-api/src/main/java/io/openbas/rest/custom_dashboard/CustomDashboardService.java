@@ -1,5 +1,6 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType.*;
 import static io.openbas.database.specification.CustomDashboardSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -39,7 +40,12 @@ public class CustomDashboardService {
    */
   @Transactional
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
-    return this.customDashboardRepository.save(customDashboard);
+    CustomDashboard customDashboardWithDefaultParams =
+        customDashboard
+            .addParameter("Time range", timeRange)
+            .addParameter("Start date", startDate)
+            .addParameter("End date", endDate);
+    return this.customDashboardRepository.save(customDashboardWithDefaultParams);
   }
 
   /**

@@ -4,22 +4,35 @@ import type { ContractVariable } from '../actions/contract/contract';
 import type { ExpectationInput } from '../admin/components/common/injects/expectations/Expectation';
 import type * as ApiTypes from './api-types';
 
-interface BaseWidgetConfiguration { title?: string }
+interface BaseWidgetConfiguration {
+  title?: string;
+  start?: string;
+  end?: string;
+  time_range:
+    | 'DEFAULT'
+    | 'ALL_TIME'
+    | 'CUSTOM'
+    | 'LAST_DAY'
+    | 'LAST_WEEK'
+    | 'LAST_MONTH'
+    | 'LAST_QUARTER'
+    | 'LAST_SEMESTER'
+    | 'LAST_YEAR';
+}
 
 export type DateHistogramWidget = BaseWidgetConfiguration & {
   display_legend?: boolean;
   widget_configuration_type: 'temporal-histogram';
   stacked?: boolean;
-  end: string;
   mode: 'temporal';
-  field: string;
+  date_attribute: string;
   interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'quarter';
   series: ApiTypes.DateHistogramSeries[];
-  start: string;
 };
 export type FlatConfiguration = BaseWidgetConfiguration & {
   series: ApiTypes.FlatSeries[];
   widget_configuration_type: 'flat';
+  date_attribute: string;
 };
 export type ListConfiguration = BaseWidgetConfiguration & {
   perspective: ApiTypes.ListPerspective;
@@ -27,6 +40,7 @@ export type ListConfiguration = BaseWidgetConfiguration & {
   sorts?: ApiTypes.EngineSortField[];
   limit?: number;
   widget_configuration_type: 'list';
+  date_attribute: string;
 };
 export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   widget_configuration_type: 'structural-histogram';
@@ -34,6 +48,7 @@ export type StructuralHistogramWidget = BaseWidgetConfiguration & {
   stacked?: boolean;
   mode: 'structural';
   field: string;
+  date_attribute: string;
   series: ApiTypes.StructuralHistogramSeries[];
   limit?: number;
 };

@@ -8,9 +8,7 @@ import static io.openbas.utils.fixtures.payload_fixture.OutputParserInputFixture
 import static io.openbas.utils.fixtures.payload_fixture.RegexGroupInputFixture.createDefaultRegexGroupInputCredentials;
 import static io.openbas.utils.fixtures.payload_fixture.RegexGroupInputFixture.createDefaultRegexGroupInputIPV6;
 
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
+import io.openbas.database.model.*;
 import io.openbas.rest.payload.contract_output_element.ContractOutputElementInput;
 import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.output_parser.OutputParserInput;
@@ -24,7 +22,7 @@ public class PayloadInputFixture {
 
   public static PayloadCreateInput createDefaultPayloadCreateInputForCommandLine() {
     PayloadCreateInput input = new PayloadCreateInput();
-    input.setType("Command");
+    input.setType(Command.COMMAND_TYPE);
     input.setName("Command line payload");
     input.setDescription("This does something, maybe");
     input.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
@@ -77,7 +75,7 @@ public class PayloadInputFixture {
 
   public static PayloadCreateInput createDefaultPayloadCreateInputForExecutable() {
     PayloadCreateInput input = new PayloadCreateInput();
-    input.setType("Executable");
+    input.setType(Executable.EXECUTABLE_TYPE);
     input.setName("My Executable Payload");
     input.setDescription("Executable description");
     input.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
@@ -129,7 +127,7 @@ public class PayloadInputFixture {
 
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInput() {
     PayloadUpsertInput input = new PayloadUpsertInput();
-    input.setType("Command");
+    input.setType(Command.COMMAND_TYPE);
     input.setName("My Command Payload");
     input.setDescription("Command description");
     input.setContent("cd ..");

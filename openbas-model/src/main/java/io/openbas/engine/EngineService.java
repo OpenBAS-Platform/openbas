@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 public interface EngineService {
 
+  List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
+
   /**
    * Process models in bulk
    *

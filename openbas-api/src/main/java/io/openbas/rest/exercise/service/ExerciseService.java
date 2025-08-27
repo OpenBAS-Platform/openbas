@@ -2,9 +2,7 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ExerciseSpecification.closestBefore;
-import static io.openbas.database.specification.ExerciseSpecification.finished;
-import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
+import static io.openbas.database.specification.ExerciseSpecification.*;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -68,6 +66,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -814,5 +813,17 @@ public class ExerciseService {
       }
     }
     return false;
+  }
+
+  // -- OPTION --
+
+  public List<FilterUtilsJpa.Option> findAllAsOptions(
+      final Specification<Exercise> specification, final String searchText) {
+    return fromIterable(
+            exerciseRepository.findAll(
+                specification.and(byName(searchText)), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

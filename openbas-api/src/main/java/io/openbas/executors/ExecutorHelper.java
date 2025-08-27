@@ -7,8 +7,11 @@ public class ExecutorHelper {
   public static final String WINDOWS_LOCATION_PATH = "$PWD.Path";
   public static final String UNIX_LOCATION_PATH = "$(pwd)";
   public static final String IMPLANT_BASE_NAME = "implant-";
-  public static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
-  public static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
+  // Only used in Tanium / CS / Caldera executors, the native OpenAEV agent will determine a
+  // relative path at its level
+  public static final String IMPLANT_LOCATION_WINDOWS =
+      "\"C:\\Program Files (x86)\\Filigran\\OBAS Agent\\runtimes\\";
+  public static final String IMPLANT_LOCATION_UNIX = "/opt/openbas-agent/runtimes/";
 
   private ExecutorHelper() {}
 
