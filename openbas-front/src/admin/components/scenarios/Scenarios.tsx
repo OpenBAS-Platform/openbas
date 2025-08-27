@@ -272,7 +272,7 @@ const Scenarios = () => {
               })
         }
       </List>
-      <Can I={ACTIONS.CREATE} a={SUBJECTS.ASSESSMENT}>
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
         <ScenarioCreation
           onCreate={(result: Scenario) => {
             setScenarios([result, ...scenarios]);
