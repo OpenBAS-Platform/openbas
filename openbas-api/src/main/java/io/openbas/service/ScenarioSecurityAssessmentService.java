@@ -121,14 +121,14 @@ public class ScenarioSecurityAssessmentService {
 
     // 6. Extract covered combinations from existing injects
     Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap =
-        extractCombinationTtpPlatformArchitecture(scenario);
+        extractCombinationTtpPlatformArchitectureFromScenarioInjects(scenario);
 
     Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> coveredCombinations =
         injectCoverageMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
 
     // 7. Identify injects to delete: if all their combinations are irrelevant
     // 8. Delete injects
-    ComputeInjectDependingOnRequiredCombinations(injectCoverageMap, requiredCombinations);
+    removeInjectsNoLongerNecessary(injectCoverageMap, requiredCombinations);
 
     // 9. Compute missing combinations
     // 10. Filter TTPs that are still missing
@@ -190,7 +190,7 @@ public class ScenarioSecurityAssessmentService {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private void ComputeInjectDependingOnRequiredCombinations(
+  private void removeInjectsNoLongerNecessary(
       Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap,
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> requiredCombinations) {
     // 7. Identify injects to delete: if all their combinations are irrelevant
@@ -218,7 +218,7 @@ public class ScenarioSecurityAssessmentService {
   }
 
   private static Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>>
-      extractCombinationTtpPlatformArchitecture(Scenario scenario) {
+  extractCombinationTtpPlatformArchitectureFromScenarioInjects(Scenario scenario) {
     return scenario.getInjects().stream()
         .map(inject -> inject.getInjectorContract().map(ic -> Map.entry(inject, ic)))
         .flatMap(Optional::stream)
