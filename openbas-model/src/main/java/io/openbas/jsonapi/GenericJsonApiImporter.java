@@ -7,15 +7,22 @@ import static io.openbas.utils.reflection.FieldUtils.getAllFieldsAsMap;
 import static io.openbas.utils.reflection.FieldUtils.setField;
 import static io.openbas.utils.reflection.RelationUtils.getAllRelationsAsMap;
 import static io.openbas.utils.reflection.RelationUtils.setInverseRelation;
+import static java.util.Collections.emptyMap;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Base;
+import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
 import jakarta.persistence.metamodel.EntityType;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,18 +35,59 @@ public class GenericJsonApiImporter<T extends Base> {
 
   private final EntityManager entityManager;
   @Resource private final ObjectMapper objectMapper;
+  private final FileService fileService;
 
   @Transactional
-  public T handleImport(JsonApiDocument<ResourceObject> doc, boolean withRels) {
+  public T handleImport(JsonApiDocument<ResourceObject> doc, IncludeOptions includeOptions) {
     if (doc == null || doc.data() == null) {
       throw new IllegalArgumentException("Data is required to import document");
     }
+    if (includeOptions == null) {
+      includeOptions = IncludeOptions.of(emptyMap());
+    }
     Map<String, ResourceObject> includedMap = toMap(doc.included());
     Map<String, T> entityCache = new HashMap<>();
-    T entity = buildEntity(doc.data(), includedMap, entityCache, withRels, true);
+    T entity = buildEntity(doc.data(), includedMap, entityCache, includeOptions, true);
 
-    // merge/upsert
+    // Persist included entities
+    for (T e : entityCache.values()) {
+      if (!entityManager.contains(e)) {
+        if (e.getId() != null && entityManager.find(e.getClass(), e.getId()) != null) {
+          entityManager.merge(e);
+        } else {
+          entityManager.persist(e);
+        }
+      }
+    }
+
+    // Validate constraint
+    entityManager.flush();
+
+    // Persist root entity
     return entityManager.merge(entity);
+  }
+
+  public void handleImportDocument(
+      JsonApiDocument<ResourceObject> doc, Map<String, byte[]> extras) {
+    if (doc.included() != null) {
+      for (Object o : doc.included()) {
+        if (o instanceof ResourceObject ro && "document".equals(ro.type())) {
+          Map<String, Object> attrs = ro.attributes();
+          if (attrs != null && attrs.containsKey("document_name")) {
+            String target = String.valueOf(attrs.get("document_name"));
+            byte[] fileBytes = extras.get(target);
+            if (fileBytes != null) {
+              try (InputStream in = new ByteArrayInputStream(fileBytes)) {
+                fileService.uploadFile(
+                    target, in, fileBytes.length, Files.probeContentType(Path.of(target)));
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   private Map<String, ResourceObject> toMap(List<Object> included) {
@@ -58,7 +106,7 @@ public class GenericJsonApiImporter<T extends Base> {
       ResourceObject resource,
       Map<String, ResourceObject> includedMap,
       Map<String, T> entityCache,
-      boolean withRels,
+      IncludeOptions includeOptions,
       boolean rootEntity) {
     // Sanity check
     if (resource == null) {
@@ -83,7 +131,39 @@ public class GenericJsonApiImporter<T extends Base> {
     // For non-root entities with a valid ID and not marked as @InnerRelationship,
     // try loading the existing entity from the database.
     if (!rootEntity && hasText(id) && !clazz.isAnnotationPresent(InnerRelationship.class)) {
-      entity = entityManager.find(clazz, id);
+      if (hasText(id)) {
+        entity = entityManager.find(clazz, id);
+      }
+
+      if (entity == null) {
+        Field businessIdField =
+            Arrays.stream(clazz.getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(BusinessId.class))
+                .findFirst()
+                .orElse(null);
+
+        if (businessIdField != null) {
+          JsonProperty annotation = businessIdField.getAnnotation(JsonProperty.class);
+          Object businessIdValue = resource.attributes().get(annotation.value());
+
+          if (businessIdValue != null) {
+            String jpql =
+                "SELECT e FROM "
+                    + clazz.getSimpleName()
+                    + " e WHERE e."
+                    + businessIdField.getName()
+                    + " = :value";
+            List<T> results =
+                entityManager
+                    .createQuery(jpql, clazz)
+                    .setParameter("value", businessIdValue)
+                    .getResultList();
+            if (!results.isEmpty()) {
+              entity = results.get(0);
+            }
+          }
+        }
+      }
     }
     // Create new instance if not found.
     if (entity == null) {
@@ -98,7 +178,7 @@ public class GenericJsonApiImporter<T extends Base> {
 
     // Populate
     applyAttributes(entity, resource.attributes());
-    applyRelationships(entity, resource.relationships(), includedMap, entityCache, withRels);
+    applyRelationships(entity, resource.relationships(), includedMap, entityCache, includeOptions);
 
     return entity;
   }
@@ -123,10 +203,7 @@ public class GenericJsonApiImporter<T extends Base> {
       Map<String, Relationship> rels,
       Map<String, ResourceObject> includedMap,
       Map<String, T> entityCache,
-      boolean withRels) {
-    if (!withRels) {
-      return;
-    }
+      IncludeOptions includeOptions) {
     if (entity == null || rels == null || rels.isEmpty()) {
       return;
     }
@@ -134,6 +211,10 @@ public class GenericJsonApiImporter<T extends Base> {
     Map<String, Field> relations = getAllRelationsAsMap(entity.getClass());
 
     for (var e : rels.entrySet()) {
+      if (!includeOptions.include(e.getKey())) {
+        continue;
+      }
+
       Field f = relations.get(e.getKey());
       if (f == null) {
         continue;
@@ -145,7 +226,7 @@ public class GenericJsonApiImporter<T extends Base> {
 
         Collection<Object> target = instantiateCollection(f);
         for (ResourceIdentifier ri : ids) {
-          Object child = resolveOrBuildEntity(ri, includedMap, entityCache, withRels);
+          Object child = resolveOrBuildEntity(ri, includedMap, entityCache, includeOptions);
           if (child != null) {
             target.add(child);
             setInverseRelation(child, entity);
@@ -156,7 +237,9 @@ public class GenericJsonApiImporter<T extends Base> {
       } else {
         ResourceIdentifier ri = rel.asOne();
         Object child =
-            (ri != null) ? resolveOrBuildEntity(ri, includedMap, entityCache, withRels) : null;
+            (ri != null)
+                ? resolveOrBuildEntity(ri, includedMap, entityCache, includeOptions)
+                : null;
         setField(entity, f, child);
         if (child != null) {
           setInverseRelation(child, entity);
@@ -169,7 +252,7 @@ public class GenericJsonApiImporter<T extends Base> {
       ResourceIdentifier resourceIdentifier,
       Map<String, ResourceObject> includedMap,
       Map<String, T> entityCache,
-      boolean withRels) {
+      IncludeOptions includeOptions) {
     if (resourceIdentifier == null) {
       return null;
     }
@@ -180,7 +263,7 @@ public class GenericJsonApiImporter<T extends Base> {
     // Available in the bundle
     ResourceObject included = includedMap.get(id);
     if (included != null) {
-      return buildEntity(included, includedMap, entityCache, withRels, false);
+      return buildEntity(included, includedMap, entityCache, includeOptions, false);
     }
 
     // Not present in the bundle, resolve it

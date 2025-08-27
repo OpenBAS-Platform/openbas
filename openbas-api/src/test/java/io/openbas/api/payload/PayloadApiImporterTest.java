@@ -1,9 +1,10 @@
-package io.openbas.api.custom_dashboard;
+package io.openbas.api.payload;
 
 import static io.openbas.jsonapi.GenericJsonApiIUtils.JSONAPI;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 import static io.openbas.utils.Constants.IMPORTED_OBJECT_NAME_SUFFIX;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @WithMockAdminUser
-@DisplayName("Custom dashboard api importer tests")
-class CustomDashboardApiImporterTest extends IntegrationTest {
+@DisplayName("Payload api importer tests")
+class PayloadApiImporterTest extends IntegrationTest {
 
   @Autowired private MockMvc mockMvc;
 
   @Test
-  @DisplayName("Import a custom dashboard returns complete entity")
+  @DisplayName("Import a payload returns complete entity")
   void import_custom_dashboard_with_include_returns_custom_dashboard_with_relationship()
       throws Exception {
     // -- PREPARE --
@@ -150,7 +151,11 @@ class CustomDashboardApiImporterTest extends IntegrationTest {
     // -- EXECUTE --
     String response =
         mockMvc
-            .perform(post(CUSTOM_DASHBOARDS_URI + "/import").contentType(JSONAPI).content(payload))
+            .perform(
+                post(CUSTOM_DASHBOARDS_URI + "/import")
+                    .queryParam("include", "true")
+                    .contentType(JSONAPI)
+                    .content(payload))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()

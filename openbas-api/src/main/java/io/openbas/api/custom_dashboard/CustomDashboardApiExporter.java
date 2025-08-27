@@ -12,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(CustomDashboardApi.CUSTOM_DASHBOARDS_URI)
@@ -28,11 +31,9 @@ public class CustomDashboardApiExporter extends RestBehavior {
           "Exports a custom dashboard in JSON:API format, optionally including related entities.")
   @GetMapping(value = "/{customDashboardId}/export", produces = "application/zip")
   @Transactional(readOnly = true)
-  public ResponseEntity<byte[]> export(
-      @PathVariable @NotBlank final String customDashboardId,
-      @RequestParam(name = "include", required = false) Boolean include)
+  public ResponseEntity<byte[]> export(@PathVariable @NotBlank final String customDashboardId)
       throws IOException {
     CustomDashboard customDashboard = customDashboardService.customDashboard(customDashboardId);
-    return zipJsonApi.handleExport(customDashboard, null, include != null && include);
+    return zipJsonApi.handleExport(customDashboard);
   }
 }

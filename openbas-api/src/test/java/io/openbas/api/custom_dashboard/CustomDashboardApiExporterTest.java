@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @WithMockAdminUser
-@DisplayName("Onboarding api exporter tests")
+@DisplayName("Custom dashboard api exporter tests")
 class CustomDashboardApiExporterTest extends IntegrationTest {
 
   @Autowired private MockMvc mockMvc;
@@ -48,7 +48,7 @@ class CustomDashboardApiExporterTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Export a custom dashboard with include returns complete entity")
+  @DisplayName("Export a custom dashboard returns entity")
   void export_custom_dashboard_with_include_returns_custom_dashboard_with_relationship()
       throws Exception {
     // -- PREPARE --
@@ -57,9 +57,7 @@ class CustomDashboardApiExporterTest extends IntegrationTest {
     // -- EXECUTE --
     String response =
         mockMvc
-            .perform(
-                get(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId() + "/export")
-                    .queryParam("include", "true"))
+            .perform(get(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId() + "/export"))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
@@ -68,6 +66,7 @@ class CustomDashboardApiExporterTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
 
+    // Custom dashboard
     JsonNode json = new ObjectMapper().readTree(response);
     assertEquals("custom_dashboards", json.at("/data/type").asText());
     assertEquals(NAME, json.at("/data/attributes/custom_dashboard_name").asText());

@@ -45,7 +45,6 @@ export const searchCustomDashboardAsOptionsByResourceId = (resourceId: string) =
 // -- EXPORT --
 export const exportCustomDashboard = (id: string) => {
   return simpleCall(`${CUSTOM_DASHBOARD_URI}/${id}/export`, {
-    params: { include: true },
     headers: { Accept: 'application/zip' },
     responseType: 'blob',
   });
@@ -53,5 +52,5 @@ export const exportCustomDashboard = (id: string) => {
 
 // -- IMPORT --
 export const importCustomDashboard = (content: FormData) => (dispatch: Dispatch) => {
-  return postReferential(null, `${CUSTOM_DASHBOARD_URI}/import`, content, { params: { include: true } })(dispatch);
+  return postReferential(null, `${CUSTOM_DASHBOARD_URI}/import`, content)(dispatch);
 };
