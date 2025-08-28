@@ -56,14 +56,6 @@ public class Scenario implements Base {
     critical,
   }
 
-  public static final String MAIN_FOCUS_INCIDENT_RESPONSE = "incident-response";
-  public static final String MAIN_FOCUS_ENDPOINT_PROTECTION = "endpoint-protection";
-  public static final String MAIN_FOCUS_WEB_FILTERING = "web-filtering";
-  public static final String MAIN_FOCUS_STANDARD_OPERATING_PROCEDURE =
-      "standard-operating-procedure";
-  public static final String MAIN_FOCUS_CRISIS_COMMUNICATION = "crisis-communication";
-  public static final String MAIN_FOCUS_STRATEGIC_REACTION = "strategic-reaction";
-
   @Id
   @UuidGenerator
   @Column(name = "scenario_id")

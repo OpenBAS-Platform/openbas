@@ -1,12 +1,12 @@
 package io.openbas.service;
 
-import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAttackReferences;
 import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.SecurityAssessment;
 import io.openbas.database.repository.ScenarioRepository;
@@ -129,7 +129,7 @@ public class SecurityAssessmentService {
     scenario.setName(sa.getName());
     scenario.setDescription(sa.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
-    scenario.setMainFocus(MAIN_FOCUS_INCIDENT_RESPONSE);
+    scenario.setMainFocus(MainFocus.INCIDENT_RESPONSE.toString());
 
     Instant start = sa.getPeriodStart();
     Instant end = sa.getPeriodEnd();

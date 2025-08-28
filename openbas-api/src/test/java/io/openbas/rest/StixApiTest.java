@@ -1,6 +1,5 @@
 package io.openbas.rest;
 
-import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.rest.StixApi.STIX_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.database.repository.InjectRepository;
@@ -165,7 +165,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
-      assertThat(createdScenario.getMainFocus()).isEqualTo(MAIN_FOCUS_INCIDENT_RESPONSE);
+      assertThat(createdScenario.getMainFocus()).isEqualTo(MainFocus.INCIDENT_RESPONSE.toString());
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
 
