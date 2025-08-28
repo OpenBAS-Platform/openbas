@@ -47,25 +47,25 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
   @BeforeAll
   void setupData() {
     InjectorContract injectorContract =
-            this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
 
     InjectTestStatusComposer.Composer injectTestStatusComposer1 =
-            injectTestStatusComposer.forInjectTestStatus(
-                    InjectTestStatusFixture.createSuccessInjectStatus());
+        injectTestStatusComposer.forInjectTestStatus(
+            InjectTestStatusFixture.createSuccessInjectStatus());
 
     InjectTestStatusComposer.Composer injectTestStatusComposer2 =
-            injectTestStatusComposer.forInjectTestStatus(
-                    InjectTestStatusFixture.createSuccessInjectStatus());
+        injectTestStatusComposer.forInjectTestStatus(
+            InjectTestStatusFixture.createSuccessInjectStatus());
 
     InjectComposer.Composer injectComposer1 =
-            injectComposer
-                    .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
-                    .withInjectTestStatus(injectTestStatusComposer1);
+        injectComposer
+            .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
+            .withInjectTestStatus(injectTestStatusComposer1);
 
     InjectComposer.Composer injectComposer2 =
-            injectComposer
-                    .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
-                    .withInjectTestStatus(injectTestStatusComposer2);
+        injectComposer
+            .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
+            .withInjectTestStatus(injectTestStatusComposer2);
 
     inject1 = injectComposer1.persist().get();
     inject2 = injectComposer2.persist().get();
@@ -74,11 +74,11 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     injectTestStatus2 = injectTestStatusComposer2.persist().get();
 
     scenario =
-            scenarioComposer
-                    .forScenario(ScenarioFixture.getScenario())
-                    .withInjects(List.of(injectComposer1, injectComposer2))
-                    .persist()
-                    .get();
+        scenarioComposer
+            .forScenario(ScenarioFixture.getScenario())
+            .withInjects(List.of(injectComposer1, injectComposer2))
+            .persist()
+            .get();
   }
 
   @Nested
@@ -91,19 +91,19 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     void should_return_paginated_results_when_inject_tests_exist() throws Exception {
       SearchPaginationInput searchPaginationInput = new SearchPaginationInput();
       String response =
-              mvc.perform(
-                              post(SCENARIO_URI + "/{scenarioId}/injects/test/search", scenario.getId())
-                                      .contentType(MediaType.APPLICATION_JSON)
-                                      .content(asJsonString(searchPaginationInput)))
-                      .andExpect(status().isOk())
-                      .andReturn()
-                      .getResponse()
-                      .getContentAsString();
+          mvc.perform(
+                  post(SCENARIO_URI + "/{scenarioId}/injects/test/search", scenario.getId())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(searchPaginationInput)))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
 
       assertThatJson(response)
-              .inPath("$.content[*].status_id")
-              .isArray()
-              .contains(injectTestStatus1.getId());
+          .inPath("$.content[*].status_id")
+          .isArray()
+          .contains(injectTestStatus1.getId());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     @WithMockAdminUser // FIXME: Temporary workaround for grant issue
     void should_return_test_status_by_testId() throws Exception {
       mvc.perform(get(SCENARIO_URI + "/injects/test/{testId}", injectTestStatus1.getId()))
-              .andExpect(status().isOk());
+          .andExpect(status().isOk());
     }
 
     @Test
@@ -119,12 +119,12 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     @WithMockAdminUser // FIXME: Temporary workaround for grant issue
     void should_return_test_status_when_testing_specific_inject() throws Exception {
       mvc.perform(
-                      get(
-                              SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
-                              scenario.getId(),
-                              inject1.getId()))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$.inject_id").value(inject1.getId()));
+              get(
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
+                  scenario.getId(),
+                  inject1.getId()))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.inject_id").value(inject1.getId()));
     }
 
     @Test
@@ -136,11 +136,11 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       input.setSimulationOrScenarioId(scenario.getId());
 
       mvc.perform(
-                      post(SCENARIO_URI + "/{scenarioId}/injects/test", scenario.getId())
-                              .contentType(MediaType.APPLICATION_JSON)
-                              .content(asJsonString(input)))
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("$").isArray());
+              post(SCENARIO_URI + "/{scenarioId}/injects/test", scenario.getId())
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$").isArray());
     }
 
     @Test
@@ -148,11 +148,11 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     @WithMockPlannerUser
     void should_return_200_when_fetching_deleting_an_inject_test_status() throws Exception {
       mvc.perform(
-                      delete(
-                              SCENARIO_URI + "/{scenarioId}/injects/test/{testId}",
-                              scenario.getId(),
-                              injectTestStatus2.getId()))
-              .andExpect(status().isOk());
+              delete(
+                  SCENARIO_URI + "/{scenarioId}/injects/test/{testId}",
+                  scenario.getId(),
+                  injectTestStatus2.getId()))
+          .andExpect(status().isOk());
     }
   }
 

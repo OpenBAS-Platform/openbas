@@ -1,6 +1,9 @@
 package io.openbas.api.payload;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Payload;
+import io.openbas.database.model.ResourceType;
 import io.openbas.jsonapi.JsonApiDocument;
 import io.openbas.jsonapi.ResourceObject;
 import io.openbas.jsonapi.ZipJsonApi;
@@ -39,6 +42,7 @@ public class PayloadApiImporter extends RestBehavior {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Transactional
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
       @RequestPart("file") @NotNull MultipartFile file) throws Exception {
     try {

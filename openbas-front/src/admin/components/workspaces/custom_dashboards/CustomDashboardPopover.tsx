@@ -6,9 +6,9 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboard, type CustomDashboardInput } from '../../../../utils/api-types';
-import { download } from '../../../../utils/utils';
 import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { download } from '../../../../utils/utils';
 import CustomDashboardForm from './CustomDashboardForm';
 
 interface Props {
@@ -69,6 +69,7 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
     {
       label: t('Export'),
       action: () => submitExport(),
+      userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.DASHBOARDS),
     },
     {
       label: t('Delete'),
