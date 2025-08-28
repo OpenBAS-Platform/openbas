@@ -1,53 +1,26 @@
 import { MoreVert } from '@mui/icons-material';
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { addGrant, addGroupOrganization, deleteGrant, deleteGroupOrganization } from '../../../../actions/Grant';
 import { deleteGroup, fetchGroup, updateGroupInformation, updateGroupRoles, updateGroupUsers } from '../../../../actions/Group';
-import { storeHelper } from '../../../../actions/Schema';
 import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
 import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
+import GroupManageGrants from './grants/GroupManageGrants.tsx';
 import GroupForm from './GroupForm';
 import GroupManageRoles from './GroupManageRoles.js';
 import GroupManageUsers from './GroupManageUsers';
-
-const TabPanel = (props) => {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box
-          style={{
-            padding: 0,
-            marginTop: 20,
-          }}
-          sx={{ p: 3 }}
-        >
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-};
 
 class GroupPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
       openDelete: false,
-      tabSelect: 0,
       openEdit: false,
       openUsers: false,
       openGrants: false,
@@ -140,68 +113,12 @@ class GroupPopover extends Component {
     this.setState({ openRoles: false });
   }
 
-  handleTabChange(_event, tabKey) {
-    this.setState({ tabSelect: tabKey });
-  }
-
   fetchAndUpdateGroup() {
     this.props.fetchGroup(this.props.group.group_id).then((result) => {
       if (this.props.onUpdate) {
         this.props.onUpdate(result.entities.groups[this.props.group.group_id]);
       }
     });
-  }
-
-  handleGrantCheck(data, grantId, event) {
-    const isChecked = event.target.checked;
-    if (isChecked) {
-      this.props
-        .addGrant(this.props.group.group_id, data)
-        .then(this.fetchAndUpdateGroup.bind(this));
-    }
-    // the grand does not exist
-    if (!isChecked && grantId !== null) {
-      this.props
-        .deleteGrant(this.props.group.group_id, grantId)
-        .then(this.fetchAndUpdateGroup.bind(this));
-    }
-  }
-
-  handleGrantScenarioCheck(scenarioId, grantId, grantName, event) {
-    const data = {
-      grant_name: grantName,
-      grant_resource: scenarioId,
-      grant_resource_type: 'SCENARIO',
-    };
-    this.handleGrantCheck(data, grantId, event);
-  }
-
-  handleGrantExerciseCheck(exerciseId, grantId, grantName, event) {
-    const data = {
-      grant_name: grantName,
-      grant_resource: exerciseId,
-      grant_resource_type: 'SIMULATION',
-    };
-    this.handleGrantCheck(data, grantId, event);
-  }
-
-  handleGrantOrganization(organizationId, event) {
-    const isChecked = event.target.checked;
-    if (isChecked) {
-      this.props
-        .addGroupOrganization(this.props.group.group_id, { organization_id: organizationId })
-        .then(() => {
-          this.props.fetchGroup(this.props.group.group_id);
-        });
-    }
-    // the grand does not exist
-    if (!isChecked && organizationId !== null) {
-      this.props
-        .deleteGroupOrganization(this.props.group.group_id, organizationId)
-        .then(() => {
-          this.props.fetchGroup(this.props.group.group_id);
-        });
-    }
   }
 
   handleOpenDelete() {
@@ -313,303 +230,12 @@ class GroupPopover extends Component {
           onClose={this.handleCloseRoles.bind(this)}
           onSubmit={this.submitUpdateRoles.bind(this)}
         />
-        <Drawer
-          open={this.state.openGrants}
-          handleClose={this.handleCloseGrants.bind(this)}
-          title={t('Manage grants')}
-        >
-          <>
-            <Tabs
-              value={this.state.tabSelect}
-              onChange={this.handleTabChange.bind(this)}
-              textColor="secondary"
-              indicatorColor="secondary"
-              aria-label="secondary tabs example"
-            >
-              <Tab label="Scenarios" />
-              <Tab label="Simulations" />
-              <Tab label="Organizations" />
-            </Tabs>
-            <TabPanel value={this.state.tabSelect} index={0}>
-              <Table selectable={false} size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('Scenario')}</TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Access')}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Manage')}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Launch')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.props.scenarios.map((scenario) => {
-                    const grantPlanner = R.find(
-                      g =>
-                        g.grant_resource === scenario.scenario_id
-                        && g.grant_resource_type === 'SCENARIO'
-                        && g.grant_name === 'PLANNER',
-                    )(group.group_grants);
-                    const grantObserver = R.find(
-                      g =>
-                        g.grant_resource === scenario.scenario_id
-                        && g.grant_resource_type === 'SCENARIO'
-                        && g.grant_name === 'OBSERVER',
-                    )(group.group_grants);
-                    const grantLauncher = R.find(
-                      g =>
-                        g.grant_resource === scenario.scenario_id
-                        && g.grant_resource_type === 'SCENARIO'
-                        && g.grant_name === 'LAUNCHER',
-                    )(group.group_grants);
-                    const grantPlannerId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantPlanner,
-                    );
-                    const grantObserverId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantObserver,
-                    );
-                    const grantLauncherId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantLauncher,
-                    );
-                    return (
-                      <TableRow key={scenario.scenario_id}>
-                        <TableCell style={{ width: '40%' }}>{scenario.scenario_name}</TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={
-                              grantObserverId !== null
-                              || grantPlannerId !== null
-                              || grantLauncherId !== null
-                            }
-                            disabled={
-                              grantLauncherId !== null
-                              || grantPlannerId !== null
-                            }
-                            onChange={this.handleGrantScenarioCheck.bind(
-                              this,
-                              scenario.scenario_id,
-                              grantObserverId,
-                              'OBSERVER',
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={
-                              grantLauncherId !== null
-                              || grantPlannerId !== null
-                            }
-
-                            disabled={grantLauncherId !== null}
-                            onChange={this.handleGrantScenarioCheck.bind(
-                              this,
-                              scenario.scenario_id,
-                              grantPlannerId,
-                              'PLANNER',
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={grantLauncherId !== null}
-                            onChange={this.handleGrantScenarioCheck.bind(
-                              this,
-                              scenario.scenario_id,
-                              grantLauncherId,
-                              'LAUNCHER',
-                            )}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TabPanel>
-            <TabPanel value={this.state.tabSelect} index={1}>
-              <Table selectable={false} size="small">
-                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-                  <TableRow>
-                    <TableCell>{t('Simulation')}</TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Access')}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Manage')}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Launch')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody displayRowCheckbox={false}>
-                  {this.props.exercises.map((exercise) => {
-                    const grantPlanner = R.find(
-                      g =>
-                        g.grant_resource === exercise.exercise_id
-                        && g.grant_resource_type === 'SIMULATION'
-                        && g.grant_name === 'PLANNER',
-                    )(group.group_grants);
-                    const grantObserver = R.find(
-                      g =>
-                        g.grant_resource === exercise.exercise_id
-                        && g.grant_resource_type === 'SIMULATION'
-                        && g.grant_name === 'OBSERVER',
-                    )(group.group_grants);
-                    const grantLauncher = R.find(
-                      g =>
-                        g.grant_resource === exercise.exercise_id
-                        && g.grant_resource_type === 'SIMULATION'
-                        && g.grant_name === 'LAUNCHER',
-                    )(group.group_grants);
-                    const grantPlannerId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantPlanner,
-                    );
-                    const grantObserverId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantObserver,
-                    );
-                    const grantLauncherId = R.propOr(
-                      null,
-                      'grant_id',
-                      grantLauncher,
-                    );
-                    return (
-                      <TableRow key={exercise.exercise_id}>
-                        <TableCell style={{ width: '40%' }}>{exercise.exercise_name}</TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={
-                              grantObserverId !== null
-                              || grantPlannerId !== null
-                              || grantLauncherId !== null
-                            }
-                            disabled={
-                              grantLauncherId !== null
-                              || grantPlannerId !== null
-                            }
-                            onChange={this.handleGrantExerciseCheck.bind(
-                              this,
-                              exercise.exercise_id,
-                              grantObserverId,
-                              'OBSERVER',
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={
-                              grantLauncherId !== null
-                              || grantPlannerId !== null
-                            }
-                            disabled={grantLauncherId !== null}
-                            onChange={this.handleGrantExerciseCheck.bind(
-                              this,
-                              exercise.exercise_id,
-                              grantPlannerId,
-                              'PLANNER',
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell style={{
-                          width: '20%',
-                          textAlign: 'center',
-                        }}
-                        >
-                          <Checkbox
-                            checked={grantLauncherId !== null}
-                            onChange={this.handleGrantExerciseCheck.bind(
-                              this,
-                              exercise.exercise_id,
-                              grantLauncherId,
-                              'LAUNCHER',
-                            )}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TabPanel>
-            <TabPanel value={this.state.tabSelect} index={2}>
-              <Table selectable={false} size="small">
-                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-                  <TableRow>
-                    <TableCell>{t('Organization')}</TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {t('Granted')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody displayRowCheckbox={false}>
-                  {this.props.organizations.map((organization) => {
-                    const isOrgaChecked = (
-                      this.props.group.group_organizations ?? []
-                    ).includes(organization.organization_id);
-                    return (
-                      <TableRow key={organization.organization_id}>
-                        <TableCell>{organization.organization_name}</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <Checkbox
-                            checked={isOrgaChecked}
-                            onChange={this.handleGrantOrganization.bind(
-                              this,
-                              organization.organization_id,
-                            )}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TabPanel>
-            <div style={{
-              float: 'right',
-              marginTop: 20,
-            }}
-            >
-              <Button variant="contained" onClick={this.handleCloseGrants.bind(this)}>
-                {t('Close')}
-              </Button>
-            </div>
-          </>
-        </Drawer>
-
+        <GroupManageGrants
+          group={group}
+          openGrants={this.state.openGrants}
+          handleCloseGrants={this.handleCloseGrants.bind(this)}
+          fetchAndUpdateGroup={this.fetchAndUpdateGroup.bind(this)}
+        />
       </>
     );
   }
@@ -623,22 +249,12 @@ GroupPopover.propTypes = {
   updateGroupRoles: PropTypes.func,
   updateGroupInformation: PropTypes.func,
   deleteGroup: PropTypes.func,
-  addGrant: PropTypes.func,
-  addGroupOrganization: PropTypes.func,
-  deleteGroupOrganization: PropTypes.func,
-  deleteGrant: PropTypes.func,
   groupUsersIds: PropTypes.array,
   groupRolesIds: PropTypes.array,
 };
 
-const select = (state) => {
-  const helper = storeHelper(state);
-  return {
-    organizations: helper.getOrganizations().toJS(),
-    organizationsMap: helper.getOrganizationsMap().toJS(),
-    exercises: helper.getExercises().toJS(),
-    scenarios: helper.getScenarios().toJS(),
-  };
+const select = () => {
+  return {};
 };
 
 export default R.compose(
@@ -648,10 +264,6 @@ export default R.compose(
     updateGroupUsers,
     updateGroupRoles,
     deleteGroup,
-    addGrant,
-    deleteGrant,
-    addGroupOrganization,
-    deleteGroupOrganization,
   }),
   inject18n,
 )(GroupPopover);

@@ -138,7 +138,7 @@ public class GroupApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.USER_GROUP)
   @Transactional(rollbackOn = Exception.class)
-  public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
+  public Group groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {
     // Validate the resourceId
     grantService.validateResourceIdForGrant(input.getResourceId());
 
@@ -152,7 +152,21 @@ public class GroupApi extends RestBehavior {
     grant.setResourceId(input.getResourceId());
     grant.setGrantResourceType(input.getResourceType());
 
-    return grantRepository.save(grant);
+    group.getGrants().add(grant);
+    return groupRepository.save(group);
+  }
+
+  @DeleteMapping("/api/groups/{groupId}/grants/{grantId}")
+  @RBAC(
+      resourceId = "#groupId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.USER_GROUP)
+  @Transactional(rollbackOn = Exception.class)
+  public Group deleteGrant(@PathVariable String groupId, @PathVariable String grantId) {
+    Group group = groupRepository.findById(groupId).orElseThrow(ElementNotFoundException::new);
+    Grant grant = grantRepository.findById(grantId).orElseThrow(ElementNotFoundException::new);
+    group.getGrants().remove(grant);
+    return this.groupRepository.save(group);
   }
 
   @PostMapping("/api/groups/{groupId}/organizations")
@@ -185,16 +199,6 @@ public class GroupApi extends RestBehavior {
         organizationRepository.findById(organizationId).orElseThrow(ElementNotFoundException::new);
     group.getOrganizations().remove(organization);
     return groupRepository.save(group);
-  }
-
-  @DeleteMapping("/api/grants/{grantId}")
-  @RBAC(
-      resourceId = "#grantId",
-      actionPerformed = Action.WRITE,
-      resourceType = ResourceType.USER_GROUP)
-  @Transactional(rollbackOn = Exception.class)
-  public void deleteGrant(@PathVariable String grantId) {
-    grantRepository.deleteById(grantId);
   }
 
   @DeleteMapping("/api/groups/{groupId}")
