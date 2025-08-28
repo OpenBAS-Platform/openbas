@@ -1391,7 +1391,7 @@ export interface Endpoint {
   asset_updated_at: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
@@ -1415,11 +1415,7 @@ export interface EndpointInput {
   endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
@@ -1530,11 +1526,7 @@ export interface EndpointRegisterInput {
   endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
