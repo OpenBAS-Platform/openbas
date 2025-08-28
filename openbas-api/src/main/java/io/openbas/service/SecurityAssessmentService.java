@@ -41,8 +41,8 @@ public class SecurityAssessmentService {
 
   private final ScenarioService scenarioService;
   private final TagService tagService;
-  private final InjectSecurityAssessmentService injectSecurityAssessmentService;
   private final CronService cronService;
+  private final SecurityAssessmentInjectService securityAssessmentInjectService;
 
   private final ScenarioRepository scenarioRepository;
 
@@ -108,8 +108,7 @@ public class SecurityAssessmentService {
   public Scenario buildScenarioFromSecurityAssessment(SecurityAssessment securityAssessment) {
     Scenario scenario = updateOrCreateScenarioFromSecurityAssessment(securityAssessment);
     securityAssessment.setScenario(scenario);
-    injectSecurityAssessmentService.createdInjectsForScenario(scenario, securityAssessment);
-    // scenarioService.replaceInjects(buildInjects);
+    securityAssessmentInjectService.createdInjectsForScenario(scenario, securityAssessment);
     return scenario;
   }
 
