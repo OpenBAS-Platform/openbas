@@ -1,17 +1,23 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAttackReferences;
+import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Scenario;
 import io.openbas.database.model.SecurityAssessment;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.SecurityAssessmentRepository;
+import io.openbas.rest.tag.TagService;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
 import io.openbas.stix.parsing.Parser;
 import io.openbas.stix.parsing.ParsingException;
 import java.io.IOException;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +36,12 @@ public class SecurityAssessmentService {
   public static final String STIX_PERIOD_END = "period_end";
   public static final String STIX_ATTACK_PATTERN_TYPE = "attack-pattern";
   public static final String ONE_SHOT = "X";
+
+  private final ScenarioService scenarioService;
+  private final TagService tagService;
+  private final InjectSecurityAssessmentService injectSecurityAssessmentService;
+
+  private final ScenarioRepository scenarioRepository;
 
   private final SecurityAssessmentRepository securityAssessmentRepository;
 
@@ -82,5 +94,53 @@ public class SecurityAssessmentService {
 
   public SecurityAssessment save(SecurityAssessment securityAssessment) {
     return securityAssessmentRepository.save(securityAssessment);
+  }
+
+  public Scenario buildScenarioFromSecurityAssessment(SecurityAssessment securityAssessment) {
+    Scenario scenario = updateOrCreateScenarioFromSecurityAssessment(securityAssessment);
+    securityAssessment.setScenario(scenario);
+    injectSecurityAssessmentService.createdInjectsForScenario(scenario, securityAssessment);
+    // scenarioService.replaceInjects(buildInjects);
+    return scenario;
+  }
+
+  public Scenario updateOrCreateScenarioFromSecurityAssessment(SecurityAssessment sa) {
+    if (sa.getScenario() != null) {
+      return scenarioRepository
+          .findById(sa.getScenario().getId())
+          .map(existing -> updateScenarioFromSecurityAssessment(existing, sa))
+          .orElseGet(() -> createAndInitializeScenario(sa));
+    }
+    return createAndInitializeScenario(sa);
+  }
+
+  private Scenario createAndInitializeScenario(SecurityAssessment sa) {
+    Scenario scenario = new Scenario();
+    updatePropertiesFromSecurityAssessment(scenario, sa);
+    return scenarioService.createScenario(scenario);
+  }
+
+  private Scenario updateScenarioFromSecurityAssessment(Scenario scenario, SecurityAssessment sa) {
+    updatePropertiesFromSecurityAssessment(scenario, sa);
+    return scenarioService.updateScenario(scenario);
+  }
+
+  private void updatePropertiesFromSecurityAssessment(Scenario scenario, SecurityAssessment sa) {
+    scenario.setSecurityAssessment(sa);
+    scenario.setName(sa.getName());
+    scenario.setDescription(sa.getDescription());
+    scenario.setSeverity(Scenario.SEVERITY.high);
+    scenario.setMainFocus(MAIN_FOCUS_INCIDENT_RESPONSE);
+
+    Instant start = sa.getPeriodStart();
+    Instant end = sa.getPeriodEnd();
+
+    scenario.setRecurrenceStart(start);
+    scenario.setRecurrenceEnd(end);
+
+    String cron = getCronExpression(sa.getScheduling(), start);
+    scenario.setRecurrence(cron);
+
+    scenario.setTags(tagService.buildDefaultTagsForStix());
   }
 }
