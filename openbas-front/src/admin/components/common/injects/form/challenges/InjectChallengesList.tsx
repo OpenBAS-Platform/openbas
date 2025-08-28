@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import { findChallenges } from '../../../../../../actions/Challenge';
+import { findChallenges } from '../../../../../../actions/challenge-action';
 import { type ChallengeHelper } from '../../../../../../actions/helper';
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemTags from '../../../../../../components/ItemTags';

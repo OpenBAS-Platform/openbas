@@ -17,7 +17,6 @@ interface PlayerFormProps {
   handleClose: () => void;
   onSubmit: (data: PlayerInputForm) => void;
   editing?: boolean;
-  canUpdateEmail?: boolean;
 }
 
 const PlayerForm: FunctionComponent<PlayerFormProps> = ({
@@ -25,7 +24,6 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
   onSubmit,
   initialValues,
   handleClose,
-  canUpdateEmail,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -68,7 +66,7 @@ const PlayerForm: FunctionComponent<PlayerFormProps> = ({
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
-            disabled={editing && !canUpdateEmail}
+            disabled={editing}
           />
           <OldTextField
             variant="standard"

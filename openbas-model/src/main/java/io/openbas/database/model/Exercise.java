@@ -34,6 +34,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "exercises")
 @EntityListeners(ModelBaseListener.class)
+@Grantable(grantFieldName = "exercise")
 public class Exercise implements Base {
 
   @Getter
@@ -309,6 +310,10 @@ public class Exercise implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("exercise_variables")
   private List<Variable> variables = new ArrayList<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SIMULATION;
 
   // region transient
   @JsonProperty("exercise_injects_statistics")

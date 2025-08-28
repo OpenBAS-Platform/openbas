@@ -1,5 +1,5 @@
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { Chip, List, ListItem, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useContext } from 'react';
@@ -7,7 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { truncate } from '../../../../utils/String';
-import { LessonContext } from '../../common/Context';
+import { LessonContext, PermissionsContext } from '../../common/Context';
 import LessonsCategoryAddTeams from '../categories/LessonsCategoryAddTeams';
 import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
 import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
@@ -25,6 +25,7 @@ const LessonsCategories = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
+  const { permissions } = useContext(PermissionsContext);
 
   // Context
   const { onUpdateLessonsCategoryTeams } = useContext(LessonContext);
@@ -57,7 +58,7 @@ const LessonsCategories = ({
           <div key={category.lessonscategory_id}>
             <Typography variant="h2">
               {category.lessons_category_name}
-              {!isReport && (
+              {!isReport && permissions.canManage && (
                 <LessonsCategoryPopover
                   lessonsCategory={category}
                 />
@@ -73,7 +74,7 @@ const LessonsCategories = ({
               <div>
                 <Typography variant="h4">
                   {t('Targeted teams')}
-                  {!isReport && (
+                  {!isReport && permissions.canManage && (
                     <LessonsCategoryAddTeams
                       lessonsCategoryId={category.lessonscategory_id}
                       lessonsCategoryTeamsIds={category.lessons_category_teams}
@@ -90,6 +91,12 @@ const LessonsCategories = ({
                     <ListItem
                       key={question.lessonsquestion_id}
                       divider
+                      secondaryAction={!isReport && permissions.canManage && (
+                        <LessonsQuestionPopover
+                          lessonsCategoryId={category.lessonscategory_id}
+                          lessonsQuestion={question}
+                        />
+                      )}
                     >
                       <ListItemIcon>
                         <HelpOutlined />
@@ -99,17 +106,9 @@ const LessonsCategories = ({
                         primary={question.lessons_question_content}
                         secondary={question.lessons_question_explanation || t('No explanation')}
                       />
-                      {!isReport && (
-                        <ListItemSecondaryAction>
-                          <LessonsQuestionPopover
-                            lessonsCategoryId={category.lessonscategory_id}
-                            lessonsQuestion={question}
-                          />
-                        </ListItemSecondaryAction>
-                      )}
                     </ListItem>
                   ))}
-                  {!isReport && (
+                  {!isReport && permissions.canManage && (
                     <CreateLessonsQuestion
                       inline
                       lessonsCategoryId={category.lessonscategory_id}
@@ -125,9 +124,9 @@ const LessonsCategories = ({
                       key={teamId}
                       title={team?.team_name || ''}
                     >
-                      <Chip
-                        onDelete={
-                          isReport
+                      {permissions.canManage ? (
+                        <Chip
+                          onDelete={isReport
                             ? undefined
                             : () => handleUpdateTeams(
                                 category.lessonscategory_id,
@@ -135,12 +134,19 @@ const LessonsCategories = ({
                                   n => n !== teamId,
                                   category.lessons_category_teams,
                                 ),
-                              )
-                        }
-                        label={truncate(team?.team_name || '', 30)}
-                        icon={<CastForEducationOutlined />}
-                        classes={{ root: classes.chip }}
-                      />
+                              )}
+                          label={truncate(team?.team_name || '', 30)}
+                          icon={<CastForEducationOutlined />}
+                          classes={{ root: classes.chip }}
+                        />
+                      ) : (
+                        <Chip
+                          label={truncate(team?.team_name || '', 30)}
+                          icon={<CastForEducationOutlined />}
+                          classes={{ root: classes.chip }}
+                        />
+                      )}
+
                     </Tooltip>
                   );
                 })}

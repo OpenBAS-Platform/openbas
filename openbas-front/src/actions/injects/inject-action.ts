@@ -1,7 +1,15 @@
 import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import { type Exercise, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
+import {
+  type Exercise,
+  type InjectExportFromSearchRequestInput,
+  type InjectExportRequestInput,
+  type InjectImportInput,
+  type InjectIndividualExportRequestInput,
+  type Scenario,
+  type SearchPaginationInput,
+} from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
 
@@ -19,6 +27,14 @@ export const exportInjects = (data: InjectExportRequestInput) => {
   const uri = '/api/injects/export';
   return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
     MESSAGING$.notifyError('Could not request export of injects');
+    throw error;
+  });
+};
+
+export const exportInject = (injectId: string, data: InjectIndividualExportRequestInput) => {
+  const uri = `/api/injects/${injectId}/inject_export`;
+  return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
+    MESSAGING$.notifyError('Could not request export of inject');
     throw error;
   });
 };

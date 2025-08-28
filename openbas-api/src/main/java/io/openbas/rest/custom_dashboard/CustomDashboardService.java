@@ -13,6 +13,7 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.mapper.CustomDashboardMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -142,6 +143,12 @@ public class CustomDashboardService {
    */
   public List<FilterUtilsJpa.Option> findAllByIdsAsOptions(final List<String> ids) {
     return fromIterable(customDashboardRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  public List<FilterUtilsJpa.Option> findAllByResourceIdsAsOptions(@NotBlank String resourceId) {
+    return fromIterable(customDashboardRepository.findByResourceId(resourceId)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }

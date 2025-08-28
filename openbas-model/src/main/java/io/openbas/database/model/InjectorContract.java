@@ -143,6 +143,10 @@ public class InjectorContract implements Base {
   @Queryable(filterable = true)
   private boolean isImportAvailable;
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.INJECTOR_CONTRACT;
+
   @JsonProperty("injector_contract_injector_type")
   private String getInjectorType() {
     return this.getInjector() != null ? this.getInjector().getType() : null;

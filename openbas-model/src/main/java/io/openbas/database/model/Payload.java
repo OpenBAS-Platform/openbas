@@ -268,6 +268,10 @@ public class Payload implements Base {
     return Objects.hash(id);
   }
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.PAYLOAD;
+
   public Payload() {}
 
   public Payload(String id, String type, String name) {

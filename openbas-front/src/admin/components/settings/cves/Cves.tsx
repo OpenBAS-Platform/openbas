@@ -18,6 +18,8 @@ import CVSSBadge from '../../../../components/CvssBadge';
 import { useFormatter } from '../../../../components/i18n';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type CveSimple, type SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateCve from './CreateCve';
 import CveDetail from './CveDetail';
@@ -159,9 +161,11 @@ const Cves = () => {
             </ListItem>
           ))}
         </List>
-        <CreateCve
-          onCreate={(result: CveSimple) => setCves([result, ...cves])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateCve
+            onCreate={(result: CveSimple) => setCves([result, ...cves])}
+          />
+        </Can>
         <Drawer
           open={!!selectedCve}
           handleClose={() => setSelectedCve(null)}

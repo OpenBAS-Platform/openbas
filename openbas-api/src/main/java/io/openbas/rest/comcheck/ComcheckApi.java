@@ -3,6 +3,7 @@ package io.openbas.rest.comcheck;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.ComcheckRepository;
 import io.openbas.database.repository.ComcheckStatusRepository;
@@ -15,7 +16,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -47,6 +47,7 @@ public class ComcheckApi extends RestBehavior {
   }
 
   @GetMapping("/api/comcheck/{comcheckStatusId}")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public ComcheckStatus checkValidation(@PathVariable String comcheckStatusId) {
     ComcheckStatus comcheckStatus =
@@ -70,13 +71,20 @@ public class ComcheckApi extends RestBehavior {
   }
 
   @DeleteMapping("/api/exercises/{exerciseId}/comchecks/{comcheckId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void deleteComcheck(@PathVariable String exerciseId, @PathVariable String comcheckId) {
     comcheckRepository.deleteById(comcheckId);
   }
 
   @PostMapping("/api/exercises/{exerciseId}/comchecks")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Comcheck communicationCheck(
       @PathVariable String exerciseId, @Valid @RequestBody ComcheckInput comCheck) {

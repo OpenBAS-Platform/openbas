@@ -1,11 +1,10 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import Dialog from '../../../../../components/common/dialog/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
-import { PermissionsContext } from '../../Context';
 import { type ExpectationInput, type ExpectationInputForm } from './Expectation';
 import ExpectationFormCreate from './ExpectationFormCreate';
 
@@ -20,18 +19,15 @@ const useStyles = makeStyles()(theme => ({
 interface InjectAddExpectationProps {
   predefinedExpectations: ExpectationInput[];
   handleAddExpectation: (data: ExpectationInput) => void;
-  disabled?: boolean;
 }
 
 const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   predefinedExpectations,
   handleAddExpectation,
-  disabled = false,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const { permissions } = useContext(PermissionsContext);
 
   // Dialog
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,7 +52,6 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
         divider={true}
         onClick={handleOpen}
         color="primary"
-        disabled={permissions.readOnly || disabled}
       >
         <ListItemIcon color="primary">
           <ControlPointOutlined color="primary" />

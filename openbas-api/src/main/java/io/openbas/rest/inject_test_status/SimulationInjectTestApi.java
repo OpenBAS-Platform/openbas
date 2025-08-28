@@ -4,7 +4,11 @@ import static io.openbas.database.specification.InjectSpecification.testable;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.Grant;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
@@ -36,6 +40,10 @@ public class SimulationInjectTestApi extends RestBehavior {
    * @see #findExercisePageInjectTests
    */
   @PostMapping("/api/exercise/{simulationId}/injects/test")
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -44,6 +52,10 @@ public class SimulationInjectTestApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test/search")
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION,
+      resourceId = "#simulationId")
   public Page<InjectTestStatusOutput> findExercisePageInjectTests(
       @PathVariable @NotBlank String simulationId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -53,6 +65,10 @@ public class SimulationInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/{simulationId}/injects/{injectId}/test")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   public InjectTestStatusOutput testInject(
       @PathVariable @NotBlank String simulationId, @PathVariable @NotBlank String injectId) {
@@ -61,12 +77,20 @@ public class SimulationInjectTestApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping(EXERCISE_URI + "/injects/test/{testId}")
+  @RBAC(
+      actionPerformed = Action.SEARCH,
+      resourceType =
+          ResourceType.SIMULATION) // fixme : should use action search on resourceType simulation
   public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(EXERCISE_URI + "/{simulationId}/injects/test/{testId}")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   public void deleteInjectTest(
       @PathVariable @NotBlank String simulationId, @PathVariable String testId) {
@@ -78,6 +102,10 @@ public class SimulationInjectTestApi extends RestBehavior {
       tags = {"Injects", "Tests"})
   @Transactional(rollbackFor = Exception.class)
   @PostMapping(EXERCISE_URI + "/{simulationId}/injects/test")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.LAUNCH,
+      resourceType = ResourceType.SIMULATION)
   @PreAuthorize("isSimulationPlanner(#simulationId)")
   @LogExecutionTime
   public List<InjectTestStatusOutput> bulkTestInject(
@@ -85,6 +113,10 @@ public class SimulationInjectTestApi extends RestBehavior {
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
+    if (!simulationId.equals(input.getSimulationOrScenarioId())) {
+      throw new BadRequestException(
+          "Provided simulation ID does not match the input simulation ID");
+    }
     if (CollectionUtils.isEmpty(input.getInjectIDsToProcess())
         && input.getSearchPaginationInput() == null) {
       throw new BadRequestException(
@@ -93,7 +125,7 @@ public class SimulationInjectTestApi extends RestBehavior {
 
     // Specification building
     Specification<Inject> filterSpecifications =
-        this.injectService.getInjectSpecification(input).and(testable());
+        this.injectService.getInjectSpecification(input, Grant.GRANT_TYPE.LAUNCHER).and(testable());
 
     // Services calls
     // Bulk test

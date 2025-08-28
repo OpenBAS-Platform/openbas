@@ -29,6 +29,7 @@ import io.openbas.rest.user.form.user.UpdateUserInput;
 import io.openbas.service.MailingService;
 import io.openbas.utils.fixtures.ScenarioFixture;
 import io.openbas.utils.fixtures.UserFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.*;
@@ -147,7 +148,7 @@ class UserApiTest extends IntegrationTest {
   class Creating {
     @DisplayName("Create existing user by email in lowercase gives a conflict")
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockAdminUser // FIXME: Temporary workaround for grant issue
     void given_known_create_user_in_lowercase_input_should_return_conflict() throws Exception {
       CreateUserInput input = new CreateUserInput();
       input.setEmail(EMAIL);
@@ -161,7 +162,7 @@ class UserApiTest extends IntegrationTest {
 
     @DisplayName("Create existing user by email in uppercase gives a conflict")
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockAdminUser // FIXME: Temporary workaround for grant issue
     void given_known_create_user_in_uppercase_input_should_return_conflict() throws Exception {
       CreateUserInput input = new CreateUserInput();
       input.setEmail(EMAIL.toUpperCase());
@@ -218,7 +219,7 @@ class UserApiTest extends IntegrationTest {
   @DisplayName(
       "Get a user with several grant on the same resource, should return the highest grant")
   @Test
-  @WithMockUser(roles = {"ADMIN"})
+  @WithMockAdminUser // FIXME: Temporary workaround for grant issue
   void given_user_with_several_grant_on_same_resource_should_return_highest_grant()
       throws Exception {
 

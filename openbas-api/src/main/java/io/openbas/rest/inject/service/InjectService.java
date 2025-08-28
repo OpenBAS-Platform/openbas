@@ -14,10 +14,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.config.OpenBASPrincipal;
+import io.openbas.config.SessionHelper;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.ee.Ee;
 import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractFieldType;
@@ -44,6 +47,9 @@ import io.openbas.utils.mapper.InjectMapper;
 import io.openbas.utils.mapper.InjectStatusMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -407,14 +413,17 @@ public class InjectService {
   }
 
   /**
-   * Get the inject specification for the search pagination input
+   * Get the inject specification for the search pagination input related where the user has grants
+   * (through scenarios or simulations)
    *
    * @param input the search input
+   * @param requestedGrantLevel the requested grant level to filter the injects
    * @return the inject specification to search in DB
    * @throws BadRequestException if neither of the searchPaginationInput or injectIDsToSearch is
    *     provided
    */
-  public Specification<Inject> getInjectSpecification(final InjectBulkProcessingInput input) {
+  public Specification<Inject> getInjectSpecification(
+      final InjectBulkProcessingInput input, Grant.GRANT_TYPE requestedGrantLevel) {
     if ((CollectionUtils.isEmpty(input.getInjectIDsToProcess())
             && (input.getSearchPaginationInput() == null))
         || (!CollectionUtils.isEmpty(input.getInjectIDsToProcess())
@@ -441,6 +450,12 @@ public class InjectService {
           filterSpecifications.and(
               JpaUtils.computeNotIn(Inject.ID_FIELD_NAME, input.getInjectIDsToIgnore()));
     }
+    // Filter out any injects not related to resources where the user is granted with the
+    // appropriate level
+    OpenBASPrincipal principal = SessionHelper.currentUser();
+    filterSpecifications =
+        filterSpecifications.and(
+            hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
     return filterSpecifications;
   }
 
@@ -505,42 +520,13 @@ public class InjectService {
       InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
-    Specification<Inject> filterSpecifications = getInjectSpecification(input);
+    Specification<Inject> filterSpecifications =
+        getInjectSpecification(input, requested_grant_level);
 
     // Services calls
-    // Bulk select
-    List<Inject> injectsToProcess = this.injectRepository.findAll(filterSpecifications);
-
-    // Assert that the user is allowed to delete the injects
-    // Can't use PreAuthorized as we don't have the data about involved scenarios and simulations
-
-    switch (requested_grant_level) {
-      case OBSERVER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectObserver);
-      case PLANNER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
-      default ->
-          throw new AccessDeniedException(
-              "No specified behaviour for grant %s".formatted(requested_grant_level.toString()));
-    }
-    return injectsToProcess;
-  }
-
-  /**
-   * Check if the user is allowed to delete the injects from the scenario or exercise
-   *
-   * @param injects the injects to check
-   * @param authoriseFunction the function to check if the user is a planner for the scenario or
-   *     exercise
-   * @throws AccessDeniedException if the user is not allowed to delete the injects from the
-   *     scenario or exercise
-   */
-  public <T extends Base> void authoriseWithThrow(
-      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
-    InjectAuthorisationResult result = this.authorise(injects, authoriseFunction);
-    if (!result.getUnauthorised().isEmpty()) {
-      throw new AccessDeniedException(
-          "You are not allowed to alter the injects of ids "
-              + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
-    }
+    // Bulk select, only on injects granted through scenario or simulation (or without grant for
+    // atomic tests)
+    return this.injectRepository.findAll(filterSpecifications);
   }
 
   /**
@@ -1011,5 +997,49 @@ public class InjectService {
    */
   public List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId) {
     return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
+  }
+
+  public Specification<Inject> hasGrantAccessForInject(
+      final String userId, final boolean isAdmin, Grant.GRANT_TYPE grantType) {
+
+    return (root, query, cb) -> {
+      if (isAdmin) {
+        return cb.conjunction();
+      }
+
+      // Check if both are null - automatically granted
+      Path<Object> scenarioPath = root.get("scenario");
+      Path<Object> exercisePath = root.get("exercise");
+      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(exercisePath));
+
+      // Get allowed grant types
+      List<Grant.GRANT_TYPE> allowedGrantTypes = grantType.andHigher();
+      // Create subquery for accessible scenarios
+      Subquery<String> accessibleScenarios =
+          SpecificationUtils.accessibleScenariosSubquery(query, cb, userId, allowedGrantTypes);
+      // Create subquery for accessible exercises
+      Subquery<String> accessibleExercises =
+          SpecificationUtils.accessibleSimulationsSubquery(query, cb, userId, allowedGrantTypes);
+      // Check if inject's scenario ID is accessible (null is OK)
+      Predicate scenarioAccessible;
+      if (scenarioPath != null) {
+        scenarioAccessible =
+            cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
+      } else {
+        scenarioAccessible = cb.conjunction(); // Always true if no scenario field
+      }
+      // Check if inject's exercise ID is accessible (null is OK)
+      Predicate exerciseAccessible;
+      if (exercisePath != null) {
+        exerciseAccessible =
+            cb.or(cb.isNull(exercisePath), exercisePath.get("id").in(accessibleExercises));
+      } else {
+        exerciseAccessible = cb.conjunction(); // Always true if no exercise field
+      }
+      // Inject is accessible if:
+      // 1. Both scenario and exercise are null (automatically granted), OR
+      // 2. User has access to the non-null scenario/exercise
+      return cb.or(bothNull, cb.and(scenarioAccessible, exerciseAccessible));
+    };
   }
 }

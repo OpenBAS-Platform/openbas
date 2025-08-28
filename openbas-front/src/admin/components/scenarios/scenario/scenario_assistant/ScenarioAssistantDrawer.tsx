@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AutoAwesomeOutlined } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
@@ -16,6 +16,8 @@ import {
   type InjectAssistantInput,
 } from '../../../../../utils/api-types';
 import useEnterpriseEdition from '../../../../../utils/hooks/useEnterpriseEdition';
+import { AbilityContext, Can } from '../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
@@ -51,6 +53,8 @@ interface Props {
 const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const ability = useContext(AbilityContext);
+
   const [openMitreFilterDrawer, setOpenMitreFilterDrawer] = useState(false);
   const [openArianeAIAssistantDialog, setOpenArianeAIAssistantDialog] = useState(false);
   const {
@@ -130,7 +134,7 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
   }) as string[];
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
   useEffect(() => {
-    if (assetIds.length > 0) {
+    if (assetIds.length > 0 && ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
       findEndpoints(assetIds).then(result => setEndpoints(result.data));
     } else {
       setEndpoints([]);
@@ -190,11 +194,13 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
                   />
                 )}
               />
-              <InjectAddEndpoints
-                endpointIds={assetIds}
-                onSubmit={onAssetChange}
-                errorLabel={errors?.asset_ids?.message ?? null}
-              />
+              <Can I={ACTIONS.ACCESS} a={SUBJECTS.ASSETS}>
+                <InjectAddEndpoints
+                  endpointIds={assetIds}
+                  onSubmit={onAssetChange}
+                  errorLabel={errors?.asset_ids?.message ?? null}
+                />
+              </Can>
             </div>
 
             <div>
@@ -211,11 +217,13 @@ const ScenarioAssistantDrawer = ({ open, onClose, onSubmit }: Props) => {
                   />
                 )}
               />
-              <InjectAddAssetGroups
-                assetGroupIds={assetGroupIds}
-                onSubmit={onAssetGroupChange}
-                errorLabel={errors?.asset_group_ids?.message ?? null}
-              />
+              <Can I={ACTIONS.ACCESS} a={SUBJECTS.ASSETS}>
+                <InjectAddAssetGroups
+                  assetGroupIds={assetGroupIds}
+                  onSubmit={onAssetGroupChange}
+                  errorLabel={errors?.asset_group_ids?.message ?? null}
+                />
+              </Can>
             </div>
 
             <div className={classes.titleWithButtonContainer}>

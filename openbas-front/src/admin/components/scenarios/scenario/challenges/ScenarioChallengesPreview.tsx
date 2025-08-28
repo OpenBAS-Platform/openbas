@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../../../actions/Application';
-import { fetchScenarioObserverChallenges } from '../../../../../actions/Challenge';
+import { fetchScenarioObserverChallenges } from '../../../../../actions/challenge-action';
 import { fetchScenarioPlayerDocuments } from '../../../../../actions/Document';
 import { type ScenarioChallengesReaderHelper } from '../../../../../actions/helper';
 import { fetchScenario } from '../../../../../actions/scenarios/scenario-actions';
@@ -10,8 +10,8 @@ import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-
 import { useHelper } from '../../../../../store';
 import { type Scenario as ScenarioType, type ScenarioChallengesReader } from '../../../../../utils/api-types';
 import { useQueryParameter } from '../../../../../utils/Environment';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import { usePermissions } from '../../../../../utils/permissions/simulationPermissions';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 

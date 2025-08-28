@@ -37,6 +37,7 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Scenario.tags-injects",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
+@Grantable(grantFieldName = "scenario")
 public class Scenario implements Base {
 
   public enum SEVERITY {
@@ -268,6 +269,10 @@ public class Scenario implements Base {
   @Column(name = "scenario_lessons_anonymized")
   @JsonProperty("scenario_lessons_anonymized")
   private boolean lessonsAnonymized = false;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SCENARIO;
 
   // -- LESSONS --
 

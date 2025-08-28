@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { type FunctionComponent, useEffect, useState } from 'react';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 
 import { deleteCve, fetchCve, updateCve } from '../../../../actions/cve-actions';
 import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
@@ -9,6 +9,8 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type CveOutput, type CveSimple, type CveUpdateInput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CveForm from './CveForm';
 
 interface Props {
@@ -19,6 +21,7 @@ interface Props {
 
 const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
 
   const [fullCve, setFullCve] = useState<CveOutput | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,10 +78,12 @@ const CvePopover: FunctionComponent<Props> = ({ onDelete, onUpdate, cve }) => {
     {
       label: t('Update'),
       action: handleOpenEdit,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
     {
       label: t('Delete'),
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
   ];
 

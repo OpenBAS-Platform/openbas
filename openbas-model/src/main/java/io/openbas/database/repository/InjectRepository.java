@@ -334,4 +334,14 @@ public interface InjectRepository
       value = "SELECT i.inject_content FROM injects i WHERE i.inject_id IN :injectIds",
       nativeQuery = true)
   List<String> findContentsByInjectIds(@NotBlank Set<String> injectIds);
+
+  /**
+   * Check if an Inject exists by its ID without loading the entity. This is useful for because of
+   * the cascade configuration
+   *
+   * @param id the ID of the Inject to check
+   * @return true if the Inject exists, false otherwise
+   */
+  @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Inject i WHERE i.id = :id")
+  boolean existsByIdWithoutLoading(@Param("id") String id);
 }

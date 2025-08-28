@@ -37,6 +37,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
+import io.openbas.service.UserService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.FilterUtilsJpa;
@@ -87,6 +88,7 @@ public class ExerciseService {
   private final TagRuleService tagRuleService;
   private final DocumentService documentService;
   private final InjectService injectService;
+  private final UserService userService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -362,9 +364,11 @@ public class ExerciseService {
 
   // -- EXERCISES --
   public List<ExerciseSimple> exercises() {
-    // We get the exercises depending on whether or not we are granted
+    // We get the exercises depending on whether or not we are granted or have the capa
+    User currentUser = userService.currentUser();
     List<RawExerciseSimple> exercises =
-        currentUser().isAdmin()
+        currentUser.isAdminOrBypass()
+                || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
             ? exerciseRepository.rawAll()
             : exerciseRepository.rawAllGranted(currentUser().getId());
     return exerciseMapper.getExerciseSimples(exercises);

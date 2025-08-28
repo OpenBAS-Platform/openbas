@@ -4,8 +4,8 @@ import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } fr
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';
+import { fetchScenarioFromSimulation } from '../../../../actions/exercises/exercise-action';
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,9 +13,9 @@ import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
 import { type Exercise as ExerciseType } from '../../../../utils/api-types';
-import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { usePermissions } from '../../../../utils/permissions/simulationPermissions';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -204,15 +204,18 @@ const Index = () => {
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   useDataLoader(() => {
     setLoading(true);
-    dispatch(fetchExercise(exerciseId)).finally(() => {
+    dispatch(fetchExercise(exerciseId));
+    if (!exercise) {
+      return;
+    }
+    if (!exercise.exercise_scenario) {
       setPristine(false);
       setLoading(false);
-    });
-  });
-
-  useDataLoader(() => {
-    if (exercise?.exercise_scenario) {
-      dispatch(fetchScenario(exercise?.exercise_scenario));
+    } else {
+      dispatch(fetchScenarioFromSimulation(exercise.exercise_id)).finally(() => {
+        setPristine(false);
+        setLoading(false);
+      });
     }
   }, [exercise]);
 

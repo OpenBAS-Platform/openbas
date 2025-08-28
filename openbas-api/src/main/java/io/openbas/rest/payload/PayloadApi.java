@@ -1,18 +1,22 @@
 package io.openbas.rest.payload;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.*;
 import io.openbas.service.ImportService;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -25,13 +29,10 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@Secured(ROLE_USER)
 @RequiredArgsConstructor
 public class PayloadApi extends RestBehavior {
 
@@ -44,8 +45,10 @@ public class PayloadApi extends RestBehavior {
   private final PayloadUpdateService payloadUpdateService;
   private final PayloadUpsertService payloadUpsertService;
   private final PayloadExportService payloadExportService;
+  private final DocumentService documentService;
 
   @PostMapping(PAYLOAD_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PAYLOAD)
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -55,19 +58,26 @@ public class PayloadApi extends RestBehavior {
   }
 
   @GetMapping(PAYLOAD_URI + "/{payloadId}")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD)
   public Payload payload(@PathVariable String payloadId) {
     return payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
   }
 
   @PostMapping(PAYLOAD_URI)
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
     return this.payloadCreationService.createPayload(input);
   }
 
   @PutMapping(PAYLOAD_URI + "/{payloadId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.PAYLOAD)
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(
       @NotBlank @PathVariable final String payloadId,
@@ -76,20 +86,24 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/{payloadId}/duplicate")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.DUPLICATE,
+      resourceType = ResourceType.PAYLOAD)
   @Transactional(rollbackOn = Exception.class)
   public Payload duplicatePayload(@NotBlank @PathVariable final String payloadId) {
     return this.payloadService.duplicate(payloadId);
   }
 
   @PostMapping(PAYLOAD_URI + "/upsert")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
     return this.payloadUpsertService.upsertPayload(input);
   }
 
   @PostMapping(PAYLOAD_URI + "/export")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD)
   public void payloadsExport(
       @RequestBody @Valid final PayloadExportRequestInput payloadExportRequestInput,
       HttpServletResponse response)
@@ -102,7 +116,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/import")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
   }
@@ -120,18 +134,35 @@ public class PayloadApi extends RestBehavior {
     outputStream.close();
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.PAYLOAD)
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
   }
 
   @PostMapping(PAYLOAD_URI + "/deprecate")
-  @Secured(ROLE_ADMIN)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   @Transactional(rollbackOn = Exception.class)
   public void deprecateNonProcessedPayloadsByCollector(
       @Valid @RequestBody PayloadsDeprecateInput input) {
     this.payloadService.deprecateNonProcessedPayloadsByCollector(
         input.collectorId(), input.processedPayloadExternalIds());
+  }
+
+  @GetMapping(PAYLOAD_URI + "/{payloadId}/documents")
+  @RBAC(
+      resourceId = "#payloadId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD)
+  @Operation(summary = "Get the Documents used in a payload")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "The list of Documents used in a payload")
+      })
+  public List<RawDocument> documentsFromPayload(@PathVariable String payloadId) {
+    return documentService.documentsForPayload(payloadId);
   }
 }

@@ -145,4 +145,8 @@ public interface EndpointRepository
       value = "UPDATE assets SET asset_updated_at = :updateDate where asset_id = :id",
       nativeQuery = true)
   void setUpdateDate(@Param("updateDate") Instant updateDate, @Param("id") String assetId);
+
+  List<Endpoint> findDistinctByInjectsScenarioId(String scenarioId);
+
+  List<Endpoint> findDistinctByInjectsExerciseId(String exerciseId);
 }

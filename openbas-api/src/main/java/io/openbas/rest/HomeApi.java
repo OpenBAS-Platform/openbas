@@ -2,6 +2,7 @@ package io.openbas.rest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import io.openbas.aop.RBAC;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -33,6 +34,7 @@ public class HomeApi {
   @GetMapping(
       path = {"/", "/{path:^(?!api$|login$|logout$|oauth2$|saml2$|static$|swagger-ui$).*$}/**"},
       produces = MediaType.TEXT_HTML_VALUE)
+  @RBAC(skipRBAC = true) // No RBAC check for home endpoint
   public ResponseEntity<String> home() {
     ClassPathResource classPathResource = new ClassPathResource("/build/index.html");
     String index = readResourceAsString(classPathResource);

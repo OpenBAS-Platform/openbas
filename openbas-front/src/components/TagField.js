@@ -8,6 +8,8 @@ import { withStyles } from 'tss-react/mui';
 import { storeHelper } from '../actions/Schema';
 import { addTag } from '../actions/Tag';
 import TagForm from '../admin/components/settings/tags/TagForm';
+import { Can } from '../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../utils/permissions/types.js';
 import Autocomplete from './Autocomplete';
 import inject18n from './i18n';
 
@@ -71,7 +73,6 @@ class TagField extends Component {
       style,
       label,
       placeholder,
-      userAdmin,
       disabled,
     } = this.props;
     const tagsOptions = R.map(
@@ -82,6 +83,7 @@ class TagField extends Component {
       }),
       tags,
     );
+
     return (
       <>
         <Autocomplete
@@ -95,7 +97,7 @@ class TagField extends Component {
           placeholder={placeholder}
           options={tagsOptions}
           style={style}
-          openCreate={userAdmin && !disabled ? this.handleOpenTagCreation.bind(this) : null}
+          openCreate={!disabled ? this.handleOpenTagCreation.bind(this) : null}
           onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props} key={option.id}>
@@ -107,7 +109,7 @@ class TagField extends Component {
           )}
           classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
-        {userAdmin && (
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
           <Dialog
             open={this.state.tagCreation}
             onClose={this.handleCloseTagCreation.bind(this)}
@@ -121,7 +123,7 @@ class TagField extends Component {
               />
             </DialogContent>
           </Dialog>
-        )}
+        </Can>
       </>
     );
   }
@@ -129,10 +131,7 @@ class TagField extends Component {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  return {
-    tags: helper.getTags().toJS(),
-    userAdmin: helper.getMeAdmin(),
-  };
+  return { tags: helper.getTags().toJS() };
 };
 
 export default R.compose(

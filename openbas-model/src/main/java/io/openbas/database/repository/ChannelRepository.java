@@ -16,4 +16,8 @@ public interface ChannelRepository
   Optional<Channel> findById(@NotNull String id);
 
   List<Channel> findByNameIgnoreCase(String name);
+
+  List<Channel> findDistinctByArticlesExerciseId(String simulationId);
+
+  List<Channel> findDistinctByArticlesScenarioId(String scenarioId);
 }

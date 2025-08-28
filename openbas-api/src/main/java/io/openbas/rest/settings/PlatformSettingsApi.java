@@ -1,8 +1,9 @@
 package io.openbas.rest.settings;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-
+import io.openbas.aop.RBAC;
 import io.openbas.aop.UserRoleDescription;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.PlatformSettings;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,14 +41,15 @@ public class PlatformSettingsApi extends RestBehavior {
   }
 
   @GetMapping()
+  @RBAC(skipRBAC = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of settings")})
   @Operation(summary = "List settings", description = "Return the settings")
   public PlatformSettings settings() {
     return platformSettingsService.findSettings();
   }
 
-  @Secured(ROLE_ADMIN)
   @GetMapping("/default")
+  @RBAC(skipRBAC = true)
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of default settings")})
   @Operation(
@@ -58,8 +59,8 @@ public class PlatformSettingsApi extends RestBehavior {
     return platformSettingsService.defaultValues();
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping()
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update settings", description = "Update the settings")
   public PlatformSettings updateBasicConfigurationSettings(
@@ -67,8 +68,8 @@ public class PlatformSettingsApi extends RestBehavior {
     return platformSettingsService.updateBasicConfigurationSettings(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/enterprise-edition")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "The updated settings"),
@@ -80,8 +81,8 @@ public class PlatformSettingsApi extends RestBehavior {
     return platformSettingsService.updateSettingsEnterpriseEdition(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/platform_whitemark")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update Whitemark settings", description = "Update the whitemark settings")
   public PlatformSettings updateSettingsPlatformWhitemark(
@@ -89,8 +90,8 @@ public class PlatformSettingsApi extends RestBehavior {
     return platformSettingsService.updateSettingsPlatformWhitemark(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/theme/light")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(
       summary = "Update light theme settings",
@@ -99,26 +100,26 @@ public class PlatformSettingsApi extends RestBehavior {
     return platformSettingsService.updateThemeLight(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/theme/dark")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update dark theme settings", description = "Update the dark theme settings")
   public PlatformSettings updateThemeDark(@Valid @RequestBody ThemeInput input) {
     return platformSettingsService.updateThemeDark(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/policies")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PLATFORM_SETTING)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update policies settings", description = "Update the policies settings")
   public PlatformSettings updateSettingsPolicies(@Valid @RequestBody PolicyInput input) {
     return platformSettingsService.updateSettingsPolicies(input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/onboarding")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
   @Operation(summary = "Update onboarding settings", description = "Update the onboarding settings")
+  @RBAC(resourceType = ResourceType.PLATFORM_SETTING, actionPerformed = Action.WRITE)
   public PlatformSettings updateSettingsOnboarding(
       @Valid @RequestBody SettingsOnboardingUpdateInput input) {
     return platformSettingsService.updateSettingsOnboarding(input);
