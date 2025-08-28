@@ -1,24 +1,31 @@
 package io.openbas.engine.model.injectexpectation;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
-import static io.openbas.helper.InjectExpectationHelper.computeStatus;
+import static io.openbas.helper.InjectExpectationHelper.computeStatusForIndexing;
 import static java.lang.String.valueOf;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 
-import io.openbas.database.model.InjectExpectation;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.engine.Handler;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
+
+  private static final String SECURITY_PLATFORM = "security-platform";
 
   private final InjectExpectationRepository injectExpectationRepository;
 
@@ -52,12 +59,6 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               esInjectExpectation.setInject_expectation_results(
                   injectExpectation.getInject_expectation_results());
 
-              InjectExpectation injectExpectationTmp = new InjectExpectation();
-              injectExpectationTmp.setScore(injectExpectation.getInject_expectation_score());
-              injectExpectationTmp.setExpectedScore(
-                  injectExpectation.getInject_expectation_expected_score());
-              esInjectExpectation.setInject_expectation_status(
-                  valueOf(computeStatus(injectExpectationTmp)));
               esInjectExpectation.setInject_expectation_score(
                   injectExpectation.getInject_expectation_score());
               esInjectExpectation.setInject_expectation_expected_score(
@@ -101,6 +102,29 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
                 esInjectExpectation.setBase_attack_patterns_side(
                     injectExpectation.getAttack_pattern_ids());
               }
+              if (injectExpectation.getInject_expectation_results() != null
+                  && !injectExpectation.getInject_expectation_results().isBlank()) {
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                  List<InjectExpectationResult> results =
+                      mapper.readValue(
+                          injectExpectation.getInject_expectation_results(),
+                          new TypeReference<>() {});
+                  Set<String> securityPlatformIds =
+                      results.stream()
+                          .filter(
+                              injectExpectationResult ->
+                                  SECURITY_PLATFORM.equals(injectExpectationResult.getSourceType()))
+                          .map(InjectExpectationResult::getSourceId)
+                          .collect(Collectors.toSet());
+                  dependencies.addAll(securityPlatformIds);
+                  esInjectExpectation.setBase_security_platforms_side(securityPlatformIds);
+                } catch (Exception e) {
+                  esInjectExpectation.setBase_security_platforms_side(new HashSet<>());
+                }
+              }
+              esInjectExpectation.setInject_expectation_status(
+                  valueOf(computeStatusForIndexing(injectExpectation)));
               esInjectExpectation.setBase_dependencies(dependencies);
               return esInjectExpectation;
             })

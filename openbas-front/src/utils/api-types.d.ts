@@ -1750,6 +1750,8 @@ export interface EsInject {
   base_inject_contract_side?: string;
   /** @uniqueItems true */
   base_kill_chain_phases_side?: string[];
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1760,6 +1762,8 @@ export interface EsInject {
   base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  /** @format date-time */
+  inject_execution_date?: string;
   inject_status?: string;
   inject_title?: string;
 }
@@ -1778,6 +1782,8 @@ export interface EsInjectExpectation {
   base_inject_side?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_security_platforms_side?: string[];
   base_simulation_side?: string;
   base_team_side?: string;
   /** @format date-time */
@@ -1807,6 +1813,8 @@ export interface EsScenario {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
@@ -1816,6 +1824,7 @@ export interface EsScenario {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsSearch {
@@ -1851,6 +1860,8 @@ export interface EsSimulation {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1861,6 +1872,7 @@ export interface EsSimulation {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsTag {
