@@ -1,6 +1,9 @@
 package io.openbas.api.custom_dashboard;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.model.ResourceType;
 import io.openbas.jsonapi.JsonApiDocument;
 import io.openbas.jsonapi.ResourceObject;
 import io.openbas.jsonapi.ZipJsonApi;
@@ -36,6 +39,7 @@ public class CustomDashboardApiImporter extends RestBehavior {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Transactional
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
       @RequestPart("file") @NotNull MultipartFile file) throws IOException {
     return zipJsonApi.handleImport(file, "custom_dashboard_name");

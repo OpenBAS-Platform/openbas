@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,12 +47,15 @@ public class GenericJsonApiImporter<T extends Base> {
       includeOptions = IncludeOptions.of(emptyMap());
     }
     Map<String, ResourceObject> includedMap = toMap(doc.included());
-    Map<String, T> entityCache = new HashMap<>();
+    // Cache keyed by id, with a boolean indicating whether the entity should be persisted or not at
+    // the end
+    Map<String, Pair<T, Boolean>> entityCache = new HashMap<>();
     T entity = buildEntity(doc.data(), includedMap, entityCache, includeOptions, true);
 
-    // Persist included entities
-    for (T e : entityCache.values()) {
-      if (!entityManager.contains(e)) {
+    // Persist included entities that not inner relationship
+    for (Pair<T, Boolean> value : entityCache.values()) {
+      if (!entityManager.contains(value.getLeft()) && !value.getRight()) {
+        T e = value.getLeft();
         if (e.getId() != null && entityManager.find(e.getClass(), e.getId()) != null) {
           entityManager.merge(e);
         } else {
@@ -97,7 +101,9 @@ public class GenericJsonApiImporter<T extends Base> {
     Map<String, ResourceObject> map = new LinkedHashMap<>();
     for (Object o : included) {
       ResourceObject ro = (ResourceObject) safeConvert(o, ResourceObject.class);
-      if (ro != null) map.put(ro.id(), ro);
+      if (ro != null) {
+        map.put(ro.id(), ro);
+      }
     }
     return map;
   }
@@ -105,7 +111,7 @@ public class GenericJsonApiImporter<T extends Base> {
   private T buildEntity(
       ResourceObject resource,
       Map<String, ResourceObject> includedMap,
-      Map<String, T> entityCache,
+      Map<String, Pair<T, Boolean>> entityCache,
       IncludeOptions includeOptions,
       boolean rootEntity) {
     // Sanity check
@@ -120,7 +126,7 @@ public class GenericJsonApiImporter<T extends Base> {
     String type = resource.type();
 
     if (entityCache.containsKey(id)) {
-      return entityCache.get(id);
+      return entityCache.get(id).getLeft();
     }
 
     Class<T> clazz = classForTypeOrThrow(type);
@@ -130,37 +136,33 @@ public class GenericJsonApiImporter<T extends Base> {
 
     // For non-root entities with a valid ID and not marked as @InnerRelationship,
     // try loading the existing entity from the database.
-    if (!rootEntity && hasText(id) && !clazz.isAnnotationPresent(InnerRelationship.class)) {
-      if (hasText(id)) {
-        entity = entityManager.find(clazz, id);
-      }
+    if (!rootEntity && !clazz.isAnnotationPresent(InnerRelationship.class)) {
+      Field businessIdField =
+          Arrays.stream(clazz.getDeclaredFields())
+              .filter(f -> f.isAnnotationPresent(BusinessId.class))
+              .findFirst()
+              .orElse(null);
 
-      if (entity == null) {
-        Field businessIdField =
-            Arrays.stream(clazz.getDeclaredFields())
-                .filter(f -> f.isAnnotationPresent(BusinessId.class))
-                .findFirst()
-                .orElse(null);
+      if (businessIdField != null) {
+        JsonProperty annotation = businessIdField.getAnnotation(JsonProperty.class);
+        Object businessIdValue = resource.attributes().get(annotation.value());
 
-        if (businessIdField != null) {
-          JsonProperty annotation = businessIdField.getAnnotation(JsonProperty.class);
-          Object businessIdValue = resource.attributes().get(annotation.value());
-
-          if (businessIdValue != null) {
-            String jpql =
-                "SELECT e FROM "
-                    + clazz.getSimpleName()
-                    + " e WHERE e."
-                    + businessIdField.getName()
-                    + " = :value";
-            List<T> results =
-                entityManager
-                    .createQuery(jpql, clazz)
-                    .setParameter("value", businessIdValue)
-                    .getResultList();
-            if (!results.isEmpty()) {
-              entity = results.get(0);
-            }
+        if (businessIdValue != null) {
+          String jpql =
+              "SELECT e FROM "
+                  + clazz.getSimpleName()
+                  + " e WHERE e."
+                  + businessIdField.getName()
+                  + " = :value";
+          List<T> results =
+              entityManager
+                  .createQuery(jpql, clazz)
+                  .setParameter("value", businessIdValue)
+                  .getResultList();
+          if (!results.isEmpty()) {
+            entity = results.get(0);
+            entityCache.put(entity.getId(), Pair.of(entity, true));
+            return entity;
           }
         }
       }
@@ -175,7 +177,7 @@ public class GenericJsonApiImporter<T extends Base> {
       }
     }
     if (!rootEntity) {
-      entityCache.put(id, entity);
+      entityCache.put(id, Pair.of(entity, clazz.isAnnotationPresent(InnerRelationship.class)));
     }
 
     // Populate
@@ -204,7 +206,7 @@ public class GenericJsonApiImporter<T extends Base> {
       Object entity,
       Map<String, Relationship> rels,
       Map<String, ResourceObject> includedMap,
-      Map<String, T> entityCache,
+      Map<String, Pair<T, Boolean>> entityCache,
       IncludeOptions includeOptions) {
     if (entity == null || rels == null || rels.isEmpty()) {
       return;
@@ -253,7 +255,7 @@ public class GenericJsonApiImporter<T extends Base> {
   private T resolveOrBuildEntity(
       ResourceIdentifier resourceIdentifier,
       Map<String, ResourceObject> includedMap,
-      Map<String, T> entityCache,
+      Map<String, Pair<T, Boolean>> entityCache,
       IncludeOptions includeOptions) {
     if (resourceIdentifier == null) {
       return null;

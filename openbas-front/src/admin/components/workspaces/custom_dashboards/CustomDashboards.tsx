@@ -99,10 +99,12 @@ const CustomDashboards = () => {
         queryableHelpers={queryableHelpers}
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
-            <ImportUploaderJsonApiComponent
-              title={t('Import a custom dashboard')}
-              uploadFn={importCustomDashboard}
-            />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.DASHBOARDS}>
+              <ImportUploaderJsonApiComponent
+                title={t('Import a custom dashboard')}
+                uploadFn={importCustomDashboard}
+              />
+            </Can>
           </ToggleButtonGroup>
         )}
       />

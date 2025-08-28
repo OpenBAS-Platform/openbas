@@ -1,6 +1,9 @@
 package io.openbas.api.payload;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Payload;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.jsonapi.ZipJsonApi;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -31,6 +34,7 @@ public class PayloadApiExporter extends RestBehavior {
       description = "Exports a payload in JSON:API format, optionally including related entities.")
   @GetMapping(value = "/{payloadId}/export", produces = "application/zip")
   @Transactional(readOnly = true)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD)
   public ResponseEntity<byte[]> export(@PathVariable @NotBlank final String payloadId)
       throws IOException {
     Payload payload =
