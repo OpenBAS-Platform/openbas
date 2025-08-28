@@ -99,7 +99,8 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
     entityManager.refresh(exerciseWrapper.get());
 
     // act
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(List.of(exerciseWrapper.get()));
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(
+        List.of(exerciseWrapper.get()));
     entityManager.flush();
 
     // assert
@@ -129,7 +130,8 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
     entityManager.refresh(exerciseWrapper.get());
 
     // act
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(List.of(exerciseWrapper.get()));
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(
+        List.of(exerciseWrapper.get()));
     entityManager.flush();
 
     // assert

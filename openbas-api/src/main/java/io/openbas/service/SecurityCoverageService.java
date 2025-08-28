@@ -80,7 +80,7 @@ public class SecurityCoverageService {
                       "relationship_type",
                       new StixString("has-assessed"),
                       RelationshipObject.Properties.SOURCE_REF.toString(),
-                      coverage.getProperty(CommonProperties.ID),
+                      coverage.getId(),
                       RelationshipObject.Properties.TARGET_REF.toString(),
                       new Identifier(stixRef.getStixRef()),
                       "covered",
@@ -94,22 +94,7 @@ public class SecurityCoverageService {
     }
 
     for (SecurityPlatform securityPlatform : assetService.securityPlatforms()) {
-      DomainObject platformIdentity =
-          new DomainObject(
-              new HashMap<>(
-                  Map.of(
-                      CommonProperties.ID.toString(),
-                      new Identifier("identity--" + securityPlatform.getId()),
-                      CommonProperties.CREATED.toString(),
-                      new Timestamp(securityPlatform.getCreatedAt()),
-                      CommonProperties.MODIFIED.toString(),
-                      new Timestamp(securityPlatform.getUpdatedAt()),
-                      "name",
-                      new StixString(securityPlatform.getName()),
-                      CommonProperties.TYPE.toString(),
-                      new StixString("identity"),
-                      "identity_class",
-                      new StixString("security-platform"))));
+      DomainObject platformIdentity = securityPlatform.toStixDomainObject();
       objects.add(platformIdentity);
 
       BaseType<?> platformCoverage = getOverallCoveragePerPlatform(exercise, securityPlatform);
@@ -119,15 +104,15 @@ public class SecurityCoverageService {
               new HashMap<>(
                   Map.of(
                       CommonProperties.ID.toString(),
-                      new Identifier(ObjectTypes.RELATIONSHIP + "--" + exercise.getId()),
+                      new Identifier(ObjectTypes.RELATIONSHIP + "--" + UUID.randomUUID()),
                       CommonProperties.TYPE.toString(),
                       new StixString(ObjectTypes.RELATIONSHIP.toString()),
                       "relationship_type",
                       new StixString("has-assessed"),
                       RelationshipObject.Properties.SOURCE_REF.toString(),
-                      coverage.getProperty(CommonProperties.ID),
+                      coverage.getId(),
                       RelationshipObject.Properties.TARGET_REF.toString(),
-                      platformIdentity.getProperty(CommonProperties.ID),
+                      platformIdentity.getId(),
                       "covered",
                       new io.openbas.stix.types.Boolean(covered))));
       sroStartTime.ifPresent(instant -> sro.setProperty("start_time", instant));

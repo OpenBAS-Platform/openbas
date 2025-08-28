@@ -7,6 +7,8 @@ import io.openbas.stix.objects.constants.CommonProperties;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.parsing.StixSerialisable;
 import io.openbas.stix.types.BaseType;
+import io.openbas.stix.types.Identifier;
+import io.openbas.stix.types.StixString;
 import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -16,6 +18,14 @@ public abstract class ObjectBase implements StixSerialisable {
 
   protected ObjectBase(Map<String, BaseType<?>> properties) {
     this.properties = properties;
+  }
+
+  public Identifier getId() {
+    return (Identifier) this.getProperty(CommonProperties.ID);
+  }
+
+  public StixString getType() {
+    return (StixString) this.getProperty(CommonProperties.TYPE);
   }
 
   public BaseType<?> getProperty(String name) {

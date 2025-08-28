@@ -8,7 +8,6 @@ import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
@@ -22,25 +21,32 @@ public class SecurityCoverageSendJobService {
   private final ExerciseService exerciseService;
   private final EntityManager entityManager;
 
-  public void createOrUpdateJobsForSimulation(List<Exercise> exercises) {
-    Set<Exercise> toSend = this.filterFullyAssessedSimulations(exercises);
+  public void createOrUpdateCoverageSendJobForSimulationsIfReady(List<Exercise> exercises) {
     List<SecurityCoverageSendJob> jobs = new ArrayList<>();
-    for (Exercise exercise : toSend) {
-      Optional<SecurityCoverageSendJob> scsj =
-          securityCoverageSendJobRepository.findBySimulation(exercise);
-      if (scsj.isPresent()) {
-        scsj.get().setStatus("PENDING");
-        scsj.get().setUpdatedAt(Instant.now());
-        jobs.add(scsj.get());
-      } else {
-        SecurityCoverageSendJob newJob = new SecurityCoverageSendJob();
-        newJob.setSimulation(exercise);
-        newJob.setUpdatedAt(Instant.now());
-        jobs.add(newJob);
-      }
+    for (Exercise exercise : new HashSet<>(exercises)) { // deduplicate
+      createOrUpdateCoverageSendJobForSimulationIfReady(exercise).ifPresent(jobs::add);
     }
     if (!jobs.isEmpty()) {
       securityCoverageSendJobRepository.saveAll(jobs);
+    }
+  }
+
+  public Optional<SecurityCoverageSendJob> createOrUpdateCoverageSendJobForSimulationIfReady(
+      Exercise exercise) {
+    if (!shouldCreateCoverageSendJob(exercise)) {
+      return Optional.empty();
+    }
+    Optional<SecurityCoverageSendJob> scsj =
+        securityCoverageSendJobRepository.findBySimulation(exercise);
+    if (scsj.isPresent()) {
+      scsj.get().setStatus("PENDING");
+      scsj.get().setUpdatedAt(Instant.now());
+      return scsj;
+    } else {
+      SecurityCoverageSendJob newJob = new SecurityCoverageSendJob();
+      newJob.setSimulation(exercise);
+      newJob.setUpdatedAt(Instant.now());
+      return Optional.of(newJob);
     }
   }
 
@@ -75,11 +81,9 @@ public class SecurityCoverageSendJobService {
     }
   }
 
-  private Set<Exercise> filterFullyAssessedSimulations(List<Exercise> source) {
-    return source.stream()
-        .filter(Objects::nonNull)
-        .filter(e -> e.getSecurityAssessment() != null)
-        .filter(e -> !exerciseService.hasPendingResults(e))
-        .collect(Collectors.toSet());
+  private boolean shouldCreateCoverageSendJob(Exercise exercise) {
+    return exercise != null
+        && exercise.getSecurityAssessment() != null
+        && !exerciseService.hasPendingResults(exercise);
   }
 }

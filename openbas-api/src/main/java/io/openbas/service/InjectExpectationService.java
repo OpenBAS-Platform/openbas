@@ -149,7 +149,7 @@ public class InjectExpectationService {
 
     List<Exercise> exercises = new ArrayList<>();
     exercises.add(updated.getInject().getExercise());
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(exercises);
 
     return updated;
   }
@@ -184,7 +184,7 @@ public class InjectExpectationService {
           }
         });
 
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(
         expectations.stream().map(exp -> exp.getInject().getExercise()).toList());
 
     injectExpectationRepository.saveAll(expectations);
@@ -248,7 +248,7 @@ public class InjectExpectationService {
 
     List<Exercise> exercises = new ArrayList<>();
     exercises.add(updated.getInject().getExercise());
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(exercises);
 
     return updated;
   }
@@ -437,7 +437,7 @@ public class InjectExpectationService {
 
     List<Exercise> exercises = new ArrayList<>();
     exercises.add(injectExpectation.getInject().getExercise());
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(exercises);
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(exercises);
 
     return injectExpectation;
   }
@@ -490,7 +490,7 @@ public class InjectExpectationService {
       propagateUpdateToAssetGroups(inject, collector);
       // end of computing
     }
-    securityCoverageSendJobService.createOrUpdateJobsForSimulation(
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(
         injectExpectations.stream().map(exp -> exp.getInject().getExercise()).toList());
   }
 

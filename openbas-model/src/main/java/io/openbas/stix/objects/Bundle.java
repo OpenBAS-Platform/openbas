@@ -46,12 +46,27 @@ public class Bundle implements StixSerialisable {
     return found;
   }
 
+  public List<RelationshipObject> findRelationshipsByTargetRef(Identifier targetRef) {
+    return this.relationshipObjects.stream()
+        .filter(
+            sro ->
+                sro.getProperty(RelationshipObject.Properties.TARGET_REF.toString())
+                    .equals(targetRef))
+        .toList();
+  }
+
+  public List<RelationshipObject> findRelationshipsBySourceRef(Identifier sourceRef) {
+    return this.relationshipObjects.stream()
+        .filter(
+            sro ->
+                sro.getProperty(RelationshipObject.Properties.SOURCE_REF.toString())
+                    .equals(sourceRef))
+        .toList();
+  }
+
   private List<ObjectBase> findByIdsWithPossibleMisses(List<Identifier> ids) {
     return this.allObjects().stream()
-        .filter(
-            ob ->
-                ids.stream()
-                    .anyMatch(id -> ob.getProperty(CommonProperties.ID.toString()).equals(id)))
+        .filter(ob -> ids.stream().anyMatch(id -> ob.getId().equals(id)))
         .toList();
   }
 
