@@ -21,7 +21,7 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @Slf4j
 @Validated
-public class InjectSecurityAssessmentService {
+public class SecurityAssessmentInjectService {
 
   public static final int INJECTS_PER_TTP = 1;
   private final TagRuleService tagRuleService;
