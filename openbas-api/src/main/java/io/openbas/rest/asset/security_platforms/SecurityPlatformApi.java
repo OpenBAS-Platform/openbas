@@ -1,6 +1,5 @@
 package io.openbas.rest.asset.security_platforms;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
