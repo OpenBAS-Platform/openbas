@@ -74,7 +74,7 @@ public class SecurityAssessmentService {
     return save(securityAssessment);
   }
 
-  private SecurityAssessment getByExternalIdOrCreateSecurityAssessment(String externalId) {
+  public SecurityAssessment getByExternalIdOrCreateSecurityAssessment(String externalId) {
     return securityAssessmentRepository
         .findByExternalId(externalId)
         .orElseGet(SecurityAssessment::new);

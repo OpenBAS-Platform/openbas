@@ -116,7 +116,7 @@ public class AttackPatternService {
     return externalAttackPatternIds;
   }
 
-  private List<AttackPattern> getAttackPatternsByExternalIds(Set<String> ids) {
+  public List<AttackPattern> getAttackPatternsByExternalIds(Set<String> ids) {
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
