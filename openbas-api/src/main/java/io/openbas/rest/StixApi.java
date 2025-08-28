@@ -1,5 +1,8 @@
 package io.openbas.rest;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.StixService;
 import io.openbas.stix.parsing.ParsingException;
@@ -42,6 +45,7 @@ public class StixApi extends RestBehavior {
         description = "Invalid STIX bundle (e.g., too many security assessments)"),
     @ApiResponse(responseCode = "500", description = "Unexpected server error")
   })
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
   public ResponseEntity<String> processBundle(@RequestBody String stixJson) {
     try {
       String createdScenario = stixService.processBundle(stixJson);
