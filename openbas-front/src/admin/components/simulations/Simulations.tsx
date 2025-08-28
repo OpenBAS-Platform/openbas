@@ -99,7 +99,9 @@ const Simulations = () => {
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderExercise />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
+              <ImportUploaderExercise />
+            </Can>
           </ToggleButtonGroup>
         )}
       />
