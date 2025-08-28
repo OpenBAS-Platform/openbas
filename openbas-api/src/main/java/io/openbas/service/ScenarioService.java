@@ -89,11 +89,9 @@ public class ScenarioService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final ScenarioRepository scenarioRepository;
   private final TeamRepository teamRepository;
@@ -284,9 +282,7 @@ public class ScenarioService {
     scenario.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
-  /**
-   * Scenario is recurring AND start date is before now AND end date is after now
-   */
+  /** Scenario is recurring AND start date is before now AND end date is after now */
   public List<Scenario> recurringScenarios(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
         ScenarioSpecification.isRecurring()
@@ -294,9 +290,7 @@ public class ScenarioService {
             .and(ScenarioSpecification.recurrenceStopDateAfter(instant)));
   }
 
-  /**
-   * Scenario is recurring AND start date is before now OR stop date is before now
-   */
+  /** Scenario is recurring AND start date is before now OR stop date is before now */
   public List<Scenario> potentialOutdatedRecurringScenario(@NotNull final Instant instant) {
     return this.scenarioRepository.findAll(
         ScenarioSpecification.isRecurring()
@@ -544,12 +538,12 @@ public class ScenarioService {
     // Build the response
     String infos =
         "("
-        + (isWithTeams ? "with_teams" : "no_teams")
-        + " & "
-        + (isWithPlayers ? "with_players" : "no_players")
-        + " & "
-        + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
-        + ")";
+            + (isWithTeams ? "with_teams" : "no_teams")
+            + " & "
+            + (isWithPlayers ? "with_players" : "no_players")
+            + " & "
+            + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
+            + ")";
 
     String zipName = (scenario.getName() + "_" + now().toString()) + "_" + infos + ".zip";
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
