@@ -1,8 +1,8 @@
 package io.openbas.rest;
 
+import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.rest.StixApi.STIX_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
-import static io.openbas.service.ScenarioSecurityAssessmentService.INCIDENT_RESPONSE;
 import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @DisplayName("STIX API Integration Tests")
 class StixApiTest extends IntegrationTest {
 
+  public static final String T_1531 = "T1531";
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
 
@@ -65,7 +66,7 @@ class StixApiTest extends IntegrationTest {
     }
 
     attackPatternComposer
-        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1531"))
+        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId(T_1531))
         .persist();
     attackPatternComposer
         .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1003"))
@@ -164,7 +165,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
-      assertThat(createdScenario.getMainFocus()).isEqualTo(INCIDENT_RESPONSE);
+      assertThat(createdScenario.getMainFocus()).isEqualTo(MAIN_FOCUS_INCIDENT_RESPONSE);
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
 
@@ -174,7 +175,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityAssessment().getAttackPatternRefs()).hasSize(2);
 
       StixRefToExternalRef stixRef1 =
-          new StixRefToExternalRef("attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1", "T1531");
+          new StixRefToExternalRef("attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1", T_1531);
       StixRefToExternalRef stixRef2 =
           new StixRefToExternalRef("attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9", "T1003");
 
