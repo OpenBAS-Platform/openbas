@@ -1,5 +1,11 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.Filters.isEmptyFilterGroup;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
+import static io.openbas.utils.FilterUtilsRuntime.computeFilterGroupRuntime;
+import static java.time.Instant.now;
+
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
@@ -7,23 +13,16 @@ import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.utils.FilterUtilsJpa;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static io.openbas.database.model.Filters.isEmptyFilterGroup;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
-import static io.openbas.utils.FilterUtilsRuntime.computeFilterGroupRuntime;
-import static java.time.Instant.now;
 
 @RequiredArgsConstructor
 @Service

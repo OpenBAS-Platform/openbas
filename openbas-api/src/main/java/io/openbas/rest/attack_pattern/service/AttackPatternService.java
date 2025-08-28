@@ -1,5 +1,7 @@
 package io.openbas.rest.attack_pattern.service;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.AttackPattern;
@@ -10,6 +12,11 @@ import io.openbas.ee.Ee;
 import io.openbas.rest.attack_pattern.form.AnalysisResultFromTTPExtractionAIWebserviceOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.annotation.Resource;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -25,21 +32,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttackPatternService {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   private final Environment env;
   private final AttackPatternRepository attackPatternRepository;
@@ -50,7 +48,7 @@ public class AttackPatternService {
    * Call the TTP Extraction AI Webservice to analyze files and text input.
    *
    * @param files List of files to be analyzed, maximum 5 files.
-   * @param text  Text input to be analyzed.
+   * @param text Text input to be analyzed.
    * @return Response body from the TTP Extraction AI Webservice, expected to be a JSON array
    * @throws IOException
    */
@@ -113,7 +111,8 @@ public class AttackPatternService {
   /**
    * Extract external attack pattern IDs from the response body of the TTP Extraction AI Webservice.
    *
-   * @param responseBody The response body from the TTP Extraction AI Webservice, expected to be a JSON array
+   * @param responseBody The response body from the TTP Extraction AI Webservice, expected to be a
+   *     JSON array
    * @return Set of external attack pattern IDs extracted from the response
    * @throws IOException
    */
@@ -151,7 +150,8 @@ public class AttackPatternService {
   /**
    * Get the attack pattern IDs from the external IDs.
    *
-   * @param externalAttackPatternIds Set of external attack pattern IDs to be converted to internal IDs.
+   * @param externalAttackPatternIds Set of external attack pattern IDs to be converted to internal
+   *     IDs.
    * @return List of attack pattern IDs corresponding to the external IDs.
    */
   private List<String> getAttackPatternInternalIdsFromExternalIds(
@@ -198,7 +198,7 @@ public class AttackPatternService {
    * Validate the inputs for the TTP Extraction AI Webservice.
    *
    * @param files List of files to be analyzed, maximum 5 files.
-   * @param text  Text input to be analyzed.
+   * @param text Text input to be analyzed.
    */
   private void validateInputs(List<MultipartFile> files, String text) {
     if (files.isEmpty() && (text == null || text.isBlank())) {
@@ -213,7 +213,7 @@ public class AttackPatternService {
    * Search for attack patterns using the TTP Extraction AI Webservice.
    *
    * @param files List of files to be analyzed, maximum 5 files.
-   * @param text  Text input to be analyzed.
+   * @param text Text input to be analyzed.
    * @return List of attack pattern IDs found in the analysis.
    */
   public List<String> searchAttackPatternWithTTPAIWebservice(
@@ -233,8 +233,8 @@ public class AttackPatternService {
   // -- STIX --
 
   /**
-   * Resolves external AttackPattern references from a {@link SecurityAssessment} into internal {@link AttackPattern}
-   * entities using the {@code attackPatternService}.
+   * Resolves external AttackPattern references from a {@link SecurityAssessment} into internal
+   * {@link AttackPattern} entities using the {@code attackPatternService}.
    *
    * @param securityAssessment the security assessment containing external AttackPattern references
    * @return list of resolved internal AttackPattern entities
@@ -242,9 +242,9 @@ public class AttackPatternService {
   public Map<String, AttackPattern> fetchInternalAttackPatternIdsFromSecurityAssessment(
       SecurityAssessment securityAssessment) {
     return getAttackPatternsByExternalIds(
-        securityAssessment.getAttackPatternRefs().stream()
-            .map(StixRefToExternalRef::getExternalRef)
-            .collect(Collectors.toSet()))
+            securityAssessment.getAttackPatternRefs().stream()
+                .map(StixRefToExternalRef::getExternalRef)
+                .collect(Collectors.toSet()))
         .stream()
         .collect(Collectors.toMap(attack -> attack.getId(), Function.identity()));
   }
