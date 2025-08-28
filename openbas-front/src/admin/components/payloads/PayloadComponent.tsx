@@ -1,26 +1,25 @@
-import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { AttachmentOutlined } from '@mui/icons-material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
+import { type DocumentHelper } from '../../../actions/helper';
+import { fetchDocumentsPayload } from '../../../actions/payloads/payload-actions';
+import AttackPatternChip from '../../../components/AttackPatternChip';
 import { useFormatter } from '../../../components/i18n';
 import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
 import { type AttackPattern, type Command, type DnsResolution, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../utils/String';
+import DocumentType from '../components/documents/DocumentType';
 
 const useStyles = makeStyles()(theme => ({
-  chip: {
-    fontSize: 12,
-    height: 25,
-    margin: '0 7px 7px 0',
-    textTransform: 'uppercase',
-    borderRadius: 4,
-    width: 180,
-  },
   payloadContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -32,8 +31,35 @@ const useStyles = makeStyles()(theme => ({
     gridTemplateColumns: '1fr 1fr',
     gap: theme.spacing(2),
   },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
 
 }));
+const inlineStyles: Record<string, CSSProperties> = {
+  document_icon: {
+    float: 'left',
+    width: '5%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_name: {
+    float: 'left',
+    width: '45%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
 
 interface Props { selectedPayload: PayloadType | null }
 
@@ -42,8 +68,14 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const { attackPatternsMap }: { attackPatternsMap: ReturnType<AttackPatternHelper['getAttackPatternsMap']> } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
+  const { documentsMap } = useHelper((helper: DocumentHelper) => ({ documentsMap: helper.getDocumentsMap() }));
+
+  useDataLoader(() => {
+    dispatch(fetchDocumentsPayload(selectedPayload?.payload_id as string));
+  });
 
   const getAttackCommand = (payload: PayloadType | null): string => {
     if (!payload) return '';
@@ -51,9 +83,9 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
     switch (payload.payload_type) {
       case 'Command':
         return (payload as Command).command_content || '';
-      case 'Dns':
+      case 'DnsResolution':
         return (payload as DnsResolution).dns_resolution_hostname || '';
-      case 'File':
+      case 'FileDrop':
         return (payload as FileDrop).file_drop_file || '';
       case 'Executable':
         return (payload as Executable).executable_file || '';
@@ -97,14 +129,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
             </Typography>
 
             {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap?.[attackPatternId]).map((attackPattern: AttackPattern) => (
-              <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
-                <Chip
-                  variant="outlined"
-                  classes={{ root: classes.chip }}
-                  color="primary"
-                  label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
-                />
-              </Tooltip>
+              <AttackPatternChip key={attackPattern.attack_pattern_id} attackPattern={attackPattern}></AttackPatternChip>
             ))}
           </div>
 
@@ -138,20 +163,34 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               {emptyFilled(selectedPayload?.payload_external_id)}
             </Typography>
           </div>
-        </div>
-        <div>
-          <Typography
-            variant="h3"
-            gutterBottom
-          >
-            {t('Tags')}
-          </Typography>
-          <ItemTags
-            variant="reduced-view"
-            tags={selectedPayload?.payload_tags}
-          />
-        </div>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Tags')}
+            </Typography>
+            <ItemTags
+              variant="reduced-view"
+              tags={selectedPayload?.payload_tags}
+            />
+          </div>
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Type')}
+            </Typography>
 
+            <Typography
+              variant="body2"
+              gutterBottom
+            >
+              {t(emptyFilled(selectedPayload?.payload_type))}
+            </Typography>
+          </div>
+        </div>
         {selectedPayload?.payload_type === 'Command' && (
           <>
             <div>
@@ -180,6 +219,62 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               </pre>
             </div>
           </>
+        )}
+        {selectedPayload?.payload_type === 'FileDrop' && (
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('File to drop')}
+            </Typography>
+
+            <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
+            <div className={classes.bodyItem} style={inlineStyles.document_name}>
+              {documentsMap[selectedPayload.file_drop_file]?.document_name}
+            </div>
+            <div className={classes.bodyItem} style={inlineStyles.document_type}>
+              <DocumentType type={documentsMap[selectedPayload.file_drop_file]?.document_type} variant="list" />
+            </div>
+
+          </div>
+        )}
+        {selectedPayload?.payload_type === 'DnsResolution' && (
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Hostname')}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              gutterBottom
+            >
+              {selectedPayload.dns_resolution_hostname}
+
+            </Typography>
+          </div>
+        )}
+        {selectedPayload?.payload_type === 'Executable' && (
+          <div>
+            <Typography
+              variant="h3"
+              gutterBottom
+            >
+              {t('Executable file')}
+            </Typography>
+
+            <div style={inlineStyles.document_icon}><AttachmentOutlined /></div>
+            <div className={classes.bodyItem} style={inlineStyles.document_name}>
+              {documentsMap[selectedPayload.executable_file]?.document_name}
+            </div>
+            <div className={classes.bodyItem} style={inlineStyles.document_type}>
+              <DocumentType type={documentsMap[selectedPayload.executable_file]?.document_type} variant="list" />
+            </div>
+
+          </div>
         )}
         <div>
           <Typography
@@ -314,7 +409,6 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
 
         </div>
       </div>
-
     </>
   );
 };

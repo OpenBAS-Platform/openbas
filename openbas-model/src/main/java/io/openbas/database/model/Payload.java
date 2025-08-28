@@ -49,11 +49,15 @@ import org.hibernate.annotations.UuidGenerator;
       NetworkTraffic.class
     },
     discriminatorMapping = {
-      @DiscriminatorMapping(value = "Command", schema = Command.class),
-      @DiscriminatorMapping(value = "Executable", schema = Executable.class),
-      @DiscriminatorMapping(value = "File", schema = FileDrop.class),
-      @DiscriminatorMapping(value = "Dns", schema = DnsResolution.class),
-      @DiscriminatorMapping(value = "Network", schema = NetworkTraffic.class)
+      @DiscriminatorMapping(value = Command.COMMAND_TYPE, schema = Command.class),
+      @DiscriminatorMapping(value = Executable.EXECUTABLE_TYPE, schema = Executable.class),
+      @DiscriminatorMapping(value = FileDrop.FILE_DROP_TYPE, schema = FileDrop.class),
+      @DiscriminatorMapping(
+          value = DnsResolution.DNS_RESOLUTION_TYPE,
+          schema = DnsResolution.class),
+      @DiscriminatorMapping(
+          value = NetworkTraffic.NETWORK_TRAFFIC_TYPE,
+          schema = NetworkTraffic.class)
     })
 public class Payload implements Base {
 
@@ -263,6 +267,10 @@ public class Payload implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.PAYLOAD;
 
   public Payload() {}
 

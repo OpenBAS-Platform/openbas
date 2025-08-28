@@ -24,10 +24,7 @@ const EndpointHeader = () => {
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
   // Fetching data
-  const { userAdmin, endpoint } = useHelper((helper: EndpointHelper & UserHelper) => ({
-    userAdmin: helper.getMeAdmin(),
-    endpoint: helper.getEndpoint(endpointId),
-  }));
+  const { endpoint } = useHelper((helper: EndpointHelper & UserHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
 
   return (
     <>
@@ -41,17 +38,15 @@ const EndpointHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {userAdmin && (
-          <EndpointPopover
-            endpoint={{
-              ...endpoint,
-              type: 'static',
-            }}
-            agentless={endpoint.asset_agents.length === 0}
-            onUpdate={() => endpoint}
-            onDelete={() => navigate('/admin/assets/endpoints')}
-          />
-        )}
+        <EndpointPopover
+          endpoint={{
+            ...endpoint,
+            type: 'static',
+          }}
+          agentless={endpoint.asset_agents.length === 0}
+          onUpdate={() => endpoint}
+          onDelete={() => navigate('/admin/assets/endpoints')}
+        />
       </div>
       <div className="clearfix" />
     </>

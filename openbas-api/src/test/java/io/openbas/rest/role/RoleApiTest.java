@@ -17,6 +17,8 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
@@ -36,10 +38,15 @@ public class RoleApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private RoleRepository roleRepository;
+  @Autowired private RoleRepository groupRepository;
+
+  Set<String> roleToDelete = new HashSet<>();
 
   @AfterEach
   void afterEach() {
-    roleRepository.deleteAll();
+
+    roleToDelete.stream().forEach(roleId -> roleRepository.deleteById(roleId));
+    roleToDelete = new HashSet<>();
   }
 
   @Test
@@ -63,12 +70,15 @@ public class RoleApiTest extends IntegrationTest {
             .getResponse()
             .getContentAsString();
     // -- ASSERT --
+    String roleId = JsonPath.read(response, "$.role_id");
     assertNotNull(response);
     assertEquals(roleName, JsonPath.read(response, "$.role_name"));
     List<String> capabilitiesJson = JsonPath.read(response, "$.role_capabilities");
     Set<Capability> responseCapabilities =
         capabilitiesJson.stream().map(Capability::valueOf).collect(Collectors.toSet());
     assertEquals(capabilities, responseCapabilities);
+
+    roleToDelete.add(roleId);
   }
 
   @Test
@@ -92,6 +102,8 @@ public class RoleApiTest extends IntegrationTest {
     assertEquals(
         expectedRole.getCapabilities(),
         capabilitiesJson.stream().map(Capability::valueOf).collect(Collectors.toSet()));
+
+    roleToDelete.add(expectedRole.getId());
   }
 
   @Test
@@ -120,6 +132,8 @@ public class RoleApiTest extends IntegrationTest {
     assertEquals(
         savedRole.getCapabilities(),
         capabilitiesJson.stream().map(Capability::valueOf).collect(Collectors.toSet()));
+
+    roleToDelete.add(savedRole.getId());
   }
 
   @Test
@@ -159,8 +173,8 @@ public class RoleApiTest extends IntegrationTest {
             .getContentAsString();
 
     assertEquals(Integer.valueOf(2), JsonPath.read(response, "$.numberOfElements"));
-    assertEquals(Integer.valueOf(4), JsonPath.read(response, "$.totalElements"));
-    ;
+
+    roleToDelete.addAll(List.of(role1.getId(), role2.getId(), role3.getId(), role4.getId()));
   }
 
   @Test
@@ -170,6 +184,9 @@ public class RoleApiTest extends IntegrationTest {
     Role role2 = roleRepository.save(RoleFixture.getRole());
     Role role3 = roleRepository.save(RoleFixture.getRole());
     Role role4 = roleRepository.save(RoleFixture.getRole());
+
+    Set<String> expectedRoleIds =
+        Set.of(role1.getId(), role2.getId(), role3.getId(), role4.getId());
     String response =
         mvc.perform(
                 get(ROLE_URI)
@@ -180,8 +197,15 @@ public class RoleApiTest extends IntegrationTest {
             .getResponse()
             .getContentAsString();
     assertNotNull(response);
-    List<Object> tagRuleList = JsonPath.read(response, "$");
-    assertEquals(4, tagRuleList.size());
+
+    List<Map<String, Object>> roleList = JsonPath.read(response, "$");
+    Set<String> returnedRoleIds =
+        roleList.stream()
+            .map(item -> Objects.toString(item.get("role_id"), null))
+            .collect(Collectors.toSet());
+    assertTrue(returnedRoleIds.containsAll(expectedRoleIds));
+
+    roleToDelete.addAll(expectedRoleIds);
   }
 
   @Test

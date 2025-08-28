@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
-import { type UserHelper } from '../../../actions/helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
@@ -11,8 +10,9 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
 import { type AtomicTestingInput, type FilterGroup, type InjectResultOverviewOutput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import { TeamContext } from '../common/Context';
 import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
@@ -23,8 +23,6 @@ const AtomicTestings = () => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
-
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const onCreateAtomicTesting = async (data: AtomicTestingInput) => {
     const toCreate = R.pipe(
@@ -72,7 +70,8 @@ const AtomicTestings = () => {
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}
       />
-      {userAdmin && (
+
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ATOMIC_TESTING}>
         <>
           <ButtonCreate onClick={() => setOpenCreateDrawer(true)} />
           <TeamContext.Provider value={teamContextForAtomicTesting()}>
@@ -85,7 +84,7 @@ const AtomicTestings = () => {
             />
           </TeamContext.Provider>
         </>
-      )}
+      </Can>
     </>
   );
 };

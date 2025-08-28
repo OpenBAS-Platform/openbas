@@ -6,7 +6,6 @@ import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
-import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -16,8 +15,9 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
-import { useHelper } from '../../../../store';
 import { type SearchPaginationInput, type SecurityPlatform } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { isNotEmptyField } from '../../../../utils/utils';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
@@ -56,9 +56,6 @@ const SecurityPlatforms = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = [
@@ -223,7 +220,10 @@ const SecurityPlatforms = () => {
               );
             })}
       </List>
-      {userAdmin && <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.SECURITY_PLATFORMS}>
+        <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />
+      </Can>
+
     </>
   );
 };

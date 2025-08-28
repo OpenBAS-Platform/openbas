@@ -1,11 +1,8 @@
-import { Autocomplete, Checkbox, TextField, Tooltip } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useEffect } from 'react';
 
-import type { GroupOption, Option } from '../../utils/Option';
 import { SIMULATIONS } from '../common/queryable/filter/constants';
-import useSearchOptions from '../common/queryable/filter/useSearchOptions';
-import { useFormatter } from '../i18n';
+import useSearchOptions, { type SearchOptionsConfig } from '../common/queryable/filter/useSearchOptions';
+import AutocompleteField from './AutocompleteField';
 
 interface Props {
   label: string;
@@ -14,93 +11,30 @@ interface Props {
   onChange: (value: string | undefined) => void;
   required?: boolean;
   error?: boolean;
-  defaultOptions?: GroupOption[];
+  searchOptionsConfig?: SearchOptionsConfig;
 }
 
-const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, defaultOptions = [] }) => {
-  const { t } = useFormatter();
-  const theme = useTheme();
-
+const SimulationField: FunctionComponent<Props> = ({ label, value, onChange, className = '', required = false, error = false, searchOptionsConfig }) => {
   const { options, searchOptions } = useSearchOptions();
+  const finalSearchOptionsConfig = {
+    filterKey: searchOptionsConfig?.filterKey ?? SIMULATIONS,
+    contextId: searchOptionsConfig?.contextId,
+    defaultValues: searchOptionsConfig?.defaultValues,
+  };
   useEffect(() => {
-    searchOptions(SIMULATIONS, '', '', defaultOptions);
+    searchOptions(finalSearchOptionsConfig, '');
   }, []);
 
-  const [currentValue, setCurrentValue] = useState<string | undefined>(value);
-
-  useEffect(() => {
-    setCurrentValue(value);
-  }, [value]);
-
-  const selectedOption = useMemo(() => {
-    if (!currentValue || options.length === 0) return null;
-    return options.find(o => o.id === currentValue) || null;
-  }, [currentValue, options]);
-
-  const handleValue = (optionId: string | undefined) => {
-    const newValue = currentValue === optionId ? undefined : optionId;
-    setCurrentValue(newValue);
-    onChange(newValue);
-  };
-
   return (
-    <Autocomplete
-      selectOnFocus
+    <AutocompleteField
+      label={label}
       className={className}
-      groupBy={(option: GroupOption | Option) => 'group' in option ? option.group : ''}
-      openOnFocus
-      autoHighlight
-      noOptionsText={t('No available options')}
+      value={value}
+      onChange={onChange}
+      required={required}
+      error={error}
       options={options}
-      getOptionLabel={option => option.label ?? ''}
-      value={selectedOption}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      onInputChange={(_, search, reason) => {
-        if (reason === 'input') {
-          searchOptions(SIMULATIONS, search);
-        }
-      }}
-      onChange={(_, newValue) => {
-        const newId = newValue?.id ?? undefined;
-        handleValue(newId);
-      }}
-      renderInput={paramsInput => (
-        <TextField
-          {...paramsInput}
-          error={error}
-          label={label}
-          variant="outlined"
-          size="small"
-          required={required}
-        />
-      )}
-      renderOption={(props, option) => {
-        const checked = currentValue === option.id;
-        return (
-          <Tooltip title={option.label}>
-            <li
-              {...props}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.stopPropagation();
-                }
-              }}
-              key={option.id}
-              onClick={() => handleValue(option.id)}
-              style={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                padding: 0,
-                margin: 0,
-              }}
-            >
-              <Checkbox checked={checked} />
-              <span style={{ padding: `0 ${theme.spacing(1)} 0 ${theme.spacing(1)}` }}>{option.label}</span>
-            </li>
-          </Tooltip>
-        );
-      }}
+      onInputChange={(search: string) => searchOptions(finalSearchOptionsConfig, search)}
     />
   );
 };

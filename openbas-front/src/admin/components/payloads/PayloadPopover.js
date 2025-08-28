@@ -14,6 +14,8 @@ import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
+import { Can } from '../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types.js';
 import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
 
@@ -144,10 +146,16 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
-        <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+          <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
+        </Can>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+          <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
+        </Can>
         <MenuItem onClick={handleExportJsonSingle}>{t('Export')}</MenuItem>
-        <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
+        <Can I={ACTIONS.DELETE} a={SUBJECTS.PAYLOADS}>
+          <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
+        </Can>
       </Menu>
       <DialogDelete
         open={deletion}

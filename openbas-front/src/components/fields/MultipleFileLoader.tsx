@@ -1,13 +1,14 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
-import { PermissionsContext } from '../../admin/components/common/Context';
 import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
+import { Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { useFormatter } from '../i18n';
 import FileTransferDialog from './FileTransferDialog';
 
@@ -39,7 +40,6 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { permissions } = useContext(PermissionsContext);
   const [open, setOpen] = useState(false);
 
   useDataLoader(() => {
@@ -60,20 +60,22 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
 
   return (
     <>
-      <ListItemButton
-        divider
-        onClick={handleOpen}
-        color="primary"
-        disabled={permissions.readOnly || disabled}
-      >
-        <ListItemIcon color="primary">
-          <ControlPointOutlined color="primary" />
-        </ListItemIcon>
-        <ListItemText
-          primary={t('Add documents')}
-          classes={{ primary: classes.text }}
-        />
-      </ListItemButton>
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.DOCUMENTS}>
+        <ListItemButton
+          divider
+          onClick={handleOpen}
+          color="primary"
+          disabled={disabled}
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Add documents')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItemButton>
+      </Can>
       <FileTransferDialog
         label={t('Add documents')}
         open={open}

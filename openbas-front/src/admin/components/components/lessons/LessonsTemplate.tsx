@@ -11,6 +11,8 @@ import { useHelper } from '../../../../store';
 import { type LessonsTemplateCategory, type LessonsTemplateQuestion } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategoryPopover';
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
@@ -32,18 +34,15 @@ const LessonsTemplate = () => {
 
   // Datas
   const {
-    userAdmin,
     categories,
     questions,
   }: {
-    userAdmin: boolean;
     categories: LessonsTemplateCategory[];
     questions: LessonsTemplateQuestion[];
   } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
       questions: helper.getLessonsTemplateQuestions(),
-      userAdmin: helper.getMeAdmin(),
     };
   });
   useDataLoader(() => {
@@ -105,19 +104,22 @@ const LessonsTemplate = () => {
                       </ListItemButton>
                     );
                   })}
-                  <CreateLessonsTemplateQuestion
-                    lessonsTemplateId={lessonsTemplateId}
-                    lessonsTemplateCategoryId={category.lessonstemplatecategory_id}
-                  />
+                  <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
+                    <CreateLessonsTemplateQuestion
+                      lessonsTemplateId={lessonsTemplateId}
+                      lessonsTemplateCategoryId={category.lessonstemplatecategory_id}
+                    />
+                  </Can>
+
                 </List>
               </Paper>
             </GridLegacy>
           );
         })}
       </GridLegacy>
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
         <CreateLessonsTemplateCategory lessonsTemplateId={lessonsTemplateId} />
-      )}
+      </Can>
     </>
   );
 };

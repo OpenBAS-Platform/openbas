@@ -7,6 +7,7 @@ import static org.springframework.util.StringUtils.hasText;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.SpecificationUtils;
+import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +37,12 @@ public class FullTextSearchService<T extends Base> {
   private final OrganizationRepository organizationRepository;
   private final ScenarioRepository scenarioRepository;
   private final ExerciseRepository exerciseRepository;
+  private final UserService userService;
 
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
   private Map<Class<T>, List<String>> searchListByClassMap;
+  private Map<Class<T>, Optional<Capability>> capaByClassMap;
 
   @PostConstruct
   @SuppressWarnings("unchecked")
@@ -70,17 +74,52 @@ public class FullTextSearchService<T extends Base> {
             List.of("name", "id"),
             (Class<T>) Exercise.class,
             List.of("name", "id"));
+
+    this.capaByClassMap =
+        Map.of(
+            (Class<T>) Asset.class,
+            Capability.of(ResourceType.ASSET, Action.SEARCH),
+            (Class<T>) AssetGroup.class,
+            Capability.of(ResourceType.ASSET_GROUP, Action.SEARCH),
+            (Class<T>) User.class,
+            Capability.of(ResourceType.USER, Action.SEARCH),
+            (Class<T>) Team.class,
+            Capability.of(ResourceType.TEAM, Action.SEARCH),
+            (Class<T>) Organization.class,
+            Capability.of(ResourceType.ORGANIZATION, Action.SEARCH),
+            (Class<T>) Scenario.class,
+            Capability.of(ResourceType.SCENARIO, Action.SEARCH),
+            (Class<T>) Exercise.class,
+            Capability.of(ResourceType.SIMULATION, Action.SEARCH));
+
+    validateMapKeys();
+  }
+
+  /** Ensure that the map have all the same classes, in case we forget when adding a new class. */
+  private void validateMapKeys() {
+    Set<Class<T>> keys1 = repositoryMap.keySet();
+    Set<Class<T>> keys2 = searchListByClassMap.keySet();
+    Set<Class<T>> keys3 = capaByClassMap.keySet();
+
+    if (!keys1.equals(keys2) || !keys1.equals(keys3)) {
+      throw new IllegalStateException("All maps must have the same keys");
+    }
+  }
+
+  private PageImpl<FullTextSearchResult> generateEmptyResult(
+      final SearchPaginationInput searchPaginationInput) {
+    Pageable pageable =
+        PageRequest.of(
+            searchPaginationInput.getPage(),
+            searchPaginationInput.getSize(),
+            toSortRuntime(searchPaginationInput.getSorts()));
+    return new PageImpl<>(Collections.emptyList(), pageable, 0);
   }
 
   public Page<FullTextSearchResult> fullTextSearch(
       @NotBlank final Class<?> clazz, @NotNull final SearchPaginationInput searchPaginationInput) {
     if (!hasText(searchPaginationInput.getTextSearch())) {
-      Pageable pageable =
-          PageRequest.of(
-              searchPaginationInput.getPage(),
-              searchPaginationInput.getSize(),
-              toSortRuntime(searchPaginationInput.getSorts()));
-      return new PageImpl<>(Collections.emptyList(), pageable, 0);
+      return generateEmptyResult(searchPaginationInput);
     }
 
     Class<T> clazzT =
@@ -90,15 +129,35 @@ public class FullTextSearchService<T extends Base> {
             .orElseThrow(
                 () -> new IllegalArgumentException(clazz + " is not handle by full text search"));
 
+    User currentUser = userService.currentUser();
+    // Check if the principal has the right to search this class
+    Capability capaForClass = capaByClassMap.get(clazzT).orElse(Capability.BYPASS);
+    boolean isGrantable = clazzT.getAnnotation(Grantable.class) != null;
+
+    if (!currentUser.isAdminOrBypass() && capaForClass != Capability.BYPASS && !isGrantable) {
+      // We can't really use the PermissionService.hasPermission method here because it would
+      // require a mapping between classes and resourceType
+      if (!currentUser.getCapabilities().contains(Capability.BYPASS)
+          && !currentUser.getCapabilities().contains(capaForClass)) {
+        return generateEmptyResult(searchPaginationInput);
+      }
+    }
+
     JpaSpecificationExecutor<T> repository = repositoryMap.get(clazzT);
 
     String finalSearchTerm = getFinalSearchTerm(searchPaginationInput.getTextSearch());
 
-    return buildPaginationJPA(
-            repository::findAll,
-            searchPaginationInput,
-            clazzT,
-            SpecificationUtils.fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT)))
+    // Specification building
+    Specification<T> specs =
+        SpecificationUtils.<T>fullTextSearch(finalSearchTerm, searchListByClassMap.get(clazzT))
+            .and(
+                SpecificationUtils.hasGrantAccess(
+                    currentUser.getId(),
+                    currentUser.isAdminOrBypass(),
+                    currentUser.getCapabilities().contains(capaForClass),
+                    Grant.GRANT_TYPE.OBSERVER));
+
+    return buildPaginationJPA(repository::findAll, searchPaginationInput, clazzT, specs)
         .map(this::transform);
   }
 
@@ -171,6 +230,13 @@ public class FullTextSearchService<T extends Base> {
     return null;
   }
 
+  /**
+   * Perform a full text search on all classes and only return the counts for each class. To get the
+   * results, use the {@link #fullTextSearch(Class, SearchPaginationInput)}
+   *
+   * @param searchTerm the search term to use
+   * @return a map of class type to the count of results for that class
+   */
   @SuppressWarnings("unchecked")
   public Map<Class<T>, FullTextSearchCountResult> fullTextSearch(
       @Nullable final String searchTerm) {
@@ -192,13 +258,40 @@ public class FullTextSearchService<T extends Base> {
     Map<Class<T>, FullTextSearchCountResult> results = new HashMap<>();
     String finalSearchTerm = getFinalSearchTerm(searchTerm);
 
-    repositoryMap.forEach(
-        (className, repository) -> {
-          long count =
-              repository.count(
-                  SpecificationUtils.fullTextSearch(
-                      finalSearchTerm, searchListByClassMap.get(className)));
-          results.put(className, new FullTextSearchCountResult(className.getSimpleName(), count));
+    User currentUser = userService.currentUser();
+    // Only search classes that the user has access to
+    Set<Class<T>> classesToSearch;
+    if (currentUser.isAdminOrBypass()) {
+      classesToSearch = new HashSet<>(repositoryMap.keySet());
+    } else {
+
+      classesToSearch = new HashSet<>();
+      for (Map.Entry<Class<T>, Optional<Capability>> entry : capaByClassMap.entrySet()) {
+        Capability capaForClass = entry.getValue().orElse(Capability.BYPASS);
+        if (currentUser.getCapabilities().contains(capaForClass)
+            || Capability.BYPASS.equals(capaForClass)) {
+          classesToSearch.add(entry.getKey());
+        }
+      }
+    }
+
+    classesToSearch.forEach(
+        tClass -> {
+          JpaSpecificationExecutor<T> repository = repositoryMap.get(tClass);
+          // Specification building
+          Specification<T> specs =
+              SpecificationUtils.<T>fullTextSearch(
+                      finalSearchTerm, searchListByClassMap.get(tClass))
+                  .and(
+                      SpecificationUtils.hasGrantAccess(
+                          currentUser.getId(),
+                          currentUser.isAdminOrBypass(),
+                          currentUser
+                              .getCapabilities()
+                              .contains(capaByClassMap.get(tClass).orElse(Capability.BYPASS)),
+                          Grant.GRANT_TYPE.OBSERVER));
+          long count = repository.count(specs);
+          results.put(tClass, new FullTextSearchCountResult(tClass.getSimpleName(), count));
         });
 
     return results;

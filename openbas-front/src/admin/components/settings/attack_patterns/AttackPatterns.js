@@ -11,6 +11,8 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import AttackPatternPopover from './AttackPatternPopover';
 import CreateAttackPattern from './CreateAttackPattern';
@@ -201,9 +203,11 @@ const AttackPatterns = () => {
             </ListItem>
           ))}
         </List>
-        <CreateAttackPattern
-          onCreate={result => setAttackPatterns([result, ...attackPatterns])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateAttackPattern
+            onCreate={result => setAttackPatterns([result, ...attackPatterns])}
+          />
+        </Can>
       </div>
       <TaxonomiesMenu />
     </div>

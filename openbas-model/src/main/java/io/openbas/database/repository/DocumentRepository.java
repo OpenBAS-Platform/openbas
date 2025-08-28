@@ -59,6 +59,99 @@ public interface DocumentRepository
 
   @Query(
       value =
+          """
+        select d.*,
+               array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+               array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+               array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+        from documents d
+        left join exercises_documents exdoc on d.document_id = exdoc.document_id
+        left join exercises ex on ex.exercise_id = exdoc.exercise_id
+        left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+        left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+        left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+        left join tags tg on tg.tag_id = tagdoc.tag_id
+        left join channels chl_light on d.document_id = chl_light.channel_logo_light
+        left join channels chl_dark  on d.document_id = chl_dark.channel_logo_dark
+        where chl_light.channel_id = :channelId
+           or chl_dark.channel_id  = :channelId
+        group by d.document_id
+        order by d.document_id desc
+        """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByChannelId(@Param("channelId") String channelId);
+
+  @Query(
+      value =
+          """
+                select d.*,
+                       array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                       array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                       array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                from documents d
+                left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                left join tags tg on tg.tag_id = tagdoc.tag_id
+                left join assets sp_light on d.document_id = sp_light.security_platform_logo_light
+                left join assets sp_dark  on d.document_id = sp_dark.security_platform_logo_dark
+                where sp_light.asset_id = :securityPlatformId
+                   or sp_dark.asset_id  = :securityPlatformId
+                group by d.document_id
+                order by d.document_id desc
+                """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsBySecurityPlatformId(
+      @Param("securityPlatformId") String securityPlatformId);
+
+  @Query(
+      value =
+          """
+                        select d.*,
+                               array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                               array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                               array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                        from documents d
+                        left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                        left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                        left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                        left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                        left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                        left join tags tg on tg.tag_id = tagdoc.tag_id
+                        left join challenges_documents chdoc on d.document_id = chdoc.document_id
+                        where chdoc.challenge_id = :challengeId
+                        group by d.document_id
+                        order by d.document_id desc
+                        """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByChallengeId(@Param("challengeId") String challengeId);
+
+  @Query(
+      value =
+          """
+                                select d.*,
+                                       array_remove(array_agg(tg.tag_id), NULL) as document_tags,
+                                       array_remove(array_agg(ex.exercise_id), NULL) as document_exercises,
+                                       array_remove(array_agg(sc.scenario_id), NULL) as document_scenarios
+                                from documents d
+                                left join exercises_documents exdoc on d.document_id = exdoc.document_id
+                                left join exercises ex on ex.exercise_id = exdoc.exercise_id
+                                left join scenarios_documents scdoc on d.document_id = scdoc.document_id
+                                left join scenarios sc on sc.scenario_id = scdoc.scenario_id
+                                left join documents_tags tagdoc on d.document_id = tagdoc.document_id
+                                left join tags tg on tg.tag_id = tagdoc.tag_id
+                                left join payloads pa on d.document_id = pa.file_drop_file
+                                where pa.payload_id = :payloadId
+                                group by d.document_id
+                                order by d.document_id desc
+                                """,
+      nativeQuery = true)
+  List<RawDocument> rawAllDocumentsByPayloadId(@Param("payloadId") String payloadId);
+
+  @Query(
+      value =
           "select d.*, "
               + "array_remove(array_agg(tg.tag_id), NULL) as document_tags, "
               + "array_remove(array_agg(ex.exercise_id), NULL) as document_exercises, "
@@ -84,4 +177,60 @@ public interface DocumentRepository
   @NotNull
   @EntityGraph(value = "Document.tags-scenarios-exercises", type = EntityGraph.EntityGraphType.LOAD)
   Page<Document> findAll(@NotNull Specification<Document> spec, @NotNull Pageable pageable);
+
+  @Query(
+      value =
+          "SELECT DISTINCT d.* FROM documents d "
+              + "WHERE d.document_id IN ("
+              + "  SELECT ad.document_id FROM articles_documents ad "
+              + "  JOIN articles a ON a.article_id = ad.article_id "
+              + "  WHERE a.article_scenario = :scenarioId "
+              + "  UNION "
+              + "  SELECT id.document_id FROM injects_documents id "
+              + "  JOIN injects i ON i.inject_id = id.inject_id "
+              + "  WHERE i.inject_scenario = :scenarioId "
+              + "  UNION "
+              + "  SELECT cd.document_id FROM challenges_documents cd "
+              + "  WHERE cd.challenge_id IN ("
+              + "    SELECT DISTINCT challenge_id FROM ("
+              + "      SELECT jsonb_array_elements_text(i.inject_content::jsonb->'challenges')::varchar as challenge_id "
+              + "      FROM injects i "
+              + "      WHERE i.inject_scenario = :scenarioId "
+              + "      AND i.inject_content IS NOT NULL "
+              + "      AND (i.inject_content::jsonb->'challenges') IS NOT NULL " // Check if key
+              // exists
+              + "      AND jsonb_typeof(i.inject_content::jsonb->'challenges') = 'array'"
+              + "    ) challenges"
+              + "  )"
+              + ")",
+      nativeQuery = true)
+  List<Document> findAllDistinctByScenarioId(@Param("scenarioId") String scenarioId);
+
+  @Query(
+      value =
+          "SELECT DISTINCT d.* FROM documents d "
+              + "WHERE d.document_id IN ("
+              + "  SELECT ad.document_id FROM articles_documents ad "
+              + "  JOIN articles a ON a.article_id = ad.article_id "
+              + "  WHERE a.article_exercise = :simulationId "
+              + "  UNION "
+              + "  SELECT id.document_id FROM injects_documents id "
+              + "  JOIN injects i ON i.inject_id = id.inject_id "
+              + "  WHERE i.inject_exercise = :simulationId "
+              + "  UNION "
+              + "  SELECT cd.document_id FROM challenges_documents cd "
+              + "  WHERE cd.challenge_id IN ("
+              + "    SELECT DISTINCT challenge_id FROM ("
+              + "      SELECT jsonb_array_elements_text(i.inject_content::jsonb->'challenges')::varchar as challenge_id "
+              + "      FROM injects i "
+              + "      WHERE i.inject_exercise = :simulationId "
+              + "      AND i.inject_content IS NOT NULL "
+              + "      AND (i.inject_content::jsonb->'challenges') IS NOT NULL " // Check if key
+              // exists
+              + "      AND jsonb_typeof(i.inject_content::jsonb->'challenges') = 'array'"
+              + "    ) challenges"
+              + "  )"
+              + ")",
+      nativeQuery = true)
+  List<Document> findAllDistinctBySimulationId(@Param("simulationId") String simulationId);
 }

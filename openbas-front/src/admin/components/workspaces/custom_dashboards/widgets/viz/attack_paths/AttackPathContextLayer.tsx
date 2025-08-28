@@ -28,7 +28,7 @@ const AttackPathContextLayer = ({ attackPathsData, widgetId, widgetConfig }: Pro
 
   const simulationParamIdFromSerie = (((widgetConfig.series[0] || []).filter?.filters || []).find(f => f.key == 'base_simulation_side')?.values ?? [])[0];
   const dashboardParameterId = customDashboard?.custom_dashboard_parameters?.find(p => p.custom_dashboards_parameter_type === 'simulation' && p.custom_dashboards_parameter_id === simulationParamIdFromSerie)?.custom_dashboards_parameter_id;
-  const simulationIdContext = dashboardParameterId == simulationParamIdFromSerie ? customDashboardParameters[dashboardParameterId] : simulationParamIdFromSerie;
+  const simulationIdContext = dashboardParameterId == simulationParamIdFromSerie ? customDashboardParameters[dashboardParameterId].value : simulationParamIdFromSerie;
 
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(simulationIdContext) }));
 

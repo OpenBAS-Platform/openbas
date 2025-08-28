@@ -8,6 +8,8 @@ import type { PropertySchemaDTO } from '../../../../../../../utils/api-types';
 import type { Widget } from '../../../../../../../utils/api-types-custom';
 import { type GroupOption } from '../../../../../../../utils/Option';
 import { getBaseEntities, type WidgetInputWithoutLayout } from '../../WidgetUtils';
+import WidgetConfigDateAttributeController from '../common/WidgetConfigDateAttributeController';
+import WidgetConfigTimeRangeController from '../common/WidgetConfigTimeRangeController';
 import getEntityPropertiesListOptions from '../EntityPropertiesListOptions';
 import WidgetColumnsCustomizationInput from './WidgetColumnsCustomizationInput';
 
@@ -58,8 +60,8 @@ const ListWidgetParameters = (props: Props) => {
       });
       setPropertySelection(finalOptions);
       const newCols = finalOptions
-      // we will hide all "side" columns unless it is the tags column
-        .filter(o => !o.id.endsWith('_side') || o.id === 'base_tags_side')
+      // we will hide all "side" columns unless it is the tags column or attack patterns column
+        .filter(o => !o.id.endsWith('_side') || o.id === 'base_tags_side' || o.id === 'base_attack_patterns_side')
         .map((d) => {
           return {
             attribute: d.id,
@@ -154,6 +156,9 @@ const ListWidgetParameters = (props: Props) => {
           />
         )}
       />
+
+      <WidgetConfigDateAttributeController widgetType={props.widgetType} />
+      <WidgetConfigTimeRangeController />
       <Controller
         control={props.control}
         name="widget_config.columns"

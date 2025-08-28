@@ -1,7 +1,7 @@
 import { AddOutlined, RouteOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import * as R from 'ramda';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
@@ -14,6 +14,8 @@ import { useHelper } from '../../store';
 import { type AttackPattern, type AttackPatternCreateInput } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import { type Option } from '../../utils/Option';
+import { AbilityContext, Can } from '../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../utils/permissions/types';
 import { useFormatter } from '../i18n';
 
 const useStyles = makeStyles()(theme => ({
@@ -43,12 +45,12 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const ability = useContext(AbilityContext);
 
   // Fetching data
-  const { attackPatterns, killChainPhasesMap, userAdmin } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & UserHelper) => ({
+  const { attackPatterns, killChainPhasesMap } = useHelper((helper: AttackPatternHelper & KillChainPhaseHelper & UserHelper) => ({
     attackPatterns: helper.getAttackPatterns(),
     killChainPhasesMap: helper.getKillChainPhasesMap(),
-    userAdmin: helper.getMeAdmin(),
   }));
 
   const [attackPatternCreation, setAttackPatternCreation] = useState(false);
@@ -92,7 +94,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
   );
 
   const openCreate = () => {
-    if (userAdmin) {
+    if (ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS)) {
       handleOpenAttackPatternCreation();
     }
   };
@@ -162,7 +164,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
             )}
             classes={{ clearIndicator: classes.autoCompleteIndicator }}
           />
-          {userAdmin && (
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
             <Dialog
               open={attackPatternCreation}
               onClose={handleCloseAttackPatternCreation}
@@ -177,7 +179,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
                 />
               </DialogContent>
             </Dialog>
-          )}
+          </Can>
         </>
       )}
     />

@@ -6,6 +6,7 @@ import { type FunctionComponent, useMemo } from 'react';
 import { FormProvider, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import SelectFieldController, { createItems, type Item } from '../../../../components/fields/SelectFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboardInput, type CustomDashboardParametersInput } from '../../../../utils/api-types';
@@ -35,7 +36,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
   const parametersSchema = z.object({
     custom_dashboards_parameter_id: z.string().optional(),
     custom_dashboards_parameter_name: z.string().min(1, { message: t('Should not be empty') }),
-    custom_dashboards_parameter_type: z.literal('simulation'),
+    custom_dashboards_parameter_type: z.enum(['scenario', 'simulation', 'timeRange', 'startDate', 'endDate']),
   });
 
   const validationSchema = useMemo(
@@ -64,7 +65,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
     name: 'custom_dashboard_parameters',
   });
 
-  const items: CustomDashboardParametersInput['custom_dashboards_parameter_type'][] = ['simulation'];
+  const items: Item<CustomDashboardParametersInput['custom_dashboards_parameter_type']>[] = createItems(['scenario', 'simulation']);
   const handleAddParameter = (type: CustomDashboardParametersInput['custom_dashboards_parameter_type']) => {
     if (type) {
       append({
@@ -108,7 +109,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
           <IconButton
             color="secondary"
             aria-label="Add"
-            onClick={() => handleAddParameter(items[0])} // For now, we handle just one type
+            onClick={() => handleAddParameter(items[0].value)}
             size="small"
           >
             <Add fontSize="small" />
@@ -123,26 +124,30 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
               gap: theme.spacing(2),
             }}
           >
-            <TextFieldController
-              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_name`}
-              label={t('Parameter Name')}
-              variant="standard"
-              required
-              noHelperText
-            />
-            <TextFieldController
-              name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
-              label={t('Parameter Type')}
-              variant="standard"
-              required
-              disabled
-              noHelperText
-            />
-            <Tooltip title={t('Delete')}>
-              <IconButton color="error" onClick={() => remove(index)}>
-                <DeleteOutlined fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            {
+              (field.custom_dashboards_parameter_type === 'simulation' || field.custom_dashboards_parameter_type === 'scenario') && (
+                <>
+                  <TextFieldController
+                    name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_name`}
+                    label={t('Parameter Name')}
+                    variant="standard"
+                    required
+                    noHelperText
+                  />
+                  <SelectFieldController
+                    name={`custom_dashboard_parameters.${index}.custom_dashboards_parameter_type`}
+                    label={t('Parameter Type')}
+                    items={items}
+                    required
+                  />
+                  <Tooltip title={t('Delete')}>
+                    <IconButton color="error" onClick={() => remove(index)}>
+                      <DeleteOutlined fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )
+            }
           </Box>
         ))}
         <Box sx={{

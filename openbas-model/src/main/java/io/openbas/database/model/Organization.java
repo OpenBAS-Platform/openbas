@@ -59,6 +59,10 @@ public class Organization implements Base {
   @JsonIgnore
   private List<User> users = new ArrayList<>();
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.ORGANIZATION;
+
   @ArraySchema(schema = @Schema(type = "string"))
   @Setter
   @Getter

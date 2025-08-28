@@ -12,6 +12,8 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import { type RawPaginationImportMapper, type SearchPaginationInput } from '../../../../utils/api-types';
+import { Can } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import DataIngestionMenu from '../DataIngestionMenu';
 import ImportUploaderMapper from './ImportUploaderMapper';
 import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
@@ -81,7 +83,9 @@ const XlsMappers = () => {
           searchPaginationInput={searchPaginationInput}
           setContent={setMappers}
         >
-          <ImportUploaderMapper />
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+            <ImportUploaderMapper />
+          </Can>
         </PaginationComponent>
         <List>
           <ListItem
@@ -142,7 +146,9 @@ const XlsMappers = () => {
           }
           {!mappers ? (<Empty message={t('No data available')} />) : null}
         </List>
-        <XlsMapperCreation onCreate={result => setMappers([result, ...mappers])} />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <XlsMapperCreation onCreate={result => setMappers([result, ...mappers])} />
+        </Can>
       </div>
       <DataIngestionMenu />
     </div>

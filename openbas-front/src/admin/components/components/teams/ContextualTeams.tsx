@@ -216,12 +216,14 @@ const ContextualTeams: FunctionComponent<Props> = ({ teams }) => {
             key={team.team_id}
             disablePadding
             secondaryAction={(
-              <TeamPopover
-                team={team}
-                managePlayers={() => setSelectedTeam(team.team_id)}
-                disabled={permissions.readOnly}
-                openEditOnInit={team.team_id === searchId}
-              />
+              permissions.canManage
+              && (
+                <TeamPopover
+                  team={team}
+                  managePlayers={() => setSelectedTeam(team.team_id)}
+                  openEditOnInit={team.team_id === searchId}
+                />
+              )
             )}
           >
             <ListItemButton

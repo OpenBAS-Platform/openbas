@@ -5,7 +5,6 @@ import { addScenarioEvaluation, fetchScenarioEvaluations, updateScenarioEvaluati
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
 import {
@@ -26,7 +25,6 @@ import {
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { fetchTeams } from '../../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
-import { fetchPlayers } from '../../../../../actions/User';
 import { useHelper } from '../../../../../store';
 import {
   type EvaluationInput,
@@ -37,14 +35,15 @@ import {
   type LessonsQuestionUpdateInput,
   type ObjectiveInput, type Scenario,
 } from '../../../../../utils/api-types';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useScenarioPermissions from '../../../../../utils/permissions/scenarioPermissions';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/scenarios/Lessons';
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
+
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
@@ -65,7 +64,6 @@ const ScenarioLessons = () => {
     lessonsCategories,
     lessonsQuestions,
     lessonsTemplates,
-    usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     const scenarioData = helper.getScenario(scenarioId);
     return {
@@ -80,8 +78,6 @@ const ScenarioLessons = () => {
     };
   });
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
-    dispatch(fetchPlayers());
     dispatch(fetchTeams());
     dispatch(fetchLessonsCategories(scenarioId));
     dispatch(fetchLessonsQuestions(scenarioId));
@@ -94,7 +90,7 @@ const ScenarioLessons = () => {
     [scenario],
   );
 
-  const permissions = usePermissions(scenarioId, scenario);
+  const permissions = useScenarioPermissions(scenarioId);
 
   const context: LessonContextType = {
     onApplyLessonsTemplate: (data: string) => dispatch(applyLessonsTemplate(scenarioId, data)),
@@ -137,8 +133,7 @@ const ScenarioLessons = () => {
       <Lessons
         source={{
           ...source,
-          isReadOnly: permissions.readOnly,
-          isUpdatable: permissions.canWrite,
+          isUpdatable: permissions.canManage,
         }}
         objectives={objectives}
         teamsMap={teamsMap}
@@ -146,7 +141,6 @@ const ScenarioLessons = () => {
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
         lessonsTemplates={lessonsTemplates}
-        usersMap={usersMap}
       >
       </Lessons>
     </LessonContext.Provider>

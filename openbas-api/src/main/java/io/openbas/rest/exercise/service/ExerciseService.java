@@ -2,9 +2,7 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.ExerciseSpecification.closestBefore;
-import static io.openbas.database.specification.ExerciseSpecification.finished;
-import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
+import static io.openbas.database.specification.ExerciseSpecification.*;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
@@ -38,6 +36,11 @@ import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.service.cron.CronService;
+import io.openbas.service.GrantService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.TeamService;
+import io.openbas.service.UserService;
+import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
@@ -65,6 +68,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,6 +91,7 @@ public class ExerciseService {
   private final DocumentService documentService;
   private final InjectService injectService;
   private final CronService cronService;
+  private final UserService userService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -378,9 +383,11 @@ public class ExerciseService {
 
   // -- EXERCISES --
   public List<ExerciseSimple> exercises() {
-    // We get the exercises depending on whether or not we are granted
+    // We get the exercises depending on whether or not we are granted or have the capa
+    User currentUser = userService.currentUser();
     List<RawExerciseSimple> exercises =
-        currentUser().isAdmin()
+        currentUser.isAdminOrBypass()
+                || currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
             ? exerciseRepository.rawAll()
             : exerciseRepository.rawAllGranted(currentUser().getId());
     return exerciseMapper.getExerciseSimples(exercises);
@@ -826,5 +833,17 @@ public class ExerciseService {
       }
     }
     return false;
+  }
+
+  // -- OPTION --
+
+  public List<FilterUtilsJpa.Option> findAllAsOptions(
+      final Specification<Exercise> specification, final String searchText) {
+    return fromIterable(
+            exerciseRepository.findAll(
+                specification.and(byName(searchText)), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

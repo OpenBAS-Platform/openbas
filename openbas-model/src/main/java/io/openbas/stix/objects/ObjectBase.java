@@ -12,6 +12,8 @@ import io.openbas.stix.types.StixString;
 import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class ObjectBase implements StixSerialisable {
   private final Map<String, BaseType<?>> properties;

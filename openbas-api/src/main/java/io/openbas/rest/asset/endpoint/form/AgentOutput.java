@@ -49,4 +49,8 @@ public class AgentOutput {
   @Schema(description = "Instant when agent was last seen")
   @JsonProperty("agent_last_seen")
   private Instant lastSeen;
+
+  @Schema(description = "The version of the agent")
+  @JsonProperty("agent_version")
+  private String agentVersion;
 }

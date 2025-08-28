@@ -17,7 +17,7 @@ import * as R from 'ramda';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchChallenges } from '../../../../../../actions/Challenge';
+import { fetchChallenges } from '../../../../../../actions/challenge-action';
 import { type ChallengeHelper } from '../../../../../../actions/helper';
 import Transition from '../../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../../components/i18n';

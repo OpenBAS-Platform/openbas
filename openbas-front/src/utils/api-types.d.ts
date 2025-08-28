@@ -55,6 +55,8 @@ export interface AgentOutput {
   agent_last_seen?: string;
   /** Agent privilege */
   agent_privilege?: "admin" | "standard";
+  /** The version of the agent */
+  agent_version?: string;
 }
 
 export interface AgentTarget {
@@ -1042,14 +1044,24 @@ export interface CustomDashboardOutput {
 export interface CustomDashboardParameters {
   custom_dashboards_parameter_id: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "timeRange"
+    | "startDate"
+    | "endDate"
+    | "scenario";
   listened?: boolean;
 }
 
 export interface CustomDashboardParametersInput {
   custom_dashboards_parameter_id?: string;
   custom_dashboards_parameter_name: string;
-  custom_dashboards_parameter_type: "simulation";
+  custom_dashboards_parameter_type:
+    | "simulation"
+    | "timeRange"
+    | "startDate"
+    | "endDate"
+    | "scenario";
 }
 
 /** Payload to create a CVE */
@@ -1252,13 +1264,10 @@ export type DateHistogramWidget = UtilRequiredKeys<
   "widget_configuration_type"
 > & {
   display_legend?: boolean;
-  end: string;
-  field: string;
   interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
   mode: string;
   series: DateHistogramSeries[];
   stacked?: boolean;
-  start: string;
 };
 
 export interface DetectionRemediation {
@@ -1741,6 +1750,8 @@ export interface EsInject {
   base_inject_contract_side?: string;
   /** @uniqueItems true */
   base_kill_chain_phases_side?: string[];
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1751,6 +1762,8 @@ export interface EsInject {
   base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  /** @format date-time */
+  inject_execution_date?: string;
   inject_status?: string;
   inject_title?: string;
 }
@@ -1769,6 +1782,8 @@ export interface EsInjectExpectation {
   base_inject_side?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_security_platforms_side?: string[];
   base_simulation_side?: string;
   base_team_side?: string;
   /** @format date-time */
@@ -1798,6 +1813,8 @@ export interface EsScenario {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
@@ -1807,6 +1824,7 @@ export interface EsScenario {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsSearch {
@@ -1842,8 +1860,11 @@ export interface EsSimulation {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   /** @uniqueItems true */
   base_tags_side?: string[];
   /** @uniqueItems true */
@@ -1851,6 +1872,7 @@ export interface EsSimulation {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsTag {
@@ -2424,16 +2446,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -2459,7 +2481,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
 }
 
@@ -2473,10 +2495,22 @@ export interface GroupUpdateUsersInput {
 }
 
 export interface HistogramWidget {
+  date_attribute: string;
   display_legend?: boolean;
-  field: string;
+  end?: string;
   mode: string;
   stacked?: boolean;
+  start?: string;
+  time_range:
+    | "DEFAULT"
+    | "ALL_TIME"
+    | "CUSTOM"
+    | "LAST_DAY"
+    | "LAST_WEEK"
+    | "LAST_MONTH"
+    | "LAST_QUARTER"
+    | "LAST_SEMESTER"
+    | "LAST_YEAR";
   title?: string;
   widget_configuration_type:
     | "flat"
@@ -2847,6 +2881,10 @@ export interface InjectImporterUpdateInput {
   inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
+}
+
+export interface InjectIndividualExportRequestInput {
+  options?: ExportOptionsInput;
 }
 
 export interface InjectInput {
@@ -4358,9 +4396,9 @@ export type Payload = BasePayload &
   (
     | BasePayloadPayloadTypeMapping<"Command", Command>
     | BasePayloadPayloadTypeMapping<"Executable", Executable>
-    | BasePayloadPayloadTypeMapping<"File", FileDrop>
-    | BasePayloadPayloadTypeMapping<"Dns", DnsResolution>
-    | BasePayloadPayloadTypeMapping<"Network", NetworkTraffic>
+    | BasePayloadPayloadTypeMapping<"FileDrop", FileDrop>
+    | BasePayloadPayloadTypeMapping<"DnsResolution", DnsResolution>
+    | BasePayloadPayloadTypeMapping<"NetworkTraffic", NetworkTraffic>
   );
 
 export interface PayloadArgument {
@@ -4381,9 +4419,9 @@ export type PayloadCreateInput = BasePayloadCreateInput &
   (
     | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
     | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
-    | BasePayloadCreateInputPayloadTypeMapping<"File", FileDrop>
-    | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
-    | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
+    | BasePayloadCreateInputPayloadTypeMapping<"FileDrop", FileDrop>
+    | BasePayloadCreateInputPayloadTypeMapping<"DnsResolution", DnsResolution>
+    | BasePayloadCreateInputPayloadTypeMapping<"NetworkTraffic", NetworkTraffic>
   );
 
 export interface PayloadExportRequestInput {
@@ -5005,10 +5043,10 @@ export interface RoleInput {
   /** @uniqueItems true */
   role_capabilities?: (
     | "BYPASS"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5832,10 +5870,10 @@ export interface User {
   /** @uniqueItems true */
   user_capabilities?: (
     | "BYPASS"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5888,6 +5926,8 @@ export interface User {
   user_groups?: string[];
   /** User ID */
   user_id: string;
+  /** True if the user is admin or has bypass capa */
+  user_is_admin_or_bypass?: boolean;
   /** True if the user is external */
   user_is_external?: boolean;
   /** True if the user is manager */

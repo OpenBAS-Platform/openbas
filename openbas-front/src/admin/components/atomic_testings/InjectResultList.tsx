@@ -17,6 +17,8 @@ import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type InjectResultOutput, type SearchPaginationInput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectImportJsonDialog from '../common/injects/InjectImportJsonDialog';
@@ -177,19 +179,21 @@ const InjectResultList: FunctionComponent<Props> = ({
         contextId={contextId}
         reloadContentCount={reloadCount}
         topBarButtons={showActions ? (
-          <Tooltip title={t('inject_import_json_action')}>
-            <ToggleButton
-              value="import"
-              aria-label="import"
-              size="small"
-              onClick={handleOpenJsonImportDialog}
-            >
-              <CloudUploadOutlined
-                color="primary"
-                fontSize="small"
-              />
-            </ToggleButton>
-          </Tooltip>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ATOMIC_TESTING}>
+            <Tooltip title={t('inject_import_json_action')}>
+              <ToggleButton
+                value="import"
+                aria-label="import"
+                size="small"
+                onClick={handleOpenJsonImportDialog}
+              >
+                <CloudUploadOutlined
+                  color="primary"
+                  fontSize="small"
+                />
+              </ToggleButton>
+            </Tooltip>
+          </Can>
         ) : null}
       />
       <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleCloseJsonImportDialog} handleSubmit={handleSubmitJsonImportFile} />

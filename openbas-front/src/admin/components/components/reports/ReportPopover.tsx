@@ -44,10 +44,12 @@ const ReportPopover: FunctionComponent<Props> = ({
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => setOpenEdit(true),
+    userRight: true,
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => setOpenDelete(true),
+    userRight: true,
   });
 
   return (

@@ -1,4 +1,5 @@
 import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { Link, useLocation } from 'react-router';
 
@@ -15,6 +16,7 @@ const MenuItemSingle: FunctionComponent<Props> = ({ navOpen, item }) => {
   // Standard hooks
   const { t } = useFormatter();
   const location = useLocation();
+  const theme = useTheme();
 
   const isCurrentTab = location.pathname === item.path;
   return (
@@ -30,7 +32,11 @@ const MenuItemSingle: FunctionComponent<Props> = ({ navOpen, item }) => {
           height: 35,
         }}
       >
-        <ListItemIcon style={{ minWidth: 20 }}>
+        <ListItemIcon style={{
+          minWidth: 20,
+          color: theme.palette.text.primary,
+        }}
+        >
           {item.icon()}
         </ListItemIcon>
         {navOpen && (

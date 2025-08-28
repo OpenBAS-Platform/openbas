@@ -1,41 +1,98 @@
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext } from 'react';
 
+import ScenarioField from '../../../../components/fields/ScenarioField';
 import SimulationField from '../../../../components/fields/SimulationField';
+import { type CustomDashboardParameters as CustomDashboardParametersType } from '../../../../utils/api-types';
 import { CustomDashboardContext } from './CustomDashboardContext';
+import TimeRangeFilters from './TimeRangeFilters';
+import { LAST_QUARTER_TIME_RANGE } from './widgets/configuration/common/TimeRangeUtils';
 
 const CustomDashboardParameters: FunctionComponent = () => {
+  const theme = useTheme();
   const { customDashboard, customDashboardParameters, setCustomDashboardParameters } = useContext(CustomDashboardContext);
 
-  const getParameterValue = (parameterId: string) => {
+  const getParameter = (parameterId: string | undefined) => {
     if (!customDashboard) return undefined;
-    return customDashboardParameters[parameterId];
+    if (parameterId) {
+      return customDashboardParameters[parameterId];
+    } else {
+      return undefined;
+    }
   };
-  const handleParameters = (parameterId: string, value: string) => {
+  const handleParametersValue = (parameterId: string | undefined, value: string) => {
     if (!customDashboard) return;
-    setCustomDashboardParameters(prev => ({
-      ...prev,
-      [parameterId]: value,
-    }));
+    if (parameterId) {
+      setCustomDashboardParameters((prev) => {
+        return {
+          ...prev,
+          [parameterId]: {
+            ...prev[parameterId],
+            value,
+          },
+        };
+      });
+    }
+  };
+
+  const dateParameters: Map<CustomDashboardParametersType['custom_dashboards_parameter_type'], string> = new Map();
+  customDashboard?.custom_dashboard_parameters?.forEach((p) => {
+    if (['timeRange', 'startDate', 'endDate'].includes(p.custom_dashboards_parameter_type)) {
+      dateParameters.set(p.custom_dashboards_parameter_type, p.custom_dashboards_parameter_id);
+    }
+  });
+
+  const renderParameterField = (p: CustomDashboardParametersType) => {
+    const param = getParameter(p.custom_dashboards_parameter_id);
+    if (param?.hidden) {
+      return null;
+    }
+    switch (p.custom_dashboards_parameter_type) {
+      case 'scenario':
+        return (
+          <ScenarioField
+            label={p.custom_dashboards_parameter_name}
+            value={param?.value}
+            onChange={(value: string | undefined) =>
+              handleParametersValue(p.custom_dashboards_parameter_id, value ?? '')}
+          />
+        );
+      case 'simulation':
+        return (
+          <SimulationField
+            label={p.custom_dashboards_parameter_name}
+            value={param?.value}
+            onChange={(value: string | undefined) =>
+              handleParametersValue(p.custom_dashboards_parameter_id, value ?? '')}
+            searchOptionsConfig={param?.searchOptionsConfig}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <>
-      {(customDashboard?.custom_dashboard_parameters ?? []).map((p) => {
-        if (p.custom_dashboards_parameter_type === 'simulation') {
-          return (
-            <div key={p.custom_dashboards_parameter_id} style={{ width: 350 }}>
-              <SimulationField
-                label={p.custom_dashboards_parameter_name}
-                value={getParameterValue(p.custom_dashboards_parameter_id)}
-                onChange={(value: string | undefined) => handleParameters(p.custom_dashboards_parameter_id, value ?? '')}
-              />
-            </div>
-          );
-        } else {
-          return (<></>);
-        }
-      })}
+      <TimeRangeFilters
+        timeRangeValue={getParameter(dateParameters.get('timeRange'))?.value ?? LAST_QUARTER_TIME_RANGE}
+        handleTimeRange={data => handleParametersValue(dateParameters.get('timeRange'), data)}
+        startDateValue={getParameter(dateParameters.get('startDate'))?.value}
+        handleStartDate={data => handleParametersValue(dateParameters.get('startDate'), data)}
+        endDateValue={getParameter(dateParameters.get('endDate'))?.value}
+        handleEndDate={data => handleParametersValue(dateParameters.get('endDate'), data)}
+      />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 300px))',
+          gap: theme.spacing(2),
+        }}
+      >
+        {(customDashboard?.custom_dashboard_parameters ?? []).map(p => renderParameterField(p))}
+      </div>
     </>
+
   );
 };
 

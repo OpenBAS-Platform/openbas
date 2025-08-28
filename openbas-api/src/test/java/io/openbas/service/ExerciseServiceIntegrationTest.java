@@ -47,6 +47,7 @@ class ExerciseServiceIntegrationTest extends IntegrationTest {
   @Autowired private TagRuleService tagRuleService;
   @Autowired private DocumentService documentService;
   @Autowired private InjectService injectService;
+  @Autowired private UserService userService;
 
   @Autowired private ExerciseMapper exerciseMapper;
   @Autowired private InjectMapper injectMapper;
@@ -87,6 +88,7 @@ class ExerciseServiceIntegrationTest extends IntegrationTest {
             documentService,
             injectService,
             cronService,
+            userService,
             exerciseMapper,
             injectMapper,
             resultUtils,

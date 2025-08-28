@@ -6,7 +6,6 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../../actions/Application';
-import { type TagHelper, type UserHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
@@ -23,8 +22,9 @@ import ItemSeverity from '../../../components/ItemSeverity';
 import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
-import { useHelper } from '../../../store';
 import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ImportFromHubButton from '../common/ImportFromHubButton';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
@@ -54,9 +54,6 @@ const Scenarios = () => {
   const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers = useMemo(() => [
@@ -195,10 +192,14 @@ const Scenarios = () => {
         queryableHelpers={queryableHelpers}
         topBarButtons={(
           <Box display="flex" gap={1}>
-            <ImportFromHubButton serviceIdentifier="obas_scenarios" />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
+              <ImportFromHubButton serviceIdentifier="obas_scenarios" />
+            </Can>
             <ToggleButtonGroup value="fake" exclusive>
               <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-              <ImportUploaderScenario />
+              <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
+                <ImportUploaderScenario />
+              </Can>
             </ToggleButtonGroup>
           </Box>
         )}
@@ -275,14 +276,14 @@ const Scenarios = () => {
               })
         }
       </List>
-      {userAdmin && (
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
         <ScenarioCreation
           onCreate={(result: Scenario) => {
             setScenarios([result, ...scenarios]);
             fetchStatistics();
           }}
         />
-      )}
+      </Can>
     </>
   );
 };

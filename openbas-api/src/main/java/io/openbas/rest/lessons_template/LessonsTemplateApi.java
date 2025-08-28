@@ -1,13 +1,11 @@
 package io.openbas.rest.lessons_template;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
-import io.openbas.database.model.LessonsTemplate;
-import io.openbas.database.model.LessonsTemplateCategory;
-import io.openbas.database.model.LessonsTemplateQuestion;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.LessonsTemplateCategoryRepository;
 import io.openbas.database.repository.LessonsTemplateQuestionRepository;
 import io.openbas.database.repository.LessonsTemplateRepository;
@@ -23,7 +21,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,8 +35,8 @@ public class LessonsTemplateApi extends RestBehavior {
 
   // -- LESSONS TEMPLATES --
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_TEMPLATE_URI)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.LESSON_LEARNED)
   @Transactional(rollbackOn = Exception.class)
   public LessonsTemplate createLessonsTemplate(@Valid @RequestBody LessonsTemplateInput input) {
     LessonsTemplate lessonsTemplate = new LessonsTemplate();
@@ -48,19 +45,24 @@ public class LessonsTemplateApi extends RestBehavior {
   }
 
   @GetMapping(LESSON_TEMPLATE_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.LESSON_LEARNED)
   public Iterable<LessonsTemplate> lessonsTemplates() {
     return fromIterable(lessonsTemplateRepository.findAll()).stream().toList();
   }
 
   @PostMapping(LESSON_TEMPLATE_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.LESSON_LEARNED)
   public Page<LessonsTemplate> lessonsTemplates(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         this.lessonsTemplateRepository::findAll, searchPaginationInput, LessonsTemplate.class);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public LessonsTemplate updateLessonsTemplate(
       @PathVariable String lessonsTemplateId, @Valid @RequestBody LessonsTemplateInput input) {
     LessonsTemplate lessonsTemplate =
@@ -72,8 +74,11 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateRepository.save(lessonsTemplate);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public void deleteLessonsTemplate(@PathVariable String lessonsTemplateId) {
     lessonsTemplateRepository.deleteById(lessonsTemplateId);
   }
@@ -83,8 +88,11 @@ public class LessonsTemplateApi extends RestBehavior {
   public static final String LESSON_CATEGORY_URI =
       LESSON_TEMPLATE_URI + "/{lessonsTemplateId}/lessons_template_categories";
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_CATEGORY_URI)
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   @Transactional(rollbackOn = Exception.class)
   public LessonsTemplateCategory createLessonsTemplateCategory(
       @PathVariable String lessonsTemplateId,
@@ -100,14 +108,21 @@ public class LessonsTemplateApi extends RestBehavior {
   }
 
   @GetMapping(LESSON_CATEGORY_URI)
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.LESSON_LEARNED)
   public Iterable<LessonsTemplateCategory> lessonsTemplateCategories(
       @PathVariable String lessonsTemplateId) {
     return lessonsTemplateCategoryRepository.findAll(
         LessonsTemplateCategorySpecification.fromTemplate(lessonsTemplateId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   @Transactional(rollbackOn = Exception.class)
   public LessonsTemplateCategory updateLessonsTemplateCategory(
       @PathVariable String lessonsTemplateId,
@@ -122,8 +137,11 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateCategoryRepository.save(lessonsTemplateCategory);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public void deleteLessonsTemplateCategory(
       @PathVariable String lessonsTemplateId, @PathVariable String lessonsTemplateCategoryId) {
     lessonsTemplateCategoryRepository.deleteById(lessonsTemplateCategoryId);
@@ -132,6 +150,10 @@ public class LessonsTemplateApi extends RestBehavior {
   // -- LESSONS TEMPLATES QUESTIONS --
 
   @GetMapping(LESSON_TEMPLATE_URI + "/{lessonsTemplateId}/lessons_template_questions")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.LESSON_LEARNED)
   public Iterable<LessonsTemplateQuestion> lessonsTemplateQuestions(
       @PathVariable String lessonsTemplateId) {
     return lessonsTemplateCategoryRepository
@@ -150,8 +172,11 @@ public class LessonsTemplateApi extends RestBehavior {
   public static final String LESSON_QUESTION_URI =
       LESSON_CATEGORY_URI + "/{lessonsTemplateCategoryId}/lessons_template_questions";
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(LESSON_QUESTION_URI)
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public LessonsTemplateQuestion createLessonsTemplateQuestion(
       @PathVariable String lessonsTemplateId,
       @PathVariable String lessonsTemplateCategoryId,
@@ -167,14 +192,21 @@ public class LessonsTemplateApi extends RestBehavior {
   }
 
   @GetMapping(LESSON_QUESTION_URI)
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.LESSON_LEARNED)
   public Iterable<LessonsTemplateQuestion> lessonsTemplateCategoryQuestions(
       @PathVariable String lessonsTemplateId, @PathVariable String lessonsTemplateCategoryId) {
     return lessonsTemplateQuestionRepository.findAll(
         LessonsTemplateQuestionSpecification.fromCategory(lessonsTemplateCategoryId));
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public LessonsTemplateQuestion updateLessonsTemplateQuestion(
       @PathVariable String lessonsTemplateId,
       @PathVariable String lessonsTemplateCategoryId,
@@ -189,8 +221,11 @@ public class LessonsTemplateApi extends RestBehavior {
     return lessonsTemplateQuestionRepository.save(lessonsTemplateQuestion);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(LESSON_QUESTION_URI + "/{lessonsTemplateQuestionId}")
+  @RBAC(
+      resourceId = "#lessonsTemplateId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.LESSON_LEARNED)
   public void deleteLessonsTemplateQuestion(
       @PathVariable String lessonsTemplateId,
       @PathVariable String lessonsTemplateCategoryId,

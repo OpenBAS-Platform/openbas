@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class StixService {
 
   private final SecurityAssessmentService securityAssessmentService;
-  private final ScenarioSecurityAssessmentService scenarioSecurityAssessmentService;
 
   @Transactional(rollbackFor = Exception.class)
   public String processBundle(String stixJson) throws IOException, ParsingException {
@@ -24,7 +23,7 @@ public class StixService {
         securityAssessmentService.buildSecurityAssessmentFromStix(stixJson);
     // Update Scenario using the last SecurityAssessment
     Scenario scenario =
-        scenarioSecurityAssessmentService.buildScenarioFromSecurityAssessment(securityAssessment);
+        securityAssessmentService.buildScenarioFromSecurityAssessment(securityAssessment);
     return scenario.getId();
   }
 }

@@ -38,7 +38,7 @@ public class NotificationRuleServiceTest extends IntegrationTest {
     Map<String, String> data = new HashMap<>();
     NotificationRule rule = new NotificationRule();
     rule.setResourceId("id");
-    rule.setResourceType(NotificationRuleResourceType.SCENARIO);
+    rule.setNotificationResourceType(NotificationRuleResourceType.SCENARIO);
     rule.setType(NotificationRuleType.EMAIL);
     rule.setSubject("subject");
     rule.setTrigger(NotificationRuleTrigger.DIFFERENCE);

@@ -7,7 +7,7 @@ import { type GroupOption, type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
 import { FilterContext } from './context';
 import { type FilterHelpers } from './FilterHelpers';
-import useSearchOptions from './useSearchOptions';
+import useSearchOptions, { type SearchOptionsConfig } from './useSearchOptions';
 import wordsToExcludeFromTranslation from './WordsToExcludeFromTranslation';
 
 interface Props {
@@ -60,7 +60,12 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   const { options, setOptions, searchOptions } = useSearchOptions();
   const { defaultValues } = useContext(FilterContext);
   const handleSearchOptions = (search: string) => {
-    searchOptions(filter.key, search, contextId, defaultValues?.get(filter.key));
+    const searchOptionsConfig: SearchOptionsConfig = {
+      filterKey: filter.key,
+      contextId: contextId,
+      defaultValues: defaultValues?.get(filter.key),
+    };
+    searchOptions(searchOptionsConfig, search);
   };
   useEffect(() => {
     if (propertySchema.schema_property_values && propertySchema.schema_property_values?.length > 0) {

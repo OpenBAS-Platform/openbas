@@ -35,14 +35,14 @@ export const widgetVisualizationTypes: {
     category: 'security-coverage',
     seriesLimit: 2,
     modes: ['structural'],
-    fields: ['base_attack_patterns_side'],
+    fields: ['base_attack_patterns_side', 'base_created_at', 'base_updated_at'],
     limit: false,
   },
   {
     category: 'attack-path',
     modes: ['structural'],
     seriesLimit: 2,
-    fields: ['base_attack_patterns_side'],
+    fields: ['base_attack_patterns_side', 'base_created_at', 'base_updated_at'],
     limit: false,
   },
   {
@@ -152,6 +152,24 @@ export const excludeBaseEntities = (filterGroup: FilterGroup | undefined) => {
     mode: filterGroup.mode,
     filters: filterGroup.filters?.filter(f => f.key !== BASE_ENTITY_FILTER_KEY) ?? [],
   };
+};
+export const getDefaultValuesForType = (
+  currentValues: Map<string, GroupOption[]>,
+  param: CustomDashboardParameters,
+  key: 'base_simulation_side' | 'base_scenario_side',
+) => {
+  const values = currentValues;
+  const items = values.get(key) ?? [];
+  const option = createGroupOption(
+    param.custom_dashboards_parameter_id,
+    param.custom_dashboards_parameter_name,
+    'Parameters',
+  );
+
+  if (!items.some(i => i.id === option.id)) {
+    values.set(key, [...items, option]);
+  }
+  return values;
 };
 
 // -- MATRIX MITRE --

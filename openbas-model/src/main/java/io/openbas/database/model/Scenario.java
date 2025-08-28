@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -36,7 +37,13 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Scenario.tags-injects",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
+@Grantable(grantFieldName = "scenario")
 public class Scenario implements Base {
+
+  public enum RECURRENCE_STATUS {
+    SCHEDULED,
+    NOT_PLANNED,
+  }
 
   public enum SEVERITY {
     @JsonProperty("low")
@@ -48,6 +55,14 @@ public class Scenario implements Base {
     @JsonProperty("critical")
     critical,
   }
+
+  public static final String MAIN_FOCUS_INCIDENT_RESPONSE = "incident-response";
+  public static final String MAIN_FOCUS_ENDPOINT_PROTECTION = "endpoint-protection";
+  public static final String MAIN_FOCUS_WEB_FILTERING = "web-filtering";
+  public static final String MAIN_FOCUS_STANDARD_OPERATING_PROCEDURE =
+      "standard-operating-procedure";
+  public static final String MAIN_FOCUS_CRISIS_COMMUNICATION = "crisis-communication";
+  public static final String MAIN_FOCUS_STRATEGIC_REACTION = "strategic-reaction";
 
   @Id
   @UuidGenerator
@@ -258,12 +273,27 @@ public class Scenario implements Base {
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_exercises")
+  @Setter(NONE)
   private List<Exercise> exercises;
+
+  public void setExercises(List<Exercise> exercises) {
+    if (exercises != null) {
+      for (Exercise exercise : exercises) {
+        if (exercise != null) exercise.setUpdatedAt(now());
+      }
+    }
+    this.exercises = exercises;
+    this.setUpdatedAt(now());
+  }
 
   @Getter
   @Column(name = "scenario_lessons_anonymized")
   @JsonProperty("scenario_lessons_anonymized")
   private boolean lessonsAnonymized = false;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SCENARIO;
 
   // -- LESSONS --
 

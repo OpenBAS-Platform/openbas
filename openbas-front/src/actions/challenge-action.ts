@@ -3,7 +3,7 @@ import { type Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential, simplePostCall } from '../utils/Action';
 import { type ChallengeInput, type ChallengeTryInput } from '../utils/api-types';
-import { scenarioChallengesReaders, simulationChallengesReaders } from './Schema';
+import { arrayOfDocuments, scenarioChallengesReaders, simulationChallengesReaders } from './Schema';
 
 const challenge = new schema.Entity(
   'challenges',
@@ -69,4 +69,10 @@ export const fetchScenarioChallenges = (scenarioId: string) => (dispatch: Dispat
 export const fetchScenarioObserverChallenges = (scenarioId: string, userId: string) => (dispatch: Dispatch) => {
   const uri = `/api/observer/scenarios/${scenarioId}/challenges?userId=${userId}`;
   return getReferential(scenarioChallengesReaders, uri)(dispatch);
+};
+
+// -- DOCUMENTS --
+export const fetchDocumentsChallenge = (challengeId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/challenges/${challengeId}/documents`;
+  return getReferential(arrayOfDocuments, uri)(dispatch);
 };

@@ -23,6 +23,8 @@ import { useHelper } from '../../../store';
 import { type PlayerOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
 
@@ -50,10 +52,7 @@ const Players = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { me, organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({
-    me: helper.getMe(),
-    organizationsMap: helper.getOrganizationsMap(),
-  }));
+  const { organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({ organizationsMap: helper.getOrganizationsMap() }));
 
   useDataLoader(() => {
     dispatch(fetchOrganizations());
@@ -209,12 +208,11 @@ const Players = () => {
               </ListItem>
             ))}
       </List>
-      {me.user_is_planner
-        && (
-          <CreatePlayer
-            onCreate={result => setPlayers([result, ...players])}
-          />
-        )}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+        <CreatePlayer
+          onCreate={result => setPlayers([result, ...players])}
+        />
+      </Can>
     </>
   );
 };

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import type { AxiosResponse } from 'axios';
+import { useContext, useState } from 'react';
 
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
+import { searchSecurityPlatformByIdAsOption } from '../../../../actions/assets/securityPlatform-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchCustomDashboardByIdAsOptions } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
@@ -14,21 +16,34 @@ import { searchSimulationByIdAsOptions } from '../../../../actions/simulations/s
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type GroupOption, type Option } from '../../../../utils/Option';
-import { CUSTOM_DASHBOARD, SIMULATIONS } from './constants';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { CUSTOM_DASHBOARD, SCENARIOS, SIMULATIONS } from './constants';
+
+interface RetrieveOptionsConfig { defaultValues?: GroupOption[] | undefined }
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
+  const ability = useContext(AbilityContext);
 
-  const searchOptions = (filterKey: string, ids: string[], defaultValues: GroupOption[] = []) => {
-    const filterDefaultValues = defaultValues.filter(v => ids.includes(v.id));
+  const handleOptions = (response: AxiosResponse<GroupOption[] | Option[]>, filterDefaultValues: GroupOption[]) => {
+    if (filterDefaultValues && filterDefaultValues.length > 0) {
+      setOptions([...filterDefaultValues, ...response.data.map((d: Option) => ({
+        ...d,
+        group: 'Values',
+      }))]);
+    } else {
+      setOptions(response.data);
+    }
+  };
+
+  const searchOptions = (filterKey: string, ids: string[], config: RetrieveOptionsConfig) => {
+    const filterDefaultValues = (config.defaultValues ?? []).filter(v => ids.includes(v.id));
     switch (filterKey) {
       case SIMULATIONS:
       case 'base_simulation_side':
         searchSimulationByIdAsOptions(ids).then((response) => {
-          setOptions([...filterDefaultValues, ...response.data.map((d: Option) => ({
-            ...d,
-            group: 'Values',
-          }))]);
+          handleOptions(response, filterDefaultValues);
         });
         break;
       case 'injector_contract_injector':
@@ -53,16 +68,25 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'target_asset_groups':
-        searchTargetOptionsById('ASSETS_GROUPS', ids).then((response) => {
-          setOptions(response.data);
-        });
+        // TODO allow to fetch for a specific resource if no capa issue/3864
+        if (ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
+          searchTargetOptionsById('ASSETS_GROUPS', ids).then((response) => {
+            setOptions(response.data);
+          });
+        } else {
+          setOptions([]);
+        }
         break;
       case 'target_assets':
       case 'target_endpoint':
       case 'base_endpoint_side':
-        searchTargetOptionsById('ASSETS', ids).then((response) => {
-          setOptions(response.data);
-        });
+        if (ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
+          searchTargetOptionsById('ASSETS', ids).then((response) => {
+            setOptions(response.data);
+          });
+        } else {
+          setOptions([]);
+        }
         break;
       case 'target_teams':
         searchTargetOptionsById('TEAMS', ids).then((response) => {
@@ -87,16 +111,24 @@ const useRetrieveOptions = () => {
       case 'finding_asset_groups':
       case 'inject_asset_groups':
       case 'base_asset_groups_side':
-        searchAssetGroupByIdAsOption(ids).then((response) => {
-          setOptions(response.data);
-        });
+        if (ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
+          searchAssetGroupByIdAsOption(ids).then((response) => {
+            setOptions(response.data);
+          });
+        } else {
+          setOptions([]);
+        }
         break;
       case 'finding_assets':
       case 'inject_assets':
       case 'base_assets_side':
-        searchEndpointByIdAsOption(ids).then((response) => {
-          setOptions(response.data);
-        });
+        if (ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
+          searchEndpointByIdAsOption(ids).then((response) => {
+            setOptions(response.data);
+          });
+        } else {
+          setOptions([]);
+        }
         break;
       case 'inject_teams':
       case 'base_teams_side':
@@ -116,8 +148,10 @@ const useRetrieveOptions = () => {
         break;
       case 'finding_scenario' :
       case 'exercise_scenario':
+      case 'base_scenario_side':
+      case SCENARIOS:
         searchScenarioByIdAsOption(ids).then((response) => {
-          setOptions(response.data);
+          handleOptions(response, filterDefaultValues);
         });
         break;
       case 'user_organization':
@@ -126,7 +160,16 @@ const useRetrieveOptions = () => {
         });
         break;
       case CUSTOM_DASHBOARD:
-        searchCustomDashboardByIdAsOptions(ids).then((response) => {
+        if (ability.can(ACTIONS.ACCESS, SUBJECTS.DASHBOARDS)) {
+          searchCustomDashboardByIdAsOptions(ids).then((response) => {
+            setOptions(response.data);
+          });
+        } else {
+          setOptions([]);
+        }
+        break;
+      case 'base_security_platforms_side':
+        searchSecurityPlatformByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

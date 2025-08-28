@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -94,6 +96,10 @@ public class SecurityPlatform extends Asset implements StixDomainObjectConvertib
   @JsonProperty("security_platform_logo_dark")
   @Schema(type = "string")
   private Document logoDark;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SECURITY_PLATFORM;
 
   public SecurityPlatform() {}
 

@@ -3,7 +3,10 @@ package io.openbas.rest.finding;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Finding;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.AggregatedFindingOutput;
@@ -21,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,6 +38,7 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.FINDING)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -61,6 +64,7 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -68,7 +72,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -90,6 +93,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -97,7 +104,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<AggregatedFindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -119,6 +125,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -126,7 +136,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<AggregatedFindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,
@@ -150,6 +159,10 @@ public class FindingSearchApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
+  @RBAC(
+      resourceId = "#endpointId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.ASSET)
   @ApiResponse(
       responseCode = "200",
       content =
@@ -157,7 +170,6 @@ public class FindingSearchApi extends RestBehavior {
               schema =
                   @Schema(
                       oneOf = {PageAggregatedFindingOutput.class, PageRelatedFindingOutput.class})))
-  @PreAuthorize("isObserver()")
   public Page<AggregatedFindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput,

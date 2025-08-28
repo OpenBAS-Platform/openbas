@@ -3,6 +3,7 @@ package io.openbas.rest.lessons;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.LessonsAnswerSpecification;
@@ -17,7 +18,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,13 +36,19 @@ public class ExerciseLessonsApi extends RestBehavior {
   private final MailingService mailingService;
 
   @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_categories")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Iterable<LessonsCategory> exerciseLessonsCategories(@PathVariable String exerciseId) {
     return lessonsCategoryRepository.findAll(LessonsCategorySpecification.fromExercise(exerciseId));
   }
 
   @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_apply_template/{lessonsTemplateId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> applyExerciseLessonsTemplate(
       @PathVariable String exerciseId, @PathVariable String lessonsTemplateId) {
@@ -79,7 +85,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_categories")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory createExerciseLessonsCategory(
       @PathVariable String exerciseId, @Valid @RequestBody LessonsCategoryCreateInput input) {
@@ -92,7 +101,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_answers_reset")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> resetExerciseLessonsAnswers(@PathVariable String exerciseId) {
     List<LessonsAnswer> lessonsAnswers =
@@ -120,7 +132,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_empty")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Iterable<LessonsCategory> emptyExerciseLessons(@PathVariable String exerciseId) {
     List<LessonsCategory> lessonsCategories =
@@ -138,7 +153,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategory(
       @PathVariable String exerciseId,
@@ -154,7 +172,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @DeleteMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsCategory(
       @PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
@@ -162,7 +183,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PutMapping(EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/teams")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public LessonsCategory updateExerciseLessonsCategoryTeams(
       @PathVariable String exerciseId,
@@ -178,7 +202,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_questions")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Iterable<LessonsQuestion> exerciseLessonsQuestions(@PathVariable String exerciseId) {
     return lessonsCategoryRepository
         .findAll(LessonsCategorySpecification.fromExercise(exerciseId))
@@ -193,7 +220,10 @@ public class ExerciseLessonsApi extends RestBehavior {
 
   @GetMapping(
       EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public Iterable<LessonsQuestion> exerciseLessonsCategoryQuestions(
       @PathVariable String exerciseId, @PathVariable String lessonsCategoryId) {
     return lessonsQuestionRepository.findAll(
@@ -202,7 +232,10 @@ public class ExerciseLessonsApi extends RestBehavior {
 
   @PostMapping(
       EXERCISE_URL + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public LessonsQuestion createExerciseLessonsQuestion(
       @PathVariable String exerciseId,
       @PathVariable String lessonsCategoryId,
@@ -220,7 +253,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   @PutMapping(
       EXERCISE_URL
           + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public LessonsQuestion updateExerciseLessonsQuestion(
       @PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId,
@@ -237,7 +273,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   @DeleteMapping(
       EXERCISE_URL
           + "{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void deleteExerciseLessonsQuestion(
       @PathVariable String exerciseId, @PathVariable String lessonsQuestionId) {
@@ -245,7 +284,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URL + "{exerciseId}/lessons_send")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void sendExerciseLessons(
       @PathVariable String exerciseId, @Valid @RequestBody LessonsSendInput input) {
@@ -267,7 +309,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @GetMapping(EXERCISE_URL + "{exerciseId}/lessons_answers")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public List<LessonsAnswer> exerciseLessonsAnswers(
       @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     return lessonsCategoryRepository
@@ -289,6 +334,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_categories")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public List<LessonsCategory> playerLessonsCategories(
       @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -296,6 +345,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_questions")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public List<LessonsQuestion> playerLessonsQuestions(
       @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -311,6 +364,10 @@ public class ExerciseLessonsApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/lessons/exercise/{exerciseId}/lessons_answers")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public List<LessonsAnswer> playerLessonsAnswers(
       @PathVariable String exerciseId, @RequestParam Optional<String> userId) {
     impersonateUser(userRepository, userId); // Protection for ?
@@ -334,6 +391,10 @@ public class ExerciseLessonsApi extends RestBehavior {
 
   @PostMapping(
       "/api/player/lessons/exercise/{exerciseId}/lessons_categories/{lessonsCategoryId}/lessons_questions/{lessonsQuestionId}/lessons_answers")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public LessonsAnswer createExerciseLessonsQuestion(
       @PathVariable String exerciseId,
       @PathVariable String lessonsQuestionId,

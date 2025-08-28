@@ -55,16 +55,16 @@ public class EndpointService {
   public static final String OPENBAS_AGENT_UPGRADE = "openbas-agent-upgrade";
   public static final String SERVICE = "service";
   public static final String SERVICE_USER = "service-user";
-  public static final String SESSION_USER = "sessions-user";
+  public static final String SESSION_USER = "session-user";
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
   public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE =
       "C:\\Program Files (x86)\\Filigran\\OBAS Agent";
-  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE_USER = "C:\\Filigran";
-  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SESSION_USER = "C:\\Filigran";
+  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SERVICE_USER = "$HOME\\.openbas";
+  public static final String OPENBAS_INSTALL_DIR_WINDOWS_SESSION_USER = "$HOME\\.openbas";
   public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE = "/opt/openbas-agent";
-  public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE_USER = "/opt/openbas-agent-service";
+  public static final String OPENBAS_INSTALL_DIR_UNIX_SERVICE_USER = ".local/openbas-agent-service";
   public static final String OPENBAS_INSTALL_DIR_UNIX_SESSION_USER = ".local/openbas-agent-session";
 
   public static final String OPENBAS_SERVICE_NAME_WINDOWS_SERVICE = "OBASAgentService";
@@ -637,6 +637,14 @@ public class EndpointService {
         generateServiceNameOrPrefix(platform, installationMode, serviceNameOrPrefix);
     return getFileOrDownloadFromJfrog(
         platform, upgradeName, adminToken, installationDir, serviceNameOrPrefix);
+  }
+
+  public List<Endpoint> endpointsForScenario(String scenarioId) {
+    return this.endpointRepository.findDistinctByInjectsScenarioId(scenarioId);
+  }
+
+  public List<Endpoint> endpointsForSimulation(String simulationId) {
+    return this.endpointRepository.findDistinctByInjectsExerciseId(simulationId);
   }
 
   // -- OPTIONS --

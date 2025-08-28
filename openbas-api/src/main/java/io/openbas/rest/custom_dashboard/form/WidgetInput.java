@@ -8,7 +8,6 @@ import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.WidgetConfiguration;
 import io.openbas.engine.api.WidgetType;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +22,6 @@ public class WidgetInput {
 
   @JsonProperty("widget_config")
   @NotNull(message = MANDATORY_MESSAGE)
-  @Valid
   private WidgetConfiguration widgetConfiguration;
 
   @JsonProperty("widget_layout")

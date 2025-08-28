@@ -10,7 +10,8 @@ import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import CustomDashboardComponent from '../../../workspaces/custom_dashboards/CustomDashboard';
-import { CustomDashboardContext } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
+import { CustomDashboardContext, type ParameterOption } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
+import { ALL_TIME_TIME_RANGE } from '../../../workspaces/custom_dashboards/widgets/configuration/common/TimeRangeUtils';
 
 const SimulationAnalysis = () => {
   const dispatch = useAppDispatch();
@@ -30,17 +31,31 @@ const SimulationAnalysis = () => {
       fetchCustomDashboard(exercise.exercise_custom_dashboard).then((response) => {
         if (response.data) {
           const dashboard = response.data;
-          // FIXME: Revise the parameter definition to indicate a hidden filter
           setCustomDashboard(dashboard);
 
-          const params: Record<string, string> = {};
+          const params: Record<string, ParameterOption> = {};
           dashboard.custom_dashboard_parameters?.forEach((p: {
             custom_dashboards_parameter_type: string;
             custom_dashboards_parameter_id: string;
           }) => {
-            // FIXME: Rework the parameter definition to flag it as a hidden filter, which should also be treated as contextual and not displayed
             if ('simulation' === p.custom_dashboards_parameter_type) {
-              params[p.custom_dashboards_parameter_id] = exerciseId;
+              params[p.custom_dashboards_parameter_id] = {
+                value: exerciseId,
+                hidden: true,
+              };
+            } else if ('scenario' === p.custom_dashboards_parameter_type) {
+              params[p.custom_dashboards_parameter_id] = {
+                value: exercise.exercise_scenario ?? '',
+                hidden: true,
+              };
+            } else {
+              params[p.custom_dashboards_parameter_id] = {
+                value: p.custom_dashboards_parameter_id,
+                hidden: false,
+              };
+            }
+            if ('timeRange' === p.custom_dashboards_parameter_type) {
+              params[p.custom_dashboards_parameter_id].value = ALL_TIME_TIME_RANGE;
             }
           });
           setCustomDashboardParameters(params);

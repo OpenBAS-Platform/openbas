@@ -14,6 +14,8 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import SecurityMenu from '../SecurityMenu';
 import CreateUser from './CreateUser';
 import UserPopover from './UserPopover';
@@ -209,9 +211,11 @@ const Users = () => {
             </ListItem>
           ))}
         </List>
-        <CreateUser
-          onCreate={result => setUsers([result, ...users])}
-        />
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PLATFORM_SETTINGS}>
+          <CreateUser
+            onCreate={result => setUsers([result, ...users])}
+          />
+        </Can>
       </div>
       <SecurityMenu />
     </div>

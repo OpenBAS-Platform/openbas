@@ -14,8 +14,6 @@ const THEME_DARK_DEFAULT_SECONDARY = '#00f1bd';
 const THEME_DARK_DEFAULT_ACCENT = '#0f1e38';
 const THEME_DARK_DEFAULT_PAPER = '#09101e';
 const THEME_DARK_DEFAULT_NAV = '#070d19';
-const THEME_DARK_DEFAULT_SCROLL_BACKGROUND = '#00020c';
-const THEME_DARK_DEFAULT_SCROLL_COLOR = '#7a7c85b3';
 export const BACKGROUND_COLOR_GREY = '#181E27';
 
 const ThemeDark = (
@@ -149,11 +147,11 @@ const ThemeDark = (
     MuiCssBaseline: {
       styleOverrides: {
         html: {
-          scrollbarColor: `${accent || THEME_DARK_DEFAULT_SCROLL_COLOR} ${background || THEME_DARK_DEFAULT_SCROLL_BACKGROUND}`,
+          scrollbarColor: `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
           scrollbarWidth: 'thin',
         },
         body: {
-          'scrollbarColor': `${accent || THEME_DARK_DEFAULT_SCROLL_COLOR} ${background || THEME_DARK_DEFAULT_SCROLL_BACKGROUND}`,
+          'scrollbarColor': `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
           'scrollbarWidth': 'thin',
           'html': { WebkitFontSmoothing: 'auto' },
           'a': { color: primary || THEME_DARK_DEFAULT_PRIMARY },

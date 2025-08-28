@@ -1,8 +1,9 @@
 package io.openbas.rest.role;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.role.form.RoleInput;
 import io.openbas.rest.role.form.RoleMapper;
@@ -18,12 +19,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_ADMIN)
 @Tag(name = "Roles management", description = "Endpoints to manage Roles.")
 public class RoleApi {
 
@@ -40,6 +39,10 @@ public class RoleApi {
 
   @LogExecutionTime
   @GetMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.GROUP_ROLE)
   @Operation(description = "Get Role by Id", summary = "Get Role")
   @ApiResponses(
       value = {
@@ -56,15 +59,19 @@ public class RoleApi {
 
   @LogExecutionTime
   @GetMapping(RoleApi.ROLE_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.GROUP_ROLE)
   @Operation(description = "Get All Roles", summary = "Get Roles")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of all Roles")})
   public List<RoleOutput> roles() {
     return roleService.findAll().stream().map(roleMapper::toRoleOutput).toList();
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Delete Role", description = "Role needs to exists")
   @ApiResponses(
@@ -77,9 +84,9 @@ public class RoleApi {
     roleService.deleteRole(roleId);
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create Role")
   @ApiResponses(
@@ -92,9 +99,12 @@ public class RoleApi {
         roleService.createRole(input.getName(), input.getCapabilities()));
   }
 
-  @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(RoleApi.ROLE_URI + "/{roleId}")
+  @RBAC(
+      resourceId = "#roleId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.GROUP_ROLE)
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Update Role", description = "Role needs to exists")
   @ApiResponses(
@@ -111,6 +121,7 @@ public class RoleApi {
 
   @LogExecutionTime
   @PostMapping(RoleApi.ROLE_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.GROUP_ROLE)
   @Operation(
       description = "Search Roles corresponding to search criteria",
       summary = "Search Roles")

@@ -1,10 +1,12 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteCustomDashboardWidget, updateCustomDashboardWidget } from '../../../../../actions/custom_dashboards/customdashboardwidget-action';
 import ButtonPopover, { type PopoverEntry } from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
 import { type Widget } from '../../../../../utils/api-types-custom';
+import { AbilityContext } from '../../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import WidgetForm from './configuration/WidgetForm';
 import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
@@ -25,6 +27,7 @@ const WidgetPopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
 
   // Edition
   const [openEdit, setOpenEdit] = useState(false);
@@ -58,10 +61,12 @@ const WidgetPopover: FunctionComponent<Props> = ({
     {
       label: 'Update',
       action: toggleDialog,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DASHBOARDS),
     },
     {
       label: 'Delete',
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.DASHBOARDS),
     },
   ];
 

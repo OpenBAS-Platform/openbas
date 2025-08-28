@@ -35,3 +35,7 @@ export const searchCustomDashboardAsOptions = (searchText: string = '') => {
 export const searchCustomDashboardByIdAsOptions = (ids: string[]) => {
   return simplePostCall(`${CUSTOM_DASHBOARD_URI}/options`, ids);
 };
+
+export const searchCustomDashboardAsOptionsByResourceId = (resourceId: string) => {
+  return simpleCall(`${CUSTOM_DASHBOARD_URI}/resource/${resourceId}/options`);
+};

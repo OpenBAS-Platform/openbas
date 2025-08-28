@@ -1,5 +1,6 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType.*;
 import static io.openbas.database.specification.CustomDashboardSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
@@ -12,6 +13,7 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.mapper.CustomDashboardMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,12 @@ public class CustomDashboardService {
    */
   @Transactional
   public CustomDashboard createCustomDashboard(@NotNull final CustomDashboard customDashboard) {
-    return this.customDashboardRepository.save(customDashboard);
+    CustomDashboard customDashboardWithDefaultParams =
+        customDashboard
+            .addParameter("Time range", timeRange)
+            .addParameter("Start date", startDate)
+            .addParameter("End date", endDate);
+    return this.customDashboardRepository.save(customDashboardWithDefaultParams);
   }
 
   /**
@@ -136,6 +143,12 @@ public class CustomDashboardService {
    */
   public List<FilterUtilsJpa.Option> findAllByIdsAsOptions(final List<String> ids) {
     return fromIterable(customDashboardRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  public List<FilterUtilsJpa.Option> findAllByResourceIdsAsOptions(@NotBlank String resourceId) {
+    return fromIterable(customDashboardRepository.findByResourceId(resourceId)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }

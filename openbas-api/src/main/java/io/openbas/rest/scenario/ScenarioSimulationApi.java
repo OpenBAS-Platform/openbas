@@ -1,38 +1,42 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.fromScenario;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.ResourceType;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Secured(ROLE_USER)
 @RequiredArgsConstructor
-public class ScenarioExerciseApi {
+public class ScenarioSimulationApi {
 
   private final ExerciseService exerciseService;
 
   @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/exercises")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId) {
     return exerciseService.scenarioExercises(scenarioId);
@@ -40,7 +44,10 @@ public class ScenarioExerciseApi {
 
   @LogExecutionTime
   @PostMapping(SCENARIO_URI + "/{scenarioId}/exercises/search")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   public Iterable<ExerciseSimple> scenarioExercises(
       @PathVariable @NotBlank final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -57,5 +64,14 @@ public class ScenarioExerciseApi {
         searchPaginationInput,
         Exercise.class,
         joinMap);
+  }
+
+  // -- OPTION --
+
+  @GetMapping(SCENARIO_URI + "/{scenarioId}/simulations/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @PathVariable @NotBlank final String scenarioId,
+      @RequestParam(required = false) final String searchText) {
+    return this.exerciseService.findAllAsOptions(fromScenario(scenarioId), searchText);
   }
 }

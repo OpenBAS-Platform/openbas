@@ -1,9 +1,11 @@
 package io.openbas.rest.scenario;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.ImportMapper;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -20,7 +22,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,9 +38,12 @@ public class ScenarioImportApi extends RestBehavior {
   private final ScenarioService scenarioService;
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/xls/{importId}/dry")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Test the import of injects from an xls file")
-  @Secured(ROLE_USER)
   public ImportTestSummary dryRunImportXLSFile(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String importId,
@@ -61,9 +65,12 @@ public class ScenarioImportApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/xls/{importId}/import")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   @Operation(summary = "Validate and import injects from an xls file")
-  @Secured(ROLE_USER)
   public ImportTestSummary validateImportXLSFile(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String importId,

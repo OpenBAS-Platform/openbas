@@ -4,10 +4,12 @@ import static jakarta.persistence.FetchType.LAZY;
 import static java.time.Instant.now;
 import static java.util.function.Function.identity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.database.model.CustomDashboardParameters.CustomDashboardParameterType;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -62,6 +64,19 @@ public class CustomDashboard implements Base {
   @OrderBy("id ASC")
   private List<CustomDashboardParameters> parameters = new ArrayList<>();
 
+  public CustomDashboard addParameter(
+      @NotBlank final String name, @NotBlank final CustomDashboardParameterType type) {
+    if (this.getParameters().stream().anyMatch(p -> p.getType().equals(type) && type.uniq)) {
+      return this;
+    }
+    CustomDashboardParameters customDashboardEndDateParameter = new CustomDashboardParameters();
+    customDashboardEndDateParameter.setName(name);
+    customDashboardEndDateParameter.setType(type);
+    customDashboardEndDateParameter.setCustomDashboard(this);
+    this.parameters.add(customDashboardEndDateParameter);
+    return this;
+  }
+
   // -- AUDIT --
 
   @CreationTimestamp
@@ -75,6 +90,10 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_updated_at")
   @NotNull
   private Instant updateDate = now();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.DASHBOARD;
 
   // -- UTILS --
 

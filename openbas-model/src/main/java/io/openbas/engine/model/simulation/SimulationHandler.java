@@ -2,6 +2,7 @@ package io.openbas.engine.model.simulation;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.raw.RawSimulation;
 import io.openbas.database.repository.ExerciseRepository;
@@ -28,12 +29,16 @@ public class SimulationHandler implements Handler<EsSimulation> {
               EsSimulation esSimulation = new EsSimulation();
               // Base
               esSimulation.setBase_id(simulation.getExercise_id());
+              esSimulation.setStatus(simulation.getExercise_status());
               esSimulation.setBase_created_at(simulation.getExercise_created_at());
               esSimulation.setBase_updated_at(simulation.getExercise_injects_updated_at());
+              esSimulation.setName(simulation.getExercise_name());
 
               esSimulation.setBase_representative(simulation.getExercise_name());
-              esSimulation.setBase_restrictions(buildRestrictions(simulation.getExercise_id()));
+              esSimulation.setBase_restrictions(
+                  buildRestrictions(simulation.getExercise_id(), simulation.getScenario_id()));
               // Specific
+              esSimulation.setBase_platforms_side_denormalized(simulation.getExercise_platforms());
               // Dependencies
               List<String> dependencies = new ArrayList<>();
               if (!isEmpty(simulation.getExercise_tags())) {
@@ -51,6 +56,10 @@ public class SimulationHandler implements Handler<EsSimulation> {
               if (!isEmpty(simulation.getExercise_teams())) {
                 dependencies.addAll(simulation.getExercise_teams());
                 esSimulation.setBase_teams_side(simulation.getExercise_teams());
+              }
+              if (hasText(simulation.getScenario_id())) {
+                dependencies.add(simulation.getScenario_id());
+                esSimulation.setBase_scenario_side(simulation.getScenario_id());
               }
               esSimulation.setBase_dependencies(dependencies);
               return esSimulation;
