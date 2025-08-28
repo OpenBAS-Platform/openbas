@@ -134,9 +134,12 @@ public class SpecificationUtils {
           BiFunction<Specification<T>, Pageable, Page<T>> findAll,
           Grant.GRANT_TYPE grantType,
           String userId,
-          boolean isAdmin) {
+          boolean isAdmin,
+          boolean hasCapaForClass) {
     return (spec, pageable) ->
         findAll.apply(
-            spec.and(SpecificationUtils.hasGrantAccess(userId, isAdmin, grantType)), pageable);
+            spec.and(
+                SpecificationUtils.hasGrantAccess(userId, isAdmin, hasCapaForClass, grantType)),
+            pageable);
   }
 }

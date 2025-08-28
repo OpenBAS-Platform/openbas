@@ -6,7 +6,7 @@ import {
   postReferential,
   putReferential,
   simpleCall,
-  simplePostCall
+  simplePostCall,
 } from '../../utils/Action';
 import {
   type Payload,
@@ -16,7 +16,7 @@ import {
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
-import {arrayOfDocuments, payload} from '../Schema';
+import { arrayOfDocuments, payload } from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
