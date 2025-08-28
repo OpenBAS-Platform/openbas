@@ -32,6 +32,22 @@ public class InjectSecurityAssessmentService {
 
   private final InjectRepository injectRepository;
 
+  /**
+   * Creates and manages injects for the given scenario based on the associated security assessment.
+   *
+   * <p>Steps:
+   *
+   * <ul>
+   *   <li>Resolves internal TTPs from the assessment
+   *   <li>Fetches asset groups based on scenario tag rules
+   *   <li>Analyzes existing inject coverage
+   *   <li>Removes outdated injects
+   *   <li>Generates missing injects depending on whether asset groups are available
+   * </ul>
+   *
+   * @param scenario the scenario for which injects are managed
+   * @param securityAssessment the related security assessment providing TTP references
+   */
   public void createdInjectsForScenario(Scenario scenario, SecurityAssessment securityAssessment) {
     // 1. Fetch internal Ids for TTPs
     Map<String, AttackPattern> attackPatterns =
@@ -63,6 +79,13 @@ public class InjectSecurityAssessmentService {
     }
   }
 
+  /**
+   * Resolves external TTP references from a {@link SecurityAssessment} into internal {@link
+   * AttackPattern} entities using the {@code attackPatternService}.
+   *
+   * @param securityAssessment the security assessment containing external TTP references
+   * @return list of resolved internal AttackPattern entities
+   */
   private Map<String, AttackPattern> fetchInternalTTPIdsFromSecurityAssessment(
       SecurityAssessment securityAssessment) {
     return attackPatternService
@@ -74,11 +97,24 @@ public class InjectSecurityAssessmentService {
         .collect(Collectors.toMap(attack -> attack.getId(), Function.identity()));
   }
 
+  /**
+   * Retrieves asset groups for a scenario based on tag rules using the {@code tagRuleService}.
+   *
+   * @param scenario the scenario containing tag references
+   * @return list of asset groups associated with the scenario tags
+   */
   private List<AssetGroup> fetchAssetGroupsFromScenarioTagRules(Scenario scenario) {
     return tagRuleService.getAssetGroupsFromTagIds(
         scenario.getTags().stream().map(Tag::getId).toList());
   }
 
+  /**
+   * Extracts the inject coverage from the scenario's injects, mapping each inject to its set of
+   * (TTP × Platform × Architecture) combinations.
+   *
+   * @param scenario the scenario containing injects
+   * @return a map of injects to their TTP-platform-architecture combinations
+   */
   private static Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>>
       extractCombinationTtpPlatformArchitectureFromScenarioInjects(Scenario scenario) {
     return scenario.getInjects().stream()
@@ -123,6 +159,23 @@ public class InjectSecurityAssessmentService {
                 }));
   }
 
+  /**
+   * Handles inject deletion and generation when asset groups and endpoints are available.
+   *
+   * <p>Performs:
+   *
+   * <ul>
+   *   <li>Required combination computation
+   *   <li>Comparison with existing injects
+   *   <li>Obsolete inject deletion
+   *   <li>Missing inject generation
+   * </ul>
+   *
+   * @param scenario the scenario being processed
+   * @param assetsFromGroupMap the available asset groups and their endpoints
+   * @param attackPatterns list of required TTPs
+   * @param injectCoverageMap existing inject coverage
+   */
   private void handleWithAssetGroupsCase(
       Scenario scenario,
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
@@ -168,6 +221,15 @@ public class InjectSecurityAssessmentService {
     }
   }
 
+  /**
+   * Handles inject deletion and generation when no asset groups are defined or available.
+   *
+   * <p>Only required TTPs are used to determine what to remove or generate.
+   *
+   * @param scenario the scenario being processed
+   * @param requiredTtps list of required TTPs
+   * @param injectCoverageMap current inject coverage
+   */
   private void handleNoAssetGroupsCase(
       Scenario scenario,
       Map<String, AttackPattern> requiredTtps,
@@ -209,6 +271,13 @@ public class InjectSecurityAssessmentService {
     }
   }
 
+  /**
+   * Builds the complete set of required combinations of TTPs and platform-architecture pairs.
+   *
+   * @param attackPatterns list of attack patterns (TTPs)
+   * @param allPlatformArchs set of platform-architecture pairs
+   * @return set of (TTP × Platform × Architecture) combinations
+   */
   private static Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>
       buildCombinationTtpPlatformArchitecture(
           Set<String> attackPatterns, Set<Pair<Endpoint.PLATFORM_TYPE, String>> allPlatformArchs) {
@@ -218,6 +287,15 @@ public class InjectSecurityAssessmentService {
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Computes the missing combinations by comparing required vs. covered combinations. Filters the
+   * missing TTPs and identifies the relevant asset groups.
+   *
+   * @param requiredCombinations expected combinations to be covered
+   * @param coveredCombinations currently covered combinations
+   * @param assetsFromGroupMap map of asset groups to endpoints
+   * @return a {@link MissingCombinations} object containing uncovered TTPs and relevant assets
+   */
   private MissingCombinations getMissingCombinations(
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> requiredCombinations,
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> coveredCombinations,
@@ -237,6 +315,14 @@ public class InjectSecurityAssessmentService {
     return new MissingCombinations(filteredTtps, filteredAssetsFromGroupMap);
   }
 
+  /**
+   * Filters and returns asset groups whose endpoints match any of the missing platform-architecture
+   * combinations.
+   *
+   * @param missingCombinations set of missing TTP-platform-architecture triples
+   * @param assetsFromGroupMap all asset groups and their endpoints
+   * @return filtered map of asset groups relevant to the missing combinations
+   */
   private Map<AssetGroup, List<Endpoint>> computeMissingAssetGroups(
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> missingCombinations,
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap) {
@@ -259,6 +345,13 @@ public class InjectSecurityAssessmentService {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
+  /**
+   * Removes injects that do not match any of the required (TTP × Platform × Architecture)
+   * combinations.
+   *
+   * @param injectCoverageMap current inject coverage
+   * @param requiredCombinations all required combinations
+   */
   private void removeInjectsNoLongerNecessary(
       Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap,
       Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> requiredCombinations) {
@@ -276,6 +369,13 @@ public class InjectSecurityAssessmentService {
     injectRepository.deleteAll(injectsToRemove);
   }
 
+  /**
+   * Record representing the result of a missing combination analysis, containing uncovered TTPs and
+   * the filtered asset groups relevant to them.
+   *
+   * @param filteredTtps set of uncovered TTPs
+   * @param filteredAssetsFromGroupMap map of relevant asset groups with their endpoints
+   */
   private record MissingCombinations(
       Set<String> filteredTtps, Map<AssetGroup, List<Endpoint>> filteredAssetsFromGroupMap) {}
 }
