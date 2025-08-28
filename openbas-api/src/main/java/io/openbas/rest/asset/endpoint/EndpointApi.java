@@ -3,13 +3,16 @@ package io.openbas.rest.asset.endpoint;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.*;
@@ -25,6 +28,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -45,6 +49,7 @@ public class EndpointApi extends RestBehavior {
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
+  private final TagRepository tagRepository;
 
   private final EndpointMapper endpointMapper;
 
@@ -63,10 +68,18 @@ public class EndpointApi extends RestBehavior {
     if (input.getExternalReference() != null) {
       endpoint = this.endpointService.findEndpointByExternalReference(input.getExternalReference());
     }
-    if (endpoint.isEmpty()) {
+    if (endpoint.isEmpty() && input.getIps() != null) {
       List<Endpoint> endpoints =
           this.endpointService.findEndpointByHostnameAndAtLeastOneIp(
-              input.getHostname(), input.getPlatform(), input.getArch(), input.getIps());
+              input.getHostname(), input.getIps());
+      if (!endpoints.isEmpty()) {
+        endpoint = Optional.of(endpoints.getFirst());
+      }
+    }
+    if (endpoint.isEmpty() && input.getMacAddresses() != null) {
+      List<Endpoint> endpoints =
+          this.endpointService.findEndpointByHostnameAndAtLeastOneMacAddress(
+              input.getHostname(), input.getMacAddresses());
       if (!endpoints.isEmpty()) {
         endpoint = Optional.of(endpoints.getFirst());
       }
@@ -74,10 +87,20 @@ public class EndpointApi extends RestBehavior {
     if (endpoint.isPresent()) {
       Endpoint endpointToUpdate = endpoint.get();
       // Mandatory fields
-      endpointToUpdate.setIps(EndpointMapper.setIps(input.getIps()));
+      endpointToUpdate.setName(input.getName());
+      Iterable<String> tags =
+          Stream.concat(
+                  endpointToUpdate.getTags().stream().map(Tag::getId).toList().stream(),
+                  input.getTagIds().stream())
+              .distinct()
+              .toList();
+      endpointToUpdate.setTags(iterableToSet(tagRepository.findAllById(tags)));
       endpointToUpdate.setArch(input.getArch());
       endpointToUpdate.setPlatform(input.getPlatform());
       // Optional fields
+      if (input.getIps() != null) {
+        endpointToUpdate.setIps(EndpointMapper.setIps(input.getIps()));
+      }
       if (input.getHostname() != null) {
         endpointToUpdate.setHostname(input.getHostname());
       }
