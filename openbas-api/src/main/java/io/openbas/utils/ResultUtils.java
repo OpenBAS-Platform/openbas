@@ -44,7 +44,10 @@ public class ResultUtils {
       return emptyList();
     }
 
-    List<InjectExpectation> expectations = injectExpectationRepository.findAllForInjects(injectIds);
+    List<InjectExpectation> expectations =
+        injectExpectationRepository.findAllForInjects(injectIds).stream()
+            .map(InjectExpectation::clone)
+            .toList();
     expectations.forEach(
         exp -> {
           exp.setResults(

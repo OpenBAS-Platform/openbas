@@ -149,7 +149,9 @@ public class SecurityCoverageService {
             .filter(
                 i ->
                     i.getInjectorContract().isPresent()
-                        && i.getInjectorContract().get().getAttackPatterns().contains(ap.get()))
+                        && i.getInjectorContract().get().getAttackPatterns().stream()
+                            .anyMatch(
+                                attackPattern -> attackPattern.getId().equals(ap.get().getId())))
             .toList();
     if (injects.isEmpty()) {
       return uncovered();

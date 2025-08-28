@@ -7,7 +7,9 @@ import java.util.Map;
 public class RelationshipObject extends ObjectBase {
   public enum Properties {
     TARGET_REF("target_ref"),
-    SOURCE_REF("source_ref");
+    SOURCE_REF("source_ref"),
+    START_TIME("start_time"),
+    STOP_TIME("stop_time");
 
     private final String value;
 
