@@ -66,7 +66,7 @@ public class EndpointApi extends RestBehavior {
   }
 
   @PostMapping(ENDPOINT_URI + "/agentless/upsert")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertAgentLessEndpoint(@Valid @RequestBody final EndpointInput input) {
     Optional<Endpoint> endpoint = Optional.empty();
