@@ -1,8 +1,8 @@
 package io.openbas.rest.asset.endpoint;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.aop.RBAC;
