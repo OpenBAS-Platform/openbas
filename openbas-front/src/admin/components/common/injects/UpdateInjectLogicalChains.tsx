@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import arrayMutators from 'final-form-arrays';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 import { Form } from 'react-final-form';
 
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
@@ -9,6 +9,7 @@ import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type Inject, type InjectDependency } from '../../../../utils/api-types';
+import { PermissionsContext } from '../Context';
 import InjectChainsForm from './InjectChainsForm';
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
 const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
   const { t } = useFormatter();
   const theme = useTheme();
+  const { permissions } = useContext(PermissionsContext);
 
   const { injectsMap } = useHelper((helper: InjectHelper) => ({ injectsMap: helper.getInjectsMap() }));
 
@@ -128,7 +130,7 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
                 variant="contained"
                 color="secondary"
                 type="submit"
-                disabled={errors !== undefined && Object.keys(errors).length > 0}
+                disabled={(errors !== undefined && Object.keys(errors).length > 0) || permissions.readOnly}
               >
                 {t('Update')}
               </Button>

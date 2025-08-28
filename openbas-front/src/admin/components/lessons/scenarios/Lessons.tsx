@@ -5,7 +5,7 @@ import { type ChangeEvent, type FunctionComponent, useContext, useEffect, useSta
 import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team } from '../../../../utils/api-types';
+import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
@@ -22,6 +22,7 @@ interface GenericSource {
   type: string;
   name: string;
   lessons_anonymized: boolean;
+  isReadOnly: boolean;
   isUpdatable: boolean;
 }
 
@@ -34,6 +35,7 @@ interface Props {
   lessonsQuestions: LessonsQuestion[];
   lessonsAnswers?: LessonsAnswer[];
   lessonsTemplates: LessonsTemplate[];
+  usersMap: Record<string, User>;
 }
 
 const Lessons: FunctionComponent<Props> = ({
@@ -129,6 +131,7 @@ const Lessons: FunctionComponent<Props> = ({
                 />
               </Grid>
             )}
+
             <Can I={ACTIONS.ACCESS} a={SUBJECTS.LESSONS_LEARNED}>
               <Grid size={{ xs: 6 }}>
                 <Typography variant="h3">{t('Template')}</Typography>
@@ -159,6 +162,7 @@ const Lessons: FunctionComponent<Props> = ({
                 <Typography variant="h3">
                   {t('Categories and questions')}
                 </Typography>
+
                 <Button
                   startIcon={<DeleteSweepOutlined />}
                   color="error"
@@ -186,9 +190,9 @@ const Lessons: FunctionComponent<Props> = ({
           isReport={false}
         />
       </div>
-
-      {permissions.canManage
-        && <CreateLessonsCategory />}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
+        <CreateLessonsCategory />
+      </Can>
       <Dialog
         TransitionComponent={Transition}
         keepMounted={false}
@@ -274,16 +278,13 @@ const Lessons: FunctionComponent<Props> = ({
             >
               {t('Cancel')}
             </Button>
-            <Can I={ACTIONS.ACCESS} a={SUBJECTS.LESSONS_LEARNED}>
-              <Button
-                color="secondary"
-                onClick={applyTemplate}
-                disabled={templateValue === null}
-              >
-                {t('Apply')}
-              </Button>
-            </Can>
-
+            <Button
+              color="secondary"
+              onClick={applyTemplate}
+              disabled={templateValue === null}
+            >
+              {t('Apply')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

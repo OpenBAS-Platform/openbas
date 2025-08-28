@@ -64,6 +64,7 @@ const ScenarioLessons = () => {
     lessonsCategories,
     lessonsQuestions,
     lessonsTemplates,
+    usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     const scenarioData = helper.getScenario(scenarioId);
     return {
@@ -133,6 +134,7 @@ const ScenarioLessons = () => {
       <Lessons
         source={{
           ...source,
+          isReadOnly: permissions.readOnly,
           isUpdatable: permissions.canManage,
         }}
         objectives={objectives}
@@ -141,6 +143,7 @@ const ScenarioLessons = () => {
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
         lessonsTemplates={lessonsTemplates}
+        usersMap={usersMap}
       >
       </Lessons>
     </LessonContext.Provider>
