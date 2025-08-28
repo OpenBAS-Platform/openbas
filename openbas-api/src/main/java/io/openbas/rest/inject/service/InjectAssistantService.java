@@ -1,5 +1,7 @@
 package io.openbas.rest.inject.service;
 
+import static java.util.Collections.emptyList;
+
 import io.openbas.database.helper.InjectorContractRepositoryHelper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -11,16 +13,13 @@ import io.openbas.rest.injector_contract.InjectorContractContentUtils;
 import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +39,8 @@ public class InjectAssistantService {
    * Generate injects for a given scenario based on the provided input.
    *
    * @param scenario the scenario for which injects are generated
-   * @param input    the input containing details for inject generation, such as attack pattern IDs, asset IDs, asset
-   *                 group IDs, and the number of injects per TTP
+   * @param input the input containing details for inject generation, such as attack pattern IDs,
+   *     asset IDs, asset group IDs, and the number of injects per TTP
    * @return a list of generated injects
    */
   public List<Inject> generateInjectsForScenario(Scenario scenario, InjectAssistantInput input) {
@@ -81,37 +80,13 @@ public class InjectAssistantService {
     return this.injectRepository.saveAll(injects);
   }
 
-  public List<Inject> generateInjectsByTTPs(
-      Scenario scenario,
-      List<String> attackPatternIds,
-      Integer ttpNumber,
-      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap) {
-    List<Inject> injects = new ArrayList<>();
-    attackPatternIds.forEach(
-        attackPatternId -> {
-          try {
-            List<Inject> injectsToAdd =
-                this.generateInjectsByTTP(attackPatternId, assetsFromGroupMap, ttpNumber);
-            injects.addAll(injectsToAdd);
-          } catch (UnprocessableContentException e) {
-            throw new UnsupportedOperationException(e);
-          }
-        });
-
-    for (Inject inject : injects) {
-      inject.setScenario(scenario);
-    }
-
-    return this.injectRepository.saveAll(injects);
-  }
-
   /**
    * Builds an Inject object based on the provided InjectorContract, title, description and enabled
    *
    * @param injectorContract the InjectorContract associated with the Inject
-   * @param title            the title of the Inject
-   * @param description      the description of the Inject
-   * @param enabled          indicates whether the Inject is enabled or not
+   * @param title the title of the Inject
+   * @param description the description of the Inject
+   * @param enabled indicates whether the Inject is enabled or not
    * @return the inject object built
    */
   private Inject buildInject(
@@ -131,7 +106,7 @@ public class InjectAssistantService {
    * Builds a technical Inject object from the provided InjectorContract and AttackPattern.
    *
    * @param injectorContract the InjectorContract to build the Inject from
-   * @param attackPattern    the AttackPattern associated with the Inject
+   * @param attackPattern the AttackPattern associated with the Inject
    * @return the built Inject object
    */
   private Inject buildTechnicalInjectFromInjectorContract(
@@ -151,8 +126,8 @@ public class InjectAssistantService {
    * Builds a manual Inject object - also called Placeholder.
    *
    * @param attackPattern the AttackPattern to specify in the title and description of the Inject
-   * @param platform      the platform to specify in the title and description of the Inject
-   * @param architecture  the architecture to specify in the title and description of the Inject
+   * @param platform the platform to specify in the title and description of the Inject
+   * @param architecture the architecture to specify in the title and description of the Inject
    * @return the built manual Inject object
    */
   private Inject buildManualInject(
@@ -189,8 +164,8 @@ public class InjectAssistantService {
    * Groups endpoints by their platform and architecture.
    *
    * @param endpoints the list of endpoints to group
-   * @return a map where the key is a string combining platform and architecture, and the value is a list of endpoints
-   * that match that platform-architecture pair
+   * @return a map where the key is a string combining platform and architecture, and the value is a
+   *     list of endpoints that match that platform-architecture pair
    */
   public Map<String, List<Endpoint>> groupEndpointsByPlatformAndArchitecture(
       List<Endpoint> endpoints) {
@@ -201,21 +176,20 @@ public class InjectAssistantService {
 
   private record ContractResultForEndpoints(
       Map<InjectorContract, List<Endpoint>> contractEndpointsMap,
-      Map<String, List<Endpoint>> manualEndpoints) {
-
-  }
+      Map<String, List<Endpoint>> manualEndpoints) {}
 
   /**
    * Get the injector contract for assets and TTP.
    *
-   * @param attackPattern     the attack pattern for which the injector contract need to match
-   * @param injectNumberByTTP the maximum number of injector contracts to return
-   * @param endpoints         the list of endpoints to consider for the injector contract
-   * @return a ContractResultForEndpoints containing the matched injector contracts with their endpoints, and the map of
-   * platform architecture pairs with the endpoints for those that didn't find injectorContract
+   * @param attackPattern the attack pattern for which the injector contract need to match
+   * @param injectsPerTTP the maximum number of injector contracts to return
+   * @param endpoints the list of endpoints to consider for the injector contract
+   * @return a ContractResultForEndpoints containing the matched injector contracts with their
+   *     endpoints, and the map of platform architecture pairs with the endpoints for those that
+   *     didn't find injectorContract
    */
   private ContractResultForEndpoints getInjectorContractForAssetsAndTTP(
-      AttackPattern attackPattern, Integer injectNumberByTTP, List<Endpoint> endpoints) {
+      AttackPattern attackPattern, Integer injectsPerTTP, List<Endpoint> endpoints) {
     Map<InjectorContract, List<Endpoint>> contractEndpointsMap = new HashMap<>();
     Map<String, List<Endpoint>> manualEndpoints = new HashMap<>();
 
@@ -226,9 +200,7 @@ public class InjectAssistantService {
     // Try to find injectors contract covering all platform-architecture pairs at once
     List<InjectorContract> injectorContracts =
         this.injectorContractRepositoryHelper.searchInjectorContractsByAttackPatternAndEnvironment(
-            attackPattern.getExternalId(),
-            groupedAssets.keySet().stream().toList(),
-            injectNumberByTTP);
+            attackPattern.getExternalId(), groupedAssets.keySet().stream().toList(), injectsPerTTP);
 
     if (!injectorContracts.isEmpty()) {
       injectorContracts.forEach(ic -> contractEndpointsMap.put(ic, endpoints));
@@ -242,7 +214,7 @@ public class InjectAssistantService {
                     .searchInjectorContractsByAttackPatternAndEnvironment(
                         attackPattern.getExternalId(),
                         List.of(platformArchitecture),
-                        injectNumberByTTP);
+                        injectsPerTTP);
 
             // Else take the manual injectorContract
             if (injectorContractsForGroup.isEmpty()) {
@@ -258,15 +230,16 @@ public class InjectAssistantService {
   /**
    * Finds injector contracts based on the provided list of already found injector contracts,
    *
-   * @param knownInjectorContracts    the list of known injector contracts to search from
-   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the contracts
-   * @param injectNumberByTTP         the maximum number of injector contracts to return
+   * @param knownInjectorContracts the list of known injector contracts to search from
+   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the
+   *     contracts
+   * @param injectsPerTTP the maximum number of injector contracts to return
    * @return a list of InjectorContract objects that match the search criteria
    */
   private List<InjectorContract> findInjectorContracts(
       List<InjectorContract> knownInjectorContracts,
       List<String> platformArchitecturePairs,
-      Integer injectNumberByTTP) {
+      Integer injectsPerTTP) {
     if (knownInjectorContracts == null
         || platformArchitecturePairs == null
         || platformArchitecturePairs.isEmpty()) {
@@ -297,27 +270,28 @@ public class InjectAssistantService {
                   architecture.equals(ic.getPayload().getExecutionArch().name());
               return hasPlatforms && hasArchitecture;
             })
-        .limit(injectNumberByTTP)
+        .limit(injectsPerTTP)
         .toList();
   }
 
   /**
    * Finds or searches in Database for injector contracts based on the provided parameters.
    *
-   * @param knownInjectorContracts    the list of known injector contracts to search from
-   * @param attackPattern             the attack pattern to match against the injector contracts
-   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the contracts
-   * @param injectNumberByTTP         the maximum number of injector contracts to return
+   * @param knownInjectorContracts the list of known injector contracts to search from
+   * @param attackPattern the attack pattern to match against the injector contracts
+   * @param platformArchitecturePairs the list of platform-architecture pairs to filter the
+   *     contracts
+   * @param injectsPerTTP the maximum number of injector contracts to return
    * @return a list of InjectorContract objects that match the search criteria
    */
   private List<InjectorContract> findOrSearchInjectorContract(
       List<InjectorContract> knownInjectorContracts,
       AttackPattern attackPattern,
       List<String> platformArchitecturePairs,
-      Integer injectNumberByTTP) {
+      Integer injectsPerTTP) {
     // Find in existing list of InjectorContracts
     List<InjectorContract> existingInjectorContract =
-        findInjectorContracts(knownInjectorContracts, platformArchitecturePairs, injectNumberByTTP);
+        findInjectorContracts(knownInjectorContracts, platformArchitecturePairs, injectsPerTTP);
     if (!existingInjectorContract.isEmpty()) {
       return existingInjectorContract;
     }
@@ -325,29 +299,28 @@ public class InjectAssistantService {
     // Else find from DB
     return this.injectorContractRepositoryHelper
         .searchInjectorContractsByAttackPatternAndEnvironment(
-            attackPattern.getExternalId(), platformArchitecturePairs, injectNumberByTTP);
+            attackPattern.getExternalId(), platformArchitecturePairs, injectsPerTTP);
   }
 
   private record ContractResultForAssetGroup(
-      List<InjectorContract> injectorContracts, String unmatchedPlatformArchitecture) {
-
-  }
+      List<InjectorContract> injectorContracts, String unmatchedPlatformArchitecture) {}
 
   /**
    * Get the injector contracts for a specific asset group and TTP
    *
-   * @param assetsFromGroup        the assets related to group for which the injector contracts need to be found
-   * @param attackPattern          the attack pattern for which the injector contracts need to match
-   * @param injectNumberByTTP      the maximum number of injector contracts to return
+   * @param assetsFromGroup the assets related to group for which the injector contracts need to be
+   *     found
+   * @param attackPattern the attack pattern for which the injector contracts need to match
+   * @param injectsPerTTP the maximum number of injector contracts to return
    * @param knownInjectorContracts the list of already found injector contracts to search from
-   * @return a ContractResultForAssetGroup containing the injector contracts that successfully matched for the asset
-   * group. and the most common platform-architecture pairs within the asset group for which no matching injector
-   * contract was found.
+   * @return a ContractResultForAssetGroup containing the injector contracts that successfully
+   *     matched for the asset group. and the most common platform-architecture pairs within the
+   *     asset group for which no matching injector contract was found.
    */
   private ContractResultForAssetGroup getInjectorContractsForAssetGroupAndTTP(
       List<Endpoint> assetsFromGroup,
       AttackPattern attackPattern,
-      Integer injectNumberByTTP,
+      Integer injectsPerTTP,
       List<InjectorContract> knownInjectorContracts) {
     String unmatchedPlatformArchitecture = "";
 
@@ -366,7 +339,7 @@ public class InjectAssistantService {
             knownInjectorContracts,
             attackPattern,
             groupedAssets.keySet().stream().toList(),
-            injectNumberByTTP);
+            injectsPerTTP);
     if (!injectorContracts.isEmpty()) {
       return new ContractResultForAssetGroup(injectorContracts, unmatchedPlatformArchitecture);
     }
@@ -381,10 +354,7 @@ public class InjectAssistantService {
     // Try to find injectors contract for the most common group
     List<InjectorContract> injectorContractsForGroup =
         findOrSearchInjectorContract(
-            knownInjectorContracts,
-            attackPattern,
-            List.of(mostCommonPlatformArch),
-            injectNumberByTTP);
+            knownInjectorContracts, attackPattern, List.of(mostCommonPlatformArch), injectsPerTTP);
     if (injectorContractsForGroup.isEmpty()) {
       unmatchedPlatformArchitecture = mostCommonPlatformArch;
     }
@@ -394,17 +364,17 @@ public class InjectAssistantService {
   /**
    * Handles the endpoints, search injector contract then create or update injects
    *
-   * @param endpoints              the list of endpoints to process
-   * @param attackPattern          the attack pattern for which the injects are created
-   * @param injectNumberByTTP      the maximum number of injects to create for each TTP
-   * @param contractInjectMap      a map to store the injector contracts and their corresponding injects
-   * @param manualInjectMap        a map to store manual injects based on platform-architecture pairs
+   * @param endpoints the list of endpoints to process
+   * @param attackPattern the attack pattern for which the injects are created
+   * @param injectsPerTTP the maximum number of injects to create for each TTP
+   * @param contractInjectMap a map to store the injector contracts and their corresponding injects
+   * @param manualInjectMap a map to store manual injects based on platform-architecture pairs
    * @param knownInjectorContracts the list of already known injector contracts
    */
   private void handleEndpoints(
       List<Endpoint> endpoints,
       AttackPattern attackPattern,
-      Integer injectNumberByTTP,
+      Integer injectsPerTTP,
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
@@ -412,7 +382,7 @@ public class InjectAssistantService {
       return;
     }
     ContractResultForEndpoints endpointResults =
-        getInjectorContractForAssetsAndTTP(attackPattern, injectNumberByTTP, endpoints);
+        getInjectorContractForAssetsAndTTP(attackPattern, injectsPerTTP, endpoints);
 
     // Add matched contracts
     endpointResults.contractEndpointsMap.forEach(
@@ -442,17 +412,17 @@ public class InjectAssistantService {
   /**
    * Handles the asset groups, search injector contract then create or update injects
    *
-   * @param assetsFromGroupMap     Map of assetGroups with their list of endpoints
-   * @param attackPattern          the attack pattern for which the injects are created
-   * @param injectNumberByTTP      the maximum number of injects to create for each TTP
-   * @param contractInjectMap      a map to store the injector contracts and their corresponding inject
-   * @param manualInjectMap        a map to store manual injects based on platform-architecture pairs
+   * @param assetsFromGroupMap Map of assetGroups with their list of endpoints
+   * @param attackPattern the attack pattern for which the injects are created
+   * @param injectsPerTTP the maximum number of injects to create for each TTP
+   * @param contractInjectMap a map to store the injector contracts and their corresponding inject
+   * @param manualInjectMap a map to store manual injects based on platform-architecture pairs
    * @param knownInjectorContracts the list of already known injector contracts
    */
   private void handleAssetGroups(
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
       AttackPattern attackPattern,
-      Integer injectNumberByTTP,
+      Integer injectsPerTTP,
       Map<InjectorContract, Inject> contractInjectMap,
       Map<String, Inject> manualInjectMap,
       List<InjectorContract> knownInjectorContracts) {
@@ -461,7 +431,7 @@ public class InjectAssistantService {
 
       ContractResultForAssetGroup result =
           getInjectorContractsForAssetGroupAndTTP(
-              assetsFromGroup, attackPattern, injectNumberByTTP, knownInjectorContracts);
+              assetsFromGroup, attackPattern, injectsPerTTP, knownInjectorContracts);
 
       result.injectorContracts.forEach(
           contract -> {
@@ -487,20 +457,20 @@ public class InjectAssistantService {
   }
 
   /**
-   * Generates injects based on the provided attack pattern ID, endpoints, asset groups, and the number of injects to
-   * create for each TTP.
+   * Generates injects based on the provided attack pattern ID, endpoints, asset groups, and the
+   * number of injects to create for each TTP.
    *
-   * @param attackPatternId    the internal ID of the attack pattern to generate injects for
-   * @param endpoints          the list of endpoints to consider for the injects
+   * @param attackPatternId the internal ID of the attack pattern to generate injects for
+   * @param endpoints the list of endpoints to consider for the injects
    * @param assetsFromGroupMap the list of asset groups to consider for the injects
-   * @param injectNumberByTTP  the maximum number of injects to create for each TTP
+   * @param injectsPerTTP the maximum number of injects to create for each TTP
    * @return a list of generated injects
    */
   private List<Inject> generateInjectsByTTP(
       String attackPatternId,
       List<Endpoint> endpoints,
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
-      Integer injectNumberByTTP)
+      Integer injectsPerTTP)
       throws UnprocessableContentException {
 
     List<Inject> injects;
@@ -510,11 +480,8 @@ public class InjectAssistantService {
 
     // Otherwise, We try computing the best case (with all possible platforms and architecture)
     injects =
-        buildInjectsForBestCaseWithAllPlatformAndArchitectures(
-            endpoints,
-            assetsFromGroupMap.keySet().stream().toList(),
-            injectNumberByTTP,
-            attackPattern);
+        buildInjectsForAllPlatformAndArchCombinations(
+            endpoints, new ArrayList<>(assetsFromGroupMap.keySet()), injectsPerTTP, attackPattern);
 
     if (!injects.isEmpty()) {
       return injects;
@@ -529,14 +496,14 @@ public class InjectAssistantService {
     handleEndpoints(
         endpoints,
         attackPattern,
-        injectNumberByTTP,
+        injectsPerTTP,
         contractInjectMap,
         manualInjectMap,
         knownInjectorContracts);
     handleAssetGroups(
         assetsFromGroupMap,
         attackPattern,
-        injectNumberByTTP,
+        injectsPerTTP,
         contractInjectMap,
         manualInjectMap,
         knownInjectorContracts);
@@ -550,39 +517,97 @@ public class InjectAssistantService {
     return injects;
   }
 
-  private List<Inject> generateInjectsByTTP(
-      String attackPatternId,
-      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
-      Integer injectNumberByTTP)
-      throws UnprocessableContentException {
+  // -- SCENARIO FROM STIX IMPORT : GENERATION INJECTS --
 
+  /**
+   * Generates injects for the given scenario and set of attack patterns, without considering asset
+   * groups or endpoint platform/architecture.
+   *
+   * <p>This method assumes no platform or architecture constraints and tries to generate injects
+   * using any compatible injector contract, or falls back to a generic manual inject.
+   *
+   * @param scenario the scenario to which the injects belong
+   * @param attackPatterns the set of attack patterns (TTPs) to generate injects for
+   * @param injectsPerTTP the number of injects to generate per TTP
+   * @return the list of created and saved injects
+   */
+  public List<Inject> generateInjectsByTTPsWithoutAssetGroups(
+      Scenario scenario, Set<AttackPattern> attackPatterns, Integer injectsPerTTP) {
+    List<Inject> injects =
+        attackPatterns.stream()
+            .flatMap(ttp -> buildInjectsForAnyPlatformAndArchitecture(injectsPerTTP, ttp).stream())
+            .peek(inject -> inject.setScenario(scenario))
+            .toList();
+    return this.injectRepository.saveAll(injects);
+  }
+
+  /**
+   * Generates injects for the given scenario and attack patterns, using the specified asset groups
+   * and their endpoints to guide platform and architecture selection.
+   *
+   * @param scenario the scenario to which the injects belong
+   * @param attackPatterns the set of attack patterns (TTPs) to generate injects for
+   * @param injectsPerTTP the number of injects to generate per TTP
+   * @param assetsFromGroupMap a mapping of asset groups to their associated endpoints
+   * @return the list of created and saved injects
+   * @throws UnsupportedOperationException if inject creation fails due to unprocessable content
+   */
+  public List<Inject> generateInjectsByTTPsWithAssetGroups(
+      Scenario scenario,
+      Set<AttackPattern> attackPatterns,
+      Integer injectsPerTTP,
+      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap) {
     List<Inject> injects = new ArrayList<>();
 
-    // Check if attack pattern exist
-    AttackPattern attackPattern = attackPatternService.findById(attackPatternId);
-
-    // If endpoints && assetgroups are empties and assetgroups have no endpoints then create
-    // injects for any platform/architecture
-    // existent
-    if (assetsFromGroupMap.keySet().isEmpty()
-        || assetsFromGroupMap.values().stream().allMatch(List::isEmpty)) {
-      return buildInjectsForAnyPlatformAndAnyArchitecture(injectNumberByTTP, attackPattern);
+    for (AttackPattern attackPattern : attackPatterns) {
+      try {
+        List<Inject> injectsToAdd =
+            this.generateInjectsForSingleTTPWithAssetGroups(
+                attackPattern, assetsFromGroupMap, injectsPerTTP);
+        injectsToAdd.forEach(inject -> inject.setScenario(scenario));
+        injects.addAll(injectsToAdd);
+      } catch (UnprocessableContentException e) {
+        throw new UnsupportedOperationException(e);
+      }
     }
+    return this.injectRepository.saveAll(injects);
+  }
 
-    // Otherwise, We try computing the best case (with all possible platforms and architecture)
-    injects =
-        buildInjectsForBestCaseWithAllPlatformAndArchitectures(
-            emptyList(),
-            assetsFromGroupMap.keySet().stream().toList(),
-            injectNumberByTTP,
+  /**
+   * Generates injects for a single attack pattern (TTP), based on the provided asset groups and
+   * their associated endpoints.
+   *
+   * <p>First attempts to use injector contracts that support all required platform-architecture
+   * pairs. If not found, performs a deeper search across endpoints and asset groups for matching
+   * contracts.
+   *
+   * @param attackPattern the attack pattern to generate injects for
+   * @param assetsFromGroupMap a mapping of asset groups to their associated endpoints
+   * @param injectsPerTTP the number of injects to generate
+   * @return the list of injects generated for the given attack pattern
+   * @throws UnprocessableContentException if no valid inject configuration can be found
+   */
+  private List<Inject> generateInjectsForSingleTTPWithAssetGroups(
+      AttackPattern attackPattern,
+      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
+      Integer injectsPerTTP)
+      throws UnprocessableContentException {
+
+    // Computing best case (with all possible platforms and architecture)
+    List<Endpoint> NO_ENDPOINTS = List.of();
+    List<Inject> bestCaseInjects =
+        buildInjectsForAllPlatformAndArchCombinations(
+            NO_ENDPOINTS,
+            new ArrayList<>(assetsFromGroupMap.keySet()),
+            injectsPerTTP,
             attackPattern);
 
-    if (!injects.isEmpty()) {
-      return injects;
+    if (!bestCaseInjects.isEmpty()) {
+      return bestCaseInjects;
     }
 
-    // Otherwise, process for all endpoints and all assetgroups to find injector contract that match
-    // with TTP and platforms/architectures
+    // Otherwise, process for all endpoints and all assetgroups to find injector contract that
+    // match with TTP and platforms/architectures
     Map<InjectorContract, Inject> contractInjectMap = new HashMap<>();
     Map<String, Inject> manualInjectMap = new HashMap<>();
     List<InjectorContract> knownInjectorContracts = new ArrayList<>();
@@ -590,7 +615,7 @@ public class InjectAssistantService {
     handleAssetGroups(
         assetsFromGroupMap,
         attackPattern,
-        injectNumberByTTP,
+        injectsPerTTP,
         contractInjectMap,
         manualInjectMap,
         knownInjectorContracts);
@@ -600,50 +625,61 @@ public class InjectAssistantService {
   }
 
   /**
-   * Try to find any injector contract without limit of architecture and platforms
+   * Attempts to generate injects for a given attack pattern (TTP) without restricting to specific
+   * platforms or architectures.
+   *
+   * <p>If any compatible injector contracts exist, they are used. Otherwise, a generic manual
+   * inject is created using default values "ANY" for platform and architecture.
+   *
+   * @param injectsPerTTP the number of injects to generate
+   * @param attackPattern the attack pattern to generate injects for
+   * @return the list of generated injects
    */
-  private List<Inject> buildInjectsForAnyPlatformAndAnyArchitecture(
-      Integer injectNumberByTTP, AttackPattern attackPattern) {
+  private List<Inject> buildInjectsForAnyPlatformAndArchitecture(
+      Integer injectsPerTTP, AttackPattern attackPattern) {
     List<InjectorContract> injectorContracts =
         this.injectorContractRepositoryHelper.searchInjectorContractsByAttackPatternAndEnvironment(
-            attackPattern.getExternalId(), emptyList(), injectNumberByTTP);
+            attackPattern.getExternalId(), emptyList(), injectsPerTTP);
 
     if (!injectorContracts.isEmpty()) {
       return injectorContracts.stream()
-          .map(
-              ic -> {
-                Inject inject = buildTechnicalInjectFromInjectorContract(ic, attackPattern);
-                return inject;
-              })
+          .map(ic -> buildTechnicalInjectFromInjectorContract(ic, attackPattern))
           .toList();
     }
-    return emptyList();
+    return List.of(buildManualInject(attackPattern, "ANY", "ANY"));
   }
 
   /**
-   * Try to find injector contract covering all platform-architecture pairs at once
+   * Attempts to generate injects using injector contracts that support all required
+   * platform-architecture combinations for the given attack pattern.
+   *
+   * <p>If such injector contracts exist, injects are created and associated with the given asset
+   * groups and endpoints. Otherwise, an empty list is returned.
+   *
+   * @param endpoints the list of endpoints involved (optional context for assets)
+   * @param assetGroups the list of asset groups to assign to each inject
+   * @param injectsPerTTP the number of injects to generate
+   * @param attackPattern the attack pattern to generate injects for
+   * @return the list of injects, or an empty list if no contracts matched
    */
-  private List<Inject> buildInjectsForBestCaseWithAllPlatformAndArchitectures(
+  private List<Inject> buildInjectsForAllPlatformAndArchCombinations(
       List<Endpoint> endpoints,
       List<AssetGroup> assetGroups,
-      Integer injectNumberByTTP,
+      Integer injectsPerTTP,
       AttackPattern attackPattern) {
     List<String> allPlatformArchitecturePairs = getAllPlatform();
     List<InjectorContract> injectorContracts =
         this.injectorContractRepositoryHelper.searchInjectorContractsByAttackPatternAndEnvironment(
-            attackPattern.getExternalId(), allPlatformArchitecturePairs, injectNumberByTTP);
+            attackPattern.getExternalId(), allPlatformArchitecturePairs, injectsPerTTP);
 
-    if (!injectorContracts.isEmpty()) {
-      return injectorContracts.stream()
-          .map(
-              ic -> {
-                Inject inject = buildTechnicalInjectFromInjectorContract(ic, attackPattern);
-                inject.setAssetGroups(assetGroups);
-                inject.setAssets(endpoints.stream().map(Asset.class::cast).toList());
-                return inject;
-              })
-          .toList();
-    }
-    return emptyList();
+    return injectorContracts.stream()
+        .map(
+            ic -> {
+              Inject inject = buildTechnicalInjectFromInjectorContract(ic, attackPattern);
+              inject.setAssetGroups(assetGroups);
+              inject.setAssets(endpoints.stream().map(Asset.class::cast).toList());
+              return inject;
+            })
+        .toList();
   }
 }
