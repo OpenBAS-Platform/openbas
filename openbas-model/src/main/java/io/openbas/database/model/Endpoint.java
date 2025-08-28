@@ -8,7 +8,6 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.Data;
@@ -57,7 +56,6 @@ public class Endpoint extends Asset {
   }
 
   @Queryable(filterable = true)
-  @NotEmpty
   @Ipv4OrIpv6Constraint
   @Type(StringArrayType.class)
   @Column(name = "endpoint_ips", columnDefinition = "text[]")
