@@ -24,13 +24,20 @@ public interface EndpointRepository
 
   @Query(
       value =
-          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch and e.endpoint_ips && cast(:ips as text[])",
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_ips && cast(:ips as text[])",
       nativeQuery = true)
   List<Endpoint> findByHostnameAndAtleastOneIp(
       @NotBlank final @Param("hostname") String hostname,
-      @NotBlank final @Param("platform") String platform,
-      @NotBlank final @Param("arch") String arch,
       @NotNull final @Param("ips") String[] ips);
+
+  @Query(
+      value =
+          "select e.* from assets e where LOWER(e.endpoint_hostname) = LOWER(:hostname) "
+              + "and exists (select 1 from unnest(e.endpoint_mac_addresses) as mac "
+              + "where mac = any(select LOWER(REPLACE(REPLACE(m, ':', ''), '-', '')) from unnest(cast(:macAddresses as text[])) as m))",
+      nativeQuery = true)
+  List<Endpoint> findByHostnameAndAtleastOneMacAddress(
+      @Param("hostname") String hostname, @Param("macAddresses") String[] macAddresses);
 
   @Query(
       value =
@@ -38,6 +45,13 @@ public interface EndpointRepository
       nativeQuery = true)
   List<Endpoint> findByAtleastOneMacAddress(
       @NotNull final @Param("macAddresses") String[] macAddresses);
+
+  @Query(
+      value =
+          "select e.* from assets e where e.asset_external_reference = :externalReference order by e.asset_id",
+      nativeQuery = true)
+  List<Endpoint> findByExternalReference(
+      @NotNull final @Param("externalReference") String externalReference);
 
   @Override
   @Query(

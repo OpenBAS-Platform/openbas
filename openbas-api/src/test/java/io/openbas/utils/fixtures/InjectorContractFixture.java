@@ -3,6 +3,7 @@ package io.openbas.utils.fixtures;
 import static io.openbas.database.model.InjectorContract.CONTRACT_CONTENT_FIELDS;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInjector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injector_contract.ContractTargetedProperty;
 import io.openbas.injector_contract.fields.ContractElement;
@@ -22,8 +24,17 @@ import io.openbas.injector_contract.fields.ContractTargetedAsset;
 import java.time.Instant;
 import java.util.*;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class InjectorContractFixture {
+
+  @Autowired private InjectorContractRepository injectorContractRepository;
+
+  public InjectorContract getWellKnownSingleEmailContract() {
+    return injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+  }
 
   private static ObjectNode createDefaultContent(ObjectMapper objectMapper) {
     ObjectNode node = objectMapper.createObjectNode();

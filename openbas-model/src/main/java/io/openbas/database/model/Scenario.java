@@ -249,6 +249,11 @@ public class Scenario implements Base {
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
+  @Getter
+  @OneToMany(mappedBy = "scenario")
+  @JsonIgnore
+  public List<Variable> variables = new ArrayList<>();
+
   @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(fetch = FetchType.LAZY)
   @JoinTable(
