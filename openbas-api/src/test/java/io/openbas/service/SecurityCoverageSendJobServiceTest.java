@@ -3,6 +3,7 @@ package io.openbas.service;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Exercise;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationResult;
 import io.openbas.database.model.SecurityCoverageSendJob;
@@ -10,6 +11,7 @@ import io.openbas.database.repository.SecurityCoverageSendJobRepository;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +29,7 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
   @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private SecurityAssessmentComposer securityAssessmentComposer;
+  @Autowired private ScenarioComposer scenarioComposer;
   @Autowired private InjectorFixture injectorFixture;
   @Autowired private EntityManager entityManager;
   @Autowired private SecurityCoverageSendJobService securityCoverageSendJobService;
@@ -39,6 +42,7 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
     injectExpectationComposer.reset();
     injectorContractComposer.reset();
     securityAssessmentComposer.reset();
+    scenarioComposer.reset();
   }
 
   private ExerciseComposer.Composer createExerciseWrapper() {
@@ -125,7 +129,10 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
                         .sourceType("manual")
                         .build())));
 
-    exerciseWrapper.persist();
+    scenarioComposer
+        .forScenario(ScenarioFixture.createDefaultCrisisScenario())
+        .withSimulation(exerciseWrapper)
+        .persist();
     entityManager.flush();
     entityManager.refresh(exerciseWrapper.get());
 
@@ -138,5 +145,47 @@ public class SecurityCoverageSendJobServiceTest extends IntegrationTest {
     Optional<SecurityCoverageSendJob> job =
         securityCoverageSendJobRepository.findBySimulation(exerciseWrapper.get());
     assertThat(job).isNotEmpty();
+  }
+
+  @Test
+  @DisplayName(
+      "Adding final result to expectation but there is a following simulation, does NOT trigger coverage job")
+  public void addingFinalResultButThereIsAFollowingSimulationDoesNOTTriggerCoverageJob() {
+    ExerciseComposer.Composer exerciseWrapper = createExerciseWrapper();
+
+    injectExpectationComposer.generatedItems.forEach(
+        exp ->
+            exp.setResults(
+                List.of(
+                    InjectExpectationResult.builder()
+                        .score(100.0)
+                        .sourceId(UUID.randomUUID().toString())
+                        .sourceName("Unit Tests")
+                        .sourceType("manual")
+                        .build())));
+
+    exerciseWrapper.get().setStart(Instant.parse("2005-05-30T23:22:10Z"));
+    Exercise otherSimulation = ExerciseFixture.createDefaultExercise();
+    otherSimulation.setStart(Instant.parse("2005-05-30T23:56:32Z"));
+
+    ScenarioComposer.Composer scenarioWrapper =
+        scenarioComposer
+            .forScenario(ScenarioFixture.createDefaultCrisisScenario())
+            .withSimulation(exerciseWrapper)
+            .persist();
+    entityManager.flush();
+    scenarioWrapper.withSimulation(exerciseComposer.forExercise(otherSimulation)).persist();
+    entityManager.flush();
+    entityManager.refresh(exerciseWrapper.get());
+
+    // act
+    securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(
+        List.of(exerciseWrapper.get()));
+    entityManager.flush();
+
+    // assert
+    Optional<SecurityCoverageSendJob> job =
+        securityCoverageSendJobRepository.findBySimulation(exerciseWrapper.get());
+    assertThat(job).isEmpty();
   }
 }

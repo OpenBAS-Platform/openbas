@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.SecurityCoverageSendJobRepository;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.DomainObject;
 import io.openbas.stix.objects.RelationshipObject;
@@ -43,12 +42,12 @@ public class SecurityCoverageServiceTest extends IntegrationTest {
   @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private SecurityAssessmentComposer securityAssessmentComposer;
+  @Autowired private SecurityCoverageSendJobComposer securityCoverageSendJobComposer;
   @Autowired private InjectorFixture injectorFixture;
   @Autowired private AttackPatternComposer attackPatternComposer;
   @Autowired private SecurityPlatformComposer securityPlatformComposer;
   @Autowired private EntityManager entityManager;
   @Autowired private SecurityCoverageSendJobService securityCoverageSendJobService;
-  @Autowired private SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
   @Autowired private ObjectMapper mapper;
   @Autowired private ResultUtils resultUtils;
   private Parser stixParser;
@@ -63,6 +62,7 @@ public class SecurityCoverageServiceTest extends IntegrationTest {
     securityAssessmentComposer.reset();
     scenarioComposer.reset();
     securityPlatformComposer.reset();
+    securityCoverageSendJobComposer.reset();
 
     stixParser = new Parser(mapper);
   }
@@ -543,7 +543,10 @@ public class SecurityCoverageServiceTest extends IntegrationTest {
     ScenarioComposer.Composer scenarioWrapper =
         scenarioComposer
             .forScenario(ScenarioFixture.getScenarioWithRecurrence("0 0 16 * * *"))
-            .withSimulation(exerciseWrapper)
+            .withSimulation(
+                exerciseWrapper.withSecurityCoverageSendJob(
+                    securityCoverageSendJobComposer.forSecurityCoverageSendJob(
+                        SecurityCoverageSendJobFixture.createDefaultSecurityCoverageSendJob())))
             .persist();
     entityManager.flush();
 
@@ -555,15 +558,11 @@ public class SecurityCoverageServiceTest extends IntegrationTest {
     entityManager.flush();
 
     entityManager.refresh(exerciseWrapper.get());
-    Optional<SecurityCoverageSendJob> job =
-        securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationIfReady(
-            exerciseWrapper.get());
-
-    // intermediate assert
-    assertThat(job).isNotEmpty();
 
     // act
-    Bundle bundle = securityCoverageService.createBundleFromSendJobs(List.of(job.get()));
+    Bundle bundle =
+        securityCoverageService.createBundleFromSendJobs(
+            securityCoverageSendJobComposer.generatedItems);
 
     // assert
     for (RelationshipObject sro : bundle.getRelationshipObjects()) {

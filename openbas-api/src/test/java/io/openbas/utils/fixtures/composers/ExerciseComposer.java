@@ -32,6 +32,8 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     private final List<PauseComposer.Composer> pauseComposers = new ArrayList<>();
     private Optional<SecurityAssessmentComposer.Composer> securityAssessmentComposer =
         Optional.empty();
+    private Optional<SecurityCoverageSendJobComposer.Composer> securityCoverageSendJobComposer =
+        Optional.empty();
 
     public Composer(Exercise exercise) {
       this.exercise = exercise;
@@ -54,6 +56,13 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
 
     public Composer withInjects(List<InjectComposer.Composer> injectComposers) {
       injectComposers.forEach(this::withInject);
+      return this;
+    }
+
+    public Composer withSecurityCoverageSendJob(
+        SecurityCoverageSendJobComposer.Composer securityCoverageSendJobWrapper) {
+      this.securityCoverageSendJobComposer = Optional.of(securityCoverageSendJobWrapper);
+      securityCoverageSendJobWrapper.get().setSimulation(this.exercise);
       return this;
     }
 
@@ -161,6 +170,8 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.variableComposers.forEach(VariableComposer.Composer::persist);
       this.pauseComposers.forEach(PauseComposer.Composer::persist);
       this.securityAssessmentComposer.ifPresent(SecurityAssessmentComposer.Composer::persist);
+      this.securityCoverageSendJobComposer.ifPresent(
+          SecurityCoverageSendJobComposer.Composer::persist);
       exerciseService.createExercise(exercise);
       return this;
     }
@@ -168,6 +179,8 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     @Override
     public Composer delete() {
       exerciseRepository.delete(exercise);
+      this.securityCoverageSendJobComposer.ifPresent(
+          SecurityCoverageSendJobComposer.Composer::delete);
       this.securityAssessmentComposer.ifPresent(SecurityAssessmentComposer.Composer::delete);
       this.variableComposers.forEach(VariableComposer.Composer::delete);
       this.documentComposers.forEach(DocumentComposer.Composer::delete);

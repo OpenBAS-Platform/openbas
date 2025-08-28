@@ -205,6 +205,10 @@ public class ExerciseService {
     return exercise.getInjects().stream().anyMatch(injectService::hasPendingResults);
   }
 
+  public Optional<Exercise> getFollowingSimulation(Exercise exercise) {
+    return exerciseRepository.following(exercise);
+  }
+
   public Optional<Instant> getLatestValidityDate(Exercise exercise) {
     Optional<Exercise> follower = exerciseRepository.following(exercise);
     if (follower.isPresent()) {
