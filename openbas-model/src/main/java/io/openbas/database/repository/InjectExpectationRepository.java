@@ -257,7 +257,8 @@ public interface InjectExpectationRepository
       ie.agent_id,
       ie.asset_id,
       ie.asset_group_id,
-      array_agg(ap.attack_pattern_id) AS attack_pattern_ids
+      array_agg(ap.attack_pattern_id) AS attack_pattern_ids,
+      MAX(se.scenario_id) AS scenario_id,
     FROM injects_expectations ie
     LEFT JOIN exercises ex ON ex.exercise_id = ie.exercise_id
     LEFT JOIN injects i ON i.inject_id = ie.inject_id
@@ -269,6 +270,7 @@ public interface InjectExpectationRepository
     LEFT JOIN agents agent ON agent.agent_id = ie.agent_id
     LEFT JOIN assets asset ON asset.asset_id = ie.asset_id
     LEFT JOIN asset_groups ag ON ag.asset_group_id = ie.asset_group_id
+    LEFT JOIN scenarios_exercises se ON se.exercise_id = ie.exercise_id
     WHERE ie.inject_expectation_updated_at > :from
     GROUP BY
       ie.inject_expectation_id,
