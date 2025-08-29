@@ -97,6 +97,20 @@ public class PayloadApi extends RestBehavior {
     return this.payloadUpsertService.upsertPayload(input);
   }
 
+  @PostMapping(PAYLOAD_URI + "/{payloadId}/export")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD, resourceId = "#payloadId")
+  public void payloadExport(
+          @NotBlank @PathVariable final String payloadId,
+          HttpServletResponse response)
+          throws IOException {
+    List<String> targetIds = List.of(payloadId);
+    User currentUser = userService.currentUser();
+    List<Payload> payloads =
+            payloadRepository.findAllByIdsAndUserGrants(targetIds, currentUser.getId()).stream()
+                    .toList();
+    runPayloadExport(payloads, response);
+  }
+
   @PostMapping(PAYLOAD_URI + "/export")
   @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD)
   public void payloadsExport(
