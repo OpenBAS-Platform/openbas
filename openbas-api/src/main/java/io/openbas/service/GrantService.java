@@ -1,16 +1,12 @@
 package io.openbas.service;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
-
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import reactor.util.function.Tuples;
 
 @Service
 @RequiredArgsConstructor

@@ -3,10 +3,7 @@ package io.openbas.rest.group.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.DefaultGrant;
 import jakarta.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 

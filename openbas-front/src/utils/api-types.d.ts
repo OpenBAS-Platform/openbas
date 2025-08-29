@@ -1270,16 +1270,6 @@ export type DateHistogramWidget = UtilRequiredKeys<
   stacked?: boolean;
 };
 
-export interface DefaultGrant {
-  grant_resource_type?:
-    | "SCENARIO"
-    | "SIMULATION"
-    | "ATOMIC_TESTING"
-    | "PAYLOAD"
-    | "UNKNOWN";
-  grant_type?: "OBSERVER" | "PLANNER" | "LAUNCHER";
-}
-
 export interface DetectionRemediation {
   detection_remediation_collector_type: string;
   /** @format date-time */
@@ -2455,8 +2445,6 @@ export interface Grant {
 }
 
 export interface Group {
-  /** @uniqueItems true */
-  group_default_grants?: DefaultGrant[];
   group_default_user_assign?: boolean;
   group_description?: string;
   group_grants?: Grant[];
@@ -2469,8 +2457,6 @@ export interface Group {
 }
 
 export interface GroupCreateInput {
-  /** @uniqueItems true */
-  group_default_grants?: DefaultGrant[];
   group_default_user_assign?: boolean;
   group_description?: string;
   group_name: string;
