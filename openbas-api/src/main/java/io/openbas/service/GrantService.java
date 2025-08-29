@@ -23,42 +23,6 @@ public class GrantService {
   private final InjectRepository injectRepository;
   private final PayloadRepository payloadRepository;
 
-  public <T extends GrantableBase> void computeGrant(@NotNull T resource) {
-    // Extract grant resource type
-    Grant.GRANT_RESOURCE_TYPE grantResourceType =
-        GrantableBase.getGrantResourceType(resource.getClass());
-    // Find automatic groups to grants
-    List<Group> groups = fromIterable(this.groupRepository.findAll());
-    List<Grant> grants =
-        groups.stream()
-            .filter(
-                group -> {
-                  List<Grant.GRANT_TYPE> defaultGrants =
-                      group.getDefaultGrantsMap().get(grantResourceType);
-                  return defaultGrants != null && !defaultGrants.isEmpty();
-                })
-            .flatMap(
-                group ->
-                    group.getDefaultGrantsMap().get(grantResourceType).stream()
-                        .distinct()
-                        .map(s -> Tuples.of(group, s)))
-            .map(
-                tuple -> {
-                  Grant grant = new Grant();
-                  grant.setGroup(tuple.getT1());
-                  grant.setName(tuple.getT2());
-                  grant.setResourceId(resource.getId());
-                  grant.setGrantResourceType(grantResourceType);
-                  return grant;
-                })
-            .toList();
-
-    if (!grants.isEmpty()) {
-      Iterable<Grant> savedGrants = this.grantRepository.saveAll(grants);
-      resource.setGrants(fromIterable(savedGrants));
-    }
-  }
-
   public boolean hasReadGrant(@NotBlank final String resourceId, @NotNull final User user) {
     return hasGrant(resourceId, user, Grant.GRANT_TYPE.OBSERVER);
   }

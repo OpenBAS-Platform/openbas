@@ -64,12 +64,6 @@ public class WithMockPlannerUserSecurityContextFactory
     if (groupOpt.isEmpty()) {
       Group newGroup = new Group();
       newGroup.setName(MOCK_PLANNER_GROUP);
-      newGroup
-          .getDefaultGrants()
-          .add(new DefaultGrant(Grant.GRANT_TYPE.PLANNER, Grant.GRANT_RESOURCE_TYPE.SCENARIO));
-      newGroup
-          .getDefaultGrants()
-          .add(new DefaultGrant(Grant.GRANT_TYPE.PLANNER, Grant.GRANT_RESOURCE_TYPE.SIMULATION));
       group = this.groupRepository.save(newGroup);
       // Create grant
       Grant grant = new Grant();

@@ -50,12 +50,6 @@ public class Group implements Base {
   @JsonProperty("group_default_user_assign")
   private boolean defaultUserAssignation;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "groups_default_grants", joinColumns = @JoinColumn(name = "group_id"))
-  @JsonProperty("group_default_grants")
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Set<DefaultGrant> defaultGrants = new HashSet<>();
-
   @OneToMany(
       mappedBy = "group",
       fetch = FetchType.EAGER,
@@ -100,36 +94,6 @@ public class Group implements Base {
   @Getter(onMethod_ = @JsonIgnore)
   @Transient
   private final ResourceType resourceType = ResourceType.USER_GROUP;
-
-  // region transient
-  // Convert to Map for easier access
-  @Transient
-  @JsonIgnore
-  public Map<Grant.GRANT_RESOURCE_TYPE, List<Grant.GRANT_TYPE>> getDefaultGrantsMap() {
-    return defaultGrants.stream()
-        .collect(
-            Collectors.groupingBy(
-                DefaultGrant::getGrantResourceType,
-                Collectors.mapping(DefaultGrant::getGrantType, Collectors.toList())));
-  }
-
-  @JsonIgnore
-  @Transient
-  public List<Grant.GRANT_TYPE> getSimulationsDefaultGrants() {
-    return defaultGrants.stream()
-        .filter(dg -> dg.getGrantResourceType() == Grant.GRANT_RESOURCE_TYPE.SIMULATION)
-        .map(DefaultGrant::getGrantType)
-        .collect(Collectors.toList());
-  }
-
-  @JsonIgnore
-  @Transient
-  public List<Grant.GRANT_TYPE> getScenariosDefaultGrants() {
-    return defaultGrants.stream()
-        .filter(dg -> dg.getGrantResourceType() == Grant.GRANT_RESOURCE_TYPE.SCENARIO)
-        .map(DefaultGrant::getGrantType)
-        .collect(Collectors.toList());
-  }
 
   // endregion
 

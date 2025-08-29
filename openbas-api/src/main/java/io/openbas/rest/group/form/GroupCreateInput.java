@@ -21,9 +21,6 @@ public class GroupCreateInput {
   @JsonProperty("group_description")
   private String description;
 
-  @JsonProperty("group_default_grants")
-  private Set<DefaultGrant> defaultGrants = new HashSet<>();
-
   @JsonProperty("group_default_user_assign")
   private boolean defaultUserAssignation;
 }

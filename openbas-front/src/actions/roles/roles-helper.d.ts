@@ -1,1 +1,1 @@
-import { type Role } from '../../utils/api-types';export interface RoleResult {  entities: { roles: Record<string, Role> };  result: string;}export interface RoleInput {  role_name: string;  role_description?: string;  role_capabilities: string[];}
+import { type Role } from '../../utils/api-types';export interface RoleResult {  entities: { roles: Record<string, Role> };  result: string;}export interface RoleInput {  role_name: string;  role_description?: string;  role_capabilities: string[];}
