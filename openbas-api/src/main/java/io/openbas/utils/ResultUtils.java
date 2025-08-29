@@ -45,7 +45,7 @@ public class ResultUtils {
     }
 
     List<InjectExpectation> expectations =
-        injectExpectationRepository.findAllForInjects(injectIds).stream()
+        injectExpectationRepository.findAllForGlobalScoreByInjects(injectIds).stream()
             .map(InjectExpectation::clone)
             .toList();
     expectations.forEach(

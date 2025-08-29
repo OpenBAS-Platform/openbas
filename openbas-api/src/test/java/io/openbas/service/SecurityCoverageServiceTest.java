@@ -642,4 +642,68 @@ public class SecurityCoverageServiceTest extends IntegrationTest {
           .isEqualTo(new Timestamp(sroStopTime));
     }
   }
+
+  @Test
+  @DisplayName("When scenario is deleted, simulation still able to produce stix bundle")
+  public void whenScenarioIsDeleted_simulationStillAbleToProduceStixBundle()
+      throws ParsingException, JsonProcessingException {
+    AttackPatternComposer.Composer ap1 =
+        attackPatternComposer.forAttackPattern(
+            AttackPatternFixture.createAttackPatternsWithExternalId("T1234"));
+    SecurityPlatformComposer.Composer securityPlatformWrapper =
+        securityPlatformComposer
+            .forSecurityPlatform(SecurityPlatformFixture.createDefaultEDR())
+            .persist();
+    // create exercise cover all TTPs
+    ExerciseComposer.Composer exerciseWrapper =
+        createExerciseWrapperWithInjectsForAttackPatterns(Map.of(ap1, true));
+
+    // set SUCCESS results for all inject expectations
+    Inject successfulInject =
+        injectComposer.generatedItems.stream()
+            .filter(
+                i ->
+                    i.getInjectorContract().get().getAttackPatterns().stream()
+                        .anyMatch(ap -> ap.getExternalId().equals("T1234")))
+            .findFirst()
+            .get();
+    successfulInject
+        .getExpectations()
+        .forEach(
+            exp ->
+                exp.setResults(
+                    List.of(
+                        InjectExpectationResult.builder()
+                            .score(100.0)
+                            .sourceId(securityPlatformWrapper.get().getId())
+                            .sourceName("Unit Tests")
+                            .sourceType("manual")
+                            .build())));
+    // start the exercise
+    Instant sroStartTime = Instant.parse("2003-02-15T19:45:02Z");
+    Instant sroStopTime = Instant.parse("2003-02-16T16:00:00Z");
+    exerciseWrapper.get().setStart(sroStartTime);
+
+    // persist
+    exerciseWrapper.persist();
+    entityManager.flush();
+
+    entityManager.refresh(exerciseWrapper.get());
+    Optional<SecurityCoverageSendJob> job =
+        securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationIfReady(
+            exerciseWrapper.get());
+
+    // intermediate assert
+    assertThat(job).isNotEmpty();
+
+    // act
+    Bundle bundle = securityCoverageService.createBundleFromSendJobs(List.of(job.get()));
+
+    // assert
+    for (RelationshipObject sro : bundle.getRelationshipObjects()) {
+      assertThat(sro.getProperty(RelationshipObject.Properties.START_TIME.toString()))
+          .isEqualTo(new Timestamp(sroStartTime));
+      assertThat(sro.hasProperty(RelationshipObject.Properties.STOP_TIME.toString())).isFalse();
+    }
+  }
 }

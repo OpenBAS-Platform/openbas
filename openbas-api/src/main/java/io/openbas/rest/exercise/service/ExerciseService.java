@@ -206,16 +206,18 @@ public class ExerciseService {
   }
 
   public Optional<Exercise> getFollowingSimulation(Exercise exercise) {
-    return exerciseRepository.following(exercise);
+    return exercise.getScenario() != null
+        ? exerciseRepository.following(exercise)
+        : Optional.empty();
   }
 
   public Optional<Instant> getLatestValidityDate(Exercise exercise) {
-    Optional<Exercise> follower = exerciseRepository.following(exercise);
+    Optional<Exercise> follower = this.getFollowingSimulation(exercise);
     if (follower.isPresent()) {
       return follower.get().getStart();
     }
 
-    return exercise.getStart().isPresent()
+    return exercise.getStart().isPresent() && exercise.getScenario() != null
         ? cronService.getNextExecutionFromInstant(
             exercise.getStart().get(), ZoneId.of("UTC"), exercise.getScenario().getRecurrence())
         : Optional.empty();
