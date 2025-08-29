@@ -73,6 +73,10 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
                 dependencies.add(injectExpectation.getExercise_id());
                 esInjectExpectation.setBase_simulation_side(injectExpectation.getExercise_id());
               }
+              if (hasText(injectExpectation.getScenario_id())) {
+                dependencies.add(injectExpectation.getScenario_id());
+                esInjectExpectation.setBase_scenario_side(injectExpectation.getScenario_id());
+              }
               if (hasText(injectExpectation.getInject_id())) {
                 dependencies.add(injectExpectation.getInject_id());
                 esInjectExpectation.setBase_inject_side(injectExpectation.getInject_id());
