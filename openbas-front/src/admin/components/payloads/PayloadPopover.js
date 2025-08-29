@@ -149,11 +149,11 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
         <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
           <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
         </Can>
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+        <Can I={ACTIONS.MANAGE} a={SUBJECTS.RESOURCE} field={payload.payload_id}>
           <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
         </Can>
         <MenuItem onClick={handleExportJsonSingle}>{t('Export')}</MenuItem>
-        <Can I={ACTIONS.DELETE} a={SUBJECTS.PAYLOADS}>
+        <Can I={ACTIONS.DELETE} a={SUBJECTS.RESOURCE} field={payload.payload_id}>
           <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
         </Can>
       </Menu>

@@ -39,6 +39,14 @@ export const addPayload = (data: PayloadCreateInput) => (dispatch: Dispatch) => 
   return postReferential(payload, uri, data)(dispatch);
 };
 
+export const exportPayload = (payloadId: string) => {
+  const uri = `/api/payloads/${payloadId}/export`;
+  return simplePostCall(uri, { responseType: 'arraybuffer' }).catch((error) => {
+    MESSAGING$.notifyError('Could not request export of payload');
+    throw error;
+  });
+};
+
 export const exportPayloads = (data: PayloadExportRequestInput) => {
   const uri = '/api/payloads/export';
   return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
