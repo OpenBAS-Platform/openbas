@@ -16,4 +16,8 @@ public interface RawEndpoint extends RawAsset {
   String getEndpoint_seen_ip();
 
   boolean getEndpoint_is_eol();
+
+  Set<String> getEndpoint_exercises();
+
+  Set<String> getEndpoint_scenarios();
 }
