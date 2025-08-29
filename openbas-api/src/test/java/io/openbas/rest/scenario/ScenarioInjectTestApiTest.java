@@ -68,7 +68,7 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("Email test send inject tests")
+  @DisplayName("Single email test send inject tests")
   public class EmailTestSendInjectTests {
     private InjectorContractComposer.Composer createEmailContract() {
       return injectorContractComposer
@@ -124,6 +124,45 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("User variable is interpolated in scenario inject test")
+    @WithMockPlannerUser
+    public void userVariableIsInterpolatedInScenarioInjectTest() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      ScenarioComposer.Composer scenarioWithEmailInjectWrapper =
+          scenarioComposer.forScenario(ScenarioFixture.createDefaultCrisisScenario());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${user.email}"));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      scenarioWithEmailInjectWrapper.withInject(injectWrapper).persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
+                  scenarioWithEmailInjectWrapper.get().getId(),
+                  scenarioWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo("<div>planner@openbas.io</div>");
+    }
+
+    @Test
     @DisplayName("Simulation variable is interpolated")
     @WithMockPlannerUser
     public void simulationVariableIsInterpolated() throws Exception {
@@ -170,6 +209,235 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
           .isEqualTo(
               "<div style=\"text-align: center; margin-bottom: 10px;\">SIMULATION HEADER</div><div>%s</div>"
                   .formatted(varValue));
+    }
+
+    @Test
+    @DisplayName("User variable is interpolated in simulation inject test")
+    @WithMockPlannerUser
+    public void userVariableIsInterpolatedInSimulationInjectTest() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      ExerciseComposer.Composer simulationWithEmailInjectWrapper =
+          simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${user.email}"));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      simulationWithEmailInjectWrapper.withInject(injectWrapper).persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  EXERCISE_URI + "/{simulationId}/injects/{injectId}/test",
+                  simulationWithEmailInjectWrapper.get().getId(),
+                  simulationWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo(
+              "<div style=\"text-align: center; margin-bottom: 10px;\">SIMULATION HEADER</div><div>%s</div>"
+                  .formatted("planner@openbas.io"));
+    }
+  }
+
+  @Nested
+  @DisplayName("Multi (global) email test send inject tests")
+  public class MultiEmailTestSendInjectTests {
+    private InjectorContractComposer.Composer createEmailContract() {
+      return injectorContractComposer
+          .forInjectorContract(injectorContractFixture.getWellKnownGlobalEmailContract())
+          .withInjector(injectorFixture.getWellKnownEmailInjector());
+    }
+
+    @Test
+    @DisplayName("Scenario variable is interpolated")
+    @WithMockPlannerUser
+    public void scenarioVariableIsInterpolated() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      String varKey = "var_key";
+      String varValue = "var_value";
+      Variable var = VariableFixture.getDefaultVariable();
+      var.setKey(varKey);
+      var.setValue(varValue);
+      ScenarioComposer.Composer scenarioWithEmailInjectWrapper =
+          scenarioComposer.forScenario(ScenarioFixture.createDefaultCrisisScenario());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${%s}".formatted(varKey)));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      scenarioWithEmailInjectWrapper
+          .withInject(injectWrapper)
+          .withVariable(variableComposer.forVariable(var))
+          .persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
+                  scenarioWithEmailInjectWrapper.get().getId(),
+                  scenarioWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo("<div>%s</div>".formatted(varValue));
+    }
+
+    @Test
+    @DisplayName(
+        "When a single user is used in a multi email, user variable is interpolated in scenario inject test")
+    @WithMockPlannerUser
+    public void userVariableIsInterpolatedInScenarioInjectTest() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      ScenarioComposer.Composer scenarioWithEmailInjectWrapper =
+          scenarioComposer.forScenario(ScenarioFixture.createDefaultCrisisScenario());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${user.email}"));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      scenarioWithEmailInjectWrapper.withInject(injectWrapper).persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  SCENARIO_URI + "/{scenarioId}/injects/{injectId}/test",
+                  scenarioWithEmailInjectWrapper.get().getId(),
+                  scenarioWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo("<div>planner@openbas.io</div>");
+    }
+
+    @Test
+    @DisplayName("Simulation variable is interpolated")
+    @WithMockPlannerUser
+    public void simulationVariableIsInterpolated() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      String varKey = "var_key";
+      String varValue = "var_value";
+      Variable var = VariableFixture.getDefaultVariable();
+      var.setKey(varKey);
+      var.setValue(varValue);
+      ExerciseComposer.Composer simulationWithEmailInjectWrapper =
+          simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${%s}".formatted(varKey)));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      simulationWithEmailInjectWrapper
+          .withInject(injectWrapper)
+          .withVariable(variableComposer.forVariable(var))
+          .persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  EXERCISE_URI + "/{simulationId}/injects/{injectId}/test",
+                  simulationWithEmailInjectWrapper.get().getId(),
+                  simulationWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo(
+              "<div style=\"text-align: center; margin-bottom: 10px;\">SIMULATION HEADER</div><div>%s</div>"
+                  .formatted(varValue));
+    }
+
+    @Test
+    @DisplayName(
+        "When a single user is used in a multi email, user variable is interpolated in simulation inject test")
+    @WithMockPlannerUser
+    public void userVariableIsInterpolatedInSimulationInjectTest() throws Exception {
+      ArgumentCaptor<MimeMessage> argument = ArgumentCaptor.forClass(MimeMessage.class);
+      ExerciseComposer.Composer simulationWithEmailInjectWrapper =
+          simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
+
+      Inject injectFixture =
+          InjectFixture.getInjectForEmailContract(
+              injectorContractFixture.getWellKnownSingleEmailContract());
+      injectFixture.getContent().set("subject", mapper.valueToTree("test email"));
+      injectFixture.getContent().set("body", mapper.valueToTree("${user.email}"));
+
+      InjectComposer.Composer injectWrapper =
+          injectComposer.forInject(injectFixture).withInjectorContract(createEmailContract());
+
+      simulationWithEmailInjectWrapper.withInject(injectWrapper).persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+      Mockito.doCallRealMethod().when(mailSender).send((MimeMessage) any());
+      mvc.perform(
+              get(
+                  EXERCISE_URI + "/{simulationId}/injects/{injectId}/test",
+                  simulationWithEmailInjectWrapper.get().getId(),
+                  simulationWithEmailInjectWrapper.get().getInjects().getFirst().getId()))
+          .andExpect(status().isOk());
+
+      verify(mailSender).send(argument.capture());
+      assertThat(
+              ((MimeMultipart) argument.getAllValues().getFirst().getContent())
+                  .getBodyPart(0)
+                  .getContent())
+          .isEqualTo(
+              "<div style=\"text-align: center; margin-bottom: 10px;\">SIMULATION HEADER</div><div>%s</div>"
+                  .formatted("planner@openbas.io"));
     }
   }
 
