@@ -1,8 +1,5 @@
 package io.openbas.rest.payload;
 
-import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
@@ -13,6 +10,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.*;
 import io.openbas.rest.payload.service.*;
 import io.openbas.service.ImportService;
+import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +23,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -46,15 +43,13 @@ public class PayloadApi extends RestBehavior {
   private final PayloadUpsertService payloadUpsertService;
   private final PayloadExportService payloadExportService;
   private final DocumentService documentService;
+  private final UserService userService;
 
   @PostMapping(PAYLOAD_URI + "/search")
   @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.PAYLOAD)
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        this.payloadRepository::findAll,
-        handleArchitectureFilter(searchPaginationInput),
-        Payload.class);
+    return this.payloadService.searchPayloads(searchPaginationInput);
   }
 
   @GetMapping(PAYLOAD_URI + "/{payloadId}")
@@ -109,14 +104,15 @@ public class PayloadApi extends RestBehavior {
       HttpServletResponse response)
       throws IOException {
     List<String> targetIds = payloadExportRequestInput.getTargetsIds();
+    User currentUser = userService.currentUser();
     List<Payload> payloads =
-        StreamSupport.stream(payloadRepository.findAllById(targetIds).spliterator(), false)
+        payloadRepository.findAllByIdsAndUserGrants(targetIds, currentUser.getId()).stream()
             .toList();
     runPayloadExport(payloads, response);
   }
 
   @PostMapping(PAYLOAD_URI + "/import")
-  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
   public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
   }

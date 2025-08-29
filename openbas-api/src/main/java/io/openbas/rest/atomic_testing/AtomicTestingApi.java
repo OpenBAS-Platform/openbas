@@ -38,7 +38,7 @@ public class AtomicTestingApi extends RestBehavior {
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return atomicTestingService.searchAtomicTestings(searchPaginationInput);
+    return atomicTestingService.searchAtomicTestingsForCurrentUser(searchPaginationInput);
   }
 
   @LogExecutionTime

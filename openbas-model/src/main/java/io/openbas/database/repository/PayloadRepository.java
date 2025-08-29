@@ -47,4 +47,13 @@ public interface PayloadRepository
     WHERE inj.id = :injectId
 """)
   List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId);
+
+  @Query(
+      "SELECT DISTINCT p FROM Payload p "
+          + "JOIN p.grants g "
+          + "JOIN g.group gr "
+          + "JOIN gr.users u "
+          + "WHERE u.id = :userId and p.id IN :ids")
+  List<Payload> findAllByIdsAndUserGrants(
+      @Param("ids") List<String> ids, @Param("userId") String userId);
 }

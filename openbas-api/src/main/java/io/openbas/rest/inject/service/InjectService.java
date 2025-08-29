@@ -14,8 +14,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.config.OpenBASPrincipal;
-import io.openbas.config.SessionHelper;
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -453,10 +451,7 @@ public class InjectService {
     }
     // Filter out any injects not related to resources where the user is granted with the
     // appropriate level
-    OpenBASPrincipal principal = SessionHelper.currentUser();
-    filterSpecifications =
-        filterSpecifications.and(
-            hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
+    filterSpecifications = filterSpecifications.and(hasGrantAccessForInject(requestedGrantLevel));
     return filterSpecifications;
   }
 
@@ -1000,11 +995,23 @@ public class InjectService {
     return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
   }
 
-  public Specification<Inject> hasGrantAccessForInject(
-      final String userId, final boolean isAdmin, Grant.GRANT_TYPE grantType) {
+  /**
+   * Chek if a user is granted on an inject. A user can be granteed on an inject if: - The inject is
+   * linked to a scenario or simulation that the user has access to - The inject is an atomic
+   * testing and the user has access to it
+   *
+   * @param grantType the grant type to check
+   * @return a Specification that checks if the user has access to the inject
+   */
+  public Specification<Inject> hasGrantAccessForInject(Grant.GRANT_TYPE grantType) {
+
+    User currentUser = userService.currentUser();
+    boolean hasCapabilityAccessAssessment =
+        currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
+            || currentUser.getCapabilities().contains(Capability.BYPASS);
 
     return (root, query, cb) -> {
-      if (isAdmin) {
+      if (currentUser.isAdmin() || hasCapabilityAccessAssessment) {
         return cb.conjunction();
       }
 
@@ -1020,11 +1027,27 @@ public class InjectService {
       // Create subquery for accessible scenarios
       Subquery<String> accessibleScenarios =
           SpecificationUtils.accessibleResourcesSubquery(
-              query, cb, userId, Grant.GRANT_RESOURCE_TYPE.SCENARIO, allowedGrantTypes);
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.SCENARIO,
+              allowedGrantTypes);
       // Create subquery for accessible simulations
       Subquery<String> accessibleSimulations =
           SpecificationUtils.accessibleResourcesSubquery(
-              query, cb, userId, Grant.GRANT_RESOURCE_TYPE.SIMULATION, allowedGrantTypes);
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.SIMULATION,
+              allowedGrantTypes);
+      // Create subquery for accessible atomic testings
+      Subquery<String> accessibleAtomicTestings =
+          SpecificationUtils.accessibleResourcesSubquery(
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.ATOMIC_TESTING,
+              allowedGrantTypes);
 
       // Check if inject's scenario ID is accessible (null is OK)
       Predicate scenarioAccessible =
@@ -1032,11 +1055,20 @@ public class InjectService {
       // Check if inject's simulation ID is accessible (null is OK)
       Predicate simulationAccessible =
           cb.or(cb.isNull(simulationPath), simulationPath.get("id").in(accessibleSimulations));
+      // When both are null, check if user has atomic testing grants
+      // Assuming inject has an ID that should be in the atomic testing grants
+      Predicate atomicTestingAccessible =
+          cb.and(bothNull, root.get("id").in(accessibleAtomicTestings));
 
       // Inject is accessible if:
-      // 1. Both scenario and exercise are null (automatically granted), OR
-      // 2. User has access to the non-null scenario/exercise
-      return cb.or(bothNull, cb.and(scenarioAccessible, simulationAccessible));
+      // 1. Both are null AND user has atomic testing grant for this inject, OR
+      // 2. User is granted on the non-null scenario/exercise linked to this inject
+      return cb.or(
+          atomicTestingAccessible,
+          cb.and(
+              cb.not(bothNull), // At least one is not null
+              scenarioAccessible,
+              simulationAccessible));
     };
   }
 }

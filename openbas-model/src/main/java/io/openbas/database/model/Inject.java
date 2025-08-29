@@ -21,10 +21,12 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -33,7 +35,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "injects")
 @EntityListeners(ModelBaseListener.class)
 @Slf4j
-public class Inject implements Base, Injection {
+@Grantable(Grant.GRANT_RESOURCE_TYPE.ATOMIC_TESTING)
+public class Inject implements GrantableBase, Injection {
 
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
   public static final String ID_COLUMN_NAME = "inject_id";
@@ -301,7 +304,25 @@ public class Inject implements Base, Injection {
   @Transient
   private final ResourceType resourceType = ResourceType.INJECT;
 
+  @Getter
+  @OneToMany
+  @JoinColumn(
+      name = "grant_resource",
+      referencedColumnName = "inject_id",
+      insertable = false,
+      updatable = false)
+  @SQLRestriction(
+      "grant_resource_type = 'ATOMIC_TESTING'") // Must be present in Grant.GRANT_RESOURCE_TYPE
+  @JsonIgnore
+  private List<Grant> grants = new ArrayList<>();
+
   // region transient
+  @Transient
+  @JsonIgnore
+  @Getter
+  @Setter(AccessLevel.NONE)
+  private Grant.GRANT_RESOURCE_TYPE grantResourceType = Grant.GRANT_RESOURCE_TYPE.ATOMIC_TESTING;
+
   @Transient
   public String getHeader() {
     return ofNullable(this.getExercise()).map(Exercise::getHeader).orElse("");

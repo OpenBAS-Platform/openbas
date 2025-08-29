@@ -1,5 +1,6 @@
 package io.openbas.rest.payload.service;
 
+import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -13,6 +14,8 @@ import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupF
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
 import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
 import static io.openbas.injector_contract.fields.ContractText.textField;
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +24,7 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
@@ -31,6 +35,8 @@ import io.openbas.injector_contract.fields.*;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.model.inject.form.Expectation;
 import io.openbas.rest.payload.PayloadUtils;
+import io.openbas.service.UserService;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +45,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -53,6 +60,7 @@ public class PayloadService {
   private final InjectorContractRepository injectorContractRepository;
   private final AttackPatternRepository attackPatternRepository;
   private final ExpectationBuilderService expectationBuilderService;
+  private final UserService userService;
   private final PayloadUtils payloadUtils;
 
   public void updateInjectorContractsForPayload(Payload payload) {
@@ -271,5 +279,26 @@ public class PayloadService {
     return payloadExternalIds.stream()
         .filter(externalId -> !processedPayloadExternalIds.contains(externalId))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Search payloads with pagination and architecture filter, where the user is granted. The user
+   * must have at least OBSERVER grant on the payloads to see them.
+   *
+   * @param searchPaginationInput the input containing pagination and search criteria
+   * @return a paginated list of Payloads
+   */
+  public Page<Payload> searchPayloads(
+      @org.jetbrains.annotations.NotNull final SearchPaginationInput searchPaginationInput) {
+    User currentUser = userService.currentUser();
+    return buildPaginationJPA(
+        SpecificationUtils.withGrantFilter(
+            this.payloadRepository,
+            Grant.GRANT_TYPE.OBSERVER,
+            currentUser.getId(),
+            currentUser.isAdminOrBypass(),
+            currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)),
+        handleArchitectureFilter(searchPaginationInput),
+        Payload.class);
   }
 }
