@@ -3132,6 +3132,7 @@ export interface InjectorContract {
   )[];
   /** @format date-time */
   injector_contract_updated_at: string;
+  injector_contract_vulnerabilities?: string[];
   listened?: boolean;
 }
 
@@ -3143,6 +3144,7 @@ export interface InjectorContractAddInput {
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   contract_platforms?: string[];
+  contract_vulnerability_ids?: string[];
   external_contract_id?: string;
   injector_id: string;
   is_atomic_testing?: boolean;
@@ -3263,11 +3265,13 @@ export interface InjectorContractUpdateInput {
   contract_labels?: Record<string, string>;
   contract_manual?: boolean;
   contract_platforms?: string[];
+  contract_vulnerability_ids?: string[];
   is_atomic_testing?: boolean;
 }
 
 export interface InjectorContractUpdateMappingInput {
   contract_attack_patterns_ids?: string[];
+  contract_vulnerability_ids?: string[];
 }
 
 export interface InjectorCreateInput {
