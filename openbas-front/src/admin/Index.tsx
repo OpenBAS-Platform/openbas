@@ -124,8 +124,7 @@ const Index = () => {
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route
                 path="settings/*"
-                element={logged.admin || ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS) ? errorWrapper(IndexSettings)()
-                  : <Navigate to="/" replace={true} />}
+                element={errorWrapper(IndexSettings)()}
               />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
