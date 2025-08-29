@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
-import { type UserHelper } from '../../../../actions/helper';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -11,7 +10,6 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
 import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
-import { useHelper } from '../../../../store';
 import {
   type CheckScenarioRulesOutput,
   type Exercise,

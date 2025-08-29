@@ -1,5 +1,5 @@
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
-import { Box, Chip, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useContext } from 'react';
