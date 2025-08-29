@@ -21,8 +21,8 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.payload.form.DetectionRemediationOutput;
-import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.ImportService;
+import io.openbas.service.UserService;
 import io.openbas.service.targets.TargetService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.TargetType;
@@ -71,6 +71,7 @@ public class InjectApi extends RestBehavior {
   private final TargetService targetService;
   private final UserRepository userRepository;
   private final PayloadMapper payloadMapper;
+  private final UserService userService;
 
   // -- INJECTS --
 
@@ -106,18 +107,16 @@ public class InjectApi extends RestBehavior {
       HttpServletResponse response)
       throws IOException {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
-    List<Inject> injects = injectRepository.findAllById(targetIds);
-
+    User currentUser = userService.currentUser();
+    List<Inject> injects;
+    if (currentUser.isAdminOrBypass()) {
+      injects = injectRepository.findAllById(targetIds);
+    } else {
+      injects = injectRepository.findAllByUserGrants(currentUser.getId());
+    }
     List<String> foundIds = injects.stream().map(Inject::getId).toList();
     List<String> missedIds =
         new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());
-    missedIds.addAll(
-        injectService
-            .authorise(injects, SecurityExpression::isInjectObserver)
-            .getUnauthorised()
-            .stream()
-            .map(Inject::getId)
-            .toList());
 
     if (!missedIds.isEmpty()) {
       throw new ElementNotFoundException(String.join(", ", missedIds));
