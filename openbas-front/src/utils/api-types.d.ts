@@ -1695,6 +1695,10 @@ export interface EsEndpoint {
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
+  base_scenario_side?: string[];
+  /** @uniqueItems true */
+  base_simulation_side?: string[];
+  /** @uniqueItems true */
   base_tags_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
@@ -1782,6 +1786,7 @@ export interface EsInjectExpectation {
   base_inject_side?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   /** @uniqueItems true */
   base_security_platforms_side?: string[];
   base_simulation_side?: string;
@@ -1900,6 +1905,7 @@ export interface EsVulnerableEndpoint {
   base_id?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  base_scenario_side?: string;
   base_simulation_side?: string;
   /** @uniqueItems true */
   base_tags_side?: string[];

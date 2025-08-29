@@ -259,6 +259,7 @@ public interface InjectExpectationRepository
       ie.asset_group_id,
       array_agg(ap.attack_pattern_id) AS attack_pattern_ids,
       MAX(se.scenario_id) AS scenario_id,
+      array_agg(DISTINCT c.collector_security_platform) FILTER ( WHERE c.collector_security_platform IS NOT NULL ) AS security_platform_ids
     FROM injects_expectations ie
     LEFT JOIN exercises ex ON ex.exercise_id = ie.exercise_id
     LEFT JOIN injects i ON i.inject_id = ie.inject_id
@@ -271,6 +272,8 @@ public interface InjectExpectationRepository
     LEFT JOIN assets asset ON asset.asset_id = ie.asset_id
     LEFT JOIN asset_groups ag ON ag.asset_group_id = ie.asset_group_id
     LEFT JOIN scenarios_exercises se ON se.exercise_id = ie.exercise_id
+    LEFT JOIN LATERAL jsonb_array_elements(ie.inject_expectation_results::jsonb) AS r(elem) ON true
+    LEFT JOIN collectors c ON r.elem->>'sourceId' = c.collector_id::text OR r.elem->>'sourceType' = 'security-platform'
     WHERE ie.inject_expectation_updated_at > :from
     GROUP BY
       ie.inject_expectation_id,
