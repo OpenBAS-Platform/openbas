@@ -106,6 +106,7 @@ public class Scenario implements Base {
 
   @OneToOne(mappedBy = "scenario")
   @JsonProperty("scenario_security_assessment")
+  @JsonIgnore
   private SecurityAssessment securityAssessment;
 
   // -- RECURRENCE --
