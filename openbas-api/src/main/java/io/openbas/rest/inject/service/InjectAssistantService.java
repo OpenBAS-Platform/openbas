@@ -650,7 +650,7 @@ public class InjectAssistantService {
           .map(ic -> buildTechnicalInjectFromInjectorContract(ic, attackPattern))
           .toList();
     }
-    return List.of(buildManualInject(attackPattern, "any", "any"));
+    return List.of(buildManualInject(attackPattern, "[any platform]", "[any architecture]"));
   }
 
   /**
