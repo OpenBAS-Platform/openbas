@@ -57,6 +57,11 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
+  @Queryable(searchable = true, sortable = true, filterable = true)
+  @Column(name = "asset_external_reference")
+  @JsonProperty("asset_external_reference")
+  private String externalReference;
+
   // -- TAG --
 
   @ArraySchema(schema = @Schema(type = "string"))

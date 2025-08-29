@@ -5,6 +5,8 @@ import static io.openbas.helper.StreamHelper.fromIterable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.SecurityAssessment;
+import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.ee.Ee;
 import io.openbas.rest.attack_pattern.form.AnalysisResultFromTTPExtractionAIWebserviceOutput;
@@ -13,6 +15,8 @@ import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -89,6 +93,19 @@ public class AttackPatternService {
           "Request to TTP Extraction AI Webservice failed: " + response.getBody());
     }
     return response.getBody();
+  }
+
+  /**
+   * Find external attack pattern from Id.
+   *
+   * @param attackPatternId Id
+   * @return attackPattern
+   * @throws IOException
+   */
+  public AttackPattern findById(String attackPatternId) {
+    return this.attackPatternRepository
+        .findById(attackPatternId)
+        .orElseThrow(() -> new ElementNotFoundException("Attack pattern not found"));
   }
 
   /**
@@ -213,9 +230,22 @@ public class AttackPatternService {
     }
   }
 
-  public AttackPattern findById(String attackPatternId) {
-    return this.attackPatternRepository
-        .findById(attackPatternId)
-        .orElseThrow(() -> new ElementNotFoundException("Attack pattern not found"));
+  // -- STIX --
+
+  /**
+   * Resolves external AttackPattern references from a {@link SecurityAssessment} into internal
+   * {@link AttackPattern} entities using the {@code attackPatternService}.
+   *
+   * @param securityAssessment the security assessment containing external AttackPattern references
+   * @return list of resolved internal AttackPattern entities
+   */
+  public Map<String, AttackPattern> fetchInternalAttackPatternIdsFromSecurityAssessment(
+      SecurityAssessment securityAssessment) {
+    return getAttackPatternsByExternalIds(
+            securityAssessment.getAttackPatternRefs().stream()
+                .map(StixRefToExternalRef::getExternalRef)
+                .collect(Collectors.toSet()))
+        .stream()
+        .collect(Collectors.toMap(attack -> attack.getId(), Function.identity()));
   }
 }

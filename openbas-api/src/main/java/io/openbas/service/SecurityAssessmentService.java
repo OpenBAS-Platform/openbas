@@ -3,11 +3,13 @@ package io.openbas.service;
 import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAttackReferences;
+import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.cron.ScheduleFrequency;
 import io.openbas.database.model.*;
+import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.SecurityAssessment;
 import io.openbas.database.repository.ScenarioRepository;
@@ -51,6 +53,18 @@ public class SecurityAssessmentService {
   private final Parser stixParser;
   private final ObjectMapper objectMapper;
 
+  /**
+   * Builds and persists a {@link SecurityAssessment} from a provided STIX JSON string.
+   *
+   * <p>This method parses the input STIX content, extracts relevant fields, maps them to a {@link
+   * SecurityAssessment} domain object, and saves it. It also extracts referenced attack patterns
+   * and sets optional fields like description and scheduling.
+   *
+   * @param stixJson STIX-formatted JSON string representing a security assessment
+   * @return the saved {@link SecurityAssessment} object
+   * @throws IOException if the input cannot be parsed into JSON
+   * @throws ParsingException if the STIX bundle is malformed
+   */
   public SecurityAssessment buildSecurityAssessmentFromStix(String stixJson)
       throws IOException, ParsingException {
 
@@ -95,16 +109,38 @@ public class SecurityAssessmentService {
     return save(securityAssessment);
   }
 
-  private SecurityAssessment getByExternalIdOrCreateSecurityAssessment(String externalId) {
+  /**
+   * Retrieves a {@link SecurityAssessment} by its external ID. If no existing assessment is found,
+   * a new instance is returned.
+   *
+   * @param externalId the external identifier from the STIX content
+   * @return an existing or new {@link SecurityAssessment}
+   */
+  public SecurityAssessment getByExternalIdOrCreateSecurityAssessment(String externalId) {
     return securityAssessmentRepository
         .findByExternalId(externalId)
         .orElseGet(SecurityAssessment::new);
   }
 
+  /**
+   * Persists {@link SecurityAssessment} to the repository.
+   *
+   * @param securityAssessment the security assessment to save
+   * @return the saved {@link SecurityAssessment}
+   */
   public SecurityAssessment save(SecurityAssessment securityAssessment) {
     return securityAssessmentRepository.save(securityAssessment);
   }
 
+  /**
+   * Builds a {@link Scenario} object based on a given {@link SecurityAssessment}.
+   *
+   * <p>This will create or update the associated scenario and generate the appropriate injects by
+   * delegating to the {@code securityAssessmentInjectService}.
+   *
+   * @param securityAssessment the source assessment
+   * @return the created or updated {@link Scenario}
+   */
   public Scenario buildScenarioFromSecurityAssessment(SecurityAssessment securityAssessment) {
     Scenario scenario = updateOrCreateScenarioFromSecurityAssessment(securityAssessment);
     securityAssessment.setScenario(scenario);
@@ -112,24 +148,33 @@ public class SecurityAssessmentService {
     return scenario;
   }
 
-  public Scenario updateOrCreateScenarioFromSecurityAssessment(SecurityAssessment sa) {
-    if (sa.getScenario() != null) {
+  /**
+   * Updates an existing {@link Scenario} from a {@link SecurityAssessment}, or creates one if none
+   * is associated with the assessment.
+   *
+   * @param securityAssessment the {@link SecurityAssessment}
+   * @return the updated or newly created {@link Scenario}
+   */
+  public Scenario updateOrCreateScenarioFromSecurityAssessment(
+      SecurityAssessment securityAssessment) {
+    if (securityAssessment.getScenario() != null) {
       return scenarioRepository
-          .findById(sa.getScenario().getId())
-          .map(existing -> updateScenarioFromSecurityAssessment(existing, sa))
-          .orElseGet(() -> createAndInitializeScenario(sa));
+          .findById(securityAssessment.getScenario().getId())
+          .map(existing -> updateScenarioFromSecurityAssessment(existing, securityAssessment))
+          .orElseGet(() -> createAndInitializeScenario(securityAssessment));
     }
-    return createAndInitializeScenario(sa);
+    return createAndInitializeScenario(securityAssessment);
   }
 
-  private Scenario createAndInitializeScenario(SecurityAssessment sa) {
+  private Scenario createAndInitializeScenario(SecurityAssessment securityAssessment) {
     Scenario scenario = new Scenario();
-    updatePropertiesFromSecurityAssessment(scenario, sa);
+    updatePropertiesFromSecurityAssessment(scenario, securityAssessment);
     return scenarioService.createScenario(scenario);
   }
 
-  private Scenario updateScenarioFromSecurityAssessment(Scenario scenario, SecurityAssessment sa) {
-    updatePropertiesFromSecurityAssessment(scenario, sa);
+  private Scenario updateScenarioFromSecurityAssessment(
+      Scenario scenario, SecurityAssessment securityAssessment) {
+    updatePropertiesFromSecurityAssessment(scenario, securityAssessment);
     return scenarioService.updateScenario(scenario);
   }
 
@@ -138,7 +183,7 @@ public class SecurityAssessmentService {
     scenario.setName(sa.getName());
     scenario.setDescription(sa.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
-    scenario.setMainFocus(MAIN_FOCUS_INCIDENT_RESPONSE);
+    scenario.setMainFocus(MainFocus.INCIDENT_RESPONSE.toString());
 
     Instant start = sa.getPeriodStart();
     Instant end = sa.getPeriodEnd();

@@ -1,6 +1,5 @@
 package io.openbas.rest;
 
-import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.rest.StixApi.STIX_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.database.repository.InjectRepository;
@@ -23,6 +23,7 @@ import io.openbas.utils.fixtures.composers.AttackPatternComposer;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
@@ -40,8 +41,11 @@ import org.springframework.test.web.servlet.MockMvc;
 class StixApiTest extends IntegrationTest {
 
   public static final String T_1531 = "T1531";
+  public static final String T_1003 = "T1003";
+
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
+  @Autowired private EntityManager entityManager;
 
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
@@ -69,7 +73,7 @@ class StixApiTest extends IntegrationTest {
         .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId(T_1531))
         .persist();
     attackPatternComposer
-        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId("T1003"))
+        .forAttackPattern(AttackPatternFixture.createAttackPatternsWithExternalId(T_1003))
         .persist();
   }
 
@@ -165,7 +169,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityAssessment().getExternalId())
           .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
-      assertThat(createdScenario.getMainFocus()).isEqualTo(MAIN_FOCUS_INCIDENT_RESPONSE);
+      assertThat(createdScenario.getMainFocus()).isEqualTo(MainFocus.INCIDENT_RESPONSE.toString());
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
 
@@ -177,7 +181,7 @@ class StixApiTest extends IntegrationTest {
       StixRefToExternalRef stixRef1 =
           new StixRefToExternalRef("attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1", T_1531);
       StixRefToExternalRef stixRef2 =
-          new StixRefToExternalRef("attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9", "T1003");
+          new StixRefToExternalRef("attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9", T_1003);
 
       assertThat(createdScenario.getSecurityAssessment().getAttackPatternRefs()).hasSize(2);
       assertTrue(
@@ -190,12 +194,14 @@ class StixApiTest extends IntegrationTest {
 
       // -- ASSERT Injects --
       List<Inject> injects = injectRepository.findByScenarioId(response);
-      assertThat(injects).hasSize(10);
+      assertThat(injects).hasSize(2);
     }
 
     @Test
-    @DisplayName("Should update scenario from same security assessment")
-    void shouldUpdateScenario() throws Exception {
+    @DisplayName(
+        "Should update scenario from same security assessment and keep same number inject when updated stix has the same attacks")
+    void shouldUpdateScenarioAndKeepSameNumberInjectsWhenUpdatedStixHasSameAttacks()
+        throws Exception {
       String createdResponse =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
@@ -211,22 +217,69 @@ class StixApiTest extends IntegrationTest {
           .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
 
       List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
-      assertThat(injects).hasSize(10);
+      assertThat(injects).hasSize(2);
 
-      String updatedBundle = stixSecurityAssessmentWithoutTtps;
+      entityManager.flush();
+      entityManager.clear();
 
+      // Push same stix in order to check the number of created injects
       String updatedResponse =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(updatedBundle))
+                      .content(stixSecurityAssessment))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
               .getContentAsString();
 
       Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
-      assertThat(updatedScenario.getName()).isEqualTo("Security Assessment Q3 2025 - UPDATED");
+      assertThat(updatedScenario.getName())
+          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+      // ASSERT injects for updated stix
+      injects = injectRepository.findByScenarioId(updatedScenario.getId());
+      assertThat(injects).hasSize(2);
+    }
+
+    @Test
+    @DisplayName(
+        "Should update scenario from same security assessment but deleting injects when attack-objects are not defined in stix")
+    void shouldUpdateScenarioAndDeleteInjectWhenStixNotContainsAttacks() throws Exception {
+      String createdResponse =
+          mvc.perform(
+                  post(STIX_URI + "/process-bundle")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(stixSecurityAssessment))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      Scenario createdScenario = scenarioRepository.findById(createdResponse).orElseThrow();
+      assertThat(createdScenario.getName())
+          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+
+      List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
+      assertThat(injects).hasSize(2);
+
+      entityManager.flush();
+      entityManager.clear();
+
+      // Push stix without object type attack-pattern
+      String updatedResponse =
+          mvc.perform(
+                  post(STIX_URI + "/process-bundle")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(stixSecurityAssessmentWithoutTtps))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
+      assertThat(updatedScenario.getName())
+          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ -- UPDATED");
+
       // ASSERT injects for updated stix
       injects = injectRepository.findByScenarioId(updatedScenario.getId());
       assertThat(injects).hasSize(0);

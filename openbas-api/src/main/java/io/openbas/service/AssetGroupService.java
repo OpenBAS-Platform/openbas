@@ -6,9 +6,7 @@ import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.FilterUtilsRuntime.computeFilterGroupRuntime;
 import static java.time.Instant.now;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.*;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
@@ -34,6 +32,7 @@ public class AssetGroupService {
   private final AssetGroupRepository assetGroupRepository;
   private final AssetService assetService;
   private final EndpointService endpointService;
+  private final TagRuleService tagRuleService;
 
   // -- ASSET GROUP --
 
@@ -224,10 +223,14 @@ public class AssetGroupService {
                         .toList()));
   }
 
-  public Set<Pair<Endpoint.PLATFORM_TYPE, String>> computePairsPlatformArchitecture(
-      List<Endpoint> endpointList) {
-    return endpointList.stream()
-        .map(ep -> Pair.of(ep.getPlatform(), ep.getArch().name()))
-        .collect(Collectors.toSet());
+  /**
+   * Retrieves asset groups for a scenario based on tag rules using the {@code tagRuleService}.
+   *
+   * @param scenario the scenario containing tag references
+   * @return list of asset groups associated with the scenario tags
+   */
+  public List<AssetGroup> fetchAssetGroupsFromScenarioTagRules(Scenario scenario) {
+    return tagRuleService.getAssetGroupsFromTagIds(
+        scenario.getTags().stream().map(Tag::getId).toList());
   }
 }

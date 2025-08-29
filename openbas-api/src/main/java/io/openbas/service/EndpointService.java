@@ -118,12 +118,18 @@ public class EndpointService {
   }
 
   public List<Endpoint> findEndpointByHostnameAndAtLeastOneIp(
-      @NotBlank final String hostname,
-      @NotNull final Endpoint.PLATFORM_TYPE platform,
-      @NotNull final Endpoint.PLATFORM_ARCH arch,
-      @NotNull final String[] ips) {
-    return this.endpointRepository.findByHostnameAndAtleastOneIp(
-        hostname, platform.name(), arch.name(), ips);
+      @NotBlank final String hostname, @NotNull final String[] ips) {
+    return this.endpointRepository.findByHostnameAndAtleastOneIp(hostname, ips);
+  }
+
+  public List<Endpoint> findEndpointByHostnameAndAtLeastOneMacAddress(
+      @NotBlank final String hostname, @NotNull final String[] macAddresses) {
+    return this.endpointRepository.findByHostnameAndAtleastOneMacAddress(hostname, macAddresses);
+  }
+
+  public Optional<Endpoint> findEndpointByExternalReference(
+      @NotNull final String externalReference) {
+    return this.endpointRepository.findByExternalReference(externalReference).stream().findFirst();
   }
 
   public Optional<Endpoint> findEndpointByAtLeastOneMacAddress(
