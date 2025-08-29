@@ -1,21 +1,13 @@
 import { InfoOutlined } from '@mui/icons-material';
-import { Button, FormControlLabel, GridLegacy, Switch, Tooltip, Typography } from '@mui/material';
+import { Button, GridLegacy, Tooltip, Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Form } from 'react-final-form';
 
 import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
-import {
-  defaultGrantAtomicTestingObserver, defaultGrantAtomicTestingPlanner,
-  defaultGrantPayloadObserver, defaultGrantPayloadPlanner,
-  defaultGrantScenarioObserver,
-  defaultGrantScenarioPlanner, defaultGrantSimulationObserver,
-  defaultGrantSimulationPlanner,
-  isDefaultGrantPresent,
-} from './GroupUtils.js';
 
 class GroupForm extends Component {
   validate(values) {
@@ -28,15 +20,6 @@ class GroupForm extends Component {
       }
     });
     return errors;
-  }
-
-  handleDefaultGrantChange(defaultGrant, input, event) {
-    const newValue = event.target.checked
-      ? [...(input.value || []), defaultGrant]
-      : (input.value || []).filter(
-          grant => !R.equals(grant, defaultGrant),
-        );
-    input.onChange(newValue);
   }
 
   render() {
