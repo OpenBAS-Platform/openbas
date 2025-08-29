@@ -1,5 +1,6 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
@@ -20,6 +21,15 @@ import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import SecurityMenu from '../SecurityMenu';
 import CreateGroup from './CreateGroup';
 import GroupPopover from './GroupPopover';
+import {
+  defaultGrantAtomicTestingObserver, defaultGrantAtomicTestingPlanner,
+  defaultGrantPayloadObserver, defaultGrantPayloadPlanner,
+  defaultGrantScenarioObserver,
+  defaultGrantScenarioPlanner,
+  defaultGrantSimulationObserver,
+  defaultGrantSimulationPlanner,
+  isDefaultGrantPresent,
+} from './GroupUtils.js';
 
 const useStyles = makeStyles()(() => ({
   itemHead: {
@@ -47,19 +57,7 @@ const useStyles = makeStyles()(() => ({
 const inlineStyles = {
   group_name: { width: '15%' },
   group_default_user_assign: { width: '15%' },
-  group_default_scenario_observer: {
-    width: '15%',
-    cursor: 'default',
-  },
-  group_default_scenario_planner: {
-    width: '15%',
-    cursor: 'default',
-  },
-  group_default_exercise_observer: {
-    width: '15%',
-    cursor: 'default',
-  },
-  group_default_exercise_planner: {
+  group_default_grants: {
     width: '15%',
     cursor: 'default',
   },
@@ -94,24 +92,52 @@ const Groups = () => {
       isSortable: true,
     },
     {
-      field: 'group_default_scenario_observer',
+      field: 'group_default_grants_scenario_observer',
       label: 'Auto observer on scenarios',
       isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantScenarioObserver),
     },
     {
-      field: 'group_default_scenario_planner',
+      field: 'group_default_grants_scenario_planner',
       label: 'Auto planner on scenarios',
       isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantScenarioPlanner),
     },
     {
-      field: 'group_default_exercise_observer',
+      field: 'group_default_grants_simulation_observer',
       label: 'Auto observer on exercises',
       isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantSimulationObserver),
     },
     {
-      field: 'group_default_exercise_planner',
+      field: 'group_default_grants_simulation_planner',
       label: 'Auto planner on exercises',
       isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantSimulationPlanner),
+    },
+    {
+      field: 'group_default_grants_payload_observer',
+      label: 'Auto observer on payloads',
+      isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantPayloadObserver),
+    },
+    {
+      field: 'group_default_grants_payload_planner',
+      label: 'Auto planner on payloads',
+      isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantPayloadPlanner),
+    },
+    {
+      field: 'group_default_grants_atomic_testing_observer',
+      label: 'Auto observer on atomic testings',
+      isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantAtomicTestingObserver),
+    },
+    {
+      field: 'group_default_grants_atomic_testing_planner',
+      label: 'Auto planner on atomic testings',
+      isSortable: false,
+      value: group => isDefaultGrantPresent(group.group_default_grants, defaultGrantAtomicTestingPlanner),
     },
     {
       field: 'group_users_number',
@@ -136,7 +162,11 @@ const Groups = () => {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{
+      display: 'flex',
+      overflow: 'scroll',
+    }}
+    >
       <div style={{ flexGrow: 1 }}>
         <Breadcrumbs
           variant="list"
@@ -217,57 +247,149 @@ const Groups = () => {
                         '-'
                       )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_observer}>
-                      {group.group_default_scenario_observer ? (
-                        <Tooltip
-                          title={t(
-                            'This group will have observer permission on new scenarios.',
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'SCENARIO'
+                          && g.grant_type === 'OBSERVER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have observer permission on new scenarios.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
                           )}
-                        >
-                          <CheckCircleOutlined fontSize="small" />
-                        </Tooltip>
-                      ) : (
-                        '-'
-                      )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_planner}>
-                      {group.group_default_scenario_planner ? (
-                        <Tooltip
-                          title={t(
-                            'This group will have planner permission on new scenarios.',
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'SCENARIO'
+                          && g.grant_type === 'PLANNER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have planner permission on new scenarios.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
                           )}
-                        >
-                          <CheckCircleOutlined fontSize="small" />
-                        </Tooltip>
-                      ) : (
-                        '-'
-                      )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_observer}>
-                      {group.group_default_exercise_observer ? (
-                        <Tooltip
-                          title={t(
-                            'This group will have observer permission on new simulations.',
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'SIMULATION'
+                          && g.grant_type === 'OBSERVER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have observer permission on new simulations.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
                           )}
-                        >
-                          <CheckCircleOutlined fontSize="small" />
-                        </Tooltip>
-                      ) : (
-                        '-'
-                      )}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
-                      {group.group_default_exercise_planner ? (
-                        <Tooltip
-                          title={t(
-                            'This group will have planner permission on new simulations.',
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'SIMULATION'
+                          && g.grant_type === 'PLANNER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have planner permission on new simulations.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
                           )}
-                        >
-                          <CheckCircleOutlined fontSize="small" />
-                        </Tooltip>
-                      ) : (
-                        '-'
-                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'PAYLOAD'
+                          && g.grant_type === 'OBSERVER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have observer permission on new payloads.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
+                          )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'PAYLOAD'
+                          && g.grant_type === 'PLANNER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have planner permission on new payloads.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
+                          )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'ATOMIC_TESTING'
+                          && g.grant_type === 'OBSERVER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have observer permission on new atomic testings.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
+                          )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_grants}>
+                      {R.any(
+                        g =>
+                          g.grant_resource_type === 'ATOMIC_TESTING'
+                          && g.grant_type === 'PLANNER',
+                        group.group_default_grants || [],
+                      ) ? (
+                            <Tooltip
+                              title={t(
+                                'This group will have planner permission on new atomic testings.',
+                              )}
+                            >
+                              <CheckCircleOutlined fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            '-'
+                          )}
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
                       {group.group_users_number}

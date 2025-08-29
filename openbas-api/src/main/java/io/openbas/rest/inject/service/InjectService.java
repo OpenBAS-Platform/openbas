@@ -96,6 +96,7 @@ public class InjectService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final PayloadRepository payloadRepository;
+  private final GrantService grantService;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -1009,37 +1010,33 @@ public class InjectService {
 
       // Check if both are null - automatically granted
       Path<Object> scenarioPath = root.get("scenario");
-      Path<Object> exercisePath = root.get("exercise");
-      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(exercisePath));
+      Path<Object> simulationPath = root.get("exercise");
+      // Check if both are null
+      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(simulationPath));
 
       // Get allowed grant types
       List<Grant.GRANT_TYPE> allowedGrantTypes = grantType.andHigher();
+
       // Create subquery for accessible scenarios
       Subquery<String> accessibleScenarios =
-          SpecificationUtils.accessibleScenariosSubquery(query, cb, userId, allowedGrantTypes);
-      // Create subquery for accessible exercises
-      Subquery<String> accessibleExercises =
-          SpecificationUtils.accessibleSimulationsSubquery(query, cb, userId, allowedGrantTypes);
+          SpecificationUtils.accessibleResourcesSubquery(
+              query, cb, userId, Grant.GRANT_RESOURCE_TYPE.SCENARIO, allowedGrantTypes);
+      // Create subquery for accessible simulations
+      Subquery<String> accessibleSimulations =
+          SpecificationUtils.accessibleResourcesSubquery(
+              query, cb, userId, Grant.GRANT_RESOURCE_TYPE.SIMULATION, allowedGrantTypes);
+
       // Check if inject's scenario ID is accessible (null is OK)
-      Predicate scenarioAccessible;
-      if (scenarioPath != null) {
-        scenarioAccessible =
-            cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
-      } else {
-        scenarioAccessible = cb.conjunction(); // Always true if no scenario field
-      }
-      // Check if inject's exercise ID is accessible (null is OK)
-      Predicate exerciseAccessible;
-      if (exercisePath != null) {
-        exerciseAccessible =
-            cb.or(cb.isNull(exercisePath), exercisePath.get("id").in(accessibleExercises));
-      } else {
-        exerciseAccessible = cb.conjunction(); // Always true if no exercise field
-      }
+      Predicate scenarioAccessible =
+          cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
+      // Check if inject's simulation ID is accessible (null is OK)
+      Predicate simulationAccessible =
+          cb.or(cb.isNull(simulationPath), simulationPath.get("id").in(accessibleSimulations));
+
       // Inject is accessible if:
       // 1. Both scenario and exercise are null (automatically granted), OR
       // 2. User has access to the non-null scenario/exercise
-      return cb.or(bothNull, cb.and(scenarioAccessible, exerciseAccessible));
+      return cb.or(bothNull, cb.and(scenarioAccessible, simulationAccessible));
     };
   }
 }

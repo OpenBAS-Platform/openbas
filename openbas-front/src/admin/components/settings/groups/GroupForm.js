@@ -1,12 +1,21 @@
 import { InfoOutlined } from '@mui/icons-material';
-import { Button, GridLegacy, Tooltip, Typography } from '@mui/material';
+import { Button, FormControlLabel, GridLegacy, Switch, Tooltip, Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
 import { Component } from 'react';
-import { Form } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 
 import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import inject18n from '../../../../components/i18n';
+import {
+  defaultGrantAtomicTestingObserver, defaultGrantAtomicTestingPlanner,
+  defaultGrantPayloadObserver, defaultGrantPayloadPlanner,
+  defaultGrantScenarioObserver,
+  defaultGrantScenarioPlanner, defaultGrantSimulationObserver,
+  defaultGrantSimulationPlanner,
+  isDefaultGrantPresent,
+} from './GroupUtils.js';
 
 class GroupForm extends Component {
   validate(values) {
@@ -19,6 +28,15 @@ class GroupForm extends Component {
       }
     });
     return errors;
+  }
+
+  handleDefaultGrantChange(defaultGrant, input, event) {
+    const newValue = event.target.checked
+      ? [...(input.value || []), defaultGrant]
+      : (input.value || []).filter(
+          grant => !R.equals(grant, defaultGrant),
+        );
+    input.onChange(newValue);
   }
 
   render() {
@@ -74,10 +92,23 @@ class GroupForm extends Component {
                     </Typography>
                   </GridLegacy>
                   <GridLegacy item xs={6} style={{ display: 'flex' }}>
-                    <OldSwitchField
-                      name="group_default_scenario_observer"
-                      label={t('Auto observer')}
-                    />
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantScenarioObserver);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantScenarioObserver, input, event)}
+                              />
+                            )}
+                            label={t('Auto observer')}
+                          />
+                        );
+                      }}
+                    </Field>
                     <Tooltip
                       title={t(
                         'This group will have observer permission on new scenarios.',
@@ -91,10 +122,23 @@ class GroupForm extends Component {
                     </Tooltip>
                   </GridLegacy>
                   <GridLegacy item xs={6} style={{ display: 'flex' }}>
-                    <OldSwitchField
-                      name="group_default_scenario_planner"
-                      label={t('Auto planner')}
-                    />
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantScenarioPlanner);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantScenarioPlanner, input, event)}
+                              />
+                            )}
+                            label={t('Auto planner')}
+                          />
+                        );
+                      }}
+                    </Field>
                     <Tooltip
                       title={t(
                         'This group will have planner permission on new scenarios.',
@@ -117,10 +161,23 @@ class GroupForm extends Component {
                     </Typography>
                   </GridLegacy>
                   <GridLegacy item xs={6} style={{ display: 'flex' }}>
-                    <OldSwitchField
-                      name="group_default_exercise_observer"
-                      label={t('Auto observer')}
-                    />
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantSimulationObserver);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantSimulationObserver, input, event)}
+                              />
+                            )}
+                            label={t('Auto observer')}
+                          />
+                        );
+                      }}
+                    </Field>
                     <Tooltip
                       title={t(
                         'This group will have observer permission on new simulations.',
@@ -134,13 +191,164 @@ class GroupForm extends Component {
                     </Tooltip>
                   </GridLegacy>
                   <GridLegacy item xs={6} style={{ display: 'flex' }}>
-                    <OldSwitchField
-                      name="group_default_exercise_planner"
-                      label={t('Auto planner')}
-                    />
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantSimulationPlanner);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantSimulationPlanner, input, event)}
+                              />
+                            )}
+                            label={t('Auto planner')}
+                          />
+                        );
+                      }}
+                    </Field>
                     <Tooltip
                       title={t(
                         'This group will have planner permission on new simulations.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </GridLegacy>
+                </GridLegacy>
+              </GridLegacy>
+              <GridLegacy item xs={12}>
+                <GridLegacy container spacing={3}>
+                  <GridLegacy item xs={12}>
+                    <Typography variant="h2" style={{ marginBottom: 0 }}>
+                      {t('Payloads')}
+                    </Typography>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantPayloadObserver);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantPayloadObserver, input, event)}
+                              />
+                            )}
+                            label={t('Auto observer')}
+                          />
+                        );
+                      }}
+                    </Field>
+                    <Tooltip
+                      title={t(
+                        'This group will have observer permission on new payloads.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantPayloadPlanner);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantPayloadPlanner, input, event)}
+                              />
+                            )}
+                            label={t('Auto planner')}
+                          />
+                        );
+                      }}
+                    </Field>
+                    <Tooltip
+                      title={t(
+                        'This group will have planner permission on new payloads.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </GridLegacy>
+                </GridLegacy>
+              </GridLegacy>
+              <GridLegacy item xs={12}>
+                <GridLegacy container spacing={3}>
+                  <GridLegacy item xs={12}>
+                    <Typography variant="h2" style={{ marginBottom: 0 }}>
+                      {t('Atomic testings')}
+                    </Typography>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantAtomicTestingObserver);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantAtomicTestingObserver, input, event)}
+                              />
+                            )}
+                            label={t('Auto observer')}
+                          />
+                        );
+                      }}
+                    </Field>
+                    <Tooltip
+                      title={t(
+                        'This group will have observer permission on new atomic testings.',
+                      )}
+                    >
+                      <InfoOutlined
+                        fontSize="small"
+                        color="primary"
+                        style={{ marginTop: 8 }}
+                      />
+                    </Tooltip>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
+                    <Field name="group_default_grants" subscription={{ value: true }}>
+                      {({ input }) => {
+                        const isChecked = isDefaultGrantPresent(input.value, defaultGrantAtomicTestingPlanner);
+
+                        return (
+                          <FormControlLabel
+                            control={(
+                              <Switch
+                                checked={isChecked}
+                                onChange={event => this.handleDefaultGrantChange(defaultGrantAtomicTestingPlanner, input, event)}
+                              />
+                            )}
+                            label={t('Auto planner')}
+                          />
+                        );
+                      }}
+                    </Field>
+                    <Tooltip
+                      title={t(
+                        'This group will have planner permission on new atomic testings.',
                       )}
                     >
                       <InfoOutlined

@@ -67,6 +67,8 @@ public class ScenarioToExerciseService {
     Exercise exerciseSaved = this.exerciseRepository.save(exercise);
 
     // Grants
+    Grant.GRANT_RESOURCE_TYPE grantResourceTypeForSimulation =
+        GrantableBase.getGrantResourceType(Exercise.class);
     List<Grant> exerciseGrants =
         scenario.getGrants().stream()
             .map(
@@ -74,7 +76,8 @@ public class ScenarioToExerciseService {
                   Grant grant = new Grant();
                   grant.setName(scenarioGrant.getName());
                   grant.setGroup(scenarioGrant.getGroup());
-                  grant.setExercise(exerciseSaved);
+                  grant.setResourceId(exerciseSaved.getId());
+                  grant.setGrantResourceType(grantResourceTypeForSimulation);
                   return this.grantRepository.save(grant);
                 })
             .toList();
