@@ -59,6 +59,3 @@ export const secondsFromToNow = (date: Date) => {
   const now = Math.floor(Date.now() / 1000);
   return now - timestamp;
 };
-
-// todo : isExerciseUpdatable -> transform in canManage
-// todo : isExerciseReadOnly transforme in readOnly
