@@ -303,7 +303,7 @@ class StixApiTest extends IntegrationTest {
       String securityAssessmentId = scenario.getSecurityAssessment().getId();
       scenarioRepository.deleteById(response);
 
-      assertThat(securityAssessmentRepository.findByExternalId(securityAssessmentId));
+      assertThat(securityAssessmentRepository.findByExternalId(securityAssessmentId)).isNotNull();
     }
 
     @Test
