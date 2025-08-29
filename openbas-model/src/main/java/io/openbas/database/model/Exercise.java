@@ -178,7 +178,7 @@ public class Exercise implements Base {
   @Getter
   @ManyToOne
   @JoinColumn(name = "exercise_security_assessment")
-  @JsonProperty("exercise_security_assessment")
+  @JsonIgnore
   private SecurityAssessment securityAssessment;
 
   // -- AUDIT --

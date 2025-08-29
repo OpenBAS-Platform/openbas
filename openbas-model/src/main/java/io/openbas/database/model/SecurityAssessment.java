@@ -34,9 +34,7 @@ public class SecurityAssessment implements Base {
   @JsonProperty("security_assessment_id")
   private String id;
 
-  @Column(
-      name = "security_assessment_external_id",
-      nullable = false) // security assessment id from octi
+  @Column(name = "security_assessment_external_id", nullable = false)
   @JsonProperty("security_assessment_external_id")
   private String externalId;
 
