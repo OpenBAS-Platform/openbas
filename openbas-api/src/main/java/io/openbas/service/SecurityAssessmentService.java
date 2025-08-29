@@ -1,9 +1,7 @@
 package io.openbas.service;
 
-import static io.openbas.database.model.Scenario.MAIN_FOCUS_INCIDENT_RESPONSE;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAndValidateAssessment;
 import static io.openbas.utils.SecurityAssessmentUtils.extractAttackReferences;
-import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
