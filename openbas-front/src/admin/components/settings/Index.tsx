@@ -5,7 +5,6 @@ import NotFound from '../../../components/NotFound';
 import AttackPatterns from './attack_patterns/AttackPatterns';
 import Cves from './cves/Cves';
 import XlsMappers from './data_ingestion/XlsMappers';
-import Groups from './groups/Groups';
 import KillChainPhases from './kill_chain_phases/KillChainPhases';
 import Parameters from './Parameters';
 import Policies from './policies/Policies';
