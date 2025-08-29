@@ -129,7 +129,6 @@ public class ScenarioService {
         scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
       }
     }
-    this.grantService.computeGrant(scenario);
     this.actionMetricCollector.addScenarioCreatedCount();
     return this.scenarioRepository.save(scenario);
   }
