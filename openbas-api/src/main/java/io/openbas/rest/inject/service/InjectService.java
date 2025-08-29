@@ -1070,6 +1070,7 @@ public class InjectService {
               Inject inject = entry.getKey();
               InjectorContract ic = entry.getValue();
 
+              // Check if this injectContract has not arch and platforms
               if (ic.getArch() == null
                   || ic.getPlatforms() == null
                   || ic.getPlatforms().length == 0) {
@@ -1077,14 +1078,17 @@ public class InjectService {
                     inject, new HashSet<Triple<String, Endpoint.PLATFORM_TYPE, String>>());
               }
 
+              // Extract archs
               Set<String> archs =
                   ALL_ARCHITECTURES.equals(ic.getArch())
                       ? Set.of(arm64.name(), x86_64.name())
                       : Set.of(ic.getArch().name());
 
+              // Extract platforms
               Set<Endpoint.PLATFORM_TYPE> platforms =
                   new HashSet<>(Arrays.asList(ic.getPlatforms()));
 
+              // Generate combinations
               Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> combinations =
                   buildCombinationsAttackPatternPlatformsArchitectures(
                       ic.getAttackPatterns(), platforms, archs);

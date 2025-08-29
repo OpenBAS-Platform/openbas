@@ -80,6 +80,60 @@ public class SecurityAssessmentInjectService {
   }
 
   /**
+   * Handles inject deletion and generation when no asset groups are defined or available.
+   *
+   * <p>Only required AttackPatterns are used to determine what to remove or generate.
+   *
+   * @param scenario the scenario being processed
+   * @param requiredAttackPatterns list of required AttackPatterns
+   * @param injectCoverageMap current inject coverage
+   */
+  private void handleNoAssetGroupsCase(
+      Scenario scenario,
+      Map<String, AttackPattern> requiredAttackPatterns,
+      Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap) {
+    Set<String> coveredAttackPatterns =
+        injectCoverageMap.values().stream()
+            .flatMap(Set::stream)
+            .map(Triple::getLeft)
+            .collect(Collectors.toSet());
+
+    // 5. Remove AttackPatterns already covered
+    Set<String> requiredAttackPatternIds = requiredAttackPatterns.keySet();
+
+    Set<String> missingAttackPatterns = new HashSet<>(requiredAttackPatternIds);
+    missingAttackPatterns.removeAll(coveredAttackPatterns);
+
+    // 6. Remove injects not in requiredAttackPatterns
+    List<Inject> injectsToRemove =
+        injectCoverageMap.entrySet().stream()
+            .filter(
+                entry -> {
+                  Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> triples = entry.getValue();
+                  return triples.isEmpty() // In order to filter Placeholders
+                      || triples.stream()
+                          .map(Triple::getLeft)
+                          .noneMatch(requiredAttackPatternIds::contains);
+                })
+            .map(Map.Entry::getKey)
+            .toList();
+
+    injectRepository.deleteAll(injectsToRemove);
+
+    // 7. Generate missing injects only for missing AttackPatterns and relevant asset groups
+    if (!missingAttackPatterns.isEmpty()) {
+      Set<AttackPattern> missingAttacks =
+          missingAttackPatterns.stream()
+              .map(requiredAttackPatterns::get)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toSet());
+
+      injectAssistantService.generateInjectsByAttackPatternsWithoutAssetGroups(
+          scenario, missingAttacks, INJECTS_PER_ATTACK_PATTERN);
+    }
+  }
+
+  /**
    * Handles inject deletion and generation when asset groups and endpoints are available.
    *
    * <p>Performs:
@@ -246,60 +300,6 @@ public class SecurityAssessmentInjectService {
     return assetsFromGroupMap.entrySet().stream()
         .filter(entry -> filteredAssetGroups.contains(entry.getKey()))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-  }
-
-  /**
-   * Handles inject deletion and generation when no asset groups are defined or available.
-   *
-   * <p>Only required AttackPatterns are used to determine what to remove or generate.
-   *
-   * @param scenario the scenario being processed
-   * @param requiredAttackPatterns list of required AttackPatterns
-   * @param injectCoverageMap current inject coverage
-   */
-  private void handleNoAssetGroupsCase(
-      Scenario scenario,
-      Map<String, AttackPattern> requiredAttackPatterns,
-      Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>> injectCoverageMap) {
-    Set<String> coveredAttackPatterns =
-        injectCoverageMap.values().stream()
-            .flatMap(Set::stream)
-            .map(Triple::getLeft)
-            .collect(Collectors.toSet());
-
-    // 5. Remove AttackPatterns already covered
-    Set<String> requiredAttackPatternIds = requiredAttackPatterns.keySet();
-
-    Set<String> missingAttackPatterns = new HashSet<>(requiredAttackPatternIds);
-    missingAttackPatterns.removeAll(coveredAttackPatterns);
-
-    // 6. Remove injects not in requiredAttackPatterns
-    List<Inject> injectsToRemove =
-        injectCoverageMap.entrySet().stream()
-            .filter(
-                entry -> {
-                  Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> triples = entry.getValue();
-                  return triples.isEmpty() // In order to filter Placeholders
-                      || triples.stream()
-                          .map(Triple::getLeft)
-                          .noneMatch(requiredAttackPatternIds::contains);
-                })
-            .map(Map.Entry::getKey)
-            .toList();
-
-    injectRepository.deleteAll(injectsToRemove);
-
-    // 7. Generate missing injects only for missing AttackPatterns and relevant asset groups
-    if (!missingAttackPatterns.isEmpty()) {
-      Set<AttackPattern> missingAttacks =
-          missingAttackPatterns.stream()
-              .map(requiredAttackPatterns::get)
-              .filter(Objects::nonNull)
-              .collect(Collectors.toSet());
-
-      injectAssistantService.generateInjectsByAttackPatternsWithoutAssetGroups(
-          scenario, missingAttacks, INJECTS_PER_ATTACK_PATTERN);
-    }
   }
 
   /**

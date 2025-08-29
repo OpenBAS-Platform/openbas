@@ -211,6 +211,12 @@ public class AssetGroupService {
         .toList();
   }
 
+  /**
+   * Build a map with asset groups and their list of endpoints (directly or dynamically related)
+   *
+   * @param assetGroups list
+   * @return map of asset groups with the list of endpoints
+   */
   public Map<AssetGroup, List<Endpoint>> assetsFromAssetGroupMap(List<AssetGroup> assetGroups) {
     return assetGroups.stream()
         .collect(
