@@ -105,7 +105,10 @@ public class AttackPatternService {
   public AttackPattern findById(String attackPatternId) {
     return this.attackPatternRepository
         .findById(attackPatternId)
-        .orElseThrow(() -> new ElementNotFoundException("Attack pattern not found"));
+        .orElseThrow(
+            () ->
+                new ElementNotFoundException(
+                    "Attack pattern not found with id: " + attackPatternId));
   }
 
   /**

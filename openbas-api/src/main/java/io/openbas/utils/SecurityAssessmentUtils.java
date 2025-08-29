@@ -13,6 +13,16 @@ public class SecurityAssessmentUtils {
   public static final String STIX_ID = "id";
   public static final String X_SECURITY_ASSESSMENT = "x-security-assessment";
 
+  /**
+   * Extracts and validates the {@code x-security-assessment} object from a STIX bundle.
+   *
+   * <p>This method ensures that the bundle contains exactly one object of type {@code
+   * x-security-assessment}.
+   *
+   * @param bundle the STIX bundle to search
+   * @return the extracted {@code x-security-assessment} object
+   * @throws BadRequestException if the bundle does not contain exactly one such object
+   */
   public static ObjectBase extractAndValidateAssessment(Bundle bundle) throws BadRequestException {
     List<ObjectBase> assessments = bundle.findByType(X_SECURITY_ASSESSMENT);
     if (assessments.size() != 1) {
@@ -21,6 +31,15 @@ public class SecurityAssessmentUtils {
     return assessments.get(0);
   }
 
+  /**
+   * Extracts MITRE attack references from a list of STIX objects.
+   *
+   * <p>For each object that has a {@code x_mitre_id} property, this method creates a {@link
+   * StixRefToExternalRef} mapping between the object's STIX ID and its MITRE external ID.
+   *
+   * @param objects the list of STIX objects to scan
+   * @return a list of {@link StixRefToExternalRef} mappings between STIX and MITRE IDs
+   */
   public static List<StixRefToExternalRef> extractAttackReferences(List<ObjectBase> objects) {
     List<StixRefToExternalRef> stixToRef = new ArrayList<>();
     for (ObjectBase obj : objects) {
