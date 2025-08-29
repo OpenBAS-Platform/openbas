@@ -114,4 +114,11 @@ public class Grant implements Base {
         ? this.getScenario().getId()
         : this.getExercise() != null ? this.getExercise().getId() : null;
   }
+
+  public boolean isEquivalentTo(Grant other) {
+    return this.getGroup().equals(other.getGroup())
+        && this.getName().equals(other.getName())
+        && ((this.getExercise() == null && this.getScenario().equals(other.getScenario()))
+            || (this.getScenario() == null && this.getExercise().equals(other.getExercise())));
+  }
 }

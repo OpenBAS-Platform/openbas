@@ -53,6 +53,7 @@ public class ScenarioToExerciseService {
     exercise.setFooter(scenario.getFooter());
     exercise.setFrom(scenario.getFrom());
     exercise.addReplyTos(scenario.getReplyTos());
+    exercise.setSecurityAssessment(scenario.getSecurityAssessment());
     exercise.setStart(start);
     exercise.setSecurityAssessment(scenario.getSecurityAssessment());
     if (isRunning) {

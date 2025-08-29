@@ -98,6 +98,7 @@ public class Exercise implements Base {
 
   @Column(name = "exercise_launch_order", insertable = false, updatable = false)
   @JsonIgnore
+  @Getter
   @Setter(NONE)
   private Long launchOrder;
 

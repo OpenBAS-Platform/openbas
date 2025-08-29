@@ -3,6 +3,8 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.cron.ScheduleFrequency;
+import io.openbas.cron.ScheduleFrequencyConverter;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -47,7 +49,8 @@ public class SecurityAssessment implements Base {
 
   @Column(name = "security_assessment_scheduling", nullable = false)
   @JsonProperty("security_assessment_scheduling")
-  private String scheduling;
+  @Convert(converter = ScheduleFrequencyConverter.class)
+  private ScheduleFrequency scheduling;
 
   @Column(name = "security_assessment_period_start")
   @JsonProperty("security_assessment_period_start")
