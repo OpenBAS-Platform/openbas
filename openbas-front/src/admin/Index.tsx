@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { lazy, Suspense, useContext, useEffect } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router';
+import { lazy, Suspense, useEffect } from 'react';
+import { Route, Routes, useNavigate } from 'react-router';
 import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -16,7 +16,6 @@ import { computeBannerSettings } from '../public/components/systembanners/utils'
 import { useHelper } from '../store';
 import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
-import { AbilityContext } from '../utils/permissions/PermissionsProvider';
 import ProtectedRoute from '../utils/permissions/ProtectedRoute';
 import { ACTIONS, SUBJECTS } from '../utils/permissions/types';
 import LeftBar from './components/nav/LeftBar';
@@ -48,7 +47,6 @@ const useStyles = makeStyles()(theme => ({ toolbar: theme.mixins.toolbar as CSSO
 
 const Index = () => {
   const theme = useTheme();
-  const ability = useContext(AbilityContext);
 
   const { classes } = useStyles();
   const navigate = useNavigate();
