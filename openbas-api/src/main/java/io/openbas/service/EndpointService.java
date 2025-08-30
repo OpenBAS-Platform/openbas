@@ -23,6 +23,7 @@ import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.mapper.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.BufferedInputStream;
@@ -234,6 +235,7 @@ public class EndpointService {
   }
 
   // -- INSTALLATION AGENT --
+  @Transactional
   public void registerAgentEndpoint(AgentRegisterInput input) {
     // Check if agent exists (only 1 agent can be found for Tanium)
     List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
@@ -251,6 +253,7 @@ public class EndpointService {
     }
   }
 
+  @Transactional
   public List<Asset> syncAgentsEndpoints(
       List<AgentRegisterInput> inputs, List<Agent> existingAgents) {
     List<Agent> agentsToSave = new ArrayList<>();
@@ -276,6 +279,7 @@ public class EndpointService {
         setUpdatedEndpointAttributes(endpointToSave, inputToSave);
         agentToUpdate.setAsset(endpointToSave);
         agentToUpdate.setLastSeen(inputToSave.getLastSeen());
+        addSourceTagToEndpoint(endpointToSave, inputToSave);
         endpointsToSave.add(endpointToSave);
         agentsToSave.add(agentToUpdate);
         inputs.removeIf(
@@ -325,6 +329,7 @@ public class EndpointService {
         endpointToSave.setIps(inputToUpdate.getIps());
         endpointToSave.setSeenIp(inputToUpdate.getSeenIp());
         endpointToSave.setMacAddresses(inputToUpdate.getMacAddresses());
+        addSourceTagToEndpoint(endpointToSave, inputToUpdate);
         endpointsToSave.add(endpointToSave);
         agentToSave = new Agent();
         setNewAgentAttributes(inputToUpdate, agentToSave);
@@ -338,6 +343,7 @@ public class EndpointService {
     return endpoints;
   }
 
+  @Transactional
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
     AgentRegisterInput agentInput = toAgentEndpoint(input);
     Agent agent;
