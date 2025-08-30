@@ -392,25 +392,44 @@ public class EndpointService {
     return endpoint;
   }
 
-  private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
-    setUpdatedEndpointAttributes(endpoint, input);
-    Optional<Tag> tag =
-        tagRepository.findByName("source:" + input.getExecutor().getName().toLowerCase());
+  private void addSourceTagToEndpoint(Endpoint endpoint, AgentRegisterInput input) {
+    // Get existing tags or create new mutable set
+    Set<Tag> existingTags =
+        endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
+    existingTags.removeIf(t -> t.getName() != null && t.getName().startsWith("source:"));
+    String tagName = "source:" + input.getExecutor().getName().toLowerCase();
+    Optional<Tag> tag = tagRepository.findByName(tagName);
     if (tag.isEmpty()) {
       Tag newTag = new Tag();
       newTag.setColor(input.getExecutor().getBackgroundColor());
-      newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
+      newTag.setName(tagName);
       tagRepository.save(newTag);
-      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
+      existingTags.add(newTag);
     } else {
-      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
+      existingTags.add(tag.get());
     }
+    endpoint.setTags(existingTags);
+  }
+
+  private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
+    setUpdatedEndpointAttributes(endpoint, input);
+    addSourceTagToEndpoint(endpoint, input);
     updateEndpoint(endpoint);
     return createOrUpdateAgent(endpoint, input);
   }
 
+  private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
+    Endpoint endpoint = (Endpoint) agent.getAsset();
+    setUpdatedEndpointAttributes(endpoint, input);
+    addSourceTagToEndpoint(endpoint, input);
+    updateEndpoint(endpoint);
+    setUpdatedAgentAttributes(agent, input, endpoint);
+    return agentService.createOrUpdateAgent(agent);
+  }
+
   private Agent updateExistingEndpointAndCreateAgent(Endpoint endpoint, AgentRegisterInput input) {
     setUpdatedEndpointAttributes(endpoint, input);
+    addSourceTagToEndpoint(endpoint, input);
     updateEndpoint(endpoint);
     Agent agent = new Agent();
     setNewAgentAttributes(input, agent);
@@ -452,25 +471,6 @@ public class EndpointService {
     endpoint.setSeenIp(input.getSeenIp());
     endpoint.setMacAddresses(
         EndpointMapper.mergeAddressArrays(endpoint.getMacAddresses(), input.getMacAddresses()));
-  }
-
-  private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
-    Endpoint endpoint = (Endpoint) agent.getAsset();
-    setUpdatedEndpointAttributes(endpoint, input);
-    Optional<Tag> tag =
-        tagRepository.findByName("source:" + input.getExecutor().getName().toLowerCase());
-    if (tag.isEmpty()) {
-      Tag newTag = new Tag();
-      newTag.setColor(input.getExecutor().getBackgroundColor());
-      newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
-      tagRepository.save(newTag);
-      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
-    } else {
-      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
-    }
-    updateEndpoint(endpoint);
-    setUpdatedAgentAttributes(agent, input, endpoint);
-    return agentService.createOrUpdateAgent(agent);
   }
 
   private void setUpdatedAgentAttributes(Agent agent, AgentRegisterInput input, Endpoint endpoint) {
