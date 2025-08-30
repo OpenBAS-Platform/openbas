@@ -393,7 +393,6 @@ public class EndpointService {
   }
 
   private void addSourceTagToEndpoint(Endpoint endpoint, AgentRegisterInput input) {
-    // Get existing tags or create new mutable set
     Set<Tag> existingTags =
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
     existingTags.removeIf(t -> t.getName() != null && t.getName().startsWith("source:"));
@@ -487,17 +486,7 @@ public class EndpointService {
     endpoint.setIps(input.getIps());
     endpoint.setSeenIp(input.getSeenIp());
     endpoint.setMacAddresses(input.getMacAddresses());
-    Optional<Tag> tag =
-        tagRepository.findByName("source:" + input.getExecutor().getName().toLowerCase());
-    if (tag.isEmpty()) {
-      Tag newTag = new Tag();
-      newTag.setColor(input.getExecutor().getBackgroundColor());
-      newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
-      tagRepository.save(newTag);
-      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
-    } else {
-      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
-    }
+    addSourceTagToEndpoint(endpoint, input);
     createEndpoint(endpoint);
     Agent agent = new Agent();
     setUpdatedAgentAttributes(agent, input, endpoint);
