@@ -540,7 +540,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           <Typography variant="h3" gutterBottom>
             {t('Platform')}
           </Typography>
-          {target.target_subtype ?? t('N/A')}
+          {target.target_subtype ?? '-'}
         </div>
       </div>
       <div
