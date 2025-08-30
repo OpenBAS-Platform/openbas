@@ -401,9 +401,9 @@ public class EndpointService {
       newTag.setColor(input.getExecutor().getBackgroundColor());
       newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
       tagRepository.save(newTag);
-      endpoint.setTags(Set.of(newTag));
+      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
     } else {
-      endpoint.setTags(Set.of(tag.get()));
+      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
     }
     updateEndpoint(endpoint);
     return createOrUpdateAgent(endpoint, input);
@@ -464,9 +464,9 @@ public class EndpointService {
       newTag.setColor(input.getExecutor().getBackgroundColor());
       newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
       tagRepository.save(newTag);
-      endpoint.setTags(Set.of(newTag));
+      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
     } else {
-      endpoint.setTags(Set.of(tag.get()));
+      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
     }
     updateEndpoint(endpoint);
     setUpdatedAgentAttributes(agent, input, endpoint);
@@ -494,9 +494,9 @@ public class EndpointService {
       newTag.setColor(input.getExecutor().getBackgroundColor());
       newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
       tagRepository.save(newTag);
-      endpoint.setTags(Set.of(newTag));
+      endpoint.setTags(new HashSet<>(Collections.singleton(newTag)));
     } else {
-      endpoint.setTags(Set.of(tag.get()));
+      endpoint.setTags(new HashSet<>(Collections.singleton(tag.get())));
     }
     createEndpoint(endpoint);
     Agent agent = new Agent();
