@@ -173,6 +173,13 @@ public class Exercise implements Base {
     this.setUpdatedAt(now());
   }
 
+  // STIX
+  @Getter
+  @ManyToOne
+  @JoinColumn(name = "exercise_security_assessment")
+  @JsonIgnore
+  private SecurityAssessment securityAssessment;
+
   // -- AUDIT --
 
   @Getter
