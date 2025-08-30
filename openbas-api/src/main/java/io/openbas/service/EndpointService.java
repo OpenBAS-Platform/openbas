@@ -465,6 +465,16 @@ public class EndpointService {
     endpoint.setIps(input.getIps());
     endpoint.setSeenIp(input.getSeenIp());
     endpoint.setMacAddresses(input.getMacAddresses());
+    Optional<Tag> tag = tagRepository.findByName("source:" + input.getExecutor().getName().toLowerCase());
+    if(tag.isEmpty()) {
+      Tag newTag = new Tag();
+      newTag.setColor(input.getExecutor().getBackgroundColor());
+      newTag.setName("source:" + input.getExecutor().getName().toLowerCase());
+      tagRepository.save(newTag);
+        endpoint.setTags(Set.of(newTag));
+    } else {
+        endpoint.setTags(Set.of(tag.get()));
+    }
     createEndpoint(endpoint);
     Agent agent = new Agent();
     setUpdatedAgentAttributes(agent, input, endpoint);
