@@ -1,7 +1,6 @@
 import { InfoOutlined } from '@mui/icons-material';
 import { Button, GridLegacy, Tooltip, Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
 import { Component } from 'react';
 import { Form } from 'react-final-form';
 
