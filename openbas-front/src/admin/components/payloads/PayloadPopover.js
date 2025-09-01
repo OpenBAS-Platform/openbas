@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import {
   deletePayload,
   duplicatePayload,
-  exportPayloads,
+  exportPayload,
   updatePayload,
 } from '../../../actions/payloads/payload-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
@@ -96,12 +96,7 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
 
   const handleExportJsonSingle = () => {
     handlePopoverClose();
-    const exportData = {
-      payloads: [
-        { payload_id: payload.payload_id },
-      ],
-    };
-    exportPayloads(exportData).then((result) => {
+    exportPayload(payload.payload_id).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
       const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
       const filename = match[1];
