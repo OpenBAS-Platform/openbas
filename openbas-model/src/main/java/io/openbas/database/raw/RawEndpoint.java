@@ -1,5 +1,6 @@
 package io.openbas.database.raw;
 
+import java.time.Instant;
 import java.util.Set;
 
 public interface RawEndpoint extends RawAsset {
@@ -20,4 +21,6 @@ public interface RawEndpoint extends RawAsset {
   Set<String> getEndpoint_exercises();
 
   Set<String> getEndpoint_scenarios();
+
+  Instant getEndpoint_updated_at();
 }

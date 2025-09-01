@@ -33,7 +33,7 @@ public class EndpointHandler implements Handler<EsEndpoint> {
               esEndpoint.setBase_id(endpoint.getAsset_id());
               esEndpoint.setBase_representative(endpoint.getAsset_name());
               esEndpoint.setBase_created_at(endpoint.getAsset_created_at());
-              esEndpoint.setBase_updated_at(endpoint.getAsset_updated_at());
+              esEndpoint.setBase_updated_at(endpoint.getEndpoint_updated_at());
               // not sure what to put here, if anything
               esEndpoint.setBase_restrictions(buildRestrictions(endpoint.getAsset_id()));
 
