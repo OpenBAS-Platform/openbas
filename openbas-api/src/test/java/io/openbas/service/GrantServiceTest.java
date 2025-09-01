@@ -1,21 +1,17 @@
 package io.openbas.service;
 
-import static io.openbas.database.model.Grant.GRANT_TYPE.LAUNCHER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
@@ -28,18 +24,13 @@ public class GrantServiceTest extends IntegrationTest {
 
   @InjectMocks private GrantService grantService;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
   @Test
   public void test_hasReadGrant_WHEN_has_read_grant() {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
 
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, OBSERVER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasReadGrant(RESOURCE_ID, user));
@@ -50,7 +41,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, OBSERVER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasReadGrant(RESOURCE_ID, user));
@@ -61,7 +52,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, LAUNCHER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasLaunchGrant(RESOURCE_ID, user));
@@ -72,7 +63,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, PLANNER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasWriteGrant(RESOURCE_ID, user));
@@ -83,7 +74,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, LAUNCHER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasLaunchGrant(RESOURCE_ID, user));
@@ -94,7 +85,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, PLANNER.andHigher()))
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasWriteGrant(RESOURCE_ID, user));
