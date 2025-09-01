@@ -53,7 +53,7 @@ public interface VulnerableEndpointRepository extends JpaRepository<Endpoint, St
               + "LEFT JOIN assets_tags at ON a.asset_id = at.asset_id "
               + "JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "JOIN exercises e ON i.inject_exercise = e.exercise_id "
-              + "JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id "
+              + "LEFT JOIN scenarios_exercises se ON se.exercise_id = e.exercise_id "
               + "WHERE (e.exercise_updated_at > :from OR a.asset_updated_at > :from) "
               + "AND f.finding_type = 'CVE' "
               + "AND a.asset_type = '"
