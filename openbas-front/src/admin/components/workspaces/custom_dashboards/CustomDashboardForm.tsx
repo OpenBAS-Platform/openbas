@@ -151,6 +151,10 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
           value={activeTab}
           onChange={handleActiveTabChange}
           aria-label="tabs for payload form"
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
         >
           {tabs.map(tab => <Tab key={tab.key} label={tab.label} value={tab.key} />)}
         </Tabs>
