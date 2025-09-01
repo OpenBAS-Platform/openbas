@@ -10,8 +10,8 @@ import { fetchCollectorsForAtomicTesting } from '../../../../actions/atomic_test
 import { fetchCollectors } from '../../../../actions/Collector';
 import type { CollectorHelper } from '../../../../actions/collectors/collector-helper';
 import { fetchPayloadDetectionRemediationsByInject } from '../../../../actions/injects/inject-action';
-import { fetchCollectorsForPayload } from '../../../../actions/payloads/payload-actions';
 import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
 import { COLLECTOR_LIST } from '../../../../constants/Entities';
 import { useHelper } from '../../../../store';
 import { type Collector, type DetectionRemediationOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
@@ -45,13 +45,19 @@ const AtomicTestingRemediations = () => {
   const isRemediationTab = location.pathname.includes('/remediations');
 
   const hasPlatformSettingsCapabilities = ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS);
+  const [loading, setLoading] = useState(true);
 
   const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
   useDataLoader(() => {
+    setLoading(true);
     if (hasPlatformSettingsCapabilities) {
-      dispatch(fetchCollectors());
+      dispatch(fetchCollectors()).finally(() => {
+        setLoading(false);
+      });
     } else if (injectId) {
-      dispatch(fetchCollectorsForAtomicTesting(injectId));
+      dispatch(fetchCollectorsForAtomicTesting(injectId)).finally(() => {
+        setLoading(false);
+      });
     }
   });
 
@@ -95,70 +101,80 @@ const AtomicTestingRemediations = () => {
   return (
     <>
       <Typography variant="h5" gutterBottom>{t('Security platform')}</Typography>
+      {loading && <Loader variant="inElement" />}
       {(hasPlatformSettingsCapabilities || injectId) ? (
         <>
-          <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
-            {tabs.length === 0
-              ? <Typography>{t('Loading collectors...')}</Typography>
-              : tabs.map((tab, index) => (
-                  <Tab
-                    key={tab.collector_type}
-                    label={(
-                      <Box display="flex" alignItems="center">
-                        <img
-                          src={`/api/images/collectors/${tab.collector_type}`}
-                          alt={tab.collector_type}
-                          style={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: 4,
-                            marginRight: theme.spacing(2),
-                          }}
-                        />
-                        {tab.collector_name}
-                      </Box>
-                    )}
-                    value={index}
-                  />
-                ))}
-          </Tabs>
+          {tabs.length === 0
+            ? (
+                <Paper className={classes.paperContainer} variant="outlined">
+                  <Typography variant="body2" color="textSecondary" sx={{ padding: 2 }}>
+                    {t('No collector configured.')}
+                  </Typography>
+                </Paper>
+              ) : (
+                <>
+                  <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
+                    {tabs.map((tab, index) => (
+                      <Tab
+                        key={tab.collector_type}
+                        label={(
+                          <Box display="flex" alignItems="center">
+                            <img
+                              src={`/api/images/collectors/${tab.collector_type}`}
+                              alt={tab.collector_type}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                borderRadius: 4,
+                                marginRight: theme.spacing(2),
+                              }}
+                            />
+                            {tab.collector_name}
+                          </Box>
+                        )}
+                        value={index}
+                      />
+                    ))}
+                  </Tabs>
 
-          <Paper className={classes.paperContainer} variant="outlined">
-            {activeCollectorRemediations.length === 0 ? (
-              <Typography sx={{ padding: 2 }} variant="body2" color="textSecondary" gutterBottom>
-                {t('No detection rule available for this security platform yet.')}
-              </Typography>
-            ) : (
-              activeCollectorRemediations.map((rem) => {
-                const content = rem.detection_remediation_values?.trim();
-
-                return (
-                  <Box sx={{ padding: 2 }} key={rem.detection_remediation_id}>
-                    {content ? (
-                      <>
-                        <Typography
-                          sx={{ paddingBottom: 2 }}
-                          variant="body2"
-                          fontWeight="bold"
-                          gutterBottom
-                        >
-                          {`${t('Detection Rule')}: `}
-                        </Typography>
-                        <div
-                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')) }}
-                        >
-                        </div>
-                      </>
-                    ) : (
-                      <Typography variant="body2" color="textSecondary" gutterBottom>
+                  <Paper className={classes.paperContainer} variant="outlined">
+                    {activeCollectorRemediations.length === 0 ? (
+                      <Typography sx={{ padding: 2 }} variant="body2" color="textSecondary" gutterBottom>
                         {t('No detection rule available for this security platform yet.')}
                       </Typography>
+                    ) : (
+                      activeCollectorRemediations.map((rem) => {
+                        const content = rem.detection_remediation_values?.trim();
+
+                        return (
+                          <Box sx={{ padding: 2 }} key={rem.detection_remediation_id}>
+                            {content ? (
+                              <>
+                                <Typography
+                                  sx={{ paddingBottom: 2 }}
+                                  variant="body2"
+                                  fontWeight="bold"
+                                  gutterBottom
+                                >
+                                  {`${t('Detection Rule')}: `}
+                                </Typography>
+                                <div
+                                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(rem.detection_remediation_values.replace(/\n/g, '<br />')) }}
+                                >
+                                </div>
+                              </>
+                            ) : (
+                              <Typography variant="body2" color="textSecondary" gutterBottom>
+                                {t('No detection rule available for this security platform yet.')}
+                              </Typography>
+                            )}
+                          </Box>
+                        );
+                      })
                     )}
-                  </Box>
-                );
-              })
-            )}
-          </Paper>
+                  </Paper>
+                </>
+              )}
         </>
       ) : (<RestrictionAccess restrictedField="collectors" />)}
     </>
