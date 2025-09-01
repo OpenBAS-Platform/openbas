@@ -145,7 +145,7 @@ public interface EndpointRepository
               + "' "
               + "GROUP BY a.asset_id "
               + "ORDER BY GREATEST(a.asset_updated_at, MAX(i.inject_updated_at)) LIMIT "
-                  // TODO updated_at exercises + scenarios
+              // TODO updated_at exercises + scenarios
               + Constants.INDEXING_RECORD_SET_SIZE
               + ";",
       nativeQuery = true)
