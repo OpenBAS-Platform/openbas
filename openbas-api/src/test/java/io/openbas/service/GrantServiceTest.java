@@ -11,13 +11,14 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class GrantServiceTest extends IntegrationTest {
 
   private static final String USER_ID = "userid";
@@ -26,6 +27,11 @@ public class GrantServiceTest extends IntegrationTest {
   @Mock private GrantRepository grantRepository;
 
   @InjectMocks private GrantService grantService;
+
+  @BeforeEach
+  void setUp() {
+    MockitoAnnotations.openMocks(this);
+  }
 
   @Test
   public void test_hasReadGrant_WHEN_has_read_grant() {
