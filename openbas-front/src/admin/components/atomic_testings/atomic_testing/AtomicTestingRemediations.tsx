@@ -92,37 +92,35 @@ const AtomicTestingRemediations = () => {
     );
   }, [tabs, activeTab, detectionRemediations]);
 
-  if (tabs.length === 0) {
-    return <Typography>{t('Loading collectors...')}</Typography>;
-  }
-
   return (
     <>
       <Typography variant="h5" gutterBottom>{t('Security platform')}</Typography>
       {(hasPlatformSettingsCapabilities || injectId) ? (
         <>
           <Tabs value={activeTab} onChange={handleActiveTabChange} aria-label="collector tabs">
-            {tabs.map((tab, index) => (
-              <Tab
-                key={tab.collector_type}
-                label={(
-                  <Box display="flex" alignItems="center">
-                    <img
-                      src={`/api/images/collectors/${tab.collector_type}`}
-                      alt={tab.collector_type}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 4,
-                        marginRight: theme.spacing(2),
-                      }}
-                    />
-                    {tab.collector_name}
-                  </Box>
-                )}
-                value={index}
-              />
-            ))}
+            {tabs.length === 0
+              ? <Typography>{t('Loading collectors...')}</Typography>
+              : tabs.map((tab, index) => (
+                  <Tab
+                    key={tab.collector_type}
+                    label={(
+                      <Box display="flex" alignItems="center">
+                        <img
+                          src={`/api/images/collectors/${tab.collector_type}`}
+                          alt={tab.collector_type}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: 4,
+                            marginRight: theme.spacing(2),
+                          }}
+                        />
+                        {tab.collector_name}
+                      </Box>
+                    )}
+                    value={index}
+                  />
+                ))}
           </Tabs>
 
           <Paper className={classes.paperContainer} variant="outlined">
