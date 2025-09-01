@@ -28,7 +28,7 @@ const RemediationFormTab = ({ payloadId }: RemediationFormTabProps) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const ability = useContext(AbilityContext);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);

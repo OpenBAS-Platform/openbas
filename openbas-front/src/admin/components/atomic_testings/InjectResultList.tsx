@@ -4,7 +4,7 @@ import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'r
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { importInjects } from '../../../actions/injects/inject-action';
+import { importAtomicTesting } from '../../../actions/atomic_testings/atomic-testing-actions';
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
@@ -161,7 +161,7 @@ const InjectResultList: FunctionComponent<Props> = ({
     setOpenJsonImportDialog(false);
   };
   const handleSubmitJsonImportFile = (values: { file: File }) => {
-    importInjects(values.file, { target: { type: 'ATOMIC_TESTING' } }).then(() => {
+    importAtomicTesting(values.file).then(() => {
       handleCloseJsonImportDialog();
       setReloadCount(prev => prev + 1);
     });
@@ -196,6 +196,7 @@ const InjectResultList: FunctionComponent<Props> = ({
           </Can>
         ) : null}
       />
+      {/* eslint-disable-next-line max-len */}
       <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleCloseJsonImportDialog} handleSubmit={handleSubmitJsonImportFile} />
       <List>
         <ListItem

@@ -45,16 +45,17 @@ const AtomicTestingRemediations = () => {
   const isRemediationTab = location.pathname.includes('/remediations');
 
   const hasPlatformSettingsCapabilities = ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
   useDataLoader(() => {
-    setLoading(true);
     if (hasPlatformSettingsCapabilities) {
+      setLoading(true);
       dispatch(fetchCollectors()).finally(() => {
         setLoading(false);
       });
     } else if (injectId) {
+      setLoading(true);
       dispatch(fetchCollectorsForAtomicTesting(injectId)).finally(() => {
         setLoading(false);
       });

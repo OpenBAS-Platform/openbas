@@ -1,5 +1,9 @@
 package io.openbas.rest.payload.service;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
+
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -11,16 +15,11 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import jakarta.transaction.Transactional;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 @RequiredArgsConstructor
 @Service
