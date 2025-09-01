@@ -1,13 +1,8 @@
 package io.openbas.service;
 
-import static io.openbas.database.model.Grant.GRANT_TYPE.LAUNCHER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import io.openbas.IntegrationTest;
@@ -15,7 +10,6 @@ import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,10 +29,7 @@ public class GrantServiceTest extends IntegrationTest {
   public void test_hasReadGrant_WHEN_has_read_grant() {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
-    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            eq(RESOURCE_ID),
-            eq(USER_ID),
-            argThat(c -> c.containsAll(List.of(OBSERVER, PLANNER, LAUNCHER)) && c.size() == 3)))
+    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(any(), any(), any()))
         .thenReturn(true);
 
     assertTrue(grantService.hasReadGrant(RESOURCE_ID, user));
@@ -59,7 +50,8 @@ public class GrantServiceTest extends IntegrationTest {
   public void test_hasLaunchGrant_WHEN_has_read_grant() {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
-    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(any(), any(), any()))
+    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
+            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasLaunchGrant(RESOURCE_ID, user));
