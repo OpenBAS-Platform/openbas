@@ -1,4 +1,4 @@
-import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

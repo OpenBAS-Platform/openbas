@@ -22,14 +22,13 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -101,16 +100,18 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/{payloadId}/export")
-  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.PAYLOAD, resourceId = "#payloadId")
+  @RBAC(
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD,
+      resourceId = "#payloadId")
   public void payloadExport(
-          @NotBlank @PathVariable final String payloadId,
-          HttpServletResponse response)
-          throws IOException {
+      @NotBlank @PathVariable final String payloadId, HttpServletResponse response)
+      throws IOException {
     List<String> targetIds = List.of(payloadId);
     User currentUser = userService.currentUser();
     List<Payload> payloads =
-            payloadRepository.findAllByIdsAndUserGrants(targetIds, currentUser.getId()).stream()
-                    .toList();
+        payloadRepository.findAllByIdsAndUserGrants(targetIds, currentUser.getId()).stream()
+            .toList();
     runPayloadExport(payloads, response);
   }
 
@@ -181,14 +182,16 @@ public class PayloadApi extends RestBehavior {
 
   @GetMapping(PAYLOAD_URI + "/{payloadId}/collectors")
   @RBAC(
-          resourceId = "#payloadId",
-          actionPerformed = Action.READ,
-          resourceType = ResourceType.PAYLOAD)
+      resourceId = "#payloadId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.PAYLOAD)
   @Operation(summary = "Get the Collectors used in a payload remediation")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "The list of Collectors used in a payload remediation")
-          })
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Collectors used in a payload remediation")
+      })
   public List<Collector> collectorsFromPayload(@PathVariable String payloadId) {
     return collectorsService.collectorsForPayload(payloadId);
   }

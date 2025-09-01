@@ -49,14 +49,13 @@ public interface PayloadRepository
   List<DetectionRemediation> fetchDetectionRemediationsByInjectId(String injectId);
 
   @Query(
-          "SELECT p FROM Payload p " +
-                  "WHERE p.id IN :ids AND EXISTS (" +
-                  "  SELECT 1 FROM p.grants g " +
-                  "  JOIN g.group gr " +
-                  "  JOIN gr.users u " +
-                  "  WHERE u.id = :userId" +
-                  ")")
-
+      "SELECT p FROM Payload p "
+          + "WHERE p.id IN :ids AND EXISTS ("
+          + "  SELECT 1 FROM p.grants g "
+          + "  JOIN g.group gr "
+          + "  JOIN gr.users u "
+          + "  WHERE u.id = :userId"
+          + ")")
   List<Payload> findAllByIdsAndUserGrants(
       @Param("ids") List<String> ids, @Param("userId") String userId);
 }

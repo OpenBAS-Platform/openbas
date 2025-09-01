@@ -1002,6 +1002,7 @@
   "No category": "无分类",
   "No challenge are used in the injects of this simulation.": "此模擬嘅注入中冇使用挑戰。",
   "No challenge in this simulation yet.": "模拟中还没有挑战.",
+  "No collector configured.": "未配置采集器。",
   "No comcheck in this simulation.": "这个模拟没有通信检查",
   "No CWEs listed.": "没有列出 CWE。",
   "No data available": "无可用数据",

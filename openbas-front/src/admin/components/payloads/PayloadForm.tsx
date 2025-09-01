@@ -6,7 +6,6 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
-import { type PayloadUpdateInput } from '../../../utils/api-types';
 import { type PayloadCreateInput } from '../../../utils/api-types-custom';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';

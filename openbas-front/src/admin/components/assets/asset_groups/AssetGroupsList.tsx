@@ -5,7 +5,6 @@ import {
   type CSSProperties,
   type FunctionComponent,
   type ReactElement,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -17,8 +16,6 @@ import { type Header } from '../../../../components/common/SortHeadersList';
 import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { type AssetGroupOutput } from '../../../../utils/api-types';
-import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
-import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import type { EndpointPopoverProps } from '../endpoints/EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -49,7 +46,6 @@ const AssetGroupsList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const ability = useContext(AbilityContext);
 
   const component = (assetGroup: AssetGroupOutput) => {
     return renderActions(assetGroup);

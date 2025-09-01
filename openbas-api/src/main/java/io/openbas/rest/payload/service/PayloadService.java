@@ -1,5 +1,21 @@
 package io.openbas.rest.payload.service;
 
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
+import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.SupportedLanguage.en;
+import static io.openbas.helper.SupportedLanguage.fr;
+import static io.openbas.injector_contract.Contract.executableContract;
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
+import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.fields.ContractAsset.assetField;
+import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
+import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
+import static io.openbas.injector_contract.fields.ContractText.textField;
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
@@ -23,30 +39,13 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
-import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.SupportedLanguage.en;
-import static io.openbas.helper.SupportedLanguage.fr;
-import static io.openbas.injector_contract.Contract.executableContract;
-import static io.openbas.injector_contract.ContractCardinality.Multiple;
-import static io.openbas.injector_contract.ContractDef.contractBuilder;
-import static io.openbas.injector_contract.fields.ContractAsset.assetField;
-import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
-import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
-import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
-import static io.openbas.injector_contract.fields.ContractText.textField;
-import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RequiredArgsConstructor
 @Service
@@ -283,7 +282,8 @@ public class PayloadService {
 
   /**
    * Search payloads with pagination and architecture filter, where the user is granted. The user
-   * must have at least OBSERVER grant on the payloads to see them OR have the access capability on payloads.
+   * must have at least OBSERVER grant on the payloads to see them OR have the access capability on
+   * payloads.
    *
    * @param searchPaginationInput the input containing pagination and search criteria
    * @return a paginated list of Payloads
@@ -297,7 +297,7 @@ public class PayloadService {
             Grant.GRANT_TYPE.OBSERVER,
             currentUser.getId(),
             currentUser.isAdminOrBypass(),
-                currentUser.getCapabilities().contains(Capability.ACCESS_PAYLOADS)),
+            currentUser.getCapabilities().contains(Capability.ACCESS_PAYLOADS)),
         handleArchitectureFilter(searchPaginationInput),
         Payload.class);
   }
