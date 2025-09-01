@@ -443,23 +443,23 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       InjectorContract injectorContract =
           injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
 
-    InjectTestStatusComposer.Composer injectTestStatusComposer1 =
-        injectTestStatusComposer.forInjectTestStatus(
-            InjectTestStatusFixture.createSuccessInjectStatus());
+      InjectTestStatusComposer.Composer injectTestStatusComposer1 =
+          injectTestStatusComposer.forInjectTestStatus(
+              InjectTestStatusFixture.createSuccessInjectStatus());
 
-    InjectTestStatusComposer.Composer injectTestStatusComposer2 =
-        injectTestStatusComposer.forInjectTestStatus(
-            InjectTestStatusFixture.createSuccessInjectStatus());
+      InjectTestStatusComposer.Composer injectTestStatusComposer2 =
+          injectTestStatusComposer.forInjectTestStatus(
+              InjectTestStatusFixture.createSuccessInjectStatus());
 
-    InjectComposer.Composer injectComposer1 =
-        injectComposer
-            .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
-            .withInjectTestStatus(injectTestStatusComposer1);
+      InjectComposer.Composer injectComposer1 =
+          injectComposer
+              .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
+              .withInjectTestStatus(injectTestStatusComposer1);
 
-    InjectComposer.Composer injectComposer2 =
-        injectComposer
-            .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
-            .withInjectTestStatus(injectTestStatusComposer2);
+      InjectComposer.Composer injectComposer2 =
+          injectComposer
+              .forInject(InjectFixture.getInjectForEmailContract(injectorContract))
+              .withInjectTestStatus(injectTestStatusComposer2);
 
       inject1Wrapper = injectComposer1.persist();
       inject2Wrapper = injectComposer2.persist();
@@ -468,8 +468,8 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       injectTestStatus2Wrapper = injectTestStatusComposer2.persist();
 
       scenarioWrapper =
-        scenarioComposer
-            .forScenario(ScenarioFixture.getScenario())
+          scenarioComposer
+              .forScenario(ScenarioFixture.getScenario())
               .withInjects(List.of(injectComposer1, injectComposer2));
     }
 
