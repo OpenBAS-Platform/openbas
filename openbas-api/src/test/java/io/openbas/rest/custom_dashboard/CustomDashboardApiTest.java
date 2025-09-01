@@ -6,6 +6,7 @@ import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.CustomDashboardFixture.NAME;
 import static io.openbas.utils.fixtures.CustomDashboardFixture.createDefaultCustomDashboard;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -151,7 +152,11 @@ class CustomDashboardApiTest extends IntegrationTest {
           .perform(delete(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId()))
           .andExpect(status().isBadRequest())
           .andExpect(
-              jsonPath("$.message").value("Default home custom dashboard can not be deleted"));
+              result -> {
+                String errorMessage = result.getResolvedException().getMessage();
+                assertTrue(
+                    errorMessage.contains("Default home custom dashboard can not be deleted"));
+              });
     }
 
     @Test
