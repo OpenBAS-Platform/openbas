@@ -17,6 +17,7 @@ import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Id;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.metamodel.EntityType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
@@ -137,33 +139,32 @@ public class GenericJsonApiImporter<T extends Base> {
     // For non-root entities with a valid ID and not marked as @InnerRelationship,
     // try loading the existing entity from the database.
     if (!rootEntity && !clazz.isAnnotationPresent(InnerRelationship.class)) {
-      Field businessIdField =
+      List<Field> businessIdFields =
           Arrays.stream(clazz.getDeclaredFields())
               .filter(f -> f.isAnnotationPresent(BusinessId.class))
-              .findFirst()
-              .orElse(null);
+              .toList();
 
-      if (businessIdField != null) {
-        JsonProperty annotation = businessIdField.getAnnotation(JsonProperty.class);
-        Object businessIdValue = resource.attributes().get(annotation.value());
+      if (!businessIdFields.isEmpty()) {
+        String jpql =
+            "SELECT e FROM "
+                + clazz.getSimpleName()
+                + " e WHERE "
+                + businessIdFields.stream()
+                    .map(f -> "e." + f.getName() + " = :" + f.getName())
+                    .collect(Collectors.joining(" AND "));
 
-        if (businessIdValue != null) {
-          String jpql =
-              "SELECT e FROM "
-                  + clazz.getSimpleName()
-                  + " e WHERE e."
-                  + businessIdField.getName()
-                  + " = :value";
-          List<T> results =
-              entityManager
-                  .createQuery(jpql, clazz)
-                  .setParameter("value", businessIdValue)
-                  .getResultList();
-          if (!results.isEmpty()) {
-            entity = results.get(0);
-            entityCache.put(entity.getId(), Pair.of(entity, true));
-            return entity;
-          }
+        TypedQuery<T> query = entityManager.createQuery(jpql, clazz);
+
+        for (Field field : businessIdFields) {
+          JsonProperty annotation = field.getAnnotation(JsonProperty.class);
+          Object value = resource.attributes().get(annotation.value());
+          query.setParameter(field.getName(), value);
+        }
+        List<T> results = query.getResultList();
+        if (!results.isEmpty()) {
+          entity = results.get(0);
+          entityCache.put(entity.getId(), Pair.of(entity, true));
+          return entity;
         }
       }
     }
