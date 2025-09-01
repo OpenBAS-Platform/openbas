@@ -11,6 +11,7 @@ import io.openbas.database.model.SettingKeys;
 import io.openbas.database.raw.RawCustomDashboard;
 import io.openbas.database.repository.CustomDashboardRepository;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardOutput;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.service.PlatformSettingsService;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.mapper.CustomDashboardMapper;
@@ -122,7 +123,7 @@ public class CustomDashboardService {
             .map(Setting::getValue)
             .orElse(null);
     if (defaultHomeDashboardId != null && defaultHomeDashboardId.equals(id)) {
-      throw new EntityNotFoundException("Default home custom dashboard can not be deleted ");
+      throw new BadRequestException("Default home custom dashboard can not be deleted");
     }
     this.platformSettingsService.clearDefaultPlatformDashboardIfMatch(id);
     if (!this.customDashboardRepository.existsById(id)) {
