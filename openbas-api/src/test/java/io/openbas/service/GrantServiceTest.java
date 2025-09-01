@@ -1,12 +1,8 @@
 package io.openbas.service;
 
-import static io.openbas.database.model.Grant.GRANT_TYPE.LAUNCHER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
-import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -15,7 +11,6 @@ import io.openbas.database.model.Grant;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.GrantRepository;
 import io.openbas.utils.fixtures.UserFixture;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,10 +30,7 @@ public class GrantServiceTest extends IntegrationTest {
   public void test_hasReadGrant_WHEN_has_read_grant() {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
-    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            eq(RESOURCE_ID),
-            eq(USER_ID),
-            any()))
+    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(eq(RESOURCE_ID), eq(USER_ID), any()))
         .thenReturn(true);
 
     assertTrue(grantService.hasReadGrant(RESOURCE_ID, user));
