@@ -1,9 +1,5 @@
 package io.openbas.rest.payload.service;
 
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
-
 import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -15,10 +11,16 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 @RequiredArgsConstructor
 @Service
@@ -57,7 +59,12 @@ public class PayloadUpdateService {
     payloadUtils.copyProperties(input, payload);
 
     payload.setAttackPatterns(attackPatterns);
+    // Somehow, loading tags can create a detached error on detection remediation.
+    // Detaching the collection before and reattaching it after bypass the issue
+    List<DetectionRemediation> originalDrs = payload.getDetectionRemediations();
+    payload.setDetectionRemediations(Collections.emptyList());
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+    payload.setDetectionRemediations(originalDrs);
 
     if (payload instanceof Executable executable) {
       executable.setExecutableFile(documentService.document(input.getExecutableFile()));

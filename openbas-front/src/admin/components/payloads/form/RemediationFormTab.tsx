@@ -38,15 +38,16 @@ const RemediationFormTab = ({ payloadId }: RemediationFormTabProps) => {
 
   const { collectors } = useHelper((helper: CollectorHelper) => ({ collectors: helper.getCollectors() }));
   useDataLoader(() => {
-    setLoading(true);
     if (hasPlatformSettingsCapabilities) {
+      setLoading(true);
       dispatch(fetchCollectors()).finally(() => {
         setLoading(false);
       }); ;
     } else if (payloadId) {
+      setLoading(true);
       dispatch(fetchCollectorsForPayload(payloadId)).finally(() => {
         setLoading(false);
-      }); ;
+      });
     }
   });
 

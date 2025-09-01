@@ -1,7 +1,7 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import * as R from 'ramda';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -14,7 +14,7 @@ import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
-import { Can } from '../../../utils/permissions/PermissionsProvider.js';
+import { AbilityContext, Can } from '../../../utils/permissions/PermissionsProvider.js';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types.js';
 import { download } from '../../../utils/utils.js';
 import PayloadForm from './PayloadForm';
@@ -25,6 +25,7 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
   const [anchorEl, setAnchorEl] = useState(null);
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -132,6 +133,8 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
       remediationId: remediation.detection_remediation_id,
     };
   });
+  const hasUpdateCapability = ability.can(ACTIONS.MANAGE, SUBJECTS.PAYLOADS) || ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, payload.payload_id);
+  const hasDeleteCapability = ability.can(ACTIONS.DELETE, SUBJECTS.PAYLOADS) || ability.can(ACTIONS.DELETE, SUBJECTS.RESOURCE, payload.payload_id);
   return (
     <>
       <IconButton color="primary" onClick={handlePopoverOpen} aria-haspopup="true" size="large">
@@ -145,13 +148,11 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
         <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
           <MenuItem onClick={handleOpenDuplicate}>{t('Duplicate')}</MenuItem>
         </Can>
-        <Can I={ACTIONS.MANAGE} a={SUBJECTS.RESOURCE} field={payload.payload_id}>
-          <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
-        </Can>
+        {hasUpdateCapability
+          && <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>}
         <MenuItem onClick={handleExportJsonSingle}>{t('Export')}</MenuItem>
-        <Can I={ACTIONS.DELETE} a={SUBJECTS.RESOURCE} field={payload.payload_id}>
-          <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
-        </Can>
+        {hasDeleteCapability
+          && <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>}
       </Menu>
       <DialogDelete
         open={deletion}
