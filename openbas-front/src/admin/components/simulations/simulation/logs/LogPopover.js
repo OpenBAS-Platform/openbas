@@ -2,7 +2,7 @@ import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { Component, useContext } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { deleteLog, updateLog } from '../../../../../actions/Log';
@@ -10,7 +10,6 @@ import { storeHelper } from '../../../../../actions/Schema';
 import Transition from '../../../../../components/common/Transition';
 import inject18n from '../../../../../components/i18n';
 import { tagOptions } from '../../../../../utils/Option';
-import { PermissionsContext } from '../../../common/Context.js';
 import LogForm from './LogForm';
 
 class LogPopover extends Component {
@@ -72,18 +71,16 @@ class LogPopover extends Component {
       R.pick(['log_title', 'log_content', 'log_tags']),
     )(log);
 
-    const { permissions } = useContext(PermissionsContext);
-
     return (
       <div>
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
-          disabled={permissions.readOnly}
         >
           <MoreVert />
         </IconButton>
+
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}

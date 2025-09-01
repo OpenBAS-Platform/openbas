@@ -17,7 +17,7 @@ import { resolveUserName } from '../../../../../utils/String';
 import { PermissionsContext } from '../../../common/Context.js';
 import AnimationMenu from '../AnimationMenu';
 import LogForm from './LogForm';
-import LogPopover from './LogPopover';
+import LogPopover from './LogPopover.js';
 
 const useStyles = makeStyles()(() => ({
   card: {
