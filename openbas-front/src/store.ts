@@ -1,7 +1,6 @@
 import { composeWithDevTools } from '@redux-devtools/extension';
 import { fromJS, isImmutable } from 'immutable';
 import * as R from 'ramda';
-import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import { thunk } from 'redux-thunk';

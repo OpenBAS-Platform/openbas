@@ -1,6 +1,6 @@
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
-import { type FunctionComponent, lazy, Suspense, useEffect, useState } from 'react';
-import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router';
+import { type FunctionComponent, lazy, Suspense, useState } from 'react';
+import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';

@@ -1,6 +1,3 @@
-import { Addchart } from '@mui/icons-material';
-import { Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
 
