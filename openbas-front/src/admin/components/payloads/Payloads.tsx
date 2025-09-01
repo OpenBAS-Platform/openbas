@@ -8,7 +8,7 @@ import { searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -205,7 +205,7 @@ const Payloads = () => {
       filters: [
         buildEmptyFilter('payload_attack_patterns', 'contains'),
         buildEmptyFilter('payload_platforms', 'contains'),
-
+        buildFilter('payload_status', ['Deprecated'], 'not_eq'),
       ],
     },
   }));
