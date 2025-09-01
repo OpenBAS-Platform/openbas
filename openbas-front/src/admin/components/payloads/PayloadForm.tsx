@@ -6,6 +6,7 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
+import { type PayloadUpdateInput } from '../../../utils/api-types';
 import { type PayloadCreateInput } from '../../../utils/api-types-custom';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
 import EEChip from '../common/entreprise_edition/EEChip';
@@ -18,7 +19,7 @@ interface Props {
   onSubmit: SubmitHandler<PayloadCreateInput>;
   handleClose: () => void;
   editing: boolean;
-  initialValues?: Partial<PayloadCreateInput>;
+  initialValues?: Partial<PayloadCreateInput> & { payload_id?: string };
 }
 
 const PayloadForm = ({
@@ -26,6 +27,7 @@ const PayloadForm = ({
   handleClose,
   editing,
   initialValues = {
+    payload_id: '',
     // @ts-expect-error set payload type to null to get a controlled component from the start
     payload_type: null,
     payload_name: '',
@@ -248,7 +250,7 @@ const PayloadForm = ({
         )}
 
         {activeTab === 'Remediation' && (
-          <RemediationFormTab />
+          <RemediationFormTab payloadId={initialValues?.payload_id} />
         )}
 
         <div style={{

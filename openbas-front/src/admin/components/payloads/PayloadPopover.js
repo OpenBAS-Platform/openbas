@@ -110,6 +110,7 @@ const PayloadPopover = ({ payload, onUpdate, onDelete, onDuplicate, disableUpdat
   };
 
   const initialValues = {
+    payload_id: payload.payload_id,
     payload_name: payload.payload_name,
     payload_description: payload.payload_description,
     payload_type: payload.payload_type,

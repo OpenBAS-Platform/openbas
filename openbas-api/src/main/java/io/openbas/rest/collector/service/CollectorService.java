@@ -1,7 +1,5 @@
 package io.openbas.rest.collector.service;
 
-import static io.openbas.service.FileService.COLLECTORS_IMAGES_BASE_PATH;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Collector;
@@ -10,11 +8,16 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
-import java.io.InputStream;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+
+import static io.openbas.service.FileService.COLLECTORS_IMAGES_BASE_PATH;
 
 @Slf4j
 @Service
@@ -73,5 +76,14 @@ public class CollectorService {
       newCollector.setType(type);
       collectorRepository.save(newCollector);
     }
+  }
+
+  public List<Collector> collectorsForPayload(String payloadId) {
+    return collectorRepository.findByPayloadId(payloadId);
+  }
+
+  @Query("SELECT c FROM Collector c WHERE c.detectionRemediations.payload.injector.contracts.injects.injectId = :injectId")
+  public List<Collector> collectorsForAtomicTesting(String injectId) {
+    return collectorRepository.findByInjectId(injectId);
   }
 }

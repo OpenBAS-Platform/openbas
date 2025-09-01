@@ -59,7 +59,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   const [assetGroupValues, setAssetGroupValues] = useState<AssetGroupOutput[]>([]);
   useEffect(() => {
     setLoading(true);
-    if (assetGroupIds.length > 0 && ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)) {
+    if (assetGroupIds.length > 0) {
       findAssetGroups(assetGroupIds).then((result) => {
         setAssetGroupValues(result.data);
         setLoading(false);

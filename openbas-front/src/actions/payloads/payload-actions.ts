@@ -17,6 +17,7 @@ import {
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import { arrayOfDocuments, payload } from '../Schema';
+import * as schema from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
@@ -74,4 +75,10 @@ export const deletePayload = (payloadId: Payload['payload_id']) => (dispatch: Di
 export const fetchDocumentsPayload = (payloadId: string) => (dispatch: Dispatch) => {
   const uri = `/api/payloads/${payloadId}/documents`;
   return getReferential(arrayOfDocuments, uri)(dispatch);
+};
+
+// -- COLLECTORS --
+export const fetchCollectorsForPayload = (payloadId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/payloads/${payloadId}/collectors`;
+  return getReferential(schema.arrayOfCollectors, uri)(dispatch);
 };

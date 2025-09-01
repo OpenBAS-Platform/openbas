@@ -179,7 +179,7 @@ const InjectResultList: FunctionComponent<Props> = ({
         contextId={contextId}
         reloadContentCount={reloadCount}
         topBarButtons={showActions ? (
-          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ATOMIC_TESTING}>
+          <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
             <Tooltip title={t('inject_import_json_action')}>
               <ToggleButton
                 value="import"

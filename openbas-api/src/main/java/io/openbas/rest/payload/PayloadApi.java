@@ -3,7 +3,8 @@ package io.openbas.rest.payload;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.PayloadRepository;
+import io.openbas.rest.collector.service.CollectorService;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -21,13 +22,14 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class PayloadApi extends RestBehavior {
   private final PayloadUpsertService payloadUpsertService;
   private final PayloadExportService payloadExportService;
   private final DocumentService documentService;
+  private final CollectorService collectorsService;
   private final UserService userService;
 
   @PostMapping(PAYLOAD_URI + "/search")
@@ -174,5 +177,19 @@ public class PayloadApi extends RestBehavior {
       })
   public List<RawDocument> documentsFromPayload(@PathVariable String payloadId) {
     return documentService.documentsForPayload(payloadId);
+  }
+
+  @GetMapping(PAYLOAD_URI + "/{payloadId}/collectors")
+  @RBAC(
+          resourceId = "#payloadId",
+          actionPerformed = Action.READ,
+          resourceType = ResourceType.PAYLOAD)
+  @Operation(summary = "Get the Collectors used in a payload remediation")
+  @ApiResponses(
+          value = {
+                  @ApiResponse(responseCode = "200", description = "The list of Collectors used in a payload remediation")
+          })
+  public List<Collector> collectorsFromPayload(@PathVariable String payloadId) {
+    return collectorsService.collectorsForPayload(payloadId);
   }
 }
