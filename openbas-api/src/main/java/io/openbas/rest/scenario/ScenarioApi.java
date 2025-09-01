@@ -65,6 +65,7 @@ public class ScenarioApi extends RestBehavior {
   private final EndpointService endpointService;
   private final ChannelService channelService;
   private final DocumentService documentService;
+  private final PlatformSettingsService platformSettingsService;
 
   @PostMapping(SCENARIO_URI)
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
@@ -79,7 +80,12 @@ public class ScenarioApi extends RestBehavior {
       scenario.setCustomDashboard(
           this.customDashboardService.customDashboard(input.getCustomDashboard()));
     } else {
-      scenario.setCustomDashboard(null);
+      scenario.setCustomDashboard(
+          this.platformSettingsService
+              .setting(SettingKeys.DEFAULT_SCENARIO_DASHBOARD.key())
+              .map(Setting::getValue)
+              .map(this.customDashboardService::customDashboard)
+              .orElse(null));
     }
     return this.scenarioService.createScenario(scenario);
   }
