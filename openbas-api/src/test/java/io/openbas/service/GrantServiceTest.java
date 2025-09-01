@@ -5,6 +5,7 @@ import static io.openbas.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openbas.database.model.Grant.GRANT_TYPE.PLANNER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -58,8 +59,7 @@ public class GrantServiceTest extends IntegrationTest {
   public void test_hasLaunchGrant_WHEN_has_read_grant() {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
-    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
+    when(grantRepository.existsByUserIdAndResourceIdAndNameIn(any(), any(), any()))
         .thenReturn(false);
 
     assertFalse(grantService.hasLaunchGrant(RESOURCE_ID, user));
