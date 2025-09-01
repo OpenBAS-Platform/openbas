@@ -50,7 +50,7 @@ public class TagService {
   }
 
   public Set<Tag> buildDefaultTagsForStix() {
-    Set tags = new HashSet();
+    Set<Tag> tags = new HashSet();
     // Set Default Tag OCTI for every created scenario from a STIX bundle
     TagCreateInput tagCreateInput = new TagCreateInput();
     tagCreateInput.setName(OPENCTI_TAG_NAME);
