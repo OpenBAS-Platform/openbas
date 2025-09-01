@@ -28,6 +28,7 @@ const LeftBar = () => {
 
   const entries = [
     {
+      userRight: true,
       items: [
         {
           path: `/admin`,
@@ -50,6 +51,7 @@ const LeftBar = () => {
       ],
     },
     {
+      userRight: true,
       items: [
         {
           path: `/admin/scenarios`,
@@ -72,6 +74,7 @@ const LeftBar = () => {
       ],
     },
     {
+      userRight: true,
       items: [
         {
           path: `/admin/assets`,
@@ -166,6 +169,7 @@ const LeftBar = () => {
       ],
     },
     {
+      userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.PAYLOADS) || ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS),
       items: [
         {
           path: `/admin/payloads`,
