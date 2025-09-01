@@ -19,7 +19,6 @@ public class V4_21__Add_octi_stix_objects extends BaseJavaMigration {
               security_assessment_id VARCHAR(255) NOT NULL CONSTRAINT security_assessment_pkey PRIMARY KEY,
               security_assessment_external_id VARCHAR(255) NOT NULL,
               security_assessment_scenario VARCHAR(255) REFERENCES scenarios(scenario_id) ON DELETE SET NULL,
-              security_assessment_exercise VARCHAR(255),
               security_assessment_name VARCHAR(255) NOT NULL,
               security_assessment_description TEXT,
               security_assessment_scheduling VARCHAR(50) NOT NULL,
