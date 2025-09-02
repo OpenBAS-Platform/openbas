@@ -1,6 +1,7 @@
 import { Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useCallback, useContext } from 'react';
+import { useNavigate } from 'react-router';
 
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
@@ -14,6 +15,7 @@ import CustomDashboardPopover from './CustomDashboardPopover';
 const CustomDashboardEditHeader: FunctionComponent = () => {
   const { t } = useFormatter();
   const theme = useTheme();
+  const navigate = useNavigate();
   const { customDashboard, setCustomDashboard } = useContext(CustomDashboardContext);
 
   const handleUpdate = useCallback(
@@ -59,6 +61,7 @@ const CustomDashboardEditHeader: FunctionComponent = () => {
           <CustomDashboardPopover
             customDashboard={customDashboard}
             onUpdate={handleUpdate}
+            onDelete={() => navigate('/admin/workspaces/custom_dashboards')}
           />
         </Can>
       </div>
