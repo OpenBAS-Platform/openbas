@@ -4,10 +4,11 @@ import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchPayloads } from '../../../actions/payloads/payload-actions';
+import { importPayload, searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
+import ImportUploaderJsonApiComponent from '../../../components/common/import/ImportUploaderJsonApiComponent';
 import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -25,7 +26,6 @@ import { type Payload, type SearchPaginationInput } from '../../../utils/api-typ
 import { Can } from '../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePayload from './CreatePayload';
-import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
@@ -252,7 +252,10 @@ const Payloads = () => {
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
-              <ImportUploaderPayloads />
+              <ImportUploaderJsonApiComponent
+                title={t('Import payloads')}
+                uploadFn={importPayload}
+              />
             </Can>
           </ToggleButtonGroup>
         )}
