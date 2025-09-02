@@ -1,9 +1,5 @@
 package io.openbas.database.model;
 
-import static jakarta.persistence.DiscriminatorType.STRING;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -25,13 +21,17 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.*;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+
+import java.time.Instant;
+import java.util.*;
+
+import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
@@ -236,12 +236,6 @@ public class Payload implements GrantableBase {
   @SQLRestriction("grant_resource_type = 'PAYLOAD'") // Must be present in Grant.GRANT_RESOURCE_TYPE
   @JsonIgnore
   private List<Grant> grants = new ArrayList<>();
-
-  @Transient
-  @JsonIgnore
-  @Getter
-  @Setter(AccessLevel.NONE)
-  private Grant.GRANT_RESOURCE_TYPE grantResourceType = Grant.GRANT_RESOURCE_TYPE.PAYLOAD;
 
   // -- AUDIT --
 
