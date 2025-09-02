@@ -28,6 +28,8 @@ public class GrantService {
   private final GrantRepository grantRepository;
 
   public void computeGrant(@NotNull Exercise exercise) {
+    // existing grants
+    List<Grant> existingGrants = exercise.getGrants();
     // Find automatic groups to grants
     List<Group> groups = fromIterable(this.groupRepository.findAll());
     List<Grant> grants =
@@ -46,6 +48,9 @@ public class GrantService {
                   grant.setExercise(exercise);
                   return grant;
                 })
+            .filter(
+                newGrant ->
+                    existingGrants.stream().noneMatch(exGrant -> exGrant.isEquivalentTo(newGrant)))
             .toList();
     if (!grants.isEmpty()) {
       Iterable<Grant> exerciseGrants = this.grantRepository.saveAll(grants);
@@ -54,6 +59,8 @@ public class GrantService {
   }
 
   public void computeGrant(@NotNull Scenario scenario) {
+    // existing grants
+    List<Grant> existingGrants = scenario.getGrants();
     // Find automatic groups to grants
     List<Group> groups = fromIterable(this.groupRepository.findAll());
     List<Grant> grants =
@@ -72,6 +79,9 @@ public class GrantService {
                   grant.setScenario(scenario);
                   return grant;
                 })
+            .filter(
+                newGrant ->
+                    existingGrants.stream().noneMatch(exGrant -> exGrant.isEquivalentTo(newGrant)))
             .toList();
     if (!grants.isEmpty()) {
       Iterable<Grant> scenarioGrants = this.grantRepository.saveAll(grants);
