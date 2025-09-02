@@ -1,8 +1,5 @@
 package io.openbas.rest.payload.service;
 
-import static io.openbas.service.ImportService.*;
-import static java.time.Instant.now;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Payload;
@@ -11,17 +8,21 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.payload.exports.PayloadFileExport;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import net.lingala.zip4j.io.outputstream.ZipOutputStream;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
+import org.springframework.stereotype.Service;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
-import lombok.extern.slf4j.Slf4j;
-import net.lingala.zip4j.io.outputstream.ZipOutputStream;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.EncryptionMethod;
-import org.springframework.stereotype.Service;
+
+import static io.openbas.service.ImportService.*;
+import static java.time.Instant.now;
 
 @Service
 @Slf4j
@@ -133,6 +134,7 @@ public class PayloadExportService {
         parentZip.write(payloadZipStream.toByteArray());
         parentZip.closeEntry();
       }
+      parentZip.finish();
     }
     return parentOutputStream.toByteArray();
   }
