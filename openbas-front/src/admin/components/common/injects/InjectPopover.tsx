@@ -248,7 +248,7 @@ const InjectPopover: FunctionComponent<Props> = ({
     label: t('Trigger now'),
     action: () => handleOpenTrigger(),
     disabled: isDisabled || !permissions.isRunning,
-    userRight: permissions.canManage,
+    userRight: permissions.canLaunch,
   });
   if (inject.inject_enabled) entries.push({
     label: t('Disable'),
