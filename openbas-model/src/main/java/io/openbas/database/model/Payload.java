@@ -1,5 +1,9 @@
 package io.openbas.database.model;
 
+import static jakarta.persistence.DiscriminatorType.STRING;
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -21,17 +25,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-
-import java.time.Instant;
-import java.util.*;
-
-import static jakarta.persistence.DiscriminatorType.STRING;
-import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
 
 @Data
 @Entity
