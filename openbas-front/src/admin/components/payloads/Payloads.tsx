@@ -4,15 +4,12 @@ import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchCollectors } from '../../../actions/Collector';
-import { type CollectorHelper } from '../../../actions/collectors/collector-helper';
-import { fetchDocuments } from '../../../actions/Document';
-import { type DocumentHelper } from '../../../actions/helper';
-import { searchPayloads } from '../../../actions/payloads/payload-actions';
+import { importPayload, searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
-import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
+import ImportUploaderJsonApiComponent from '../../../components/common/import/ImportUploaderJsonApiComponent';
+import { buildEmptyFilter, buildFilter } from '../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -25,12 +22,10 @@ import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
-import { useHelper } from '../../../store';
 import { type Payload, type SearchPaginationInput } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import CreatePayload from './CreatePayload';
-import ImportUploaderPayloads from './ImportUploaderPayloads';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
@@ -104,17 +99,8 @@ const Payloads = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
-  const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
-  const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
-    documentsMap: helper.getDocumentsMap(),
-    collectorsMap: helper.getCollectorsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchDocuments());
-    dispatch(fetchCollectors());
-  });
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -219,6 +205,7 @@ const Payloads = () => {
       filters: [
         buildEmptyFilter('payload_attack_patterns', 'contains'),
         buildEmptyFilter('payload_platforms', 'contains'),
+        buildFilter('payload_status', ['Deprecated'], 'not_eq'),
       ],
     },
   }));
@@ -264,7 +251,12 @@ const Payloads = () => {
         topBarButtons={(
           <ToggleButtonGroup value="fake" exclusive>
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
-            <ImportUploaderPayloads />
+            <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+              <ImportUploaderJsonApiComponent
+                title={t('Import payloads')}
+                uploadFn={importPayload}
+              />
+            </Can>
           </ToggleButtonGroup>
         )}
       />
@@ -289,7 +281,6 @@ const Payloads = () => {
         {loading
           ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
           : payloads.map((payload: Payload) => {
-              const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
               return (
                 (
                   <ListItem
@@ -301,8 +292,8 @@ const Payloads = () => {
                         onUpdate={(result: Payload) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
                         onDuplicate={(result: Payload) => setPayloads([result, ...payloads])}
                         onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
-                        disableUpdate={collector !== null}
-                        disableDelete={collector !== null && payload.payload_status !== 'DEPRECATED'}
+                        disableUpdate={payload.payload_collector !== null}
+                        disableDelete={payload.payload_collector !== null && payload.payload_status !== 'DEPRECATED'}
                       />
                     )}
                     disablePadding
@@ -312,10 +303,10 @@ const Payloads = () => {
                       onClick={() => setSelectedPayload(payload)}
                     >
                       <ListItemIcon>
-                        {collector ? (
+                        {payload.payload_collector ? (
                           <img
-                            src={`/api/images/collectors/${collector.collector_type}`}
-                            alt={collector.collector_type}
+                            src={`/api/images/collectors/${payload.payload_collector_type}`}
+                            alt={payload.payload_collector_type}
                             style={{
                               padding: 0,
                               cursor: 'pointer',
@@ -351,15 +342,17 @@ const Payloads = () => {
               );
             })}
       </List>
-      <CreatePayload
-        onCreate={(result: Payload) => setPayloads([result, ...payloads])}
-      />
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.PAYLOADS}>
+        <CreatePayload
+          onCreate={(result: Payload) => setPayloads([result, ...payloads])}
+        />
+      </Can>
       <Drawer
         open={selectedPayload !== null}
         handleClose={() => setSelectedPayload(null)}
         title={t('Selected payload')}
       >
-        <PayloadComponent selectedPayload={selectedPayload} documentsMap={documentsMap} />
+        <PayloadComponent selectedPayload={selectedPayload} />
       </Drawer>
     </>
   );

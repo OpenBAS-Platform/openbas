@@ -275,6 +275,10 @@ public class User implements Base {
   @JsonIgnore
   private List<Token> tokens = new ArrayList<>();
 
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.USER;
+
   @Setter
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
@@ -339,6 +343,12 @@ public class User implements Base {
   @Schema(description = "True if the user is only a player")
   public boolean isOnlyPlayer() {
     return !isAdmin() && !isManager();
+  }
+
+  @JsonProperty("user_is_admin_or_bypass")
+  @Schema(description = "True if the user is admin or has bypass capa")
+  public boolean isAdminOrBypass() {
+    return isAdmin() || getCapabilities().contains(Capability.BYPASS);
   }
 
   @JsonProperty("user_capabilities")

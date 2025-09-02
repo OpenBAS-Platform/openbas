@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Article;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
@@ -107,5 +108,29 @@ public class DocumentService {
 
   public static String encodeFileName(String name) {
     return URLEncoder.encode(name, StandardCharsets.UTF_8).replace("+", "%20");
+  }
+
+  public List<Document> documentsForScenario(String scenarioId) {
+    return this.documentRepository.findAllDistinctByScenarioId(scenarioId);
+  }
+
+  public List<Document> documentsForSimulation(String simulationId) {
+    return this.documentRepository.findAllDistinctBySimulationId(simulationId);
+  }
+
+  public List<RawDocument> documentsForChannel(@NotBlank String channelId) {
+    return this.documentRepository.rawAllDocumentsByChannelId(channelId);
+  }
+
+  public List<RawDocument> documentsForSecurityPlatform(@NotBlank String securityPlatformId) {
+    return this.documentRepository.rawAllDocumentsBySecurityPlatformId(securityPlatformId);
+  }
+
+  public List<RawDocument> documentsForChallenge(@NotBlank String challengeId) {
+    return this.documentRepository.rawAllDocumentsByChallengeId(challengeId);
+  }
+
+  public List<RawDocument> documentsForPayload(@NotBlank String payloadId) {
+    return this.documentRepository.rawAllDocumentsByPayloadId(payloadId);
   }
 }

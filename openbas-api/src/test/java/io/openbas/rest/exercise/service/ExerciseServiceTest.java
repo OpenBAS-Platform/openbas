@@ -22,6 +22,7 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
+import io.openbas.service.UserService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.InjectExpectationResultUtils.ExpectationResultsByType;
@@ -57,6 +58,7 @@ class ExerciseServiceTest extends IntegrationTest {
   @Mock private TagRuleService tagRuleService;
   @Mock private DocumentService documentService;
   @Mock private InjectService injectService;
+  @Mock private UserService userService;
 
   @Mock private ExerciseMapper exerciseMapper;
   @Mock private InjectMapper injectMapper;
@@ -91,6 +93,7 @@ class ExerciseServiceTest extends IntegrationTest {
             tagRuleService,
             documentService,
             injectService,
+            userService,
             exerciseMapper,
             injectMapper,
             resultUtils,

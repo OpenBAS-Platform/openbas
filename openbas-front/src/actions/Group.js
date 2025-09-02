@@ -22,3 +22,5 @@ export const updateGroupInformation = (groupId, data) => dispatch => putReferent
 export const updateGroupUsers = (groupId, data) => dispatch => putReferential(schema.group, `/api/groups/${groupId}/users`, data)(dispatch);
 
 export const deleteGroup = groupId => dispatch => delReferential(`/api/groups/${groupId}`, 'groups', groupId)(dispatch);
+
+export const updateGroupRoles = (groupId, data) => dispatch => putReferential(schema.group, `/api/groups/${groupId}/roles`, data)(dispatch);

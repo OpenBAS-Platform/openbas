@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -8,11 +9,9 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 @EqualsAndHashCode(callSuper = true)
@@ -57,7 +56,6 @@ public class Endpoint extends Asset {
   }
 
   @Queryable(filterable = true)
-  @NotEmpty
   @Ipv4OrIpv6Constraint
   @Type(StringArrayType.class)
   @Column(name = "endpoint_ips", columnDefinition = "text[]")
@@ -106,6 +104,18 @@ public class Endpoint extends Asset {
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
+
+  // -- INJECT --
+
+  @Getter
+  @Setter(AccessLevel.NONE)
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "injects_assets",
+      joinColumns = @JoinColumn(name = "asset_id"),
+      inverseJoinColumns = @JoinColumn(name = "inject_id"))
+  @JsonIgnore
+  private List<Inject> injects = new ArrayList<>();
 
   public void setHostname(String hostname) {
     this.hostname = hostname.toLowerCase();

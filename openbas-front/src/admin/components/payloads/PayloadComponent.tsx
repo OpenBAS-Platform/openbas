@@ -1,28 +1,25 @@
 import { AttachmentOutlined } from '@mui/icons-material';
-import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { type AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
+import { type DocumentHelper } from '../../../actions/helper';
+import { fetchDocumentsPayload } from '../../../actions/payloads/payload-actions';
+import AttackPatternChip from '../../../components/AttackPatternChip';
 import { useFormatter } from '../../../components/i18n';
 import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { type AttackPattern, type Command, type DnsResolution, type Document, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
+import { type AttackPattern, type Command, type DnsResolution, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
+import { useAppDispatch } from '../../../utils/hooks';
+import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { emptyFilled } from '../../../utils/String';
 import DocumentType from '../components/documents/DocumentType';
 
 const useStyles = makeStyles()(theme => ({
-  chip: {
-    fontSize: 12,
-    height: 25,
-    margin: '0 7px 7px 0',
-    textTransform: 'uppercase',
-    borderRadius: 4,
-    width: 180,
-  },
   payloadContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -64,17 +61,21 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-interface Props {
-  selectedPayload: PayloadType | null;
-  documentsMap: Record<string, Document>;
-}
+interface Props { selectedPayload: PayloadType | null }
 
-const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documentsMap }) => {
+const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+
   const { attackPatternsMap }: { attackPatternsMap: ReturnType<AttackPatternHelper['getAttackPatternsMap']> } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
+  const { documentsMap } = useHelper((helper: DocumentHelper) => ({ documentsMap: helper.getDocumentsMap() }));
+
+  useDataLoader(() => {
+    dispatch(fetchDocumentsPayload(selectedPayload?.payload_id as string));
+  });
 
   const getAttackCommand = (payload: PayloadType | null): string => {
     if (!payload) return '';
@@ -128,14 +129,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload, documents
             </Typography>
 
             {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap?.[attackPatternId]).map((attackPattern: AttackPattern) => (
-              <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
-                <Chip
-                  variant="outlined"
-                  classes={{ root: classes.chip }}
-                  color="primary"
-                  label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
-                />
-              </Tooltip>
+              <AttackPatternChip key={attackPattern.attack_pattern_id} attackPattern={attackPattern}></AttackPatternChip>
             ))}
           </div>
 

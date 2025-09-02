@@ -39,7 +39,7 @@ const Reports: FunctionComponent<Props> = ({ reports, navigateToReportPage }) =>
               height: 50,
               padding: 0,
             }}
-            secondaryAction={permissions.canWrite
+            secondaryAction={permissions.canManage
               && (
                 <ReportPopover
                   report={report}

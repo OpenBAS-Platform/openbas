@@ -1,10 +1,12 @@
 package io.openbas.rest.collector;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.utils.UserOnboardingProgressUtils.COLLECTOR_SETUP;
 
+import io.openbas.aop.RBAC;
 import io.openbas.aop.onboarding.Onboarding;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Collector;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -18,7 +20,6 @@ import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +34,7 @@ public class CollectorApi extends RestBehavior {
   private final FileService fileService;
 
   @GetMapping("/api/collectors")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.COLLECTOR)
   public Iterable<Collector> collectors() {
     return collectorRepository.findAll();
   }
@@ -58,13 +60,19 @@ public class CollectorApi extends RestBehavior {
   }
 
   @GetMapping("/api/collectors/{collectorId}")
-  @Secured(ROLE_ADMIN)
+  @RBAC(
+      resourceId = "#collectorId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.COLLECTOR)
   public Collector getCollector(@PathVariable String collectorId) {
     return collectorService.collector(collectorId);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/collectors/{collectorId}")
+  @RBAC(
+      resourceId = "#collectorId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.COLLECTOR)
   @Transactional(rollbackOn = Exception.class)
   public Collector updateCollector(
       @PathVariable String collectorId, @Valid @RequestBody CollectorUpdateInput input) {
@@ -78,13 +86,13 @@ public class CollectorApi extends RestBehavior {
         collector.getSecurityPlatform() != null ? collector.getSecurityPlatform().getId() : null);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(
       value = "/api/collectors",
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.COLLECTOR)
   @Transactional(rollbackOn = Exception.class)
-  @Onboarding(step = COLLECTOR_SETUP)
+  @Onboarding(step = COLLECTOR_SETUP, allUsers = true)
   public Collector registerCollector(
       @Valid @RequestPart("input") CollectorCreateInput input,
       @RequestPart("icon") Optional<MultipartFile> file) {

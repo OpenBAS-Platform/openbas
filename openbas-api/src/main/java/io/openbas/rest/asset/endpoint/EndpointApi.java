@@ -1,17 +1,21 @@
 package io.openbas.rest.asset.endpoint;
 
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.UserOnboardingProgressUtils.ENDPOINT_SETUP;
 
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.aop.RBAC;
 import io.openbas.aop.onboarding.Onboarding;
+import io.openbas.database.model.Action;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.ResourceType;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.*;
@@ -28,21 +32,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@Secured(ROLE_USER)
 public class EndpointApi extends RestBehavior {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
@@ -50,19 +53,72 @@ public class EndpointApi extends RestBehavior {
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
+  private final TagRepository tagRepository;
 
   private final EndpointMapper endpointMapper;
 
   @PostMapping(ENDPOINT_URI + "/agentless")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   @Onboarding(step = ENDPOINT_SETUP)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     return this.endpointService.createEndpoint(input);
   }
 
-  @Secured(ROLE_ADMIN)
+  @PostMapping(ENDPOINT_URI + "/agentless/upsert")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
+  @Transactional(rollbackFor = Exception.class)
+  public Endpoint upsertAgentLessEndpoint(@Valid @RequestBody final EndpointInput input) {
+    Optional<Endpoint> endpoint = Optional.empty();
+    if (input.getExternalReference() != null) {
+      endpoint = this.endpointService.findEndpointByExternalReference(input.getExternalReference());
+    }
+    if (endpoint.isEmpty() && input.getIps() != null) {
+      List<Endpoint> endpoints =
+          this.endpointService.findEndpointByHostnameAndAtLeastOneIp(
+              input.getHostname(), input.getIps());
+      if (!endpoints.isEmpty()) {
+        endpoint = Optional.of(endpoints.getFirst());
+      }
+    }
+    if (endpoint.isEmpty() && input.getMacAddresses() != null) {
+      List<Endpoint> endpoints =
+          this.endpointService.findEndpointByHostnameAndAtLeastOneMacAddress(
+              input.getHostname(), input.getMacAddresses());
+      if (!endpoints.isEmpty()) {
+        endpoint = Optional.of(endpoints.getFirst());
+      }
+    }
+    if (endpoint.isPresent()) {
+      Endpoint endpointToUpdate = endpoint.get();
+      // Mandatory fields
+      endpointToUpdate.setName(input.getName());
+      Iterable<String> tags =
+          Stream.concat(
+                  endpointToUpdate.getTags().stream().map(Tag::getId).toList().stream(),
+                  input.getTagIds().stream())
+              .distinct()
+              .toList();
+      endpointToUpdate.setTags(iterableToSet(tagRepository.findAllById(tags)));
+      endpointToUpdate.setArch(input.getArch());
+      endpointToUpdate.setPlatform(input.getPlatform());
+      // Optional fields
+      if (input.getIps() != null) {
+        endpointToUpdate.setIps(EndpointMapper.setIps(input.getIps()));
+      }
+      if (input.getHostname() != null) {
+        endpointToUpdate.setHostname(input.getHostname());
+      }
+      if (input.getMacAddresses() != null) {
+        endpointToUpdate.setMacAddresses(input.getMacAddresses());
+      }
+      return this.endpointService.updateEndpoint(endpointToUpdate);
+    }
+    return this.endpointService.createEndpoint(input);
+  }
+
   @PostMapping(ENDPOINT_URI + "/register")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
@@ -72,7 +128,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/jobs")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(@RequestBody final EndpointRegisterInput input) {
     return this.assetAgentJobRepository.findAll(
@@ -88,7 +144,7 @@ public class EndpointApi extends RestBehavior {
   @Deprecated(since = "1.11.0")
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(
       @PathVariable @NotBlank final String endpointExternalReference) {
@@ -97,7 +153,7 @@ public class EndpointApi extends RestBehavior {
   }
 
   @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
@@ -105,7 +161,7 @@ public class EndpointApi extends RestBehavior {
 
   @Deprecated(since = "1.11.0")
   @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.JOB)
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJobDepreacted(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
@@ -113,7 +169,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI)
-  @PreAuthorize("isObserver()")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(
         EndpointSpecification.findEndpointsForInjectionOrAgentlessEndpoints());
@@ -121,13 +177,17 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/{endpointId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#endpointId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.ASSET)
   public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
     return endpointMapper.toEndpointOverviewOutput(this.endpointService.getEndpoint(endpointId));
   }
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public Page<EndpointOutput> endpoints(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     Page<Endpoint> endpointPage = endpointService.searchEndpoints(searchPaginationInput);
@@ -140,13 +200,17 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   @Transactional(readOnly = true)
   public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
     return this.endpointService.endpoints(endpointIds);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
+  @RBAC(
+      resourceId = "#endpointId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
@@ -155,8 +219,11 @@ public class EndpointApi extends RestBehavior {
         this.endpointService.updateEndpoint(endpointId, input));
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
+  @RBAC(
+      resourceId = "#endpointId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.ASSET)
   @Transactional(rollbackFor = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
@@ -165,6 +232,7 @@ public class EndpointApi extends RestBehavior {
   // -- OPTION --
 
   @GetMapping(ENDPOINT_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId,
@@ -220,6 +288,7 @@ public class EndpointApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/findings/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String sourceId) {
@@ -228,6 +297,7 @@ public class EndpointApi extends RestBehavior {
   }
 
   @PostMapping(ENDPOINT_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.ASSET)
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.endpointRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

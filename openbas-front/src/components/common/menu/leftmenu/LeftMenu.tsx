@@ -62,27 +62,26 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
       >
         <Toolbar />
         <div style={{ marginTop: bannerHeightNumber }}>
-          {entries.map((entry, idxList) => {
+          {entries.filter(entry => entry.userRight).map((entry, idxList) => {
             return (
               <Fragment key={idxList}>
-                {idxList !== 0 && <Divider />}
+                {entry.items.some(item => item.userRight) && idxList !== 0 && <Divider />}
                 <MenuList component="nav">
-                  {(entry.userRight ?? true)
-                    && entry.items.map((item) => {
-                      if (hasHref(item)) {
-                        return (
-                          <MenuItemGroup
-                            key={item.label}
-                            item={item}
-                            state={state}
-                            helpers={helpers}
-                          />
-                        );
-                      }
+                  {entry.items.filter(entry => entry.userRight).map((item) => {
+                    if (hasHref(item)) {
                       return (
-                        <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
+                        <MenuItemGroup
+                          key={item.label}
+                          item={item}
+                          state={state}
+                          helpers={helpers}
+                        />
                       );
-                    })}
+                    }
+                    return (
+                      <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
+                    );
+                  })}
                 </MenuList>
               </Fragment>
             );

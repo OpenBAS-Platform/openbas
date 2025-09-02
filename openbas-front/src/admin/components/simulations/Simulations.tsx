@@ -2,8 +2,6 @@ import { ToggleButtonGroup } from '@mui/material';
 import { useState } from 'react';
 
 import { searchExercises } from '../../../actions/Exercise';
-import { type ExercisesHelper } from '../../../actions/exercises/exercise-helper';
-import { type UserHelper } from '../../../actions/helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
@@ -12,8 +10,9 @@ import PaginationComponentV2 from '../../../components/common/queryable/paginati
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
-import { useHelper } from '../../../store';
 import { type ExerciseSimple, type FilterGroup, type SearchPaginationInput } from '../../../utils/api-types';
+import { Can } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import ExercisePopover from './simulation/ExercisePopover';
@@ -22,9 +21,6 @@ import SimulationList from './SimulationList';
 const Simulations = () => {
   // Standard hooks
   const { t } = useFormatter();
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const [loading, setLoading] = useState<boolean>(true);
   const [exercises, setExercises] = useState<ExerciseSimple[]>([]);
@@ -113,7 +109,10 @@ const Simulations = () => {
         secondaryAction={secondaryAction}
         loading={loading}
       />
-      {userAdmin && <ExerciseCreation />}
+      {/* todo: manage and not create while the capability will be created */}
+      <Can I={ACTIONS.CREATE} a={SUBJECTS.ASSESSMENT}>
+        <ExerciseCreation />
+      </Can>
     </>
   );
 };

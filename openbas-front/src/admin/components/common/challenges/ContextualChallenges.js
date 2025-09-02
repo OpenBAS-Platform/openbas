@@ -11,7 +11,7 @@ import { makeStyles } from 'tss-react/mui';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { ChallengeContext } from '../Context';
+import { ChallengeContext, PermissionsContext } from '../Context';
 import ChallengeCard from './ChallengeCard.js';
 
 const useStyles = makeStyles()(() => ({
@@ -45,6 +45,7 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
 
   // Context
   const { previewChallengeUrl } = useContext(ChallengeContext);
+  const { permissions } = useContext(PermissionsContext);
 
   // Filter and sort hook
   const searchColumns = ['name', 'category', 'content'];
@@ -75,7 +76,7 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
             <div style={{ fontSize: 18 }}>
               {t('No challenge are used in the injects of this simulation.')}
             </div>
-            {linkToInjects && (
+            {linkToInjects && permissions.canManage && (
               <Button
                 style={{ marginTop: 20 }}
                 startIcon={<SlowMotionVideoOutlined />}

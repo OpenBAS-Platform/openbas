@@ -2,6 +2,7 @@ package io.openbas.service;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.openbas.database.model.Capability;
 import io.openbas.database.model.Role;
 import io.openbas.database.repository.RoleRepository;
@@ -35,7 +36,7 @@ public class RoleService {
       @NotBlank final String roleName, @NotNull final Set<Capability> capabilities) {
     Role role = new Role();
     role.setName(roleName);
-    role.setCapabilities(capabilities);
+    role.setCapabilities(getCapabilitiesWithParents(capabilities));
     return roleRepository.save(role);
   }
 
@@ -52,7 +53,7 @@ public class RoleService {
 
     role.setUpdatedAt(Instant.now());
     role.setName(roleName);
-    role.setCapabilities(capabilities);
+    role.setCapabilities(getCapabilitiesWithParents(capabilities));
 
     return roleRepository.save(role);
   }
@@ -69,5 +70,25 @@ public class RoleService {
             .orElseThrow(() -> new ElementNotFoundException("Role not found with id: " + roleId));
 
     roleRepository.deleteById(roleId);
+  }
+
+  /**
+   * Get a set of capabilities as input and return a set containing the input + their parent
+   *
+   * @param capabilitiesInput
+   * @return
+   */
+  @VisibleForTesting
+  protected Set<Capability> getCapabilitiesWithParents(
+      @NotNull final Set<Capability> capabilitiesInput) {
+    Set<Capability> result = new HashSet<>();
+
+    for (Capability capability : capabilitiesInput) {
+      Capability current = capability;
+      while (current != null && result.add(current)) {
+        current = current.getParent();
+      }
+    }
+    return result;
   }
 }

@@ -1,8 +1,12 @@
 import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { fetchScenarioAssetGroups } from '../../../../../actions/asset_groups/assetgroup-action';
+import { fetchScenarioEndpoints } from '../../../../../actions/assets/endpoint-actions';
 import { fetchScenarioArticles } from '../../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
+import { fetchScenarioChannels } from '../../../../../actions/channels/channel-action';
+import { fetchScenarioDocuments } from '../../../../../actions/documents/documents-actions';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { testInject } from '../../../../../actions/inject_test/scenario-inject-test-actions';
 import { fetchScenarioInjectsSimple } from '../../../../../actions/injects/inject-action';
@@ -42,6 +46,10 @@ const ScenarioInjects: FunctionComponent = () => {
     dispatch(fetchScenarioTeams(scenarioId));
     dispatch(fetchVariablesForScenario(scenarioId));
     dispatch(fetchScenarioArticles(scenarioId));
+    dispatch(fetchScenarioEndpoints(scenarioId));
+    dispatch(fetchScenarioAssetGroups(scenarioId));
+    dispatch(fetchScenarioDocuments(scenarioId));
+    dispatch(fetchScenarioChannels(scenarioId));
   });
 
   const articleContext = articleContextForScenario(scenarioId);

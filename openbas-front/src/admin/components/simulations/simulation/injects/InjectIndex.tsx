@@ -7,9 +7,9 @@ import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
 import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
-import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { usePermissions } from '../../../../../utils/permissions/simulationPermissions';
 import AtomicTestingRoutes from '../../../atomic_testings/atomic_testing/AtomicTestingRoutes';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';

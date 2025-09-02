@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -19,6 +20,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -136,6 +138,10 @@ public class Finding implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_users")
   private List<User> users = new ArrayList<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SIMULATION;
 
   @JsonProperty("finding_simulation")
   @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.id")

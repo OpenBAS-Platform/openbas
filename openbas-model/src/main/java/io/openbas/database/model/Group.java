@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -32,7 +33,7 @@ public class Group implements Base {
   @NotBlank
   private String id;
 
-  @Queryable(sortable = true)
+  @Queryable(searchable = true, sortable = true)
   @Column(name = "group_name")
   @JsonProperty("group_name")
   @NotBlank
@@ -99,6 +100,10 @@ public class Group implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("group_roles")
   private List<Role> roles = new ArrayList<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.USER_GROUP;
 
   // region transient
   @JsonProperty("group_default_exercise_planner")

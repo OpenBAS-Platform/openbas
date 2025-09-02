@@ -1,16 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Autocomplete, Box, Button, Checkbox, Chip, FormControlLabel, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import {
+  searchCustomDashboardAsOptions,
+  searchCustomDashboardAsOptionsByResourceId,
+} from '../../../actions/custom_dashboards/customdashboard-action';
 import CustomDashboardFieldController from '../../../components/fields/CustomDashboardFieldController';
 import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
 import { useFormatter } from '../../../components/i18n';
 import { type ScenarioInput } from '../../../utils/api-types';
+import type { Option } from '../../../utils/Option';
+import { AbilityContext } from '../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
 
@@ -21,6 +28,7 @@ interface Props {
   disabled?: boolean;
   initialValues: ScenarioInput;
   isCreation?: boolean;
+  scenarioId?: string;
 }
 
 const ScenarioForm: FunctionComponent<Props> = ({
@@ -30,6 +38,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
   initialValues,
   disabled,
   isCreation = false,
+  scenarioId,
 }) => {
   // Standard hooks
   const theme = useTheme();
@@ -37,9 +46,35 @@ const ScenarioForm: FunctionComponent<Props> = ({
   const [inputValue, setInputValue] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
   const [isScenarioAssistantChecked, setIsScenarioAssistantChecked] = useState(false);
+
   const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
+
+  const ability = useContext(AbilityContext);
+  const [options, setOptions] = useState<Option[]>([]);
+
+  const fetchDashboardOptions = async (searchText: string) => {
+    let res;
+
+    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DASHBOARDS)) {
+      // get all the dashboards
+      res = await searchCustomDashboardAsOptions(searchText);
+    } else if (scenarioId) {
+      // get the dashboards for the scenario
+      res = await searchCustomDashboardAsOptionsByResourceId(scenarioId);
+    } else {
+      // nothing to fetch
+      setOptions([]);
+      return;
+    }
+    setOptions(res.data as Option[]);
+  };
+
+  useEffect(() => {
+    fetchDashboardOptions('');
+  }, []);
+
   const {
     register,
     control,
@@ -206,6 +241,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
               control={control}
               name="scenario_custom_dashboard"
               label={t('Dashboard')}
+              fetchOptions={fetchDashboardOptions}
+              options={options}
             />
             {isCreation && (
               <FormControlLabel

@@ -1,10 +1,12 @@
 package io.openbas.rest.team;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.contextual;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -15,20 +17,20 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
 public class ExerciseTeamApi extends RestBehavior {
 
   private final TeamService teamService;
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/teams/search")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(readOnly = true)
   public Page<TeamOutput> searchTeams(
       @PathVariable @NotBlank final String exerciseId,

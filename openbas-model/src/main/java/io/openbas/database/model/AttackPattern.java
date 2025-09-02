@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -9,6 +10,7 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.jsonapi.BusinessId;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -57,6 +60,7 @@ public class AttackPattern implements Base {
   @Column(name = "attack_pattern_external_id")
   @JsonProperty("attack_pattern_external_id")
   @NotBlank
+  @BusinessId
   private String externalId;
 
   @Type(StringArrayType.class)
@@ -97,6 +101,10 @@ public class AttackPattern implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("attack_pattern_kill_chain_phases")
   private List<KillChainPhase> killChainPhases = new ArrayList<>();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.ATTACK_PATTERN;
 
   // UpdatedAt now used to sync with linked object
   public void setKillChainPhases(List<KillChainPhase> killChainPhases) {

@@ -1,9 +1,11 @@
 import { FlagOutlined } from '@mui/icons-material';
 import { Box, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
 import * as R from 'ramda';
+import { useContext } from 'react';
 
 import Empty from '../../../components/Empty.js';
 import { useFormatter } from '../../../components/i18n';
+import { PermissionsContext } from '../common/Context.js';
 import ObjectivePopover from './ObjectivePopover.js';
 
 const LessonsObjectives = ({
@@ -12,6 +14,8 @@ const LessonsObjectives = ({
   setSelectedObjective,
 }) => {
   const { t } = useFormatter();
+  const { permissions } = useContext(PermissionsContext);
+
   const sortedObjectives = R.sortWith(
     [R.ascend(R.prop('objective_priority'))],
     objectives,
@@ -24,10 +28,13 @@ const LessonsObjectives = ({
             <ListItem
               key={objective.objective_id}
               secondaryAction={(
-                <ObjectivePopover
-                  isReadOnly={source.isReadOnly}
-                  objective={objective}
-                />
+                permissions.canManage && (
+                  <ObjectivePopover
+                    isReadOnly={source.isReadOnly}
+                    objective={objective}
+                  />
+                )
+
               )}
             >
               <ListItemButton

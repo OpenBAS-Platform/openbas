@@ -23,6 +23,8 @@ import Transition from '../../../../components/common/Transition';
 import inject18n from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
+import { Can } from '../../../../utils/permissions/PermissionsProvider.js';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types.js';
 import { truncate } from '../../../../utils/String';
 import TagsFilter from '../../common/filters/TagsFilter';
 import CreateTeam from '../../components/teams/CreateTeam';
@@ -235,10 +237,12 @@ class LessonsCategoryAddTeams extends Component {
                       </ListItemButton>
                     );
                   })}
-                  <CreateTeam
-                    inline
-                    onCreate={this.onCreate.bind(this)}
-                  />
+                  <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
+                    <CreateTeam
+                      inline
+                      onCreate={this.onCreate.bind(this)}
+                    />
+                  </Can>
                 </List>
               </GridLegacy>
               <GridLegacy item xs={4}>

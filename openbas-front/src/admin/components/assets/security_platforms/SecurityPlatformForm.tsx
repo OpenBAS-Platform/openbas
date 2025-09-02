@@ -15,6 +15,7 @@ interface Props {
   handleClose: () => void;
   editing?: boolean;
   initialValues?: SecurityPlatformInput;
+  securityPlatformId?: string;
 }
 
 const SecurityPlatformForm: FunctionComponent<Props> = ({
@@ -29,6 +30,7 @@ const SecurityPlatformForm: FunctionComponent<Props> = ({
     security_platform_logo_dark: undefined,
     asset_tags: [],
   },
+  securityPlatformId,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -48,6 +50,7 @@ const SecurityPlatformForm: FunctionComponent<Props> = ({
         security_platform_logo_light: z.string().optional(),
         security_platform_logo_dark: z.string().optional(),
         asset_tags: z.string().array().optional(),
+        asset_external_reference: z.string().optional(),
       }),
     ),
     defaultValues: initialValues,
@@ -119,6 +122,8 @@ const SecurityPlatformForm: FunctionComponent<Props> = ({
               onChange(document?.id);
             }}
             initialValue={{ id: value }}
+            parentResourceType="security_platform"
+            parentResourceId={securityPlatformId}
           />
         )}
       />
@@ -134,6 +139,8 @@ const SecurityPlatformForm: FunctionComponent<Props> = ({
               onChange(document?.id);
             }}
             initialValue={{ id: value }}
+            parentResourceType="security_platform"
+            parentResourceId={securityPlatformId}
           />
         )}
       />

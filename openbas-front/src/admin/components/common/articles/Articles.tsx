@@ -7,9 +7,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type FullArticleStore } from '../../../../actions/channels/Article';
-import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import { fetchDocuments } from '../../../../actions/Document';
 import { type DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -49,6 +47,10 @@ const useStyles = makeStyles()(() => ({
 interface Props { articles: Article[] }
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {
+  // Context
+  const { previewArticleUrl, fetchChannels, fetchDocuments } = useContext(ArticleContext);
+  const { permissions } = useContext(PermissionsContext);
+
   // Standard hooks
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
@@ -90,16 +92,12 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
     filtering.filterAndSort(fullArticles),
   );
 
-  // Context
-  const { previewArticleUrl } = useContext(ArticleContext);
-  const { permissions } = useContext(PermissionsContext);
-
   return (
     <div>
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
         {t('Media pressure')}
       </Typography>
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <CreateArticle
           openCreate={openCreate}
           handleOpenCreate={handleOpenCreate}
@@ -119,16 +117,19 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
             <div style={{ fontSize: 18 }}>
               {t('No media pressure article available in this simulation yet.')}
             </div>
-            <Button
-              style={{ marginTop: 20 }}
-              startIcon={<NewspaperOutlined />}
-              variant="outlined"
-              color="primary"
-              size="small"
-              onClick={handleOpenCreate}
-            >
-              {t('Create an article')}
-            </Button>
+            {permissions.canManage
+              && (
+                <Button
+                  style={{ marginTop: 20 }}
+                  startIcon={<NewspaperOutlined />}
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  onClick={handleOpenCreate}
+                >
+                  {t('Create an article')}
+                </Button>
+              )}
           </div>
         )}
         />

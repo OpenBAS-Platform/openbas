@@ -548,15 +548,17 @@ const Injects: FunctionComponent<Props> = ({
             style={{ paddingTop: 0 }}
             secondaryAction={<>&nbsp;</>}
           >
-            <ListItemIcon style={{ minWidth: 40 }}>
-              <Checkbox
-                edge="start"
-                checked={selectAll}
-                disableRipple
-                onChange={handleToggleSelectAll}
-                disabled={typeof handleToggleSelectAll !== 'function'}
-              />
-            </ListItemIcon>
+            { permissions.canManage && (
+              <ListItemIcon style={{ minWidth: 40 }}>
+                <Checkbox
+                  edge="start"
+                  checked={selectAll}
+                  disableRipple
+                  onChange={handleToggleSelectAll}
+                  disabled={typeof handleToggleSelectAll !== 'function'}
+                />
+              </ListItemIcon>
+            )}
             <ListItemIcon />
             <ListItemText
               primary={(
@@ -597,22 +599,25 @@ const Injects: FunctionComponent<Props> = ({
                         }
                       }}
                     >
-                      <ListItemIcon
-                        style={{ minWidth: 40 }}
-                        onClick={event => (event.shiftKey
-                          ? onRowShiftClick(index, inject, event)
-                          : onToggleEntity(inject, event))}
-                      >
-                        <Checkbox
-                          edge="start"
-                          checked={
-                            (selectAll && !(inject.inject_id
-                              in (deSelectedElements || {})))
-                              || inject.inject_id in (selectedElements || {})
-                          }
-                          disableRipple
-                        />
-                      </ListItemIcon>
+                      { permissions.canManage
+                        && (
+                          <ListItemIcon
+                            style={{ minWidth: 40 }}
+                            onClick={event => (event.shiftKey
+                              ? onRowShiftClick(index, inject, event)
+                              : onToggleEntity(inject, event))}
+                          >
+                            <Checkbox
+                              edge="start"
+                              checked={
+                                (selectAll && !(inject.inject_id
+                                  in (deSelectedElements || {})))
+                                  || inject.inject_id in (selectedElements || {})
+                              }
+                              disableRipple
+                            />
+                          </ListItemIcon>
+                        )}
                       <ListItemIcon style={{ paddingTop: 5 }}>
                         <InjectIcon
                           isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
@@ -650,7 +655,7 @@ const Injects: FunctionComponent<Props> = ({
               })}
         </List>
       )}
-      {permissions.canWrite && (
+      {permissions.canManage && (
         <>
           {selectedInjectId !== null
             && (

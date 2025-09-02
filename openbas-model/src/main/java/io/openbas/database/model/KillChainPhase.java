@@ -2,14 +2,17 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.jsonapi.BusinessId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.Data;
+import lombok.Getter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
@@ -39,6 +42,7 @@ public class KillChainPhase implements Base {
   @Column(name = "phase_name")
   @JsonProperty("phase_name")
   @NotBlank
+  @BusinessId
   private String name;
 
   @Column(name = "phase_shortname")
@@ -50,6 +54,7 @@ public class KillChainPhase implements Base {
   @Column(name = "phase_kill_chain_name")
   @JsonProperty("phase_kill_chain_name")
   @NotBlank
+  @BusinessId
   private String killChainName;
 
   @Column(name = "phase_description")
@@ -71,4 +76,8 @@ public class KillChainPhase implements Base {
   @JsonProperty("phase_updated_at")
   @NotNull
   private Instant updatedAt = now();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.KILL_CHAIN_PHASE;
 }

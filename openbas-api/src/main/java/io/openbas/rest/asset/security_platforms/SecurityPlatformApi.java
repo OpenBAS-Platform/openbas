@@ -1,29 +1,35 @@
 package io.openbas.rest.asset.security_platforms;
 
-import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformInput;
 import io.openbas.rest.asset.security_platforms.form.SecurityPlatformUpsertInput;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
 public class SecurityPlatformApi {
 
   public static final String SECURITY_PLATFORM_URI = "/api/security_platforms";
@@ -34,14 +40,16 @@ public class SecurityPlatformApi {
   private final SecurityPlatformRepository securityPlatformRepository;
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
+  private final DocumentService documentService;
 
   @GetMapping(SECURITY_PLATFORM_URI)
+  @RBAC(actionPerformed = Action.READ, resourceType = ResourceType.SECURITY_PLATFORM)
   public Iterable<SecurityPlatform> securityPlatforms() {
     return securityPlatformRepository.findAll();
   }
 
   @PostMapping(SECURITY_PLATFORM_URI)
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SECURITY_PLATFORM)
   @Transactional(rollbackOn = Exception.class)
   public SecurityPlatform createSecurityPlatform(
       @Valid @RequestBody final SecurityPlatformInput input) {
@@ -63,7 +71,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI + "/upsert")
-  @PreAuthorize("isPlanner()")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SECURITY_PLATFORM)
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public SecurityPlatform upsertSecurityPlatform(
       @Valid @RequestBody SecurityPlatformUpsertInput input) {
@@ -110,7 +118,10 @@ public class SecurityPlatformApi {
   }
 
   @GetMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   public SecurityPlatform securityPlatform(
       @PathVariable @NotBlank final String securityPlatformId) {
     return this.securityPlatformRepository
@@ -119,6 +130,7 @@ public class SecurityPlatformApi {
   }
 
   @PostMapping(SECURITY_PLATFORM_URI + "/search")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SECURITY_PLATFORM)
   public Page<SecurityPlatform> securityPlatforms(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
@@ -126,7 +138,10 @@ public class SecurityPlatformApi {
   }
 
   @PutMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   @Transactional(rollbackOn = Exception.class)
   public SecurityPlatform updateSecurityPlatform(
       @PathVariable @NotBlank final String securityPlatformId,
@@ -149,9 +164,45 @@ public class SecurityPlatformApi {
   }
 
   @DeleteMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}")
-  @PreAuthorize("isPlanner()")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.SECURITY_PLATFORM)
   @Transactional(rollbackOn = Exception.class)
   public void deleteSecurityPlatform(@PathVariable @NotBlank final String securityPlatformId) {
     this.securityPlatformRepository.deleteById(securityPlatformId);
+  }
+
+  @GetMapping(SECURITY_PLATFORM_URI + "/{securityPlatformId}/documents")
+  @RBAC(
+      resourceId = "#securityPlatformId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SECURITY_PLATFORM)
+  @Operation(summary = "Get the Documents used in a security platform")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the security platform")
+      })
+  public List<RawDocument> documentsFromSecurityPlatform(@PathVariable String securityPlatformId) {
+    return documentService.documentsForSecurityPlatform(securityPlatformId);
+  }
+
+  @GetMapping(SECURITY_PLATFORM_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SECURITY_PLATFORM)
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return securityPlatformRepository.findAllByName(StringUtils.trimToNull(searchText)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @PostMapping(SECURITY_PLATFORM_URI + "/options")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.SECURITY_PLATFORM)
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.securityPlatformRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 }

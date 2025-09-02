@@ -37,7 +37,13 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Scenario.tags-injects",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("injects")})
 })
+@Grantable(grantFieldName = "scenario")
 public class Scenario implements Base {
+
+  public enum RECURRENCE_STATUS {
+    SCHEDULED,
+    NOT_PLANNED,
+  }
 
   public enum SEVERITY {
     @JsonProperty("low")
@@ -243,6 +249,11 @@ public class Scenario implements Base {
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
+  @Getter
+  @OneToMany(mappedBy = "scenario")
+  @JsonIgnore
+  public List<Variable> variables = new ArrayList<>();
+
   @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -268,6 +279,10 @@ public class Scenario implements Base {
   @Column(name = "scenario_lessons_anonymized")
   @JsonProperty("scenario_lessons_anonymized")
   private boolean lessonsAnonymized = false;
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.SCENARIO;
 
   // -- LESSONS --
 

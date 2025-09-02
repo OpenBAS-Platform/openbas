@@ -4,6 +4,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static java.time.Instant.now;
 import static java.util.function.Function.identity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -49,10 +50,14 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_description")
   private String description;
 
-  @OneToMany(mappedBy = "customDashboard", fetch = LAZY)
+  @OneToMany(
+      mappedBy = "customDashboard",
+      fetch = LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("custom_dashboard_widgets")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  private List<Widget> widgets;
+  private List<Widget> widgets = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "customDashboard",
@@ -89,6 +94,10 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_updated_at")
   @NotNull
   private Instant updateDate = now();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.DASHBOARD;
 
   // -- UTILS --
 

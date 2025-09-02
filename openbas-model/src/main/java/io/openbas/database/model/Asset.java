@@ -18,6 +18,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -56,6 +57,11 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
+  @Queryable(searchable = true, sortable = true, filterable = true)
+  @Column(name = "asset_external_reference")
+  @JsonProperty("asset_external_reference")
+  private String externalReference;
+
   // -- TAG --
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -86,6 +92,10 @@ public class Asset implements Base {
   @NotNull
   @UpdateTimestamp
   private Instant updatedAt = now();
+
+  @Getter(onMethod_ = @JsonIgnore)
+  @Transient
+  private final ResourceType resourceType = ResourceType.ASSET;
 
   @Override
   public int hashCode() {

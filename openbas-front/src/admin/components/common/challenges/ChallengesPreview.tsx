@@ -8,7 +8,7 @@ import { type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { tryChallenge } from '../../../../actions/Challenge';
+import { tryChallenge } from '../../../../actions/challenge-action';
 import Dialog from '../../../../components/common/dialog/Dialog';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -39,7 +39,7 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   challenges: ChallengeInformation[] | undefined;
   permissions: {
-    canRead: boolean;
+    canAccess: boolean;
     isRunning: boolean;
     isLoggedIn: boolean;
   };
@@ -78,7 +78,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
 
     return (
       <div className={classes.root}>
-        {permissions.isLoggedIn && permissions.canRead && value.linkToPlayerMode.length > 0 && (
+        {permissions.isLoggedIn && permissions.canAccess && value.linkToPlayerMode.length > 0 && (
           <Button
             color="secondary"
             variant="outlined"
@@ -94,7 +94,7 @@ const ChallengesPreview: FunctionComponent<Props> = ({
             {t('Switch to player mode')}
           </Button>
         )}
-        {permissions.isLoggedIn && permissions.canRead && (
+        {permissions.isLoggedIn && permissions.canAccess && (
           <Button
             color="primary"
             variant="outlined"

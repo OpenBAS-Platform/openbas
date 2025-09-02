@@ -1,9 +1,11 @@
 package io.openbas.rest.team;
 
-import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.TeamSpecification.*;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
+import io.openbas.database.model.Action;
+import io.openbas.database.model.ResourceType;
 import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
@@ -14,20 +16,20 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@Secured(ROLE_USER)
 public class ScenarioTeamApi extends RestBehavior {
 
   private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/teams/search")
-  @PreAuthorize("isScenarioObserver(#scenarioId)")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(readOnly = true)
   public Page<TeamOutput> teams(
       @PathVariable @NotBlank final String scenarioId,

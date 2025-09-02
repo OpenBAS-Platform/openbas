@@ -248,7 +248,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     assertNotNull(exerciseSaved);
     assertEquals(name, exerciseSaved.getName());
     // Grants
-    assertEquals(2, (long) exerciseSaved.getGrants().size());
+    assertEquals(3, (long) exerciseSaved.getGrants().size());
     // User & Teams
     assertEquals(2, (long) exerciseSaved.getTeams().size());
     assertTrue(

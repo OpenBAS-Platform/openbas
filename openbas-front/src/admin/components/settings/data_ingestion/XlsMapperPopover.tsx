@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
 import { deleteMapper, duplicateMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
 import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
@@ -7,6 +7,8 @@ import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { type RawPaginationImportMapper } from '../../../../utils/api-types';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { download } from '../../../../utils/utils';
 import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
 
@@ -27,6 +29,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const ability = useContext(AbilityContext);
 
   // Duplication
   const [openDuplicate, setOpenDuplicate] = useState(false);
@@ -82,18 +85,22 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
     {
       label: 'Duplicate',
       action: handleOpenDuplicate,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
     {
       label: 'Update',
       action: handleOpenEdit,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
     {
       label: 'Delete',
       action: handleOpenDelete,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
     {
       label: 'Export',
       action: exportMapperAction,
+      userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS),
     },
   ];
 

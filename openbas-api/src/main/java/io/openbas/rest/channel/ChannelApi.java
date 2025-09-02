@@ -1,18 +1,23 @@
 package io.openbas.rest.channel;
 
 import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.rest.channel.ChannelHelper.enrichArticleWithVirtualPublication;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 
+import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
+import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.*;
 import io.openbas.rest.channel.form.*;
 import io.openbas.rest.channel.response.ChannelReader;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChannelService;
 import io.openbas.service.ScenarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -21,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,21 +39,30 @@ public class ChannelApi extends RestBehavior {
   private final DocumentRepository documentRepository;
   private final UserRepository userRepository;
   private final ChannelService channelService;
+  private final DocumentService documentService;
 
   // -- CHANNELS --
 
   @GetMapping("/api/channels")
+  @RBAC(actionPerformed = Action.SEARCH, resourceType = ResourceType.CHANNEL)
   public Iterable<Channel> channels() {
     return channelRepository.findAll();
   }
 
   @GetMapping("/api/channels/{channelId}")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHANNEL)
   public Channel channel(@PathVariable String channelId) {
     return channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHANNEL)
   public Channel updateChannel(
       @PathVariable String channelId, @Valid @RequestBody ChannelUpdateInput input) {
     Channel channel =
@@ -60,8 +72,11 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @Secured(ROLE_ADMIN)
   @PutMapping("/api/channels/{channelId}/logos")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CHANNEL)
   public Channel updateChannelLogos(
       @PathVariable String channelId, @Valid @RequestBody ChannelUpdateLogoInput input) {
     Channel channel =
@@ -79,8 +94,8 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping("/api/channels")
+  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.CHANNEL)
   @Transactional(rollbackOn = Exception.class)
   public Channel createChannel(@Valid @RequestBody ChannelCreateInput input) {
     Channel channel = new Channel();
@@ -88,14 +103,20 @@ public class ChannelApi extends RestBehavior {
     return channelRepository.save(channel);
   }
 
-  @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/channels/{channelId}")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.DELETE,
+      resourceType = ResourceType.CHANNEL)
   public void deleteChannel(@PathVariable String channelId) {
     channelRepository.deleteById(channelId);
   }
 
   @GetMapping("/api/observer/channels/{exerciseId}/{channelId}")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public ChannelReader observerArticles(
       @PathVariable String exerciseId, @PathVariable String channelId) {
     ChannelReader channelReader;
@@ -124,6 +145,10 @@ public class ChannelApi extends RestBehavior {
   }
 
   @GetMapping("/api/player/channels/{exerciseId}/{channelId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
   public ChannelReader playerArticles(
       @PathVariable String exerciseId,
       @PathVariable String channelId,
@@ -137,8 +162,11 @@ public class ChannelApi extends RestBehavior {
 
   // -- EXERCISES --
 
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @PostMapping("/api/exercises/{exerciseId}/articles")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public Article createArticleForExercise(
       @PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
@@ -172,8 +200,11 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle, this.mapper);
   }
 
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @PutMapping("/api/exercises/{exerciseId}/articles/{articleId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   public Article updateArticleForExercise(
       @PathVariable String exerciseId,
       @PathVariable String articleId,
@@ -217,8 +248,11 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(exercise.getInjects(), savedArticle, this.mapper);
   }
 
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
   @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
+  @RBAC(
+      resourceId = "#exerciseId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackOn = Exception.class)
   public void deleteArticleForExercise(
       @PathVariable String exerciseId, @PathVariable String articleId) {
@@ -227,8 +261,11 @@ public class ChannelApi extends RestBehavior {
 
   // -- SCENARIOS --
 
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @PostMapping(SCENARIO_URI + "/{scenarioId}/articles")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackOn = Exception.class)
   public Article createArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -261,8 +298,11 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle, this.mapper);
   }
 
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @PutMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackOn = Exception.class)
   public Article updateArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -306,12 +346,31 @@ public class ChannelApi extends RestBehavior {
     return enrichArticleWithVirtualPublication(scenario.getInjects(), savedArticle, this.mapper);
   }
 
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}/articles/{articleId}")
+  @RBAC(
+      resourceId = "#scenarioId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackOn = Exception.class)
   public void deleteArticleForScenario(
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String articleId) {
     articleRepository.deleteById(articleId);
+  }
+
+  @GetMapping("/api/channels/{channelId}/documents")
+  @RBAC(
+      resourceId = "#channelId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.CHANNEL)
+  @Operation(summary = "Get the Documents used in a channel")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "The list of Documents used in the Channel")
+      })
+  public List<RawDocument> documentsFromChannel(@PathVariable String channelId) {
+    return documentService.documentsForChannel(channelId);
   }
 }

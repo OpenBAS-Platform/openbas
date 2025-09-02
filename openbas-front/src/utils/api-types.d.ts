@@ -1422,6 +1422,7 @@ export interface Endpoint {
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
+  asset_external_reference?: string;
   asset_id: string;
   asset_name: string;
   asset_tags?: string[];
@@ -1430,7 +1431,7 @@ export interface Endpoint {
   asset_updated_at: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
   endpoint_platform:
@@ -1448,16 +1449,13 @@ export interface Endpoint {
 
 export interface EndpointInput {
   asset_description?: string;
+  asset_external_reference?: string;
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
@@ -1478,6 +1476,8 @@ export interface EndpointOutput {
    * @uniqueItems true
    */
   asset_agents: AgentOutput[];
+  /** Asset external reference */
+  asset_external_reference?: string;
   /** Asset Id */
   asset_id: string;
   /** Asset name */
@@ -1566,11 +1566,7 @@ export interface EndpointRegisterInput {
   endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
+  endpoint_ips?: string[];
   /** True if the endpoint is in an End of Life state */
   endpoint_is_eol?: boolean;
   endpoint_mac_addresses?: string[];
@@ -1750,6 +1746,8 @@ export interface EsInject {
   base_inject_contract_side?: string;
   /** @uniqueItems true */
   base_kill_chain_phases_side?: string[];
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1760,6 +1758,8 @@ export interface EsInject {
   base_teams_side?: string[];
   /** @format date-time */
   base_updated_at?: string;
+  /** @format date-time */
+  inject_execution_date?: string;
   inject_status?: string;
   inject_title?: string;
 }
@@ -1778,6 +1778,8 @@ export interface EsInjectExpectation {
   base_inject_side?: string;
   base_representative?: string;
   base_restrictions?: string[];
+  /** @uniqueItems true */
+  base_security_platforms_side?: string[];
   base_simulation_side?: string;
   base_team_side?: string;
   /** @format date-time */
@@ -1807,6 +1809,8 @@ export interface EsScenario {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   /** @uniqueItems true */
@@ -1816,6 +1820,7 @@ export interface EsScenario {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsSearch {
@@ -1851,6 +1856,8 @@ export interface EsSimulation {
   base_dependencies?: string[];
   base_entity?: string;
   base_id?: string;
+  /** @uniqueItems true */
+  base_platforms_side_denormalized?: string[];
   base_representative?: string;
   base_restrictions?: string[];
   base_scenario_side?: string;
@@ -1861,6 +1868,7 @@ export interface EsSimulation {
   /** @format date-time */
   base_updated_at?: string;
   name?: string;
+  status?: string;
 }
 
 export interface EsTag {
@@ -2434,16 +2442,16 @@ export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
   grant_id: string;
-  grant_name: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
   listened?: boolean;
 }
 
 export interface Group {
-  group_default_exercise_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_exercise_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_exercise_observer?: boolean;
   group_default_exercise_planner?: boolean;
-  group_default_scenario_assign?: ("OBSERVER" | "LAUNCHER" | "PLANNER")[];
+  group_default_scenario_assign?: ("OBSERVER" | "PLANNER" | "LAUNCHER")[];
   group_default_scenario_observer?: boolean;
   group_default_scenario_planner?: boolean;
   group_default_user_assign?: boolean;
@@ -2469,7 +2477,7 @@ export interface GroupCreateInput {
 
 export interface GroupGrantInput {
   grant_exercise?: string;
-  grant_name?: "OBSERVER" | "LAUNCHER" | "PLANNER";
+  grant_name?: "OBSERVER" | "PLANNER" | "LAUNCHER";
   grant_scenario?: string;
 }
 
@@ -2869,6 +2877,10 @@ export interface InjectImporterUpdateInput {
   inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttributeUpdateInput[];
   inject_importer_type_value: string;
+}
+
+export interface InjectIndividualExportRequestInput {
+  options?: ExportOptionsInput;
 }
 
 export interface InjectInput {
@@ -3299,6 +3311,11 @@ export interface InjectsImportTestInput {
   sheet_name: string;
   /** @format int32 */
   timezone_offset: number;
+}
+
+export interface JsonApiDocumentResourceObject {
+  data?: ResourceObject;
+  included?: object[];
 }
 
 export type JsonNode = object;
@@ -4951,6 +4968,10 @@ export interface RelatedFindingOutput {
   finding_value: string;
 }
 
+export interface Relationship {
+  data: object;
+}
+
 export interface RenewTokenInput {
   token_id: string;
 }
@@ -5016,6 +5037,13 @@ export interface ResetUserInput {
   login: string;
 }
 
+export interface ResourceObject {
+  attributes?: Record<string, object>;
+  id: string;
+  relationships?: Record<string, Relationship>;
+  type: string;
+}
+
 export interface ResultDistribution {
   id: string;
   label: string;
@@ -5027,10 +5055,10 @@ export interface RoleInput {
   /** @uniqueItems true */
   role_capabilities?: (
     | "BYPASS"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5267,6 +5295,7 @@ export interface SecurityPlatform {
 
 export interface SecurityPlatformInput {
   asset_description?: string;
+  asset_external_reference?: string;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
@@ -5854,10 +5883,10 @@ export interface User {
   /** @uniqueItems true */
   user_capabilities?: (
     | "BYPASS"
-    | "ACCESS_ATOMIC_TESTING"
-    | "MANAGE_ATOMIC_TESTING"
-    | "DELETE_ATOMIC_TESTING"
-    | "LAUNCH_ATOMIC_TESTING"
+    | "ACCESS_ASSESSMENT"
+    | "MANAGE_ASSESSMENT"
+    | "DELETE_ASSESSMENT"
+    | "LAUNCH_ASSESSMENT"
     | "MANAGE_TEAMS_AND_PLAYERS"
     | "DELETE_TEAMS_AND_PLAYERS"
     | "ACCESS_ASSETS"
@@ -5910,6 +5939,8 @@ export interface User {
   user_groups?: string[];
   /** User ID */
   user_id: string;
+  /** True if the user is admin or has bypass capa */
+  user_is_admin_or_bypass?: boolean;
   /** True if the user is external */
   user_is_external?: boolean;
   /** True if the user is manager */
@@ -6054,7 +6085,6 @@ export interface Widget {
     | StructuralHistogramWidget;
   /** @format date-time */
   widget_created_at: string;
-  widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
   widget_type:
