@@ -48,12 +48,14 @@ const ParametersOnboardingForm: FunctionComponent<ParametersOnboardingFormForms>
     ),
     defaultValues: initialValues,
   });
-  const { handleSubmit, reset, formState } = methods;
-
+  const { handleSubmit, reset } = methods;
   useEffect(() => {
-    if (!formState.isDirty) return;
-    handleSubmit(onSubmit)();
-  }, [formState.isDirty, methods, onSubmit]);
+    const subscription = methods.watch(() => {
+      const values = methods.getValues();
+      onSubmit(values);
+    });
+    return () => subscription.unsubscribe();
+  }, [methods, onSubmit]);
 
   const handleReset = async () => {
     dispatch(fetchDefaultPlatformParameters())
