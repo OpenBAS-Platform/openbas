@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.parsing.StixSerialisable;
 import io.openbas.stix.types.BaseType;
+import io.openbas.stix.types.StixString;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +58,21 @@ public class ObjectBase implements StixSerialisable {
   public void setIfListPresent(String propName, Consumer<List<String>> setter) {
     if (this.hasProperty(propName) && this.getProperty(propName).getValue() != null) {
       Object value = getProperty(propName).getValue();
-      if (value != null) {
-        if (value instanceof List<?>) {
-          setter.accept(
-              ((List<?>) value).stream().map(Object::toString).collect(Collectors.toList()));
-        }
+      if (value instanceof List<?>) {
+        List<String> strings =
+            ((List<?>) value)
+                .stream()
+                    .map(
+                        v -> {
+                          if (v instanceof StixString) {
+                            return ((StixString) v).getValue();
+                          } else {
+                            return v.toString();
+                          }
+                        })
+                    .collect(Collectors.toList());
+
+        setter.accept(strings);
       }
     }
   }

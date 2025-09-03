@@ -36,6 +36,8 @@ public class SecurityCoverageService {
   public static final String STIX_PERIOD_END = "period_end";
   public static final String STIX_ATTACK_PATTERN_TYPE = "attack-pattern";
   public static final String ONE_SHOT = "X";
+  public static final String INCIDENT_RESPONSE = "incident-response";
+  public static final String ATTACK_SCENARIO = "attack-scenario";
 
   private final ScenarioService scenarioService;
   private final TagService tagService;
@@ -170,6 +172,8 @@ public class SecurityCoverageService {
     scenario.setName(sa.getName());
     scenario.setDescription(sa.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
+    scenario.setMainFocus(INCIDENT_RESPONSE);
+    scenario.setCategory(ATTACK_SCENARIO);
 
     Instant start = sa.getPeriodStart();
     Instant end = sa.getPeriodEnd();
