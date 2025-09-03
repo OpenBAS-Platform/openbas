@@ -1,7 +1,7 @@
 package io.openbas.rest.tag;
 
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.service.TagRuleService.OPENCTI_TAG_NAME;
+import static io.openbas.utils.StringUtils.generateRandomColor;
 import static java.time.Instant.now;
 
 import io.openbas.database.model.Tag;
@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class TagService {
-
-  public static final String OPENCTI_TAG_COLOR = "#001bda";
 
   private final TagRepository tagRepository;
 
@@ -49,16 +47,27 @@ public class TagService {
     return tagRepository.save(tag);
   }
 
-  public Set<Tag> buildDefaultTagsForStix() {
+  /**
+   * Generate a list of tag from a list of labels
+   *
+   * @param labels
+   * @return list of tags
+   */
+  public Set<Tag> fetchTagsFromLabels(List<String> labels) {
     Set<Tag> tags = new HashSet();
-    // Set Default Tag OCTI for every created scenario from a STIX bundle
-    TagCreateInput tagCreateInput = new TagCreateInput();
-    tagCreateInput.setName(OPENCTI_TAG_NAME);
-    tagCreateInput.setColor(OPENCTI_TAG_COLOR);
 
-    Tag octiTag = upsertTag(tagCreateInput);
+    if (labels != null) {
+      for (String label : labels) {
+        if (label == null || label.isBlank()) {
+          continue;
+        }
+        TagCreateInput tagCreateInput = new TagCreateInput();
+        tagCreateInput.setName(label);
+        tagCreateInput.setColor(generateRandomColor());
 
-    tags.add(octiTag);
+        tags.add(upsertTag(tagCreateInput));
+      }
+    }
 
     return tags;
   }

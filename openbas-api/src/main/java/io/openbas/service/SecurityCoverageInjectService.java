@@ -20,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @Slf4j
 @Validated
-public class SecurityAssessmentInjectService {
+public class SecurityCoverageInjectService {
 
   public static final int INJECTS_PER_ATTACK_PATTERN = 1;
 
@@ -32,12 +32,12 @@ public class SecurityAssessmentInjectService {
   private final InjectRepository injectRepository;
 
   /**
-   * Creates and manages injects for the given scenario based on the associated security assessment.
+   * Creates and manages injects for the given scenario based on the associated security coverage.
    *
    * <p>Steps:
    *
    * <ul>
-   *   <li>Resolves internal AttackPatterns from the assessment
+   *   <li>Resolves internal AttackPatterns from the coverage
    *   <li>Fetches asset groups based on scenario tag rules
    *   <li>Analyzes existing inject coverage
    *   <li>Removes outdated injects
@@ -45,13 +45,12 @@ public class SecurityAssessmentInjectService {
    * </ul>
    *
    * @param scenario the scenario for which injects are managed
-   * @param securityAssessment the related security assessment providing AttackPattern references
+   * @param securityCoverage the related security coverage providing AttackPattern references
    */
-  public void createdInjectsForScenario(Scenario scenario, SecurityAssessment securityAssessment) {
+  public void createdInjectsForScenario(Scenario scenario, SecurityCoverage securityCoverage) {
     // 1. Fetch internal Ids for AttackPatterns
     Map<String, AttackPattern> attackPatterns =
-        attackPatternService.fetchInternalAttackPatternIdsFromSecurityAssessment(
-            securityAssessment);
+        attackPatternService.fetchInternalAttackPatternIdsFromSecurityCoverage(securityCoverage);
 
     if (attackPatterns.isEmpty()) {
       injectService.deleteAll(scenario.getInjects());

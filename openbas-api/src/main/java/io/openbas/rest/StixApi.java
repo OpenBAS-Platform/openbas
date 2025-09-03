@@ -42,7 +42,7 @@ public class StixApi extends RestBehavior {
     @ApiResponse(responseCode = "200", description = "STIX bundle processed successfully"),
     @ApiResponse(
         responseCode = "400",
-        description = "Invalid STIX bundle (e.g., too many security assessments)"),
+        description = "Invalid STIX bundle (e.g., too many security coverages)"),
     @ApiResponse(responseCode = "500", description = "Unexpected server error")
   })
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)

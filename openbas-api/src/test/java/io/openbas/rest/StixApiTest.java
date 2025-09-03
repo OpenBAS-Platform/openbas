@@ -18,7 +18,7 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.database.repository.SecurityAssessmentRepository;
+import io.openbas.database.repository.SecurityCoverageRepository;
 import io.openbas.utils.fixtures.composers.AttackPatternComposer;
 import io.openbas.utils.fixtures.files.AttackPatternFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
@@ -49,24 +49,24 @@ class StixApiTest extends IntegrationTest {
 
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
-  @Autowired private SecurityAssessmentRepository securityAssessmentRepository;
+  @Autowired private SecurityCoverageRepository securityCoverageRepository;
 
   @Autowired private AttackPatternComposer attackPatternComposer;
 
-  private String stixSecurityAssessment;
-  private String stixSecurityAssessmentWithoutTtps;
+  private String stixSecurityCoverage;
+  private String stixSecurityCoverageWithoutTtps;
 
   @BeforeEach
   void setUp() throws Exception {
     attackPatternComposer.reset();
     try (FileInputStream fis1 =
-            new FileInputStream("src/test/resources/stix-bundles/security-assessment.json");
+            new FileInputStream("src/test/resources/stix-bundles/security-coverage.json");
         FileInputStream fis2 =
             new FileInputStream(
-                "src/test/resources/stix-bundles/security-assessment-without-ttps.json")) {
+                "src/test/resources/stix-bundles/security-coverage-without-ttps.json")) {
 
-      stixSecurityAssessment = IOUtils.toString(fis1, StandardCharsets.UTF_8);
-      stixSecurityAssessmentWithoutTtps = IOUtils.toString(fis2, StandardCharsets.UTF_8);
+      stixSecurityCoverage = IOUtils.toString(fis1, StandardCharsets.UTF_8);
+      stixSecurityCoverageWithoutTtps = IOUtils.toString(fis2, StandardCharsets.UTF_8);
     }
 
     attackPatternComposer
@@ -87,29 +87,29 @@ class StixApiTest extends IntegrationTest {
   class ImportStixBundles {
 
     @Test
-    @DisplayName("Should return 400 when STIX bundle has no security assessment")
-    void shouldReturnBadRequestWhenNoSecurityAssessment() throws Exception {
-      String bundleWithoutAssessment =
-          stixSecurityAssessment.replace("x-security-assessment", "x-other-type");
+    @DisplayName("Should return 400 when STIX bundle has no security coverage")
+    void shouldReturnBadRequestWhenNoSecurityCoverage() throws Exception {
+      String bundleWithoutCoverage =
+          stixSecurityCoverage.replace("x-security-coverage", "x-other-type");
 
       mvc.perform(
               post(STIX_URI + "/process-bundle")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(bundleWithoutAssessment))
+                  .content(bundleWithoutCoverage))
           .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Should return 400 when STIX bundle has multiple security assessments")
-    void shouldReturnBadRequestWhenMultipleSecurityAssessments() throws Exception {
-      // Simulate bundle with two identical security assessments
-      String duplicatedAssessment =
-          stixSecurityAssessment.replace("]", ", " + stixSecurityAssessment.split("\\[")[1]);
+    @DisplayName("Should return 400 when STIX bundle has multiple security coverages")
+    void shouldReturnBadRequestWhenMultipleSecurityCoverages() throws Exception {
+      // Simulate bundle with two identical security coverages
+      String duplicatedCoverage =
+          stixSecurityCoverage.replace("]", ", " + stixSecurityCoverage.split("\\[")[1]);
 
       mvc.perform(
               post(STIX_URI + "/process-bundle")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(duplicatedAssessment))
+                  .content(duplicatedCoverage))
           .andExpect(status().isBadRequest());
     }
 
@@ -151,7 +151,7 @@ class StixApiTest extends IntegrationTest {
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -163,34 +163,34 @@ class StixApiTest extends IntegrationTest {
 
       // -- ASSERT Scenario --
       assertThat(createdScenario.getName())
-          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+          .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
       assertThat(createdScenario.getDescription())
-          .isEqualTo("Security assessment test plan for threat context XYZ.");
-      assertThat(createdScenario.getSecurityAssessment().getExternalId())
-          .isEqualTo("x-security-assessment--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
+          .isEqualTo("Security coverage test plan for threat context XYZ.");
+      assertThat(createdScenario.getSecurityCoverage().getExternalId())
+          .isEqualTo("x-security-coverage--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
       assertThat(createdScenario.getMainFocus()).isEqualTo(MainFocus.INCIDENT_RESPONSE.toString());
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
 
-      // -- ASSERT Security Assessment --
-      assertThat(createdScenario.getSecurityAssessment().getThreatContextRef())
+      // -- ASSERT Security Coverage --
+      assertThat(createdScenario.getSecurityCoverage().getThreatContextRef())
           .isEqualTo("report--453a2ac1-e111-57bf-8277-dbec448cd851");
-      assertThat(createdScenario.getSecurityAssessment().getAttackPatternRefs()).hasSize(2);
+      assertThat(createdScenario.getSecurityCoverage().getAttackPatternRefs()).hasSize(2);
 
       StixRefToExternalRef stixRef1 =
           new StixRefToExternalRef("attack-pattern--a24d97e6-401c-51fc-be24-8f797a35d1f1", T_1531);
       StixRefToExternalRef stixRef2 =
           new StixRefToExternalRef("attack-pattern--033921be-85df-5f05-8bc0-d3d9fc945db9", T_1003);
 
-      assertThat(createdScenario.getSecurityAssessment().getAttackPatternRefs()).hasSize(2);
+      assertThat(createdScenario.getSecurityCoverage().getAttackPatternRefs()).hasSize(2);
       assertTrue(
           createdScenario
-              .getSecurityAssessment()
+              .getSecurityCoverage()
               .getAttackPatternRefs()
               .containsAll(List.of(stixRef1, stixRef2)));
-      assertThat(createdScenario.getSecurityAssessment().getVulnerabilitiesRefs()).isNull();
-      assertThat(createdScenario.getSecurityAssessment().getContent()).isNotBlank();
+      assertThat(createdScenario.getSecurityCoverage().getVulnerabilitiesRefs()).isNull();
+      assertThat(createdScenario.getSecurityCoverage().getContent()).isNotBlank();
 
       // -- ASSERT Injects --
       List<Inject> injects = injectRepository.findByScenarioId(response);
@@ -199,14 +199,14 @@ class StixApiTest extends IntegrationTest {
 
     @Test
     @DisplayName(
-        "Should update scenario from same security assessment and keep same number inject when updated stix has the same attacks")
+        "Should update scenario from same security coverage and keep same number inject when updated stix has the same attacks")
     void shouldUpdateScenarioAndKeepSameNumberInjectsWhenUpdatedStixHasSameAttacks()
         throws Exception {
       String createdResponse =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -214,7 +214,7 @@ class StixApiTest extends IntegrationTest {
 
       Scenario createdScenario = scenarioRepository.findById(createdResponse).orElseThrow();
       assertThat(createdScenario.getName())
-          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+          .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
       List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
       assertThat(injects).hasSize(2);
@@ -227,7 +227,7 @@ class StixApiTest extends IntegrationTest {
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -235,7 +235,7 @@ class StixApiTest extends IntegrationTest {
 
       Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
       assertThat(updatedScenario.getName())
-          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+          .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
       // ASSERT injects for updated stix
       injects = injectRepository.findByScenarioId(updatedScenario.getId());
       assertThat(injects).hasSize(2);
@@ -243,13 +243,13 @@ class StixApiTest extends IntegrationTest {
 
     @Test
     @DisplayName(
-        "Should update scenario from same security assessment but deleting injects when attack-objects are not defined in stix")
+        "Should update scenario from same security coverage but deleting injects when attack-objects are not defined in stix")
     void shouldUpdateScenarioAndDeleteInjectWhenStixNotContainsAttacks() throws Exception {
       String createdResponse =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -257,7 +257,7 @@ class StixApiTest extends IntegrationTest {
 
       Scenario createdScenario = scenarioRepository.findById(createdResponse).orElseThrow();
       assertThat(createdScenario.getName())
-          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ");
+          .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
       List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
       assertThat(injects).hasSize(2);
@@ -270,7 +270,7 @@ class StixApiTest extends IntegrationTest {
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessmentWithoutTtps))
+                      .content(stixSecurityCoverageWithoutTtps))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -278,7 +278,7 @@ class StixApiTest extends IntegrationTest {
 
       Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
       assertThat(updatedScenario.getName())
-          .isEqualTo("Security Assessment Q3 2025 - Threat Report XYZ -- UPDATED");
+          .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ -- UPDATED");
 
       // ASSERT injects for updated stix
       injects = injectRepository.findByScenarioId(updatedScenario.getId());
@@ -286,35 +286,35 @@ class StixApiTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Should not remove security assessment even if scenario is deleted")
-    void shouldExistSecurityAssessment() throws Exception {
+    @DisplayName("Should not remove security coverage even if scenario is deleted")
+    void shouldExistSecurityCoverage() throws Exception {
 
       String response =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
               .getContentAsString();
 
       Scenario scenario = scenarioRepository.findById(response).orElseThrow();
-      String securityAssessmentId = scenario.getSecurityAssessment().getId();
+      String securityCoverageId = scenario.getSecurityCoverage().getId();
       scenarioRepository.deleteById(response);
 
-      assertThat(securityAssessmentRepository.findByExternalId(securityAssessmentId)).isNotNull();
+      assertThat(securityCoverageRepository.findByExternalId(securityCoverageId)).isNotNull();
     }
 
     @Test
-    @DisplayName("Should not duplicate security assessment reference when scenario is duplicated")
-    void shouldNotDuplicatedReferenceSecurityAssessment() throws Exception {
+    @DisplayName("Should not duplicate security coverage reference when scenario is duplicated")
+    void shouldNotDuplicatedReferenceSecurityCoverage() throws Exception {
 
       String response =
           mvc.perform(
                   post(STIX_URI + "/process-bundle")
                       .contentType(MediaType.APPLICATION_JSON)
-                      .content(stixSecurityAssessment))
+                      .content(stixSecurityCoverage))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
@@ -331,7 +331,7 @@ class StixApiTest extends IntegrationTest {
 
       Scenario duplicatedScenario = scenarioRepository.findById(scenarioId).orElseThrow();
 
-      assertThat(duplicatedScenario.getSecurityAssessment()).isNull();
+      assertThat(duplicatedScenario.getSecurityCoverage()).isNull();
     }
   }
 }

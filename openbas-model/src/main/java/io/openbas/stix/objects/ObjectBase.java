@@ -7,8 +7,10 @@ import io.openbas.stix.parsing.ParsingException;
 import io.openbas.stix.parsing.StixSerialisable;
 import io.openbas.stix.types.BaseType;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,6 +51,18 @@ public class ObjectBase implements StixSerialisable {
   public void setIfPresent(String propName, Consumer<String> setter) {
     if (this.hasProperty(propName) && this.getProperty(propName).getValue() != null) {
       setter.accept(this.getProperty(propName).getValue().toString());
+    }
+  }
+
+  public void setIfListPresent(String propName, Consumer<List<String>> setter) {
+    if (this.hasProperty(propName) && this.getProperty(propName).getValue() != null) {
+      Object value = getProperty(propName).getValue();
+      if (value != null) {
+        if (value instanceof List<?>) {
+          setter.accept(
+              ((List<?>) value).stream().map(Object::toString).collect(Collectors.toList()));
+        }
+      }
     }
   }
 

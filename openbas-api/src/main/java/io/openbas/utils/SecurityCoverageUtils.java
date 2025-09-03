@@ -7,28 +7,28 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
 
-public class SecurityAssessmentUtils {
+public class SecurityCoverageUtils {
 
   public static final String STIX_X_MITRE_ID = "x_mitre_id";
   public static final String STIX_ID = "id";
-  public static final String X_SECURITY_ASSESSMENT = "x-security-assessment";
+  public static final String X_SECURITY_COVERAGE = "x-security-coverage";
 
   /**
-   * Extracts and validates the {@code x-security-assessment} object from a STIX bundle.
+   * Extracts and validates the {@code x-security-coverage} object from a STIX bundle.
    *
    * <p>This method ensures that the bundle contains exactly one object of type {@code
-   * x-security-assessment}.
+   * x-security-coverage}.
    *
    * @param bundle the STIX bundle to search
-   * @return the extracted {@code x-security-assessment} object
+   * @return the extracted {@code x-security-coverage} object
    * @throws BadRequestException if the bundle does not contain exactly one such object
    */
-  public static ObjectBase extractAndValidateAssessment(Bundle bundle) throws BadRequestException {
-    List<ObjectBase> assessments = bundle.findByType(X_SECURITY_ASSESSMENT);
-    if (assessments.size() != 1) {
-      throw new BadRequestException("STIX bundle must contain exactly one x-security-assessment");
+  public static ObjectBase extractAndValidateCoverage(Bundle bundle) throws BadRequestException {
+    List<ObjectBase> coverages = bundle.findByType(X_SECURITY_COVERAGE);
+    if (coverages.size() != 1) {
+      throw new BadRequestException("STIX bundle must contain exactly one x-security-coverage");
     }
-    return assessments.get(0);
+    return coverages.get(0);
   }
 
   /**
