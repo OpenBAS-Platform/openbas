@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.database.repository.InjectRepository;
@@ -169,7 +168,6 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityCoverage().getExternalId())
           .isEqualTo("x-security-coverage--4c3b91e2-3b47-4f84-b2e6-d27e3f0581c1");
       assertThat(createdScenario.getRecurrence()).isEqualTo("0 0 14 * * *");
-      assertThat(createdScenario.getMainFocus()).isEqualTo(MainFocus.INCIDENT_RESPONSE.toString());
       assertThat(createdScenario.getTags().stream().map(tag -> tag.getName()).toList())
           .contains(OPENCTI_TAG_NAME);
 

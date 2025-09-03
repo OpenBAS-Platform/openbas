@@ -6,7 +6,6 @@ import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.MainFocus;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.SecurityCoverage;
 import io.openbas.database.repository.ScenarioRepository;
@@ -171,7 +170,6 @@ public class SecurityCoverageService {
     scenario.setName(sa.getName());
     scenario.setDescription(sa.getDescription());
     scenario.setSeverity(Scenario.SEVERITY.high);
-    scenario.setMainFocus(MainFocus.INCIDENT_RESPONSE.toString());
 
     Instant start = sa.getPeriodStart();
     Instant end = sa.getPeriodEnd();
