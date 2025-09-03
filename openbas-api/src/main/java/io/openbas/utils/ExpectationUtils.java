@@ -10,6 +10,7 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAgent;
 import static io.openbas.utils.VulnerabilityExpectationUtils.vulnerabilityExpectationForAsset;
+import static io.openbas.utils.inject_expectation_result.InjectExpectationResultUtils.buildForMediaPressure;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -98,15 +99,7 @@ public class ExpectationUtils {
                     }
 
                     if (isaNewExpectationResult) {
-                      InjectExpectationResult result =
-                          InjectExpectationResult.builder()
-                              .sourceId("media-pressure")
-                              .sourceType("media-pressure")
-                              .sourceName("Media pressure read")
-                              .result(Instant.now().toString())
-                              .date(Instant.now().toString())
-                              .score(process.getExpectedScore())
-                              .build();
+                      InjectExpectationResult result = buildForMediaPressure(process);
                       parentExpectation.getResults().add(result);
                     }
 
@@ -386,7 +379,20 @@ public class ExpectationUtils {
     return signatures;
   }
 
-  // --
+  // -- AGENT --
+
+  public static boolean isAgentExpectation(InjectExpectation e) {
+    return e.getAgent() != null;
+  }
+
+  // -- ASSET --
+
+  public static boolean isAssetExpectation(InjectExpectation e) {
+    return e.getAsset() != null && e.getAgent() == null;
+  }
+
+  // -- ASSET GROUP --
+
   public static boolean isAssetGroupExpectation(InjectExpectation e) {
     return e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null;
   }
