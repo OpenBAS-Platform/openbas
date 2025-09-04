@@ -22,8 +22,12 @@ import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
+import io.openbas.engine.model.EsBase;
+import io.openbas.engine.query.EsAttackPath;
+import io.openbas.engine.query.EsSeries;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
+import io.openbas.rest.dashboard.DashboardService;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
@@ -56,18 +60,21 @@ import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -117,6 +124,7 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
+  @Autowired private DashboardService dashboardService;
 
   // endregion
 
@@ -825,5 +833,70 @@ public class ExerciseService {
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  public long dashboardCount(
+      @NotBlank final String simulationId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the simulation dashboard
+    Exercise simulation = this.exercise(simulationId);
+    if (simulation.getCustomDashboard() == null
+        || !simulation.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.count(widgetId, parameters);
+  }
+
+  public List<EsSeries> dashboardSeries(
+      @NotBlank final String simulationId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the simulation dashboard
+    Exercise simulation = this.exercise(simulationId);
+    if (simulation.getCustomDashboard() == null
+        || !simulation.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.series(widgetId, parameters);
+  }
+
+  public List<EsBase> dashboardEntities(
+      @NotBlank final String simulationId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the simulation dashboard
+    Exercise simulation = this.exercise(simulationId);
+    if (simulation.getCustomDashboard() == null
+        || !simulation.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.entities(widgetId, parameters);
+  }
+
+  public List<EsAttackPath> dashboardAttackPaths(
+      @NotBlank final String simulationId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters)
+      throws ExecutionException, InterruptedException {
+    // verify that the widget is in the simulation dashboard
+    Exercise simulation = this.exercise(simulationId);
+    if (simulation.getCustomDashboard() == null
+        || !simulation.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.attackPaths(widgetId, parameters);
   }
 }

@@ -17,3 +17,19 @@ export const entities = (widgetId: string, parameters: Record<string, string | u
 export const attackPaths = (widgetId: string, parameters: Record<string, string | undefined>) => {
   return simplePostCall(`${DASHBOARD_URI}/attack-paths/${widgetId}`, parameters);
 };
+
+export const countBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/exercises/${simulationId}/dashboard/count/${widgetId}`, parameters);
+};
+
+export const seriesBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/exercises/${simulationId}/dashboard/series/${widgetId}`, parameters);
+};
+
+export const entitiesBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/exercises/${simulationId}/dashboard/entities/${widgetId}`, parameters);
+};
+
+export const attackPathsBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/exercises/${simulationId}/dashboard/attack-paths/${widgetId}`, parameters);
+};
