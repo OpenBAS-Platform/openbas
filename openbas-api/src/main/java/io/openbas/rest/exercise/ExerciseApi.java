@@ -962,13 +962,12 @@ public class ExerciseApi extends RestBehavior {
       resourceId = "#simulationId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
-  @Operation(
-          summary = "Find the dashboard linked to a Simulation")
+  @Operation(summary = "Find the dashboard linked to a Simulation")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "The dashboard"),
-                  @ApiResponse(responseCode = "404", description = "The Simulation doesn't exist")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "The dashboard"),
+        @ApiResponse(responseCode = "404", description = "The Simulation doesn't exist")
+      })
   public ResponseEntity<CustomDashboard> dashboard(@PathVariable final String simulationId) {
     return ResponseEntity.ok(
         this.customDashboardService.findCustomDashboardBySimulationId(simulationId));
