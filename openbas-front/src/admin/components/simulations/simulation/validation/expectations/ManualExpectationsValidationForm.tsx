@@ -51,9 +51,10 @@ interface FormProps {
   expectation: InjectExpectationsStore;
   onUpdate?: () => void;
   withSummary?: boolean;
+  isDisabled?: boolean;
 }
 
-const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true }) => {
+const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true, isDisabled }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
@@ -129,6 +130,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
               label={t('Score')}
               type="number"
               error={!!errors.expectation_score}
+              disabled={isDisabled}
               helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
               {...register('expectation_score')}
               InputProps={{
@@ -148,6 +150,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
                 return value;
               }}
               sx={{ marginTop: 2 }}
+              disabled={isDisabled}
             >
               <MenuItem value="Success">{t('Success')}</MenuItem>
               <MenuItem value="Failed">{t('Failed')}</MenuItem>
@@ -160,11 +163,12 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
           onChange={(_, value) => setValue('expectation_score', value as number)}
           style={{ color: watch('expectation_score') < expectation.inject_expectation_expected_score ? theme.palette.error.main : theme.palette.success.main }}
           sx={{ width: '99%' }}
+          disabled={isDisabled}
         />
         <div className={classes.buttons}>
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isDisabled}
             variant="contained"
           >
             {t('Validate')}
