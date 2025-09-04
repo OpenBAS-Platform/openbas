@@ -347,9 +347,11 @@ public class ElasticService implements EngineService {
                 if (indexingStatus.isPresent()) {
                   IndexingStatus status = indexingStatus.get();
                   status.setLastIndexing(results.getLast().getBase_updated_at());
-                  log.info("### Indexing status present, before saved " + model.getModel().getName());
+                  log.info(
+                      "### Indexing status present, before saved " + model.getModel().getName());
                   indexingStatusRepository.save(status);
-                  log.info("### Indexing status present, after saved " + model.getModel().getName());
+                  log.info(
+                      "### Indexing status present, after saved " + model.getModel().getName());
                 } else {
                   IndexingStatus status = new IndexingStatus();
                   status.setType(model.getName());
