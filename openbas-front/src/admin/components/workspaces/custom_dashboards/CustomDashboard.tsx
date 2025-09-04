@@ -9,6 +9,8 @@ import { ErrorBoundary } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type Widget } from '../../../../utils/api-types-custom';
+import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { CustomDashboardContext, type ParameterOption } from './CustomDashboardContext';
 import { LAST_QUARTER_TIME_RANGE } from './widgets/configuration/common/TimeRangeUtils';
 import WidgetPopover from './widgets/WidgetPopover';
@@ -26,6 +28,7 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
 
   const [idToResize, setIdToResize] = useState<string | null>(null);
   const handleResize = (updatedWidget: string | null) => setIdToResize(updatedWidget);
+  const ability = useContext(AbilityContext);
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'));
@@ -76,6 +79,8 @@ const CustomDashboardComponent: FunctionComponent<{ readOnly: boolean }> = ({ re
 
   const onLayoutChange = async (layouts: Layout[]) => {
     if (!customDashboard) return;
+    if (!ability.can(ACTIONS.MANAGE, SUBJECTS.DASHBOARDS)) return;
+
     await Promise.all(
       layouts.map(layout =>
         updateCustomDashboardWidgetLayout(customDashboard.custom_dashboard_id, layout.i, {

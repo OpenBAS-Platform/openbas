@@ -61,6 +61,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -954,6 +955,16 @@ public class ExerciseApi extends RestBehavior {
       @PathVariable @NotBlank @Schema(description = "ID of the simulation")
           final String simulationId) {
     return scenarioService.scenarioFromSimulationId(simulationId);
+  }
+
+  @GetMapping(EXERCISE_URI + "/{simulationId}/dashboard")
+  @RBAC(
+      resourceId = "#simulationId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.SIMULATION)
+  public ResponseEntity<CustomDashboard> dashboard(@PathVariable final String simulationId) {
+    return ResponseEntity.ok(
+        this.customDashboardService.findCustomDashboardBySimulationId(simulationId));
   }
 
   @PostMapping(EXERCISE_URI + "/{simulationId}/dashboard/count/{widgetId}")

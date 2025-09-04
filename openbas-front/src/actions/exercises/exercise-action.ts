@@ -17,6 +17,7 @@ import {
 import { MESSAGING$ } from '../../utils/Environment';
 import { scenario } from '../scenarios/scenario-schema';
 import * as schema from '../Schema';
+import {CUSTOM_DASHBOARD_URI} from "../custom_dashboards/customdashboard-action";
 
 export const EXERCISE_URI = '/api/exercises';
 
@@ -202,4 +203,24 @@ export const updateCustomDashboard = (exerciseId: string, customDashboardId: str
 export const fetchScenarioFromSimulation = (simulationId: string) => (dispatch: Dispatch) => {
   const uri = `/api/exercises/${simulationId}/scenario`;
   return getReferential(scenario, uri)(dispatch);
+};
+
+export const fetchCustomDashboardFromSimulation = (simulationId: string) => {
+  return simpleCall(`${EXERCISE_URI}/${simulationId}/dashboard`);
+};
+
+export const countBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${EXERCISE_URI}/${simulationId}/dashboard/count/${widgetId}`, parameters);
+};
+
+export const seriesBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${EXERCISE_URI}/${simulationId}/dashboard/series/${widgetId}`, parameters);
+};
+
+export const entitiesBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${EXERCISE_URI}/${simulationId}/dashboard/entities/${widgetId}`, parameters);
+};
+
+export const attackPathsBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`${EXERCISE_URI}/${simulationId}/dashboard/attack-paths/${widgetId}`, parameters);
 };

@@ -28,8 +28,12 @@ import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.ScenarioSpecification;
 import io.openbas.ee.Ee;
+import io.openbas.engine.model.EsBase;
+import io.openbas.engine.query.EsAttackPath;
+import io.openbas.engine.query.EsSeries;
 import io.openbas.export.Mixins;
 import io.openbas.helper.ObjectMapperHelper;
+import io.openbas.rest.dashboard.DashboardService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
@@ -55,6 +59,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,6 +78,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -114,6 +120,7 @@ public class ScenarioService {
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
   private final UserService userService;
+  private final DashboardService dashboardService;
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -693,6 +700,71 @@ public class ScenarioService {
       @NotNull final Scenario scenario, @NotNull final List<String> newTags) {
     return tagRuleService.checkIfRulesApply(
         scenario.getTags().stream().map(Tag::getId).toList(), newTags);
+  }
+
+  public long dashboardCount(
+      @NotBlank final String scenarioId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the scenario dashboard
+    Scenario scenario = this.scenario(scenarioId);
+    if (scenario.getCustomDashboard() == null
+        || !scenario.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.count(widgetId, parameters);
+  }
+
+  public List<EsSeries> dashboardSeries(
+      @NotBlank final String scenarioId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the scenario dashboard
+    Scenario scenario = this.scenario(scenarioId);
+    if (scenario.getCustomDashboard() == null
+        || !scenario.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.series(widgetId, parameters);
+  }
+
+  public List<EsBase> dashboardEntities(
+      @NotBlank final String scenarioId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters) {
+    // verify that the widget is in the scenario dashboard
+    Scenario scenario = this.scenario(scenarioId);
+    if (scenario.getCustomDashboard() == null
+        || !scenario.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.entities(widgetId, parameters);
+  }
+
+  public List<EsAttackPath> dashboardAttackPaths(
+      @NotBlank final String scenarioId,
+      @NotBlank final String widgetId,
+      final Map<String, String> parameters)
+      throws ExecutionException, InterruptedException {
+    // verify that the widget is in the scenario dashboard
+    Scenario scenario = this.scenario(scenarioId);
+    if (scenario.getCustomDashboard() == null
+        || !scenario.getCustomDashboard().getWidgets().stream()
+            .map(Widget::getId)
+            .collect(Collectors.toSet())
+            .contains(widgetId)) {
+      throw new AccessDeniedException("Access denied");
+    }
+    return this.dashboardService.attackPaths(widgetId, parameters);
   }
 
   private void getListOfScenarioTeams(

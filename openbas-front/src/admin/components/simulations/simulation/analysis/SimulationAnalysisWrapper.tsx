@@ -7,7 +7,7 @@ import {
   countBySimulation,
   entitiesBySimulation,
   seriesBySimulation,
-} from '../../../../../actions/dashboards/dashboard-action';
+} from '../../../../../actions/exercises/exercise-action';
 import { type CustomDashboard, type Exercise } from '../../../../../utils/api-types';
 import { CustomDashboardContext, type CustomDashboardContextType, type ParameterOption } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
 import SimulationAnalysis from './SimulationAnalysis';

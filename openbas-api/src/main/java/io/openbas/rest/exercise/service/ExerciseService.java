@@ -67,7 +67,6 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -96,6 +95,7 @@ public class ExerciseService {
   private final DocumentService documentService;
   private final InjectService injectService;
   private final UserService userService;
+  private final DashboardService dashboardService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -124,7 +124,6 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
-  @Autowired private DashboardService dashboardService;
 
   // endregion
 

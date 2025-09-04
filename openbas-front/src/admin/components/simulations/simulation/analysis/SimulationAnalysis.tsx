@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { fetchCustomDashboard } from '../../../../../actions/custom_dashboards/customdashboard-action';
 import { fetchExercise } from '../../../../../actions/Exercise';
+import { fetchCustomDashboardFromSimulation } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
@@ -28,7 +28,7 @@ const SimulationAnalysis = () => {
 
   useEffect(() => {
     if (exercise.exercise_custom_dashboard != '-') {
-      fetchCustomDashboard(exercise.exercise_custom_dashboard).then((response) => {
+      fetchCustomDashboardFromSimulation(exercise.exercise_id).then((response) => {
         if (response.data) {
           const dashboard = response.data;
           setCustomDashboard(dashboard);

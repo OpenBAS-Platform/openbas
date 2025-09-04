@@ -20,6 +20,7 @@ import {
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
 import { arrayOfScenarios, scenario } from './scenario-schema';
+import {EXERCISE_URI} from "../exercises/exercise-action";
 
 export const SCENARIO_URI = '/api/scenarios';
 
@@ -239,4 +240,24 @@ export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) =
   const uri = `/api/scenarios/${scenarioId}/check-rules`;
   const input = { new_tags: newTagIds };
   return simplePostCall(uri, input);
+};
+
+export const fetchCustomDashboardFromScenario = (scenarioId: string) => {
+  return simpleCall(`/api/scenarios/${scenarioId}/dashboard`);
+};
+
+export const countByScenario = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/scenarios/${simulationId}/dashboard/count/${widgetId}`, parameters);
+};
+
+export const seriesByScenario = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/scenarios/${simulationId}/dashboard/series/${widgetId}`, parameters);
+};
+
+export const entitiesByScenario = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/scenarios/${simulationId}/dashboard/entities/${widgetId}`, parameters);
+};
+
+export const attackPathsByScenario = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {
+  return simplePostCall(`/api/scenarios/${simulationId}/dashboard/attack-paths/${widgetId}`, parameters);
 };
