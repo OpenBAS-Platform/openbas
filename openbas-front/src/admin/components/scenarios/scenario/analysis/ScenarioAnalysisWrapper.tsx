@@ -12,7 +12,7 @@ import { type CustomDashboard, type Scenario } from '../../../../../utils/api-ty
 import {
   CustomDashboardContext,
   type CustomDashboardContextType,
-  type ParameterOption
+  type ParameterOption,
 } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
 import ScenarioAnalysis from './ScenarioAnalysis';
 

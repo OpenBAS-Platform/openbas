@@ -15,7 +15,6 @@ import {
   type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
-import { CUSTOM_DASHBOARD_URI } from '../custom_dashboards/customdashboard-action';
 import { scenario } from '../scenarios/scenario-schema';
 import * as schema from '../Schema';
 

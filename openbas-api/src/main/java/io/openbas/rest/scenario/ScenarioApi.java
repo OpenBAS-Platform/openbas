@@ -434,6 +434,13 @@ public class ScenarioApi extends RestBehavior {
     return this.documentService.documentsForScenario(scenarioId);
   }
 
+  @Operation(
+          summary = "Find the dashboard linked to a Scenario")
+  @ApiResponses(
+          value = {
+                  @ApiResponse(responseCode = "200", description = "The dashboard"),
+                  @ApiResponse(responseCode = "404", description = "The Scenario doesn't exist")
+          })
   @GetMapping(SCENARIO_URI + "/{scenarioId}/dashboard")
   @RBAC(
       resourceId = "#scenarioId",
@@ -485,6 +492,14 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
+  @Operation(
+          summary = "Search TagRules")
+  @ApiResponses(
+          value = {
+                  @ApiResponse(
+                          responseCode = "200",
+                          description = "The list of all TagRules corresponding to the search criteria")
+          })
   public List<EsAttackPath> dashboardAttackPaths(
       @PathVariable final String scenarioId,
       @PathVariable final String widgetId,

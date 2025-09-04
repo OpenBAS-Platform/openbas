@@ -18,7 +18,6 @@ import {
   type UpdateScenarioInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
-import { EXERCISE_URI } from '../exercises/exercise-action';
 import * as schema from '../Schema';
 import { arrayOfScenarios, scenario } from './scenario-schema';
 

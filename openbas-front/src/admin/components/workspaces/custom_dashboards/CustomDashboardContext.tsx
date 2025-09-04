@@ -15,10 +15,10 @@ export interface CustomDashboardContextType {
   setCustomDashboard: React.Dispatch<React.SetStateAction<CustomDashboard | undefined>>;
   customDashboardParameters: Record<string, ParameterOption>;
   setCustomDashboardParameters: React.Dispatch<React.SetStateAction<Record<string, ParameterOption>>>;
-  fetchCount: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
-  fetchSeries: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
-  fetchEntities: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
-  fetchAttackPaths: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
+  fetchCount: (widgetId: string, params: Record<string, string | undefined>) => Promise<unknown>;
+  fetchSeries: (widgetId: string, params: Record<string, string | undefined>) => Promise<unknown>;
+  fetchEntities: (widgetId: string, params: Record<string, string | undefined>) => Promise<unknown>;
+  fetchAttackPaths: (widgetId: string, params: Record<string, string | undefined>) => Promise<unknown>;
 }
 
 export const CustomDashboardContext = createContext<CustomDashboardContextType>({
