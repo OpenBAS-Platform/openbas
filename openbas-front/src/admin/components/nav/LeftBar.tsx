@@ -202,6 +202,10 @@ const LeftBar = () => {
               link: '/admin/settings/data_ingestion',
               label: 'Data ingestion',
             },
+            {
+              link: '/admin/settings/experience',
+              label: 'Filigran Experience',
+            },
           ],
         },
       ],
