@@ -82,11 +82,8 @@ public class EsEndpoint extends EsBase {
   private Set<String>
       base_simulation_side; // Must finish by _side, no plural (Set) to work as the other generic
 
-  // base_simulation_side attributes
-
   @Queryable(label = "scenario", filterable = true, dynamicValues = true)
   @EsQueryable(keyword = true)
   private Set<String>
       base_scenario_side; // Must finish by _side, no plural (Set) to work as the other generic
-  // base_scenario_side attributes
 }
