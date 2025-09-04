@@ -29,7 +29,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasReadGrant(RESOURCE_ID, user));
@@ -40,7 +40,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.OBSERVER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasReadGrant(RESOURCE_ID, user));
@@ -51,7 +51,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasLaunchGrant(RESOURCE_ID, user));
@@ -62,7 +62,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
         .thenReturn(false);
 
     assertFalse(grantService.hasWriteGrant(RESOURCE_ID, user));
@@ -73,7 +73,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.LAUNCHER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasLaunchGrant(RESOURCE_ID, user));
@@ -84,7 +84,7 @@ public class GrantServiceTest extends IntegrationTest {
     User user = UserFixture.getUser();
     user.setId(USER_ID);
     when(grantRepository.existsByUserIdAndResourceIdAndNameIn(
-            RESOURCE_ID, USER_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
+            USER_ID, RESOURCE_ID, Grant.GRANT_TYPE.PLANNER.andHigher()))
         .thenReturn(true);
 
     assertTrue(grantService.hasWriteGrant(RESOURCE_ID, user));

@@ -63,9 +63,6 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
 
   // Fetching data
   const { securityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper((helper: SecurityPlatformHelper) => ({ securityPlatforms: helper.getSecurityPlatforms() }));
-  useDataLoader(() => {
-    dispatch(fetchSecurityPlatforms());
-  });
 
   // Form
   const securityPlatformsOptions = securityPlatformsToOptions(securityPlatforms, filterOptions);
