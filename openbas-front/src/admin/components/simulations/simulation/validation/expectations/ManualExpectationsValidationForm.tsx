@@ -1,5 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Chip, GridLegacy, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
+import {
+  Button,
+  Chip,
+  Grid,
+  MenuItem,
+  Select,
+  Slider,
+  TextField as MuiTextField,
+  Typography,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -10,7 +19,7 @@ import { updateInjectExpectation } from '../../../../../../actions/Exercise';
 import { type UserHelper } from '../../../../../../actions/helper';
 import { fetchTeams } from '../../../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../../../actions/teams/team-helper';
-import { fetchUsers } from '../../../../../../actions/User';
+import { fetchPlayers } from '../../../../../../actions/User';
 import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
 import { type Team, type User } from '../../../../../../utils/api-types';
@@ -48,6 +57,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
+
   const { teamsMap, usersMap }: {
     teamsMap: Record<string, Team>;
     usersMap: Record<string, User>;
@@ -59,7 +69,7 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
   });
   const dispatch = useAppDispatch();
   useDataLoader(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchPlayers());
     dispatch(fetchTeams());
   });
   const onSubmit = (data: { expectation_score: number }) => {
@@ -111,8 +121,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
         )}
         {withSummary && (<Typography variant="h3">{expectation.inject_expectation_user ? t('Player') : t('Team')}</Typography>)}
         {withSummary && targetLabel(expectation)}
-        <GridLegacy container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
-          <GridLegacy item xs={6}>
+        <Grid container spacing={3} className={withSummary ? classes.marginTop_2 : classes.scoreAcc}>
+          <Grid size={{ xs: 6 }}>
             <MuiTextField
               variant="standard"
               fullWidth
@@ -128,8 +138,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
                 },
               }}
             />
-          </GridLegacy>
-          <GridLegacy item xs={6}>
+          </Grid>
+          <Grid size={{ xs: 6 }}>
             <Select
               fullWidth
               value={watch('expectation_score') < expectation.inject_expectation_expected_score ? 'Failed' : 'Success'}
@@ -142,8 +152,8 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
               <MenuItem value="Success">{t('Success')}</MenuItem>
               <MenuItem value="Failed">{t('Failed')}</MenuItem>
             </Select>
-          </GridLegacy>
-        </GridLegacy>
+          </Grid>
+        </Grid>
         <Slider
           size="small"
           value={watch('expectation_score')}

@@ -11,7 +11,7 @@ import { useHelper } from '../../../../../store';
 import { type Scenario as ScenarioType, type ScenarioChallengesReader } from '../../../../../utils/api-types';
 import { useQueryParameter } from '../../../../../utils/Environment';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useScenarioPermissions from '../../../../../utils/permissions/scenarioPermissions';
+import useScenarioPermissions from '../../../../../utils/permissions/useScenarioPermissions';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 

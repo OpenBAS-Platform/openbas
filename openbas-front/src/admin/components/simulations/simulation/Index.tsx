@@ -15,7 +15,7 @@ import { useHelper } from '../../../../store';
 import { type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import useSimulationPermissions from '../../../../utils/permissions/simulationPermissions';
+import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -162,10 +162,12 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
                 />
               )}
             </Tabs>
-            <div className={classes.scheduling}>
-              <ExerciseDatePopover exercise={exercise} />
-              {exercise.exercise_start_date ? fldt(exercise.exercise_start_date) : t('Manual')}
-            </div>
+            {permissionsContext.permissions.canManage && (
+              <div className={classes.scheduling}>
+                <ExerciseDatePopover exercise={exercise} />
+                {exercise.exercise_start_date ? fldt(exercise.exercise_start_date) : t('Manual')}
+              </div>
+            )}
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>

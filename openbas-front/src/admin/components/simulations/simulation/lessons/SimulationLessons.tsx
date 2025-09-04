@@ -17,7 +17,7 @@ import { useHelper } from '../../../../../store';
 import { type EvaluationInput, type Exercise, type LessonsCategoryCreateInput, type LessonsCategoryTeamsInput, type LessonsCategoryUpdateInput, type LessonsQuestionCreateInput, type LessonsQuestionUpdateInput, type LessonsSendInput, type ObjectiveInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import useSimulationPermissions from '../../../../../utils/permissions/simulationPermissions';
+import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/simulations/Lessons';
 

@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -26,7 +26,7 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
-import { TeamContext } from '../../../common/Context';
+import { PermissionsContext, TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import AnimationMenu from '../AnimationMenu';
@@ -196,6 +196,7 @@ const Mails = () => {
   const dispatch = useDispatch();
   const { t, fndt } = useFormatter();
   const [viewMode, setViewMode] = useState('list');
+  const { permissions } = useContext(PermissionsContext);
 
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -447,9 +448,11 @@ const Mails = () => {
               );
             })}
           </List>
-          <TeamContext.Provider value={teamContext}>
-            <CreateQuickInject exercise={exercise} />
-          </TeamContext.Provider>
+          {permissions.canManage && (
+            <TeamContext.Provider value={teamContext}>
+              <CreateQuickInject exercise={exercise} />
+            </TeamContext.Provider>
+          )}
         </>
       )}
     </div>

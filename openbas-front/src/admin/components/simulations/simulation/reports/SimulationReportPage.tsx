@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type Exercise, type LessonsQuestion, type Report, type ReportInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useSimulationPermissions from '../../../../../utils/permissions/simulationPermissions';
+import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
 import { ReportContext, type ReportContextType } from '../../../common/Context';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import ReportComment from '../../../components/reports/ReportComment';

@@ -11,7 +11,7 @@ import { useHelper } from '../../../store';
 import { type Exercise } from '../../../utils/api-types';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
-import useSimulationPermissions from '../../../utils/permissions/simulationPermissions';
+import useSimulationPermissions from '../../../utils/permissions/useSimulationPermissions';
 import LessonsPlayer from './LessonsPlayer';
 import LessonsPreview from './LessonsPreview';
 

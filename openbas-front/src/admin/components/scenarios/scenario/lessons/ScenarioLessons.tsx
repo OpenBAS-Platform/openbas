@@ -37,7 +37,7 @@ import {
 } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import useScenarioPermissions from '../../../../../utils/permissions/scenarioPermissions';
+import useScenarioPermissions from '../../../../../utils/permissions/useScenarioPermissions';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/scenarios/Lessons';
 
@@ -64,7 +64,6 @@ const ScenarioLessons = () => {
     lessonsCategories,
     lessonsQuestions,
     lessonsTemplates,
-    usersMap,
   } = useHelper((helper: ExercisesHelper & InjectHelper & LessonsTemplatesHelper & ScenariosHelper & TeamsHelper & UserHelper) => {
     const scenarioData = helper.getScenario(scenarioId);
     return {
@@ -75,7 +74,6 @@ const ScenarioLessons = () => {
       lessonsTemplates: helper.getLessonsTemplates(),
       teamsMap: helper.getTeamsMap(),
       teams: helper.getScenarioTeams(scenarioId),
-      usersMap: helper.getUsersMap(),
     };
   });
   useDataLoader(() => {
@@ -143,7 +141,6 @@ const ScenarioLessons = () => {
         lessonsCategories={lessonsCategories}
         lessonsQuestions={lessonsQuestions}
         lessonsTemplates={lessonsTemplates}
-        usersMap={usersMap}
       >
       </Lessons>
     </LessonContext.Provider>

@@ -17,9 +17,10 @@ interface Props {
   handleClose: () => void;
   onUpdateInject?: (data: Inject[]) => Promise<void>;
   injects?: InjectOutputType[];
+  isDisabled: boolean;
 }
 
-const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
+const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects, isDisabled }) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const { permissions } = useContext(PermissionsContext);
@@ -113,6 +114,7 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
               form={form}
               values={values}
               injects={injects}
+              isDisabled={isDisabled}
             />
             <div style={{
               display: 'flex',

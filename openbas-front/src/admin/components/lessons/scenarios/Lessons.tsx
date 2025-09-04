@@ -5,7 +5,7 @@ import { type ChangeEvent, type FunctionComponent, useContext, useEffect, useSta
 import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
+import { type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
@@ -35,7 +35,6 @@ interface Props {
   lessonsQuestions: LessonsQuestion[];
   lessonsAnswers?: LessonsAnswer[];
   lessonsTemplates: LessonsTemplate[];
-  usersMap: Record<string, User>;
 }
 
 const Lessons: FunctionComponent<Props> = ({

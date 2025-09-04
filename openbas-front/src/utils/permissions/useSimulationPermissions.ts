@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { useContext } from 'react';
 
 import { type ExercisesHelper } from '../../actions/exercises/exercise-helper';
@@ -26,7 +25,7 @@ const useSimulationPermissions = (exerciseId: string, fullExercise?: Exercise) =
       canLaunch: false,
       canDelete: false,
       readOnly: true,
-      isLoggedIn: !R.isEmpty(logged),
+      isLoggedIn: Boolean(logged),
       isRunning: false,
     };
   }
@@ -44,18 +43,9 @@ const useSimulationPermissions = (exerciseId: string, fullExercise?: Exercise) =
     canLaunch,
     canDelete,
     readOnly,
-    isLoggedIn: !R.isEmpty(logged),
+    isLoggedIn: Boolean(logged),
     isRunning,
   };
 };
 
 export default useSimulationPermissions;
-
-export const secondsFromToNow = (date: Date) => {
-  if (!date) {
-    return 0;
-  }
-  const timestamp = Math.floor(new Date(date).getTime() / 1000);
-  const now = Math.floor(Date.now() / 1000);
-  return now - timestamp;
-};

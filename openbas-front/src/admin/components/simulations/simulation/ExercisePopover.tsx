@@ -17,8 +17,8 @@ import {
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
-import useSimulationPermissions from '../../../../utils/permissions/simulationPermissions';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
 

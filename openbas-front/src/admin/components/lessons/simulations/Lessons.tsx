@@ -327,7 +327,7 @@ const Lessons: FunctionComponent<Props> = ({
         </Paper>
         {permissions.canManage && (
           <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
-            <Alert severity="info">
+            <Alert severity="info" sx={{ mb: 2 }}>
               {t(
                 'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
               )}
