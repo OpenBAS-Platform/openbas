@@ -62,17 +62,6 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
     }),
   };
 
-  // useEffect(() => {
-  //   const analysisPath = `/admin/simulations/${exercise.exercise_id}/analysis`;
-  //
-  //   if (
-  //     location.pathname.startsWith(analysisPath)
-  //     && !exercise.exercise_custom_dashboard
-  //   ) {
-  //     navigate(`/admin/simulations/${exercise.exercise_id}`, { replace: true });
-  //   }
-  // }, [exercise.exercise_custom_dashboard, location.pathname, exercise.exercise_id, navigate]);
-
   let tabValue = location.pathname;
   if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/definition`)) {
     tabValue = `/admin/simulations/${exercise.exercise_id}/definition`;

@@ -84,6 +84,7 @@ public class ScenarioApi extends RestBehavior {
           this.platformSettingsService
               .setting(SettingKeys.DEFAULT_SCENARIO_DASHBOARD.key())
               .map(Setting::getValue)
+              .filter(v -> !v.isEmpty())
               .map(this.customDashboardService::customDashboard)
               .orElse(null));
     }

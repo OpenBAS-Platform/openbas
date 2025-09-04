@@ -369,6 +369,7 @@ public class ExerciseApi extends RestBehavior {
           this.platformSettingsService
               .setting(SettingKeys.DEFAULT_SIMULATION_DASHBOARD.key())
               .map(Setting::getValue)
+              .filter(v -> !v.isEmpty())
               .map(this.customDashboardService::customDashboard)
               .orElse(null));
     }

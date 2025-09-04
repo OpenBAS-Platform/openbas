@@ -132,7 +132,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
       }));
     }
 
-    handleSubmit(onSubmit);
+    handleSubmit(onSubmit)(e);
     handleClose();
   };
 

@@ -53,7 +53,7 @@ const CustomDashboardEditHeader: FunctionComponent = () => {
       }}
       >
         <Tooltip title={customDashboard.custom_dashboard_name}>
-          <Typography variant="h1" style={{ margin: 0 }}>
+          <Typography variant="h1">
             {truncate(customDashboard.custom_dashboard_name, 80)}
           </Typography>
         </Tooltip>

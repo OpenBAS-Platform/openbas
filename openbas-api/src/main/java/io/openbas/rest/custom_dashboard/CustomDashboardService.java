@@ -163,7 +163,7 @@ public class CustomDashboardService {
         .toList();
   }
 
-  public List<FilterUtilsJpa.Option> findAllByResourceIdsAsOptions(@NotBlank String resourceId) {
+  public List<FilterUtilsJpa.Option> findAllByResourceIdAsOptions(@NotBlank String resourceId) {
     Optional<CustomDashboard> customDashboard =
         customDashboardRepository.findByResourceId(resourceId);
     if (customDashboard.isPresent()) {
