@@ -120,6 +120,7 @@ class ScenarioServiceTest extends IntegrationTest {
             tagRuleService,
             injectService,
             userService,
+            dashboardService,
             injectRepository,
             lessonsCategoryRepository);
   }
