@@ -4,6 +4,7 @@ import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.helper.StreamHelper;
 import io.openbas.rest.collector.service.CollectorService;
 import io.openbas.rest.document.DocumentService;
@@ -23,16 +24,16 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -103,19 +104,20 @@ public class PayloadApi extends RestBehavior {
     return this.payloadUpsertService.upsertPayload(input);
   }
 
-  @PostMapping(PAYLOAD_URI + "/{payloadId}/export")
+  @PostMapping(path = PAYLOAD_URI + "/{payloadId}/export", produces = "application/zip")
   @RBAC(
       actionPerformed = Action.READ,
       resourceType = ResourceType.PAYLOAD,
       resourceId = "#payloadId")
-  public ResponseEntity<byte[]> payloadExport(@NotBlank @PathVariable String payloadId) throws IOException {
+  public ResponseEntity<byte[]> payloadExport(@NotBlank @PathVariable String payloadId)
+      throws IOException {
     List<String> targetIds = List.of(payloadId);
     List<Payload> payloads = StreamHelper.fromIterable(payloadRepository.findAllById(targetIds));
     byte[] zippedExport = payloadExportService.exportPayloadsToZip(payloads);
     String zipName = payloadExportService.getZipFileName();
 
     HttpHeaders headers = new HttpHeaders();
-    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipName + "\"");
+    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
     headers.setContentLength(zippedExport.length);
 
@@ -130,9 +132,16 @@ public class PayloadApi extends RestBehavior {
       throws IOException {
     List<String> targetIds = payloadExportRequestInput.getTargetsIds();
     User currentUser = userService.currentUser();
+
     List<Payload> payloads =
-        payloadRepository.findAllByIdsAndUserGrants(targetIds, currentUser.getId()).stream()
-            .toList();
+        payloadRepository.findAll(
+            Specification.where(SpecificationUtils.<Payload>hasIdIn(targetIds))
+                .and(
+                    SpecificationUtils.hasGrantAccess(
+                        currentUser.getId(),
+                        currentUser.isAdminOrBypass(),
+                        currentUser.getCapabilities().contains(Capability.ACCESS_PAYLOADS),
+                        Grant.GRANT_TYPE.OBSERVER)));
     runPayloadExport(payloads, response);
   }
 

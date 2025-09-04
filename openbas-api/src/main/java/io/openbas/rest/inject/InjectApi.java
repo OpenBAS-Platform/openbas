@@ -12,6 +12,7 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.rest.atomic_testing.form.ExecutionTraceOutput;
 import io.openbas.rest.atomic_testing.form.InjectStatusOutput;
 import io.openbas.rest.exception.BadRequestException;
@@ -49,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,12 +114,15 @@ public class InjectApi extends RestBehavior {
       throws IOException {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
     User currentUser = userService.currentUser();
-    List<Inject> injects;
-    if (currentUser.isAdminOrBypass()) {
-      injects = injectRepository.findAllById(targetIds);
-    } else {
-      injects = injectRepository.findAllByUserGrants(currentUser.getId());
-    }
+    List<Inject> injects =
+        injectRepository.findAll(
+            Specification.where(SpecificationUtils.<Inject>hasIdIn(targetIds))
+                .and(
+                    SpecificationUtils.hasGrantAccess(
+                        currentUser.getId(),
+                        currentUser.isAdminOrBypass(),
+                        currentUser.getCapabilities().contains(Capability.ACCESS_PAYLOADS),
+                        Grant.GRANT_TYPE.OBSERVER)));
     List<String> foundIds = injects.stream().map(Inject::getId).toList();
     List<String> missedIds =
         new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());

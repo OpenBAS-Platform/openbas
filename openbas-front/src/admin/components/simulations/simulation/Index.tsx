@@ -16,6 +16,7 @@ import { type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { usePermissions } from '../../../../utils/permissions/simulationPermissions';
+import { INHERITED_CONTEXT } from '../../../../utils/permissions/types';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -49,7 +50,10 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
   const location = useLocation();
   const navigate = useNavigate();
   const { classes } = useStyles();
-  const permissionsContext: PermissionsContextType = { permissions: usePermissions(exercise.exercise_id) };
+  const permissionsContext: PermissionsContextType = {
+    permissions: usePermissions(exercise.exercise_id),
+    inherited_context: INHERITED_CONTEXT.SIMULATION,
+  };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
       document_tags: [],

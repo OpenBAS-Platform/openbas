@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.database.specification.InjectSpecification;
 import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.*;
@@ -25,7 +26,6 @@ import io.openbas.utils.mapper.PayloadMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -243,21 +243,15 @@ public class AtomicTestingService {
     // Atomic testings are injects where scenario and exercise are null. They are also subject to
     // the grant system.
     User currentUser = userService.currentUser();
+
     Specification<Inject> customSpec =
-        Specification.<Inject>where(
-                (root, query, cb) -> {
-                  Predicate predicate = cb.conjunction();
-                  predicate = cb.and(predicate, cb.isNull(root.get("scenario")));
-                  predicate = cb.and(predicate, cb.isNull(root.get("exercise")));
-                  return predicate;
-                })
+        Specification.where(InjectSpecification.isAtomicTesting())
             .and(
                 SpecificationUtils.hasGrantAccess(
                     currentUser.getId(),
                     currentUser.isAdminOrBypass(),
                     currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT),
                     Grant.GRANT_TYPE.OBSERVER));
-    ;
 
     return buildPaginationCriteriaBuilder(
         (Specification<Inject> specification,
