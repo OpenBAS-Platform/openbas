@@ -50,8 +50,7 @@ public class SecurityCoverageInjectService {
   public void createdInjectsForScenario(Scenario scenario, SecurityCoverage securityCoverage) {
     // 1. Fetch internal Ids for AttackPatterns
     Map<String, AttackPattern> attackPatterns =
-        attackPatternService.fetchInternalAttackPatternIdsFromSecurityCoverage(
-            securityCoverage.getAttackPatternRefs());
+        attackPatternService.fetchInternalAttackPatternIds(securityCoverage.getAttackPatternRefs());
 
     if (attackPatterns.isEmpty()) {
       injectService.deleteAll(scenario.getInjects());
