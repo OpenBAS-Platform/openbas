@@ -55,20 +55,14 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
 
   @LogExecutionTime
   @GetMapping("/{injectId}/payload")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public StatusPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
     return atomicTestingService.findPayloadOutputByInjectId(injectId);
   }
@@ -133,10 +127,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public List<InjectExpectation> findTargetResult(
       @PathVariable String injectId,
       @PathVariable String targetId,
@@ -165,10 +156,7 @@ public class AtomicTestingApi extends RestBehavior {
         @ApiResponse(responseCode = "400", description = "An invalid target type was specified")
       })
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}/merged")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   public List<InjectExpectation> findTargetResultMerged(
       @PathVariable String injectId,
       @PathVariable String targetId,
@@ -193,10 +181,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @GetMapping(ATOMIC_TESTING_URI + "/{injectId}/collectors")
-  @RBAC(
-      resourceId = "#injectId",
-      actionPerformed = Action.READ,
-      resourceType = ResourceType.ATOMIC_TESTING)
+  @RBAC(resourceId = "#injectId", actionPerformed = Action.READ, resourceType = ResourceType.INJECT)
   @Operation(summary = "Get the Collectors used in an atomic testing remediation")
   @ApiResponses(
       value = {
