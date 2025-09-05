@@ -125,7 +125,7 @@ const Groups = () => {
   return (
     <div style={{
       display: 'flex',
-      overflow: 'scroll',
+      overflow: 'auto',
     }}
     >
       <div style={{ flexGrow: 1 }}>
