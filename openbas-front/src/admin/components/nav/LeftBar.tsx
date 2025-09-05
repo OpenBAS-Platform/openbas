@@ -21,9 +21,11 @@ import {
 import { type UserHelper } from '../../../actions/helper';
 import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
 import { useHelper } from '../../../store';
+import { isFeatureEnabled } from '../../../utils/utils';
 
 const LeftBar = () => {
   const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
+  const isHubRegistrationEnabled = isFeatureEnabled('OPENAEV_REGISTRATION');
   const entries = [
     {
       items: [
@@ -202,10 +204,12 @@ const LeftBar = () => {
               link: '/admin/settings/data_ingestion',
               label: 'Data ingestion',
             },
-            {
-              link: '/admin/settings/experience',
-              label: 'Filigran Experience',
-            },
+            ...isHubRegistrationEnabled
+              ? [{
+                  link: '/admin/settings/experience',
+                  label: 'Filigran Experience',
+                }]
+              : [],
           ],
         },
       ],
