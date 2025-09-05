@@ -192,7 +192,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityCoverage().getContent()).isNotBlank();
 
       // -- ASSERT Injects --
-      Set<Inject> injects = injectRepository.findByScenarioId(response);
+      Set<Inject> injects = injectRepository.findByScenarioId(scenarioId);
       assertThat(injects).hasSize(2);
     }
 
