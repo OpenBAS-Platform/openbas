@@ -1,5 +1,8 @@
 package io.openbas.utils;
 
+import static io.openbas.service.SecurityCoverageService.STIX_NAME;
+import static io.openbas.service.SecurityCoverageService.STIX_TYPE;
+
 import io.openbas.database.model.StixRefToExternalRef;
 import io.openbas.stix.objects.Bundle;
 import io.openbas.stix.objects.ObjectBase;
@@ -12,6 +15,7 @@ public class SecurityCoverageUtils {
   public static final String STIX_X_MITRE_ID = "x_mitre_id";
   public static final String STIX_ID = "id";
   public static final String X_SECURITY_COVERAGE = "x-security-coverage";
+  public static final String STIX_TYPE_ATTACK_PATTERN = "attack-pattern";
 
   /**
    * Extracts and validates the {@code x-security-coverage} object from a STIX bundle.
@@ -32,7 +36,7 @@ public class SecurityCoverageUtils {
   }
 
   /**
-   * Extracts MITRE attack references from a list of STIX objects.
+   * Extracts references from a list of STIX objects.
    *
    * <p>For each object that has a {@code x_mitre_id} property, this method creates a {@link
    * StixRefToExternalRef} mapping between the object's STIX ID and its MITRE external ID.
@@ -40,16 +44,27 @@ public class SecurityCoverageUtils {
    * @param objects the list of STIX objects to scan
    * @return a list of {@link StixRefToExternalRef} mappings between STIX and MITRE IDs
    */
-  public static List<StixRefToExternalRef> extractAttackReferences(List<ObjectBase> objects) {
+  public static List<StixRefToExternalRef> extractObjectReferences(List<ObjectBase> objects) {
     List<StixRefToExternalRef> stixToRef = new ArrayList<>();
+
     for (ObjectBase obj : objects) {
-      String mitreId = (String) obj.getProperty(STIX_X_MITRE_ID).getValue();
-      if (mitreId != null) {
+      String stixType = (String) obj.getProperty(STIX_TYPE).getValue();
+      String refId;
+
+      if (STIX_TYPE_ATTACK_PATTERN.equals(stixType)) {
+        refId = (String) obj.getProperty(STIX_X_MITRE_ID).getValue();
+      } else {
+        refId = (String) obj.getProperty(STIX_NAME).getValue();
+      }
+
+      if (refId != null) {
         String stixId = (String) obj.getProperty(STIX_ID).getValue();
-        StixRefToExternalRef stixRef = new StixRefToExternalRef(stixId, mitreId);
-        stixToRef.add(stixRef);
+        if (stixId != null) {
+          stixToRef.add(new StixRefToExternalRef(stixId, refId));
+        }
       }
     }
+
     return stixToRef;
   }
 }

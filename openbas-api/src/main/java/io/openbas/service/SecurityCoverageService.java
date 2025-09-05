@@ -1,7 +1,7 @@
 package io.openbas.service;
 
 import static io.openbas.utils.SecurityCoverageUtils.extractAndValidateCoverage;
-import static io.openbas.utils.SecurityCoverageUtils.extractAttackReferences;
+import static io.openbas.utils.SecurityCoverageUtils.extractObjectReferences;
 import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,7 +36,9 @@ public class SecurityCoverageService {
   public static final String STIX_SCHEDULING = "scheduling";
   public static final String STIX_PERIOD_START = "period_start";
   public static final String STIX_PERIOD_END = "period_end";
+  public static final String STIX_TYPE = "type";
   public static final String STIX_ATTACK_PATTERN_TYPE = "attack-pattern";
+  public static final String STIX_VULNERABILITY_TYPE = "vulnerability";
   public static final String ONE_SHOT = "X";
   public static final String INCIDENT_RESPONSE = "incident-response";
   public static final String ATTACK_SCENARIO = "attack-scenario";
@@ -89,7 +91,11 @@ public class SecurityCoverageService {
 
     // Extract Attack Patterns
     securityCoverage.setAttackPatternRefs(
-        extractAttackReferences(bundle.findByType(STIX_ATTACK_PATTERN_TYPE)));
+        extractObjectReferences(bundle.findByType(STIX_ATTACK_PATTERN_TYPE)));
+
+    // Extract vulnerabilities
+    securityCoverage.setVulnerabilitiesRefs(
+        extractObjectReferences(bundle.findByType(STIX_VULNERABILITY_TYPE)));
 
     // Default Fields
     String scheduling = stixCoverageObj.getOptionalProperty(STIX_SCHEDULING, ONE_SHOT);
