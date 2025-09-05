@@ -158,7 +158,19 @@ const SimulationReportPage: FunctionComponent = () => {
                   flex: 1,
                 }}
               >
-                <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation />
+                { reportData.exerciseExpectationResults.length > 0 ? (
+                  <ResponsePie
+                    expectationResultsByTypes={reportData.exerciseExpectationResults}
+                    disableChartAnimation
+                  />
+                ) : (
+                  <div
+                    id="score_details"
+                    style={{ height: 1 }}
+                  >
+                    <p>&nbsp;</p>
+                  </div>
+                )}
               </Paper>
             </div>
           )}
