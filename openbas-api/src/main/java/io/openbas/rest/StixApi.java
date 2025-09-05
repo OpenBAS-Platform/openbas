@@ -50,8 +50,7 @@ public class StixApi extends RestBehavior {
   public ResponseEntity<?> processBundle(@RequestBody String stixJson) {
     try {
       Scenario scenario = stixService.processBundle(stixJson);
-
-      String summary = generateImportReport(scenario);
+      String summary = stixService.generateBundleImportReport(scenario);
       BundleImportReport importReport = new BundleImportReport(scenario.getId(), summary);
 
       return ResponseEntity.ok(importReport);
@@ -60,19 +59,6 @@ public class StixApi extends RestBehavior {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
-  }
-
-  private static String generateImportReport(Scenario scenario) {
-    String summary = null;
-    if (scenario.getInjects().isEmpty()) {
-      summary =
-          "The current scenario does not contain injects. "
-              + "This may happen if no Attack-Pattern is defined in the STIX bundle "
-              + "or if the Attack Patterns (TTPs) do not exist in the OAEV platform.";
-    } else {
-      summary = "Scenario with Injects created successfully";
-    }
-    return summary;
   }
 
   public record BundleImportReport(String scenarioId, String importSummary) {}

@@ -25,4 +25,23 @@ public class StixService {
     Scenario scenario = securityCoverageService.buildScenarioFromSecurityCoverage(securityCoverage);
     return scenario;
   }
+
+  /**
+   * Builds a bundle import report
+   *
+   * @param scenario
+   * @return string contains bundle import report
+   */
+  public String generateBundleImportReport(Scenario scenario) {
+    String summary = null;
+    if (scenario.getInjects().isEmpty()) {
+      summary =
+          "The current scenario does not contain injects. "
+              + "This may happen if no Attack-Pattern is defined in the STIX bundle "
+              + "or if the Attack Patterns (TTPs) do not exist in the OAEV platform.";
+    } else {
+      summary = "Scenario with Injects created successfully";
+    }
+    return summary;
+  }
 }
