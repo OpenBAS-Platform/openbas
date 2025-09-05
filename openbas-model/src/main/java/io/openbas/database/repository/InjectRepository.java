@@ -345,14 +345,6 @@ public interface InjectRepository
   @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Inject i WHERE i.id = :id")
   boolean existsByIdWithoutLoading(@Param("id") String id);
 
-  @Query(
-      "SELECT DISTINCT i FROM Inject i "
-          + "JOIN i.grants g "
-          + "JOIN g.group gr "
-          + "JOIN gr.users u "
-          + "WHERE u.id = :userId")
-  List<Inject> findAllByUserGrants(@Param("userId") String userId);
-
   /**
    * Check if an Inject exists by its ID, where the Inject is an atomic testing.
    *

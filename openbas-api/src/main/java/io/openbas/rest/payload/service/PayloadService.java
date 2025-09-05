@@ -1,6 +1,5 @@
 package io.openbas.rest.payload.service;
 
-import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_ASSET_SEPARATOR;
 import static io.openbas.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -283,7 +282,8 @@ public class PayloadService {
 
   /**
    * Search payloads with pagination and architecture filter, where the user is granted. The user
-   * must have at least OBSERVER grant on the payloads to see them.
+   * must have at least OBSERVER grant on the payloads to see them OR have the access capability on
+   * payloads.
    *
    * @param searchPaginationInput the input containing pagination and search criteria
    * @return a paginated list of Payloads
@@ -297,7 +297,7 @@ public class PayloadService {
             Grant.GRANT_TYPE.OBSERVER,
             currentUser.getId(),
             currentUser.isAdminOrBypass(),
-            currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)),
+            currentUser.getCapabilities().contains(Capability.ACCESS_PAYLOADS)),
         handleArchitectureFilter(searchPaginationInput),
         Payload.class);
   }

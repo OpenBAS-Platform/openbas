@@ -94,9 +94,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
   );
 
   const openCreate = () => {
-    if (ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS)) {
-      handleOpenAttackPatternCreation();
-    }
+    handleOpenAttackPatternCreation();
   };
   return (
     <Controller
@@ -128,7 +126,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {!hideAddButton && (
+                          {ability.can(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS) && !hideAddButton && (
                             <IconButton
                               style={{
                                 position: 'absolute',

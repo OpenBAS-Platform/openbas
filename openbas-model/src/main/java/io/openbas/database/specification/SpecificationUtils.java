@@ -1,10 +1,6 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.*;
-import io.openbas.database.model.Base;
-import io.openbas.database.model.Grant;
-import io.openbas.database.model.Group;
-import io.openbas.database.model.User;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -144,5 +140,9 @@ public class SpecificationUtils {
           SpecificationUtils.hasGrantAccess(userId, isAdminOrBypass, hasCapaForClass, grantType);
       return repo.findAll(spec == null ? grantSpec : spec.and(grantSpec), pageable);
     };
+  }
+
+  public static <T extends Base> Specification<T> hasIdIn(List<String> ids) {
+    return (root, query, cb) -> root.get("id").in(ids);
   }
 }
