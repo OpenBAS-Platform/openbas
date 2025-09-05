@@ -27,6 +27,7 @@ import jakarta.transaction.Transactional;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,7 +192,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getSecurityCoverage().getContent()).isNotBlank();
 
       // -- ASSERT Injects --
-      List<Inject> injects = injectRepository.findByScenarioId(response);
+      Set<Inject> injects = injectRepository.findByScenarioId(response);
       assertThat(injects).hasSize(2);
     }
 
@@ -214,7 +215,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
-      List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
+      Set<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
       assertThat(injects).hasSize(2);
 
       entityManager.flush();
@@ -257,7 +258,7 @@ class StixApiTest extends IntegrationTest {
       assertThat(createdScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
-      List<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
+      Set<Inject> injects = injectRepository.findByScenarioId(createdScenario.getId());
       assertThat(injects).hasSize(2);
 
       entityManager.flush();

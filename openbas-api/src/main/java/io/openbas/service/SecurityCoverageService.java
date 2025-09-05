@@ -6,6 +6,7 @@ import static io.openbas.utils.TimeUtils.getCronExpression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.SecurityCoverage;
 import io.openbas.database.repository.ScenarioRepository;
@@ -17,6 +18,7 @@ import io.openbas.stix.parsing.Parser;
 import io.openbas.stix.parsing.ParsingException;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,7 +136,9 @@ public class SecurityCoverageService {
   public Scenario buildScenarioFromSecurityCoverage(SecurityCoverage securityCoverage) {
     Scenario scenario = updateOrCreateScenarioFromSecurityCoverage(securityCoverage);
     securityCoverage.setScenario(scenario);
-    securityCoverageInjectService.createdInjectsForScenario(scenario, securityCoverage);
+    Set<Inject> injects =
+        securityCoverageInjectService.createdInjectsForScenario(scenario, securityCoverage);
+    scenario.setInjects(injects);
     return scenario;
   }
 

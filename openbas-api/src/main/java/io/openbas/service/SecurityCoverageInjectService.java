@@ -1,6 +1,7 @@
 package io.openbas.service;
 
 import static io.openbas.utils.AssetUtils.computePairsPlatformArchitecture;
+import static java.util.Collections.emptySet;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -47,14 +48,15 @@ public class SecurityCoverageInjectService {
    * @param scenario the scenario for which injects are managed
    * @param securityCoverage the related security coverage providing AttackPattern references
    */
-  public void createdInjectsForScenario(Scenario scenario, SecurityCoverage securityCoverage) {
+  public Set<Inject> createdInjectsForScenario(
+      Scenario scenario, SecurityCoverage securityCoverage) {
     // 1. Fetch internal Ids for AttackPatterns
     Map<String, AttackPattern> attackPatterns =
         attackPatternService.fetchInternalAttackPatternIds(securityCoverage.getAttackPatternRefs());
 
     if (attackPatterns.isEmpty()) {
       injectService.deleteAll(scenario.getInjects());
-      return;
+      return emptySet();
     }
 
     // 2. Fetch asset groups via tag rules
@@ -76,6 +78,8 @@ public class SecurityCoverageInjectService {
     } else {
       handleWithAssetGroupsCase(scenario, assetsFromGroupMap, attackPatterns, injectCoverageMap);
     }
+
+    return injectRepository.findByScenarioId(scenario.getId());
   }
 
   /**
