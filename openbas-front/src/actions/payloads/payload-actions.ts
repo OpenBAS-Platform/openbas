@@ -17,6 +17,7 @@ import {
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import { arrayOfDocuments, payload } from '../Schema';
+import * as schema from '../Schema';
 
 export const searchPayloads = (paginationInput: SearchPaginationInput) => {
   const data = paginationInput;
@@ -37,6 +38,14 @@ export const updatePayload = (payloadId: Payload['payload_id'], data: PayloadUpd
 export const addPayload = (data: PayloadCreateInput) => (dispatch: Dispatch) => {
   const uri = '/api/payloads';
   return postReferential(payload, uri, data)(dispatch);
+};
+
+export const exportPayload = (payloadId: string) => {
+  const uri = `/api/payloads/${payloadId}/export`;
+  return simplePostCall(uri, null, { responseType: 'arraybuffer' }).catch((error) => {
+    MESSAGING$.notifyError('Could not request export of payload');
+    throw error;
+  });
 };
 
 export const exportPayloads = (data: PayloadExportRequestInput) => {
@@ -66,4 +75,10 @@ export const deletePayload = (payloadId: Payload['payload_id']) => (dispatch: Di
 export const fetchDocumentsPayload = (payloadId: string) => (dispatch: Dispatch) => {
   const uri = `/api/payloads/${payloadId}/documents`;
   return getReferential(arrayOfDocuments, uri)(dispatch);
+};
+
+// -- COLLECTORS --
+export const fetchCollectorsForPayload = (payloadId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/payloads/${payloadId}/collectors`;
+  return getReferential(schema.arrayOfCollectors, uri)(dispatch);
 };
