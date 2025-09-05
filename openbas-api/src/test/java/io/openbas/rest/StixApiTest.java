@@ -158,8 +158,8 @@ class StixApiTest extends IntegrationTest {
               .getContentAsString();
 
       assertThat(response).isNotBlank();
-
-      Scenario createdScenario = scenarioRepository.findById(response).orElseThrow();
+      String scenarioId = JsonPath.read(response, "$.scenarioId");
+      Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
 
       // -- ASSERT Scenario --
       assertThat(createdScenario.getName())
@@ -211,7 +211,8 @@ class StixApiTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
-      Scenario createdScenario = scenarioRepository.findById(createdResponse).orElseThrow();
+      String scenarioId = JsonPath.read(createdResponse, "$.scenarioId");
+      Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
       assertThat(createdScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
@@ -253,8 +254,8 @@ class StixApiTest extends IntegrationTest {
               .andReturn()
               .getResponse()
               .getContentAsString();
-
-      Scenario createdScenario = scenarioRepository.findById(createdResponse).orElseThrow();
+      String scenarioId = JsonPath.read(createdResponse, "$.scenarioId");
+      Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
       assertThat(createdScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
 
@@ -297,8 +298,8 @@ class StixApiTest extends IntegrationTest {
               .andReturn()
               .getResponse()
               .getContentAsString();
-
-      Scenario scenario = scenarioRepository.findById(response).orElseThrow();
+      String scenarioId = JsonPath.read(response, "$.scenarioId");
+      Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
       String securityCoverageId = scenario.getSecurityCoverage().getId();
       scenarioRepository.deleteById(response);
 
@@ -319,14 +320,16 @@ class StixApiTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
+      String scenarioId = JsonPath.read(response, "$.scenarioId");
+
       String duplicated =
-          mvc.perform(post(SCENARIO_URI + "/" + response).contentType(MediaType.APPLICATION_JSON))
+          mvc.perform(post(SCENARIO_URI + "/" + scenarioId).contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andReturn()
               .getResponse()
               .getContentAsString();
 
-      String scenarioId = JsonPath.read(duplicated, "$.scenario_id");
+      scenarioId = JsonPath.read(duplicated, "$.scenario_id");
 
       Scenario duplicatedScenario = scenarioRepository.findById(scenarioId).orElseThrow();
 
