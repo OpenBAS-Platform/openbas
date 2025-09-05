@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -48,23 +50,17 @@ public class Group implements Base {
   @JsonProperty("group_default_user_assign")
   private boolean defaultUserAssignation;
 
-  @JsonProperty("group_default_exercise_assign")
-  @Enumerated(EnumType.STRING)
-  @ElementCollection
-  @CollectionTable(
-      name = "groups_exercises_default_grants",
-      joinColumns = @JoinColumn(name = "group_id"))
-  private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "groups_default_grants", joinColumns = @JoinColumn(name = "group_id"))
+  @JsonProperty("group_default_grants")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Set<DefaultGrant> defaultGrants = new HashSet<>();
 
-  @JsonProperty("group_default_scenario_assign")
-  @Enumerated(EnumType.STRING)
-  @ElementCollection
-  @CollectionTable(
-      name = "groups_scenarios_default_grants",
-      joinColumns = @JoinColumn(name = "group_id"))
-  private List<Grant.GRANT_TYPE> scenariosDefaultGrants = new ArrayList<>();
-
-  @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+  @OneToMany(
+      mappedBy = "group",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("group_grants")
   @JsonSerialize(using = MultiModelDeserializer.class)
   @Fetch(value = FetchMode.SUBSELECT)
@@ -106,24 +102,33 @@ public class Group implements Base {
   private final ResourceType resourceType = ResourceType.USER_GROUP;
 
   // region transient
-  @JsonProperty("group_default_exercise_planner")
-  public boolean isDefaultExercisePlanner() {
-    return exercisesDefaultGrants.contains(Grant.GRANT_TYPE.PLANNER);
+  // Convert to Map for easier access
+  @Transient
+  @JsonIgnore
+  public Map<Grant.GRANT_RESOURCE_TYPE, List<Grant.GRANT_TYPE>> getDefaultGrantsMap() {
+    return defaultGrants.stream()
+        .collect(
+            Collectors.groupingBy(
+                DefaultGrant::getGrantResourceType,
+                Collectors.mapping(DefaultGrant::getGrantType, Collectors.toList())));
   }
 
-  @JsonProperty("group_default_exercise_observer")
-  public boolean isDefaultExerciseObserver() {
-    return exercisesDefaultGrants.contains(Grant.GRANT_TYPE.OBSERVER);
+  @JsonIgnore
+  @Transient
+  public List<Grant.GRANT_TYPE> getSimulationsDefaultGrants() {
+    return defaultGrants.stream()
+        .filter(dg -> dg.getGrantResourceType() == Grant.GRANT_RESOURCE_TYPE.SIMULATION)
+        .map(DefaultGrant::getGrantType)
+        .collect(Collectors.toList());
   }
 
-  @JsonProperty("group_default_scenario_planner")
-  public boolean isDefaultScenarioPlanner() {
-    return scenariosDefaultGrants.contains(Grant.GRANT_TYPE.PLANNER);
-  }
-
-  @JsonProperty("group_default_scenario_observer")
-  public boolean isDefaultScenarioObserver() {
-    return scenariosDefaultGrants.contains(Grant.GRANT_TYPE.OBSERVER);
+  @JsonIgnore
+  @Transient
+  public List<Grant.GRANT_TYPE> getScenariosDefaultGrants() {
+    return defaultGrants.stream()
+        .filter(dg -> dg.getGrantResourceType() == Grant.GRANT_RESOURCE_TYPE.SCENARIO)
+        .map(DefaultGrant::getGrantType)
+        .collect(Collectors.toList());
   }
 
   // endregion

@@ -17,15 +17,15 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Variable;
 import io.openbas.database.repository.InjectorContractRepository;
-import io.openbas.utils.fixtures.*;
-import io.openbas.utils.fixtures.composers.*;
+import io.openbas.rest.inject.form.InjectBulkProcessingInput;
+import io.openbas.utils.fixtures.InjectFixture;
+import io.openbas.utils.fixtures.InjectTestStatusFixture;
+import io.openbas.utils.fixtures.ScenarioFixture;
+import io.openbas.utils.fixtures.composers.InjectComposer;
+import io.openbas.utils.fixtures.composers.InjectTestStatusComposer;
+import io.openbas.utils.fixtures.composers.ScenarioComposer;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
@@ -502,14 +502,11 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
       }
 
 
-      @Test
-      @DisplayName("Should return test status using test id")
-      @WithMockPlannerUser
-      void should_return_test_status_by_testId() throws Exception {
-        mvc.perform(
-                get(
-                    SCENARIO_URI + "/injects/test/{testId}",
-                    injectTestStatus1Wrapper.get().getId()))
+    @Test
+    @DisplayName("Should return test status using test id")
+    @WithMockPlannerUser
+    void should_return_test_status_by_testId() throws Exception {
+      mvc.perform(get(SCENARIO_URI + "/injects/test/{testId}", injectTestStatus1.getId()))
           .andExpect(status().isOk());
     }
 
@@ -526,14 +523,13 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
             .andExpect(jsonPath("$.inject_id").value(inject1Wrapper.get().getId()));
       }
 
-      @Test
-      @DisplayName("Should return test statuses when performing bulk test with inject IDs")
-      @WithMockAdminUser // FIXME: Temporary workaround for grant issue
-      void should_return_test_statuses_when_bulk_testing_with_inject_ids() throws Exception {
-        InjectBulkProcessingInput input = new InjectBulkProcessingInput();
-        input.setInjectIDsToProcess(List.of(inject1Wrapper.get().getId()));
-        Scenario scenario = scenarioWrapper.persist().get();
-        input.setSimulationOrScenarioId(scenario.getId());
+    @Test
+    @DisplayName("Should return test statuses when performing bulk test with inject IDs")
+    @WithMockPlannerUser
+    void should_return_test_statuses_when_bulk_testing_with_inject_ids() throws Exception {
+      InjectBulkProcessingInput input = new InjectBulkProcessingInput();
+      input.setInjectIDsToProcess(List.of(inject1.getId()));
+      input.setSimulationOrScenarioId(scenario.getId());
 
       mvc.perform(
               post(SCENARIO_URI + "/{scenarioId}/injects/test", scenario.getId())
@@ -575,16 +571,13 @@ public class ScenarioInjectTestApiTest extends IntegrationTest {
             .andExpect(status().isOk());
       }
 
-      @Test
-      @DisplayName("Should return 200 when search by id")
-      @WithMockObserverUser
-      void should_return_200_when_search_by_testId() throws Exception {
-        mvc.perform(
-                get(
-                    SCENARIO_URI + "/injects/test/{testId}",
-                    injectTestStatus1Wrapper.get().getId()))
-            .andExpect(status().isOk());
-      }
+    @Test
+    @DisplayName("Should return 200 when search by id")
+    @WithMockObserverUser
+    void should_return_200_when_search_by_testId() throws Exception {
+      mvc.perform(get(SCENARIO_URI + "/injects/test/{testId}", injectTestStatus1.getId()))
+          .andExpect(status().isOk());
+    }
 
       @Test
       @DisplayName("Should return 404 when testing a specific inject")

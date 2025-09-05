@@ -10,6 +10,7 @@ import { storeHelper } from '../../../../../actions/Schema';
 import Transition from '../../../../../components/common/Transition';
 import inject18n from '../../../../../components/i18n';
 import { tagOptions } from '../../../../../utils/Option';
+import { isExerciseReadOnly } from '../../../../../utils/permissions/simulationPermissions.js';
 import LogForm from './LogForm';
 
 class LogPopover extends Component {

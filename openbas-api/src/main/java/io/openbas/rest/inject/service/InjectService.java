@@ -457,10 +457,7 @@ public class InjectService {
     }
     // Filter out any injects not related to resources where the user is granted with the
     // appropriate level
-    OpenBASPrincipal principal = SessionHelper.currentUser();
-    filterSpecifications =
-        filterSpecifications.and(
-            hasGrantAccessForInject(principal.getId(), principal.isAdmin(), requestedGrantLevel));
+    filterSpecifications = filterSpecifications.and(hasGrantAccessForInject(requestedGrantLevel));
     return filterSpecifications;
   }
 
@@ -1004,101 +1001,80 @@ public class InjectService {
     return payloadRepository.fetchDetectionRemediationsByInjectId(injectId);
   }
 
-  public Specification<Inject> hasGrantAccessForInject(
-      final String userId, final boolean isAdmin, Grant.GRANT_TYPE grantType) {
+  /**
+   * Chek if a user is granted on an inject. A user can be granteed on an inject if: - The inject is
+   * linked to a scenario or simulation that the user has access to - The inject is an atomic
+   * testing and the user has access to it
+   *
+   * @param grantType the grant type to check
+   * @return a Specification that checks if the user has access to the inject
+   */
+  public Specification<Inject> hasGrantAccessForInject(Grant.GRANT_TYPE grantType) {
+
+    User currentUser = userService.currentUser();
+    boolean hasCapabilityAccessAssessment =
+        currentUser.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)
+            || currentUser.getCapabilities().contains(Capability.BYPASS);
 
     return (root, query, cb) -> {
-      if (isAdmin) {
+      if (currentUser.isAdmin() || hasCapabilityAccessAssessment) {
         return cb.conjunction();
       }
 
       // Check if both are null - automatically granted
       Path<Object> scenarioPath = root.get("scenario");
-      Path<Object> exercisePath = root.get("exercise");
-      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(exercisePath));
+      Path<Object> simulationPath = root.get("exercise");
+      // Check if both are null
+      Predicate bothNull = cb.and(cb.isNull(scenarioPath), cb.isNull(simulationPath));
 
       // Get allowed grant types
       List<Grant.GRANT_TYPE> allowedGrantTypes = grantType.andHigher();
+
       // Create subquery for accessible scenarios
       Subquery<String> accessibleScenarios =
-          SpecificationUtils.accessibleScenariosSubquery(query, cb, userId, allowedGrantTypes);
-      // Create subquery for accessible exercises
-      Subquery<String> accessibleExercises =
-          SpecificationUtils.accessibleSimulationsSubquery(query, cb, userId, allowedGrantTypes);
+          SpecificationUtils.accessibleResourcesSubquery(
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.SCENARIO,
+              allowedGrantTypes);
+      // Create subquery for accessible simulations
+      Subquery<String> accessibleSimulations =
+          SpecificationUtils.accessibleResourcesSubquery(
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.SIMULATION,
+              allowedGrantTypes);
+      // Create subquery for accessible atomic testings
+      Subquery<String> accessibleAtomicTestings =
+          SpecificationUtils.accessibleResourcesSubquery(
+              query,
+              cb,
+              currentUser.getId(),
+              Grant.GRANT_RESOURCE_TYPE.ATOMIC_TESTING,
+              allowedGrantTypes);
+
       // Check if inject's scenario ID is accessible (null is OK)
-      Predicate scenarioAccessible;
-      if (scenarioPath != null) {
-        scenarioAccessible =
-            cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
-      } else {
-        scenarioAccessible = cb.conjunction(); // Always true if no scenario field
-      }
-      // Check if inject's exercise ID is accessible (null is OK)
-      Predicate exerciseAccessible;
-      if (exercisePath != null) {
-        exerciseAccessible =
-            cb.or(cb.isNull(exercisePath), exercisePath.get("id").in(accessibleExercises));
-      } else {
-        exerciseAccessible = cb.conjunction(); // Always true if no exercise field
-      }
+      Predicate scenarioAccessible =
+          cb.or(cb.isNull(scenarioPath), scenarioPath.get("id").in(accessibleScenarios));
+      // Check if inject's simulation ID is accessible (null is OK)
+      Predicate simulationAccessible =
+          cb.or(cb.isNull(simulationPath), simulationPath.get("id").in(accessibleSimulations));
+      // When both are null, check if user has atomic testing grants
+      // Assuming inject has an ID that should be in the atomic testing grants
+      Predicate atomicTestingAccessible =
+          cb.and(bothNull, root.get("id").in(accessibleAtomicTestings));
+
       // Inject is accessible if:
-      // 1. Both scenario and exercise are null (automatically granted), OR
-      // 2. User has access to the non-null scenario/exercise
-      return cb.or(bothNull, cb.and(scenarioAccessible, exerciseAccessible));
+      // 1. Both are null AND user has atomic testing grant for this inject, OR
+      // 2. User is granted on the non-null scenario/exercise linked to this inject
+      return cb.or(
+          atomicTestingAccessible,
+          cb.and(
+              cb.not(bothNull), // At least one is not null
+              scenarioAccessible,
+              simulationAccessible));
     };
-  }
-
-  /**
-   * Extracts the inject coverage from the scenario's injects, mapping each inject to its set of
-   * (AttackPattern × Platform × Architecture) combinations.
-   *
-   * @param scenario the scenario containing injects
-   * @return a map of injects to their AttackPattern-platform-architecture combinations
-   */
-  public Map<Inject, Set<Triple<String, Endpoint.PLATFORM_TYPE, String>>>
-      extractCombinationAttackPatternPlatformArchitecture(Scenario scenario) {
-
-    return scenario.getInjects().stream()
-        .map(inject -> inject.getInjectorContract().map(ic -> Map.entry(inject, ic)))
-        .flatMap(Optional::stream)
-        .map(
-            entry -> {
-              Inject inject = entry.getKey();
-              InjectorContract ic = entry.getValue();
-
-              // Check if this injectContract has not arch and platforms
-              if (ic.getArch() == null
-                  || ic.getPlatforms() == null
-                  || ic.getPlatforms().length == 0) {
-                return Map.entry(
-                    inject, new HashSet<Triple<String, Endpoint.PLATFORM_TYPE, String>>());
-              }
-
-              // Extract archs
-              Set<String> archs =
-                  ALL_ARCHITECTURES.equals(ic.getArch())
-                      ? Set.of(arm64.name(), x86_64.name())
-                      : Set.of(ic.getArch().name());
-
-              // Extract platforms
-              Set<Endpoint.PLATFORM_TYPE> platforms =
-                  new HashSet<>(Arrays.asList(ic.getPlatforms()));
-
-              // Generate combinations
-              Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> combinations =
-                  buildCombinationsAttackPatternPlatformsArchitectures(
-                      ic.getAttackPatterns(), platforms, archs);
-
-              return Map.entry(inject, combinations);
-            })
-        .collect(
-            Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (v1, v2) -> {
-                  Set<Triple<String, Endpoint.PLATFORM_TYPE, String>> merged = new HashSet<>(v1);
-                  merged.addAll(v2);
-                  return v1;
-                }));
   }
 }

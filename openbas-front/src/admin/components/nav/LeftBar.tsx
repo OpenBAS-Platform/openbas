@@ -69,7 +69,7 @@ const LeftBar = () => {
           path: `/admin/atomic_testings`,
           icon: () => (<Target />),
           label: 'Atomic testings',
-          userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.ATOMIC_TESTING),
+          userRight: true,
         },
       ],
     },
@@ -175,7 +175,7 @@ const LeftBar = () => {
           path: `/admin/payloads`,
           icon: () => (<SubscriptionsOutlined />),
           label: 'Payloads',
-          userRight: ability.can(ACTIONS.ACCESS, SUBJECTS.PAYLOADS),
+          userRight: true,
         },
         {
           path: `/admin/integrations`,

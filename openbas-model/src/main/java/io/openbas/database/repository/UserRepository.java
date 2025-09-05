@@ -79,8 +79,7 @@ public interface UserRepository
   @Query(
       value =
           "select us.user_id, us.user_admin, "
-              + "array_remove(array_agg(grt.grant_exercise), null) as user_grant_exercises, "
-              + "array_remove(array_agg(grt.grant_scenario), null) as user_grant_scenarios "
+              + "array_remove(array_agg(grt.grant_resource), NULL) as user_grants "
               + "from users us "
               + "left join users_groups usr_grp on us.user_id = usr_grp.user_id "
               + "left join grants grt on grt.grant_group = usr_grp.group_id "

@@ -13,6 +13,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { isExerciseUpdatable } from '../../../../../utils/permissions/simulationPermissions.js';
 import { resolveUserName } from '../../../../../utils/String';
 import { PermissionsContext } from '../../../common/Context.js';
 import AnimationMenu from '../AnimationMenu';
