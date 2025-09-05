@@ -15,9 +15,13 @@ export interface CustomDashboardContextType {
   setCustomDashboard: React.Dispatch<React.SetStateAction<CustomDashboard | undefined>>;
   customDashboardParameters: Record<string, ParameterOption>;
   setCustomDashboardParameters: React.Dispatch<React.SetStateAction<Record<string, ParameterOption>>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchCount: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchSeries: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchEntities: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchAttackPaths: (widgetId: string, params: Record<string, string | undefined>) => Promise<any>;
 }
 
