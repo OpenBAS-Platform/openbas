@@ -370,8 +370,10 @@ public class DocumentApi extends RestBehavior {
   public void downloadDocument(@PathVariable String documentId, HttpServletResponse response)
       throws IOException {
     Document document = documentService.document(documentId);
-    response.addHeader(
-        HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+
+    String encodedFilename = DocumentService.encodeFileName(document.getName());
+
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + encodedFilename);
     response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
     response.setStatus(HttpServletResponse.SC_OK);
     try (InputStream fileStream =
