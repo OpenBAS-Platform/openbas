@@ -3,6 +3,7 @@ package io.openbas.rest;
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.Action;
 import io.openbas.database.model.ResourceType;
+import io.openbas.database.model.Scenario;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.StixService;
 import io.openbas.stix.parsing.ParsingException;
@@ -46,14 +47,33 @@ public class StixApi extends RestBehavior {
     @ApiResponse(responseCode = "500", description = "Unexpected server error")
   })
   @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
-  public ResponseEntity<String> processBundle(@RequestBody String stixJson) {
+  public ResponseEntity<?> processBundle(@RequestBody String stixJson) {
     try {
-      String createdScenario = stixService.processBundle(stixJson);
-      return ResponseEntity.ok(createdScenario);
+      Scenario scenario = stixService.processBundle(stixJson);
+
+      String summary = generateImportReport(scenario);
+      BundleImportReport importReport = new BundleImportReport(scenario.getId(), summary);
+
+      return ResponseEntity.ok(importReport);
     } catch (ParsingException | IOException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
   }
+
+  private static String generateImportReport(Scenario scenario) {
+    String summary = null;
+    if (scenario.getInjects().isEmpty()) {
+      summary =
+          "The current scenario does not contain injects. "
+              + "This may happen if no Attack-Pattern is defined in the STIX bundle "
+              + "or if the attack patterns (TTPs) do not exist in the OAEV platform.";
+    } else {
+      summary = "Scenario with Injects created successfully";
+    }
+    return summary;
+  }
+
+  public record BundleImportReport(String scenarioId, String importSummary) {}
 }

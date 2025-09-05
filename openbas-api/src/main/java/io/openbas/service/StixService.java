@@ -17,12 +17,12 @@ public class StixService {
   private final SecurityCoverageService securityCoverageService;
 
   @Transactional(rollbackFor = Exception.class)
-  public String processBundle(String stixJson) throws IOException, ParsingException {
+  public Scenario processBundle(String stixJson) throws IOException, ParsingException {
     // Update securityCoverage with the last bundle
     SecurityCoverage securityCoverage =
         securityCoverageService.buildSecurityCoverageFromStix(stixJson);
     // Update Scenario using the last SecurityCoverage
     Scenario scenario = securityCoverageService.buildScenarioFromSecurityCoverage(securityCoverage);
-    return scenario.getId();
+    return scenario;
   }
 }
