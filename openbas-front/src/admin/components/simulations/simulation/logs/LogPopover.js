@@ -65,22 +65,23 @@ class LogPopover extends Component {
   }
 
   render() {
-    const { t, log, exercise, tagsMap } = this.props;
+    const { t, log, tagsMap } = this.props;
     const logTags = tagOptions(log.log_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('log_tags', logTags),
       R.pick(['log_title', 'log_content', 'log_tags']),
     )(log);
+
     return (
       <div>
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
-          disabled={isExerciseReadOnly(exercise, true)}
         >
           <MoreVert />
         </IconButton>
+
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}

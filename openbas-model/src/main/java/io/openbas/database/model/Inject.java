@@ -318,12 +318,6 @@ public class Inject implements GrantableBase, Injection {
 
   // region transient
   @Transient
-  @JsonIgnore
-  @Getter
-  @Setter(AccessLevel.NONE)
-  private Grant.GRANT_RESOURCE_TYPE grantResourceType = Grant.GRANT_RESOURCE_TYPE.ATOMIC_TESTING;
-
-  @Transient
   public String getHeader() {
     return ofNullable(this.getExercise()).map(Exercise::getHeader).orElse("");
   }

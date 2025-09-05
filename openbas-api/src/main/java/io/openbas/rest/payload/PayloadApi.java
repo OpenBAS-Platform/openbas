@@ -1,5 +1,8 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawDocument;
@@ -7,6 +10,9 @@ import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.specification.SpecificationUtils;
 import io.openbas.helper.StreamHelper;
 import io.openbas.rest.collector.service.CollectorService;
+import io.openbas.rest.document.DocumentService;
+import io.openbas.database.raw.RawDocument;
+import io.openbas.database.repository.*;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -146,7 +152,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @PostMapping(PAYLOAD_URI + "/import")
-  @RBAC(actionPerformed = Action.CREATE, resourceType = ResourceType.PAYLOAD)
+  @RBAC(actionPerformed = Action.WRITE, resourceType = ResourceType.PAYLOAD)
   public void importPayloads(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
     this.importService.handleFileImport(file, null, null);
   }

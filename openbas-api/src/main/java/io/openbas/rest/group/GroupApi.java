@@ -1,18 +1,13 @@
 package io.openbas.rest.group;
 
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-
 import io.openbas.aop.RBAC;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.GrantRepository;
+import io.openbas.database.repository.GroupRepository;
+import io.openbas.database.repository.OrganizationRepository;
+import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.group.form.GroupCreateInput;
-import io.openbas.rest.group.form.GroupGrantInput;
-import io.openbas.rest.group.form.GroupUpdateRolesInput;
-import io.openbas.rest.group.form.GroupUpdateUsersInput;
-import io.openbas.rest.group.form.OrganizationGrantInput;
+import io.openbas.rest.group.form.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.GrantService;
 import io.openbas.service.RoleService;
@@ -22,10 +17,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import java.util.Spliterator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Spliterator;
+
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @RestController
 @AllArgsConstructor

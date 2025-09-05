@@ -18,7 +18,7 @@ import { type NotificationRuleOutput, type Scenario } from '../../../../utils/ap
 import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import useScenarioPermissions from '../../../../utils/permissions/scenarioPermissions';
+import useScenarioPermissions from '../../../../utils/permissions/useScenarioPermissions';
 import { INHERITED_CONTEXT } from '../../../../utils/permissions/types';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import ScenarioNotificationRulesDrawer from './notification_rule/ScenarioNotificationRulesDrawer';

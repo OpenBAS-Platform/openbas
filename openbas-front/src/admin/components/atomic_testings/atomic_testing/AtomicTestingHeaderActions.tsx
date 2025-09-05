@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 import { launchAtomicTesting, relaunchAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
-import { AbilityContext } from '../../../../utils/permissions/PermissionsProvider';
+import { AbilityContext, Can } from '../../../../utils/permissions/PermissionsProvider';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';

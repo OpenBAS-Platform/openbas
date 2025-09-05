@@ -110,8 +110,8 @@ const Index = () => {
               <Route path="simulations" element={errorWrapper(Exercises)()} />
               <Route path="simulations/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="simulations/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
-              <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />
-              <Route path="atomic_testings/:injectId/*" element={errorWrapper(IndexAtomicTesting)()} />
+              <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />} />
+              <Route path="atomic_testings/:injectId/*" element={<ProtectedRoute action={ACTIONS.ACCESS} subject={SUBJECTS.ATOMIC_TESTING} Component={errorWrapper(IndexAtomicTesting)()} />} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />
               <Route path="scenarios/:scenarioId/*" element={errorWrapper(IndexScenario)()} />
               <Route path="assets/*" element={errorWrapper(Assets)()} />
@@ -124,8 +124,7 @@ const Index = () => {
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route
                 path="settings/*"
-                element={logged.admin || ability.can(ACTIONS.ACCESS, SUBJECTS.PLATFORM_SETTINGS) ? errorWrapper(IndexSettings)()
-                  : <Navigate to="/" replace={true} />}
+                element={errorWrapper(IndexSettings)()}
               />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />

@@ -9,7 +9,7 @@ import { useHelper } from '../../../../../store';
 import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import { usePermissions } from '../../../../../utils/permissions/simulationPermissions';
+import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
 import { INHERITED_CONTEXT } from '../../../../../utils/permissions/types';
 import AtomicTestingRoutes from '../../../atomic_testings/atomic_testing/AtomicTestingRoutes';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
@@ -24,7 +24,7 @@ const InjectIndexComponent: FunctionComponent<{
   injectResult,
 }) => {
   const permissionsContext: PermissionsContextType = {
-    permissions: usePermissions(exercise.exercise_id),
+    permissions: useSimulationPermissions(exercise.exercise_id, exercise),
     inherited_context: INHERITED_CONTEXT.SIMULATION,
   };
 
