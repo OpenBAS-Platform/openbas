@@ -1135,13 +1135,14 @@ public class V1_DataImporter implements Importer {
           injectDocuments.forEach(
               jsonNode -> {
                 String docId = jsonNode.get("document_id").textValue();
-                if (hasText(docId)) {
-                  String documentId = baseIds.get(docId).getId();
-                  boolean docAttached = jsonNode.get("document_attached").booleanValue();
-                  injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
-                } else {
-                  log.warn("Missing document in the exercise_documents property");
-                }
+                  Base base = baseIds.get(docId);
+                  if (base == null) {
+                    log.warn("Missing document in zip file");
+                  } else {
+                    String documentId = base.getId();
+                    boolean docAttached = jsonNode.get("document_attached").booleanValue();
+                    injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
+                  }
               });
         });
     // Looking for children of created injects
