@@ -112,6 +112,8 @@ const WidgetViz = ({ widget, fullscreen, setFullscreen }: WidgetTemporalVizProps
           widgetConfig={widget.widget_config}
           series={seriesData}
           errorMessage={errorMessage}
+          customDashboardParameters={customDashboardParameters}
+          widgetCustomDashboard={widget.widget_custom_dashboard}
         />
       );
     case 'horizontal-barchart':
