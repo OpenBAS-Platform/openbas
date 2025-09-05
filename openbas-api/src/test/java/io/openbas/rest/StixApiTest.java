@@ -233,7 +233,8 @@ class StixApiTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
-      Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
+      scenarioId = JsonPath.read(updatedResponse, "$.scenarioId");
+      Scenario updatedScenario = scenarioRepository.findById(scenarioId).orElseThrow();
       assertThat(updatedScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ");
       // ASSERT injects for updated stix
@@ -254,6 +255,7 @@ class StixApiTest extends IntegrationTest {
               .andReturn()
               .getResponse()
               .getContentAsString();
+
       String scenarioId = JsonPath.read(createdResponse, "$.scenarioId");
       Scenario createdScenario = scenarioRepository.findById(scenarioId).orElseThrow();
       assertThat(createdScenario.getName())
@@ -276,7 +278,8 @@ class StixApiTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
-      Scenario updatedScenario = scenarioRepository.findById(updatedResponse).orElseThrow();
+      scenarioId = JsonPath.read(updatedResponse, "$.scenarioId");
+      Scenario updatedScenario = scenarioRepository.findById(scenarioId).orElseThrow();
       assertThat(updatedScenario.getName())
           .isEqualTo("Security Coverage Q3 2025 - Threat Report XYZ -- UPDATED");
 
